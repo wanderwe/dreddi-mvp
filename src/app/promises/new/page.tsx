@@ -33,6 +33,8 @@ export default function NewPromisePage() {
         details: details || null,
         counterparty_contact: counterparty || null,
         due_at: dueAt ? new Date(dueAt).toISOString() : null,
+        invite_token: crypto.randomUUID?.() ??
+          `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       })
       .select("id")
       .single();
