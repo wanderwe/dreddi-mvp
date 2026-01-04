@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+type PromiseInviteRow = {
+  id: string;
+  title: string;
+  details: string | null;
+  due_at: string | null;
+  status: string;
+  created_at: string;
+  creator_id: string;
+  counterparty_id: string | null;
+};
+
 function getEnv(name: string) {
   const v = process.env[name];
   if (!v) throw new Error(`${name} is required`);
@@ -20,7 +31,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     });
 
     const { data: p, error } = await admin
-      .from("promises")
+      .from<PromiseInviteRow>("promises")
       .select("id,title,details,due_at,status,created_at,creator_id,counterparty_id")
       .eq("invite_token", token)
       .maybeSingle();
@@ -53,7 +64,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       {
         id: p.id,
         title: p.title,
-        details: (p as any).details ?? null,
+        details: p.details ?? null,
         due_at: p.due_at ?? null,
         creator_handle: null, // залишаємо на майбутнє
         creator_display_name,
