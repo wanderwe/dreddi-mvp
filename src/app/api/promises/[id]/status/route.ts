@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-
-type Params = { params: { id: string } };
 
 type PromiseRow = {
   id: string;
@@ -10,7 +9,6 @@ type PromiseRow = {
 };
 
 type Status = "active" | "fulfilled" | "broken";
-
 const allowedStatuses = new Set<Status>(["active", "fulfilled", "broken"]);
 
 function getEnv(name: string) {
@@ -19,9 +17,12 @@ function getEnv(name: string) {
   return value;
 }
 
-export async function POST(req: Request, ctx: Params) {
+export async function POST(
+  req: NextRequest,
+  ctx: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = ctx.params;
+    const { id } = await ctx.params;
 
     const url = getEnv("NEXT_PUBLIC_SUPABASE_URL");
     const anon = getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
@@ -40,7 +41,6 @@ export async function POST(req: Request, ctx: Params) {
     });
 
     const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
-
     if (userErr || !userData.user) {
       return NextResponse.json({ error: "Invalid auth token" }, { status: 401 });
     }
@@ -72,7 +72,10 @@ export async function POST(req: Request, ctx: Params) {
       promiseRow.creator_id === userId || promiseRow.counterparty_id === userId;
 
     if (!authorized) {
-      return NextResponse.json({ error: "Not allowed to update this promise" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Not allowed to update this promise" },
+        { status: 403 }
+      );
     }
 
     let payload: { status?: string };
@@ -83,7 +86,6 @@ export async function POST(req: Request, ctx: Params) {
     }
 
     const nextStatus = payload.status as Status | undefined;
-
     if (!nextStatus || !allowedStatuses.has(nextStatus)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
