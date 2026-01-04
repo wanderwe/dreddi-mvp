@@ -26,27 +26,33 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
-      <header className="border-b border-neutral-900">
-        <div className="mx-auto max-w-3xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-semibold tracking-tight">
-            Dreddi knows
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+      <div className="absolute inset-0 hero-grid" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]" aria-hidden />
+
+      <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-3 text-lg font-semibold text-white">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30">
+              Dk
+            </span>
+            <span className="tracking-tight">Dreddi knows</span>
           </Link>
 
-          <nav className="flex items-center gap-3 text-sm">
-            <Link className="text-neutral-300 hover:text-white" href="/promises">
+          <nav className="flex items-center gap-3 text-sm font-medium text-slate-200">
+            <Link className="rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100" href="/promises">
               My promises
             </Link>
             <Link
-              className="rounded-lg bg-white text-neutral-950 px-3 py-1.5 font-medium"
+              className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
               href="/promises/new"
             >
-              New
+              New promise
             </Link>
             {email && (
               <button
                 onClick={logout}
-                className="text-neutral-300 hover:text-white"
+                className="rounded-xl px-3 py-1.5 text-slate-300 transition hover:text-emerald-200"
               >
                 Log out
               </button>
@@ -55,7 +61,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
         </div>
       </header>
 
-      <main>{children}</main>
+      <main className="relative">{children}</main>
     </div>
   );
 }
