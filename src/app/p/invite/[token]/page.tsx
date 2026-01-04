@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 type InviteInfo = {
@@ -14,11 +14,17 @@ type InviteInfo = {
   counterparty_id: string | null;
 };
 
-function formatDue(dueAt: string | null) {
+const formatDue = (dueAt: string | null) => {
   if (!dueAt) return "No deadline";
-  const d = new Date(dueAt);
-  return `Due: ${d.toLocaleString()}`;
-}
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(dueAt));
+};
 
 export default function InvitePage() {
   const params = useParams<{ token: string }>();
@@ -95,47 +101,128 @@ export default function InvitePage() {
     router.push("/promises");
   }
 
+  const creatorName = useMemo(() => {
+    if (!info) return null;
+    return info.creator_handle ? `@${info.creator_handle}` : info.creator_display_name ?? "Unknown";
+  }, [info]);
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10 space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href="/" className="text-neutral-400 hover:text-white">
-          ← Home
-        </Link>
-        <div className="text-sm text-neutral-400">{signedIn ? "Signed in" : "Not signed in"}</div>
-      </div>
+    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-70"
+        aria-hidden
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 15% 25%, rgba(52, 211, 153, 0.12), transparent 32%)," +
+            "radial-gradient(circle at 80% 10%, rgba(99, 102, 241, 0.12), transparent 28%)," +
+            "radial-gradient(circle at 50% 70%, rgba(248, 113, 113, 0.08), transparent 35%)",
+        }}
+      />
 
-      <div className="space-y-2">
-        <div className="text-3xl font-semibold">Dreddi invite</div>
-        {error && <div className="text-red-400">{error}</div>}
-      </div>
-
-      {!info ? (
-        !error && <div className="text-neutral-400">Loading invite…</div>
-      ) : (
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 space-y-4">
-          <div className="text-xl font-semibold">{info.title}</div>
-          <div className="text-sm text-neutral-400">{formatDue(info.due_at)}</div>
-
-          <div className="text-sm text-neutral-400">
-            Created by{" "}
-            <span className="text-neutral-200">
-              {info.creator_handle ? `@${info.creator_handle}` : info.creator_display_name ?? "Unknown"}
-            </span>
+      <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
+        <div className="flex items-center justify-between gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-300/60 hover:bg-emerald-500/10"
+          >
+            <span aria-hidden>←</span>
+            Back to home
+          </Link>
+          <div
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300"
+          >
+            {signedIn ? (
+              <>
+                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> Signed in
+              </>
+            ) : (
+              <>
+                <span className="h-2 w-2 rounded-full bg-amber-300" aria-hidden /> Guest mode
+              </>
+            )}
           </div>
-
-          {info.counterparty_id ? (
-            <div className="text-emerald-300 text-sm">Already accepted ✅</div>
-          ) : (
-            <button
-              disabled={busy}
-              onClick={accept}
-              className="rounded-xl bg-white text-neutral-950 font-medium px-4 py-2 disabled:opacity-60"
-            >
-              Accept promise
-            </button>
-          )}
         </div>
-      )}
-    </div>
+
+        <div className="space-y-3">
+          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Invitation</p>
+          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">Join this promise on Dreddi</h1>
+          <p className="max-w-2xl text-base text-slate-200">
+            Review the promise details below. If everything looks good, accept the invite to start
+            collaborating and keep each other accountable.
+          </p>
+        </div>
+
+        {error && (
+          <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
+            {error}
+          </div>
+        )}
+
+        {!info && !error && (
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-28 animate-pulse rounded-2xl bg-white/5" />
+            ))}
+          </div>
+        )}
+
+        {info && (
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                  Promise invite
+                </div>
+                <h2 className="text-2xl font-semibold text-white sm:text-3xl">{info.title}</h2>
+                <p className="text-sm text-slate-300">
+                  Created by <span className="font-semibold text-white">{creatorName}</span>
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
+                <div className="rounded-full bg-white/10 p-2 text-emerald-300" aria-hidden>
+                  ⏰
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Deadline</p>
+                  <p className="font-semibold text-white">{formatDue(info.due_at)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
+                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Status</p>
+                <p className="mt-1 text-lg font-semibold text-white">
+                  {info.counterparty_id ? "Already accepted" : "Awaiting acceptance"}
+                </p>
+                <p className="text-sm text-slate-300">
+                  {info.counterparty_id
+                    ? "This promise is ready—jump into your dashboard to follow progress."
+                    : "Accept to join the promise and it will appear in your dashboard."}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
+                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Next step</p>
+                {info.counterparty_id ? (
+                  <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
+                    <span aria-hidden>✅</span> Already accepted
+                  </div>
+                ) : (
+                  <button
+                    disabled={busy}
+                    onClick={accept}
+                    className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                  >
+                    {busy ? "Processing..." : "Accept promise"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

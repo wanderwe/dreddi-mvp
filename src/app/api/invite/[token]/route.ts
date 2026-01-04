@@ -37,9 +37,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     }
 
     return NextResponse.json({ promise: data }, { status: 200 });
-  } catch (e: any) {
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+
     return NextResponse.json(
-      { error: "API crashed", message: e?.message ?? String(e) },
+      { error: "API crashed", message },
       { status: 500 }
     );
   }
