@@ -56,10 +56,8 @@ export async function GET(
         creator: data.profiles,
       },
     });
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: "API crashed", message: e.message },
-      { status: 500 }
-    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: "API crashed", message }, { status: 500 });
   }
 }
