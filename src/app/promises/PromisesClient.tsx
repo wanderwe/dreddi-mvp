@@ -11,6 +11,7 @@ type PromiseRow = {
   status: string;
   due_at: string | null;
   created_at: string;
+  completed_at: string | null;
   counterparty_id: string | null;
   creator_id?: string;
 };
@@ -65,7 +66,7 @@ export default function PromisesClient() {
 
       const { data, error } = await supabase
         .from("promises")
-        .select("id,title,status,due_at,created_at,counterparty_id,creator_id")
+        .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
         .eq(roleColumn, user.id)
         .order("created_at", { ascending: false });
 
@@ -183,6 +184,29 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = tab === "i-promised";
                 const waiting = p.status === "completed_by_promisor";
+                const impact = (() => {
+                  if (!isPromisor) return null;
+
+                  if (p.status === "confirmed") {
+                    const onTime = Boolean(
+                      p.due_at &&
+                        p.completed_at &&
+                        new Date(p.completed_at).getTime() <= new Date(p.due_at).getTime()
+                    );
+                    return `+${onTime ? 4 : 3}`;
+                  }
+
+                  if (p.status === "disputed") {
+                    const late = Boolean(
+                      p.due_at &&
+                        p.completed_at &&
+                        new Date(p.completed_at).getTime() > new Date(p.due_at).getTime()
+                    );
+                    return late ? "-7" : "-6";
+                  }
+
+                  return null;
+                })();
 
                 const actionLabel = isPromisor
                   ? "Waiting for confirmation"
@@ -235,6 +259,12 @@ export default function PromisesClient() {
                         </span>
                         {actionLabel && (
                           <span className="text-xs text-amber-200">{actionLabel}</span>
+                        )}
+
+                        {impact && (
+                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
+                            Score impact: {impact}
+                          </span>
                         )}
 
                         {isPromisor && p.status === "active" && (

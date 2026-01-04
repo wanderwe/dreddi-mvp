@@ -6,6 +6,7 @@ import {
   loadPromiseForUser,
   requireUser,
 } from "../common";
+import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -33,11 +34,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const admin = getAdminClient();
+    const disputedAt = new Date().toISOString();
     const { error } = await admin
       .from("promises")
       .update({
         status: "disputed",
-        disputed_at: new Date().toISOString(),
+        disputed_at: disputedAt,
         disputed_code: code,
         dispute_reason: reason ?? null,
       })
@@ -48,6 +50,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         { error: "Could not update promise", detail: error.message },
         { status: 500 }
       );
+    }
+
+    try {
+      await applyReputationForPromiseFinalization(admin, {
+        ...promise,
+        status: "disputed",
+        disputed_at: disputedAt,
+        disputed_code: code,
+        dispute_reason: reason ?? null,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to update reputation";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
