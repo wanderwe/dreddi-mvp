@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+function getEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`${name} is required`);
+  return v;
+}
+
 type PromiseInviteRow = {
   id: string;
   title: string;
@@ -10,13 +16,8 @@ type PromiseInviteRow = {
   created_at: string;
   creator_id: string;
   counterparty_id: string | null;
+  invite_token: string | null;
 };
-
-function getEnv(name: string) {
-  const v = process.env[name];
-  if (!v) throw new Error(`${name} is required`);
-  return v;
-}
 
 export async function GET(_req: Request, ctx: { params: Promise<{ token: string }> }) {
   try {
@@ -25,16 +26,15 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const url = getEnv("NEXT_PUBLIC_SUPABASE_URL");
     const service = getEnv("SUPABASE_SERVICE_ROLE_KEY");
 
-    // service client (server only) to bypass RLS for reading invite by token
     const admin = createClient(url, service, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
     const { data: p, error } = await admin
-      .from<PromiseInviteRow>("promises")
-      .select("id,title,details,due_at,status,created_at,creator_id,counterparty_id")
+      .from("promises")
+      .select("id,title,details,due_at,status,created_at,creator_id,counterparty_id,invite_token")
       .eq("invite_token", token)
-      .maybeSingle();
+      .maybeSingle<PromiseInviteRow>(); // ✅ якщо TS не любить — прибери generic
 
     if (error) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         title: p.title,
         details: p.details ?? null,
         due_at: p.due_at ?? null,
-        creator_handle: null, // залишаємо на майбутнє
+        creator_handle: null,
         creator_display_name,
         counterparty_id: p.counterparty_id ?? null,
       },
