@@ -12,12 +12,35 @@ type DealRow = {
   meta: string;
 };
 
+type ReputationResponse = {
+  reputation: {
+    user_id: string;
+    score: number;
+    confirmed_count: number;
+    disputed_count: number;
+    on_time_count: number;
+    total_promises_completed: number;
+    updated_at: string;
+  };
+  recent_events: {
+    id: string;
+    kind: string;
+    delta: number;
+    created_at: string;
+    meta: Record<string, unknown>;
+    promise?: { title?: string | null } | null;
+  }[];
+};
+
 export default function Home() {
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
   const [recentError, setRecentError] = useState<string | null>(null);
+  const [reputation, setReputation] = useState<ReputationResponse | null>(null);
+  const [reputationLoading, setReputationLoading] = useState(false);
+  const [reputationError, setReputationError] = useState<string | null>(null);
 
   const highlights = [
     "Promises tracked.",
@@ -129,10 +152,68 @@ export default function Home() {
     };
   }, [email]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadReputation = async () => {
+      if (!email) {
+        setReputation(null);
+        setReputationError(null);
+        setReputationLoading(false);
+        return;
+      }
+
+      setReputationLoading(true);
+      setReputationError(null);
+
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (sessionError || !token) {
+        if (!cancelled) {
+          setReputationError(sessionError?.message ?? "Not authenticated");
+          setReputationLoading(false);
+        }
+        return;
+      }
+
+      const res = await fetch("/api/reputation/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (cancelled) return;
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setReputationError(body.error ?? "Unable to load reputation");
+      } else {
+        const body = (await res.json()) as ReputationResponse;
+        setReputation(body);
+      }
+
+      setReputationLoading(false);
+    };
+
+    void loadReputation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [email]);
+
   async function logout() {
     await supabase.auth.signOut();
     // onAuthStateChange оновить UI
   }
+
+  const rep = reputation?.reputation;
+  const score = rep?.score ?? 50;
+  const confirmedCount = rep?.confirmed_count ?? 0;
+  const disputedCount = rep?.disputed_count ?? 0;
+  const onTimeCount = rep?.on_time_count ?? 0;
+  const recentEvents = reputation?.recent_events ?? [];
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -226,41 +307,62 @@ export default function Home() {
                   <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
                     <p className="text-sm text-slate-300">Reputation Score</p>
-                    <p className="text-2xl font-semibold text-white">84</p>
+                    <p className="text-2xl font-semibold text-white">
+                      {reputationLoading ? "Loading…" : score}
+                    </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
-                  Live
-                </span>
+                {email ? (
+                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
+                    Live
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
+                    Sign in for live score
+                  </span>
+                )}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-slate-200 shadow-inner shadow-black/30">
                   <div className="text-xs text-slate-400">Score</div>
-                  <div className="text-2xl font-semibold text-white">84</div>
+                  <div className="text-2xl font-semibold text-white">
+                    {reputationLoading ? "…" : score}
+                  </div>
                 </div>
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">Promises</div>
-                  <div className="text-lg font-semibold">+2 complete</div>
+                  <div className="text-xs text-emerald-200">Confirmed</div>
+                  <div className="text-lg font-semibold">
+                    {reputationLoading ? "…" : `${confirmedCount} complete`}
+                  </div>
                 </div>
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">Alerts</div>
-                  <div className="text-lg font-semibold">1 pending</div>
+                  <div className="text-xs text-amber-200">Disputed</div>
+                  <div className="text-lg font-semibold">
+                    {reputationLoading ? "…" : `${disputedCount} recorded`}
+                  </div>
                 </div>
               </div>
+
+              {reputationError && email && (
+                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                  {reputationError}
+                </div>
+              )}
 
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-inner shadow-black/50">
                 <div className="flex items-center gap-2 text-sm text-emerald-200">
                   <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  Reputation pending…
+                  On-time completions
                 </div>
                 <p className="mt-2 text-lg font-semibold text-white">
-                  Dreddi Alert
+                  {reputationLoading ? "…" : `${onTimeCount} delivered on time`}
                 </p>
-                <p className="text-sm text-slate-300">Review pending • Action needed</p>
-                <button className="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50">
-                  View deal
-                </button>
+                <p className="text-sm text-slate-300">
+                  {email
+                    ? "Each on-time delivery boosts your reputation."
+                    : "Sign in to start tracking how on-time completions help your score."}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
@@ -286,12 +388,38 @@ export default function Home() {
                 )}
 
                 <div className="mt-3 space-y-2 text-sm">
-                  {recentLoading ? (
+                  {reputationLoading || recentLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
                       ))}
                     </div>
+                  ) : email && recentEvents.length > 0 ? (
+                    recentEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                      >
+                        <div>
+                          <div className="font-semibold text-white">
+                            {event.delta > 0 ? `+${event.delta}` : event.delta} {event.kind.replace("promise_", "").replace("_", " ")}
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {event.promise?.title ?? "Promise"} • {new Date(event.created_at).toLocaleString()}
+                          </div>
+                        </div>
+                        <span
+                          className={[
+                            "rounded-full px-3 py-1 text-xs",
+                            event.delta >= 0
+                              ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                              : "bg-red-500/10 text-red-100 border border-red-400/30",
+                          ].join(" ")}
+                        >
+                          {event.delta >= 0 ? "Positive" : "Negative"}
+                        </span>
+                      </div>
+                    ))
                   ) : email && recentDeals.length === 0 ? (
                     <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
                       Create your first promise to populate your reputation feed.

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
+import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -19,11 +20,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const admin = getAdminClient();
+    const confirmedAt = new Date().toISOString();
     const { error } = await admin
       .from("promises")
       .update({
         status: "confirmed",
-        confirmed_at: new Date().toISOString(),
+        confirmed_at: confirmedAt,
       })
       .eq("id", id);
 
@@ -32,6 +34,17 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         { error: "Could not update promise", detail: error.message },
         { status: 500 }
       );
+    }
+
+    try {
+      await applyReputationForPromiseFinalization(admin, {
+        ...promise,
+        status: "confirmed",
+        confirmed_at: confirmedAt,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to update reputation";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });

@@ -22,7 +22,23 @@ and track fulfillment or breach over time.
 1) Create a promise with a counterparty assigned.
 2) As the promisor, open `/promises` ("I promised" tab) and click **Mark as completed**.
 3) As the counterparty, open the "Promised to me" tab and click **Review & confirm**.
-4) Confirm or dispute in the review screen. Reputation updates are stubbed for now.
+4) Confirm or dispute in the review screen. Reputation updates will be recorded for the promisor and counterparty.
+
+## Reputation model (MVP)
+- Tables: `user_reputation` (aggregate) and `reputation_events` (append-only). Default score is 50.
+- Run `docs/migrations_reputation.sql` to create the tables, indexes, and simple RLS policies.
+- Reputation updates on final outcomes: confirm/dispute routes call `applyReputationForPromiseFinalization` to append unique events and adjust aggregates.
+
+### Reputation rules
+- Confirmed: creator +3 (+1 if completed_at <= due_at); counterparty +1.
+- Disputed: creator -6 (-1 extra if late); counterparty +1.
+- Scores are clamped to [0,100]; counts include confirmed, disputed, on-time, and total completions.
+
+### How to test reputation locally
+1) Apply `docs/migrations_reputation.sql` in Supabase.
+2) Create and accept a promise, mark it completed, then confirm it. Check `/api/reputation/me` (with bearer token) for score/counters/events.
+3) Repeat with a disputed promise to see the negative delta and idempotent event handling.
+4) The landing page shows the live score, counts, and recent reputation events when signed in.
 
 ## Tech stack
 - Next.js (App Router)
