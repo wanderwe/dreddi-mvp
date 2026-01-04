@@ -5,9 +5,19 @@ import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
+type DealRow = {
+  id: string;
+  title: string;
+  status: "active" | "fulfilled" | "broken";
+  meta: string;
+};
+
 export default function Home() {
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
+  const [recentLoading, setRecentLoading] = useState(false);
+  const [recentError, setRecentError] = useState<string | null>(null);
 
   const highlights = [
     "Promises tracked.",
@@ -15,11 +25,19 @@ export default function Home() {
     "Dreddi knows.",
   ];
 
-  const showcasePromises = [
-    { title: "Dreddi Alert", meta: "Review Pending • 3:32PM" },
-    { title: "Buy Car Parts", meta: "Complete Task • Due today" },
-    { title: "Delivery Completed", meta: "Deal review • 2h ago" },
+  const showcasePromises: DealRow[] = [
+    { id: "demo-1", title: "Dreddi Alert", meta: "Review pending • 3:32PM", status: "active" },
+    { id: "demo-2", title: "Buy Car Parts", meta: "Complete Task • Due today", status: "active" },
+    { id: "demo-3", title: "Delivery Completed", meta: "Deal review • 2h ago", status: "fulfilled" },
   ];
+
+  const formatDateShort = (value: string) =>
+    new Intl.DateTimeFormat("en", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(value));
 
   useEffect(() => {
     let active = true;
@@ -44,6 +62,72 @@ export default function Home() {
       sub.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadRecentDeals = async () => {
+      if (!email) {
+        setRecentDeals([]);
+        setRecentError(null);
+        setRecentLoading(false);
+        return;
+      }
+
+      setRecentLoading(true);
+      setRecentError(null);
+
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+
+      if (userErr || !userId) {
+        if (!cancelled) {
+          setRecentError(userErr?.message ?? "Unable to load user session");
+          setRecentLoading(false);
+        }
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("promises")
+        .select("id,title,status,due_at,created_at")
+        .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (cancelled) return;
+
+      if (error) {
+        setRecentError(error.message);
+      } else {
+        const normalized: DealRow[] = (data ?? []).map((row) => {
+          const status =
+            row.status === "fulfilled" || row.status === "broken" ? row.status : "active";
+
+          const meta = row.due_at
+            ? `Due ${formatDateShort(row.due_at)}`
+            : `Created ${formatDateShort(row.created_at)}`;
+
+          return {
+            id: row.id,
+            title: row.title,
+            status,
+            meta,
+          };
+        });
+
+        setRecentDeals(normalized);
+      }
+
+      setRecentLoading(false);
+    };
+
+    void loadRecentDeals();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [email]);
 
   async function logout() {
     await supabase.auth.signOut();
@@ -189,21 +273,45 @@ export default function Home() {
                     See all
                   </Link>
                 </div>
+                {recentError && email && (
+                  <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                    {recentError}
+                  </div>
+                )}
+
+                {!email && (
+                  <p className="mt-3 text-xs text-slate-400">
+                    Sign in to see your live promises. Here’s what an active reputation feed looks like.
+                  </p>
+                )}
+
                 <div className="mt-3 space-y-2 text-sm">
-                  {showcasePromises.map((item) => (
-                    <div
-                      key={item.title}
-                      className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                    >
-                      <div>
-                        <div className="font-semibold text-white">{item.title}</div>
-                        <div className="text-xs text-slate-400">{item.meta}</div>
-                      </div>
-                      <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200">
-                        Active
-                      </span>
+                  {recentLoading ? (
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                      ))}
                     </div>
-                  ))}
+                  ) : email && recentDeals.length === 0 ? (
+                    <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                      Create your first promise to populate your reputation feed.
+                    </div>
+                  ) : (
+                    (email ? recentDeals : showcasePromises).map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                      >
+                        <div>
+                          <div className="font-semibold text-white">{item.title}</div>
+                          <div className="text-xs text-slate-400">{item.meta}</div>
+                        </div>
+                        <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200">
+                          {item.status === "fulfilled" ? "Fulfilled" : item.status === "broken" ? "Broken" : "Active"}
+                        </span>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
