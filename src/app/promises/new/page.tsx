@@ -17,24 +17,36 @@ export default function NewPromisePage() {
     setBusy(true);
     setError(null);
 
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
     const user = userData.user;
 
+    if (userErr) {
+      setBusy(false);
+      setError(userErr.message);
+      return;
+    }
+
     if (!user) {
+      setBusy(false);
       router.push("/login");
       return;
     }
+
+    const inviteToken =
+      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     const { data, error } = await supabase
       .from("promises")
       .insert({
         creator_id: user.id,
-        title,
-        details: details || null,
-        counterparty_contact: counterparty || null,
+        promisor_id: user.id, // ✅ важливо для вкладки "I promised"
+        // promisee_id поки null — з’явиться після accept invite
+        title: title.trim(),
+        details: details.trim() || null,
+        counterparty_contact: counterparty.trim() || null,
         due_at: dueAt ? new Date(dueAt).toISOString() : null,
-        invite_token: crypto.randomUUID?.() ??
-          `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        status: "active",
+        invite_token: inviteToken,
       })
       .select("id")
       .single();
