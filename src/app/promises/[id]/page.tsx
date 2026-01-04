@@ -192,18 +192,24 @@ export default function PromisePage() {
       return;
     }
 
-    const { error } = await supabase.from("promises").update({ status: next }).eq("id", p.id);
+    const res = await fetch(`/api/promises/${p.id}/status`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ status: next }),
+    });
 
     setStatusBusy(null);
 
-    if (error) {
-      setError(error.message);
-      // rollback на реальное значение
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? "Could not update status");
       setP(prev);
       return;
     }
 
-    // подхватим актуальные данные (на случай триггеров/правил)
     load();
   }
 
