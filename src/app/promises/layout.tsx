@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
@@ -32,11 +33,12 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
 
       <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-3 text-lg font-semibold text-white">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-300/30">
-              Dk
-            </span>
-            <span className="tracking-tight">Dreddi knows</span>
+          <Link href="/" className="flex items-center text-white">
+            <DreddiLogo
+              accentClassName="text-xs"
+              markClassName="h-11 w-11"
+              titleClassName="text-lg"
+            />
           </Link>
 
           <nav className="flex items-center gap-3 text-sm font-medium text-slate-200">

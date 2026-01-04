@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AuthCallbackPage() {
@@ -77,9 +78,7 @@ export default function AuthCallbackPage() {
 
       <div className="relative flex min-h-screen items-center justify-center px-6">
         <div className="glass-panel w-full max-w-xl rounded-3xl border-white/10 p-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-lg font-semibold text-emerald-200 ring-1 ring-emerald-300/30">
-            Dk
-          </div>
+          <DreddiLogoMark className="mx-auto mb-4 h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           <h1 className="text-3xl font-semibold text-white">Dreddi knows</h1>
           <p className="mt-2 text-slate-300">{msg}</p>
           <div className="mt-4 text-sm text-emerald-200">Securing your session…</div>

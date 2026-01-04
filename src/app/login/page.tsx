@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
@@ -38,9 +39,7 @@ export default function LoginPage() {
               <h1 className="text-4xl font-semibold text-white">Dreddi knows</h1>
               <p className="text-slate-300">Увійди, щоб створювати обіцянки та відстежувати репутацію.</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-lg font-semibold text-emerald-200 ring-1 ring-emerald-300/30">
-              Dk
-            </div>
+            <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           </div>
 
           <div className="mt-6 space-y-4">
