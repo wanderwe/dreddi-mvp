@@ -12,6 +12,7 @@ type PromiseRow = {
   due_at: string | null;
   created_at: string;
   counterparty_id: string | null;
+  creator_id?: string;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -36,6 +37,7 @@ export default function PromisesClient() {
   const [rows, setRows] = useState<PromiseRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
 
   const roleColumn = useMemo(() => {
     return tab === "promised-to-me" ? "counterparty_id" : "creator_id";
@@ -63,7 +65,7 @@ export default function PromisesClient() {
 
       const { data, error } = await supabase
         .from("promises")
-        .select("id,title,status,due_at,created_at,counterparty_id")
+        .select("id,title,status,due_at,created_at,counterparty_id,creator_id")
         .eq(roleColumn, user.id)
         .order("created_at", { ascending: false });
 
@@ -172,31 +174,127 @@ export default function PromisesClient() {
             {loading && (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-[82px] animate-pulse rounded-2xl bg-white/5" />
+                  <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-white/5" />
                 ))}
               </div>
             )}
 
             {!loading &&
-              rows.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/promises/${p.id}`}
-                  className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">Promise</div>
-                      <div className="text-lg font-semibold text-white group-hover:text-emerald-100">{p.title}</div>
-                      <div className="text-sm text-slate-300">Due: {formatDue(p.due_at)}</div>
-                    </div>
+              rows.map((p) => {
+                const isPromisor = tab === "i-promised";
+                const waiting = p.status === "completed_by_promisor";
 
-                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
-                      Status: {p.status}
-                    </span>
+                const actionLabel = isPromisor
+                  ? "Waiting for confirmation"
+                  : waiting
+                  ? "Action required"
+                  : null;
+
+                const statusLabel =
+                  p.status === "active"
+                    ? "Active"
+                    : p.status === "completed_by_promisor"
+                    ? isPromisor
+                      ? "Waiting confirmation"
+                      : "Awaiting your review"
+                    : p.status === "confirmed"
+                    ? "Confirmed"
+                    : p.status === "disputed"
+                    ? "Disputed"
+                    : p.status;
+
+                const busy = busyMap[p.id];
+
+                return (
+                  <div
+                    key={p.id}
+                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="space-y-1">
+                        <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">Promise</div>
+                        <Link
+                          href={`/promises/${p.id}`}
+                          className="text-lg font-semibold text-white transition hover:text-emerald-100"
+                        >
+                          {p.title}
+                        </Link>
+                        <div className="text-sm text-slate-300">Due: {formatDue(p.due_at)}</div>
+                        {waiting && (
+                          <p className="text-xs text-amber-200">
+                            {isPromisor
+                              ? "You marked this complete. Waiting for the counterparty."
+                              : "Promisor marked this complete. Please confirm or dispute."}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
+                        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
+                          {statusLabel}
+                        </span>
+                        {actionLabel && (
+                          <span className="text-xs text-amber-200">{actionLabel}</span>
+                        )}
+
+                        {isPromisor && p.status === "active" && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={async () => {
+                              setBusyMap((m) => ({ ...m, [p.id]: true }));
+                              setError(null);
+                              try {
+                                const { data } = await supabase.auth.getSession();
+                                if (!data.session) {
+                                  router.push(`/login?next=${encodeURIComponent("/promises")}`);
+                                  return;
+                                }
+
+                                const res = await fetch(`/api/promises/${p.id}/complete`, {
+                                  method: "POST",
+                                  headers: {
+                                    Authorization: `Bearer ${data.session.access_token}`,
+                                  },
+                                });
+
+                                if (!res.ok) {
+                                  const body = await res.json().catch(() => ({}));
+                                  throw new Error(body.error ?? "Could not mark complete");
+                                }
+
+                                setRows((prev) =>
+                                  prev.map((row) =>
+                                    row.id === p.id
+                                      ? { ...row, status: "completed_by_promisor" }
+                                      : row
+                                  )
+                                );
+                              } catch (e) {
+                                setError(e instanceof Error ? e.message : "Failed to update");
+                              } finally {
+                                setBusyMap((m) => ({ ...m, [p.id]: false }));
+                              }
+                            }}
+                            className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+                          >
+                            {busy ? "Updating…" : "Mark as completed"}
+                          </button>
+                        )}
+
+                        {!isPromisor && p.status === "completed_by_promisor" && (
+                          <Link
+                            href={`/promises/${p.id}/confirm`}
+                            className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
+                          >
+                            Review & confirm
+                          </Link>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </Link>
-              ))}
+                );
+              })}
 
             {!loading && rows.length === 0 && (
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">

@@ -11,7 +11,13 @@ type PromiseRow = {
   details: string | null;
   counterparty_contact: string | null;
   due_at: string | null;
-  status: "active" | "fulfilled" | "broken";
+  status:
+    | "active"
+    | "fulfilled"
+    | "broken"
+    | "completed_by_promisor"
+    | "confirmed"
+    | "disputed";
   created_at: string;
 
   invite_token: string | null;
@@ -49,19 +55,29 @@ function Card({
 }
 
 function StatusPill({ status }: { status: PromiseRow["status"] }) {
-  const label =
-    status === "active" ? "Active" : status === "fulfilled" ? "Fulfilled" : "Broken";
+  const labelMap: Record<PromiseRow["status"], string> = {
+    active: "Active",
+    fulfilled: "Fulfilled",
+    broken: "Broken",
+    completed_by_promisor: "Waiting confirmation",
+    confirmed: "Confirmed",
+    disputed: "Disputed",
+  };
 
-  const cls =
-    status === "active"
-      ? "border-neutral-700 text-neutral-200 bg-white/0"
-      : status === "fulfilled"
-      ? "border-emerald-700/60 text-emerald-200 bg-emerald-500/10"
-      : "border-red-700/60 text-red-200 bg-red-500/10";
+  const colorMap: Record<PromiseRow["status"], string> = {
+    active: "border-neutral-700 text-neutral-200 bg-white/0",
+    fulfilled: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
+    confirmed: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
+    broken: "border-red-700/60 text-red-200 bg-red-500/10",
+    disputed: "border-red-700/60 text-red-200 bg-red-500/10",
+    completed_by_promisor: "border-amber-500/40 text-amber-100 bg-amber-500/10",
+  };
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${cls}`}>
-      {label}
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${colorMap[status] ?? "border-neutral-700 bg-white/0 text-white"}`}
+    >
+      {labelMap[status] ?? status}
     </span>
   );
 }

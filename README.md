@@ -11,6 +11,16 @@ and track fulfillment or breach over time.
 - Accept promises
 - Track status (active / fulfilled / broken)
 
+## Confirm / dispute flow (MVP)
+- A promisor can mark a promise as completed, moving it to a pending state.
+- The counterparty reviews the completion and either confirms or files a dispute.
+
+### How to test
+1) Create a promise with a counterparty assigned.
+2) As the promisor, open `/promises` ("I promised" tab) and click **Mark as completed**.
+3) As the counterparty, open the "Promised to me" tab and click **Review & confirm**.
+4) Confirm or dispute in the review screen. Reputation updates are stubbed for now.
+
 ## Tech stack
 - Next.js (App Router)
 - Supabase (Auth + DB + RLS)
