@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
@@ -62,9 +63,12 @@ export default function Home() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-4xl font-semibold leading-tight sm:text-5xl">
-              <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-              <span className="text-white">knows</span>
+            <div className="flex items-center gap-4">
+              <DreddiLogoMark className="h-14 w-14 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)]" />
+              <div className="flex items-center gap-3 text-4xl font-semibold leading-tight sm:text-5xl">
+                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
+                <span className="text-white">knows</span>
+              </div>
             </div>
             <p className="max-w-xl text-lg text-slate-300">
               Track every promise, measure delivery, and keep your reputation sharp.
@@ -135,9 +139,7 @@ export default function Home() {
             <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/20 text-lg font-bold text-emerald-200 ring-1 ring-emerald-300/30">
-                    Dk
-                  </div>
+                  <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
                     <p className="text-sm text-slate-300">Reputation Score</p>
                     <p className="text-2xl font-semibold text-white">84</p>
