@@ -10,6 +10,8 @@ export type PromiseRecord = {
   counterparty_id: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
+  disputed_code: string | null;
+  dispute_reason: string | null;
 };
 
 type ReputationEventKind = "promise_confirmed" | "promise_disputed" | "manual_adjustment";
