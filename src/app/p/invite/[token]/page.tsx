@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 type InviteInfo = {
   id: string;
   title: string;
+  details: string | null;
   due_at: string | null;
   creator_handle: string | null;
   creator_display_name: string | null;
@@ -102,8 +103,10 @@ export default function InvitePage() {
   }
 
   const creatorName = useMemo(() => {
-    if (!info) return null;
-    return info.creator_handle ? `@${info.creator_handle}` : info.creator_display_name ?? "Unknown";
+    if (!info) return "Unknown";
+    return info.creator_handle
+      ? `@${info.creator_handle}`
+      : info.creator_display_name ?? "Unknown";
   }, [info]);
 
   return (
@@ -128,9 +131,8 @@ export default function InvitePage() {
             <span aria-hidden>←</span>
             Back to home
           </Link>
-          <div
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300"
-          >
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
                 <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> Signed in
@@ -145,7 +147,9 @@ export default function InvitePage() {
 
         <div className="space-y-3">
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Invitation</p>
-          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">Join this promise on Dreddi</h1>
+          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
+            Join this promise on Dreddi
+          </h1>
           <p className="max-w-2xl text-base text-slate-200">
             Review the promise details below. If everything looks good, accept the invite to start
             collaborating and keep each other accountable.
@@ -173,7 +177,16 @@ export default function InvitePage() {
                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
                   Promise invite
                 </div>
+
+                {/* What exactly you accept */}
                 <h2 className="text-2xl font-semibold text-white sm:text-3xl">{info.title}</h2>
+
+                {info.details && (
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+                    {info.details}
+                  </p>
+                )}
+
                 <p className="text-sm text-slate-300">
                   Created by <span className="font-semibold text-white">{creatorName}</span>
                 </p>
@@ -205,18 +218,24 @@ export default function InvitePage() {
 
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Next step</p>
+
                 {info.counterparty_id ? (
                   <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
                     <span aria-hidden>✅</span> Already accepted
                   </div>
                 ) : (
-                  <button
-                    disabled={busy}
-                    onClick={accept}
-                    className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-                  >
-                    {busy ? "Processing..." : "Accept promise"}
-                  </button>
+                  <>
+                    <p className="mt-2 text-xs text-slate-400">
+                      By accepting, you confirm you understand this commitment.
+                    </p>
+                    <button
+                      disabled={busy}
+                      onClick={accept}
+                      className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                    >
+                      {busy ? "Processing..." : "Accept promise"}
+                    </button>
+                  </>
                 )}
               </div>
             </div>

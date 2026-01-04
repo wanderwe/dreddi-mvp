@@ -11,6 +11,7 @@ type PromiseRow = {
   status: string;
   due_at: string | null;
   created_at: string;
+  counterparty_id: string | null;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -26,8 +27,7 @@ export default function PromisesPage() {
   const [loading, setLoading] = useState(true);
 
   const roleColumn = useMemo(() => {
-    // IMPORTANT: columns in DB must exist: promisor_id, promisee_id
-    return tab === "promised-to-me" ? "promisee_id" : "promisor_id";
+  return tab === "promised-to-me" ? "counterparty_id" : "creator_id";
   }, [tab]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function PromisesPage() {
 
       const { data, error } = await supabase
         .from("promises")
-        .select("id,title,status,due_at,created_at")
+        .select("id,title,status,due_at,created_at,counterparty_id")
         .eq(roleColumn, user.id)
         .order("created_at", { ascending: false });
 
@@ -114,8 +114,12 @@ export default function PromisesPage() {
             </div>
             <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">Pending</div>
-              <div className="mt-1 text-lg font-semibold">{rows.filter((p) => p.status !== "completed" && p.status !== "cancelled").length}</div>
-            </div>
+              <div className="mt-1 text-lg font-semibold">
+                {tab === "i-promised"
+                  ? rows.filter((p) => !p.counterparty_id).length
+                  : "—"}
+              </div>
+            </div>            
           </div>
         </div>
 

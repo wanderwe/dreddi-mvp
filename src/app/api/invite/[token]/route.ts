@@ -19,9 +19,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const { data, error } = await admin
+    const { data: p, error } = await admin
       .from("promises")
-      .select("id,title,details,due_at,status,created_at,creator_id,counterparty_id,invite_token")
+      .select("id,title,details,due_at,status,created_at,creator_id,counterparty_id")
       .eq("invite_token", token)
       .maybeSingle();
 
@@ -32,17 +32,37 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       );
     }
 
-    if (!data) {
-      return NextResponse.json({ error: "Invite not found or expired" }, { status: 404 });
+    if (!p) {
+      return NextResponse.json(
+        { error: "Invite not found or expired" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ promise: data }, { status: 200 });
+    // Resolve creator label (MVP: email via admin API)
+    let creator_display_name: string | null = null;
+    try {
+      const { data: u } = await admin.auth.admin.getUserById(p.creator_id);
+      creator_display_name = u.user?.email ?? null;
+    } catch {
+      creator_display_name = null;
+    }
+
+    // Return shape that InvitePage expects (flat object)
+    return NextResponse.json(
+      {
+        id: p.id,
+        title: p.title,
+        details: (p as any).details ?? null,
+        due_at: p.due_at ?? null,
+        creator_handle: null, // залишаємо на майбутнє
+        creator_display_name,
+        counterparty_id: p.counterparty_id ?? null,
+      },
+      { status: 200 }
+    );
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-
-    return NextResponse.json(
-      { error: "API crashed", message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "API crashed", message }, { status: 500 });
   }
 }
