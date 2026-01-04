@@ -15,6 +15,9 @@ and track fulfillment or breach over time.
 - A promisor can mark a promise as completed, moving it to a pending state.
 - The counterparty reviews the completion and either confirms or files a dispute.
 
+### Supabase migration for the flow
+- Run `docs/migrations_confirm_dispute.sql` in the Supabase SQL editor to add the confirm/dispute timestamps and extend the `status` enum (or text column) with `completed_by_promisor`, `confirmed`, and `disputed`.
+
 ### How to test
 1) Create a promise with a counterparty assigned.
 2) As the promisor, open `/promises` ("I promised" tab) and click **Mark as completed**.
