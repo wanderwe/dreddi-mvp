@@ -128,8 +128,11 @@ export default function Home() {
 
       const { data, error } = await supabase
         .from("promises")
-        .select("id,title,status,due_at,created_at")
-        .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
+        .select("id,title,status,due_at,confirmed_at,disputed_at,created_at")
+        .eq("promisor_id", userId)
+        .in("status", ["confirmed", "disputed", "completed_by_promisor"])
+        .order("confirmed_at", { ascending: false, nullsLast: true })
+        .order("disputed_at", { ascending: false, nullsLast: true })
         .order("created_at", { ascending: false })
         .limit(3);
 
@@ -142,9 +145,17 @@ export default function Home() {
           .map((row) => {
             if (!isPromiseStatus(row.status)) return null;
 
-            const meta = row.due_at
-              ? `Due ${formatDateShort(row.due_at)}`
-              : `Created ${formatDateShort(row.created_at)}`;
+            const eventTime = row.confirmed_at ?? row.disputed_at ?? row.created_at;
+            const label =
+              row.status === "confirmed"
+                ? "Confirmed"
+                : row.status === "disputed"
+                  ? "Disputed"
+                  : row.status === "completed_by_promisor"
+                    ? "Awaiting review"
+                    : "Created";
+
+            const meta = `${label} ${formatDateShort(eventTime ?? row.created_at)}`;
 
             return {
               id: row.id,
@@ -347,13 +358,13 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">Confirmed</div>
+                  <div className="text-xs text-emerald-200">Confirmed deliveries</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading ? "…" : `${confirmedCount} complete`}
+                    {reputationLoading ? "…" : `${confirmedCount} deliveries`}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">Disputed</div>
+                  <div className="text-xs text-amber-200">Disputed deliveries</div>
                   <div className="text-lg font-semibold">
                     {reputationLoading ? "…" : `${disputedCount} recorded`}
                   </div>
@@ -369,7 +380,7 @@ export default function Home() {
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-inner shadow-black/50">
                 <div className="flex items-center gap-2 text-sm text-emerald-200">
                   <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  On-time completions
+                  On-time deliveries
                 </div>
                 <p className="mt-2 text-lg font-semibold text-white">
                   {reputationLoading ? "…" : `${onTimeCount} delivered on time`}
@@ -377,7 +388,7 @@ export default function Home() {
                 <p className="text-sm text-slate-300">
                   {email
                     ? "Each on-time delivery boosts your reputation."
-                    : "Sign in to start tracking how on-time completions help your score."}
+                    : "Sign in to start tracking how on-time deliveries help your score."}
                 </p>
               </div>
 
@@ -438,7 +449,7 @@ export default function Home() {
                     ))
                   ) : email && recentDeals.length === 0 ? (
                     <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                      Create your first promise to populate your reputation feed.
+                      No deliveries yet.
                     </div>
                   ) : (
                     (email ? recentDeals : showcasePromises).map((item) => (
