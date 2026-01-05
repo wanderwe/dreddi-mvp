@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
+  const { locale } = useParams<{ locale: string }>();
+  const localePrefix = useMemo(() => `/${locale}`, [locale]);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -70,7 +73,7 @@ export default function LoginPage() {
             {error && <div className="text-sm text-red-400">{error}</div>}
 
             <div className="flex items-center justify-between text-sm text-slate-400">
-              <Link href="/" className="text-emerald-200 hover:text-emerald-100">
+              <Link href={localePrefix} className="text-emerald-200 hover:text-emerald-100">
                 ← Back to landing
               </Link>
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-emerald-200">

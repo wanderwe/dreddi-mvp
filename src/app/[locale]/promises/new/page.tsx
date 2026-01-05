@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function NewPromisePage() {
   const router = useRouter();
+  const { locale } = useParams<{ locale: string }>();
+  const localePrefix = useMemo(() => `/${locale}`, [locale]);
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
@@ -29,7 +31,7 @@ export default function NewPromisePage() {
 
     if (!user) {
       setBusy(false);
-      router.push("/login");
+      router.push(`${localePrefix}/login`);
       return;
     }
 
@@ -59,7 +61,7 @@ export default function NewPromisePage() {
       return;
     }
 
-    router.push(`/promises/${data.id}`);
+    router.push(`${localePrefix}/promises/${data.id}`);
   }
 
   return (
@@ -76,7 +78,7 @@ export default function NewPromisePage() {
               <p className="text-sm text-slate-300">Назви обіцянку, додай контекст і опціональний дедлайн.</p>
             </div>
             <Link
-              href="/promises"
+            href={`${localePrefix}/promises`}
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
             >
               ← Back

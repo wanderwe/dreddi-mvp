@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type PromiseRow = {
@@ -32,8 +32,10 @@ const formatDue = (dueAt: string | null) => {
 export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { locale } = useParams<{ locale: string }>();
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const localePrefix = useMemo(() => `/${locale}`, [locale]);
 
   const [rows, setRows] = useState<PromiseRow[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function PromisesClient() {
 
       const user = userData.user;
       if (!user) {
-        window.location.href = "/login";
+        window.location.href = `${localePrefix}/login`;
         return;
       }
 
@@ -81,12 +83,12 @@ export default function PromisesClient() {
     return () => {
       cancelled = true;
     };
-  }, [roleColumn]);
+  }, [localePrefix, roleColumn]);
 
   const setTab = (next: TabKey) => {
     const sp = new URLSearchParams(searchParams.toString());
     sp.set("tab", next);
-    router.push(`/promises?${sp.toString()}`);
+    router.push(`${localePrefix}/promises?${sp.toString()}`);
   };
 
   return (
@@ -112,7 +114,7 @@ export default function PromisesClient() {
             </div>
 
             <Link
-              href="/promises/new"
+              href={`${localePrefix}/promises/new`}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
             >
               <span className="text-lg">＋</span>
@@ -238,7 +240,7 @@ export default function PromisesClient() {
                       <div className="space-y-1">
                         <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">Promise</div>
                         <Link
-                          href={`/promises/${p.id}`}
+                          href={`${localePrefix}/promises/${p.id}`}
                           className="text-lg font-semibold text-white transition hover:text-emerald-100"
                         >
                           {p.title}
@@ -277,7 +279,9 @@ export default function PromisesClient() {
                               try {
                                 const { data } = await supabase.auth.getSession();
                                 if (!data.session) {
-                                  router.push(`/login?next=${encodeURIComponent("/promises")}`);
+                                  router.push(
+                                    `${localePrefix}/login?next=${encodeURIComponent(`${localePrefix}/promises`)}`,
+                                  );
                                   return;
                                 }
 
@@ -314,7 +318,7 @@ export default function PromisesClient() {
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
                           <Link
-                            href={`/promises/${p.id}/confirm`}
+                            href={`${localePrefix}/promises/${p.id}/confirm`}
                             className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
                           >
                             Review & confirm
@@ -336,7 +340,7 @@ export default function PromisesClient() {
                 </p>
                 <div className="mt-4">
                   <Link
-                    href="/promises/new"
+                    href={`${localePrefix}/promises/new`}
                     className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
                   >
                     Create promise

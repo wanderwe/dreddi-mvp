@@ -27,6 +27,8 @@ const formatDue = (dueAt: string | null) => {
   }).format(new Date(dueAt));
 };
 
+const DEFAULT_LOCALE = "en";
+
 export default function InvitePage() {
   const params = useParams<{ token: string }>();
   const token = params?.token;
@@ -74,7 +76,7 @@ export default function InvitePage() {
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
       // відправляємо на логін і повертаємо назад сюди
-      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}`)}`);
+      router.push(`/${DEFAULT_LOCALE}/login?next=${encodeURIComponent(`/p/invite/${token}`)}`);
       setBusy(false);
       return;
     }
@@ -99,7 +101,7 @@ export default function InvitePage() {
 
     // успіх: перезавантажимо дані і перекинемо на promises
     await load();
-    router.push("/promises");
+    router.push(`/${DEFAULT_LOCALE}/promises`);
   }
 
   const creatorName = useMemo(() => {

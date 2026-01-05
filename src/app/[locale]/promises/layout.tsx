@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
+  const { locale } = useParams<{ locale: string }>();
+  const localePrefix = useMemo(() => `/${locale}`, [locale]);
 
   useEffect(() => {
     (async () => {
@@ -23,7 +26,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
 
   async function logout() {
     await supabase.auth.signOut();
-    window.location.href = "/";
+    window.location.href = localePrefix;
   }
 
   return (
@@ -33,7 +36,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
 
       <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center text-white">
+          <Link href={localePrefix} className="flex items-center text-white">
             <DreddiLogo
               accentClassName="text-xs"
               markClassName="h-11 w-11"
@@ -42,12 +45,15 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
           </Link>
 
           <nav className="flex items-center gap-3 text-sm font-medium text-slate-200">
-            <Link className="rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100" href="/promises">
+            <Link
+              className="rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100"
+              href={`${localePrefix}/promises`}
+            >
               My promises
             </Link>
             <Link
               className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
-              href="/promises/new"
+              href={`${localePrefix}/promises/new`}
             >
               New promise
             </Link>

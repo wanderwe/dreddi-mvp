@@ -141,9 +141,13 @@ function ActionButton({
 }
 
 export default function PromisePage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string; locale: string }>();
   const router = useRouter();
   const id = params?.id;
+  const localePrefix = useMemo(
+    () => `/${params.locale ?? "en"}`,
+    [params.locale],
+  );
 
   const [p, setP] = useState<PromiseRow | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -158,7 +162,7 @@ export default function PromisePage() {
   async function requireSessionOrRedirect(nextPath: string) {
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      router.push(`/login?next=${encodeURIComponent(nextPath)}`);
+      router.push(`${localePrefix}/login?next=${encodeURIComponent(nextPath)}`);
       return null;
     }
     return data.session;
@@ -169,7 +173,7 @@ export default function PromisePage() {
 
     setError(null);
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    const session = await requireSessionOrRedirect(`${localePrefix}/promises/${id}`);
     if (!session) return;
 
     const { data, error } = await supabase
@@ -201,7 +205,7 @@ export default function PromisePage() {
     const prev = p;
     setP({ ...p, status: next });
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    const session = await requireSessionOrRedirect(`${localePrefix}/promises/${id}`);
     if (!session) {
       setStatusBusy(null);
       setP(prev);
@@ -235,7 +239,7 @@ export default function PromisePage() {
     setError(null);
     setInviteBusy(regenerate ? "regen" : "generate");
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    const session = await requireSessionOrRedirect(`${localePrefix}/promises/${id}`);
     if (!session) {
       setInviteBusy(null);
       return;
@@ -286,7 +290,7 @@ export default function PromisePage() {
     setLogoutBusy(true);
     await supabase.auth.signOut();
     setLogoutBusy(false);
-    router.push("/login");
+    router.push(`${localePrefix}/login`);
   }
 
   const anyStatusBusy = statusBusy !== null;
@@ -294,7 +298,7 @@ export default function PromisePage() {
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/promises" className="text-neutral-400 hover:text-white">
+        <Link href={`${localePrefix}/promises`} className="text-neutral-400 hover:text-white">
           ← Back
         </Link>
 

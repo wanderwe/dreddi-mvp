@@ -41,8 +41,12 @@ function formatDate(value: string | null) {
 }
 
 export default function ConfirmPromisePage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string; locale: string }>();
   const router = useRouter();
+  const localePrefix = useMemo(
+    () => `/${params.locale ?? "en"}`,
+    [params.locale],
+  );
   const [promise, setPromise] = useState<PromiseRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +68,9 @@ export default function ConfirmPromisePage() {
 
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
-        router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm`)}`);
+        router.push(
+          `${localePrefix}/login?next=${encodeURIComponent(`${localePrefix}/promises/${params.id}/confirm`)}`,
+        );
         return;
       }
 
@@ -92,7 +98,7 @@ export default function ConfirmPromisePage() {
     return () => {
       mounted = false;
     };
-  }, [params?.id, router]);
+  }, [localePrefix, params?.id, router]);
 
   function statusNote(status: string) {
     if (status === "confirmed") return "Already confirmed ✅";
@@ -105,7 +111,9 @@ export default function ConfirmPromisePage() {
     if (!promise) return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      router.push(`/login?next=${encodeURIComponent(`/promises/${promise.id}/confirm`)}`);
+      router.push(
+        `${localePrefix}/login?next=${encodeURIComponent(`${localePrefix}/promises/${promise.id}/confirm`)}`,
+      );
       return;
     }
 
@@ -131,7 +139,7 @@ export default function ConfirmPromisePage() {
     try {
       await postAction(`/api/promises/${promise.id}/confirm`);
       setSuccessMessage("Promise confirmed. Redirecting…");
-      setTimeout(() => router.push("/promises"), 1000);
+      setTimeout(() => router.push(`${localePrefix}/promises`), 1000);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to confirm");
     } finally {
@@ -149,7 +157,7 @@ export default function ConfirmPromisePage() {
         reason: disputeCode === "other" ? disputeReason : undefined,
       });
       setSuccessMessage("Dispute submitted. Redirecting…");
-      setTimeout(() => router.push("/promises"), 1200);
+      setTimeout(() => router.push(`${localePrefix}/promises`), 1200);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to dispute");
     } finally {
@@ -175,7 +183,7 @@ export default function ConfirmPromisePage() {
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-6">
         <div className="flex items-center justify-between text-sm text-emerald-100/80">
-          <Link href="/promises" className="hover:text-emerald-200">
+          <Link href={`${localePrefix}/promises`} className="hover:text-emerald-200">
             ← Back to promises
           </Link>
           <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
