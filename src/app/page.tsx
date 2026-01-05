@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type DealRow = {
   id: string;
   title: string;
-  status: "active" | "fulfilled" | "broken";
+  status: PromiseStatus;
   meta: string;
 };
 
@@ -51,8 +52,22 @@ export default function Home() {
   const showcasePromises: DealRow[] = [
     { id: "demo-1", title: "Dreddi Alert", meta: "Review pending • 3:32PM", status: "active" },
     { id: "demo-2", title: "Buy Car Parts", meta: "Complete Task • Due today", status: "active" },
-    { id: "demo-3", title: "Delivery Completed", meta: "Deal review • 2h ago", status: "fulfilled" },
+    { id: "demo-3", title: "Delivery Completed", meta: "Deal review • 2h ago", status: "confirmed" },
   ];
+
+  const statusLabels: Record<PromiseStatus, string> = {
+    active: "Active",
+    completed_by_promisor: "Awaiting review",
+    confirmed: "Confirmed",
+    disputed: "Disputed",
+  };
+
+  const statusTones: Record<PromiseStatus, string> = {
+    active: "bg-white/5 text-emerald-200 border border-white/10",
+    completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
+    confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
+    disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
+  };
 
   const formatDateShort = (value: string) =>
     new Intl.DateTimeFormat("en", {
@@ -123,21 +138,22 @@ export default function Home() {
       if (error) {
         setRecentError(error.message);
       } else {
-        const normalized: DealRow[] = (data ?? []).map((row) => {
-          const status =
-            row.status === "fulfilled" || row.status === "broken" ? row.status : "active";
+        const normalized: DealRow[] = (data ?? [])
+          .map((row) => {
+            if (!isPromiseStatus(row.status)) return null;
 
-          const meta = row.due_at
-            ? `Due ${formatDateShort(row.due_at)}`
-            : `Created ${formatDateShort(row.created_at)}`;
+            const meta = row.due_at
+              ? `Due ${formatDateShort(row.due_at)}`
+              : `Created ${formatDateShort(row.created_at)}`;
 
-          return {
-            id: row.id,
-            title: row.title,
-            status,
-            meta,
-          };
-        });
+            return {
+              id: row.id,
+              title: row.title,
+              status: row.status as PromiseStatus,
+              meta,
+            };
+          })
+          .filter((row): row is DealRow => Boolean(row));
 
         setRecentDeals(normalized);
       }
@@ -434,8 +450,10 @@ export default function Home() {
                           <div className="font-semibold text-white">{item.title}</div>
                           <div className="text-xs text-slate-400">{item.meta}</div>
                         </div>
-                        <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200">
-                          {item.status === "fulfilled" ? "Fulfilled" : item.status === "broken" ? "Broken" : "Active"}
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                        >
+                          {statusLabels[item.status] ?? item.status}
                         </span>
                       </div>
                     ))

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRow = {
   id: string;
@@ -11,13 +12,7 @@ type PromiseRow = {
   details: string | null;
   counterparty_contact: string | null;
   due_at: string | null;
-  status:
-    | "active"
-    | "fulfilled"
-    | "broken"
-    | "completed_by_promisor"
-    | "confirmed"
-    | "disputed";
+  status: PromiseStatus;
   created_at: string;
 
   invite_token: string | null;
@@ -57,8 +52,6 @@ function Card({
 function StatusPill({ status }: { status: PromiseRow["status"] }) {
   const labelMap: Record<PromiseRow["status"], string> = {
     active: "Active",
-    fulfilled: "Fulfilled",
-    broken: "Broken",
     completed_by_promisor: "Waiting confirmation",
     confirmed: "Confirmed",
     disputed: "Disputed",
@@ -66,9 +59,7 @@ function StatusPill({ status }: { status: PromiseRow["status"] }) {
 
   const colorMap: Record<PromiseRow["status"], string> = {
     active: "border-neutral-700 text-neutral-200 bg-white/0",
-    fulfilled: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
     confirmed: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
-    broken: "border-red-700/60 text-red-200 bg-red-500/10",
     disputed: "border-red-700/60 text-red-200 bg-red-500/10",
     completed_by_promisor: "border-amber-500/40 text-amber-100 bg-amber-500/10",
   };
@@ -146,10 +137,11 @@ export default function PromisePage() {
   const id = params?.id;
 
   const [p, setP] = useState<PromiseRow | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [statusBusy, setStatusBusy] = useState<PromiseRow["status"] | null>(null);
+  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
   const [logoutBusy, setLogoutBusy] = useState(false);
 
@@ -161,6 +153,7 @@ export default function PromisePage() {
       router.push(`/login?next=${encodeURIComponent(nextPath)}`);
       return null;
     }
+    setUserId(data.session.user.id);
     return data.session;
   }
 
@@ -181,7 +174,15 @@ export default function PromisePage() {
       .single();
 
     if (error) setError(error.message);
-    else setP(data as PromiseRow);
+    else {
+      const status = (data as { status?: unknown }).status;
+      if (!isPromiseStatus(status)) {
+        setError("Promise has an unsupported status value");
+        setP({ ...(data as PromiseRow), status: "active" });
+      } else {
+        setP({ ...(data as PromiseRow), status });
+      }
+    }
   }
 
   useEffect(() => {
@@ -190,39 +191,29 @@ export default function PromisePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  async function setStatus(next: PromiseRow["status"]) {
+  async function markCompleted() {
     if (!p) return;
-    if (p.status === next) return;
-
     setError(null);
-    setStatusBusy(next);
-
-    // optimistic UI: сразу подсветим выбранное
-    const prev = p;
-    setP({ ...p, status: next });
+    setActionBusy("complete");
 
     const session = await requireSessionOrRedirect(`/promises/${id}`);
     if (!session) {
-      setStatusBusy(null);
-      setP(prev);
+      setActionBusy(null);
       return;
     }
 
-    const res = await fetch(`/api/promises/${p.id}/status`, {
+    const res = await fetch(`/api/promises/${p.id}/complete`, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ status: next }),
     });
 
-    setStatusBusy(null);
+    setActionBusy(null);
 
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
       setError(j?.error ?? "Could not update status");
-      setP(prev);
       return;
     }
 
@@ -289,7 +280,9 @@ export default function PromisePage() {
     router.push("/login");
   }
 
-  const anyStatusBusy = statusBusy !== null;
+  const isPromisor = Boolean(p && userId === p.creator_id);
+  const isCounterparty = Boolean(p && userId === p.counterparty_id);
+  const waitingForReview = p?.status === "completed_by_promisor";
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -354,36 +347,44 @@ export default function PromisePage() {
             </div>
           </Card>
 
-          <Card title="Status actions" right={<div className="text-xs text-neutral-500">Click to set</div>}>
-            <div className="flex flex-wrap gap-3">
-              <ActionButton
-                label="Active"
-                variant="ghost"
-                active={p.status === "active"}
-                loading={statusBusy === "active"}
-                disabled={anyStatusBusy}
-                onClick={() => setStatus("active")}
-              />
-              <ActionButton
-                label="Fulfilled"
-                variant="ok"
-                active={p.status === "fulfilled"}
-                loading={statusBusy === "fulfilled"}
-                disabled={anyStatusBusy}
-                onClick={() => setStatus("fulfilled")}
-              />
-              <ActionButton
-                label="Broken"
-                variant="danger"
-                active={p.status === "broken"}
-                loading={statusBusy === "broken"}
-                disabled={anyStatusBusy}
-                onClick={() => setStatus("broken")}
-              />
-            </div>
+          <Card title="Status actions">
+            <div className="space-y-3">
+              <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
 
-            <div className="mt-3 text-xs text-neutral-500">
-              Tip: hover shows intent; click updates status (with optimistic highlight).
+              {isPromisor && p.status === "active" && (
+                <ActionButton
+                  label="Mark as completed"
+                  variant="ok"
+                  loading={actionBusy === "complete"}
+                  disabled={actionBusy !== null}
+                  onClick={markCompleted}
+                />
+              )}
+
+              {isCounterparty && p.status === "completed_by_promisor" && (
+                <Link
+                  href={`/promises/${p.id}/confirm`}
+                  className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
+                >
+                  Review & confirm
+                </Link>
+              )}
+
+              {waitingForReview && !isCounterparty && (
+                <div className="text-sm text-neutral-400">Waiting for the counterparty to review.</div>
+              )}
+
+              {p.status === "confirmed" && (
+                <div className="text-sm text-emerald-300">Promise confirmed ✅</div>
+              )}
+
+              {p.status === "disputed" && (
+                <div className="text-sm text-red-300">Promise disputed.</div>
+              )}
+
+              {!isPromisor && !isCounterparty && (
+                <div className="text-xs text-neutral-500">You are viewing this promise as a guest.</div>
+              )}
             </div>
           </Card>
 

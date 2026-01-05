@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRow = {
   id: string;
   title: string;
   details: string | null;
   due_at: string | null;
-  status: string;
+  status: PromiseStatus;
   creator_id: string;
   creator_display_name: string | null;
   counterparty_id: string | null;
@@ -84,7 +85,13 @@ export default function ConfirmPromisePage() {
       }
 
       const body = await res.json();
-      setPromise(body as PromiseRow);
+      if (!isPromiseStatus((body as { status?: unknown }).status)) {
+        setError("Promise has unsupported status");
+        setLoading(false);
+        return;
+      }
+
+      setPromise({ ...(body as PromiseRow), status: body.status as PromiseStatus });
       setLoading(false);
     }
 
@@ -94,7 +101,7 @@ export default function ConfirmPromisePage() {
     };
   }, [params?.id, router]);
 
-  function statusNote(status: string) {
+  function statusNote(status: PromiseStatus) {
     if (status === "confirmed") return "Already confirmed ✅";
     if (status === "disputed") return "Already disputed";
     if (status === "active") return "Not marked as completed yet";

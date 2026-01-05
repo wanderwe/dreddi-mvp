@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRecord = {
   id: string;
   title: string;
   details: string | null;
-  status: string;
+  status: PromiseStatus;
   due_at: string | null;
   creator_id: string;
   counterparty_id: string | null;
@@ -72,6 +73,10 @@ export async function loadPromiseForUser(id: string, userId: string) {
 
   if (!promise) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (!isPromiseStatus(promise.status)) {
+    return NextResponse.json({ error: "Promise has unsupported status" }, { status: 400 });
   }
 
   if (promise.creator_id !== userId && promise.counterparty_id !== userId) {

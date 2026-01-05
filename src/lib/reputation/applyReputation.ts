@@ -1,9 +1,10 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 export type PromiseRecord = {
   id: string;
   title: string;
-  status: string;
+  status: PromiseStatus;
   due_at: string | null;
   completed_at: string | null;
   creator_id: string;
@@ -103,6 +104,7 @@ async function ensureReputationRows(admin: SupabaseClient, userIds: string[]) {
 
 export async function applyReputationForPromiseFinalization(admin: SupabaseClient, promise: PromiseRecord) {
   if (!promise.creator_id) return;
+  if (!isPromiseStatus(promise.status)) return;
   if (promise.status !== "confirmed" && promise.status !== "disputed") return;
 
   const events = computeDeltas(promise);
