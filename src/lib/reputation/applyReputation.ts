@@ -154,7 +154,6 @@ export async function applyReputationForPromiseFinalization(admin: SupabaseClien
 
     if (event.kind === "promise_disputed") {
       prev.disputed += 1;
-      prev.totalCompleted += 1;
     }
 
     prev.delta += event.delta;

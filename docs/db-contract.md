@@ -23,7 +23,7 @@ This document codifies the database surface the codebase expects Supabase Postgr
   - `invite_token text`
 - `user_reputation`
   - `user_id uuid primary key` (auth.users FK)
-  - `score int default 50`, `confirmed_count int default 0`, `disputed_count int default 0`, `on_time_count int default 0`, `total_promises_completed int default 0`, `updated_at timestamptz default now()`
+  - `score int default 50`, `confirmed_count int default 0`, `disputed_count int default 0`, `on_time_count int default 0`, `total_promises_completed int default 0`, `updated_at timestamptz default now()` — `total_promises_completed` counts confirmed (non-disputed) completions.
 - `reputation_events`
   - `id uuid primary key default gen_random_uuid()`
   - `user_id uuid not null` (auth.users FK), `promise_id uuid not null` (promises FK)

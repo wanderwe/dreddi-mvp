@@ -32,7 +32,7 @@ and track fulfillment or breach over time.
 ### Reputation rules
 - Confirmed: creator +3 (+1 if completed_at <= due_at); counterparty +1.
 - Disputed: creator -6 (-1 extra if late); counterparty +1.
-- Scores are clamped to [0,100]; counts include confirmed, disputed, on-time, and total completions.
+- Scores are clamped to [0,100]; counts track confirmed, disputed, and on-time; `total_promises_completed` increases only when promises are confirmed (disputed outcomes are kept separate).
 
 ### How to test reputation locally
 1) Apply `docs/migrations_reputation.sql` in Supabase.
