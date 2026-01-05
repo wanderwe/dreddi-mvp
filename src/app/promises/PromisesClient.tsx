@@ -14,7 +14,7 @@ type PromiseRow = {
   created_at: string;
   completed_at: string | null;
   counterparty_id: string | null;
-  creator_id?: string;
+  creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -93,6 +93,7 @@ export default function PromisesClient() {
         window.location.href = "/login";
         return;
       }
+
       const { data, error } = await supabase
         .from("promises")
         .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
@@ -103,13 +104,18 @@ export default function PromisesClient() {
 
       if (error) setError(error.message);
       else {
-        const filtered = (data ?? [])
+        // ✅ Explicitly type the result as PromiseWithRole[] so role can't widen to string
+        const filtered: PromiseWithRole[] = (data ?? [])
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
-          .map((row) => ({
-            ...row,
-            status: row.status as PromiseStatus,
-            role: row.creator_id === user.id ? "promisor" : "counterparty",
-          }));
+          .map((row) => {
+            const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
+            const role: PromiseRole = r.creator_id === user.id ? "promisor" : "counterparty";
+            return {
+              ...r,
+              status: r.status as PromiseStatus,
+              role,
+            };
+          });
 
         setAllRows(filtered);
       }
@@ -297,9 +303,7 @@ export default function PromisesClient() {
                         <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
                           {statusLabel}
                         </span>
-                        {actionLabel && (
-                          <span className="text-xs text-amber-200">{actionLabel}</span>
-                        )}
+                        {actionLabel && <span className="text-xs text-amber-200">{actionLabel}</span>}
 
                         {impact && (
                           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
