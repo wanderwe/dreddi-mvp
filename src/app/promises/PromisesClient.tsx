@@ -18,6 +18,9 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
+type PromiseRole = "promisor" | "counterparty";
+
+type PromiseWithRole = PromiseRow & { role: PromiseRole };
 
 const formatDue = (dueAt: string | null) => {
   if (!dueAt) return "No deadline";
@@ -30,20 +33,46 @@ const formatDue = (dueAt: string | null) => {
   }).format(new Date(dueAt));
 };
 
+const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
+  if (role === "promisor") {
+    if (status === "active") return "Active";
+    if (status === "completed_by_promisor") return "Pending confirmation";
+    if (status === "confirmed") return "Confirmed";
+    if (status === "disputed") return "Disputed";
+  }
+
+  if (status === "active") return "Pending completion";
+  if (status === "completed_by_promisor") return "Needs your review";
+  if (status === "confirmed") return "Confirmed";
+  if (status === "disputed") return "Disputed";
+
+  return status;
+};
+
+const isAwaitingYourAction = (row: PromiseWithRole) => {
+  if (row.role === "counterparty" && row.status === "completed_by_promisor") {
+    return true;
+  }
+
+  return false;
+};
+
+const isAwaitingOthers = (row: PromiseWithRole) => {
+  if (row.role === "promisor" && row.status === "completed_by_promisor") return true;
+  if (row.role === "counterparty" && row.status === "active") return true;
+  return false;
+};
+
 export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
 
-  const [rows, setRows] = useState<PromiseRow[]>([]);
+  const [allRows, setAllRows] = useState<PromiseWithRole[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
-
-  const roleColumn = useMemo(() => {
-    return tab === "promised-to-me" ? "counterparty_id" : "creator_id";
-  }, [tab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -64,11 +93,10 @@ export default function PromisesClient() {
         window.location.href = "/login";
         return;
       }
-
       const { data, error } = await supabase
         .from("promises")
         .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
-        .eq(roleColumn, user.id)
+        .or(`creator_id.eq.${user.id},counterparty_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
 
       if (cancelled) return;
@@ -77,9 +105,13 @@ export default function PromisesClient() {
       else {
         const filtered = (data ?? [])
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
-          .map((row) => ({ ...row, status: row.status as PromiseStatus }));
+          .map((row) => ({
+            ...row,
+            status: row.status as PromiseStatus,
+            role: row.creator_id === user.id ? "promisor" : "counterparty",
+          }));
 
-        setRows(filtered);
+        setAllRows(filtered);
       }
 
       setLoading(false);
@@ -88,13 +120,29 @@ export default function PromisesClient() {
     return () => {
       cancelled = true;
     };
-  }, [roleColumn]);
+  }, []);
 
   const setTab = (next: TabKey) => {
     const sp = new URLSearchParams(searchParams.toString());
     sp.set("tab", next);
     router.push(`/promises?${sp.toString()}`);
   };
+
+  const rows = useMemo(
+    () =>
+      allRows.filter((row) =>
+        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+      ),
+    [allRows, tab]
+  );
+
+  const overview = useMemo(() => {
+    const total = allRows.length;
+    const awaitingYou = allRows.filter((row) => isAwaitingYourAction(row)).length;
+    const awaitingOthers = allRows.filter((row) => isAwaitingOthers(row)).length;
+
+    return { total, awaitingYou, awaitingOthers };
+  }, [allRows]);
 
   return (
     <main className="relative py-10">
@@ -108,14 +156,8 @@ export default function PromisesClient() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Promises</p>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">
-                {tab === "i-promised" ? "I promised" : "Promised to me"}
-              </h1>
-              <p className="text-sm text-slate-300">
-                {tab === "i-promised"
-                  ? "Promises where you are the promisor"
-                  : "Promises where you are the promisee"}
-              </p>
+              <h1 className="text-3xl font-semibold text-white sm:text-4xl">Your promises overview</h1>
+              <p className="text-sm text-slate-300">Snapshot of everything you promised and what was promised to you.</p>
             </div>
 
             <Link
@@ -130,15 +172,15 @@ export default function PromisesClient() {
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-black/30">
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Total</div>
-              <div className="mt-1 text-2xl font-semibold text-white">{rows.length}</div>
+              <div className="mt-1 text-2xl font-semibold text-white">{overview.total}</div>
             </div>
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">Active</div>
-              <div className="mt-1 text-lg font-semibold">{rows.filter((p) => p.status === "active").length}</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">Awaiting your action</div>
+              <div className="mt-1 text-lg font-semibold">{overview.awaitingYou}</div>
             </div>
             <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-amber-200">Pending</div>
-              <div className="mt-1 text-lg font-semibold">{rows.filter((p) => !p.counterparty_id).length}</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-amber-200">Awaiting others</div>
+              <div className="mt-1 text-lg font-semibold">{overview.awaitingOthers}</div>
             </div>
           </div>
         </div>
@@ -189,7 +231,7 @@ export default function PromisesClient() {
 
             {!loading &&
               rows.map((p) => {
-                const isPromisor = tab === "i-promised";
+                const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
                 const impact = (() => {
                   if (!isPromisor) return null;
@@ -216,23 +258,14 @@ export default function PromisesClient() {
                 })();
 
                 const actionLabel = isPromisor
-                  ? "Waiting for confirmation"
+                  ? p.status === "completed_by_promisor"
+                    ? "Waiting for confirmation"
+                    : null
                   : waiting
                   ? "Action required"
                   : null;
 
-                const statusLabel =
-                  p.status === "active"
-                    ? "Active"
-                    : p.status === "completed_by_promisor"
-                    ? isPromisor
-                      ? "Waiting confirmation"
-                      : "Awaiting your review"
-                    : p.status === "confirmed"
-                    ? "Confirmed"
-                    : p.status === "disputed"
-                    ? "Disputed"
-                    : p.status;
+                const statusLabel = statusLabelForRole(p.status, p.role);
 
                 const busy = busyMap[p.id];
 
@@ -300,10 +333,10 @@ export default function PromisesClient() {
                                   throw new Error(body.error ?? "Could not mark complete");
                                 }
 
-                                setRows((prev) =>
+                                setAllRows((prev) =>
                                   prev.map((row) =>
                                     row.id === p.id
-                                      ? { ...row, status: "completed_by_promisor" }
+                                      ? { ...row, status: "completed_by_promisor" as PromiseStatus }
                                       : row
                                   )
                                 );
