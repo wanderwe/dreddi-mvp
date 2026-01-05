@@ -1,0 +1,20 @@
+{
+  "name": "next-intl",
+  "version": "0.0.0-local",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./middleware": {
+      "import": "./middleware.js",
+      "types": "./middleware.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}
