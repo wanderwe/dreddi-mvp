@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRow = {
   id: string;
   title: string;
-  status: string;
+  status: PromiseStatus;
   due_at: string | null;
   created_at: string;
   completed_at: string | null;
@@ -73,7 +74,13 @@ export default function PromisesClient() {
       if (cancelled) return;
 
       if (error) setError(error.message);
-      else setRows(data ?? []);
+      else {
+        const filtered = (data ?? [])
+          .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
+          .map((row) => ({ ...row, status: row.status as PromiseStatus }));
+
+        setRows(filtered);
+      }
 
       setLoading(false);
     })();
