@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
+import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -53,6 +54,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
             >
               {t("nav.newPromise")}
             </Link>
+            <LocaleSwitcher />
             {email && (
               <button
                 onClick={logout}

@@ -35,3 +35,9 @@ export const useT = () => {
   if (!ctx) throw new Error("useT must be used within I18nProvider");
   return ctx.t;
 };
+
+export const useLocale = () => {
+  const ctx = useContext(I18nContext);
+  if (!ctx) throw new Error("useLocale must be used within I18nProvider");
+  return ctx.locale;
+};

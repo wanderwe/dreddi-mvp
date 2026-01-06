@@ -1,33 +1,35 @@
 import { cookies, headers } from "next/headers";
+import { LOCALE_COOKIE_NAME, Locale, defaultLocale, normalizeLocale } from "./locales";
 
-const DEFAULT_LOCALE = "en";
-const LOCALE_COOKIE_NAME = "locale";
-
-export async function getLocale(): Promise<string> {
-  const cookieStore = await cookies();
-
+export async function getLocale(): Promise<Locale> {
   // IMPORTANT:
   // Do NOT use cookies().get() here.
   // In Next.js App Router (especially with Turbopack),
-  // cookies() does not reliably expose `.get()`.
-  // Always use getAll() + manual lookup.
+  // cookies() may be async and does not reliably expose `.get()`.
+  // Always await cookies() and use getAll() + manual lookup.
+  const cookieStore = await cookies();
+
   const localeCookie = cookieStore
     .getAll()
     .find((cookie) => cookie.name === LOCALE_COOKIE_NAME)?.value;
 
-  if (localeCookie) {
-    return localeCookie;
+  const normalizedCookie = normalizeLocale(localeCookie);
+  if (normalizedCookie) {
+    return normalizedCookie;
   }
 
   const acceptLanguage = (await headers()).get("accept-language");
   if (acceptLanguage) {
-    const [preferredLocale] = acceptLanguage.split(",");
-    if (preferredLocale) {
-      return preferredLocale;
+    // Example: "en-US,en;q=0.9,uk;q=0.8"
+    const [preferred] = acceptLanguage.split(",");
+    const lang = preferred?.trim().split(";")[0]; // drop q=...
+    const normalizedHeaderLocale = normalizeLocale(lang);
+    if (normalizedHeaderLocale) {
+      return normalizedHeaderLocale;
     }
   }
 
-  return DEFAULT_LOCALE;
+  return defaultLocale;
 }
 
-export { DEFAULT_LOCALE, LOCALE_COOKIE_NAME };
+export { LOCALE_COOKIE_NAME };
