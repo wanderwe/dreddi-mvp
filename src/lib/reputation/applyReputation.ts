@@ -146,13 +146,13 @@ export async function applyReputationForPromiseFinalization(admin: SupabaseClien
       totalCompleted: 0,
     };
 
-    if (event.kind === "promise_confirmed") {
+    if (event.kind === "promise_confirmed" && event.meta?.role !== "counterparty") {
       prev.confirmed += 1;
       if (event.meta.on_time) prev.onTime += 1;
       prev.totalCompleted += 1;
     }
 
-    if (event.kind === "promise_disputed") {
+    if (event.kind === "promise_disputed" && event.meta?.role !== "counterparty") {
       prev.disputed += 1;
       prev.totalCompleted += 1;
     }
