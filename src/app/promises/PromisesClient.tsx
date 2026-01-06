@@ -19,7 +19,7 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
-type PromiseWithRole = PromiseRow & { role: PromiseRole };
+type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
 const formatDue = (dueAt: string | null) => {
   if (!dueAt) return "No deadline";
@@ -81,6 +81,7 @@ export default function PromisesClient() {
 
       const { data, error } = await supabase
         .from("promises")
+        // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
         .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
         .or(`creator_id.eq.${user.id},counterparty_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
@@ -99,6 +100,7 @@ export default function PromisesClient() {
               ...r,
               status: r.status as PromiseStatus,
               role,
+              acceptedBySecondSide: Boolean(r.counterparty_id),
             };
           });
 
@@ -224,6 +226,7 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
+                const acceptedBySecondSide = p.acceptedBySecondSide;
                 const impact = (() => {
                   if (!isPromisor) return null;
 
@@ -296,7 +299,7 @@ export default function PromisesClient() {
                           </span>
                         )}
 
-                        {isPromisor && p.status === "active" && (
+                        {isPromisor && p.status === "active" && acceptedBySecondSide && (
                           <button
                             type="button"
                             disabled={busy}
@@ -339,6 +342,10 @@ export default function PromisesClient() {
                           >
                             {busy ? "Updating…" : "Mark as completed"}
                           </button>
+                        )}
+
+                        {isPromisor && p.status === "active" && !acceptedBySecondSide && (
+                          <span className="text-xs text-slate-400">Waiting for invite acceptance</span>
                         )}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
