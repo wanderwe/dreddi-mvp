@@ -4,14 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
-
-type DealRow = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  meta: string;
-};
+import { PromiseStatus } from "@/lib/promiseStatus";
 
 type ReputationResponse = {
   reputation: {
@@ -28,7 +21,10 @@ type ReputationResponse = {
     kind: string;
     delta: number;
     created_at: string;
-    meta: Record<string, unknown>;
+    meta: {
+      promise_title?: string | null;
+      role?: string | null;
+    };
     promise?: { title?: string | null } | null;
   }[];
 };
@@ -36,9 +32,6 @@ type ReputationResponse = {
 export default function Home() {
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
-  const [recentLoading, setRecentLoading] = useState(false);
-  const [recentError, setRecentError] = useState<string | null>(null);
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
@@ -49,7 +42,7 @@ export default function Home() {
     "Dreddi knows.",
   ];
 
-  const showcasePromises: DealRow[] = [
+  const showcasePromises = [
     { id: "demo-1", title: "Dreddi Alert", meta: "Review pending • 3:32PM", status: "active" },
     { id: "demo-2", title: "Buy Car Parts", meta: "Complete Task • Due today", status: "active" },
     { id: "demo-3", title: "Delivery Completed", meta: "Deal review • 2h ago", status: "confirmed" },
@@ -68,14 +61,6 @@ export default function Home() {
     confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
     disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
   };
-
-  const formatDateShort = (value: string) =>
-    new Intl.DateTimeFormat("en", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
 
   useEffect(() => {
     let active = true;
@@ -100,73 +85,6 @@ export default function Home() {
       sub.subscription.unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadRecentDeals = async () => {
-      if (!email) {
-        setRecentDeals([]);
-        setRecentError(null);
-        setRecentLoading(false);
-        return;
-      }
-
-      setRecentLoading(true);
-      setRecentError(null);
-
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
-
-      if (userErr || !userId) {
-        if (!cancelled) {
-          setRecentError(userErr?.message ?? "Unable to load user session");
-          setRecentLoading(false);
-        }
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("promises")
-        .select("id,title,status,due_at,created_at")
-        .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
-        .order("created_at", { ascending: false })
-        .limit(3);
-
-      if (cancelled) return;
-
-      if (error) {
-        setRecentError(error.message);
-      } else {
-        const normalized: DealRow[] = (data ?? [])
-          .map((row) => {
-            if (!isPromiseStatus(row.status)) return null;
-
-            const meta = row.due_at
-              ? `Due ${formatDateShort(row.due_at)}`
-              : `Created ${formatDateShort(row.created_at)}`;
-
-            return {
-              id: row.id,
-              title: row.title,
-              status: row.status as PromiseStatus,
-              meta,
-            };
-          })
-          .filter((row): row is DealRow => Boolean(row));
-
-        setRecentDeals(normalized);
-      }
-
-      setRecentLoading(false);
-    };
-
-    void loadRecentDeals();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [email]);
 
   useEffect(() => {
     let cancelled = false;
@@ -391,57 +309,63 @@ export default function Home() {
                     See all
                   </Link>
                 </div>
-                {recentError && email && (
-                  <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                    {recentError}
-                  </div>
-                )}
-
-                {!email && (
-                  <p className="mt-3 text-xs text-slate-400">
-                    Sign in to see your live promises. Here’s what an active reputation feed looks like.
+                  {!email && (
+                    <p className="mt-3 text-xs text-slate-400">
+                      Sign in to see your live promises. Here’s what an active reputation feed looks like.
                   </p>
                 )}
 
                 <div className="mt-3 space-y-2 text-sm">
-                  {reputationLoading || recentLoading ? (
+                  {reputationLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
                         <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
                       ))}
                     </div>
                   ) : email && recentEvents.length > 0 ? (
-                    recentEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">
-                            {event.delta > 0 ? `+${event.delta}` : event.delta} {event.kind.replace("promise_", "").replace("_", " ")}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            {event.promise?.title ?? "Promise"} • {new Date(event.created_at).toLocaleString()}
-                          </div>
-                        </div>
-                        <span
-                          className={[
-                            "rounded-full px-3 py-1 text-xs",
-                            event.delta >= 0
-                              ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                              : "bg-red-500/10 text-red-100 border border-red-400/30",
-                          ].join(" ")}
+                    recentEvents.map((event) => {
+                      const roleHint = event.meta?.role
+                        ? event.meta.role === "counterparty"
+                          ? "as counterparty"
+                          : "as promisor"
+                        : null;
+
+                      const label = event.kind.replace("promise_", "").replace("_", " ");
+                      const title = event.promise?.title ?? event.meta?.promise_title ?? "Promise";
+
+                      return (
+                        <div
+                          key={event.id}
+                          className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                         >
-                          {event.delta >= 0 ? "Positive" : "Negative"}
-                        </span>
-                      </div>
-                    ))
-                  ) : email && recentDeals.length === 0 ? (
+                          <div>
+                            <div className="font-semibold text-white">
+                              {event.delta > 0 ? `+${event.delta}` : event.delta} {label}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {title} • {new Date(event.created_at).toLocaleString()}
+                              {roleHint ? ` • ${roleHint}` : ""}
+                            </div>
+                          </div>
+                          <span
+                            className={[
+                              "rounded-full px-3 py-1 text-xs",
+                              event.delta >= 0
+                                ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                                : "bg-red-500/10 text-red-100 border border-red-400/30",
+                            ].join(" ")}
+                          >
+                            {event.delta >= 0 ? "Positive" : "Negative"}
+                          </span>
+                        </div>
+                      );
+                    })
+                  ) : email ? (
                     <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                      Create your first promise to populate your reputation feed.
+                      No reputation activity yet. Confirm or deliver promises to see updates here.
                     </div>
                   ) : (
-                    (email ? recentDeals : showcasePromises).map((item) => (
+                    showcasePromises.map((item) => (
                       <div
                         key={item.id}
                         className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
