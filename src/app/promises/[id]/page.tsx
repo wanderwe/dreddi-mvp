@@ -141,7 +141,7 @@ export default function PromisePage() {
   const [error, setError] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
+  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "cancel" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
 
   const dueText = useMemo(() => (p ? formatDue(p.due_at) : ""), [p]);
@@ -219,6 +219,44 @@ export default function PromisePage() {
     load();
   }
 
+  async function cancelPromise() {
+    if (!p) return;
+    setError(null);
+    setActionBusy("cancel");
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/cancel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const code = typeof body?.code === "string" ? body.code : undefined;
+      const codeMessages: Record<string, string> = {
+        FORBIDDEN_NOT_PROMISOR: "Only the promisor can cancel this promise.",
+        CANNOT_CANCEL_ACCEPTED: "The counterparty already accepted this promise.",
+        CANNOT_CANCEL_FINAL_STATUS: "Finalized promises cannot be canceled.",
+        CANNOT_CANCEL_STATUS: body?.error ?? "Promise cannot be canceled right now.",
+      };
+
+      const fallbackError = body?.error ?? "Could not cancel promise";
+      setError(code ? codeMessages[code] ?? fallbackError : fallbackError);
+      return;
+    }
+
+    router.push("/promises");
+  }
+
   async function generateInvite(regenerate = false) {
     if (!p) return;
 
@@ -283,6 +321,8 @@ export default function PromisePage() {
   const isInviteAccepted = Boolean(p?.counterparty_id);
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && isPromisor);
+  const canCancel =
+    Boolean(p && isPromisor && !isInviteAccepted && (p.status === "active" || p.status === "completed_by_promisor"));
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -362,6 +402,22 @@ export default function PromisePage() {
 
               {waitingForReview && !isCounterparty && (
                 <div className="text-sm text-neutral-400">Waiting for the counterparty to review.</div>
+              )}
+
+              {canCancel && (
+                <div className="space-y-2 rounded-xl border border-neutral-800/80 bg-black/30 p-3">
+                  <div className="text-sm text-neutral-300">
+                    The counterparty hasn&apos;t accepted yet. You can cancel it to start over.
+                  </div>
+
+                  <ActionButton
+                    label="Cancel promise"
+                    variant="danger"
+                    loading={actionBusy === "cancel"}
+                    disabled={actionBusy !== null}
+                    onClick={cancelPromise}
+                  />
+                </div>
               )}
 
               {p.status === "confirmed" && (

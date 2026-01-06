@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
-type PromiseRecord = {
+export type PromiseRecord = {
   id: string;
   title: string;
   details: string | null;
