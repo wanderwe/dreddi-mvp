@@ -3,8 +3,8 @@ import { cookies, headers } from "next/headers";
 const DEFAULT_LOCALE = "en";
 const LOCALE_COOKIE_NAME = "locale";
 
-export function getLocale(): string {
-  const cookieStore = cookies();
+export async function getLocale(): Promise<string> {
+  const cookieStore = await cookies();
 
   // IMPORTANT:
   // Do NOT use cookies().get() here.
@@ -19,7 +19,7 @@ export function getLocale(): string {
     return localeCookie;
   }
 
-  const acceptLanguage = headers().get("accept-language");
+  const acceptLanguage = (await headers()).get("accept-language");
   if (acceptLanguage) {
     const [preferredLocale] = acceptLanguage.split(",");
     if (preferredLocale) {

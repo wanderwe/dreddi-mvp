@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   description: "Promises tracked. Reputation earned."
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = getLocale();
+  const locale = await getLocale();
   const messages = getMessages(locale);
 
   return (
