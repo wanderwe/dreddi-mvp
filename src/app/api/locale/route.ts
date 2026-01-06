@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { LOCALE_COOKIE_NAME, Locale, isLocale } from "@/lib/i18n/locales";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -11,7 +10,10 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true });
-  cookies().set(LOCALE_COOKIE_NAME, locale, {
+
+  // Route Handlers cannot rely on cookies().set() because cookies may be async/readonly
+  // in the App Router; setting cookies via the response object is the only safe option.
+  response.cookies.set(LOCALE_COOKIE_NAME, locale, {
     path: "/",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 365,
