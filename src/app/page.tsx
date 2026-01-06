@@ -170,7 +170,7 @@ export default function Home() {
               created_at: row.created_at,
             };
           })
-          .filter((row): row is DealRow => Boolean(row));
+          .filter((row): row is DealRow => row !== null);
 
         setRecentDeals(normalized);
       }
