@@ -1,5 +1,5 @@
 import { Locale } from "./locales";
-import { Messages } from "./getMessages";
+import { MessageValue, Messages } from "./getMessages";
 
 type Params = Record<string, string | number>;
 
@@ -8,12 +8,16 @@ const format = (template: string, params?: Params) =>
     params && key in params ? String(params[key]) : `{${key}}`
   );
 
-const resolveKey = (messages: Messages, key: string): string | undefined => {
-  return key.split(".").reduce<string | Messages | undefined>((acc, part) => {
-    if (typeof acc === "string" || acc === undefined) return acc as string | undefined;
-    const next = acc[part];
-    return next as string | Messages | undefined;
-  }, messages) as string | undefined;
+const resolveKey = (messages: Messages, key: string): MessageValue | undefined => {
+  return key.split(".").reduce<MessageValue | undefined>((acc, part) => {
+    if (
+      typeof acc === "string" ||
+      acc === undefined ||
+      Array.isArray(acc)
+    )
+      return acc;
+    return acc[part];
+  }, messages);
 };
 
 export type TFunction = (key: string, params?: Params) => string;
