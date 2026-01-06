@@ -1,4 +1,76 @@
 {
+  "home": {
+    "eyebrow": "Reputation intelligence for deals and promises",
+    "brand": {
+      "name": "Dreddi",
+      "suffix": "knows"
+    },
+    "tagline": "Track every promise, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
+    "highlights": [
+      "Promises tracked.",
+      "Reputation intact.",
+      "Dreddi knows."
+    ],
+    "showcase": [
+      {
+        "title": "Dreddi Alert",
+        "meta": "Review pending • 3:32PM"
+      },
+      {
+        "title": "Buy Car Parts",
+        "meta": "Complete Task • Due today"
+      },
+      {
+        "title": "Delivery Completed",
+        "meta": "Deal review • 2h ago"
+      }
+    ],
+    "loading": "Loading your session…",
+    "cta": {
+      "getStarted": "Get started",
+      "publicProfiles": "See public profiles",
+      "createPromise": "Create promise",
+      "reviewDeals": "Review deals",
+      "logout": "Log out"
+    },
+    "score": {
+      "label": "Reputation Score",
+      "live": "Live",
+      "signIn": "Sign in for live score",
+      "cards": {
+        "score": "Score",
+        "confirmed": "Confirmed",
+        "confirmedSuffix": "{count} complete",
+        "disputed": "Disputed",
+        "disputedSuffix": "{count} recorded"
+      },
+      "onTime": {
+        "label": "On-time completions",
+        "suffix": "{count} delivered on time",
+        "descriptionSignedIn": "Each on-time delivery boosts your reputation.",
+        "descriptionGuest": "Sign in to start tracking how on-time completions help your score."
+      }
+    },
+    "recentDeals": {
+      "title": "Recent deals",
+      "seeAll": "See all",
+      "guestHint": "Sign in to see your live promises. Here’s what an active reputation feed looks like.",
+      "empty": "Create your first promise to populate your reputation feed.",
+      "sentiment": {
+        "positive": "Positive",
+        "negative": "Negative"
+      },
+      "eventFallbackTitle": "Promise",
+      "placeholderMetaDue": "Due {date}",
+      "placeholderMetaCreated": "Created {date}",
+      "status": {
+        "active": "Active",
+        "completed_by_promisor": "Awaiting review",
+        "confirmed": "Confirmed",
+        "disputed": "Disputed"
+      }
+    }
+  },
   "nav": {
     "myPromises": "My promises",
     "newPromise": "New promise",

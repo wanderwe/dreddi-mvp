@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
@@ -11,7 +12,9 @@ type DealRow = {
   id: string;
   title: string;
   status: PromiseStatus;
-  meta: string;
+  meta?: string;
+  due_at?: string | null;
+  created_at?: string;
 };
 
 type ReputationResponse = {
@@ -35,6 +38,8 @@ type ReputationResponse = {
 };
 
 export default function Home() {
+  const t = useT();
+  const locale = useLocale();
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
@@ -45,22 +50,37 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
 
   const highlights = [
-    "Promises tracked.",
-    "Reputation intact.",
-    "Dreddi knows.",
+    t("home.highlights.0"),
+    t("home.highlights.1"),
+    t("home.highlights.2"),
   ];
 
   const showcasePromises: DealRow[] = [
-    { id: "demo-1", title: "Dreddi Alert", meta: "Review pending • 3:32PM", status: "active" },
-    { id: "demo-2", title: "Buy Car Parts", meta: "Complete Task • Due today", status: "active" },
-    { id: "demo-3", title: "Delivery Completed", meta: "Deal review • 2h ago", status: "confirmed" },
+    {
+      id: "demo-1",
+      title: t("home.showcase.0.title"),
+      meta: t("home.showcase.0.meta"),
+      status: "active",
+    },
+    {
+      id: "demo-2",
+      title: t("home.showcase.1.title"),
+      meta: t("home.showcase.1.meta"),
+      status: "active",
+    },
+    {
+      id: "demo-3",
+      title: t("home.showcase.2.title"),
+      meta: t("home.showcase.2.meta"),
+      status: "confirmed",
+    },
   ];
 
   const statusLabels: Record<PromiseStatus, string> = {
-    active: "Active",
-    completed_by_promisor: "Awaiting review",
-    confirmed: "Confirmed",
-    disputed: "Disputed",
+    active: t("home.recentDeals.status.active"),
+    completed_by_promisor: t("home.recentDeals.status.completed_by_promisor"),
+    confirmed: t("home.recentDeals.status.confirmed"),
+    disputed: t("home.recentDeals.status.disputed"),
   };
 
   const statusTones: Record<PromiseStatus, string> = {
@@ -71,7 +91,7 @@ export default function Home() {
   };
 
   const formatDateShort = (value: string) =>
-    new Intl.DateTimeFormat("en", {
+    new Intl.DateTimeFormat(locale, {
       month: "short",
       day: "numeric",
       hour: "numeric",
@@ -142,16 +162,12 @@ export default function Home() {
         const normalized: DealRow[] = (data ?? [])
           .map((row) => {
             if (!isPromiseStatus(row.status)) return null;
-
-            const meta = row.due_at
-              ? `Due ${formatDateShort(row.due_at)}`
-              : `Created ${formatDateShort(row.created_at)}`;
-
             return {
               id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
-              meta,
+              due_at: row.due_at,
+              created_at: row.created_at,
             };
           })
           .filter((row): row is DealRow => Boolean(row));
@@ -241,20 +257,19 @@ export default function Home() {
         <div className="flex-1 space-y-8">
           <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-emerald-200">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(74,222,128,0.25)]" />
-            Reputation intelligence for deals and promises
+            {t("home.eyebrow")}
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-14 w-14 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)]" />
               <div className="flex items-center gap-3 text-4xl font-semibold leading-tight sm:text-5xl">
-                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-                <span className="text-white">knows</span>
+                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">{t("home.brand.name")}</span>
+                <span className="text-white">{t("home.brand.suffix")}</span>
               </div>
             </div>
             <p className="max-w-xl text-lg text-slate-300">
-              Track every promise, measure delivery, and keep your reputation sharp.
-              Dreddi watches the details so your deals stay honest.
+              {t("home.tagline")}
             </p>
             <div className="grid max-w-lg gap-2 sm:grid-cols-3">
               {highlights.map((item) => (
@@ -274,7 +289,7 @@ export default function Home() {
           {!ready ? (
             <div className="flex items-center gap-3 text-slate-400">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-              Loading your session…
+              {t("home.loading")}
             </div>
           ) : !email ? (
             <div className="flex flex-wrap items-center gap-3">
@@ -282,13 +297,13 @@ export default function Home() {
                 href="/login"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
-                Get started
+                {t("home.cta.getStarted")}
               </Link>
               <Link
                 href="/p"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                See public profiles
+                {t("home.cta.publicProfiles")}
               </Link>
               <LocaleSwitcher />
             </div>
@@ -298,20 +313,20 @@ export default function Home() {
                 href="/promises/new"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
-                Create promise
+                {t("home.cta.createPromise")}
               </Link>
               <Link
                 href="/promises"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                Review deals
+                {t("home.cta.reviewDeals")}
               </Link>
               <LocaleSwitcher />
               <button
                 onClick={logout}
                 className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200"
               >
-                Log out
+                {t("home.cta.logout")}
               </button>
             </div>
           )}
@@ -325,7 +340,7 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
-                    <p className="text-sm text-slate-300">Reputation Score</p>
+                    <p className="text-sm text-slate-300">{t("home.score.label")}</p>
                     <p className="text-2xl font-semibold text-white">
                       {reputationLoading ? "Loading…" : score}
                     </p>
@@ -333,32 +348,40 @@ export default function Home() {
                 </div>
                 {email ? (
                   <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
-                    Live
+                    {t("home.score.live")}
                   </span>
                 ) : (
                   <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
-                    Sign in for live score
+                    {t("home.score.signIn")}
                   </span>
                 )}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-slate-200 shadow-inner shadow-black/30">
-                  <div className="text-xs text-slate-400">Score</div>
+                  <div className="text-xs text-slate-400">{t("home.score.cards.score")}</div>
                   <div className="text-2xl font-semibold text-white">
                     {reputationLoading ? "…" : score}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">Confirmed</div>
+                  <div className="text-xs text-emerald-200">{t("home.score.cards.confirmed")}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading ? "…" : `${confirmedCount} complete`}
+                    {reputationLoading
+                      ? "…"
+                      : t("home.score.cards.confirmedSuffix", {
+                          count: confirmedCount,
+                        })}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">Disputed</div>
+                  <div className="text-xs text-amber-200">{t("home.score.cards.disputed")}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading ? "…" : `${disputedCount} recorded`}
+                    {reputationLoading
+                      ? "…"
+                      : t("home.score.cards.disputedSuffix", {
+                          count: disputedCount,
+                        })}
                   </div>
                 </div>
               </div>
@@ -372,26 +395,30 @@ export default function Home() {
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-inner shadow-black/50">
                 <div className="flex items-center gap-2 text-sm text-emerald-200">
                   <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  On-time completions
+                  {t("home.score.onTime.label")}
                 </div>
                 <p className="mt-2 text-lg font-semibold text-white">
-                  {reputationLoading ? "…" : `${onTimeCount} delivered on time`}
+                  {reputationLoading
+                    ? "…"
+                    : t("home.score.onTime.suffix", {
+                        count: onTimeCount,
+                      })}
                 </p>
                 <p className="text-sm text-slate-300">
                   {email
-                    ? "Each on-time delivery boosts your reputation."
-                    : "Sign in to start tracking how on-time completions help your score."}
+                    ? t("home.score.onTime.descriptionSignedIn")
+                    : t("home.score.onTime.descriptionGuest")}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
                 <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>Recent deals</span>
+                  <span>{t("home.recentDeals.title")}</span>
                   <Link
                     href="/promises"
                     className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
                   >
-                    See all
+                    {t("home.recentDeals.seeAll")}
                   </Link>
                 </div>
                 {recentError && email && (
@@ -402,7 +429,7 @@ export default function Home() {
 
                 {!email && (
                   <p className="mt-3 text-xs text-slate-400">
-                    Sign in to see your live promises. Here’s what an active reputation feed looks like.
+                    {t("home.recentDeals.guestHint")}
                   </p>
                 )}
 
@@ -424,7 +451,9 @@ export default function Home() {
                             {event.delta > 0 ? `+${event.delta}` : event.delta} {event.kind.replace("promise_", "").replace("_", " ")}
                           </div>
                           <div className="text-xs text-slate-400">
-                            {event.promise?.title ?? "Promise"} • {new Date(event.created_at).toLocaleString()}
+                            {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
+                            {" • "}
+                            {new Date(event.created_at).toLocaleString(locale)}
                           </div>
                         </div>
                         <span
@@ -435,31 +464,47 @@ export default function Home() {
                               : "bg-red-500/10 text-red-100 border border-red-400/30",
                           ].join(" ")}
                         >
-                          {event.delta >= 0 ? "Positive" : "Negative"}
+                          {event.delta >= 0
+                            ? t("home.recentDeals.sentiment.positive")
+                            : t("home.recentDeals.sentiment.negative")}
                         </span>
                       </div>
                     ))
                   ) : email && recentDeals.length === 0 ? (
                     <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                      Create your first promise to populate your reputation feed.
+                      {t("home.recentDeals.empty")}
                     </div>
                   ) : (
-                    (email ? recentDeals : showcasePromises).map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">{item.title}</div>
-                          <div className="text-xs text-slate-400">{item.meta}</div>
-                        </div>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                    (email ? recentDeals : showcasePromises).map((item) => {
+                      const metaText =
+                        item.meta ??
+                        (item.due_at
+                          ? t("home.recentDeals.placeholderMetaDue", {
+                              date: formatDateShort(item.due_at),
+                            })
+                          : item.created_at
+                          ? t("home.recentDeals.placeholderMetaCreated", {
+                              date: formatDateShort(item.created_at),
+                            })
+                          : "");
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                         >
-                          {statusLabels[item.status] ?? item.status}
-                        </span>
-                      </div>
-                    ))
+                          <div>
+                            <div className="font-semibold text-white">{item.title}</div>
+                            <div className="text-xs text-slate-400">{metaText}</div>
+                          </div>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                          >
+                            {statusLabels[item.status] ?? item.status}
+                          </span>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
