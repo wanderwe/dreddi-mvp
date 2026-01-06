@@ -4,7 +4,10 @@ import { Locale, defaultLocale } from "./locales";
 
 export type MessageValue =
   | string
-  | string[]
+  | number
+  | boolean
+  | null
+  | MessageValue[]
   | { [key: string]: MessageValue };
 
 export type Messages = { [key: string]: MessageValue };
