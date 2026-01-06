@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "myPromises": "My promises",
+    "newPromise": "New promise",
+    "logout": "Log out"
+  },
+  "promises": {
+    "overview": {
+      "eyebrow": "Promises",
+      "title": "Your promises overview",
+      "subtitle": "Snapshot of everything you promised and what was promised to you.",
+      "cta": "New promise",
+      "metrics": {
+        "total": "Total",
+        "awaitingYou": "Awaiting your action",
+        "awaitingOthers": "Awaiting others"
+      }
+    },
+    "empty": {
+      "title": "Nothing here yet",
+      "promisorDescription": "You haven’t created any promises yet. Start a new one to track your commitments.",
+      "counterpartyDescription": "Nothing has been promised to you yet. Accept an invite link to get started.",
+      "cta": "Create promise"
+    }
+  }
+}

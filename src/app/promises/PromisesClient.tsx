@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 type PromiseRow = {
   id: string;
@@ -49,6 +50,7 @@ const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
 };
 
 export default function PromisesClient() {
+  const t = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -214,9 +216,11 @@ export default function PromisesClient() {
         <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 shadow-2xl shadow-black/40 backdrop-blur">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Promises</p>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">Your promises overview</h1>
-              <p className="text-sm text-slate-300">Snapshot of everything you promised and what was promised to you.</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.overview.eyebrow")}
+              </p>
+              <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
+              <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
             </div>
 
             <Link
@@ -224,21 +228,25 @@ export default function PromisesClient() {
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
             >
               <span className="text-lg">＋</span>
-              New promise
+              {t("promises.overview.cta")}
             </Link>
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Total</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{overview.total}</div>
             </div>
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">Awaiting your action</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.overview.metrics.awaitingYou")}
+              </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingYou}</div>
             </div>
             <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-amber-200">Awaiting others</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
+                {t("promises.overview.metrics.awaitingOthers")}
+              </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingOthers}</div>
             </div>
           </div>
@@ -396,18 +404,18 @@ export default function PromisesClient() {
 
             {!loading && rows.length === 0 && (
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
-                <p className="text-lg font-semibold text-white">Nothing here yet</p>
+                <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
                 <p className="text-sm text-slate-400">
                   {tab === "i-promised"
-                    ? "You haven’t created any promises yet. Start a new one to track your commitments."
-                    : "Nothing has been promised to you yet. Accept an invite link to get started."}
+                    ? t("promises.empty.promisorDescription")
+                    : t("promises.empty.counterpartyDescription")}
                 </p>
                 <div className="mt-4">
                   <Link
                     href="/promises/new"
                     className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
                   >
-                    Create promise
+                    {t("promises.empty.cta")}
                   </Link>
                 </div>
               </div>
