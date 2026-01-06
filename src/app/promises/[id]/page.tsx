@@ -342,13 +342,19 @@ export default function PromisePage() {
               <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
 
               {isPromisor && p.status === "active" && (
-                <ActionButton
-                  label="Mark as completed"
-                  variant="ok"
-                  loading={actionBusy === "complete"}
-                  disabled={actionBusy !== null}
-                  onClick={markCompleted}
-                />
+                isInviteAccepted ? (
+                  <ActionButton
+                    label="Mark as completed"
+                    variant="ok"
+                    loading={actionBusy === "complete"}
+                    disabled={actionBusy !== null}
+                    onClick={markCompleted}
+                  />
+                ) : (
+                  <div className="text-sm text-neutral-400">
+                    Share the invite and wait for acceptance to request confirmation.
+                  </div>
+                )
               )}
 
               {isCounterparty && p.status === "completed_by_promisor" && (

@@ -14,6 +14,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Only the promisor can complete" }, { status: 403 });
     }
 
+    if (!promise.counterparty_id) {
+      return NextResponse.json({ error: "PROMISE_NOT_ACCEPTED" }, { status: 400 });
+    }
+
     if (promise.status !== "active") {
       return NextResponse.json({ error: "Promise is not active" }, { status: 400 });
     }
