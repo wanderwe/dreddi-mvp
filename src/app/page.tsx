@@ -159,18 +159,18 @@ export default function Home() {
       if (error) {
         setRecentError(error.message);
       } else {
-        const normalized: DealRow[] = (data ?? [])
-          .map((row) => {
-            if (!isPromiseStatus(row.status)) return null;
-            return {
+        const normalized: DealRow[] = (data ?? []).flatMap((row) => {
+          if (!isPromiseStatus(row.status)) return [];
+          return [
+            {
               id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
               due_at: row.due_at,
               created_at: row.created_at,
-            };
-          })
-          .filter((row): row is DealRow => row !== null);
+            },
+          ];
+        });
 
         setRecentDeals(normalized);
       }
