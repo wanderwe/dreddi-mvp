@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 
 type PromiseRow = {
   id: string;
@@ -18,8 +19,6 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
-type PromiseRole = "promisor" | "counterparty";
-
 type PromiseWithRole = PromiseRow & { role: PromiseRole };
 
 const formatDue = (dueAt: string | null) => {
@@ -47,20 +46,6 @@ const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
   if (status === "disputed") return "Disputed";
 
   return status;
-};
-
-const isAwaitingYourAction = (row: PromiseWithRole) => {
-  if (row.role === "counterparty" && row.status === "completed_by_promisor") {
-    return true;
-  }
-
-  return false;
-};
-
-const isAwaitingOthers = (row: PromiseWithRole) => {
-  if (row.role === "promisor" && row.status === "completed_by_promisor") return true;
-  if (row.role === "counterparty" && row.status === "active") return true;
-  return false;
 };
 
 export default function PromisesClient() {
