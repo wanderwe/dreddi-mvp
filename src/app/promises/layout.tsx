@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
+  const t = useT();
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,20 +45,20 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
 
           <nav className="flex items-center gap-3 text-sm font-medium text-slate-200">
             <Link className="rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100" href="/promises">
-              My promises
+              {t("nav.myPromises")}
             </Link>
             <Link
               className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
               href="/promises/new"
             >
-              New promise
+              {t("nav.newPromise")}
             </Link>
             {email && (
               <button
                 onClick={logout}
                 className="rounded-xl px-3 py-1.5 text-slate-300 transition hover:text-emerald-200"
               >
-                Log out
+                {t("nav.logout")}
               </button>
             )}
           </nav>
