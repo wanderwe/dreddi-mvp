@@ -41,7 +41,7 @@ create table if not exists promises (
 );
 
 alter table promises add constraint promises_status_valid
-  check (status in ('active','completed_by_promisor','confirmed','disputed','fulfilled','broken'));
+  check (status in ('active','completed_by_promisor','confirmed','disputed','fulfilled','broken','canceled'));
 alter table promises add constraint promises_dispute_code_valid
   check (disputed_code is null or disputed_code in ('not_completed','partial','late','other'));
 

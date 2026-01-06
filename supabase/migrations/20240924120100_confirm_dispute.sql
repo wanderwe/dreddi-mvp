@@ -10,7 +10,7 @@ ALTER TABLE promises
   DROP CONSTRAINT IF EXISTS promises_status_valid;
 ALTER TABLE promises
   ADD CONSTRAINT promises_status_valid
-  CHECK (status IN ('active','completed_by_promisor','confirmed','disputed','fulfilled','broken'));
+  CHECK (status IN ('active','completed_by_promisor','confirmed','disputed','fulfilled','broken','canceled'));
 
 -- Keep dispute codes aligned to API constants
 ALTER TABLE promises

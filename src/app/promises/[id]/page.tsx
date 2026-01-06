@@ -55,6 +55,7 @@ function StatusPill({ status }: { status: PromiseRow["status"] }) {
     completed_by_promisor: "Waiting confirmation",
     confirmed: "Confirmed",
     disputed: "Disputed",
+    canceled: "Canceled",
   };
 
   const colorMap: Record<PromiseRow["status"], string> = {
@@ -62,6 +63,7 @@ function StatusPill({ status }: { status: PromiseRow["status"] }) {
     confirmed: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
     disputed: "border-red-700/60 text-red-200 bg-red-500/10",
     completed_by_promisor: "border-amber-500/40 text-amber-100 bg-amber-500/10",
+    canceled: "border-neutral-700 text-neutral-300 bg-neutral-800/50",
   };
 
   return (
@@ -141,7 +143,7 @@ export default function PromisePage() {
   const [error, setError] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
+  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "cancel" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
 
   const dueText = useMemo(() => (p ? formatDue(p.due_at) : ""), [p]);
@@ -190,7 +192,7 @@ export default function PromisePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  async function markCompleted() {
+  async function requestConfirmation() {
     if (!p) return;
     setError(null);
     setActionBusy("complete");
@@ -213,6 +215,35 @@ export default function PromisePage() {
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
       setError(j?.error ?? "Could not update status");
+      return;
+    }
+
+    load();
+  }
+
+  async function cancelPromise() {
+    if (!p) return;
+    setError(null);
+    setActionBusy("cancel");
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/cancel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? "Could not cancel promise");
       return;
     }
 
@@ -281,8 +312,14 @@ export default function PromisePage() {
   const isCounterparty = Boolean(p && userId === p.counterparty_id);
   const waitingForReview = p?.status === "completed_by_promisor";
   const isInviteAccepted = Boolean(p?.counterparty_id);
-  const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
+  const isFinal = Boolean(
+    p && (p.status === "confirmed" || p.status === "disputed" || p.status === "canceled")
+  );
   const canManageInvite = Boolean(p && isPromisor);
+  const canRequestConfirmation = Boolean(isPromisor && p?.status === "active" && isInviteAccepted);
+  const canCancelPromise = Boolean(
+    isPromisor && !isInviteAccepted && p && p.status !== "confirmed" && p.status !== "disputed"
+  );
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -341,14 +378,51 @@ export default function PromisePage() {
             <div className="space-y-3">
               <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
 
-              {isPromisor && p.status === "active" && (
-                <ActionButton
-                  label="Mark as completed"
-                  variant="ok"
-                  loading={actionBusy === "complete"}
-                  disabled={actionBusy !== null}
-                  onClick={markCompleted}
-                />
+              {isPromisor && (p.status === "active" || (!isInviteAccepted && waitingForReview)) && (
+                <div className="space-y-2">
+                  {canRequestConfirmation && (
+                    <ActionButton
+                      label="Request confirmation"
+                      variant="ok"
+                      loading={actionBusy === "complete"}
+                      disabled={actionBusy !== null}
+                      onClick={requestConfirmation}
+                    />
+                  )}
+
+                  {!canRequestConfirmation && p.status === "active" && (
+                    <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4 text-sm text-neutral-300">
+                      <div className="font-semibold text-white">Request confirmation</div>
+                      <div className="mt-1 space-y-1 text-neutral-400">
+                        <p>Надішліть інвайт і дочекайтесь прийняття, щоб запросити підтвердження.</p>
+                        <p>Send the invite and wait for acceptance to request confirmation.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!canRequestConfirmation && waitingForReview && !isInviteAccepted && (
+                    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-50">
+                      This promise is waiting for confirmation but no counterparty has accepted the invite. You can cancel it to
+                      start over.
+                    </div>
+                  )}
+
+                  {canCancelPromise ? (
+                    <ActionButton
+                      label="Cancel promise"
+                      variant="danger"
+                      loading={actionBusy === "cancel"}
+                      disabled={actionBusy !== null}
+                      onClick={cancelPromise}
+                    />
+                  ) : (
+                    isPromisor && isInviteAccepted && p.status === "active" && (
+                      <div className="text-xs text-neutral-500">
+                        Скасування після прийняття потребує підтвердження другої сторони (coming soon).
+                      </div>
+                    )
+                  )}
+                </div>
               )}
 
               {isCounterparty && p.status === "completed_by_promisor" && (
@@ -370,6 +444,10 @@ export default function PromisePage() {
 
               {p.status === "disputed" && (
                 <div className="text-sm text-red-300">Promise disputed.</div>
+              )}
+
+              {p.status === "canceled" && (
+                <div className="text-sm text-neutral-400">Promise canceled.</div>
               )}
 
               {!isPromisor && !isCounterparty && (

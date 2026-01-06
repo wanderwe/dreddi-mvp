@@ -7,17 +7,18 @@ import { PromiseStatus } from "../src/lib/promiseStatus";
 type FixtureRow = {
   role: PromiseRole;
   status: PromiseStatus;
+  counterpartyAccepted?: boolean;
 };
 
 test("promisor with an active promise should be awaiting your action", () => {
-  const row: FixtureRow = { role: "promisor", status: "active" };
+  const row: FixtureRow = { role: "promisor", status: "active", counterpartyAccepted: true };
 
   assert.equal(isAwaitingYourAction(row), true);
   assert.equal(isAwaitingOthers(row), false);
 });
 
 test("counterparty should be awaiting action after promisor marks complete", () => {
-  const row: FixtureRow = { role: "counterparty", status: "completed_by_promisor" };
+  const row: FixtureRow = { role: "counterparty", status: "completed_by_promisor", counterpartyAccepted: true };
 
   assert.equal(isAwaitingYourAction(row), true);
   assert.equal(isAwaitingOthers(row), false);

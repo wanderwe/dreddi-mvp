@@ -19,7 +19,7 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
-type PromiseWithRole = PromiseRow & { role: PromiseRole };
+type PromiseWithRole = PromiseRow & { role: PromiseRole; counterpartyAccepted: boolean };
 
 const formatDue = (dueAt: string | null) => {
   if (!dueAt) return "No deadline";
@@ -38,12 +38,14 @@ const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
     if (status === "completed_by_promisor") return "Pending confirmation";
     if (status === "confirmed") return "Confirmed";
     if (status === "disputed") return "Disputed";
+    if (status === "canceled") return "Canceled";
   }
 
   if (status === "active") return "Pending completion";
   if (status === "completed_by_promisor") return "Needs your review";
   if (status === "confirmed") return "Confirmed";
   if (status === "disputed") return "Disputed";
+  if (status === "canceled") return "Canceled";
 
   return status;
 };
@@ -99,8 +101,10 @@ export default function PromisesClient() {
               ...r,
               status: r.status as PromiseStatus,
               role,
+              counterpartyAccepted: Boolean(r.counterparty_id),
             };
-          });
+          })
+          .filter((row) => row.status !== "canceled");
 
         setAllRows(filtered);
       }
@@ -296,7 +300,7 @@ export default function PromisesClient() {
                           </span>
                         )}
 
-                        {isPromisor && p.status === "active" && (
+                        {isPromisor && p.status === "active" && p.counterpartyAccepted && (
                           <button
                             type="button"
                             disabled={busy}
@@ -337,8 +341,14 @@ export default function PromisesClient() {
                             }}
                             className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
                           >
-                            {busy ? "Updating…" : "Mark as completed"}
+                            {busy ? "Updating…" : "Request confirmation"}
                           </button>
+                        )}
+
+                        {isPromisor && p.status === "active" && !p.counterpartyAccepted && (
+                          <p className="text-xs text-slate-400">
+                            Send the invite and wait for acceptance to request confirmation.
+                          </p>
                         )}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
