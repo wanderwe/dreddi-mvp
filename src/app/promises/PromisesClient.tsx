@@ -122,6 +122,20 @@ export default function PromisesClient() {
     router.push(`/promises?${sp.toString()}`);
   };
 
+  const roleCounts = useMemo(
+    () =>
+      allRows.reduce(
+        (acc, row) => {
+          if (row.role === "promisor") acc.promisor += 1;
+          else if (row.role === "counterparty") acc.counterparty += 1;
+          else acc.uncategorized.push(row.id);
+          return acc;
+        },
+        { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
+      ),
+    [allRows]
+  );
+
   const rows = useMemo(
     () =>
       allRows.filter((row) =>
@@ -137,6 +151,21 @@ export default function PromisesClient() {
 
     return { total, awaitingYou, awaitingOthers };
   }, [allRows]);
+
+  useEffect(() => {
+    const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
+    if (
+      process.env.NODE_ENV !== "production" &&
+      categorizedTotal !== allRows.length
+    ) {
+      console.warn("[promises] Tab counts do not sum to total", {
+        total: allRows.length,
+        promisorCount: roleCounts.promisor,
+        counterpartyCount: roleCounts.counterparty,
+        uncategorizedIds: roleCounts.uncategorized,
+      });
+    }
+  }, [allRows.length, roleCounts.counterparty, roleCounts.promisor, roleCounts.uncategorized]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -227,7 +256,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              I promised
+              I promised ({roleCounts.promisor})
             </button>
 
             <button
@@ -240,7 +269,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              Promised to me
+              Promised to me ({roleCounts.counterparty})
             </button>
           </div>
 
