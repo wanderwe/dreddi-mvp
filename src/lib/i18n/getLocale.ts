@@ -1,9 +1,7 @@
 import { cookies, headers } from "next/headers";
+import { LOCALE_COOKIE_NAME, Locale, defaultLocale, normalizeLocale } from "./locales";
 
-const DEFAULT_LOCALE = "en";
-const LOCALE_COOKIE_NAME = "locale";
-
-export function getLocale(): string {
+export function getLocale(): Locale {
   const cookieStore = cookies();
 
   // IMPORTANT:
@@ -15,19 +13,21 @@ export function getLocale(): string {
     .getAll()
     .find((cookie) => cookie.name === LOCALE_COOKIE_NAME)?.value;
 
-  if (localeCookie) {
-    return localeCookie;
+  const normalizedCookie = normalizeLocale(localeCookie);
+  if (normalizedCookie) {
+    return normalizedCookie;
   }
 
   const acceptLanguage = headers().get("accept-language");
   if (acceptLanguage) {
     const [preferredLocale] = acceptLanguage.split(",");
-    if (preferredLocale) {
-      return preferredLocale;
+    const normalizedHeaderLocale = normalizeLocale(preferredLocale);
+    if (normalizedHeaderLocale) {
+      return normalizedHeaderLocale;
     }
   }
 
-  return DEFAULT_LOCALE;
+  return defaultLocale;
 }
 
-export { DEFAULT_LOCALE, LOCALE_COOKIE_NAME };
+export { LOCALE_COOKIE_NAME };
