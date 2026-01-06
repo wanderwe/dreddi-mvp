@@ -2,7 +2,9 @@ import enMessages from "@/messages/en.json";
 import ukMessages from "@/messages/uk.json";
 import { Locale, defaultLocale } from "./locales";
 
-export type Messages = Record<string, string | Messages>;
+export interface Messages {
+  [key: string]: string | Messages;
+}
 
 const dictionaries: Record<Locale, Messages> = {
   en: enMessages,
