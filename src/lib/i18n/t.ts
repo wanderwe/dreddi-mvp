@@ -8,14 +8,14 @@ const format = (template: string, params?: Params) =>
     params && key in params ? String(params[key]) : `{${key}}`
   );
 
+const isRecord = (
+  value: MessageValue | Messages | undefined
+): value is Record<string, MessageValue> =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
 const resolveKey = (messages: Messages, key: string): MessageValue | undefined => {
   return key.split(".").reduce<MessageValue | undefined>((acc, part) => {
-    if (
-      typeof acc === "string" ||
-      acc === undefined ||
-      Array.isArray(acc)
-    )
-      return acc;
+    if (!isRecord(acc)) return acc;
     return acc[part];
   }, messages);
 };
