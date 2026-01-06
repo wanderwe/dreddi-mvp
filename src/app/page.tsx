@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
@@ -276,7 +277,7 @@ export default function Home() {
               Loading your session…
             </div>
           ) : !email ? (
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/login"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -289,9 +290,10 @@ export default function Home() {
               >
                 See public profiles
               </Link>
+              <LocaleSwitcher />
             </div>
           ) : (
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/promises/new"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -304,6 +306,7 @@ export default function Home() {
               >
                 Review deals
               </Link>
+              <LocaleSwitcher />
               <button
                 onClick={logout}
                 className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200"
