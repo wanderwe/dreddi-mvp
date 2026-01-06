@@ -143,6 +143,7 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const dueText = useMemo(() => (p ? formatDue(p.due_at) : ""), [p]);
 
@@ -348,7 +349,7 @@ export default function PromisePage() {
                     variant="ok"
                     loading={actionBusy === "complete"}
                     disabled={actionBusy !== null}
-                    onClick={markCompleted}
+                    onClick={() => setShowConfirmModal(true)}
                   />
                 ) : (
                   <div className="text-sm text-neutral-400">
@@ -451,6 +452,37 @@ export default function PromisePage() {
             </Card>
           )}
         </>
+      )}
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">Request confirmation?</h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              You’re asking the other side to confirm you delivered this promise.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                Not yet
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowConfirmModal(false);
+                  await markCompleted();
+                }}
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+              >
+                Yes, request confirmation
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -58,6 +58,7 @@ export default function PromisesClient() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,6 +135,42 @@ export default function PromisesClient() {
 
     return { total, awaitingYou, awaitingOthers };
   }, [allRows]);
+
+  const handleMarkCompleted = async (promiseId: string) => {
+    setBusyMap((m) => ({ ...m, [promiseId]: true }));
+    setError(null);
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.push(`/login?next=${encodeURIComponent("/promises")}`);
+        return;
+      }
+
+      const res = await fetch(`/api/promises/${promiseId}/complete`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? "Could not mark complete");
+      }
+
+      setAllRows((prev) =>
+        prev.map((row) =>
+          row.id === promiseId
+            ? { ...row, status: "completed_by_promisor" as PromiseStatus }
+            : row
+        )
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to update");
+    } finally {
+      setBusyMap((m) => ({ ...m, [promiseId]: false }));
+    }
+  };
 
   return (
     <main className="relative py-10">
@@ -300,41 +337,7 @@ export default function PromisesClient() {
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={async () => {
-                              setBusyMap((m) => ({ ...m, [p.id]: true }));
-                              setError(null);
-                              try {
-                                const { data } = await supabase.auth.getSession();
-                                if (!data.session) {
-                                  router.push(`/login?next=${encodeURIComponent("/promises")}`);
-                                  return;
-                                }
-
-                                const res = await fetch(`/api/promises/${p.id}/complete`, {
-                                  method: "POST",
-                                  headers: {
-                                    Authorization: `Bearer ${data.session.access_token}`,
-                                  },
-                                });
-
-                                if (!res.ok) {
-                                  const body = await res.json().catch(() => ({}));
-                                  throw new Error(body.error ?? "Could not mark complete");
-                                }
-
-                                setAllRows((prev) =>
-                                  prev.map((row) =>
-                                    row.id === p.id
-                                      ? { ...row, status: "completed_by_promisor" as PromiseStatus }
-                                      : row
-                                  )
-                                );
-                              } catch (e) {
-                                setError(e instanceof Error ? e.message : "Failed to update");
-                              } finally {
-                                setBusyMap((m) => ({ ...m, [p.id]: false }));
-                              }
-                            }}
+                            onClick={() => setConfirmingId(p.id)}
                             className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
                           >
                             {busy ? "Updating…" : "Mark as completed"}
@@ -376,6 +379,38 @@ export default function PromisesClient() {
           </div>
         </div>
       </div>
+
+      {confirmingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">Request confirmation?</h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              You’re asking the other side to confirm you delivered this promise.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmingId(null)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                Not yet
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const id = confirmingId;
+                  setConfirmingId(null);
+                  if (id) await handleMarkCompleted(id);
+                }}
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+              >
+                Yes, request confirmation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
