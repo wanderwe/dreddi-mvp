@@ -51,6 +51,10 @@ const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
 export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const acceptanceHint = {
+    en: "Share the invite and wait for acceptance to request confirmation.",
+    ua: "Надішліть інвайт і дочекайтесь прийняття, щоб запросити підтвердження.",
+  };
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
 
@@ -224,6 +228,7 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
+                const isInviteAccepted = Boolean(p.counterparty_id);
                 const impact = (() => {
                   if (!isPromisor) return null;
 
@@ -296,50 +301,59 @@ export default function PromisesClient() {
                           </span>
                         )}
 
-                        {isPromisor && p.status === "active" && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={async () => {
-                              setBusyMap((m) => ({ ...m, [p.id]: true }));
-                              setError(null);
-                              try {
-                                const { data } = await supabase.auth.getSession();
-                                if (!data.session) {
-                                  router.push(`/login?next=${encodeURIComponent("/promises")}`);
-                                  return;
+                        {isPromisor && p.status === "active" &&
+                          (isInviteAccepted ? (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={async () => {
+                                setBusyMap((m) => ({ ...m, [p.id]: true }));
+                                setError(null);
+                                try {
+                                  const { data } = await supabase.auth.getSession();
+                                  if (!data.session) {
+                                    router.push(`/login?next=${encodeURIComponent("/promises")}`);
+                                    return;
+                                  }
+
+                                  const res = await fetch(`/api/promises/${p.id}/complete`, {
+                                    method: "POST",
+                                    headers: {
+                                      Authorization: `Bearer ${data.session.access_token}`,
+                                    },
+                                  });
+
+                                  if (!res.ok) {
+                                    const body = await res.json().catch(() => ({}));
+                                    if (body?.error === "PROMISE_NOT_ACCEPTED") {
+                                      throw new Error(acceptanceHint.en);
+                                    }
+                                    throw new Error(body.error ?? "Could not mark complete");
+                                  }
+
+                                  setAllRows((prev) =>
+                                    prev.map((row) =>
+                                      row.id === p.id
+                                        ? { ...row, status: "completed_by_promisor" as PromiseStatus }
+                                        : row
+                                    )
+                                  );
+                                } catch (e) {
+                                  setError(e instanceof Error ? e.message : "Failed to update");
+                                } finally {
+                                  setBusyMap((m) => ({ ...m, [p.id]: false }));
                                 }
-
-                                const res = await fetch(`/api/promises/${p.id}/complete`, {
-                                  method: "POST",
-                                  headers: {
-                                    Authorization: `Bearer ${data.session.access_token}`,
-                                  },
-                                });
-
-                                if (!res.ok) {
-                                  const body = await res.json().catch(() => ({}));
-                                  throw new Error(body.error ?? "Could not mark complete");
-                                }
-
-                                setAllRows((prev) =>
-                                  prev.map((row) =>
-                                    row.id === p.id
-                                      ? { ...row, status: "completed_by_promisor" as PromiseStatus }
-                                      : row
-                                  )
-                                );
-                              } catch (e) {
-                                setError(e instanceof Error ? e.message : "Failed to update");
-                              } finally {
-                                setBusyMap((m) => ({ ...m, [p.id]: false }));
-                              }
-                            }}
-                            className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
-                          >
-                            {busy ? "Updating…" : "Mark as completed"}
-                          </button>
-                        )}
+                              }}
+                              className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+                            >
+                              {busy ? "Updating…" : "Mark as completed"}
+                            </button>
+                          ) : (
+                            <div className="max-w-xs text-right text-xs text-slate-400">
+                              <div>{acceptanceHint.en}</div>
+                              <div className="text-slate-500">{acceptanceHint.ua}</div>
+                            </div>
+                          ))}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
                           <Link

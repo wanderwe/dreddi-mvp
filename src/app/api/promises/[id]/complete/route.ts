@@ -18,6 +18,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Promise is not active" }, { status: 400 });
     }
 
+    if (!promise.counterparty_id) {
+      return NextResponse.json({ error: "PROMISE_NOT_ACCEPTED" }, { status: 400 });
+    }
+
     const admin = getAdminClient();
     const { error } = await admin
       .from("promises")

@@ -212,7 +212,11 @@ export default function PromisePage() {
 
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      setError(j?.error ?? "Could not update status");
+      if (j?.error === "PROMISE_NOT_ACCEPTED") {
+        setError(acceptanceHint.en);
+      } else {
+        setError(j?.error ?? "Could not update status");
+      }
       return;
     }
 
@@ -283,6 +287,10 @@ export default function PromisePage() {
   const isInviteAccepted = Boolean(p?.counterparty_id);
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && isPromisor);
+  const acceptanceHint = {
+    en: "Share the invite and wait for acceptance to request confirmation.",
+    ua: "Надішліть інвайт і дочекайтесь прийняття, щоб запросити підтвердження.",
+  };
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -342,13 +350,20 @@ export default function PromisePage() {
               <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
 
               {isPromisor && p.status === "active" && (
-                <ActionButton
-                  label="Mark as completed"
-                  variant="ok"
-                  loading={actionBusy === "complete"}
-                  disabled={actionBusy !== null}
-                  onClick={markCompleted}
-                />
+                isInviteAccepted ? (
+                  <ActionButton
+                    label="Mark as completed"
+                    variant="ok"
+                    loading={actionBusy === "complete"}
+                    disabled={actionBusy !== null}
+                    onClick={markCompleted}
+                  />
+                ) : (
+                  <div className="text-sm text-neutral-400">
+                    <div>{acceptanceHint.en}</div>
+                    <div className="text-neutral-500">{acceptanceHint.ua}</div>
+                  </div>
+                )
               )}
 
               {isCounterparty && p.status === "completed_by_promisor" && (
