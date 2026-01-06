@@ -13,6 +13,7 @@ type InviteInfo = {
   creator_handle: string | null;
   creator_display_name: string | null;
   counterparty_id: string | null;
+  counterparty_contact: string | null;
 };
 
 const formatDue = (dueAt: string | null) => {
@@ -172,6 +173,11 @@ export default function InvitePage() {
 
         {info && (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
+            {info.counterparty_id && (
+              <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                This invite was already accepted{info.counterparty_contact ? ` by ${info.counterparty_contact}` : ""}.
+              </div>
+            )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
