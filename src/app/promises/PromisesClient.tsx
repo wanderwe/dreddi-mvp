@@ -15,6 +15,7 @@ type PromiseRow = {
   created_at: string;
   completed_at: string | null;
   counterparty_id: string | null;
+  accepted_by_second_side: boolean | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
 };
 
@@ -81,7 +82,9 @@ export default function PromisesClient() {
 
       const { data, error } = await supabase
         .from("promises")
-        .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
+        .select(
+          "id,title,status,due_at,created_at,completed_at,counterparty_id,accepted_by_second_side,creator_id"
+        )
         .or(`creator_id.eq.${user.id},counterparty_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
 
@@ -296,7 +299,7 @@ export default function PromisesClient() {
                           </span>
                         )}
 
-                        {isPromisor && p.status === "active" && (
+                        {isPromisor && p.status === "active" && p.accepted_by_second_side === true && (
                           <button
                             type="button"
                             disabled={busy}

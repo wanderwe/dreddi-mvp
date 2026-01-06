@@ -17,6 +17,7 @@ type PromiseRow = {
 
   invite_token: string | null;
   counterparty_id: string | null;
+  accepted_by_second_side: boolean | null;
   creator_id: string;
 };
 
@@ -167,7 +168,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id"
+        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,accepted_by_second_side,creator_id"
       )
       .eq("id", id)
       .single();
@@ -341,7 +342,7 @@ export default function PromisePage() {
             <div className="space-y-3">
               <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
 
-              {isPromisor && p.status === "active" && (
+              {isPromisor && p.status === "active" && p.accepted_by_second_side === true && (
                 <ActionButton
                   label="Mark as completed"
                   variant="ok"
