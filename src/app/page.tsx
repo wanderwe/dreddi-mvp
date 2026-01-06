@@ -253,6 +253,12 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
+      <header className="absolute inset-x-0 top-0 z-10">
+        <div className="mx-auto flex max-w-6xl justify-end px-6 py-6">
+          <LocaleSwitcher className="shadow-[0_10px_30px_rgba(0,0,0,0.35)]" />
+        </div>
+      </header>
+
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-16 px-6 py-14 md:flex-row md:items-center">
         <div className="flex-1 space-y-8">
           <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-emerald-200">
@@ -305,7 +311,6 @@ export default function Home() {
               >
                 {t("home.cta.publicProfiles")}
               </Link>
-              <LocaleSwitcher />
             </div>
           ) : (
             <div className="flex flex-wrap items-center gap-3">
@@ -321,7 +326,6 @@ export default function Home() {
               >
                 {t("home.cta.reviewDeals")}
               </Link>
-              <LocaleSwitcher />
               <button
                 onClick={logout}
                 className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200"
