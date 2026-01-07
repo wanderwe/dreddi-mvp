@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
 export default function AuthCallbackPage() {
   const [msg, setMsg] = useState("Signing you in...");

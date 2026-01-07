@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
 export default function LoginPage() {

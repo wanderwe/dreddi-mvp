@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type DealRow = {

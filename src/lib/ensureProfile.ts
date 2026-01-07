@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
 export async function upsertProfile(user: { id: string; email?: string | null }) {
   if (!supabase) return;
