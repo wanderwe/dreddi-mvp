@@ -7,9 +7,9 @@
     },
     "tagline": "Track every deal, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
     "highlights": {
-      "promisesTracked": "Deals tracked.",
-      "reputationIntact": "Reputation intact.",
-      "dreddiKnows": "Dreddi knows."
+      "promisesTracked": "Deals tracked",
+      "reputationIntact": "Reputation intact",
+      "dreddiKnows": "Dreddi knows"
     },
     "showcase": {
       "0": {
@@ -55,8 +55,8 @@
         "label": "On-time completions",
         "suffix": "{count} delivered on time",
         "helper": {
-          "auth": "On-time completions strengthen your reputation.",
-          "guest": "Sign in to see on-time performance."
+          "auth": "On-time completions strengthen your reputation",
+          "guest": "Sign in to see on-time performance"
         }
       }
     },
