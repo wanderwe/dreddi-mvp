@@ -26,6 +26,13 @@
       }
     ],
     "loading": "Loading your session…",
+    "loadingShort": "Loading…",
+    "loadingPlaceholder": "…",
+    "errors": {
+      "userSession": "Unable to load user session",
+      "notAuthenticated": "Not authenticated",
+      "reputation": "Unable to load reputation"
+    },
     "cta": {
       "getStarted": "Get started",
       "publicProfiles": "See public profiles",
@@ -65,7 +72,7 @@
       "placeholderMetaCreated": "Created {date}",
       "status": {
         "active": "Active",
-        "completed_by_promisor": "Awaiting review",
+        "completed_by_promisor": "Marked complete (waiting for confirmation)",
         "confirmed": "Confirmed",
         "disputed": "Disputed"
       }
@@ -93,6 +100,188 @@
       "promisorDescription": "You haven’t created any promises yet. Start a new one to track your commitments.",
       "counterpartyDescription": "Nothing has been promised to you yet. Accept an invite link to get started.",
       "cta": "Create promise"
+    },
+    "status": {
+      "active": "Active",
+      "pendingConfirmation": "Pending confirmation",
+      "waitingConfirmation": "Waiting for confirmation",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed",
+      "pendingCompletion": "Pending completion",
+      "needsReview": "Needs your review",
+      "awaitingInviteAcceptance": "Waiting for invite acceptance"
+    },
+    "confirmModal": {
+      "title": "Request confirmation?",
+      "body": "You’re asking the other side to confirm you delivered this promise.",
+      "cancel": "Not yet",
+      "confirm": "Yes, request confirmation"
+    },
+    "list": {
+      "tabs": {
+        "promisor": "I promised ({count})",
+        "counterparty": "Promised to me ({count})"
+      },
+      "cardLabel": "Promise",
+      "dueLabel": "Due",
+      "noDeadline": "No deadline",
+      "waitingNotePromisor": "You marked this complete. Waiting for the counterparty.",
+      "waitingNoteCounterparty": "Promisor marked this complete. Please confirm or dispute.",
+      "actionRequired": "Action required",
+      "scoreImpact": "Score impact: {impact}",
+      "markCompleted": "Mark as completed",
+      "updating": "Updating…",
+      "reviewConfirm": "Review & confirm",
+      "errors": {
+        "markComplete": "Could not mark complete",
+        "updateFailed": "Failed to update"
+      }
+    },
+    "detail": {
+      "back": "Back",
+      "loading": "Loading…",
+      "cardTitle": "Promise",
+      "acceptedBySecondSide": "Accepted by second side",
+      "yes": "Yes",
+      "no": "No",
+      "counterparty": "Counterparty",
+      "counterpartyFallback": "counterparty",
+      "noDetails": "No details provided",
+      "statusActions": "Status actions",
+      "currentStatus": "Current status",
+      "markCompleted": "Mark as completed",
+      "shareInvite": "Share the invite and wait for acceptance to request confirmation.",
+      "reviewConfirm": "Review & confirm",
+      "waitingReview": "Waiting for the counterparty to review.",
+      "confirmed": "Promise confirmed ✅",
+      "disputed": "Promise disputed.",
+      "guestView": "You are viewing this promise as a guest.",
+      "inviteTitle": "Invite",
+      "inviteLinkTitle": "Invite link",
+      "inviteAccepted": "Invite accepted",
+      "inviteAcceptedBy": "Invite accepted by {name}.",
+      "noInviteToken": "No invite token yet. Press “Generate” to create one.",
+      "generate": "Generate",
+      "copyLink": "Copy link",
+      "regenerate": "Regenerate",
+      "openInvite": "Open invite page",
+      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link.",
+      "inviteFallback": "…",
+      "noDeadline": "No deadline",
+      "saving": "Saving…",
+      "errors": {
+        "unsupportedStatus": "Promise has an unsupported status value",
+        "updateStatus": "Could not update status",
+        "copyClipboard": "Could not copy to clipboard."
+      }
+    },
+    "confirm": {
+      "back": "Back to promises",
+      "badge": "Review",
+      "promiseLabel": "Promise",
+      "dueLabel": "Due",
+      "createdBy": "Created by {name}",
+      "statusLabel": "Status",
+      "actionRequired": "Action required from you",
+      "detailsLabel": "Details",
+      "alreadyDisputed": "Already disputed",
+      "reasonLabel": "Reason",
+      "confirming": "Confirming…",
+      "confirm": "Confirm completion",
+      "sending": "Sending…",
+      "dispute": "Dispute",
+      "noActions": "No actions available.",
+      "notFound": "Promise not found.",
+      "disputeBadge": "Dispute",
+      "disputeTitle": "Tell us what went wrong",
+      "disputeSubtitle": "Choose the issue and provide optional context.",
+      "disputePlaceholder": "Add context",
+      "submitDispute": "Submit dispute",
+      "submitting": "Submitting…",
+      "cancel": "Cancel",
+      "noDeadline": "No deadline",
+      "statusNote": {
+        "confirmed": "Already confirmed ✅",
+        "disputed": "Already disputed",
+        "active": "Not marked as completed yet"
+      },
+      "success": {
+        "confirmed": "Promise confirmed. Redirecting…",
+        "disputed": "Dispute submitted. Redirecting…"
+      },
+      "errors": {
+        "loadFailed": "Failed to load promise",
+        "unsupportedStatus": "Promise has unsupported status",
+        "actionFailed": "Action failed",
+        "confirmFailed": "Failed to confirm",
+        "disputeFailed": "Failed to dispute"
+      }
+    },
+    "disputeOptions": {
+      "not_completed": "It wasn’t completed",
+      "partial": "Partially completed",
+      "late": "Completed late",
+      "other": "Other"
+    },
+    "new": {
+      "eyebrow": "New promise",
+      "title": "Document the commitment",
+      "subtitle": "Name the promise, add context, and an optional deadline.",
+      "back": "Back",
+      "fields": {
+        "title": "Title",
+        "details": "Details",
+        "counterparty": "Counterparty",
+        "dueDate": "Due date"
+      },
+      "placeholders": {
+        "title": "Short summary of the commitment",
+        "details": "Details (optional)",
+        "counterparty": "Who (email/phone/handle) — optional"
+      },
+      "submit": "Create promise",
+      "creating": "Creating…"
+    }
+  },
+  "invite": {
+    "back": "Back to home",
+    "signedIn": "Signed in",
+    "guestMode": "Guest mode",
+    "eyebrow": "Invitation",
+    "title": "Join this promise on Dreddi",
+    "subtitle": "Review the promise details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
+    "accepted": "This invite was already accepted.",
+    "acceptedBy": "This invite was already accepted by {name}.",
+    "badge": "Promise invite",
+    "createdBy": "Created by {name}",
+    "deadline": "Deadline",
+    "statusLabel": "Status",
+    "statusAccepted": "Already accepted",
+    "statusAwaiting": "Awaiting acceptance",
+    "statusAcceptedBody": "This promise is ready—jump into your dashboard to follow progress.",
+    "statusAwaitingBody": "Accept to join the promise and it will appear in your dashboard.",
+    "nextStep": "Next step",
+    "nextStepHint": "By accepting, you confirm you understand this commitment.",
+    "processing": "Processing...",
+    "accept": "Accept promise",
+    "unknown": "Unknown",
+    "noDeadline": "No deadline",
+    "errors": {
+      "notFound": "Invite not found or expired.",
+      "acceptFailed": "Accept failed."
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Welcome back",
+      "subtitle": "Sign in to create promises and track reputation.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Send magic link",
+      "sending": "Sending...",
+      "sent": "Link sent ✅ Check your inbox (and Spam).",
+      "back": "Back to landing",
+      "secure": "Secure, zero-password access"
     }
   }
 }
