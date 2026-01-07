@@ -66,26 +66,31 @@ export default function Home() {
   ];
   const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
 
+  const safeText = (key: string, fallback = "") => {
+    const value = t(key);
+    return value.startsWith("⟦missing:") ? fallback : value;
+  };
+
   const showcasePromises: DealRow[] = [
     {
       id: "demo-1",
-      title: t("home.showcase.0.title"),
-      meta: t("home.showcase.0.meta"),
+      title: safeText("home.showcase.0.title"),
+      meta: safeText("home.showcase.0.meta"),
       status: "active",
     },
     {
       id: "demo-2",
-      title: t("home.showcase.1.title"),
-      meta: t("home.showcase.1.meta"),
+      title: safeText("home.showcase.1.title"),
+      meta: safeText("home.showcase.1.meta"),
       status: "active",
     },
     {
       id: "demo-3",
-      title: t("home.showcase.2.title"),
-      meta: t("home.showcase.2.meta"),
+      title: safeText("home.showcase.2.title"),
+      meta: safeText("home.showcase.2.meta"),
       status: "confirmed",
     },
-  ];
+  ].filter((item) => item.title);
 
   const statusLabels: Record<PromiseStatus, string> = {
     active: t("home.recentDeals.status.active"),
@@ -364,13 +369,6 @@ export default function Home() {
               >
                 {t("home.cta.reviewDeals")}
               </Link>
-              <button
-                onClick={logout}
-                className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
-                type="button"
-              >
-                {t("home.cta.logout")}
-              </button>
             </div>
           )}
         </div>
@@ -439,11 +437,6 @@ export default function Home() {
                         count: onTimeCount,
                       })}
                 </p>
-                <p className="text-sm text-slate-300">
-                  {isAuthenticated
-                    ? t("home.score.onTime.descriptionSignedIn")
-                    : t("home.score.onTime.descriptionGuest")}
-                </p>
               </div>
 
               <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
@@ -456,92 +449,93 @@ export default function Home() {
                     {t("home.recentDeals.seeAll")}
                   </Link>
                 </div>
-                {recentError && isAuthenticated && (
-                  <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                    {recentError}
-                  </div>
-                )}
-
-                {!isAuthenticated && (
-                  <p className="mt-3 text-xs text-slate-400">
-                    {t("home.recentDeals.guestHint")}
-                  </p>
-                )}
-
-                <div className="mt-3 space-y-2 text-sm">
-                  {reputationLoading || recentLoading ? (
-                    <div className="space-y-2">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
-                      ))}
-                    </div>
-                  ) : isAuthenticated && recentEvents.length > 0 ? (
-                    recentEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">
-                            {event.delta > 0 ? `+${event.delta}` : event.delta} {event.kind.replace("promise_", "").replace("_", " ")}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
-                            {" • "}
-                            {new Date(event.created_at).toLocaleString(locale)}
-                          </div>
-                        </div>
-                        <span
-                          className={[
-                            "rounded-full px-3 py-1 text-xs",
-                            event.delta >= 0
-                              ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                              : "bg-red-500/10 text-red-100 border border-red-400/30",
-                          ].join(" ")}
-                        >
-                          {event.delta >= 0
-                            ? t("home.recentDeals.sentiment.positive")
-                            : t("home.recentDeals.sentiment.negative")}
-                        </span>
+                {!isAuthenticated ? (
+                  <p className="mt-3 text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
+                ) : (
+                  <>
+                    {recentError && (
+                      <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                        {recentError}
                       </div>
-                    ))
-                  ) : isAuthenticated && recentDeals.length === 0 ? (
-                    <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                      {t("home.recentDeals.empty")}
-                    </div>
-                  ) : (
-                    (isAuthenticated ? recentDeals : showcasePromises).map((item) => {
-                      const metaText =
-                        item.meta ??
-                        (item.due_at
-                          ? t("home.recentDeals.placeholderMetaDue", {
-                              date: formatDateShort(item.due_at),
-                            })
-                          : item.created_at
-                          ? t("home.recentDeals.placeholderMetaCreated", {
-                              date: formatDateShort(item.created_at),
-                            })
-                          : "");
+                    )}
 
-                      return (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                        >
-                          <div>
-                            <div className="font-semibold text-white">{item.title}</div>
-                            <div className="text-xs text-slate-400">{metaText}</div>
-                          </div>
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                          >
-                            {statusLabels[item.status] ?? item.status}
-                          </span>
+                    <div className="mt-3 space-y-2 text-sm">
+                      {reputationLoading || recentLoading ? (
+                        <div className="space-y-2">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                          ))}
                         </div>
-                      );
-                    })
-                  )}
-                </div>
+                      ) : recentEvents.length > 0 ? (
+                        recentEvents.map((event) => (
+                          <div
+                            key={event.id}
+                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                          >
+                            <div>
+                              <div className="font-semibold text-white">
+                                {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
+                                {event.kind.replace("promise_", "").replace("_", " ")}
+                              </div>
+                              <div className="text-xs text-slate-400">
+                                {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
+                                {" • "}
+                                {new Date(event.created_at).toLocaleString(locale)}
+                              </div>
+                            </div>
+                            <span
+                              className={[
+                                "rounded-full px-3 py-1 text-xs",
+                                event.delta >= 0
+                                  ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                                  : "bg-red-500/10 text-red-100 border border-red-400/30",
+                              ].join(" ")}
+                            >
+                              {event.delta >= 0
+                                ? t("home.recentDeals.sentiment.positive")
+                                : t("home.recentDeals.sentiment.negative")}
+                            </span>
+                          </div>
+                        ))
+                      ) : recentDeals.length === 0 ? (
+                        <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                          {t("home.recentDeals.empty")}
+                        </div>
+                      ) : (
+                        recentDeals.map((item) => {
+                          const metaText =
+                            item.meta ??
+                            (item.due_at
+                              ? t("home.recentDeals.placeholderMetaDue", {
+                                  date: formatDateShort(item.due_at),
+                                })
+                              : item.created_at
+                              ? t("home.recentDeals.placeholderMetaCreated", {
+                                  date: formatDateShort(item.created_at),
+                                })
+                              : "");
+
+                          return (
+                            <div
+                              key={item.id}
+                              className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                            >
+                              <div>
+                                <div className="font-semibold text-white">{item.title}</div>
+                                <div className="text-xs text-slate-400">{metaText}</div>
+                              </div>
+                              <span
+                                className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                              >
+                                {statusLabels[item.status] ?? item.status}
+                              </span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

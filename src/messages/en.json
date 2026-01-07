@@ -11,20 +11,20 @@
       "reputationIntact": "Reputation intact.",
       "dreddiKnows": "Dreddi knows."
     },
-    "showcase": [
-      {
+    "showcase": {
+      "0": {
         "title": "Deal: Vendor onboarding deck by Wed",
         "meta": "Commitment kept • Outcome: approved • Reputation +2"
       },
-      {
+      "1": {
         "title": "Deal: Refund within 24h",
         "meta": "Commitment met • Outcome: case closed • Reputation +1"
       },
-      {
+      "2": {
         "title": "Deal: Launch UA landing page",
         "meta": "Commitment delivered • Outcome: live • Reputation +3"
       }
-    ],
+    },
     "loading": "Loading your session…",
     "loadingShort": "Loading…",
     "loadingPlaceholder": "…",
@@ -61,7 +61,7 @@
     "recentDeals": {
       "title": "Recent deals",
       "seeAll": "See all",
-      "guestHint": "Sign in to see your live deals. These demo deals are examples (not real activity) so you can preview how outcomes shape reputation.",
+      "guestHint": "Sign in to see your live deals",
       "empty": "Create your first deal to populate your reputation feed.",
       "sentiment": {
         "positive": "Positive",
