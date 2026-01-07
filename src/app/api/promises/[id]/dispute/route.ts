@@ -30,7 +30,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     if (promise.status !== "completed_by_promisor") {
-      return NextResponse.json({ error: "Promise is not awaiting confirmation" }, { status: 400 });
+      return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
     }
 
     const admin = getAdminClient();
