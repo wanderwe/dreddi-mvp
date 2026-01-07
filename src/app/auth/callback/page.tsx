@@ -17,6 +17,7 @@ export default function AuthCallbackPage() {
 
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
+        const next = url.searchParams.get("next");
 
         // Hash-based flow (implicit)
         const hash = window.location.hash?.replace(/^#/, "") ?? "";
@@ -67,8 +68,8 @@ export default function AuthCallbackPage() {
         const { upsertProfile } = await import("@/lib/ensureProfile");
         await upsertProfile(data.session.user);
 
-        // На головну
-        window.location.replace("/");
+        const nextPath = next && next.startsWith("/") ? next : "/";
+        window.location.replace(nextPath);
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
         setMsg("Unexpected error: " + message);
