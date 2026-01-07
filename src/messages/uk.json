@@ -122,9 +122,13 @@
       "confirm": "Так, запросити підтвердження"
     },
     "list": {
-      "tabs": {
-        "promisor": "Я створив(ла) ({count})",
-        "counterparty": "Для мене ({count})"
+      "roleFilter": {
+        "label": "Роль",
+        "options": {
+          "all": "Усі",
+          "executor": "Я виконавець",
+          "requester": "Для мене"
+        }
       },
       "cardLabel": "Угода",
       "dueLabel": "Строк",

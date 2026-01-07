@@ -21,7 +21,7 @@ type PromiseRow = {
   promisee_id: string | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me";
+type RoleFilter = "all" | "executor" | "requester";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
 export default function PromisesClient() {
@@ -30,7 +30,11 @@ export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const roleFilterParam = searchParams.get("role");
+  const roleFilter: RoleFilter =
+    roleFilterParam === "executor" || roleFilterParam === "requester" || roleFilterParam === "all"
+      ? roleFilterParam
+      : "all";
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("promises.list.noDeadline");
@@ -139,32 +143,28 @@ export default function PromisesClient() {
     };
   }, []);
 
-  const setTab = (next: TabKey) => {
+  const setRoleFilter = (next: RoleFilter) => {
     const sp = new URLSearchParams(searchParams.toString());
-    sp.set("tab", next);
-    router.push(`/promises?${sp.toString()}`);
+    if (next === "all") {
+      sp.delete("role");
+    } else {
+      sp.set("role", next);
+    }
+    const query = sp.toString();
+    router.push(query ? `/promises?${query}` : "/promises");
   };
 
-  const roleCounts = useMemo(
-    () =>
-      allRows.reduce(
-        (acc, row) => {
-          if (row.role === "promisor") acc.promisor += 1;
-          else if (row.role === "counterparty") acc.counterparty += 1;
-          else acc.uncategorized.push(row.id);
-          return acc;
-        },
-        { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
-      ),
-    [allRows]
-  );
-
   const rows = useMemo(
-    () =>
-      allRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      ),
-    [allRows, tab]
+    () => {
+      if (roleFilter === "executor") {
+        return allRows.filter((row) => row.role === "promisor");
+      }
+      if (roleFilter === "requester") {
+        return allRows.filter((row) => row.role === "counterparty");
+      }
+      return allRows;
+    },
+    [allRows, roleFilter]
   );
 
   const overview = useMemo(() => {
@@ -174,21 +174,6 @@ export default function PromisesClient() {
 
     return { total, awaitingYou, awaitingOthers };
   }, [allRows]);
-
-  useEffect(() => {
-    const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
-    if (
-      process.env.NODE_ENV !== "production" &&
-      categorizedTotal !== allRows.length
-    ) {
-      console.warn("[promises] Tab counts do not sum to total", {
-        total: allRows.length,
-        promisorCount: roleCounts.promisor,
-        counterpartyCount: roleCounts.counterparty,
-        uncategorizedIds: roleCounts.uncategorized,
-      });
-    }
-  }, [allRows.length, roleCounts.counterparty, roleCounts.promisor, roleCounts.uncategorized]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -277,32 +262,27 @@ export default function PromisesClient() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTab("i-promised")}
-              className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "i-promised"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.promisor", { count: roleCounts.promisor })}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTab("promised-to-me")}
-              className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "promised-to-me"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.counterparty", { count: roleCounts.counterparty })}
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-semibold text-slate-200">
+              {t("promises.list.roleFilter.label")}
+            </span>
+            <div className="inline-flex overflow-hidden rounded-xl border border-white/10 bg-white/5">
+              {(["all", "executor", "requester"] as RoleFilter[]).map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setRoleFilter(filter)}
+                  className={[
+                    "px-4 py-2 text-sm font-semibold transition",
+                    roleFilter === filter
+                      ? "bg-emerald-400 text-slate-950"
+                      : "text-white hover:bg-white/10",
+                  ].join(" ")}
+                >
+                  {t(`promises.list.roleFilter.options.${filter}`)}
+                </button>
+              ))}
+            </div>
           </div>
 
           {error && (
@@ -436,9 +416,9 @@ export default function PromisesClient() {
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
                 <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
                 <p className="text-sm text-slate-400">
-                  {tab === "i-promised"
-                    ? t("promises.empty.promisorDescription")
-                    : t("promises.empty.counterpartyDescription")}
+                  {roleFilter === "requester"
+                    ? t("promises.empty.counterpartyDescription")
+                    : t("promises.empty.promisorDescription")}
                 </p>
                 <div className="mt-4">
                   <Link

@@ -122,9 +122,13 @@
       "confirm": "Yes, request confirmation"
     },
     "list": {
-      "tabs": {
-        "promisor": "I created ({count})",
-        "counterparty": "Created for me ({count})"
+      "roleFilter": {
+        "label": "Role",
+        "options": {
+          "all": "All",
+          "executor": "I perform",
+          "requester": "Performed for me"
+        }
       },
       "cardLabel": "Deal",
       "dueLabel": "Due",
