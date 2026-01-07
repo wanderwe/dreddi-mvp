@@ -45,7 +45,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     // 4) шукаємо promise по invite_token
     const { data: p, error: pErr } = await admin
       .from("promises")
-      .select("id, creator_id, counterparty_id, invite_token")
+      .select("id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id")
       .eq("invite_token", token)
       .maybeSingle();
 
@@ -63,17 +63,23 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     // якщо вже прийнято
-    if (p.counterparty_id) {
+    if (p.counterparty_id || p.counterparty_accepted_at) {
       if (p.counterparty_id === userId) {
         return NextResponse.json({ ok: true, alreadyAccepted: true }, { status: 200 });
       }
       return NextResponse.json({ error: "Already accepted by another user" }, { status: 409 });
     }
 
+    const updateData = {
+      counterparty_id: userId,
+      counterparty_accepted_at: new Date().toISOString(),
+      ...(p.promisor_id ? {} : { promisor_id: userId }),
+    };
+
     // 5) пишемо counterparty_id
     const { error: upErr } = await admin
       .from("promises")
-      .update({ counterparty_id: userId })
+      .update(updateData)
       .eq("id", p.id);
 
     if (upErr) {
