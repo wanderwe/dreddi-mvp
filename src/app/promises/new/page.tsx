@@ -13,6 +13,7 @@ export default function NewPromisePage() {
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState("");
+  const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,6 +70,13 @@ export default function NewPromisePage() {
     }
 
     const user = session.user;
+    const counterpartyContact = counterparty.trim();
+
+    if (!counterpartyContact) {
+      setBusy(false);
+      setError(t("promises.new.errors.counterpartyRequired"));
+      return;
+    }
 
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -77,11 +85,11 @@ export default function NewPromisePage() {
       .from("promises")
       .insert({
         creator_id: user.id,
-        promisor_id: user.id, // ✅ важливо для вкладки "I promised"
-        // promisee_id поки null — з’явиться після accept invite
+        promisor_id: executor === "me" ? user.id : null,
+        promisee_id: executor === "other" ? user.id : null,
         title: title.trim(),
         details: details.trim() || null,
-        counterparty_contact: counterparty.trim() || null,
+        counterparty_contact: counterpartyContact,
         due_at: dueAt ? new Date(dueAt).toISOString() : null,
         status: "active",
         invite_token: inviteToken,
@@ -125,6 +133,36 @@ export default function NewPromisePage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.executor")}
+              </span>
+              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
+                <button
+                  type="button"
+                  onClick={() => setExecutor("me")}
+                  className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    executor === "me"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                      : "text-slate-200 hover:text-emerald-100"
+                  }`}
+                >
+                  {t("promises.new.executor.me")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExecutor("other")}
+                  className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    executor === "other"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                      : "text-slate-200 hover:text-emerald-100"
+                  }`}
+                >
+                  {t("promises.new.executor.other")}
+                </button>
+              </div>
+            </div>
+
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.title")}
@@ -149,17 +187,25 @@ export default function NewPromisePage() {
               />
             </label>
 
-            <label className="space-y-2 text-sm text-slate-200">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.counterparty")}
-              </span>
-              <input
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                placeholder={t("promises.new.placeholders.counterparty")}
-                value={counterparty}
-                onChange={(e) => setCounterparty(e.target.value)}
-              />
-            </label>
+            {executor && (
+              <label className="space-y-2 text-sm text-slate-200">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {executor === "me"
+                    ? t("promises.new.fields.counterpartyMe")
+                    : t("promises.new.fields.counterpartyOther")}
+                </span>
+                <input
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                  placeholder={
+                    executor === "me"
+                      ? t("promises.new.placeholders.counterpartyMe")
+                      : t("promises.new.placeholders.counterpartyOther")
+                  }
+                  value={counterparty}
+                  onChange={(e) => setCounterparty(e.target.value)}
+                />
+              </label>
+            )}
 
             <label className="space-y-2 text-sm text-slate-200">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -177,7 +223,7 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim()}
+              disabled={busy || !title.trim() || !counterparty.trim()}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("promises.new.creating") : t("promises.new.submit")}

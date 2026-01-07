@@ -235,13 +235,23 @@
       "fields": {
         "title": "Назва",
         "details": "Деталі",
-        "counterparty": "Контрагент",
+        "executor": "Виконавець",
+        "counterpartyMe": "Контакт контрагента",
+        "counterpartyOther": "Контакт виконавця",
         "dueDate": "Строк"
+      },
+      "executor": {
+        "me": "Я",
+        "other": "Інша людина"
       },
       "placeholders": {
         "title": "Коротко: про що угода?",
         "details": "Деталі (опціонально)",
-        "counterparty": "Кому (email/телефон/нік) — опціонально"
+        "counterpartyMe": "Контакт контрагента (email/телефон/нік)",
+        "counterpartyOther": "Контакт виконавця (email/телефон/нік)"
+      },
+      "errors": {
+        "counterpartyRequired": "Додайте контакт іншої сторони."
       },
       "submit": "Створити угоду",
       "creating": "Створення…"
