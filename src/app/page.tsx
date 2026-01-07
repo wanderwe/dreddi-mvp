@@ -133,22 +133,23 @@ export default function Home() {
 
   useEffect(() => {
     let active = true;
+    const client = supabase;
 
-    if (!supabase) {
+    if (!client) {
       setReady(true);
       return;
     }
 
     const syncSession = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data: sessionData } = await client.auth.getSession();
       if (!active) return;
-      setEmail(data.session?.user?.email ?? null);
+      setEmail(sessionData.session?.user?.email ?? null);
       setReady(true);
     };
 
     void syncSession();
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       setEmail(session?.user?.email ?? null);
       setReady(true);
@@ -162,9 +163,10 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    const client = supabase;
 
     const loadRecentDeals = async () => {
-      if (!supabase) {
+      if (!client) {
         setRecentDeals([]);
         setRecentError(null);
         setRecentLoading(false);
@@ -181,7 +183,7 @@ export default function Home() {
       setRecentLoading(true);
       setRecentError(null);
 
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      const { data: userData, error: userErr } = await client.auth.getUser();
       const userId = userData.user?.id;
 
       if (userErr || !userId) {
@@ -192,7 +194,7 @@ export default function Home() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from("promises")
         .select("id,title,status,due_at,created_at")
         .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
@@ -232,9 +234,10 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    const client = supabase;
 
     const loadReputation = async () => {
-      if (!supabase) {
+      if (!client) {
         setReputation(null);
         setReputationError(null);
         setReputationLoading(false);
@@ -251,7 +254,7 @@ export default function Home() {
       setReputationLoading(true);
       setReputationError(null);
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
       const token = sessionData.session?.access_token;
 
       if (sessionError || !token) {
