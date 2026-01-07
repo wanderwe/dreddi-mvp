@@ -66,31 +66,48 @@ export default function Home() {
   ];
   const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
 
-  const safeText = (key: string, fallback = "") => {
-    const value = t(key);
-    return value.startsWith("⟦missing:") ? fallback : value;
-  };
-
-  const showcasePromises: DealRow[] = [
-    {
-      id: "demo-1",
-      title: safeText("home.showcase.0.title"),
-      meta: safeText("home.showcase.0.meta"),
-      status: "active",
-    },
-    {
-      id: "demo-2",
-      title: safeText("home.showcase.1.title"),
-      meta: safeText("home.showcase.1.meta"),
-      status: "active",
-    },
-    {
-      id: "demo-3",
-      title: safeText("home.showcase.2.title"),
-      meta: safeText("home.showcase.2.meta"),
-      status: "confirmed",
-    },
-  ].filter((item) => item.title);
+  const demoDeals: DealRow[] =
+    locale === "uk"
+      ? [
+          {
+            id: "demo-1",
+            title: "Підготувати лендинг до 10 січня",
+            meta: "Відповідальність прийнята • Результат: підтверджено",
+            status: "confirmed",
+          },
+          {
+            id: "demo-2",
+            title: "Підготувати пітч для інвесторів",
+            meta: "Відповідальність в роботі • Результат: в процесі",
+            status: "active",
+          },
+          {
+            id: "demo-3",
+            title: "Виправити баги онбордингу",
+            meta: "Відповідальність оскаржено • Результат: перегляд",
+            status: "disputed",
+          },
+        ]
+      : [
+          {
+            id: "demo-1",
+            title: "Deliver landing page by Jan 10",
+            meta: "Responsibility accepted • Outcome: confirmed",
+            status: "confirmed",
+          },
+          {
+            id: "demo-2",
+            title: "Prepare investor pitch",
+            meta: "Responsibility in motion • Outcome: active",
+            status: "active",
+          },
+          {
+            id: "demo-3",
+            title: "Fix onboarding bugs",
+            meta: "Responsibility disputed • Outcome: under review",
+            status: "disputed",
+          },
+        ];
 
   const statusLabels: Record<PromiseStatus, string> = {
     active: t("home.recentDeals.status.active"),
@@ -431,11 +448,7 @@ export default function Home() {
                   {t("home.score.onTime.label")}
                 </div>
                 <p className="mt-2 text-lg font-semibold text-white">
-                  {reputationLoading
-                    ? t("home.loadingPlaceholder")
-                    : t("home.score.onTime.suffix", {
-                        count: onTimeCount,
-                      })}
+                  {reputationLoading ? t("home.loadingPlaceholder") : onTimeCount}
                 </p>
               </div>
 
@@ -450,7 +463,27 @@ export default function Home() {
                   </Link>
                 </div>
                 {!isAuthenticated ? (
-                  <p className="mt-3 text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
+                  <div className="mt-3 space-y-2 text-sm">
+                    <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
+                    {demoDeals.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                      >
+                        <div>
+                          <div className="font-semibold text-white">{item.title}</div>
+                          {item.meta ? (
+                            <div className="text-xs text-slate-400">{item.meta}</div>
+                          ) : null}
+                        </div>
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                        >
+                          {statusLabels[item.status] ?? item.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <>
                     {recentError && (
