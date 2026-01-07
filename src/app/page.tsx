@@ -48,6 +48,7 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const isAuthenticated = Boolean(email);
 
   const highlights = [
     {
@@ -272,7 +273,7 @@ export default function Home() {
               titleClassName="text-lg"
             />
           </Link>
-          <HeaderActions showLogout={Boolean(email)} onLogout={logout} />
+          <HeaderActions isAuthenticated={isAuthenticated} onLogout={logout} />
         </div>
       </header>
 
@@ -314,7 +315,7 @@ export default function Home() {
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
               {t("home.loading")}
             </div>
-          ) : !email ? (
+          ) : !isAuthenticated ? (
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/login"
@@ -400,11 +401,11 @@ export default function Home() {
                 </div>
               </div>
 
-              {reputationError && email && (
-                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
-                  {reputationError}
-                </div>
-              )}
+                {reputationError && isAuthenticated && (
+                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                    {reputationError}
+                  </div>
+                )}
 
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-inner shadow-black/50">
                 <div className="flex items-center gap-2 text-sm text-emerald-200">
@@ -419,7 +420,7 @@ export default function Home() {
                       })}
                 </p>
                 <p className="text-sm text-slate-300">
-                  {email
+                  {isAuthenticated
                     ? t("home.score.onTime.descriptionSignedIn")
                     : t("home.score.onTime.descriptionGuest")}
                 </p>
@@ -429,19 +430,19 @@ export default function Home() {
                 <div className="flex items-center justify-between text-sm text-slate-300">
                   <span>{t("home.recentDeals.title")}</span>
                   <Link
-                    href="/promises"
+                    href={isAuthenticated ? "/promises" : "/login?next=%2Fpromises"}
                     className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
                   >
                     {t("home.recentDeals.seeAll")}
                   </Link>
                 </div>
-                {recentError && email && (
+                {recentError && isAuthenticated && (
                   <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                     {recentError}
                   </div>
                 )}
 
-                {!email && (
+                {!isAuthenticated && (
                   <p className="mt-3 text-xs text-slate-400">
                     {t("home.recentDeals.guestHint")}
                   </p>
@@ -454,7 +455,7 @@ export default function Home() {
                         <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
                       ))}
                     </div>
-                  ) : email && recentEvents.length > 0 ? (
+                  ) : isAuthenticated && recentEvents.length > 0 ? (
                     recentEvents.map((event) => (
                       <div
                         key={event.id}
@@ -484,12 +485,12 @@ export default function Home() {
                         </span>
                       </div>
                     ))
-                  ) : email && recentDeals.length === 0 ? (
+                  ) : isAuthenticated && recentDeals.length === 0 ? (
                     <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
                       {t("home.recentDeals.empty")}
                     </div>
                   ) : (
-                    (email ? recentDeals : showcasePromises).map((item) => {
+                    (isAuthenticated ? recentDeals : showcasePromises).map((item) => {
                       const metaText =
                         item.meta ??
                         (item.due_at

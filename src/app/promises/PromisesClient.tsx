@@ -70,18 +70,14 @@ export default function PromisesClient() {
       setLoading(true);
       setError(null);
 
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      if (userErr) {
-        if (!cancelled) setError(userErr.message);
-        setLoading(false);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        window.location.href = `/login?next=${encodeURIComponent("/promises")}`;
         return;
       }
 
-      const user = userData.user;
-      if (!user) {
-        window.location.href = "/login";
-        return;
-      }
+      const user = session.user;
 
       const { data, error } = await supabase
         .from("promises")

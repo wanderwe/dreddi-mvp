@@ -81,6 +81,8 @@
   "nav": {
     "myPromises": "My promises",
     "newPromise": "New promise",
+    "login": "Sign in",
+    "getStarted": "Get started",
     "logout": "Log out"
   },
   "promises": {

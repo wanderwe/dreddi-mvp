@@ -81,6 +81,8 @@
   "nav": {
     "myPromises": "Мої угоди",
     "newPromise": "Нова угода",
+    "login": "Увійти",
+    "getStarted": "Почати",
     "logout": "Вийти"
   },
   "promises": {
