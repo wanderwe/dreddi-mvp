@@ -235,13 +235,23 @@
       "fields": {
         "title": "Title",
         "details": "Details",
-        "counterparty": "Counterparty",
+        "executor": "Executor",
+        "counterpartyMe": "Counterparty contact",
+        "counterpartyOther": "Performer contact",
         "dueDate": "Due date"
+      },
+      "executor": {
+        "me": "Me",
+        "other": "Other person"
       },
       "placeholders": {
         "title": "Short summary of the deal",
         "details": "Details (optional)",
-        "counterparty": "Who (email/phone/handle) — optional"
+        "counterpartyMe": "Other party contact (email/phone/handle)",
+        "counterpartyOther": "Performer contact (email/phone/handle)"
+      },
+      "errors": {
+        "counterpartyRequired": "Please add the other party's contact."
       },
       "submit": "Create deal",
       "creating": "Creating…"
