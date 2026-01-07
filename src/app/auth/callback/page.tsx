@@ -68,7 +68,8 @@ export default function AuthCallbackPage() {
         const { upsertProfile } = await import("@/lib/ensureProfile");
         await upsertProfile(data.session.user);
 
-        const nextPath = next && next.startsWith("/") ? next : "/";
+        const nextPath =
+          next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
         window.location.replace(nextPath);
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
