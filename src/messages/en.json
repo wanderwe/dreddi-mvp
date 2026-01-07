@@ -13,16 +13,16 @@
     },
     "showcase": [
       {
-        "title": "Dreddi Alert",
-        "meta": "Review pending • 3:32PM"
+        "title": "Deal: Vendor onboarding deck by Wed",
+        "meta": "Commitment kept • Outcome: approved • Reputation +2"
       },
       {
-        "title": "Buy Car Parts",
-        "meta": "Complete Task • Due today"
+        "title": "Deal: Refund within 24h",
+        "meta": "Commitment met • Outcome: case closed • Reputation +1"
       },
       {
-        "title": "Delivery Completed",
-        "meta": "Deal review • 2h ago"
+        "title": "Deal: Launch UA landing page",
+        "meta": "Commitment delivered • Outcome: live • Reputation +3"
       }
     ],
     "loading": "Loading your session…",
@@ -61,7 +61,7 @@
     "recentDeals": {
       "title": "Recent deals",
       "seeAll": "See all",
-      "guestHint": "Sign in to see your live promises. Here’s what an active reputation feed looks like.",
+      "guestHint": "Sign in to see your live deals. These demo deals are examples (not real activity) so you can preview how outcomes shape reputation.",
       "empty": "Create your first promise to populate your reputation feed.",
       "sentiment": {
         "positive": "Positive",
