@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -16,24 +16,38 @@ export default function NewPromisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    let active = true;
+
+    const ensureSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      if (!data.session) {
+        router.replace(`/login?next=${encodeURIComponent("/promises/new")}`);
+      }
+    };
+
+    void ensureSession();
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
   async function createPromise() {
     setBusy(true);
     setError(null);
 
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    const user = userData.user;
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
 
-    if (userErr) {
+    if (!session) {
       setBusy(false);
-      setError(userErr.message);
+      router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
       return;
     }
 
-    if (!user) {
-      setBusy(false);
-      router.push("/login");
-      return;
-    }
+    const user = session.user;
 
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;

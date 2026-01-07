@@ -2,25 +2,43 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
+  const pathname = usePathname();
+  const isAuthenticated = Boolean(email);
 
   useEffect(() => {
-    (async () => {
+    let active = true;
+
+    const syncSession = async () => {
       const { data } = await supabase.auth.getSession();
+      if (!active) return;
       setEmail(data.session?.user?.email ?? null);
-    })();
+      if (!data.session) {
+        window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+      }
+    };
+
+    void syncSession();
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!active) return;
       setEmail(session?.user?.email ?? null);
+      if (!session) {
+        window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+      }
     });
 
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [pathname]);
 
   async function logout() {
     await supabase.auth.signOut();
@@ -42,7 +60,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
             />
           </Link>
 
-          <HeaderActions showLogout={Boolean(email)} onLogout={logout} />
+          <HeaderActions isAuthenticated={isAuthenticated} onLogout={logout} />
         </div>
       </header>
 
