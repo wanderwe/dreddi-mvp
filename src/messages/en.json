@@ -6,11 +6,11 @@
       "suffix": "knows"
     },
     "tagline": "Track every promise, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
-    "highlights": [
-      "Promises tracked.",
-      "Reputation intact.",
-      "Dreddi knows."
-    ],
+    "highlights": {
+      "promisesTracked": "Promises tracked.",
+      "reputationIntact": "Reputation intact.",
+      "dreddiKnows": "Dreddi knows."
+    },
     "showcase": [
       {
         "title": "Dreddi Alert",

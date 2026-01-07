@@ -50,9 +50,18 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
 
   const highlights = [
-    t("home.highlights.0"),
-    t("home.highlights.1"),
-    t("home.highlights.2"),
+    {
+      key: "promisesTracked",
+      text: t("home.highlights.promisesTracked"),
+    },
+    {
+      key: "reputationIntact",
+      text: t("home.highlights.reputationIntact"),
+    },
+    {
+      key: "dreddiKnows",
+      text: t("home.highlights.dreddiKnows"),
+    },
   ];
 
   const showcasePromises: DealRow[] = [
@@ -287,13 +296,13 @@ export default function Home() {
             <div className="grid max-w-lg gap-2 sm:grid-cols-3">
               {highlights.map((item) => (
                 <div
-                  key={item}
+                  key={item.key}
                   className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
                 >
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
                     ✓
                   </span>
-                  {item}
+                  {item.text}
                 </div>
               ))}
             </div>
