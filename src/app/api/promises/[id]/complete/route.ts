@@ -19,7 +19,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     if (promise.status !== "active") {
-      return NextResponse.json({ error: "Promise is not active" }, { status: 400 });
+      return NextResponse.json({ error: "Deal is not active" }, { status: 400 });
     }
 
     const admin = getAdminClient();

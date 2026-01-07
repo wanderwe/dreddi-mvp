@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Dreddi knows",
-  description: "Promises tracked. Reputation earned."
+  description: "Deals tracked. Reputation earned."
 };
 
 export default async function RootLayout({
