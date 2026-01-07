@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
 export default function AuthCallbackPage() {
   const [msg, setMsg] = useState("Signing you in...");
@@ -10,6 +10,11 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     (async () => {
       try {
+        if (!supabase) {
+          setMsg("Authentication is unavailable in this preview.");
+          return;
+        }
+
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
 

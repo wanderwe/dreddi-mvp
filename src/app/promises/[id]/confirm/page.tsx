@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRow = {
@@ -19,29 +20,11 @@ type PromiseRow = {
   dispute_reason: string | null;
 };
 
-const DISPUTE_OPTIONS = [
-  { code: "not_completed", label: "It wasn’t completed" },
-  { code: "partial", label: "Partially completed" },
-  { code: "late", label: "Completed late" },
-  { code: "other", label: "Other" },
-] as const;
-
-function formatDate(value: string | null) {
-  if (!value) return "No deadline";
-  try {
-    return new Intl.DateTimeFormat("en", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
+const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
 
 export default function ConfirmPromisePage() {
+  const t = useT();
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [promise, setPromise] = useState<PromiseRow | null>(null);
@@ -49,11 +32,38 @@ export default function ConfirmPromisePage() {
   const [error, setError] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<"confirm" | "dispute" | null>(null);
   const [showDispute, setShowDispute] = useState(false);
-  const [disputeCode, setDisputeCode] = useState<(typeof DISPUTE_OPTIONS)[number]["code"]>(
-    DISPUTE_OPTIONS[0].code
+  const [disputeCode, setDisputeCode] = useState<(typeof DISPUTE_OPTIONS)[number]>(
+    DISPUTE_OPTIONS[0]
   );
   const [disputeReason, setDisputeReason] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const supabaseErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+
+  const formatDate = (value: string | null) => {
+    if (!value) return t("promises.confirm.noDeadline");
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(new Date(value));
+    } catch {
+      return value ?? t("promises.confirm.noDeadline");
+    }
+  };
+
+  const disputeOptions = useMemo(
+    () =>
+      DISPUTE_OPTIONS.map((code) => ({
+        code,
+        label: t(`promises.disputeOptions.${code}`),
+      })),
+    [t]
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -62,6 +72,15 @@ export default function ConfirmPromisePage() {
       if (!params?.id) return;
       setLoading(true);
       setError(null);
+
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (err) {
+        setError(supabaseErrorMessage(err));
+        setLoading(false);
+        return;
+      }
 
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
@@ -79,14 +98,14 @@ export default function ConfirmPromisePage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setError(body.error ?? "Failed to load promise");
+        setError(body.error ?? t("promises.confirm.errors.loadFailed"));
         setLoading(false);
         return;
       }
 
       const body = await res.json();
       if (!isPromiseStatus((body as { status?: unknown }).status)) {
-        setError("Promise has unsupported status");
+        setError(t("promises.confirm.errors.unsupportedStatus"));
         setLoading(false);
         return;
       }
@@ -102,14 +121,15 @@ export default function ConfirmPromisePage() {
   }, [params?.id, router]);
 
   function statusNote(status: PromiseStatus) {
-    if (status === "confirmed") return "Already confirmed ✅";
-    if (status === "disputed") return "Already disputed";
-    if (status === "active") return "Not marked as completed yet";
+    if (status === "confirmed") return t("promises.confirm.statusNote.confirmed");
+    if (status === "disputed") return t("promises.confirm.statusNote.disputed");
+    if (status === "active") return t("promises.confirm.statusNote.active");
     return null;
   }
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
+    const supabase = requireSupabase();
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push(`/login?next=${encodeURIComponent(`/promises/${promise.id}/confirm`)}`);
@@ -127,7 +147,7 @@ export default function ConfirmPromisePage() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error ?? "Action failed");
+      throw new Error(body.error ?? t("promises.confirm.errors.actionFailed"));
     }
   }
 
@@ -137,10 +157,10 @@ export default function ConfirmPromisePage() {
     setError(null);
     try {
       await postAction(`/api/promises/${promise.id}/confirm`);
-      setSuccessMessage("Promise confirmed. Redirecting…");
+      setSuccessMessage(t("promises.confirm.success.confirmed"));
       setTimeout(() => router.push("/promises"), 1000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to confirm");
+      setError(e instanceof Error ? e.message : t("promises.confirm.errors.confirmFailed"));
     } finally {
       setActionBusy(null);
     }
@@ -155,10 +175,10 @@ export default function ConfirmPromisePage() {
         code: disputeCode,
         reason: disputeCode === "other" ? disputeReason : undefined,
       });
-      setSuccessMessage("Dispute submitted. Redirecting…");
+      setSuccessMessage(t("promises.confirm.success.disputed"));
       setTimeout(() => router.push("/promises"), 1200);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to dispute");
+      setError(e instanceof Error ? e.message : t("promises.confirm.errors.disputeFailed"));
     } finally {
       setActionBusy(null);
       setShowDispute(false);
@@ -169,9 +189,17 @@ export default function ConfirmPromisePage() {
     disputeCode === "other" && disputeReason.trim().length < 4;
 
   const disputeLabel = useMemo(() => {
-    const found = DISPUTE_OPTIONS.find((d) => d.code === promise?.disputed_code);
-    return found?.label ?? promise?.disputed_code;
-  }, [promise?.disputed_code]);
+    if (!promise?.disputed_code) return promise?.disputed_code;
+    const known = DISPUTE_OPTIONS.includes(promise.disputed_code as (typeof DISPUTE_OPTIONS)[number]);
+    return known ? t(`promises.disputeOptions.${promise.disputed_code}`) : promise.disputed_code;
+  }, [promise?.disputed_code, t]);
+
+  const statusLabelMap: Record<PromiseStatus, string> = {
+    active: t("promises.status.active"),
+    completed_by_promisor: t("promises.status.pendingConfirmation"),
+    confirmed: t("promises.status.confirmed"),
+    disputed: t("promises.status.disputed"),
+  };
 
   return (
     <main className="relative min-h-screen py-12">
@@ -183,10 +211,10 @@ export default function ConfirmPromisePage() {
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-6">
         <div className="flex items-center justify-between text-sm text-emerald-100/80">
           <Link href="/promises" className="hover:text-emerald-200">
-            ← Back to promises
+            ← {t("promises.confirm.back")}
           </Link>
           <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
-            Review
+            {t("promises.confirm.badge")}
           </span>
         </div>
 
@@ -200,40 +228,50 @@ export default function ConfirmPromisePage() {
           ) : error ? (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-100">{error}</div>
           ) : !promise ? (
-            <div className="text-slate-200">Promise not found.</div>
+            <div className="text-slate-200">{t("promises.confirm.notFound")}</div>
           ) : (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Promise</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.confirm.promiseLabel")}
+                  </p>
                   <h1 className="text-3xl font-semibold text-white sm:text-4xl">{promise.title}</h1>
-                  <p className="text-sm text-slate-300">Due: {formatDate(promise.due_at)}</p>
+                  <p className="text-sm text-slate-300">
+                    {t("promises.confirm.dueLabel")}: {formatDate(promise.due_at)}
+                  </p>
                   <p className="text-sm text-slate-400">
-                    Created by {promise.creator_display_name ?? promise.creator_id.slice(0, 8)}
+                    {t("promises.confirm.createdBy", {
+                      name: promise.creator_display_name ?? promise.creator_id.slice(0, 8),
+                    })}
                   </p>
                 </div>
 
                 <div className="flex flex-col items-end gap-2 text-sm text-slate-200">
                   <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                    Status: {promise.status}
+                    {t("promises.confirm.statusLabel")}: {statusLabelMap[promise.status]}
                   </span>
                   {promise.status === "completed_by_promisor" && (
-                    <p className="text-xs text-amber-200">Action required from you</p>
+                    <p className="text-xs text-amber-200">{t("promises.confirm.actionRequired")}</p>
                   )}
                 </div>
               </div>
 
               {promise.details && (
                 <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
-                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Details</p>
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                    {t("promises.confirm.detailsLabel")}
+                  </p>
                   <div className="mt-2 whitespace-pre-wrap">{promise.details}</div>
                 </div>
               )}
 
               {promise.status === "disputed" && (
                 <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-50">
-                  <p className="font-semibold">Already disputed</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-amber-200">Reason</p>
+                  <p className="font-semibold">{t("promises.confirm.alreadyDisputed")}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-amber-200">
+                    {t("promises.confirm.reasonLabel")}
+                  </p>
                   <p className="mt-1">{disputeLabel}</p>
                   {promise.dispute_reason && (
                     <p className="mt-1 text-amber-100/80">{promise.dispute_reason}</p>
@@ -255,7 +293,7 @@ export default function ConfirmPromisePage() {
                     disabled={actionBusy !== null}
                     className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
                   >
-                    {actionBusy === "confirm" ? "Confirming…" : "Confirm completion"}
+                    {actionBusy === "confirm" ? t("promises.confirm.confirming") : t("promises.confirm.confirm")}
                   </button>
 
                   <button
@@ -264,12 +302,12 @@ export default function ConfirmPromisePage() {
                     disabled={actionBusy !== null}
                     className="inline-flex items-center justify-center rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-100 shadow-lg shadow-red-900/30 transition hover:bg-red-500/20 disabled:opacity-60"
                   >
-                    {actionBusy === "dispute" ? "Sending…" : "Dispute"}
+                    {actionBusy === "dispute" ? t("promises.confirm.sending") : t("promises.confirm.dispute")}
                   </button>
                 </div>
               ) : (
                 <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-                  {statusNote(promise.status) ?? "No actions available."}
+                  {statusNote(promise.status) ?? t("promises.confirm.noActions")}
                 </div>
               )}
             </>
@@ -288,13 +326,15 @@ export default function ConfirmPromisePage() {
               </button>
 
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.2em] text-amber-200">Dispute</p>
-                <h2 className="text-xl font-semibold text-white">Tell us what went wrong</h2>
-                <p className="text-sm text-slate-300">Choose the issue and provide optional context.</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-amber-200">
+                  {t("promises.confirm.disputeBadge")}
+                </p>
+                <h2 className="text-xl font-semibold text-white">{t("promises.confirm.disputeTitle")}</h2>
+                <p className="text-sm text-slate-300">{t("promises.confirm.disputeSubtitle")}</p>
               </div>
 
               <div className="mt-4 space-y-3">
-                {DISPUTE_OPTIONS.map((opt) => (
+                {disputeOptions.map((opt) => (
                   <label
                     key={opt.code}
                     className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-sm text-slate-100 hover:border-emerald-300/30"
@@ -314,13 +354,15 @@ export default function ConfirmPromisePage() {
 
               {disputeCode === "other" && (
                 <div className="mt-4">
-                  <label className="text-xs uppercase tracking-[0.14em] text-slate-400">Reason</label>
+                  <label className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                    {t("promises.confirm.reasonLabel")}
+                  </label>
                   <textarea
                     rows={3}
                     value={disputeReason}
                     onChange={(e) => setDisputeReason(e.target.value)}
                     className="mt-2 w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
-                    placeholder="Add context"
+                    placeholder={t("promises.confirm.disputePlaceholder")}
                   />
                 </div>
               )}
@@ -332,14 +374,14 @@ export default function ConfirmPromisePage() {
                   disabled={actionBusy !== null || disputeDisabled}
                   className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/25 transition hover:translate-y-[-1px] hover:shadow-amber-400/40 disabled:opacity-60"
                 >
-                  {actionBusy === "dispute" ? "Submitting…" : "Submit dispute"}
+                  {actionBusy === "dispute" ? t("promises.confirm.submitting") : t("promises.confirm.submitDispute")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDispute(false)}
                   className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/10"
                 >
-                  Cancel
+                  {t("promises.confirm.cancel")}
                 </button>
               </div>
             </div>

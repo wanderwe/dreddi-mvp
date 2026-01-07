@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
 type InviteInfo = {
   id: string;
@@ -16,19 +17,9 @@ type InviteInfo = {
   counterparty_contact: string | null;
 };
 
-const formatDue = (dueAt: string | null) => {
-  if (!dueAt) return "No deadline";
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(dueAt));
-};
-
 export default function InvitePage() {
+  const t = useT();
+  const locale = useLocale();
   const params = useParams<{ token: string }>();
   const token = params?.token;
 
@@ -45,15 +36,19 @@ export default function InvitePage() {
     setError(null);
 
     // просто перевіряємо чи є сесія (для UI)
-    const { data: s } = await supabase.auth.getSession();
-    setSignedIn(Boolean(s.session));
+    if (!supabase) {
+      setSignedIn(false);
+    } else {
+      const { data: s } = await supabase.auth.getSession();
+      setSignedIn(Boolean(s.session));
+    }
 
     // Дістаємо дані інвайту через API (server-side safe)
     const res = await fetch(`/api/invite/${token}`, { cache: "no-store" });
     const j = await res.json();
 
     if (!res.ok) {
-      setError(j?.error ?? "Invite not found or expired.");
+      setError(j?.error ?? t("invite.errors.notFound"));
       setInfo(null);
       return;
     }
@@ -71,6 +66,12 @@ export default function InvitePage() {
 
     setBusy(true);
     setError(null);
+
+    if (!supabase) {
+      setBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
@@ -94,7 +95,7 @@ export default function InvitePage() {
     setBusy(false);
 
     if (!res.ok) {
-      setError(j?.error ?? "Accept failed.");
+      setError(j?.error ?? t("invite.errors.acceptFailed"));
       return;
     }
 
@@ -104,11 +105,22 @@ export default function InvitePage() {
   }
 
   const creatorName = useMemo(() => {
-    if (!info) return "Unknown";
+    if (!info) return t("invite.unknown");
     return info.creator_handle
       ? `@${info.creator_handle}`
-      : info.creator_display_name ?? "Unknown";
-  }, [info]);
+      : info.creator_display_name ?? t("invite.unknown");
+  }, [info, t]);
+
+  const formatDue = (dueAt: string | null) => {
+    if (!dueAt) return t("invite.noDeadline");
+    return new Intl.DateTimeFormat(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(dueAt));
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -130,30 +142,29 @@ export default function InvitePage() {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-300/60 hover:bg-emerald-500/10"
           >
             <span aria-hidden>←</span>
-            Back to home
+            {t("invite.back")}
           </Link>
 
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
-                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> Signed in
+                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> {t("invite.signedIn")}
               </>
             ) : (
               <>
-                <span className="h-2 w-2 rounded-full bg-amber-300" aria-hidden /> Guest mode
+                <span className="h-2 w-2 rounded-full bg-amber-300" aria-hidden /> {t("invite.guestMode")}
               </>
             )}
           </div>
         </div>
 
         <div className="space-y-3">
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Invitation</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
           <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            Join this promise on Dreddi
+            {t("invite.title")}
           </h1>
           <p className="max-w-2xl text-base text-slate-200">
-            Review the promise details below. If everything looks good, accept the invite to start
-            collaborating and keep each other accountable.
+            {t("invite.subtitle")}
           </p>
         </div>
 
@@ -175,13 +186,15 @@ export default function InvitePage() {
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
             {info.counterparty_id && (
               <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-                This invite was already accepted{info.counterparty_contact ? ` by ${info.counterparty_contact}` : ""}.
+                {info.counterparty_contact
+                  ? t("invite.acceptedBy", { name: info.counterparty_contact })
+                  : t("invite.accepted")}
               </div>
             )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  Promise invite
+                  {t("invite.badge")}
                 </div>
 
                 {/* What exactly you accept */}
@@ -194,7 +207,7 @@ export default function InvitePage() {
                 )}
 
                 <p className="text-sm text-slate-300">
-                  Created by <span className="font-semibold text-white">{creatorName}</span>
+                  {t("invite.createdBy", { name: creatorName })}
                 </p>
               </div>
 
@@ -203,7 +216,7 @@ export default function InvitePage() {
                   ⏰
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Deadline</p>
+                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.deadline")}</p>
                   <p className="font-semibold text-white">{formatDue(info.due_at)}</p>
                 </div>
               </div>
@@ -211,35 +224,35 @@ export default function InvitePage() {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Status</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.statusLabel")}</p>
                 <p className="mt-1 text-lg font-semibold text-white">
-                  {info.counterparty_id ? "Already accepted" : "Awaiting acceptance"}
+                  {info.counterparty_id ? t("invite.statusAccepted") : t("invite.statusAwaiting")}
                 </p>
                 <p className="text-sm text-slate-300">
                   {info.counterparty_id
-                    ? "This promise is ready—jump into your dashboard to follow progress."
-                    : "Accept to join the promise and it will appear in your dashboard."}
+                    ? t("invite.statusAcceptedBody")
+                    : t("invite.statusAwaitingBody")}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Next step</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.nextStep")}</p>
 
                 {info.counterparty_id ? (
                   <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
-                    <span aria-hidden>✅</span> Already accepted
+                    <span aria-hidden>✅</span> {t("invite.statusAccepted")}
                   </div>
                 ) : (
                   <>
                     <p className="mt-2 text-xs text-slate-400">
-                      By accepting, you confirm you understand this commitment.
+                      {t("invite.nextStepHint")}
                     </p>
                     <button
                       disabled={busy}
                       onClick={accept}
                       className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                     >
-                      {busy ? "Processing..." : "Accept promise"}
+                      {busy ? t("invite.processing") : t("invite.accept")}
                     </button>
                   </>
                 )}

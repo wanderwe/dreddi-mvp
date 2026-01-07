@@ -1,0 +1,291 @@
+{
+  "home": {
+    "eyebrow": "Reputation intelligence for deals and promises",
+    "brand": {
+      "name": "Dreddi",
+      "suffix": "knows"
+    },
+    "tagline": "Track deals and promises, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
+    "highlights": {
+      "promisesTracked": "Deals tracked",
+      "reputationIntact": "Reputation intact",
+      "dreddiKnows": "Dreddi knows"
+    },
+    "showcase": {
+      "0": {
+        "title": "Deal: Vendor onboarding deck by Wed",
+        "meta": "Commitment kept • Outcome: approved • Reputation +2"
+      },
+      "1": {
+        "title": "Deal: Refund within 24h",
+        "meta": "Commitment met • Outcome: case closed • Reputation +1"
+      },
+      "2": {
+        "title": "Deal: Launch UA landing page",
+        "meta": "Commitment delivered • Outcome: live • Reputation +3"
+      }
+    },
+    "loading": "Loading your session…",
+    "loadingShort": "Loading…",
+    "loadingPlaceholder": "…",
+    "errors": {
+      "userSession": "Unable to load user session",
+      "notAuthenticated": "Not authenticated",
+      "reputation": "Unable to load reputation"
+    },
+    "cta": {
+      "getStarted": "Get started",
+      "publicProfiles": "See public profiles",
+      "createPromise": "Create deal",
+      "reviewDeals": "Review deals",
+      "logout": "Log out"
+    },
+    "score": {
+      "label": "Reputation Score",
+      "live": "Live",
+      "signIn": "Sign in for live score",
+      "cards": {
+        "score": "Score",
+        "confirmed": "Confirmed",
+        "confirmedSuffix": "{count} complete",
+        "disputed": "Disputed",
+        "disputedSuffix": "{count} recorded"
+      },
+      "onTime": {
+        "label": "On-time completions",
+        "suffix": "{count} delivered on time",
+        "helper": {
+          "auth": "On-time completions strengthen your reputation",
+          "guest": "Sign in to see on-time performance"
+        }
+      }
+    },
+    "recentDeals": {
+      "title": "Recent deals",
+      "seeAll": "See all",
+      "guestHint": "Sign in to see your live deals",
+      "empty": "Create your first deal to populate your reputation feed.",
+      "sentiment": {
+        "positive": "Positive",
+        "negative": "Negative"
+      },
+      "eventFallbackTitle": "Deal",
+      "placeholderMetaDue": "Due {date}",
+      "placeholderMetaCreated": "Created {date}",
+      "status": {
+        "active": "Active",
+        "completed_by_promisor": "Marked complete (waiting for confirmation)",
+        "confirmed": "Confirmed",
+        "disputed": "Disputed"
+      }
+    }
+  },
+  "nav": {
+    "myPromises": "My deals",
+    "newPromise": "New deal",
+    "login": "Sign in",
+    "getStarted": "Get started",
+    "logout": "Log out"
+  },
+  "promises": {
+    "overview": {
+      "eyebrow": "Deals",
+      "title": "Your deals overview",
+      "subtitle": "Snapshot of every deal you created and what was created for you.",
+      "cta": "New deal",
+      "metrics": {
+        "total": "Total",
+        "awaitingYou": "Awaiting your action",
+        "awaitingOthers": "Awaiting others"
+      }
+    },
+    "empty": {
+      "title": "Nothing here yet",
+      "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
+      "counterpartyDescription": "No deals have been created for you yet. Accept an invite link to get started.",
+      "cta": "Create deal"
+    },
+    "status": {
+      "active": "Active",
+      "pendingConfirmation": "Pending confirmation",
+      "waitingConfirmation": "Waiting for confirmation",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed",
+      "pendingCompletion": "Pending completion",
+      "needsReview": "Needs your review",
+      "awaitingInviteAcceptance": "Waiting for invite acceptance"
+    },
+    "confirmModal": {
+      "title": "Request confirmation?",
+      "body": "You’re asking the other side to confirm you delivered this deal.",
+      "cancel": "Not yet",
+      "confirm": "Yes, request confirmation"
+    },
+    "list": {
+      "tabs": {
+        "promisor": "I created ({count})",
+        "counterparty": "Created for me ({count})"
+      },
+      "cardLabel": "Deal",
+      "dueLabel": "Due",
+      "noDeadline": "No deadline",
+      "waitingNotePromisor": "You marked this complete. Waiting for the counterparty.",
+      "waitingNoteCounterparty": "Creator marked this complete. Please confirm or dispute.",
+      "actionRequired": "Action required",
+      "scoreImpact": "Score impact: {impact}",
+      "markCompleted": "Mark as completed",
+      "updating": "Updating…",
+      "reviewConfirm": "Review & confirm",
+      "errors": {
+        "markComplete": "Could not mark complete",
+        "updateFailed": "Failed to update"
+      }
+    },
+    "detail": {
+      "back": "Back",
+      "loading": "Loading…",
+      "cardTitle": "Deal",
+      "acceptedBySecondSide": "Accepted by second side",
+      "yes": "Yes",
+      "no": "No",
+      "counterparty": "Counterparty",
+      "counterpartyFallback": "counterparty",
+      "noDetails": "No details provided",
+      "statusActions": "Status actions",
+      "currentStatus": "Current status",
+      "markCompleted": "Mark as completed",
+      "shareInvite": "Share the invite and wait for acceptance to request confirmation.",
+      "reviewConfirm": "Review & confirm",
+      "waitingReview": "Waiting for the counterparty to review.",
+      "confirmed": "Deal confirmed ✅",
+      "disputed": "Deal disputed.",
+      "guestView": "You are viewing this deal as a guest.",
+      "inviteTitle": "Invite",
+      "inviteLinkTitle": "Invite link",
+      "inviteAccepted": "Invite accepted",
+      "inviteAcceptedBy": "Invite accepted by {name}.",
+      "noInviteToken": "No invite token yet. Press “Generate” to create one.",
+      "generate": "Generate",
+      "copyLink": "Copy link",
+      "regenerate": "Regenerate",
+      "openInvite": "Open invite page",
+      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link.",
+      "inviteFallback": "…",
+      "noDeadline": "No deadline",
+      "saving": "Saving…",
+      "errors": {
+        "unsupportedStatus": "Deal has an unsupported status value",
+        "updateStatus": "Could not update status",
+        "copyClipboard": "Could not copy to clipboard."
+      }
+    },
+    "confirm": {
+      "back": "Back to deals",
+      "badge": "Review",
+      "promiseLabel": "Deal",
+      "dueLabel": "Due",
+      "createdBy": "Created by {name}",
+      "statusLabel": "Status",
+      "actionRequired": "Action required from you",
+      "detailsLabel": "Details",
+      "alreadyDisputed": "Already disputed",
+      "reasonLabel": "Reason",
+      "confirming": "Confirming…",
+      "confirm": "Confirm completion",
+      "sending": "Sending…",
+      "dispute": "Dispute",
+      "noActions": "No actions available.",
+      "notFound": "Deal not found.",
+      "disputeBadge": "Dispute",
+      "disputeTitle": "Tell us what went wrong",
+      "disputeSubtitle": "Choose the issue and provide optional context.",
+      "disputePlaceholder": "Add context",
+      "submitDispute": "Submit dispute",
+      "submitting": "Submitting…",
+      "cancel": "Cancel",
+      "noDeadline": "No deadline",
+      "statusNote": {
+        "confirmed": "Already confirmed ✅",
+        "disputed": "Already disputed",
+        "active": "Not marked as completed yet"
+      },
+      "success": {
+        "confirmed": "Deal confirmed. Redirecting…",
+        "disputed": "Dispute submitted. Redirecting…"
+      },
+      "errors": {
+        "loadFailed": "Failed to load deal",
+        "unsupportedStatus": "Deal has unsupported status",
+        "actionFailed": "Action failed",
+        "confirmFailed": "Failed to confirm",
+        "disputeFailed": "Failed to dispute"
+      }
+    },
+    "disputeOptions": {
+      "not_completed": "It wasn’t completed",
+      "partial": "Partially completed",
+      "late": "Completed late",
+      "other": "Other"
+    },
+    "new": {
+      "eyebrow": "New deal",
+      "title": "Document the deal",
+      "subtitle": "Name the deal, add context, and an optional deadline.",
+      "back": "Back",
+      "fields": {
+        "title": "Title",
+        "details": "Details",
+        "counterparty": "Counterparty",
+        "dueDate": "Due date"
+      },
+      "placeholders": {
+        "title": "Short summary of the deal",
+        "details": "Details (optional)",
+        "counterparty": "Who (email/phone/handle) — optional"
+      },
+      "submit": "Create deal",
+      "creating": "Creating…"
+    }
+  },
+  "invite": {
+    "back": "Back to home",
+    "signedIn": "Signed in",
+    "guestMode": "Guest mode",
+    "eyebrow": "Invitation",
+    "title": "Join this deal on Dreddi",
+    "subtitle": "Review the deal details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
+    "accepted": "This invite was already accepted.",
+    "acceptedBy": "This invite was already accepted by {name}.",
+    "badge": "Deal invite",
+    "createdBy": "Created by {name}",
+    "deadline": "Deadline",
+    "statusLabel": "Status",
+    "statusAccepted": "Already accepted",
+    "statusAwaiting": "Awaiting acceptance",
+    "statusAcceptedBody": "This deal is ready—jump into your dashboard to follow progress.",
+    "statusAwaitingBody": "Accept to join the deal and it will appear in your dashboard.",
+    "nextStep": "Next step",
+    "nextStepHint": "By accepting, you confirm you understand this deal.",
+    "processing": "Processing...",
+    "accept": "Accept deal",
+    "unknown": "Unknown",
+    "noDeadline": "No deadline",
+    "errors": {
+      "notFound": "Invite not found or expired.",
+      "acceptFailed": "Accept failed."
+    }
+  },
+  "auth": {
+    "login": {
+      "eyebrow": "Welcome back",
+      "subtitle": "Sign in to create deals and track reputation.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Send magic link",
+      "sending": "Sending...",
+      "sent": "Link sent ✅ Check your inbox (and Spam).",
+      "back": "Back to landing",
+      "secure": "Secure, zero-password access"
+    }
+  }
+}
