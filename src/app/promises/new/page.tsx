@@ -26,9 +26,9 @@ export default function NewPromisePage() {
         }
         return;
       }
-      const { data } = await supabase.auth.getSession();
+      const { data: sessionData } = await supabase.auth.getSession();
       if (!active) return;
-      if (!data.session) {
+      if (!sessionData.session) {
         router.replace(`/login?next=${encodeURIComponent("/promises/new")}`);
       }
     };
@@ -50,8 +50,8 @@ export default function NewPromisePage() {
       return;
     }
 
-    const { data } = await supabase.auth.getSession();
-    const session = data.session;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
 
     if (!session) {
       setBusy(false);
@@ -64,7 +64,7 @@ export default function NewPromisePage() {
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-    const { data, error } = await supabase
+    const { data: insertData, error: insertError } = await supabase
       .from("promises")
       .insert({
         creator_id: user.id,
@@ -82,12 +82,12 @@ export default function NewPromisePage() {
 
     setBusy(false);
 
-    if (error) {
-      setError(error.message);
+    if (insertError) {
+      setError(insertError.message);
       return;
     }
 
-    router.push(`/promises/${data.id}`);
+    router.push(`/promises/${insertData.id}`);
   }
 
   return (
