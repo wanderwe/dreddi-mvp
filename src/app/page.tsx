@@ -453,6 +453,13 @@ export default function Home() {
                 <p className="mt-2 text-lg font-semibold text-white">
                   {reputationLoading ? t("home.loadingPlaceholder") : onTimeCount}
                 </p>
+                <p className="mt-1 text-xs text-emerald-100/80 whitespace-nowrap">
+                  {t(
+                    isAuthenticated
+                      ? "home.score.onTime.helper.auth"
+                      : "home.score.onTime.helper.guest",
+                  )}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-white/5 bg-white/5 p-4">

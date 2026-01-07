@@ -54,8 +54,10 @@
       "onTime": {
         "label": "On-time completions",
         "suffix": "{count} delivered on time",
-        "descriptionSignedIn": "Each on-time delivery boosts your reputation.",
-        "descriptionGuest": "Sign in to start tracking how on-time completions help your score."
+        "helper": {
+          "auth": "On-time completions strengthen your reputation.",
+          "guest": "Sign in to see on-time performance."
+        }
       }
     },
     "recentDeals": {
