@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
@@ -38,6 +38,9 @@ export default function ConfirmPromisePage() {
   const [disputeReason, setDisputeReason] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const supabaseErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+
   const formatDate = (value: string | null) => {
     if (!value) return t("promises.confirm.noDeadline");
     try {
@@ -70,8 +73,11 @@ export default function ConfirmPromisePage() {
       setLoading(true);
       setError(null);
 
-      if (!supabase) {
-        setError("Authentication is unavailable in this preview.");
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (err) {
+        setError(supabaseErrorMessage(err));
         setLoading(false);
         return;
       }
@@ -123,9 +129,7 @@ export default function ConfirmPromisePage() {
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
-    if (!supabase) {
-      throw new Error("Authentication is unavailable in this preview.");
-    }
+    const supabase = requireSupabase();
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push(`/login?next=${encodeURIComponent(`/promises/${promise.id}/confirm`)}`);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
 export default function NewPromisePage() {
@@ -16,13 +16,19 @@ export default function NewPromisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const supabaseErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+
   useEffect(() => {
     let active = true;
 
     const ensureSession = async () => {
-      if (!supabase) {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (err) {
         if (active) {
-          setError("Authentication is unavailable in this preview.");
+          setError(supabaseErrorMessage(err));
         }
         return;
       }
@@ -44,9 +50,12 @@ export default function NewPromisePage() {
     setBusy(true);
     setError(null);
 
-    if (!supabase) {
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
       setBusy(false);
-      setError("Authentication is unavailable in this preview.");
+      setError(supabaseErrorMessage(err));
       return;
     }
 

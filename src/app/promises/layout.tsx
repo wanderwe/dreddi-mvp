@@ -5,22 +5,29 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
+  const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const pathname = usePathname();
   const isAuthenticated = Boolean(email);
 
   useEffect(() => {
     let active = true;
 
-    if (!supabase) {
-      setEmail(null);
-      return;
-    }
-
     const syncSession = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (error) {
+        if (!active) return;
+        setSupabaseError(
+          error instanceof Error ? error.message : "Authentication is unavailable in this preview."
+        );
+        setEmail(null);
+        return;
+      }
       const { data } = await supabase.auth.getSession();
       if (!active) return;
       setEmail(data.session?.user?.email ?? null);
@@ -31,24 +38,46 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
 
     void syncSession();
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!active) return;
-      setEmail(session?.user?.email ?? null);
-      if (!session) {
-        window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+    let subscription:
+      | {
+          data: { subscription: { unsubscribe: () => void } };
+        }
+      | null = null;
+    try {
+      const supabase = requireSupabase();
+      subscription = supabase.auth.onAuthStateChange((_e, session) => {
+        if (!active) return;
+        setEmail(session?.user?.email ?? null);
+        if (!session) {
+          window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+        }
+      });
+    } catch (error) {
+      if (active) {
+        setSupabaseError(
+          error instanceof Error
+            ? error.message
+            : "Authentication is unavailable in this preview."
+        );
       }
-    });
+    }
 
     return () => {
       active = false;
-      sub.subscription.unsubscribe();
+      subscription?.data.subscription.unsubscribe();
     };
   }, [pathname]);
 
   async function logout() {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    try {
+      const supabase = requireSupabase();
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } catch (error) {
+      setSupabaseError(
+        error instanceof Error ? error.message : "Authentication is unavailable in this preview."
+      );
+    }
   }
 
   return (
@@ -70,7 +99,22 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
         </div>
       </header>
 
-      <main className="relative">{children}</main>
+      <main className="relative">
+        {supabaseError ? (
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-16 text-center text-slate-200">
+            <h1 className="text-3xl font-semibold text-white">Authentication unavailable</h1>
+            <p className="text-sm text-slate-300">{supabaseError}</p>
+            <Link
+              href="/"
+              className="mx-auto inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              Back to home
+            </Link>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
     </div>
   );
 }

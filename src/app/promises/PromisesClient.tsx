@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -63,6 +63,9 @@ export default function PromisesClient() {
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
+  const supabaseErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
+
   useEffect(() => {
     let cancelled = false;
 
@@ -70,8 +73,11 @@ export default function PromisesClient() {
       setLoading(true);
       setError(null);
 
-      if (!supabase) {
-        setError("Authentication is unavailable in this preview.");
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (error) {
+        setError(supabaseErrorMessage(error));
         setLoading(false);
         return;
       }
@@ -176,9 +182,7 @@ export default function PromisesClient() {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
     setError(null);
     try {
-      if (!supabase) {
-        throw new Error("Authentication is unavailable in this preview.");
-      }
+      const supabase = requireSupabase();
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push(`/login?next=${encodeURIComponent("/promises")}`);
@@ -205,7 +209,9 @@ export default function PromisesClient() {
         )
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("promises.list.errors.updateFailed"));
+      setError(
+        e instanceof Error ? e.message : t("promises.list.errors.updateFailed")
+      );
     } finally {
       setBusyMap((m) => ({ ...m, [promiseId]: false }));
     }

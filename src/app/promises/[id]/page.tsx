@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
@@ -142,6 +142,9 @@ export default function PromisePage() {
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  const supabaseErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
     try {
@@ -151,11 +154,10 @@ export default function PromisePage() {
     }
   }, [locale, p, t]);
 
-  async function requireSessionOrRedirect(nextPath: string) {
-    if (!supabase) {
-      setError("Authentication is unavailable in this preview.");
-      return null;
-    }
+  async function requireSessionOrRedirect(
+    nextPath: string,
+    supabase: ReturnType<typeof requireSupabase>
+  ) {
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push(`/login?next=${encodeURIComponent(nextPath)}`);
@@ -170,7 +172,15 @@ export default function PromisePage() {
 
     setError(null);
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
     if (!session) return;
 
     const { data, error } = await supabase
@@ -204,7 +214,16 @@ export default function PromisePage() {
     setError(null);
     setActionBusy("complete");
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
     if (!session) {
       setActionBusy(null);
       return;
@@ -239,7 +258,16 @@ export default function PromisePage() {
     setError(null);
     setInviteBusy(regenerate ? "regen" : "generate");
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`);
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setInviteBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
     if (!session) {
       setInviteBusy(null);
       return;
