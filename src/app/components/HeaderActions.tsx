@@ -15,7 +15,7 @@ export function HeaderActions({ showLogout = false, onLogout, className = "" }: 
 
   return (
     <nav
-      className={`flex flex-wrap items-center gap-3 text-sm font-medium text-slate-200 sm:flex-nowrap ${className}`}
+      className={`flex flex-nowrap items-center gap-3 text-sm font-medium text-slate-200 ${className}`}
     >
       <Link
         className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -35,7 +35,7 @@ export function HeaderActions({ showLogout = false, onLogout, className = "" }: 
       {showLogout && onLogout && (
         <button
           onClick={onLogout}
-          className="whitespace-nowrap rounded-xl px-3 py-1.5 text-slate-300 transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
+          className="whitespace-nowrap rounded-xl px-3 py-1.5 text-slate-300 transition hover:bg-white/10 hover:text-emerald-200 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
           type="button"
         >
           {t("nav.logout")}
