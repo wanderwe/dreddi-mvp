@@ -83,7 +83,7 @@ export default function Home() {
           },
           {
             id: "demo-3",
-            title: "Виправити баги онбордингу",
+            title: "Завершити монтаж кухні до кінця року",
             meta: "Відповідальність оскаржено • Результат: перегляд",
             status: "disputed",
           },
@@ -103,7 +103,7 @@ export default function Home() {
           },
           {
             id: "demo-3",
-            title: "Fix onboarding bugs",
+            title: "Complete kitchen installation by year-end",
             meta: "Responsibility disputed • Outcome: under review",
             status: "disputed",
           },
