@@ -112,6 +112,11 @@ export default function Home() {
   useEffect(() => {
     let active = true;
 
+    if (!supabase) {
+      setReady(true);
+      return;
+    }
+
     const syncSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (!active) return;
@@ -137,6 +142,13 @@ export default function Home() {
     let cancelled = false;
 
     const loadRecentDeals = async () => {
+      if (!supabase) {
+        setRecentDeals([]);
+        setRecentError(null);
+        setRecentLoading(false);
+        return;
+      }
+
       if (!email) {
         setRecentDeals([]);
         setRecentError(null);
@@ -200,6 +212,13 @@ export default function Home() {
     let cancelled = false;
 
     const loadReputation = async () => {
+      if (!supabase) {
+        setReputation(null);
+        setReputationError(null);
+        setReputationLoading(false);
+        return;
+      }
+
       if (!email) {
         setReputation(null);
         setReputationError(null);
@@ -248,6 +267,7 @@ export default function Home() {
   }, [email]);
 
   async function logout() {
+    if (!supabase) return;
     await supabase.auth.signOut();
     // onAuthStateChange оновить UI
   }

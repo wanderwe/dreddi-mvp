@@ -20,6 +20,12 @@ export default function NewPromisePage() {
     let active = true;
 
     const ensureSession = async () => {
+      if (!supabase) {
+        if (active) {
+          setError("Authentication is unavailable in this preview.");
+        }
+        return;
+      }
       const { data } = await supabase.auth.getSession();
       if (!active) return;
       if (!data.session) {
@@ -37,6 +43,12 @@ export default function NewPromisePage() {
   async function createPromise() {
     setBusy(true);
     setError(null);
+
+    if (!supabase) {
+      setBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
 
     const { data } = await supabase.auth.getSession();
     const session = data.session;

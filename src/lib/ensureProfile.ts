@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 
 export async function upsertProfile(user: { id: string; email?: string | null }) {
+  if (!supabase) return;
   const handle =
     user.email?.split("@")[0].toLowerCase() ?? `user_${user.id.slice(0, 6)}`;
 

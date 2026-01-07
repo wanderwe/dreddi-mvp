@@ -36,8 +36,12 @@ export default function InvitePage() {
     setError(null);
 
     // просто перевіряємо чи є сесія (для UI)
-    const { data: s } = await supabase.auth.getSession();
-    setSignedIn(Boolean(s.session));
+    if (!supabase) {
+      setSignedIn(false);
+    } else {
+      const { data: s } = await supabase.auth.getSession();
+      setSignedIn(Boolean(s.session));
+    }
 
     // Дістаємо дані інвайту через API (server-side safe)
     const res = await fetch(`/api/invite/${token}`, { cache: "no-store" });
@@ -62,6 +66,12 @@ export default function InvitePage() {
 
     setBusy(true);
     setError(null);
+
+    if (!supabase) {
+      setBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {

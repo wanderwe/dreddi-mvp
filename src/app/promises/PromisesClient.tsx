@@ -70,6 +70,12 @@ export default function PromisesClient() {
       setLoading(true);
       setError(null);
 
+      if (!supabase) {
+        setError("Authentication is unavailable in this preview.");
+        setLoading(false);
+        return;
+      }
+
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
@@ -170,6 +176,9 @@ export default function PromisesClient() {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
     setError(null);
     try {
+      if (!supabase) {
+        throw new Error("Authentication is unavailable in this preview.");
+      }
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push(`/login?next=${encodeURIComponent("/promises")}`);

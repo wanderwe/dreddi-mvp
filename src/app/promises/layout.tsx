@@ -15,6 +15,11 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
   useEffect(() => {
     let active = true;
 
+    if (!supabase) {
+      setEmail(null);
+      return;
+    }
+
     const syncSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (!active) return;
@@ -41,6 +46,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
   }, [pathname]);
 
   async function logout() {
+    if (!supabase) return;
     await supabase.auth.signOut();
     window.location.href = "/";
   }
