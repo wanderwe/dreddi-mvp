@@ -63,6 +63,7 @@ export default function Home() {
       text: t("home.highlights.dreddiKnows"),
     },
   ];
+  const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
 
   const showcasePromises: DealRow[] = [
     {
@@ -294,7 +295,7 @@ export default function Home() {
               {t("home.tagline")}
             </p>
             <div className="grid max-w-lg gap-2 sm:grid-cols-3">
-              {highlights.map((item) => (
+              {highlightItems.map((item) => (
                 <div
                   key={item.key}
                   className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
@@ -388,21 +389,13 @@ export default function Home() {
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
                   <div className="text-xs text-emerald-200">{t("home.score.cards.confirmed")}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading
-                      ? t("home.loadingPlaceholder")
-                      : t("home.score.cards.confirmedSuffix", {
-                          count: confirmedCount,
-                        })}
+                    {reputationLoading ? t("home.loadingPlaceholder") : confirmedCount}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
                   <div className="text-xs text-amber-200">{t("home.score.cards.disputed")}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading
-                      ? t("home.loadingPlaceholder")
-                      : t("home.score.cards.disputedSuffix", {
-                          count: disputedCount,
-                        })}
+                    {reputationLoading ? t("home.loadingPlaceholder") : disputedCount}
                   </div>
                 </div>
               </div>
