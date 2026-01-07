@@ -17,6 +17,12 @@ export default function LoginPage() {
     setBusy(true);
     setError(null);
 
+    if (!supabase) {
+      setBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${location.origin}/auth/callback` },

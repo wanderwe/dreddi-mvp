@@ -70,6 +70,12 @@ export default function ConfirmPromisePage() {
       setLoading(true);
       setError(null);
 
+      if (!supabase) {
+        setError("Authentication is unavailable in this preview.");
+        setLoading(false);
+        return;
+      }
+
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm`)}`);
@@ -117,6 +123,9 @@ export default function ConfirmPromisePage() {
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
+    if (!supabase) {
+      throw new Error("Authentication is unavailable in this preview.");
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push(`/login?next=${encodeURIComponent(`/promises/${promise.id}/confirm`)}`);

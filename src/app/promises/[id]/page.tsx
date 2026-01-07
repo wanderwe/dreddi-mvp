@@ -152,6 +152,10 @@ export default function PromisePage() {
   }, [locale, p, t]);
 
   async function requireSessionOrRedirect(nextPath: string) {
+    if (!supabase) {
+      setError("Authentication is unavailable in this preview.");
+      return null;
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       router.push(`/login?next=${encodeURIComponent(nextPath)}`);
