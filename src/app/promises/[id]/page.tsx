@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PromiseRow = {
@@ -19,15 +20,6 @@ type PromiseRow = {
   counterparty_id: string | null;
   creator_id: string;
 };
-
-function formatDue(dueAt: string | null) {
-  if (!dueAt) return "No deadline";
-  try {
-    return new Date(dueAt).toLocaleString();
-  } catch {
-    return "No deadline";
-  }
-}
 
 function Card({
   title,
@@ -50,11 +42,12 @@ function Card({
 }
 
 function StatusPill({ status }: { status: PromiseRow["status"] }) {
+  const t = useT();
   const labelMap: Record<PromiseRow["status"], string> = {
-    active: "Active",
-    completed_by_promisor: "Waiting confirmation",
-    confirmed: "Confirmed",
-    disputed: "Disputed",
+    active: t("promises.status.active"),
+    completed_by_promisor: t("promises.status.pendingConfirmation"),
+    confirmed: t("promises.status.confirmed"),
+    disputed: t("promises.status.disputed"),
   };
 
   const colorMap: Record<PromiseRow["status"], string> = {
@@ -124,14 +117,18 @@ function ActionButton({
     cls += " " + activeNeutral;
   }
 
+  const t = useT();
+
   return (
     <button type="button" disabled={disabled} onClick={onClick} className={cls}>
-      {loading ? "Saving…" : label}
+      {loading ? t("promises.detail.saving") : label}
     </button>
   );
 }
 
 export default function PromisePage() {
+  const t = useT();
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const id = params?.id;
@@ -145,7 +142,14 @@ export default function PromisePage() {
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const dueText = useMemo(() => (p ? formatDue(p.due_at) : ""), [p]);
+  const dueText = useMemo(() => {
+    if (!p?.due_at) return t("promises.detail.noDeadline");
+    try {
+      return new Date(p.due_at).toLocaleString(locale);
+    } catch {
+      return t("promises.detail.noDeadline");
+    }
+  }, [locale, p, t]);
 
   async function requireSessionOrRedirect(nextPath: string) {
     const { data } = await supabase.auth.getSession();
@@ -177,7 +181,7 @@ export default function PromisePage() {
     else {
       const status = (data as { status?: unknown }).status;
       if (!isPromiseStatus(status)) {
-        setError("Promise has an unsupported status value");
+        setError(t("promises.detail.errors.unsupportedStatus"));
         setP({ ...(data as PromiseRow), status: "active" });
       } else {
         setP({ ...(data as PromiseRow), status });
@@ -213,7 +217,7 @@ export default function PromisePage() {
 
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      setError(j?.error ?? "Could not update status");
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
       return;
     }
 
@@ -272,7 +276,7 @@ export default function PromisePage() {
     try {
       await navigator.clipboard.writeText(inviteLink);
     } catch {
-      setError("Could not copy to clipboard.");
+      setError(t("promises.detail.errors.copyClipboard"));
     } finally {
       setInviteBusy(null);
     }
@@ -289,7 +293,7 @@ export default function PromisePage() {
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <Link href="/promises" className="text-neutral-400 hover:text-white">
-          ← Back
+          ← {t("promises.detail.back")}
         </Link>
 
         <div className="flex items-center gap-3">{p && <StatusPill status={p.status} />}</div>
@@ -302,10 +306,10 @@ export default function PromisePage() {
       )}
 
       {!p ? (
-        <div className="text-neutral-400">Loading…</div>
+        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
       ) : (
         <>
-          <Card title="Promise">
+          <Card title={t("promises.detail.cardTitle")}>
             <div className="space-y-3">
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
@@ -313,39 +317,42 @@ export default function PromisePage() {
               </div>
 
               <div className="text-sm text-neutral-400">
-                Accepted by second side:{" "}
+                {t("promises.detail.acceptedBySecondSide")}:{" "}
                 <span
                   className={
                     "text-sm font-medium " +
                     (p.counterparty_id ? "text-emerald-300" : "text-neutral-200")
                   }
                 >
-                  {p.counterparty_id ? "Yes" : "No"}
+                  {p.counterparty_id ? t("promises.detail.yes") : t("promises.detail.no")}
                 </span>
               </div>
 
               {p.counterparty_contact && (
                 <div className="text-sm text-neutral-400">
-                  Counterparty: <span className="text-neutral-200">{p.counterparty_contact}</span>
+                  {t("promises.detail.counterparty")}:{" "}
+                  <span className="text-neutral-200">{p.counterparty_contact}</span>
                 </div>
               )}
 
               {p.details ? (
                 <div className="pt-2 text-neutral-200 whitespace-pre-wrap">{p.details}</div>
               ) : (
-                <div className="pt-2 text-neutral-500">без деталей</div>
+                <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
               )}
             </div>
           </Card>
 
-          <Card title="Status actions">
+          <Card title={t("promises.detail.statusActions")}>
             <div className="space-y-3">
-              <div className="text-sm text-neutral-300">Current status: <StatusPill status={p.status} /></div>
+              <div className="text-sm text-neutral-300">
+                {t("promises.detail.currentStatus")}: <StatusPill status={p.status} />
+              </div>
 
               {isPromisor && p.status === "active" && (
                 isInviteAccepted ? (
                   <ActionButton
-                    label="Mark as completed"
+                    label={t("promises.detail.markCompleted")}
                     variant="ok"
                     loading={actionBusy === "complete"}
                     disabled={actionBusy !== null}
@@ -353,7 +360,7 @@ export default function PromisePage() {
                   />
                 ) : (
                   <div className="text-sm text-neutral-400">
-                    Share the invite and wait for acceptance to request confirmation.
+                    {t("promises.detail.shareInvite")}
                   </div>
                 )
               )}
@@ -363,47 +370,51 @@ export default function PromisePage() {
                   href={`/promises/${p.id}/confirm`}
                   className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
                 >
-                  Review & confirm
+                  {t("promises.detail.reviewConfirm")}
                 </Link>
               )}
 
               {waitingForReview && !isCounterparty && (
-                <div className="text-sm text-neutral-400">Waiting for the counterparty to review.</div>
+                <div className="text-sm text-neutral-400">
+                  {t("promises.detail.waitingReview")}
+                </div>
               )}
 
               {p.status === "confirmed" && (
-                <div className="text-sm text-emerald-300">Promise confirmed ✅</div>
+                <div className="text-sm text-emerald-300">{t("promises.detail.confirmed")}</div>
               )}
 
               {p.status === "disputed" && (
-                <div className="text-sm text-red-300">Promise disputed.</div>
+                <div className="text-sm text-red-300">{t("promises.detail.disputed")}</div>
               )}
 
               {!isPromisor && !isCounterparty && (
-                <div className="text-xs text-neutral-500">You are viewing this promise as a guest.</div>
+                <div className="text-xs text-neutral-500">{t("promises.detail.guestView")}</div>
               )}
             </div>
           </Card>
 
           {!isFinal && canManageInvite && (
-            <Card title={isInviteAccepted ? "Invite" : "Invite link"}>
+            <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
               {isInviteAccepted ? (
                 <div className="flex flex-col gap-2 text-sm text-neutral-300">
                   <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100">
-                    Invite accepted
+                    {t("promises.detail.inviteAccepted")}
                   </div>
                   <div className="text-neutral-300">
-                    Invite accepted by {p.counterparty_contact ?? "counterparty"}.
+                    {t("promises.detail.inviteAcceptedBy", {
+                      name: p.counterparty_contact ?? t("promises.detail.counterpartyFallback"),
+                    })}
                   </div>
                 </div>
               ) : !p.invite_token ? (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="text-sm text-neutral-400">
-                    No invite token yet. Press “Generate” to create one.
+                    {t("promises.detail.noInviteToken")}
                   </div>
 
                   <ActionButton
-                    label="Generate"
+                    label={t("promises.detail.generate")}
                     variant="primary"
                     loading={inviteBusy === "generate"}
                     disabled={inviteBusy !== null}
@@ -413,12 +424,12 @@ export default function PromisePage() {
               ) : (
                 <div className="space-y-3">
                   <div className="rounded-xl border border-neutral-800 bg-black/30 px-4 py-3 text-sm text-neutral-200 break-all">
-                    {inviteLink ?? "…"}
+                    {inviteLink ?? t("promises.detail.inviteFallback")}
                   </div>
 
                   <div className="flex flex-wrap gap-3">
                     <ActionButton
-                      label="Copy link"
+                      label={t("promises.detail.copyLink")}
                       variant="primary"
                       loading={inviteBusy === "copy"}
                       disabled={inviteBusy !== null || !inviteLink}
@@ -426,7 +437,7 @@ export default function PromisePage() {
                     />
 
                     <ActionButton
-                      label="Regenerate"
+                      label={t("promises.detail.regenerate")}
                       variant="ghost"
                       loading={inviteBusy === "regen"}
                       disabled={inviteBusy !== null}
@@ -438,14 +449,13 @@ export default function PromisePage() {
                         href={`/p/invite/${p.invite_token}`}
                         className="inline-flex items-center justify-center rounded-xl border border-neutral-800 bg-transparent text-neutral-200 px-4 py-2 text-sm font-medium transition hover:bg-white/5 hover:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white/15"
                       >
-                        Open invite page
+                        {t("promises.detail.openInvite")}
                       </Link>
                     )}
                   </div>
 
                   <div className="text-xs text-neutral-500">
-                    Tip: open the invite in Incognito to test another user. Regenerating invalidates the
-                    old link.
+                    {t("promises.detail.inviteTip")}
                   </div>
                 </div>
               )}
@@ -457,9 +467,11 @@ export default function PromisePage() {
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">Request confirmation?</h2>
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.confirmModal.title")}
+            </h2>
             <p className="mt-3 text-sm text-neutral-200">
-              You’re asking the other side to confirm you delivered this promise.
+              {t("promises.confirmModal.body")}
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -468,7 +480,7 @@ export default function PromisePage() {
                 onClick={() => setShowConfirmModal(false)}
                 className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Not yet
+                {t("promises.confirmModal.cancel")}
               </button>
               <button
                 type="button"
@@ -478,7 +490,7 @@ export default function PromisePage() {
                 }}
                 className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
               >
-                Yes, request confirmation
+                {t("promises.confirmModal.confirm")}
               </button>
             </div>
           </div>

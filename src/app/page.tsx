@@ -141,7 +141,7 @@ export default function Home() {
 
       if (userErr || !userId) {
         if (!cancelled) {
-          setRecentError(userErr?.message ?? "Unable to load user session");
+          setRecentError(userErr?.message ?? t("home.errors.userSession"));
           setRecentLoading(false);
         }
         return;
@@ -204,7 +204,7 @@ export default function Home() {
 
       if (sessionError || !token) {
         if (!cancelled) {
-          setReputationError(sessionError?.message ?? "Not authenticated");
+          setReputationError(sessionError?.message ?? t("home.errors.notAuthenticated"));
           setReputationLoading(false);
         }
         return;
@@ -220,7 +220,7 @@ export default function Home() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setReputationError(body.error ?? "Unable to load reputation");
+        setReputationError(body.error ?? t("home.errors.reputation"));
       } else {
         const body = (await res.json()) as ReputationResponse;
         setReputation(body);
@@ -354,7 +354,7 @@ export default function Home() {
                   <div>
                     <p className="text-sm text-slate-300">{t("home.score.label")}</p>
                     <p className="text-2xl font-semibold text-white">
-                      {reputationLoading ? "Loading…" : score}
+                      {reputationLoading ? t("home.loadingShort") : score}
                     </p>
                   </div>
                 </div>
@@ -373,14 +373,14 @@ export default function Home() {
                 <div className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-slate-200 shadow-inner shadow-black/30">
                   <div className="text-xs text-slate-400">{t("home.score.cards.score")}</div>
                   <div className="text-2xl font-semibold text-white">
-                    {reputationLoading ? "…" : score}
+                    {reputationLoading ? t("home.loadingPlaceholder") : score}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
                   <div className="text-xs text-emerald-200">{t("home.score.cards.confirmed")}</div>
                   <div className="text-lg font-semibold">
                     {reputationLoading
-                      ? "…"
+                      ? t("home.loadingPlaceholder")
                       : t("home.score.cards.confirmedSuffix", {
                           count: confirmedCount,
                         })}
@@ -390,7 +390,7 @@ export default function Home() {
                   <div className="text-xs text-amber-200">{t("home.score.cards.disputed")}</div>
                   <div className="text-lg font-semibold">
                     {reputationLoading
-                      ? "…"
+                      ? t("home.loadingPlaceholder")
                       : t("home.score.cards.disputedSuffix", {
                           count: disputedCount,
                         })}
@@ -411,7 +411,7 @@ export default function Home() {
                 </div>
                 <p className="mt-2 text-lg font-semibold text-white">
                   {reputationLoading
-                    ? "…"
+                    ? t("home.loadingPlaceholder")
                     : t("home.score.onTime.suffix", {
                         count: onTimeCount,
                       })}

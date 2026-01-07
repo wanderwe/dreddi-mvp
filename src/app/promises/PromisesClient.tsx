@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
 type PromiseRow = {
   id: string;
@@ -22,39 +22,40 @@ type PromiseRow = {
 type TabKey = "i-promised" | "promised-to-me";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
-const formatDue = (dueAt: string | null) => {
-  if (!dueAt) return "No deadline";
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(dueAt));
-};
-
-const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
-  if (role === "promisor") {
-    if (status === "active") return "Active";
-    if (status === "completed_by_promisor") return "Pending confirmation";
-    if (status === "confirmed") return "Confirmed";
-    if (status === "disputed") return "Disputed";
-  }
-
-  if (status === "active") return "Pending completion";
-  if (status === "completed_by_promisor") return "Needs your review";
-  if (status === "confirmed") return "Confirmed";
-  if (status === "disputed") return "Disputed";
-
-  return status;
-};
-
 export default function PromisesClient() {
   const t = useT();
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+
+  const formatDue = (dueAt: string | null) => {
+    if (!dueAt) return t("promises.list.noDeadline");
+    return new Intl.DateTimeFormat(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(dueAt));
+  };
+
+  const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
+    if (role === "promisor") {
+      if (status === "active") return t("promises.status.active");
+      if (status === "completed_by_promisor") return t("promises.status.pendingConfirmation");
+      if (status === "confirmed") return t("promises.status.confirmed");
+      if (status === "disputed") return t("promises.status.disputed");
+    }
+
+    if (status === "active") return t("promises.status.pendingCompletion");
+    if (status === "completed_by_promisor") return t("promises.status.needsReview");
+    if (status === "confirmed") return t("promises.status.confirmed");
+    if (status === "disputed") return t("promises.status.disputed");
+
+    return status;
+  };
 
   const [allRows, setAllRows] = useState<PromiseWithRole[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -188,7 +189,7 @@ export default function PromisesClient() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Could not mark complete");
+        throw new Error(body.error ?? t("promises.list.errors.markComplete"));
       }
 
       setAllRows((prev) =>
@@ -199,7 +200,7 @@ export default function PromisesClient() {
         )
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to update");
+      setError(e instanceof Error ? e.message : t("promises.list.errors.updateFailed"));
     } finally {
       setBusyMap((m) => ({ ...m, [promiseId]: false }));
     }
@@ -264,7 +265,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              I promised ({roleCounts.promisor})
+              {t("promises.list.tabs.promisor", { count: roleCounts.promisor })}
             </button>
 
             <button
@@ -277,7 +278,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              Promised to me ({roleCounts.counterparty})
+              {t("promises.list.tabs.counterparty", { count: roleCounts.counterparty })}
             </button>
           </div>
 
@@ -327,10 +328,10 @@ export default function PromisesClient() {
 
                 const actionLabel = isPromisor
                   ? p.status === "completed_by_promisor"
-                    ? "Waiting for confirmation"
+                    ? t("promises.status.waitingConfirmation")
                     : null
                   : waiting
-                  ? "Action required"
+                  ? t("promises.list.actionRequired")
                   : null;
 
                 const statusLabel = statusLabelForRole(p.status, p.role);
@@ -344,19 +345,23 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="space-y-1">
-                        <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">Promise</div>
+                        <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">
+                          {t("promises.list.cardLabel")}
+                        </div>
                         <Link
                           href={`/promises/${p.id}`}
                           className="text-lg font-semibold text-white transition hover:text-emerald-100"
                         >
                           {p.title}
                         </Link>
-                        <div className="text-sm text-slate-300">Due: {formatDue(p.due_at)}</div>
+                        <div className="text-sm text-slate-300">
+                          {t("promises.list.dueLabel")}: {formatDue(p.due_at)}
+                        </div>
                         {waiting && (
                           <p className="text-xs text-amber-200">
                             {isPromisor
-                              ? "You marked this complete. Waiting for the counterparty."
-                              : "Promisor marked this complete. Please confirm or dispute."}
+                              ? t("promises.list.waitingNotePromisor")
+                              : t("promises.list.waitingNoteCounterparty")}
                           </p>
                         )}
                       </div>
@@ -369,7 +374,7 @@ export default function PromisesClient() {
 
                         {impact && (
                           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
-                            Score impact: {impact}
+                            {t("promises.list.scoreImpact", { impact })}
                           </span>
                         )}
 
@@ -380,12 +385,14 @@ export default function PromisesClient() {
                             onClick={() => setConfirmingId(p.id)}
                             className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
                           >
-                            {busy ? "Updating…" : "Mark as completed"}
+                            {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
                           </button>
                         )}
 
                         {isPromisor && p.status === "active" && !acceptedBySecondSide && (
-                          <span className="text-xs text-slate-400">Waiting for invite acceptance</span>
+                          <span className="text-xs text-slate-400">
+                            {t("promises.status.awaitingInviteAcceptance")}
+                          </span>
                         )}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
@@ -393,7 +400,7 @@ export default function PromisesClient() {
                             href={`/promises/${p.id}/confirm`}
                             className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
                           >
-                            Review & confirm
+                            {t("promises.list.reviewConfirm")}
                           </Link>
                         )}
                       </div>
@@ -427,9 +434,11 @@ export default function PromisesClient() {
       {confirmingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">Request confirmation?</h2>
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.confirmModal.title")}
+            </h2>
             <p className="mt-3 text-sm text-neutral-200">
-              You’re asking the other side to confirm you delivered this promise.
+              {t("promises.confirmModal.body")}
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -438,7 +447,7 @@ export default function PromisesClient() {
                 onClick={() => setConfirmingId(null)}
                 className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Not yet
+                {t("promises.confirmModal.cancel")}
               </button>
               <button
                 type="button"
@@ -449,7 +458,7 @@ export default function PromisesClient() {
                 }}
                 className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
               >
-                Yes, request confirmation
+                {t("promises.confirmModal.confirm")}
               </button>
             </div>
           </div>
