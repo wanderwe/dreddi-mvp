@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
 export default function LoginPage() {
   const t = useT();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -23,9 +25,15 @@ export default function LoginPage() {
       return;
     }
 
+    const next = searchParams.get("next");
+    const redirectTo = new URL("/auth/callback", location.origin);
+    if (next) {
+      redirectTo.searchParams.set("next", next);
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/auth/callback` },
+      options: { emailRedirectTo: redirectTo.toString() },
     });
 
     setBusy(false);

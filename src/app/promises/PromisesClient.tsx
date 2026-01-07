@@ -17,6 +17,8 @@ type PromiseRow = {
   completed_at: string | null;
   counterparty_id: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
+  promisor_id: string | null;
+  promisee_id: string | null;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -94,8 +96,12 @@ export default function PromisesClient() {
       const { data, error } = await supabase
         .from("promises")
         // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
-        .select("id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id")
-        .or(`creator_id.eq.${user.id},counterparty_id.eq.${user.id}`)
+        .select(
+          "id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
+        )
+        .or(
+          `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
+        )
         .order("created_at", { ascending: false });
 
       if (cancelled) return;
@@ -107,12 +113,18 @@ export default function PromisesClient() {
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
           .map((row) => {
             const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
-            const role: PromiseRole = r.creator_id === user.id ? "promisor" : "counterparty";
+            const isPromisor =
+              (r.promisor_id ? r.promisor_id === user.id : false) ||
+              (!r.promisee_id && r.creator_id === user.id);
+            const isPromisee =
+              (r.promisee_id ? r.promisee_id === user.id : false) ||
+              (!r.promisee_id && r.counterparty_id === user.id);
+            const role: PromiseRole = isPromisor ? "promisor" : "counterparty";
             return {
               ...r,
               status: r.status as PromiseStatus,
               role,
-              acceptedBySecondSide: Boolean(r.counterparty_id),
+              acceptedBySecondSide: Boolean(r.counterparty_id ?? (r.promisor_id && r.promisee_id)),
             };
           });
 

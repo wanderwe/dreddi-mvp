@@ -29,3 +29,10 @@ test("awaiting others mirrors CTA responsibility", () => {
   assert.equal(isAwaitingYourAction(row), false);
   assert.equal(isAwaitingOthers(row), true);
 });
+
+test("counterparty with an active promise is awaiting the promisor", () => {
+  const row: FixtureRow = { role: "counterparty", status: "active" };
+
+  assert.equal(isAwaitingYourAction(row), false);
+  assert.equal(isAwaitingOthers(row), true);
+});

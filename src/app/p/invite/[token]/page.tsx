@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -24,11 +24,14 @@ export default function InvitePage() {
   const token = params?.token;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [info, setInfo] = useState<InviteInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
 
   async function load() {
     if (!token) return;
@@ -38,9 +41,11 @@ export default function InvitePage() {
     // просто перевіряємо чи є сесія (для UI)
     if (!supabase) {
       setSignedIn(false);
+      setUserId(null);
     } else {
       const { data: s } = await supabase.auth.getSession();
       setSignedIn(Boolean(s.session));
+      setUserId(s.session?.user?.id ?? null);
     }
 
     // Дістаємо дані інвайту через API (server-side safe)
@@ -61,6 +66,23 @@ export default function InvitePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  useEffect(() => {
+    const shouldAutoAccept = searchParams.get("accept") === "1";
+    if (!shouldAutoAccept || autoAcceptAttempted) return;
+    if (!signedIn || !info) return;
+
+    if (info.counterparty_id && userId === info.counterparty_id) {
+      setAutoAcceptAttempted(true);
+      router.push("/promises");
+      return;
+    }
+
+    if (!info.counterparty_id) {
+      setAutoAcceptAttempted(true);
+      void accept();
+    }
+  }, [autoAcceptAttempted, info, router, searchParams, signedIn, userId]);
+
   async function accept() {
     if (!token) return;
 
@@ -76,7 +98,7 @@ export default function InvitePage() {
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
       // відправляємо на логін і повертаємо назад сюди
-      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}`)}`);
+      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}?accept=1`)}`);
       setBusy(false);
       return;
     }

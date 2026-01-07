@@ -45,7 +45,9 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     // 4) шукаємо promise по invite_token
     const { data: p, error: pErr } = await admin
       .from("promises")
-      .select("id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id")
+      .select(
+        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id"
+      )
       .eq("invite_token", token)
       .maybeSingle();
 
@@ -63,18 +65,35 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     // якщо вже прийнято
-    if (p.counterparty_id || p.counterparty_accepted_at) {
-      if (p.counterparty_id === userId) {
+    const alreadyAccepted = Boolean(p.counterparty_id || p.counterparty_accepted_at);
+    const alreadyParticipant =
+      p.counterparty_id === userId || p.promisor_id === userId || p.promisee_id === userId;
+
+    if (alreadyAccepted) {
+      if (alreadyParticipant) {
         return NextResponse.json({ ok: true, alreadyAccepted: true }, { status: 200 });
       }
       return NextResponse.json({ error: "Already accepted by another user" }, { status: 409 });
     }
 
-    const updateData = {
+    const updateData: {
+      counterparty_id: string;
+      counterparty_accepted_at: string;
+      promisor_id?: string;
+      promisee_id?: string;
+    } = {
       counterparty_id: userId,
       counterparty_accepted_at: new Date().toISOString(),
-      ...(p.promisor_id ? {} : { promisor_id: userId }),
     };
+
+    if (p.promisor_id && !p.promisee_id) {
+      updateData.promisee_id = userId;
+    } else if (p.promisee_id && !p.promisor_id) {
+      updateData.promisor_id = userId;
+    } else if (!p.promisee_id && !p.promisor_id) {
+      updateData.promisor_id = userId;
+      updateData.promisee_id = p.creator_id;
+    }
 
     // 5) пишемо counterparty_id
     const { error: upErr } = await admin
