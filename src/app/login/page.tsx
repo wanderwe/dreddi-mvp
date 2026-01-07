@@ -26,8 +26,9 @@ export default function LoginPage() {
     }
 
     const next = searchParams.get("next");
-    const redirectTo = new URL("/auth/callback", location.origin);
-    if (next) {
+    // Supabase redirect URLs must include your localhost origin in the dashboard.
+    const redirectTo = new URL("/auth/callback", window.location.origin);
+    if (next && next.startsWith("/") && !next.startsWith("//")) {
       redirectTo.searchParams.set("next", next);
     }
 
