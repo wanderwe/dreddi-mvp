@@ -99,9 +99,7 @@ export default function PromisesClient() {
         .select(
           "id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
         )
-        .or(
-          `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
-        )
+        .or(`promisor_id.eq.${user.id},promisee_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
 
       if (cancelled) return;
@@ -113,12 +111,11 @@ export default function PromisesClient() {
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
           .map((row) => {
             const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
-            const isPromisor =
-              (r.promisor_id ? r.promisor_id === user.id : false) ||
-              (!r.promisee_id && r.creator_id === user.id);
-            const isPromisee =
-              (r.promisee_id ? r.promisee_id === user.id : false) ||
-              (!r.promisee_id && r.counterparty_id === user.id);
+            const isPromisor = r.promisor_id === user.id;
+            const isPromisee = r.promisee_id === user.id && r.promisor_id !== user.id;
+
+            if (!isPromisor && !isPromisee) return null;
+
             const role: PromiseRole = isPromisor ? "promisor" : "counterparty";
             return {
               ...r,
@@ -126,7 +123,8 @@ export default function PromisesClient() {
               role,
               acceptedBySecondSide: Boolean(r.counterparty_id ?? (r.promisor_id && r.promisee_id)),
             };
-          });
+          })
+          .filter((row): row is PromiseWithRole => row !== null);
 
         setAllRows(filtered);
       }
