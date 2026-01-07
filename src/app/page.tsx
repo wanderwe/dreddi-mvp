@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { HeaderActions } from "@/app/components/HeaderActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -254,8 +254,15 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       <header className="absolute inset-x-0 top-0 z-10">
-        <div className="mx-auto flex max-w-6xl justify-end px-6 py-6">
-          <LocaleSwitcher className="shadow-[0_10px_30px_rgba(0,0,0,0.35)]" />
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
+          <Link href="/" className="flex items-center text-white">
+            <DreddiLogo
+              accentClassName="text-xs"
+              markClassName="h-10 w-10"
+              titleClassName="text-lg"
+            />
+          </Link>
+          <HeaderActions showLogout={Boolean(email)} onLogout={logout} />
         </div>
       </header>
 
@@ -270,8 +277,8 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-14 w-14 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)]" />
               <div className="flex items-center gap-3 text-4xl font-semibold leading-tight sm:text-5xl">
-                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">{t("home.brand.name")}</span>
-                <span className="text-white">{t("home.brand.suffix")}</span>
+                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
+                <span className="text-white">knows</span>
               </div>
             </div>
             <p className="max-w-xl text-lg text-slate-300">
@@ -328,7 +335,8 @@ export default function Home() {
               </Link>
               <button
                 onClick={logout}
-                className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200"
+                className="rounded-xl px-6 py-3 text-base font-medium text-slate-300 transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 cursor-pointer"
+                type="button"
               >
                 {t("home.cta.logout")}
               </button>

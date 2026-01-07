@@ -48,11 +48,11 @@ export function LocaleSwitcher({ className }: { className?: string }) {
             onClick={() => void updateLocale(code)}
             disabled={busy || code === locale}
             aria-pressed={code === locale}
-            className={`rounded-full px-3 py-1 transition ${
+            className={`rounded-full px-3 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
               code === locale
                 ? "bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30"
                 : "text-slate-100 hover:bg-white/10 hover:text-emerald-100"
-            } ${busy ? "opacity-70" : ""}`}
+            } ${busy ? "opacity-70" : ""} cursor-pointer`}
           >
             {code.toUpperCase()}
           </button>

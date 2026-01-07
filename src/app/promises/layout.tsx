@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
-import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { HeaderActions } from "@/app/components/HeaderActions";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
-  const t = useT();
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,7 +33,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]" aria-hidden />
 
       <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="flex items-center text-white">
             <DreddiLogo
               accentClassName="text-xs"
@@ -44,26 +42,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
             />
           </Link>
 
-          <nav className="flex items-center gap-3 text-sm font-medium text-slate-200">
-            <Link className="rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100" href="/promises">
-              {t("nav.myPromises")}
-            </Link>
-            <Link
-              className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
-              href="/promises/new"
-            >
-              {t("nav.newPromise")}
-            </Link>
-            <LocaleSwitcher />
-            {email && (
-              <button
-                onClick={logout}
-                className="rounded-xl px-3 py-1.5 text-slate-300 transition hover:text-emerald-200"
-              >
-                {t("nav.logout")}
-              </button>
-            )}
-          </nav>
+          <HeaderActions showLogout={Boolean(email)} onLogout={logout} />
         </div>
       </header>
 
