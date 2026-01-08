@@ -69,6 +69,7 @@ export function DreddiLogo({
   markClassName = "h-11 w-11",
   titleClassName = "text-lg",
   accentClassName = "text-sm",
+  textClassName = "",
   direction = "row",
 }: {
   showText?: boolean;
@@ -76,6 +77,7 @@ export function DreddiLogo({
   markClassName?: string;
   titleClassName?: string;
   accentClassName?: string;
+  textClassName?: string;
   direction?: "row" | "column";
 }) {
   return (
@@ -84,7 +86,7 @@ export function DreddiLogo({
     >
       <DreddiLogoMark className={markClassName} />
       {showText && (
-        <div className="leading-tight">
+        <div className={`leading-tight ${textClassName}`}>
           <div className={`font-semibold uppercase tracking-[0.12em] text-emerald-200 ${accentClassName}`}>
             Dreddi
           </div>
