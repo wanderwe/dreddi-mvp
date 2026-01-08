@@ -45,7 +45,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
 
 type SheetTriggerProps = {
   asChild?: boolean;
-  children: React.ReactElement;
+  children: React.ReactNode;
 };
 
 export function SheetTrigger({ asChild = false, children }: SheetTriggerProps) {
@@ -59,8 +59,19 @@ export function SheetTrigger({ asChild = false, children }: SheetTriggerProps) {
     );
   }
 
-  const handleClick = (event: React.MouseEvent) => {
-    children.props.onClick?.(event);
+  if (!React.isValidElement(children)) {
+    return null;
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (
+      typeof children.props === "object" &&
+      children.props !== null &&
+      "onClick" in children.props &&
+      typeof children.props.onClick === "function"
+    ) {
+      children.props.onClick(event);
+    }
     if (!event.defaultPrevented) {
       setOpen(true);
     }
@@ -71,7 +82,7 @@ export function SheetTrigger({ asChild = false, children }: SheetTriggerProps) {
 
 type SheetCloseProps = {
   asChild?: boolean;
-  children: React.ReactElement;
+  children: React.ReactNode;
 };
 
 export function SheetClose({ asChild = false, children }: SheetCloseProps) {
@@ -85,8 +96,19 @@ export function SheetClose({ asChild = false, children }: SheetCloseProps) {
     );
   }
 
-  const handleClick = (event: React.MouseEvent) => {
-    children.props.onClick?.(event);
+  if (!React.isValidElement(children)) {
+    return null;
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (
+      typeof children.props === "object" &&
+      children.props !== null &&
+      "onClick" in children.props &&
+      typeof children.props.onClick === "function"
+    ) {
+      children.props.onClick(event);
+    }
     if (!event.defaultPrevented) {
       setOpen(false);
     }
