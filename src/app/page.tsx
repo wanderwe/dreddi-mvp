@@ -472,13 +472,7 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-slate-200 shadow-inner shadow-black/30">
-                  <div className="text-xs text-slate-400">{t("home.score.cards.score")}</div>
-                  <div className="text-2xl font-semibold text-white">
-                    {reputationLoading ? t("home.loadingPlaceholder") : score}
-                  </div>
-                </div>
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
                   <div className="text-xs text-emerald-200">{t("home.score.cards.confirmed")}</div>
                   <div className="text-lg font-semibold">
