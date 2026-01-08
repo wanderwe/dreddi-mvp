@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
+import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -42,6 +43,7 @@ export default function Home() {
   const locale = useLocale();
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
   const [recentError, setRecentError] = useState<string | null>(null);
@@ -310,29 +312,80 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       <header className="absolute inset-x-0 top-0 z-10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
-          <Link href="/" className="flex items-center text-white">
+        <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-6">
+          <Link href="/" className="flex min-w-0 items-center text-white">
             <DreddiLogo
               accentClassName="text-xs"
               markClassName="h-10 w-10"
-              titleClassName="text-lg"
+              textClassName="min-w-0"
+              titleClassName="truncate text-lg"
             />
           </Link>
-          <HeaderActions isAuthenticated={isAuthenticated} onLogout={logout} />
+          <HeaderActions
+            className="hidden md:flex"
+            isAuthenticated={isAuthenticated}
+            onLogout={logout}
+          />
+          <button
+            type="button"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={isAuthenticated ? t("nav.logout") : t("nav.login")}
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
+          >
+            <span className="flex h-5 w-5 flex-col items-center justify-center gap-1">
+              <span className="h-0.5 w-5 rounded-full bg-white" />
+              <span className="h-0.5 w-5 rounded-full bg-white" />
+              <span className="h-0.5 w-5 rounded-full bg-white" />
+            </span>
+          </button>
+          {mobileMenuOpen && (
+            <div
+              id="mobile-menu"
+              className="absolute right-4 top-full mt-3 w-[220px] rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-xl shadow-black/40 backdrop-blur md:hidden"
+            >
+              <div className="flex flex-col gap-3">
+                <div className="w-fit">
+                  <LocaleSwitcher />
+                </div>
+                {!isAuthenticated ? (
+                  <Link
+                    href="/login"
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t("nav.login")}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                  >
+                    {t("nav.logout")}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-16 px-6 py-14 md:flex-row md:items-center">
-        <div className="flex-1 space-y-8">
-          <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-emerald-200">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
+        <div className="flex-1 flex flex-col gap-6 md:gap-8">
+          <div className="order-1 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-emerald-200 sm:px-4 sm:py-2 sm:text-sm">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(74,222,128,0.25)]" />
             {t("home.eyebrow")}
           </div>
 
-          <div className="space-y-4">
+          <div className="order-2 space-y-4">
             <div className="flex items-center gap-4">
-              <DreddiLogoMark className="h-14 w-14 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)]" />
-              <div className="flex items-center gap-3 text-4xl font-semibold leading-tight sm:text-5xl">
+              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
+              <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
                 <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
                 <span className="text-white">knows</span>
               </div>
@@ -340,28 +393,15 @@ export default function Home() {
             <p className="max-w-xl text-lg text-slate-300">
               {t("home.tagline")}
             </p>
-            <div className="grid max-w-lg gap-2 sm:grid-cols-3">
-              {highlightItems.map((item) => (
-                <div
-                  key={item.key}
-                  className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
-                >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
-                    ✓
-                  </span>
-                  {item.text}
-                </div>
-              ))}
-            </div>
           </div>
 
           {!ready ? (
-            <div className="flex items-center gap-3 text-slate-400">
+            <div className="order-3 flex items-center gap-3 text-slate-400 md:order-4">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
               {t("home.loading")}
             </div>
           ) : !isAuthenticated ? (
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/login"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -376,7 +416,7 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/promises/new"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -391,6 +431,20 @@ export default function Home() {
               </Link>
             </div>
           )}
+
+          <div className="order-4 grid max-w-lg gap-2 md:order-3 md:grid-cols-3">
+            {highlightItems.map((item) => (
+              <div
+                key={item.key}
+                className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
+              >
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+                  ✓
+                </span>
+                {item.text}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1">
