@@ -101,8 +101,8 @@
     },
     "empty": {
       "title": "Nothing here yet",
-      "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
-      "counterpartyDescription": "No deals have been created for you yet. Accept an invite link to get started.",
+      "awaitingYouDescription": "No deals currently need your action. Check back when a deal is ready for you.",
+      "awaitingOthersDescription": "No deals are waiting on the other side right now.",
       "cta": "Create deal"
     },
     "status": {
@@ -123,8 +123,8 @@
     },
     "list": {
       "tabs": {
-        "promisor": "I created ({count})",
-        "counterparty": "Created for me ({count})"
+        "awaitingYou": "Awaiting my action ({count})",
+        "awaitingOthers": "Awaiting other side ({count})"
       },
       "cardLabel": "Deal",
       "dueLabel": "Due",

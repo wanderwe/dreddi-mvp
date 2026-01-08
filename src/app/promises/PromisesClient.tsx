@@ -21,7 +21,7 @@ type PromiseRow = {
   promisee_id: string | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me";
+type TabKey = "awaiting-you" | "awaiting-others";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
 export default function PromisesClient() {
@@ -30,7 +30,8 @@ export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const tabParam = searchParams.get("tab");
+  const tab: TabKey = tabParam === "awaiting-others" ? "awaiting-others" : "awaiting-you";
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("promises.list.noDeadline");
@@ -145,24 +146,10 @@ export default function PromisesClient() {
     router.push(`/promises?${sp.toString()}`);
   };
 
-  const roleCounts = useMemo(
-    () =>
-      allRows.reduce(
-        (acc, row) => {
-          if (row.role === "promisor") acc.promisor += 1;
-          else if (row.role === "counterparty") acc.counterparty += 1;
-          else acc.uncategorized.push(row.id);
-          return acc;
-        },
-        { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
-      ),
-    [allRows]
-  );
-
   const rows = useMemo(
     () =>
       allRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+        tab === "awaiting-you" ? isAwaitingYourAction(row) : isAwaitingOthers(row)
       ),
     [allRows, tab]
   );
@@ -174,21 +161,6 @@ export default function PromisesClient() {
 
     return { total, awaitingYou, awaitingOthers };
   }, [allRows]);
-
-  useEffect(() => {
-    const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
-    if (
-      process.env.NODE_ENV !== "production" &&
-      categorizedTotal !== allRows.length
-    ) {
-      console.warn("[promises] Tab counts do not sum to total", {
-        total: allRows.length,
-        promisorCount: roleCounts.promisor,
-        counterpartyCount: roleCounts.counterparty,
-        uncategorizedIds: roleCounts.uncategorized,
-      });
-    }
-  }, [allRows.length, roleCounts.counterparty, roleCounts.promisor, roleCounts.uncategorized]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -261,18 +233,36 @@ export default function PromisesClient() {
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{overview.total}</div>
             </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 shadow-inner shadow-black/30">
+            <button
+              type="button"
+              onClick={() => setTab("awaiting-you")}
+              className={[
+                "rounded-2xl border px-4 py-3 text-left text-emerald-100 shadow-inner shadow-black/30 transition",
+                tab === "awaiting-you"
+                  ? "border-emerald-300 bg-emerald-500/20"
+                  : "border-emerald-400/20 bg-emerald-500/10 hover:border-emerald-300/60",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingYou}</div>
-            </div>
-            <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("awaiting-others")}
+              className={[
+                "rounded-2xl border px-4 py-3 text-left text-amber-50 shadow-inner shadow-black/30 transition",
+                tab === "awaiting-others"
+                  ? "border-amber-200 bg-amber-400/20"
+                  : "border-amber-300/30 bg-amber-400/10 hover:border-amber-200/70",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingOthers}</div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -280,28 +270,28 @@ export default function PromisesClient() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => setTab("i-promised")}
+              onClick={() => setTab("awaiting-you")}
               className={[
                 "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "i-promised"
+                tab === "awaiting-you"
                   ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              {t("promises.list.tabs.promisor", { count: roleCounts.promisor })}
+              {t("promises.list.tabs.awaitingYou", { count: overview.awaitingYou })}
             </button>
 
             <button
               type="button"
-              onClick={() => setTab("promised-to-me")}
+              onClick={() => setTab("awaiting-others")}
               className={[
                 "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "promised-to-me"
+                tab === "awaiting-others"
                   ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              {t("promises.list.tabs.counterparty", { count: roleCounts.counterparty })}
+              {t("promises.list.tabs.awaitingOthers", { count: overview.awaitingOthers })}
             </button>
           </div>
 
@@ -436,9 +426,9 @@ export default function PromisesClient() {
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
                 <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
                 <p className="text-sm text-slate-400">
-                  {tab === "i-promised"
-                    ? t("promises.empty.promisorDescription")
-                    : t("promises.empty.counterpartyDescription")}
+                  {tab === "awaiting-you"
+                    ? t("promises.empty.awaitingYouDescription")
+                    : t("promises.empty.awaitingOthersDescription")}
                 </p>
                 <div className="mt-4">
                   <Link

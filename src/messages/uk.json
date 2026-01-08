@@ -101,8 +101,8 @@
     },
     "empty": {
       "title": "Поки що порожньо",
-      "promisorDescription": "Ви ще не створили жодної угоди. Створіть нову, щоб відстежувати угоди.",
-      "counterpartyDescription": "Ще немає угод для вас. Прийміть посилання-запрошення, щоб почати.",
+      "awaitingYouDescription": "Поки що немає угод, які потребують ваших дій.",
+      "awaitingOthersDescription": "Поки що немає угод, що очікують дій іншої сторони.",
       "cta": "Створити угоду"
     },
     "status": {
@@ -123,8 +123,8 @@
     },
     "list": {
       "tabs": {
-        "promisor": "Я створив(ла) ({count})",
-        "counterparty": "Для мене ({count})"
+        "awaitingYou": "Очікує моїх дій ({count})",
+        "awaitingOthers": "Очікує дій іншої сторони ({count})"
       },
       "cardLabel": "Угода",
       "dueLabel": "Строк",
