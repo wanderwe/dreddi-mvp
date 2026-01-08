@@ -21,7 +21,7 @@ type PromiseRow = {
   promisee_id: string | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me";
+type FilterKey = "all" | "awaiting_me" | "awaiting_others";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
 export default function PromisesClient() {
@@ -30,7 +30,11 @@ export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const filterParam = searchParams.get("filter");
+  const filter: FilterKey =
+    filterParam === "awaiting_me" || filterParam === "awaiting_others" || filterParam === "all"
+      ? filterParam
+      : "all";
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("promises.list.noDeadline");
@@ -139,32 +143,19 @@ export default function PromisesClient() {
     };
   }, []);
 
-  const setTab = (next: TabKey) => {
+  const setFilter = (next: FilterKey) => {
     const sp = new URLSearchParams(searchParams.toString());
-    sp.set("tab", next);
+    sp.set("filter", next);
     router.push(`/promises?${sp.toString()}`);
   };
 
-  const roleCounts = useMemo(
-    () =>
-      allRows.reduce(
-        (acc, row) => {
-          if (row.role === "promisor") acc.promisor += 1;
-          else if (row.role === "counterparty") acc.counterparty += 1;
-          else acc.uncategorized.push(row.id);
-          return acc;
-        },
-        { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
-      ),
-    [allRows]
-  );
-
   const rows = useMemo(
-    () =>
-      allRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      ),
-    [allRows, tab]
+    () => {
+      if (filter === "awaiting_me") return allRows.filter((row) => isAwaitingYourAction(row));
+      if (filter === "awaiting_others") return allRows.filter((row) => isAwaitingOthers(row));
+      return allRows;
+    },
+    [allRows, filter]
   );
 
   const overview = useMemo(() => {
@@ -174,21 +165,6 @@ export default function PromisesClient() {
 
     return { total, awaitingYou, awaitingOthers };
   }, [allRows]);
-
-  useEffect(() => {
-    const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
-    if (
-      process.env.NODE_ENV !== "production" &&
-      categorizedTotal !== allRows.length
-    ) {
-      console.warn("[promises] Tab counts do not sum to total", {
-        total: allRows.length,
-        promisorCount: roleCounts.promisor,
-        counterpartyCount: roleCounts.counterparty,
-        uncategorizedIds: roleCounts.uncategorized,
-      });
-    }
-  }, [allRows.length, roleCounts.counterparty, roleCounts.promisor, roleCounts.uncategorized]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -257,54 +233,59 @@ export default function PromisesClient() {
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-black/30">
+            <button
+              type="button"
+              onClick={() => setFilter("all")}
+              aria-pressed={filter === "all"}
+              className={[
+                "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30 transition",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70",
+                filter === "all"
+                  ? "border-emerald-300/60 bg-emerald-400/20 ring-2 ring-emerald-300/70"
+                  : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{overview.total}</div>
-            </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter("awaiting_me")}
+              aria-pressed={filter === "awaiting_me"}
+              className={[
+                "rounded-2xl border px-4 py-3 text-left text-emerald-100 shadow-inner shadow-black/30 transition",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70",
+                filter === "awaiting_me"
+                  ? "border-emerald-300/70 bg-emerald-400/30 ring-2 ring-emerald-300/70"
+                  : "border-emerald-400/20 bg-emerald-500/10 hover:border-emerald-300/40 hover:bg-emerald-500/20",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingYou}</div>
-            </div>
-            <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter("awaiting_others")}
+              aria-pressed={filter === "awaiting_others"}
+              className={[
+                "rounded-2xl border px-4 py-3 text-left text-amber-50 shadow-inner shadow-black/30 transition",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70",
+                filter === "awaiting_others"
+                  ? "border-amber-300/70 bg-amber-400/30 ring-2 ring-amber-300/70"
+                  : "border-amber-300/30 bg-amber-400/10 hover:border-amber-300/50 hover:bg-amber-400/20",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingOthers}</div>
-            </div>
+            </button>
           </div>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTab("i-promised")}
-              className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "i-promised"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.promisor", { count: roleCounts.promisor })}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTab("promised-to-me")}
-              className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
-                tab === "promised-to-me"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.counterparty", { count: roleCounts.counterparty })}
-            </button>
-          </div>
-
           {error && (
             <div className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
               {error}
@@ -436,9 +417,11 @@ export default function PromisesClient() {
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
                 <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
                 <p className="text-sm text-slate-400">
-                  {tab === "i-promised"
-                    ? t("promises.empty.promisorDescription")
-                    : t("promises.empty.counterpartyDescription")}
+                  {filter === "awaiting_me"
+                    ? t("promises.empty.awaitingMeDescription")
+                    : filter === "awaiting_others"
+                    ? t("promises.empty.awaitingOthersDescription")
+                    : t("promises.empty.allDescription")}
                 </p>
                 <div className="mt-4">
                   <Link

@@ -101,6 +101,9 @@
     },
     "empty": {
       "title": "Nothing here yet",
+      "allDescription": "You don’t have any deals yet. Create a new one or accept an invite to get started.",
+      "awaitingMeDescription": "No deals are waiting on your action right now.",
+      "awaitingOthersDescription": "No deals are currently waiting on the other side.",
       "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
       "counterpartyDescription": "No deals have been created for you yet. Accept an invite link to get started.",
       "cta": "Create deal"
