@@ -231,7 +231,7 @@ export default function PromisesClient() {
     }
   };
 
-  const metricValueClass = "mt-1 text-2xl font-semibold leading-tight";
+  const metricValueClass = "mt-1 text-base font-semibold leading-tight";
 
   return (
     <main className="relative py-10">
