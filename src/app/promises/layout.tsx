@@ -86,7 +86,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]" aria-hidden />
 
       <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="flex items-center text-white">
             <DreddiLogo
               accentClassName="text-xs"
