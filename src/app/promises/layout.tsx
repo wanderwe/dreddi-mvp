@@ -5,17 +5,14 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
-import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { MobileMenu } from "@/app/components/MobileMenu";
 import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const isAuthenticated = Boolean(email);
-  const t = useT();
 
   useEffect(() => {
     let active = true;
@@ -104,58 +101,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
             isAuthenticated={isAuthenticated}
             onLogout={logout}
           />
-          <button
-            type="button"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="promises-mobile-menu"
-            aria-label="Open menu"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
-          >
-            <span className="flex h-5 w-5 flex-col items-center justify-center gap-1">
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-            </span>
-          </button>
-          {mobileMenuOpen && (
-            <div
-              id="promises-mobile-menu"
-              className="absolute right-6 top-full mt-3 w-[220px] rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-xl shadow-black/40 backdrop-blur md:hidden"
-            >
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="/promises/new"
-                  className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {t("nav.newPromise")}
-                </Link>
-                <Link
-                  href="/promises"
-                  className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {t("nav.myPromises")}
-                </Link>
-                <div className="w-fit">
-                  <LocaleSwitcher />
-                </div>
-                {isAuthenticated && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      void logout();
-                    }}
-                    className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  >
-                    {t("nav.logout")}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+          <MobileMenu isAuthenticated={isAuthenticated} onLogout={logout} />
         </div>
       </header>
 

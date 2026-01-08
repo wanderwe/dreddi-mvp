@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
-import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { MobileMenu } from "@/app/components/MobileMenu";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -43,7 +43,6 @@ export default function Home() {
   const locale = useLocale();
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
   const [recentError, setRecentError] = useState<string | null>(null);
@@ -326,52 +325,7 @@ export default function Home() {
             isAuthenticated={isAuthenticated}
             onLogout={logout}
           />
-          <button
-            type="button"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label={isAuthenticated ? t("nav.logout") : t("nav.login")}
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
-          >
-            <span className="flex h-5 w-5 flex-col items-center justify-center gap-1">
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-              <span className="h-0.5 w-5 rounded-full bg-white" />
-            </span>
-          </button>
-          {mobileMenuOpen && (
-            <div
-              id="mobile-menu"
-              className="absolute right-4 top-full mt-3 w-[220px] rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-xl shadow-black/40 backdrop-blur md:hidden"
-            >
-              <div className="flex flex-col gap-3">
-                <div className="w-fit">
-                  <LocaleSwitcher />
-                </div>
-                {!isAuthenticated ? (
-                  <Link
-                    href="/login"
-                    className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {t("nav.login")}
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      logout();
-                    }}
-                    className="rounded-xl border border-white/10 px-3 py-2 text-left font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  >
-                    {t("nav.logout")}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+          <MobileMenu isAuthenticated={isAuthenticated} onLogout={logout} />
         </div>
       </header>
 
