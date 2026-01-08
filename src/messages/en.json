@@ -91,7 +91,7 @@
     "overview": {
       "eyebrow": "Deals",
       "title": "Your deals overview",
-      "subtitle": "Snapshot of every deal you created and what was created for you.",
+      "subtitle": "Overview of deals by responsibility — what you’re accountable for and what others owe you.",
       "cta": "New deal",
       "metrics": {
         "total": "Total",
@@ -123,8 +123,8 @@
     },
     "list": {
       "tabs": {
-        "promisor": "I created ({count})",
-        "counterparty": "Created for me ({count})"
+        "executorMe": "I’m the executor ({count})",
+        "executorOther": "Other executor ({count})"
       },
       "cardLabel": "Deal",
       "dueLabel": "Due",

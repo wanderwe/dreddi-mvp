@@ -22,6 +22,7 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
+type MetricFilter = "all" | "awaiting-you" | "awaiting-others";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 
 export default function PromisesClient() {
@@ -64,6 +65,7 @@ export default function PromisesClient() {
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [metricFilter, setMetricFilter] = useState<MetricFilter>("all");
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -159,13 +161,23 @@ export default function PromisesClient() {
     [allRows]
   );
 
-  const rows = useMemo(
+  const tabRows = useMemo(
     () =>
       allRows.filter((row) =>
         tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
       ),
     [allRows, tab]
   );
+
+  const rows = useMemo(() => {
+    if (metricFilter === "awaiting-you") {
+      return tabRows.filter((row) => isAwaitingYourAction(row));
+    }
+    if (metricFilter === "awaiting-others") {
+      return tabRows.filter((row) => isAwaitingOthers(row));
+    }
+    return tabRows;
+  }, [metricFilter, tabRows]);
 
   const overview = useMemo(() => {
     const total = allRows.length;
@@ -257,22 +269,50 @@ export default function PromisesClient() {
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-black/30">
+            <button
+              type="button"
+              onClick={() => setMetricFilter("all")}
+              aria-pressed={metricFilter === "all"}
+              className={[
+                "rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left shadow-inner shadow-black/30 transition",
+                metricFilter === "all" ? "ring-2 ring-emerald-300/50" : "hover:border-white/20",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{overview.total}</div>
-            </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => setMetricFilter("awaiting-you")}
+              aria-pressed={metricFilter === "awaiting-you"}
+              className={[
+                "rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-left text-emerald-100 shadow-inner shadow-black/30 transition",
+                metricFilter === "awaiting-you"
+                  ? "ring-2 ring-emerald-300/60"
+                  : "hover:border-emerald-300/40",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingYou}</div>
-            </div>
-            <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-amber-50 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => setMetricFilter("awaiting-others")}
+              aria-pressed={metricFilter === "awaiting-others"}
+              className={[
+                "rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-left text-amber-50 shadow-inner shadow-black/30 transition",
+                metricFilter === "awaiting-others"
+                  ? "ring-2 ring-amber-300/60"
+                  : "hover:border-amber-300/50",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className="mt-1 text-lg font-semibold">{overview.awaitingOthers}</div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -288,7 +328,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              {t("promises.list.tabs.promisor", { count: roleCounts.promisor })}
+              {t("promises.list.tabs.executorMe", { count: roleCounts.promisor })}
             </button>
 
             <button
@@ -301,7 +341,7 @@ export default function PromisesClient() {
                   : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
               ].join(" ")}
             >
-              {t("promises.list.tabs.counterparty", { count: roleCounts.counterparty })}
+              {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
           </div>
 
