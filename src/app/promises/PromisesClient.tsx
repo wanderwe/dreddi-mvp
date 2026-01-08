@@ -231,6 +231,8 @@ export default function PromisesClient() {
     }
   };
 
+  const metricValueClass = "mt-1 text-2xl font-semibold leading-tight";
+
   return (
     <main className="relative py-10">
       <div
@@ -242,6 +244,9 @@ export default function PromisesClient() {
         <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 shadow-2xl shadow-black/40 backdrop-blur">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
+              <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
+                {t("promises.overview.eyebrow")}
+              </div>
               <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
               <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
             </div>
@@ -258,19 +263,19 @@ export default function PromisesClient() {
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left shadow-inner shadow-black/30">
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
-              <div className="mt-1 text-2xl font-semibold leading-tight text-white">{overview.total}</div>
+              <div className={`${metricValueClass} text-white`}>{overview.total}</div>
             </div>
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-left text-emerald-100 shadow-inner shadow-black/30">
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
-              <div className="mt-1 text-2xl font-semibold leading-tight">{overview.awaitingYou}</div>
+              <div className={metricValueClass}>{overview.awaitingYou}</div>
             </div>
             <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-left text-amber-50 shadow-inner shadow-black/30">
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
-              <div className="mt-1 text-2xl font-semibold leading-tight">{overview.awaitingOthers}</div>
+              <div className={metricValueClass}>{overview.awaitingOthers}</div>
             </div>
           </div>
         </div>
