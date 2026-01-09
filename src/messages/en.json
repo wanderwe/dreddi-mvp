@@ -44,6 +44,8 @@
       "label": "Reputation Score",
       "live": "Live",
       "signIn": "Sign in for live score",
+      "profileAction": "Profile",
+      "profileActionAria": "Open profile",
       "cards": {
         "score": "Score",
         "confirmed": "Confirmed",
