@@ -192,6 +192,10 @@ export default function NewPromisePage() {
               ← {t("promises.new.back")}
             </Link>
           </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/60">
+            <span className="block">{t("thesis.line1")}</span>
+            <span className="block">{t("thesis.line2")}</span>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
