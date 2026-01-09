@@ -48,6 +48,14 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
                 <SheetClose asChild>
                   <Link
                     className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    href="/profiles"
+                  >
+                    {t("nav.publicProfiles")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
                     href="/promises"
                   >
                     {t("nav.myPromises")}
@@ -71,14 +79,24 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
                 </SheetClose>
               </>
             ) : (
-              <SheetClose asChild>
-                <Link
-                  className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  href="/login"
-                >
-                  {t("nav.login")}
-                </Link>
-              </SheetClose>
+              <>
+                <SheetClose asChild>
+                  <Link
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    href="/profiles"
+                  >
+                    {t("nav.publicProfiles")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    href="/login"
+                  >
+                    {t("nav.login")}
+                  </Link>
+                </SheetClose>
+              </>
             )}
             <div className="w-fit">
               <LocaleSwitcher />

@@ -94,13 +94,34 @@
     "line1": "You can’t force accountability.",
     "line2": "You can invite it."
   },
+  "createDeal": {
+    "philosophy": {
+      "line1": "You can’t force someone to be responsible.",
+      "line2": "You can only invite them into responsibility."
+    }
+  },
   "nav": {
     "myPromises": "My deals",
     "newPromise": "New deal",
+    "publicProfiles": "Public profiles",
     "profile": "Profile",
     "login": "Sign in",
     "getStarted": "Get started",
     "logout": "Log out"
+  },
+  "publicProfiles": {
+    "title": "Public profiles",
+    "subtitle": "Browse recent public profiles or search by handle or name.",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search by handle or name",
+    "loading": "Loading profiles…",
+    "empty": "No profiles found",
+    "emptyRecent": "No profiles available yet",
+    "viewProfile": "View profile",
+    "retry": "Try again",
+    "errors": {
+      "supabase": "Unable to load profiles."
+    }
   },
   "profile": {
     "publicProfile": "Public profile",

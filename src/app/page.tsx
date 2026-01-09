@@ -347,12 +347,6 @@ export default function Home() {
             <p className="max-w-xl text-lg text-slate-300">
               {t("home.tagline")}
             </p>
-            {!isAuthenticated ? (
-              <p className="max-w-xl text-base text-slate-300/80">
-                <span className="block">{t("thesis.line1")}</span>
-                <span className="block">{t("thesis.line2")}</span>
-              </p>
-            ) : null}
           </div>
 
           {!ready ? (
@@ -369,7 +363,7 @@ export default function Home() {
                 {t("home.cta.getStarted")}
               </Link>
               <Link
-                href="/p"
+                href="/profiles"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
                 {t("home.cta.publicProfiles")}

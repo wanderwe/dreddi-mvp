@@ -21,6 +21,12 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
         <>
           <Link
             className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            href="/profiles"
+          >
+            {t("nav.publicProfiles")}
+          </Link>
+          <Link
+            className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             href="/promises"
           >
             {t("nav.myPromises")}
@@ -40,6 +46,12 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
         </>
       ) : (
         <>
+          <Link
+            className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            href="/profiles"
+          >
+            {t("nav.publicProfiles")}
+          </Link>
           <Link
             className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             href="/login"

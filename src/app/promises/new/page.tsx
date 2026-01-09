@@ -163,6 +163,16 @@ export default function NewPromisePage() {
               </div>
             </div>
 
+            <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-200/80 sm:col-span-2">
+              <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-500/10 text-emerald-200">
+                i
+              </span>
+              <p className="leading-relaxed">
+                <span className="block">{t("createDeal.philosophy.line1")}</span>
+                <span className="block">{t("createDeal.philosophy.line2")}</span>
+              </p>
+            </div>
+
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.title")}
