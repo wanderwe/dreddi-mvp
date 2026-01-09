@@ -4,6 +4,7 @@ DROP VIEW IF EXISTS public_profile_deals;
 
 CREATE OR REPLACE VIEW public_profile_stats AS
 SELECT
+  profiles.id AS profile_id,
   profiles.handle,
   profiles.display_name,
   profiles.avatar_url,
@@ -37,7 +38,7 @@ WHERE profiles.handle IS NOT NULL;
 
 GRANT SELECT ON public_profile_stats TO anon, authenticated;
 
-CREATE OR REPLACE FUNCTION public_get_profile_deals(handle text, limit_count integer DEFAULT 5)
+CREATE OR REPLACE FUNCTION public_get_profile_deals(p_handle text, p_limit integer DEFAULT 5)
 RETURNS TABLE (
   title text,
   status text,
@@ -59,10 +60,12 @@ AS $$
     promises.disputed_at
   FROM promises
   JOIN profiles ON profiles.id = promises.creator_id
-  WHERE profiles.handle = public_get_profile_deals.handle
+  WHERE profiles.handle = public_get_profile_deals.p_handle
     AND promises.status IN ('confirmed', 'disputed')
-  ORDER BY promises.created_at DESC
-  LIMIT LEAST(GREATEST(public_get_profile_deals.limit_count, 1), 20);
+  ORDER BY COALESCE(promises.confirmed_at, promises.disputed_at, promises.created_at) DESC
+  LIMIT LEAST(GREATEST(public_get_profile_deals.p_limit, 1), 20);
 $$;
 
 GRANT EXECUTE ON FUNCTION public_get_profile_deals(text, integer) TO anon, authenticated;
+
+CREATE INDEX IF NOT EXISTS promises_creator_status_idx ON promises(creator_id, status);
