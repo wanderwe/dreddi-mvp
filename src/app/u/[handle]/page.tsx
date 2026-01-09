@@ -127,20 +127,18 @@ export default function PublicProfilePage() {
 
       setProfile(profileRow as PublicProfileRow);
 
-      const { data: dealRows, error: dealsErr } = await supabase.rpc<PublicDealRow>(
-        "public_get_profile_deals",
-        {
-          handle: profileRow.handle,
-          limit_count: 5,
-        }
-      );
+      const { data, error: dealsErr } = await supabase.rpc("public_get_profile_deals", {
+        p_handle: profileRow.handle,
+        p_limit: 5,
+      });
+      const dealRows = (data ?? []) as PublicDealRow[];
 
       if (!active) return;
 
       if (dealsErr) {
         setDeals([]);
       } else {
-        const normalized: PublicDeal[] = (dealRows ?? []).flatMap((row: PublicDealRow) => {
+        const normalized: PublicDeal[] = dealRows.flatMap((row: PublicDealRow) => {
           if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
           return [
             {
