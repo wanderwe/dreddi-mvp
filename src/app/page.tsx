@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { MobileMenu } from "@/app/components/MobileMenu";
+import { ProfileHandleCard } from "@/app/components/ProfileHandleCard";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -584,6 +585,8 @@ export default function Home() {
                   </>
                 )}
               </div>
+
+              {isAuthenticated && <ProfileHandleCard variant="mini" />}
             </div>
           </div>
         </div>

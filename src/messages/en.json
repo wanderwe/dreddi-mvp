@@ -83,9 +83,32 @@
   "nav": {
     "myPromises": "My deals",
     "newPromise": "New deal",
+    "profile": "Profile",
     "login": "Sign in",
     "getStarted": "Get started",
     "logout": "Log out"
+  },
+  "profile": {
+    "publicProfile": "Public profile",
+    "open": "Open",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "editHandle": "Edit handle",
+    "setHandle": "Set handle",
+    "setHandleHint": "Set a handle to enable your public profile link.",
+    "header": "Profile",
+    "pageTitle": "Your profile",
+    "handleWarning": "Changing your handle will change your public profile link.",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "saved": "Saved",
+    "errors": {
+      "invalidHandle": "Handle must be 3-20 characters and use lowercase letters, numbers, underscores, or hyphens.",
+      "handleTaken": "That handle is already taken.",
+      "loadFailed": "Unable to load profile.",
+      "updateFailed": "Unable to update handle."
+    }
   },
   "promises": {
     "overview": {

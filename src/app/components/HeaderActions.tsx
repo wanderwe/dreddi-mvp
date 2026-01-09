@@ -26,6 +26,12 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
             {t("nav.myPromises")}
           </Link>
           <Link
+            className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            href="/me"
+          >
+            {t("nav.profile")}
+          </Link>
+          <Link
             className="whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             href="/promises/new"
           >
