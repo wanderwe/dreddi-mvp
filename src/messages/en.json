@@ -297,5 +297,26 @@
       "back": "Back to landing",
       "secure": "Secure, zero-password access"
     }
+  },
+  "publicProfile": {
+    "reputation": "Reputation",
+    "confirmed": "Confirmed",
+    "disputed": "Disputed",
+    "lastActivity": "Last activity",
+    "recentDeals": "Recent deals",
+    "emptyDeals": "No public deals yet",
+    "loading": "Loading profile…",
+    "noActivity": "No activity yet",
+    "recentDealsMeta": "Finalized {date}",
+    "status": {
+      "strong": "Strong standing",
+      "steady": "Steady standing",
+      "risk": "At risk"
+    },
+    "errors": {
+      "supabase": "Supabase is not configured.",
+      "missing": "Profile handle is missing.",
+      "notFound": "Profile not found."
+    }
   }
 }
