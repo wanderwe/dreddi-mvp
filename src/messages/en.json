@@ -88,6 +88,10 @@
       "setHandle": "Set handle"
     }
   },
+  "thesis": {
+    "line1": "You can’t force accountability.",
+    "line2": "You can invite it."
+  },
   "nav": {
     "myPromises": "My deals",
     "newPromise": "New deal",
