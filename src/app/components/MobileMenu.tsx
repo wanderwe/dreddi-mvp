@@ -55,6 +55,14 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    href="/me"
+                  >
+                    {t("nav.profile")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
                     className="rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
                     href="/promises/new"
                   >
