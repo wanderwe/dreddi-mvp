@@ -17,6 +17,15 @@ type PublicProfileRow = {
 };
 
 type PublicDealRow = {
+  title: string | null;
+  status: string | null;
+  created_at: string | null;
+  due_at: string | null;
+  confirmed_at: string | null;
+  disputed_at: string | null;
+};
+
+type PublicDeal = {
   title: string;
   status: PromiseStatus;
   created_at: string;
@@ -53,7 +62,7 @@ export default function PublicProfilePage() {
   }, [params]);
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
-  const [deals, setDeals] = useState<PublicDealRow[]>([]);
+  const [deals, setDeals] = useState<PublicDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,22 +127,25 @@ export default function PublicProfilePage() {
 
       setProfile(profileRow as PublicProfileRow);
 
-      const { data: dealRows, error: dealsErr } = await supabase.rpc("public_get_profile_deals", {
-        handle: profileRow.handle,
-        limit_count: 5,
-      });
+      const { data: dealRows, error: dealsErr } = await supabase.rpc<PublicDealRow>(
+        "public_get_profile_deals",
+        {
+          handle: profileRow.handle,
+          limit_count: 5,
+        }
+      );
 
       if (!active) return;
 
       if (dealsErr) {
         setDeals([]);
       } else {
-        const normalized: PublicDealRow[] = (dealRows ?? []).flatMap((row) => {
-          if (!isPromiseStatus(row.status)) return [];
+        const normalized: PublicDeal[] = (dealRows ?? []).flatMap((row: PublicDealRow) => {
+          if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
           return [
             {
               title: row.title,
-              status: row.status as PromiseStatus,
+              status: row.status,
               created_at: row.created_at,
               due_at: row.due_at,
               confirmed_at: row.confirmed_at,
