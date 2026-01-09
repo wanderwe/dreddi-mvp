@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PublicProfileRow = {
+  profile_id: string;
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -56,6 +57,7 @@ export default function PublicProfilePage() {
   const params = useParams();
   const t = useT();
   const locale = useLocale();
+  const router = useRouter();
   const handle = useMemo(() => {
     const raw = params?.handle;
     return Array.isArray(raw) ? raw[0] : raw;
@@ -65,6 +67,8 @@ export default function PublicProfilePage() {
   const [deals, setDeals] = useState<PublicDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewerId, setViewerId] = useState<string | null>(null);
+  const [ctaMessage, setCtaMessage] = useState<string | null>(null);
 
   const formatDateShort = useMemo(
     () =>
@@ -112,7 +116,7 @@ export default function PublicProfilePage() {
       const { data: profileRow, error: profileErr } = await supabase
         .from("public_profile_stats")
         .select(
-          "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
+          "profile_id,handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
         )
         .eq("handle", handle)
         .maybeSingle();
@@ -164,6 +168,23 @@ export default function PublicProfilePage() {
     };
   }, [handle, t]);
 
+  useEffect(() => {
+    let active = true;
+
+    const loadViewer = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      setViewerId(data.session?.user.id ?? null);
+    };
+
+    void loadViewer();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const statusLabels: Partial<Record<PromiseStatus, string>> = {
     confirmed: t("home.recentDeals.status.confirmed"),
     disputed: t("home.recentDeals.status.disputed"),
@@ -174,6 +195,40 @@ export default function PublicProfilePage() {
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const lastActivity = profile?.last_activity_at;
+  const isSelf = Boolean(viewerId && profile?.profile_id && viewerId === profile?.profile_id);
+  const profileUrl =
+    typeof window === "undefined" || !profile?.handle ? "" : `${window.location.origin}/u/${profile.handle}`;
+
+  const handleCopyLink = async () => {
+    if (!profileUrl) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(profileUrl);
+        setCtaMessage(t("publicProfile.linkCopied"));
+        window.setTimeout(() => setCtaMessage(null), 2400);
+      }
+    } catch (copyError) {
+      console.warn("[publicProfile] Copy failed", copyError);
+    }
+  };
+
+  const handleCreateDeal = async () => {
+    if (!handle) return;
+    const nextPath = `/promises/new?counterparty_handle=${encodeURIComponent(handle)}`;
+    if (!supabase) {
+      setCtaMessage(t("publicProfile.signInToCreateDeal"));
+      return;
+    }
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      setCtaMessage(t("publicProfile.signInToCreateDeal"));
+      window.setTimeout(() => {
+        window.location.href = `/login?next=${encodeURIComponent(nextPath)}`;
+      }, 300);
+      return;
+    }
+    router.push(nextPath);
+  };
 
   const reputationStatusKey = score >= 70 ? "strong" : score >= 50 ? "steady" : "risk";
 
@@ -219,16 +274,36 @@ export default function PublicProfilePage() {
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>
-                <div className="flex flex-col items-start gap-2 rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
-                  <span className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.reputation")}
-                  </span>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-semibold">{score}</span>
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
-                      {t(`publicProfile.status.${reputationStatusKey}`)}
+                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                  <div className="flex flex-col items-start gap-2 rounded-2xl border border-white/10 bg-black/40 px-5 py-4">
+                    <span className="text-xs uppercase tracking-wide text-white/50">
+                      {t("publicProfile.reputation")}
                     </span>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-3xl font-semibold">{score}</span>
+                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">
+                        {t(`publicProfile.status.${reputationStatusKey}`)}
+                      </span>
+                    </div>
                   </div>
+                  {!isSelf ? (
+                    <button
+                      type="button"
+                      onClick={handleCreateDeal}
+                      className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 md:w-auto"
+                    >
+                      {t("publicProfile.createDeal")}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="inline-flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10 md:w-auto"
+                    >
+                      {t("publicProfile.copyLink")}
+                    </button>
+                  )}
+                  {ctaMessage && <span className="text-xs text-white/60">{ctaMessage}</span>}
                 </div>
               </div>
               <p className="max-w-xl text-sm text-white/50">

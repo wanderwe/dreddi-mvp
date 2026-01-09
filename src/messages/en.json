@@ -86,6 +86,7 @@
       "open": "Open",
       "copy": "Copy link",
       "copied": "Copied",
+      "linkCopied": "Link copied",
       "setHandleHint": "Set handle to enable public link",
       "setHandle": "Set handle"
     }
@@ -323,6 +324,7 @@
       "errors": {
         "counterpartyRequired": "Please add the other party's contact."
       },
+      "prefillNotFound": "Profile not found.",
       "submit": "Create deal",
       "creating": "Creating…"
     }
@@ -379,6 +381,10 @@
     "loading": "Loading profile…",
     "noActivity": "No activity yet",
     "recentDealsMeta": "Finalized {date}",
+    "createDeal": "Create deal",
+    "copyLink": "Copy profile link",
+    "linkCopied": "Link copied",
+    "signInToCreateDeal": "Sign in to create a deal",
     "status": {
       "strong": "Strong standing",
       "steady": "Steady standing",

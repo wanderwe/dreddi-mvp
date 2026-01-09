@@ -1,21 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
+type PublicProfileIdentity = {
+  profile_id: string;
+  handle: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
 export default function NewPromisePage() {
   const t = useT();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
+  const [counterpartyId, setCounterpartyId] = useState<string | null>(null);
   const [dueAt, setDueAt] = useState("");
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prefillNotice, setPrefillNotice] = useState<string | null>(null);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -46,6 +56,56 @@ export default function NewPromisePage() {
       active = false;
     };
   }, [router]);
+
+  useEffect(() => {
+    let active = true;
+    const handleParam = searchParams.get("counterparty_handle")?.trim().toLowerCase() ?? "";
+
+    if (!handleParam) {
+      setPrefillNotice(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadCounterparty = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("public_profile_stats")
+        .select("profile_id,handle,display_name,avatar_url")
+        .eq("handle", handleParam)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (error || !data) {
+        setPrefillNotice(t("promises.new.prefillNotFound"));
+        setCounterpartyId(null);
+        setCounterparty("");
+        return;
+      }
+
+      const profile = data as PublicProfileIdentity;
+      const label = profile.display_name?.trim()
+        ? `${profile.display_name.trim()} (@${profile.handle})`
+        : `@${profile.handle}`;
+      setCounterparty(label);
+      setCounterpartyId(profile.profile_id);
+      setPrefillNotice(null);
+    };
+
+    void loadCounterparty();
+
+    return () => {
+      active = false;
+    };
+  }, [searchParams, t]);
 
   async function createPromise() {
     setBusy(true);
@@ -87,6 +147,7 @@ export default function NewPromisePage() {
         creator_id: user.id,
         promisor_id: executor === "me" ? user.id : null,
         promisee_id: executor === "other" ? user.id : null,
+        counterparty_id: counterpartyId,
         title: title.trim(),
         details: details.trim() || null,
         counterparty_contact: counterpartyContact,
@@ -202,8 +263,13 @@ export default function NewPromisePage() {
                       : t("promises.new.placeholders.counterpartyOther")
                   }
                   value={counterparty}
-                  onChange={(e) => setCounterparty(e.target.value)}
+                  onChange={(e) => {
+                    setCounterparty(e.target.value);
+                    if (counterpartyId) setCounterpartyId(null);
+                    if (prefillNotice) setPrefillNotice(null);
+                  }}
                 />
+                {prefillNotice && <p className="text-xs text-slate-400">{prefillNotice}</p>}
               </label>
             )}
 
