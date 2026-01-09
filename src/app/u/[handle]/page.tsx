@@ -208,7 +208,14 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                   <div>
-                    <h1 className="text-2xl font-semibold">{displayName}</h1>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h1 className="text-2xl font-semibold">{displayName}</h1>
+                      {confirmedCount > 0 && (
+                        <span className="rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                          {t("publicProfile.verifiedBadge")}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>

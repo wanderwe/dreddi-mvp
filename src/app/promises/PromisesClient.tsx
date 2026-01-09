@@ -64,6 +64,14 @@ export default function PromisesClient() {
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [profileHandle, setProfileHandle] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [showCopyFallback, setShowCopyFallback] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [handleModalOpen, setHandleModalOpen] = useState(false);
+  const [handleInput, setHandleInput] = useState("");
+  const [handleError, setHandleError] = useState<string | null>(null);
+  const [handleSaving, setHandleSaving] = useState(false);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -81,6 +89,7 @@ export default function PromisesClient() {
       } catch (error) {
         setError(supabaseErrorMessage(error));
         setLoading(false);
+        setProfileLoading(false);
         return;
       }
 
@@ -132,6 +141,22 @@ export default function PromisesClient() {
       }
 
       setLoading(false);
+
+      const { data: profileRow, error: profileError } = await supabase
+        .from("profiles")
+        .select("handle")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (profileError) {
+        console.warn("[promises] Failed to load profile handle", profileError);
+      }
+
+      const nextHandle = profileRow?.handle?.trim() || null;
+      setProfileHandle(nextHandle);
+      setProfileLoading(false);
     })();
 
     return () => {
@@ -232,6 +257,101 @@ export default function PromisesClient() {
   };
 
   const metricValueClass = "mt-1 text-base font-semibold leading-tight";
+  const profileUrl =
+    typeof window === "undefined" || !profileHandle
+      ? ""
+      : `${window.location.origin}/u/${profileHandle}`;
+
+  const showToast = (message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 2400);
+  };
+
+  const openHandleModal = () => {
+    setHandleInput(profileHandle ?? "");
+    setHandleError(null);
+    setHandleModalOpen(true);
+  };
+
+  const validateHandle = (value: string) => {
+    if (!value) return t("promises.publicProfile.errors.handleRequired");
+    if (!/^[a-z0-9_-]{3,20}$/.test(value)) {
+      return t("promises.publicProfile.errors.handleInvalid");
+    }
+    return null;
+  };
+
+  const saveHandle = async () => {
+    const nextHandle = handleInput.trim().toLowerCase();
+    const validationError = validateHandle(nextHandle);
+    if (validationError) {
+      setHandleError(validationError);
+      return;
+    }
+
+    setHandleSaving(true);
+    setHandleError(null);
+
+    try {
+      const supabase = requireSupabase();
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.push(`/login?next=${encodeURIComponent("/promises")}`);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ handle: nextHandle })
+        .eq("id", data.session.user.id);
+
+      if (updateError) {
+        const errorCode =
+          typeof updateError === "object" && "code" in updateError
+            ? (updateError as { code?: string }).code
+            : undefined;
+
+        if (
+          errorCode === "23505" ||
+          updateError.message.toLowerCase().includes("duplicate")
+        ) {
+          setHandleError(t("promises.publicProfile.errors.handleTaken"));
+          return;
+        }
+
+        setHandleError(t("promises.publicProfile.errors.handleSaveFailed"));
+        return;
+      }
+
+      setProfileHandle(nextHandle);
+      setShowCopyFallback(false);
+      setHandleModalOpen(false);
+      showToast(t("promises.publicProfile.toast.saved"));
+    } catch (saveError) {
+      setHandleError(
+        saveError instanceof Error
+          ? saveError.message
+          : t("promises.publicProfile.errors.handleSaveFailed")
+      );
+    } finally {
+      setHandleSaving(false);
+    }
+  };
+
+  const copyProfileLink = async () => {
+    if (!profileUrl) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(profileUrl);
+        setShowCopyFallback(false);
+        showToast(t("promises.publicProfile.toast.copied"));
+        return;
+      }
+    } catch (copyError) {
+      console.warn("[promises] Clipboard copy failed", copyError);
+    }
+    setShowCopyFallback(true);
+  };
 
   return (
     <main className="relative py-10">
@@ -277,6 +397,75 @@ export default function PromisesClient() {
               </div>
               <div className={metricValueClass}>{overview.awaitingOthers}</div>
             </div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-black/30 p-5 shadow-xl shadow-black/30 backdrop-blur">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                {t("promises.publicProfile.title")}
+              </p>
+              {toast && (
+                <span className="rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                  {toast}
+                </span>
+              )}
+            </div>
+            {profileLoading ? (
+              <p className="text-sm text-slate-400">{t("promises.publicProfile.loading")}</p>
+            ) : profileHandle ? (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-200 break-all">{profileUrl}</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={`/u/${profileHandle}`}
+                    className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+                  >
+                    {t("promises.publicProfile.actions.view")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={copyProfileLink}
+                    className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+                  >
+                    {t("promises.publicProfile.actions.copy")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openHandleModal}
+                    className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+                  >
+                    {t("promises.publicProfile.actions.edit")}
+                  </button>
+                </div>
+                {showCopyFallback && (
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={profileUrl}
+                      onClick={(event) => event.currentTarget.select()}
+                      className="w-full bg-transparent text-xs text-slate-200 outline-none"
+                    />
+                    <p className="mt-2 text-xs text-slate-400">
+                      {t("promises.publicProfile.copyFallback")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-slate-300">{t("promises.publicProfile.helper")}</p>
+                <button
+                  type="button"
+                  onClick={openHandleModal}
+                  className="inline-flex w-fit items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-xs font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+                >
+                  {t("promises.publicProfile.actions.set")}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -486,6 +675,62 @@ export default function PromisesClient() {
                 className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
               >
                 {t("promises.confirmModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {handleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {profileHandle
+                ? t("promises.publicProfile.modal.editTitle")
+                : t("promises.publicProfile.modal.setTitle")}
+            </h2>
+            <p className="mt-2 text-sm text-neutral-300">
+              {t("promises.publicProfile.modal.helper")}
+            </p>
+
+            <div className="mt-4">
+              <label className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                {t("promises.publicProfile.modal.label")}
+              </label>
+              <input
+                value={handleInput}
+                onChange={(event) => {
+                  setHandleInput(event.target.value.toLowerCase());
+                  if (handleError) setHandleError(null);
+                }}
+                placeholder={t("promises.publicProfile.modal.placeholder")}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300/60"
+              />
+              {profileHandle && (
+                <p className="mt-2 text-xs text-amber-200">
+                  {t("promises.publicProfile.modal.warning")}
+                </p>
+              )}
+              {handleError && <p className="mt-2 text-xs text-red-300">{handleError}</p>}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setHandleModalOpen(false)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                {t("promises.publicProfile.modal.cancel")}
+              </button>
+              <button
+                type="button"
+                disabled={handleSaving}
+                onClick={saveHandle}
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+              >
+                {handleSaving
+                  ? t("promises.publicProfile.modal.saving")
+                  : t("promises.publicProfile.modal.save")}
               </button>
             </div>
           </div>

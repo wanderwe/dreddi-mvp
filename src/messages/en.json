@@ -141,6 +141,39 @@
         "updateFailed": "Failed to update"
       }
     },
+    "publicProfile": {
+      "title": "Public profile",
+      "loading": "Loading profile…",
+      "helper": "Set a handle to enable your public profile link.",
+      "copyFallback": "Tap to select and copy.",
+      "actions": {
+        "view": "View public profile",
+        "copy": "Copy link",
+        "edit": "Edit handle",
+        "set": "Set handle"
+      },
+      "modal": {
+        "setTitle": "Set handle",
+        "editTitle": "Edit handle",
+        "helper": "Choose a public handle for your profile link.",
+        "label": "Handle",
+        "placeholder": "your-handle",
+        "warning": "Changing your handle will change your public profile link.",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "toast": {
+        "copied": "Copied",
+        "saved": "Saved"
+      },
+      "errors": {
+        "handleRequired": "Handle is required.",
+        "handleInvalid": "Handle must be 3-20 characters (a-z, 0-9, underscore, hyphen).",
+        "handleTaken": "Handle already taken.",
+        "handleSaveFailed": "Could not save handle."
+      }
+    },
     "detail": {
       "back": "Back",
       "loading": "Loading…",
@@ -303,6 +336,7 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "lastActivity": "Last activity",
+    "verifiedBadge": "Verified history",
     "recentDeals": "Recent deals",
     "emptyDeals": "No public deals yet",
     "loading": "Loading profile…",
