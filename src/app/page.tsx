@@ -49,6 +49,8 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const [profileHandle, setProfileHandle] = useState<string | null>(null);
+  const [profileToast, setProfileToast] = useState<string | null>(null);
   const isAuthenticated = Boolean(email);
 
   const highlights = [
@@ -234,6 +236,64 @@ export default function Home() {
   }, [email]);
 
   useEffect(() => {
+    let active = true;
+    const client = supabase;
+
+    if (!client || !email) {
+      setProfileHandle(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadHandle = async () => {
+      const { data: userData, error: userError } = await client.auth.getUser();
+      if (!active) return;
+      if (userError || !userData.user?.id) {
+        setProfileHandle(null);
+        return;
+      }
+
+      const { data, error } = await client
+        .from("profiles")
+        .select("handle")
+        .eq("id", userData.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+      if (error) {
+        setProfileHandle(null);
+        return;
+      }
+      setProfileHandle(data?.handle?.trim() || null);
+    };
+
+    void loadHandle();
+
+    return () => {
+      active = false;
+    };
+  }, [email]);
+
+  const profileUrl =
+    typeof window === "undefined" || !profileHandle
+      ? ""
+      : `${window.location.origin}/u/${profileHandle}`;
+
+  const copyProfileLink = async () => {
+    if (!profileUrl) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(profileUrl);
+        setProfileToast(t("home.publicProfile.linkCopied"));
+        window.setTimeout(() => setProfileToast(null), 2400);
+      }
+    } catch (copyError) {
+      console.warn("[home] copy failed", copyError);
+    }
+  };
+
+  useEffect(() => {
     let cancelled = false;
     const client = supabase;
 
@@ -410,10 +470,10 @@ export default function Home() {
         <div className="flex-1">
           <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-6">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-white/10 to-sky-400/5" aria-hidden />
-            <div className="relative flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
+              <div className="relative flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
                     <p className="text-sm text-slate-300">{t("home.score.label")}</p>
                     <p className="text-2xl font-semibold text-white">
@@ -422,25 +482,70 @@ export default function Home() {
                   </div>
                 </div>
                 {email ? (
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href="/me"
-                      aria-label={t("home.score.profileActionAria")}
-                      className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                    >
-                      <svg
-                        className="h-4 w-4 text-emerald-200 sm:hidden"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
+                  <div className="flex flex-col items-end gap-2 text-xs text-slate-200">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Link
+                        href="/me"
+                        aria-label={t("home.score.profileActionAria")}
+                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
                       >
-                        <path d="M10 10a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0H3Z" />
-                      </svg>
-                      <span className="hidden sm:inline">{t("home.score.profileAction")}</span>
-                    </Link>
-                    <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
-                      {t("home.score.live")}
-                    </span>
+                        <svg
+                          className="h-4 w-4 text-emerald-200 sm:hidden"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path d="M10 10a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0H3Z" />
+                        </svg>
+                        <span className="hidden sm:inline">{t("home.score.profileAction")}</span>
+                      </Link>
+                      <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
+                        {t("home.score.live")}
+                      </span>
+                    </div>
+                    {profileHandle ? (
+                      <div className="flex flex-wrap items-center justify-end gap-2">
+                        <Link
+                          href={`/u/${profileHandle}`}
+                          className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                        >
+                          <svg
+                            className="h-4 w-4 text-emerald-200"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M12.5 3a1 1 0 0 1 1 1v2.5a1 1 0 1 1-2 0V6.41l-6.04 6.04a1 1 0 1 1-1.42-1.42l6.04-6.04H9a1 1 0 1 1 0-2h3.5Z" />
+                            <path d="M3.5 7a1 1 0 0 1 1 1v6.5h6.5a1 1 0 1 1 0 2H4.5A2.5 2.5 0 0 1 2 14V8a1 1 0 0 1 1-1Z" />
+                          </svg>
+                          <span>{t("home.publicProfile.label")}</span>
+                          <span className="text-emerald-200">@{profileHandle}</span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={copyProfileLink}
+                          title={t("home.publicProfile.copy")}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-emerald-200 transition hover:border-emerald-300/50 hover:text-emerald-100"
+                        >
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                            <path d="M7.5 7A2.5 2.5 0 0 1 10 4.5h5A2.5 2.5 0 0 1 17.5 7v5A2.5 2.5 0 0 1 15 14.5h-5A2.5 2.5 0 0 1 7.5 12V7Z" />
+                            <path d="M5 5.5a2.5 2.5 0 0 1 2.5-2.5h4a1 1 0 1 1 0 2h-4a.5.5 0 0 0-.5.5v4a1 1 0 1 1-2 0v-4Z" />
+                          </svg>
+                        </button>
+                        {profileToast && (
+                          <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
+                            {profileToast}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <Link
+                        href="/me"
+                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                      >
+                        {t("home.publicProfile.setHandle")}
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
