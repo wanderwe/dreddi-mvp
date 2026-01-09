@@ -7,7 +7,6 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PublicProfileRow = {
-  profile_id: string;
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -18,7 +17,6 @@ type PublicProfileRow = {
 };
 
 type PublicDealRow = {
-  id: string;
   title: string;
   status: PromiseStatus;
   created_at: string;
@@ -105,7 +103,7 @@ export default function PublicProfilePage() {
       const { data: profileRow, error: profileErr } = await supabase
         .from("public_profile_stats")
         .select(
-          "profile_id,handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
+          "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
         )
         .eq("handle", handle)
         .maybeSingle();
@@ -120,12 +118,10 @@ export default function PublicProfilePage() {
 
       setProfile(profileRow as PublicProfileRow);
 
-      const { data: dealRows, error: dealsErr } = await supabase
-        .from("public_profile_deals")
-        .select("id,title,status,created_at,due_at,confirmed_at,disputed_at,creator_id")
-        .eq("creator_id", profileRow.profile_id)
-        .order("created_at", { ascending: false })
-        .limit(5);
+      const { data: dealRows, error: dealsErr } = await supabase.rpc("public_get_profile_deals", {
+        handle: profileRow.handle,
+        limit_count: 5,
+      });
 
       if (!active) return;
 
@@ -136,7 +132,6 @@ export default function PublicProfilePage() {
           if (!isPromiseStatus(row.status)) return [];
           return [
             {
-              id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
               created_at: row.created_at,
@@ -258,7 +253,7 @@ export default function PublicProfilePage() {
                     const finalizedAt = deal.confirmed_at ?? deal.disputed_at ?? deal.created_at;
                     return (
                       <div
-                        key={deal.id}
+                        key={`${deal.title}-${deal.created_at}`}
                         className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
                       >
                         <div>
