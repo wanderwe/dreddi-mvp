@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { MobileMenu } from "@/app/components/MobileMenu";
-import { ProfileHandleCard } from "@/app/components/ProfileHandleCard";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -50,6 +49,10 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const [profileHandle, setProfileHandle] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [copyToastVisible, setCopyToastVisible] = useState(false);
+  const [origin, setOrigin] = useState("");
   const isAuthenticated = Boolean(email);
 
   const highlights = [
@@ -293,6 +296,60 @@ export default function Home() {
     };
   }, [email]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const client = supabase;
+
+    const loadProfileHandle = async () => {
+      if (!client || !email) {
+        setProfileHandle(null);
+        setProfileLoading(false);
+        return;
+      }
+
+      setProfileLoading(true);
+
+      const { data: userData, error: userErr } = await client.auth.getUser();
+      const userId = userData.user?.id;
+
+      if (cancelled) return;
+
+      if (userErr || !userId) {
+        setProfileHandle(null);
+        setProfileLoading(false);
+        return;
+      }
+
+      const { data, error } = await client
+        .from("profiles")
+        .select("handle")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error) {
+        setProfileHandle(null);
+      } else {
+        setProfileHandle(data?.handle ?? null);
+      }
+
+      setProfileLoading(false);
+    };
+
+    void loadProfileHandle();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [email]);
+
   async function logout() {
     if (!supabase) return;
     await supabase.auth.signOut();
@@ -305,6 +362,48 @@ export default function Home() {
   const disputedCount = rep?.disputed_count ?? 0;
   const onTimeCount = rep?.on_time_count ?? 0;
   const recentEvents = reputation?.recent_events ?? [];
+  const profilePath = profileHandle ? `/u/${profileHandle}` : "";
+  const profileUrl = profileHandle && origin ? `${origin}${profilePath}` : "";
+
+  const showCopyToast = () => {
+    setCopyToastVisible(true);
+    window.setTimeout(() => setCopyToastVisible(false), 1600);
+  };
+
+  const handleCopyProfile = async () => {
+    if (!profileUrl) return;
+    if (navigator?.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(profileUrl);
+        showCopyToast();
+        return;
+      } catch {
+        // fallback below
+      }
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = profileUrl;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, profileUrl.length);
+    try {
+      if (document.execCommand("copy")) {
+        showCopyToast();
+      }
+    } catch {
+      // ignore copy failures
+    }
+    document.body.removeChild(textarea);
+  };
+
+  const handleOpenProfile = () => {
+    if (!profileUrl) return;
+    window.open(profileUrl, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -442,11 +541,11 @@ export default function Home() {
                 </div>
               </div>
 
-                {reputationError && isAuthenticated && (
-                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
-                    {reputationError}
-                  </div>
-                )}
+              {reputationError && isAuthenticated && (
+                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                  {reputationError}
+                </div>
+              )}
 
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
                 <div className="flex items-center justify-between text-sm text-emerald-200">
@@ -586,7 +685,64 @@ export default function Home() {
                 )}
               </div>
 
-              {isAuthenticated && <ProfileHandleCard variant="mini" />}
+              {isAuthenticated && !profileLoading && profileHandle ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <span className="text-slate-400">{t("home.publicProfile.label")}</span>
+                    <span className="text-slate-500">·</span>
+                    <span className="font-medium text-white">{profilePath}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleOpenProfile}
+                      aria-label={t("home.publicProfile.open")}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69L9.22 9.47a.75.75 0 0 0 1.06 1.06l5.97-5.97V7.25a.75.75 0 0 0 1.5 0v-4A.75.75 0 0 0 17 2h-4.5Z" />
+                        <path d="M3 5.75A2.75 2.75 0 0 1 5.75 3h3.5a.75.75 0 0 1 0 1.5h-3.5A1.25 1.25 0 0 0 4.5 5.75v8.5A1.25 1.25 0 0 0 5.75 15.5h8.5a1.25 1.25 0 0 0 1.25-1.25v-3.5a.75.75 0 0 1 1.5 0v3.5A2.75 2.75 0 0 1 14.25 17h-8.5A2.75 2.75 0 0 1 3 14.25v-8.5Z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopyProfile}
+                      aria-label={t("home.publicProfile.copy")}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M6.75 2A2.75 2.75 0 0 0 4 4.75v7.5A2.75 2.75 0 0 0 6.75 15h4.5A2.75 2.75 0 0 0 14 12.25v-7.5A2.75 2.75 0 0 0 11.25 2h-4.5Zm-1.25 2.75c0-.69.56-1.25 1.25-1.25h4.5c.69 0 1.25.56 1.25 1.25v7.5c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-7.5Z" />
+                        <path d="M8.75 16.5a.75.75 0 0 1 .75-.75h3.75A2.75 2.75 0 0 0 16 13V6.25a.75.75 0 0 1 1.5 0V13A4.25 4.25 0 0 1 13.25 17.25H9.5a.75.75 0 0 1-.75-.75Z" />
+                      </svg>
+                    </button>
+                    {copyToastVisible && (
+                      <span className="rounded-full border border-emerald-300/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-100">
+                        {t("home.publicProfile.copied")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : isAuthenticated && !profileLoading ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
+                  <span>{t("home.publicProfile.setHandleHint")}</span>
+                  <Link
+                    href="/me"
+                    className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                  >
+                    {t("home.publicProfile.setHandle")}
+                  </Link>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

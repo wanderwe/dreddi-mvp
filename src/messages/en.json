@@ -78,6 +78,14 @@
         "confirmed": "Confirmed",
         "disputed": "Disputed"
       }
+    },
+    "publicProfile": {
+      "label": "Public profile",
+      "open": "Open",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "setHandleHint": "Set handle to enable public link",
+      "setHandle": "Set handle"
     }
   },
   "nav": {
