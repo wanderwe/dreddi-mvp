@@ -231,6 +231,10 @@ export default function PublicProfilePage() {
                   </div>
                 </div>
               </div>
+              <p className="max-w-xl text-sm text-white/50">
+                <span className="block">{t("thesis.line1")}</span>
+                <span className="block">{t("thesis.line2")}</span>
+              </p>
               <div className="flex flex-wrap gap-3 text-sm text-white/60">
                 <span>
                   {t("publicProfile.confirmed")} · <span className="text-white">{confirmedCount}</span>

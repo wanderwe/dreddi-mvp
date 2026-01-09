@@ -347,6 +347,12 @@ export default function Home() {
             <p className="max-w-xl text-lg text-slate-300">
               {t("home.tagline")}
             </p>
+            {!isAuthenticated ? (
+              <p className="max-w-xl text-base text-slate-300/80">
+                <span className="block">{t("thesis.line1")}</span>
+                <span className="block">{t("thesis.line2")}</span>
+              </p>
+            ) : null}
           </div>
 
           {!ready ? (
