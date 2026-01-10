@@ -14,7 +14,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Only the promisor can complete" }, { status: 403 });
     }
 
-    if (!promise.counterparty_id) {
+    const acceptedBySecondSide = Boolean(
+      promise.counterparty_id ?? (promise.promisor_id && promise.promisee_id)
+    );
+
+    if (!acceptedBySecondSide) {
       return NextResponse.json({ error: "PROMISE_NOT_ACCEPTED" }, { status: 400 });
     }
 
