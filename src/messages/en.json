@@ -236,8 +236,7 @@
         "title": "Title",
         "details": "Details",
         "executor": "Executor",
-        "counterpartyMe": "Who are you offering this deal to?",
-        "counterpartyOther": "Who are you offering this deal to?",
+        "counterparty": "Counterparty",
         "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
         "dueDate": "Due date"
       },
