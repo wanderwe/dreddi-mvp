@@ -11,14 +11,12 @@
     "validate:package-json": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\""
   },
   "dependencies": {
-    "@radix-ui/react-popover": "^1.1.15",
     "@supabase/supabase-js": "^2.89.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.515.0",
     "next": "16.1.1",
     "react": "19.2.3",
-    "react-day-picker": "^8.10.1",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.3.1"
   },
