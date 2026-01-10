@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, X } from "lucide-react";
-import { Calendar } from "@/app/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -28,6 +26,7 @@ export default function NewPromisePage() {
     () => (dueAt ? format(dueAt, "dd.MM.yyyy") : t("promises.new.placeholders.dueDate")),
     [dueAt, t]
   );
+  const dueAtInputValue = useMemo(() => (dueAt ? format(dueAt, "yyyy-MM-dd") : ""), [dueAt]);
 
   const normalizedDueAt = useMemo(() => {
     if (!dueAt) return null;
@@ -228,48 +227,20 @@ export default function NewPromisePage() {
                 {t("promises.new.fields.dueDate")}
               </span>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
-                    >
-                      <span className="flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
-                        <span className={dueAt ? "text-slate-100" : "text-slate-400"}>
-                          {formattedDueAt}
-                        </span>
-                      </span>
-                      <span className="text-xs uppercase tracking-[0.25em] text-emerald-200/70">
-                        {t("promises.new.fields.dueDate")}
-                      </span>
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <div className="rounded-2xl border border-white/10 bg-slate-950/95 p-3">
-                      <Calendar
-                        mode="single"
-                        selected={dueAt}
-                        onSelect={(date) => setDueAt(date ?? undefined)}
-                        initialFocus
-                      />
-                      <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
-                        <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                          {formattedDueAt}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setDueAt(undefined)}
-                          disabled={!dueAt}
-                          className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:opacity-50"
-                        >
-                          <X className="h-3 w-3" aria-hidden />
-                          {t("promises.new.actions.clearDate")}
-                        </button>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <div className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1">
+                  <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
+                  <input
+                    type="date"
+                    className="w-full bg-transparent text-sm text-slate-100 outline-none"
+                    value={dueAtInputValue}
+                    onChange={(event) => {
+                      const { value } = event.target;
+                      setDueAt(value ? new Date(`${value}T12:00:00`) : undefined);
+                    }}
+                    placeholder={formattedDueAt}
+                    aria-label={t("promises.new.fields.dueDate")}
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={() => setDueAt(undefined)}
