@@ -399,63 +399,70 @@ export default function NewPromisePage() {
               />
             </label>
 
-            {executor && (
-              <div className="space-y-2 text-sm text-slate-200">
-                <label className="space-y-2">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.counterparty")}
-                  </span>
-                  <input
-                    id="counterparty"
-                    aria-describedby="counterparty-helper"
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                    placeholder={
-                      executor === "me"
-                        ? t("promises.new.placeholders.counterpartyMe")
-                        : t("promises.new.placeholders.counterpartyOther")
-                    }
-                    value={counterparty}
-                    onChange={(e) => setCounterparty(e.target.value)}
-                  />
-                </label>
-                <p id="counterparty-helper" className="text-xs text-slate-400">
-                  {t("promises.new.fields.counterpartyHelper")}
-                </p>
-              </div>
-            )}
+            <div className="grid items-start gap-4 sm:col-span-2 sm:grid-cols-2">
+              {executor && (
+                <div className="text-sm text-slate-200">
+                  <label className="block">
+                    <span className="mb-2 block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.fields.counterparty")}
+                    </span>
+                    <input
+                      id="counterparty"
+                      aria-describedby="counterparty-helper"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      placeholder={
+                        executor === "me"
+                          ? t("promises.new.placeholders.counterpartyMe")
+                          : t("promises.new.placeholders.counterpartyOther")
+                      }
+                      value={counterparty}
+                      onChange={(e) => setCounterparty(e.target.value)}
+                    />
+                  </label>
+                  <p
+                    id="counterparty-helper"
+                    className="mt-2 text-sm leading-relaxed text-slate-400"
+                  >
+                    {t("promises.new.fields.counterpartyHelper")}
+                  </p>
+                </div>
+              )}
 
-            <div className="space-y-2 text-sm text-slate-200">
-              <span className="block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.dueDate")}
-              </span>
-              <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center">
-                <button
-                  type="button"
-                  ref={triggerRef}
-                  onClick={() => setIsCalendarOpen((open) => !open)}
-                  aria-expanded={isCalendarOpen}
-                  aria-label={t("promises.new.fields.dueDate")}
-                  className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
-                >
-                  <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
-                  <span className={clsx("flex-1", dueAt ? "text-slate-100" : "text-slate-500")}>
-                    {formattedDueAt}
-                  </span>
-                </button>
-                {dueAt && (
+              <div className="text-sm text-slate-200">
+                <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.fields.dueDate")}
+                </span>
+                <div className="relative flex flex-col sm:flex-row sm:items-center">
                   <button
                     type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setDueAt(undefined);
-                    }}
-                    aria-label={t("promises.new.actions.clearDate")}
-                    title={t("promises.new.actions.clearDate")}
-                    className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
+                    ref={triggerRef}
+                    onClick={() => setIsCalendarOpen((open) => !open)}
+                    aria-expanded={isCalendarOpen}
+                    aria-label={t("promises.new.fields.dueDate")}
+                    className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
                   >
-                    <X className="h-4 w-4" aria-hidden />
+                    <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
+                    <span
+                      className={clsx("flex-1", dueAt ? "text-slate-100" : "text-slate-500")}
+                    >
+                      {formattedDueAt}
+                    </span>
                   </button>
-                )}
+                  {dueAt && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setDueAt(undefined);
+                      }}
+                      aria-label={t("promises.new.actions.clearDate")}
+                      title={t("promises.new.actions.clearDate")}
+                      className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
+                    >
+                      <X className="h-4 w-4" aria-hidden />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
