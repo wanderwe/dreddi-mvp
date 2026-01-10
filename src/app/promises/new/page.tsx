@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon, X } from "lucide-react";
+import { Calendar } from "@/app/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -12,13 +16,25 @@ export default function NewPromisePage() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
-  const [dueAt, setDueAt] = useState("");
+  const [dueAt, setDueAt] = useState<Date | undefined>();
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+
+  const formattedDueAt = useMemo(
+    () => (dueAt ? format(dueAt, "dd.MM.yyyy") : t("promises.new.placeholders.dueDate")),
+    [dueAt, t]
+  );
+
+  const normalizedDueAt = useMemo(() => {
+    if (!dueAt) return null;
+    const normalized = new Date(dueAt);
+    normalized.setHours(12, 0, 0, 0);
+    return normalized;
+  }, [dueAt]);
 
   useEffect(() => {
     let active = true;
@@ -90,7 +106,7 @@ export default function NewPromisePage() {
         title: title.trim(),
         details: details.trim() || null,
         counterparty_contact: counterpartyContact,
-        due_at: dueAt ? new Date(dueAt).toISOString() : null,
+        due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
         status: "active",
         invite_token: inviteToken,
       })
@@ -211,12 +227,59 @@ export default function NewPromisePage() {
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.dueDate")}
               </span>
-              <input
-                type="datetime-local"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                value={dueAt}
-                onChange={(e) => setDueAt(e.target.value)}
-              />
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                    >
+                      <span className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
+                        <span className={dueAt ? "text-slate-100" : "text-slate-400"}>
+                          {formattedDueAt}
+                        </span>
+                      </span>
+                      <span className="text-xs uppercase tracking-[0.25em] text-emerald-200/70">
+                        {t("promises.new.fields.dueDate")}
+                      </span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/95 p-3">
+                      <Calendar
+                        mode="single"
+                        selected={dueAt}
+                        onSelect={(date) => setDueAt(date ?? undefined)}
+                        initialFocus
+                      />
+                      <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+                        <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                          {formattedDueAt}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setDueAt(undefined)}
+                          disabled={!dueAt}
+                          className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:opacity-50"
+                        >
+                          <X className="h-3 w-3" aria-hidden />
+                          {t("promises.new.actions.clearDate")}
+                        </button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <button
+                  type="button"
+                  onClick={() => setDueAt(undefined)}
+                  disabled={!dueAt}
+                  className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:opacity-40"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                  {t("promises.new.actions.clearDate")}
+                </button>
+              </div>
             </label>
           </div>
 

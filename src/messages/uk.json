@@ -248,7 +248,11 @@
         "title": "Коротко: про що угода?",
         "details": "Деталі (опціонально)",
         "counterpartyMe": "Контакт контрагента (email/телефон/нік)",
-        "counterpartyOther": "Контакт виконавця (email/телефон/нік)"
+        "counterpartyOther": "Контакт виконавця (email/телефон/нік)",
+        "dueDate": "Оберіть дату"
+      },
+      "actions": {
+        "clearDate": "Очистити дату"
       },
       "errors": {
         "counterpartyRequired": "Додайте контакт іншої сторони."
