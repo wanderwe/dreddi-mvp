@@ -401,26 +401,23 @@ export default function NewPromisePage() {
 
             {executor && (
               <div className="space-y-2 text-sm text-slate-200">
-                <label
-                  htmlFor="counterparty"
-                  className="block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200"
-                >
-                  {executor === "me"
-                    ? t("promises.new.fields.counterpartyMe")
-                    : t("promises.new.fields.counterpartyOther")}
+                <label className="space-y-2">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.fields.counterparty")}
+                  </span>
+                  <input
+                    id="counterparty"
+                    aria-describedby="counterparty-helper"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                    placeholder={
+                      executor === "me"
+                        ? t("promises.new.placeholders.counterpartyMe")
+                        : t("promises.new.placeholders.counterpartyOther")
+                    }
+                    value={counterparty}
+                    onChange={(e) => setCounterparty(e.target.value)}
+                  />
                 </label>
-                <input
-                  id="counterparty"
-                  aria-describedby="counterparty-helper"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                  placeholder={
-                    executor === "me"
-                      ? t("promises.new.placeholders.counterpartyMe")
-                      : t("promises.new.placeholders.counterpartyOther")
-                  }
-                  value={counterparty}
-                  onChange={(e) => setCounterparty(e.target.value)}
-                />
                 <p id="counterparty-helper" className="text-xs text-slate-400">
                   {t("promises.new.fields.counterpartyHelper")}
                 </p>
