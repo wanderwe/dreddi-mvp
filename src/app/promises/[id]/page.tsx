@@ -363,10 +363,10 @@ export default function PromisePage() {
                 <span
                   className={
                     "text-sm font-medium " +
-                    (p.counterparty_id ? "text-emerald-300" : "text-neutral-200")
+                    (isInviteAccepted ? "text-emerald-300" : "text-neutral-200")
                   }
                 >
-                  {p.counterparty_id ? t("promises.detail.yes") : t("promises.detail.no")}
+                  {isInviteAccepted ? t("promises.detail.yes") : t("promises.detail.no")}
                 </span>
               </div>
 

@@ -10,6 +10,8 @@ type PromiseRecord = {
   due_at: string | null;
   creator_id: string;
   counterparty_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
   completed_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
@@ -62,7 +64,7 @@ export async function loadPromiseForUser(id: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,status,due_at,creator_id,counterparty_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason"
+      "id,title,details,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason"
     )
     .eq("id", id)
     .maybeSingle<PromiseRecord>();

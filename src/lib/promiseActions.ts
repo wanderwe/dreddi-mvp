@@ -5,6 +5,7 @@ export type PromiseRole = "promisor" | "counterparty";
 export type PromiseListItem = {
   status: PromiseStatus;
   role: PromiseRole;
+  acceptedBySecondSide: boolean;
 };
 
 /**
@@ -16,7 +17,7 @@ export type PromiseListItem = {
  * match what the UI renders as actionable for the current user.
  */
 export function isAwaitingYourAction(row: PromiseListItem): boolean {
-  if (row.role === "promisor" && row.status === "active") return true;
+  if (row.role === "promisor" && row.status === "active" && row.acceptedBySecondSide) return true;
   if (row.role === "counterparty" && row.status === "completed_by_promisor") return true;
   return false;
 }
@@ -27,6 +28,6 @@ export function isAwaitingYourAction(row: PromiseListItem): boolean {
  */
 export function isAwaitingOthers(row: PromiseListItem): boolean {
   if (row.role === "promisor" && row.status === "completed_by_promisor") return true;
-  if (row.role === "counterparty" && row.status === "active") return true;
+  if (row.role === "counterparty" && row.status === "active" && row.acceptedBySecondSide) return true;
   return false;
 }
