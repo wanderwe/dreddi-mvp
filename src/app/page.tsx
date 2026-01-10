@@ -303,6 +303,7 @@ export default function Home() {
   const confirmedCount = rep?.confirmed_count ?? 0;
   const disputedCount = rep?.disputed_count ?? 0;
   const onTimeCount = rep?.on_time_count ?? 0;
+  const onTimeSummary = `${onTimeCount} / ${confirmedCount} on time`;
   const recentEvents = reputation?.recent_events ?? [];
 
   return (
@@ -448,16 +449,16 @@ export default function Home() {
                 )}
 
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
-                <div className="flex items-center justify-between text-sm text-emerald-200">
+                <div className="text-sm text-emerald-200">
                   <div className="flex items-center gap-2">
                     <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                     {t("home.score.onTime.label")}
                   </div>
-                  <span className="text-lg font-semibold text-white">
-                    {reputationLoading ? t("home.loadingPlaceholder") : onTimeCount}
-                  </span>
+                  <div className="mt-1 text-lg font-semibold text-white">
+                    {reputationLoading ? t("home.loadingPlaceholder") : onTimeSummary}
+                  </div>
                 </div>
-                <p className="mt-1 text-xs text-emerald-100/80">
+                <p className="mt-2 text-xs text-emerald-100/80">
                   {t(
                     isAuthenticated
                       ? "home.score.onTime.helper.auth"
