@@ -301,20 +301,35 @@
     }
   },
   "publicProfile": {
-    "reputation": "Репутація",
     "confirmed": "Підтверджено",
     "disputed": "Оскаржено",
-    "lastActivity": "Остання активність",
-    "recentDeals": "Останні угоди",
-    "emptyDeals": "Публічних угод поки немає",
     "loading": "Завантаження профілю…",
-    "noActivity": "Ще немає активності",
     "recentDealsMeta": "Фіналізовано {date}",
-    "status": {
-      "strong": "Сильна репутація",
-      "steady": "Стабільна репутація",
-      "risk": "Під ризиком"
+    "sections": {
+      "responsibilityStatus": "Статус публічних відповідальностей",
+      "whatsHappening": "Що відбувається зараз",
+      "trackRecord": "Публічна історія",
+      "recentConfirmations": "Останні публічні підтвердження"
     },
+    "status": {
+      "active": "Активні",
+      "pendingAcceptance": "Очікує прийняття",
+      "overdue": "Прострочено",
+      "inProgress": "В процесі",
+      "awaitingOutcome": "Очікує результату",
+      "awaitingAcceptance": "Очікує підтвердження"
+    },
+    "meta": {
+      "due": "Термін до {date}",
+      "overdue": "Прострочено з {date}",
+      "noDue": "Без терміну"
+    },
+    "emptyStatus": "Немає активних публічних відповідальностей.",
+    "emptyInProgress": "Немає активних відповідальностей.",
+    "emptyAwaitingAcceptance": "Нічого не очікує прийняття.",
+    "emptyOverdue": "Немає прострочених відповідальностей.",
+    "emptyHistory": "Поки немає публічної історії.",
+    "emptyRecent": "Поки немає публічних підтверджень.",
     "errors": {
       "supabase": "Supabase не налаштовано.",
       "missing": "Відсутній хендл профілю.",
