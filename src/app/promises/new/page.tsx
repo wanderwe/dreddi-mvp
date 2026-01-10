@@ -344,7 +344,7 @@ export default function NewPromisePage() {
             </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.executor")}
@@ -400,13 +400,18 @@ export default function NewPromisePage() {
             </label>
 
             {executor && (
-              <label className="space-y-2 text-sm text-slate-200">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <div className="space-y-2 text-sm text-slate-200">
+                <label
+                  htmlFor="counterparty"
+                  className="block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200"
+                >
                   {executor === "me"
                     ? t("promises.new.fields.counterpartyMe")
                     : t("promises.new.fields.counterpartyOther")}
-                </span>
+                </label>
                 <input
+                  id="counterparty"
+                  aria-describedby="counterparty-helper"
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                   placeholder={
                     executor === "me"
@@ -416,14 +421,14 @@ export default function NewPromisePage() {
                   value={counterparty}
                   onChange={(e) => setCounterparty(e.target.value)}
                 />
-                <span className="block text-xs text-slate-400">
+                <p id="counterparty-helper" className="text-xs text-slate-400">
                   {t("promises.new.fields.counterpartyHelper")}
-                </span>
-              </label>
+                </p>
+              </div>
             )}
 
             <div className="space-y-2 text-sm text-slate-200">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.dueDate")}
               </span>
               <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center">
