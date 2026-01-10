@@ -404,7 +404,7 @@ export default function NewPromisePage() {
                 {executor && (
                   <div className="text-sm text-slate-200">
                     <label className="block">
-                      <span className="mb-2 block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
                         {t("promises.new.fields.counterparty")}
                       </span>
                       <input
