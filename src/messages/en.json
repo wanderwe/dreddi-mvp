@@ -248,7 +248,11 @@
         "title": "Short summary of the deal",
         "details": "Details (optional)",
         "counterpartyMe": "Other party contact (email/phone/handle)",
-        "counterpartyOther": "Performer contact (email/phone/handle)"
+        "counterpartyOther": "Performer contact (email/phone/handle)",
+        "dueDate": "Select date"
+      },
+      "actions": {
+        "clearDate": "Clear date"
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact."
