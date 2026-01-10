@@ -230,7 +230,7 @@
     "new": {
       "eyebrow": "New deal",
       "title": "Document the deal",
-      "subtitle": "Name the deal, add context, and an optional deadline.",
+      "subtitle": "Name the deal, add context, and an optional deadline",
       "back": "Back",
       "fields": {
         "title": "Title",
@@ -238,7 +238,7 @@
         "executor": "Executor",
         "counterpartyMe": "Who are you offering this deal to?",
         "counterpartyOther": "Who are you offering this deal to?",
-        "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do.",
+        "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
         "dueDate": "Due date"
       },
       "executor": {
