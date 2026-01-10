@@ -236,8 +236,9 @@
         "title": "Title",
         "details": "Details",
         "executor": "Executor",
-        "counterpartyMe": "Counterparty contact",
-        "counterpartyOther": "Performer contact",
+        "counterpartyMe": "Who are you offering this deal to?",
+        "counterpartyOther": "Who are you offering this deal to?",
+        "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do.",
         "dueDate": "Due date"
       },
       "executor": {
@@ -247,8 +248,8 @@
       "placeholders": {
         "title": "Short summary of the deal",
         "details": "Details (optional)",
-        "counterpartyMe": "Other party contact (email/phone/handle)",
-        "counterpartyOther": "Performer contact (email/phone/handle)",
+        "counterpartyMe": "Counterparty email or phone",
+        "counterpartyOther": "Counterparty email or phone",
         "dueDate": "Select date"
       },
       "actions": {

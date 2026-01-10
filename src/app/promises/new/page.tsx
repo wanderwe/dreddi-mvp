@@ -416,6 +416,9 @@ export default function NewPromisePage() {
                   value={counterparty}
                   onChange={(e) => setCounterparty(e.target.value)}
                 />
+                <span className="block text-xs text-slate-400">
+                  {t("promises.new.fields.counterpartyHelper")}
+                </span>
               </label>
             )}
 

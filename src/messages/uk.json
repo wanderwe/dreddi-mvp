@@ -236,8 +236,9 @@
         "title": "Назва",
         "details": "Деталі",
         "executor": "Виконавець",
-        "counterpartyMe": "Контакт контрагента",
-        "counterpartyOther": "Контакт виконавця",
+        "counterpartyMe": "Кому ви пропонуєте цю угоду?",
+        "counterpartyOther": "Кому ви пропонуєте цю угоду?",
+        "counterpartyHelper": "Контрагент має прийняти угоду — відповідальність не фіксується до прийняття.",
         "dueDate": "Строк"
       },
       "executor": {
@@ -247,8 +248,8 @@
       "placeholders": {
         "title": "Коротко: про що угода?",
         "details": "Деталі (опціонально)",
-        "counterpartyMe": "Контакт контрагента (email/телефон/нік)",
-        "counterpartyOther": "Контакт виконавця (email/телефон/нік)",
+        "counterpartyMe": "Email або телефон контрагента",
+        "counterpartyOther": "Email або телефон контрагента",
         "dueDate": "Оберіть дату"
       },
       "actions": {
