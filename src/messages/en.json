@@ -54,10 +54,8 @@
       "onTime": {
         "label": "On-time completions",
         "suffix": "{count} delivered on time",
-        "helper": {
-          "auth": "On-time completions strengthen your reputation",
-          "guest": "Sign in to see on-time performance"
-        }
+        "helper": "Based on deals with a due date",
+        "empty": "No due-date deals yet"
       }
     },
     "recentDeals": {

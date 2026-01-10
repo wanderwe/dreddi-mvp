@@ -23,6 +23,7 @@ type ReputationResponse = {
     user_id: string;
     score: number;
     confirmed_count: number;
+    confirmed_with_deadline_count: number;
     disputed_count: number;
     on_time_count: number;
     total_promises_completed: number;
@@ -301,9 +302,18 @@ export default function Home() {
   const rep = reputation?.reputation;
   const score = rep?.score ?? 50;
   const confirmedCount = rep?.confirmed_count ?? 0;
+  const confirmedWithDeadlineCount = rep?.confirmed_with_deadline_count ?? 0;
   const disputedCount = rep?.disputed_count ?? 0;
   const onTimeCount = rep?.on_time_count ?? 0;
-  const onTimeSummary = `${onTimeCount} / ${confirmedCount} on time`;
+  const onTimePercentage =
+    confirmedWithDeadlineCount > 0
+      ? Math.round((onTimeCount / confirmedWithDeadlineCount) * 100)
+      : null;
+  const onTimeSummary = onTimePercentage === null ? "—" : `${onTimePercentage}%`;
+  const onTimeHelperKey =
+    confirmedWithDeadlineCount === 0
+      ? "home.score.onTime.empty"
+      : "home.score.onTime.helper";
   const recentEvents = reputation?.recent_events ?? [];
 
   return (
@@ -459,11 +469,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-emerald-100/80">
-                  {t(
-                    isAuthenticated
-                      ? "home.score.onTime.helper.auth"
-                      : "home.score.onTime.helper.guest",
-                  )}
+                  {t(onTimeHelperKey)}
                 </p>
               </div>
 

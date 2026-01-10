@@ -31,8 +31,9 @@ export async function GET(req: Request) {
     const confirmedDeliveries = (deliveries ?? []).filter((row) => row.status === "confirmed");
     const disputedDeliveries = (deliveries ?? []).filter((row) => row.status === "disputed");
 
-    const onTimeDeliveries = confirmedDeliveries.filter((row) => {
-      if (!row.due_at) return false;
+    const confirmedWithDeadline = confirmedDeliveries.filter((row) => row.due_at);
+
+    const onTimeDeliveries = confirmedWithDeadline.filter((row) => {
       const deadline = new Date(row.due_at).getTime();
       const completion = row.confirmed_at ?? row.completed_at;
       if (!completion) return false;
@@ -43,6 +44,7 @@ export async function GET(req: Request) {
       confirmed: confirmedDeliveries.length,
       disputed: disputedDeliveries.length,
       onTime: onTimeDeliveries.length,
+      confirmedWithDeadline: confirmedWithDeadline.length,
       totalCompleted: confirmedDeliveries.length + disputedDeliveries.length,
     };
 
@@ -65,6 +67,7 @@ export async function GET(req: Request) {
         disputed_count: 0,
         on_time_count: 0,
         total_promises_completed: 0,
+        confirmed_with_deadline_count: 0,
         updated_at: new Date().toISOString(),
       };
 
@@ -75,6 +78,7 @@ export async function GET(req: Request) {
         disputed_count: deliveryMetrics.disputed,
         on_time_count: deliveryMetrics.onTime,
         total_promises_completed: deliveryMetrics.totalCompleted,
+        confirmed_with_deadline_count: deliveryMetrics.confirmedWithDeadline,
       },
       recent_events: events ?? [],
     });
