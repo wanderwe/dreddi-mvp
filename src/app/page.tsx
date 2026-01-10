@@ -309,11 +309,12 @@ export default function Home() {
     confirmedWithDeadlineCount > 0
       ? Math.round((onTimeCount / confirmedWithDeadlineCount) * 100)
       : null;
-  const onTimeSummary = onTimePercentage === null ? "N/A" : `${onTimePercentage}%`;
+  const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
   const onTimeHelperKey =
     confirmedWithDeadlineCount === 0
       ? "home.score.onTime.empty"
       : "home.score.onTime.helper";
+  const hasDueDateDeals = confirmedWithDeadlineCount > 0;
   const recentEvents = reputation?.recent_events ?? [];
 
   return (
@@ -462,9 +463,11 @@ export default function Home() {
                 <div className="flex items-center gap-3 text-sm text-emerald-200">
                   <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                   <span>{t("home.score.onTime.label")}</span>
-                  <span className="ml-auto text-lg font-semibold text-white">
-                    {reputationLoading ? t("home.loadingPlaceholder") : onTimeSummary}
-                  </span>
+                  {hasDueDateDeals ? (
+                    <span className="ml-auto text-lg font-semibold text-white">
+                      {reputationLoading ? t("home.loadingPlaceholder") : onTimeSummary}
+                    </span>
+                  ) : null}
                 </div>
                 <p className="mt-2 text-xs text-emerald-100/80">
                   {t(onTimeHelperKey)}
