@@ -410,7 +410,7 @@ export default function NewPromisePage() {
                       <input
                         id="counterparty"
                         aria-describedby="counterparty-helper"
-                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                        className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                         placeholder={
                           executor === "me"
                             ? t("promises.new.placeholders.counterpartyMe")
@@ -434,7 +434,7 @@ export default function NewPromisePage() {
                       onClick={() => setIsCalendarOpen((open) => !open)}
                       aria-expanded={isCalendarOpen}
                       aria-label={t("promises.new.fields.dueDate")}
-                      className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                      className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
                     >
                       <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
                       <span
