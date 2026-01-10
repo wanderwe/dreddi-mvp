@@ -309,7 +309,7 @@ export default function Home() {
     confirmedWithDeadlineCount > 0
       ? Math.round((onTimeCount / confirmedWithDeadlineCount) * 100)
       : null;
-  const onTimeSummary = onTimePercentage === null ? "—" : `${onTimePercentage}%`;
+  const onTimeSummary = onTimePercentage === null ? "N/A" : `${onTimePercentage}%`;
   const onTimeHelperKey =
     confirmedWithDeadlineCount === 0
       ? "home.score.onTime.empty"
@@ -459,14 +459,12 @@ export default function Home() {
                 )}
 
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
-                <div className="text-sm text-emerald-200">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                    {t("home.score.onTime.label")}
-                  </div>
-                  <div className="mt-1 text-lg font-semibold text-white">
+                <div className="flex items-center gap-3 text-sm text-emerald-200">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                  <span>{t("home.score.onTime.label")}</span>
+                  <span className="ml-auto text-lg font-semibold text-white">
                     {reputationLoading ? t("home.loadingPlaceholder") : onTimeSummary}
-                  </div>
+                  </span>
                 </div>
                 <p className="mt-2 text-xs text-emerald-100/80">
                   {t(onTimeHelperKey)}
