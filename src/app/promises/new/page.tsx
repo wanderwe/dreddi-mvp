@@ -2,9 +2,22 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { format } from "date-fns";
-import { CalendarIcon, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import clsx from "clsx";
+import {
+  addDays,
+  addMonths,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
+import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -15,6 +28,10 @@ export default function NewPromisePage() {
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +43,6 @@ export default function NewPromisePage() {
     () => (dueAt ? format(dueAt, "dd.MM.yyyy") : t("promises.new.placeholders.dueDate")),
     [dueAt, t]
   );
-  const dueAtInputValue = useMemo(() => (dueAt ? format(dueAt, "yyyy-MM-dd") : ""), [dueAt]);
 
   const normalizedDueAt = useMemo(() => {
     if (!dueAt) return null;
@@ -34,6 +50,47 @@ export default function NewPromisePage() {
     normalized.setHours(12, 0, 0, 0);
     return normalized;
   }, [dueAt]);
+
+  const calendarDays = useMemo(() => {
+    const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });
+    const end = endOfWeek(endOfMonth(calendarMonth), { weekStartsOn: 1 });
+    const days: Date[] = [];
+    let current = start;
+    while (current <= end) {
+      days.push(current);
+      current = addDays(current, 1);
+    }
+    return days;
+  }, [calendarMonth]);
+
+  const weekDays = useMemo(() => {
+    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+    return Array.from({ length: 7 }, (_, index) => format(addDays(start, index), "EE"));
+  }, []);
+
+  useEffect(() => {
+    if (!isCalendarOpen) return;
+    setCalendarMonth(startOfMonth(dueAt ?? new Date()));
+  }, [dueAt, isCalendarOpen]);
+
+  useEffect(() => {
+    if (!isCalendarOpen) return;
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (popoverRef.current?.contains(target)) return;
+      if (triggerRef.current?.contains(target)) return;
+      setIsCalendarOpen(false);
+    };
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsCalendarOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [isCalendarOpen]);
 
   useEffect(() => {
     let active = true;
@@ -222,25 +279,85 @@ export default function NewPromisePage() {
               </label>
             )}
 
-            <label className="space-y-2 text-sm text-slate-200">
+            <div className="space-y-2 text-sm text-slate-200">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.dueDate")}
               </span>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <div className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1">
+              <div className="relative flex flex-col gap-2 sm:flex-row sm:items-center">
+                <button
+                  type="button"
+                  ref={triggerRef}
+                  onClick={() => setIsCalendarOpen((open) => !open)}
+                  aria-expanded={isCalendarOpen}
+                  aria-label={t("promises.new.fields.dueDate")}
+                  className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                >
                   <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
-                  <input
-                    type="date"
-                    className="w-full bg-transparent text-sm text-slate-100 outline-none"
-                    value={dueAtInputValue}
-                    onChange={(event) => {
-                      const { value } = event.target;
-                      setDueAt(value ? new Date(`${value}T12:00:00`) : undefined);
-                    }}
-                    placeholder={formattedDueAt}
-                    aria-label={t("promises.new.fields.dueDate")}
-                  />
-                </div>
+                  <span className={clsx("flex-1", dueAt ? "text-slate-100" : "text-slate-500")}>
+                    {formattedDueAt}
+                  </span>
+                </button>
+                {isCalendarOpen && (
+                  <div
+                    ref={popoverRef}
+                    className="absolute left-0 top-full z-20 mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur sm:w-[320px]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
+                        className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                        aria-label="Previous month"
+                      >
+                        <ChevronLeft className="h-4 w-4" aria-hidden />
+                      </button>
+                      <div className="text-sm font-semibold text-slate-100">
+                        {format(calendarMonth, "MMMM yyyy")}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
+                        className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                        aria-label="Next month"
+                      >
+                        <ChevronRight className="h-4 w-4" aria-hidden />
+                      </button>
+                    </div>
+                    <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                      {weekDays.map((day) => (
+                        <div key={day}>{day}</div>
+                      ))}
+                    </div>
+                    <div className="mt-2 grid grid-cols-7 gap-1 text-center">
+                      {calendarDays.map((day) => {
+                        const isSelected = !!dueAt && isSameDay(day, dueAt);
+                        const inMonth = isSameMonth(day, calendarMonth);
+                        return (
+                          <button
+                            key={day.toISOString()}
+                            type="button"
+                            onClick={() => {
+                              const next = new Date(day);
+                              next.setHours(12, 0, 0, 0);
+                              setDueAt(next);
+                              setIsCalendarOpen(false);
+                            }}
+                            className={clsx(
+                              "flex h-9 w-9 items-center justify-center rounded-full text-sm transition",
+                              isSelected
+                                ? "bg-emerald-400/90 text-slate-950"
+                                : "text-slate-200 hover:bg-white/10",
+                              !inMonth && "text-slate-600",
+                              isToday(day) && !isSelected && "border border-emerald-400/40"
+                            )}
+                          >
+                            {format(day, "d")}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => setDueAt(undefined)}
@@ -251,7 +368,7 @@ export default function NewPromisePage() {
                   {t("promises.new.actions.clearDate")}
                 </button>
               </div>
-            </label>
+            </div>
           </div>
 
           <div className="space-y-3">
