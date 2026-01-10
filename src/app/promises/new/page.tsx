@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import clsx from "clsx";
 import {
   addDays,
@@ -32,6 +33,12 @@ export default function NewPromisePage() {
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [popoverStyles, setPopoverStyles] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    placement: "top" | "bottom";
+  } | null>(null);
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +75,81 @@ export default function NewPromisePage() {
     return Array.from({ length: 7 }, (_, index) => format(addDays(start, index), "EE"));
   }, []);
 
+  const calendarPopover =
+    isCalendarOpen && typeof document !== "undefined"
+      ? createPortal(
+          <div
+            ref={popoverRef}
+            data-placement={popoverStyles?.placement ?? "bottom"}
+            style={{
+              top: popoverStyles?.top ?? 0,
+              left: popoverStyles?.left ?? 0,
+              width: popoverStyles?.width ?? 320,
+            }}
+            className={clsx(
+              "fixed z-50 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
+              !popoverStyles && "pointer-events-none opacity-0"
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
+                className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              </button>
+              <div className="text-sm font-semibold text-slate-100">
+                {format(calendarMonth, "MMMM yyyy")}
+              </div>
+              <button
+                type="button"
+                onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
+                className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                aria-label="Next month"
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-slate-500">
+              {weekDays.map((day) => (
+                <div key={day}>{day}</div>
+              ))}
+            </div>
+            <div className="mt-2 grid grid-cols-7 gap-1 text-center">
+              {calendarDays.map((day) => {
+                const isSelected = !!dueAt && isSameDay(day, dueAt);
+                const inMonth = isSameMonth(day, calendarMonth);
+                return (
+                  <button
+                    key={day.toISOString()}
+                    type="button"
+                    onClick={() => {
+                      const next = new Date(day);
+                      next.setHours(12, 0, 0, 0);
+                      setDueAt(next);
+                      setIsCalendarOpen(false);
+                    }}
+                    className={clsx(
+                      "flex h-9 w-9 items-center justify-center rounded-full text-sm transition",
+                      isSelected
+                        ? "bg-emerald-400/90 text-slate-950"
+                        : "text-slate-200 hover:bg-white/10",
+                      !inMonth && "text-slate-600",
+                      isToday(day) && !isSelected && "border border-emerald-400/40"
+                    )}
+                  >
+                    {format(day, "d")}
+                  </button>
+                );
+              })}
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   useEffect(() => {
     if (!isCalendarOpen) return;
     setCalendarMonth(startOfMonth(dueAt ?? new Date()));
@@ -90,7 +172,64 @@ export default function NewPromisePage() {
       document.removeEventListener("mousedown", handleClick);
       document.removeEventListener("keydown", handleKey);
     };
-  }, [isCalendarOpen]);
+  }, [isCalendarOpen, calendarMonth]);
+
+  useEffect(() => {
+    if (!isCalendarOpen) {
+      setPopoverStyles(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!triggerRef.current || !popoverRef.current) return;
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const popoverRect = popoverRef.current.getBoundingClientRect();
+      const viewportPadding = 8;
+      const spacing = 8;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      const maxWidth = Math.max(0, viewportWidth - viewportPadding * 2);
+      const desiredWidth = Math.max(
+        triggerRect.width,
+        Math.min(320, maxWidth)
+      );
+      const width = Math.min(desiredWidth, maxWidth);
+
+      let top = triggerRect.bottom + spacing;
+      let placement: "top" | "bottom" = "bottom";
+      if (top + popoverRect.height > viewportHeight - viewportPadding) {
+        const nextTop = triggerRect.top - spacing - popoverRect.height;
+        if (nextTop >= viewportPadding) {
+          top = nextTop;
+          placement = "top";
+        } else {
+          top = Math.max(viewportPadding, viewportHeight - popoverRect.height - viewportPadding);
+        }
+      }
+
+      let left = triggerRect.left;
+      if (left + width > viewportWidth - viewportPadding) {
+        left = viewportWidth - viewportPadding - width;
+      }
+      if (left < viewportPadding) {
+        left = viewportPadding;
+      }
+
+      setPopoverStyles({ top, left, width, placement });
+    };
+
+    updatePosition();
+    const raf = window.requestAnimationFrame(updatePosition);
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isCalendarOpen, calendarMonth]);
 
   useEffect(() => {
     let active = true;
@@ -181,6 +320,7 @@ export default function NewPromisePage() {
 
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+      {calendarPopover}
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
@@ -290,83 +430,27 @@ export default function NewPromisePage() {
                   onClick={() => setIsCalendarOpen((open) => !open)}
                   aria-expanded={isCalendarOpen}
                   aria-label={t("promises.new.fields.dueDate")}
-                  className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                  className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-10 text-left text-sm text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
                 >
                   <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
                   <span className={clsx("flex-1", dueAt ? "text-slate-100" : "text-slate-500")}>
                     {formattedDueAt}
                   </span>
                 </button>
-                {isCalendarOpen && (
-                  <div
-                    ref={popoverRef}
-                    className="absolute left-0 top-full z-20 mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur sm:w-[320px]"
+                {dueAt && (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setDueAt(undefined);
+                    }}
+                    aria-label={t("promises.new.actions.clearDate")}
+                    title={t("promises.new.actions.clearDate")}
+                    className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
                   >
-                    <div className="flex items-center justify-between">
-                      <button
-                        type="button"
-                        onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
-                        className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
-                        aria-label="Previous month"
-                      >
-                        <ChevronLeft className="h-4 w-4" aria-hidden />
-                      </button>
-                      <div className="text-sm font-semibold text-slate-100">
-                        {format(calendarMonth, "MMMM yyyy")}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
-                        className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
-                        aria-label="Next month"
-                      >
-                        <ChevronRight className="h-4 w-4" aria-hidden />
-                      </button>
-                    </div>
-                    <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                      {weekDays.map((day) => (
-                        <div key={day}>{day}</div>
-                      ))}
-                    </div>
-                    <div className="mt-2 grid grid-cols-7 gap-1 text-center">
-                      {calendarDays.map((day) => {
-                        const isSelected = !!dueAt && isSameDay(day, dueAt);
-                        const inMonth = isSameMonth(day, calendarMonth);
-                        return (
-                          <button
-                            key={day.toISOString()}
-                            type="button"
-                            onClick={() => {
-                              const next = new Date(day);
-                              next.setHours(12, 0, 0, 0);
-                              setDueAt(next);
-                              setIsCalendarOpen(false);
-                            }}
-                            className={clsx(
-                              "flex h-9 w-9 items-center justify-center rounded-full text-sm transition",
-                              isSelected
-                                ? "bg-emerald-400/90 text-slate-950"
-                                : "text-slate-200 hover:bg-white/10",
-                              !inMonth && "text-slate-600",
-                              isToday(day) && !isSelected && "border border-emerald-400/40"
-                            )}
-                          >
-                            {format(day, "d")}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                    <X className="h-4 w-4" aria-hidden />
+                  </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setDueAt(undefined)}
-                  disabled={!dueAt}
-                  className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:opacity-40"
-                >
-                  <X className="h-4 w-4" aria-hidden />
-                  {t("promises.new.actions.clearDate")}
-                </button>
               </div>
             </div>
           </div>
