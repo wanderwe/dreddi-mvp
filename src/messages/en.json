@@ -301,20 +301,35 @@
     }
   },
   "publicProfile": {
-    "reputation": "Reputation",
     "confirmed": "Confirmed",
     "disputed": "Disputed",
-    "lastActivity": "Last activity",
-    "recentDeals": "Recent deals",
-    "emptyDeals": "No public deals yet",
     "loading": "Loading profile…",
-    "noActivity": "No activity yet",
     "recentDealsMeta": "Finalized {date}",
-    "status": {
-      "strong": "Strong standing",
-      "steady": "Steady standing",
-      "risk": "At risk"
+    "sections": {
+      "responsibilityStatus": "Public responsibility status",
+      "whatsHappening": "What’s happening now",
+      "trackRecord": "Public track record",
+      "recentConfirmations": "Recent public confirmations"
     },
+    "status": {
+      "active": "Active",
+      "pendingAcceptance": "Pending acceptance",
+      "overdue": "Overdue",
+      "inProgress": "In progress",
+      "awaitingOutcome": "Awaiting outcome",
+      "awaitingAcceptance": "Awaiting acceptance"
+    },
+    "meta": {
+      "due": "Due {date}",
+      "overdue": "Overdue since {date}",
+      "noDue": "No due date"
+    },
+    "emptyStatus": "No active public responsibilities.",
+    "emptyInProgress": "No in-progress responsibilities.",
+    "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
+    "emptyOverdue": "No overdue responsibilities.",
+    "emptyHistory": "No public history yet.",
+    "emptyRecent": "No public confirmations yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
