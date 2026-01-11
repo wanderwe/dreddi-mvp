@@ -97,6 +97,14 @@
         "awaitingOthers": "Awaiting others"
       }
     },
+    "profile": {
+      "eyebrow": "PROFILE",
+      "publicTitle": "Public profile",
+      "publicHelper": "If off, your profile isn’t accessible publicly.",
+      "publicOn": "Public",
+      "publicOff": "Private",
+      "loading": "Loading…"
+    },
     "empty": {
       "title": "Nothing here yet",
       "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
@@ -171,6 +179,14 @@
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
+      "publicVisibility": {
+        "title": "Public visibility (confirmed only)",
+        "helper": "This deal will appear on your public profile only if both sides agree.",
+        "creatorConsent": "I agree to show this confirmed deal publicly.",
+        "counterpartyConsent": "I agree to show this confirmed deal publicly.",
+        "confirmedOnly": "Only confirmed responsibilities can be shown publicly.",
+        "awaitingAcceptance": "The other side must accept the deal before it can be made public."
+      },
       "errors": {
         "unsupportedStatus": "Deal has an unsupported status value",
         "updateStatus": "Could not update status",
@@ -333,6 +349,7 @@
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
+      "private": "Profile is private.",
       "notFound": "Profile not found."
     }
   }
