@@ -204,30 +204,30 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           {loading && (
             <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
           )}
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">
-              {t("profileSettings.linkLabel")}
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.linkLabel")}
+              </div>
+              <p className="text-xs text-slate-300">
+                {t("profileSettings.linkDescription")}
+              </p>
             </div>
-            <p className="text-xs text-slate-300">
-              {t("profileSettings.linkDescription")}
-            </p>
+            {isPublic && publicProfileLink ? (
+              <a
+                href={publicProfileLink}
+                className="mt-3 inline-flex items-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100 transition hover:border-emerald-300/70 hover:text-white"
+                rel="noreferrer"
+                target="_blank"
+              >
+                {publicProfileLink}
+              </a>
+            ) : (
+              <p className="mt-3 text-xs text-slate-400">
+                {t("profileSettings.linkHint")}
+              </p>
+            )}
           </div>
-          {isPublic && publicProfileLink ? (
-            <a
-              href={publicProfileLink}
-              className="mt-3 inline-flex items-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-100 transition hover:border-emerald-300/70 hover:text-white"
-              rel="noreferrer"
-              target="_blank"
-            >
-              {publicProfileLink}
-            </a>
-          ) : (
-            <p className="mt-3 text-xs text-slate-400">
-              {t("profileSettings.linkHint")}
-            </p>
-          )}
         </div>
 
         {error && (
