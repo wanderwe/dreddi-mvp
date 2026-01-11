@@ -272,7 +272,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="flex flex-col">
+        <SheetContent className="flex max-h-screen flex-col gap-4 overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
