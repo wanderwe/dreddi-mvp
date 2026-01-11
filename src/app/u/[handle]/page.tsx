@@ -24,7 +24,6 @@ type PublicPromiseRow = {
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
-  accepted_by_second_side: boolean | null;
 };
 
 type PublicPromise = {
@@ -34,7 +33,6 @@ type PublicPromise = {
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
-  accepted_by_second_side: boolean;
 };
 
 const statusTones: Record<PromiseStatus, string> = {
@@ -105,7 +103,7 @@ export default function PublicProfilePage() {
       if (!active) return;
 
       if (profileErr || !profileRow) {
-        setError(profileErr?.message ?? t("publicProfile.errors.notFound"));
+        setError(profileErr?.message ?? t("publicProfile.errors.private"));
         setLoading(false);
         return;
       }
@@ -136,7 +134,6 @@ export default function PublicProfilePage() {
               due_at: row.due_at,
               confirmed_at: row.confirmed_at,
               disputed_at: row.disputed_at,
-              accepted_by_second_side: Boolean(row.accepted_by_second_side),
             },
           ];
         });
@@ -174,9 +171,7 @@ export default function PublicProfilePage() {
     () =>
       promises.filter(
         (promise) =>
-          promise.status === "active" &&
-          !promise.accepted_by_second_side &&
-          !isOverdue(promise.due_at)
+          promise.status === "active" && !isOverdue(promise.due_at)
       ),
     [promises]
   );
@@ -185,8 +180,7 @@ export default function PublicProfilePage() {
     () =>
       promises.filter(
         (promise) =>
-          ((promise.status === "active" && promise.accepted_by_second_side) ||
-            promise.status === "completed_by_promisor") &&
+          (promise.status === "active" || promise.status === "completed_by_promisor") &&
           !isOverdue(promise.due_at)
       ),
     [promises]
