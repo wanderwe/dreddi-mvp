@@ -85,6 +85,25 @@
     "getStarted": "Get started",
     "logout": "Log out"
   },
+  "profileSettings": {
+    "sectionLabel": "PROFILE",
+    "title": "Profile settings",
+    "buttonLabel": "Profile",
+    "close": "Close",
+    "publicLabel": "Public profile",
+    "publicDescription": "If disabled, your profile isn't publicly visible",
+    "toggleLabel": "Toggle public profile",
+    "status": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "loading": "Loading profile…",
+    "errors": {
+      "unavailable": "Authentication is unavailable in this preview",
+      "notAuthenticated": "Not authenticated",
+      "saveFailed": "Failed to update profile"
+    }
+  },
   "promises": {
     "overview": {
       "eyebrow": "DEALS",

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
 import {
   Sheet,
   SheetClose,
@@ -75,6 +76,14 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
             <div className="w-fit">
               <LocaleSwitcher />
             </div>
+            {isAuthenticated && (
+              <div className="mt-2 border-t border-white/10 pt-4">
+                <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                  {t("profileSettings.sectionLabel")}
+                </div>
+                <ProfileSettingsPanel showTitle={false} className="mt-3" />
+              </div>
+            )}
             {isAuthenticated && onLogout && (
               <SheetClose asChild>
                 <button
