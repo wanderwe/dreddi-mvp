@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { useT } from "@/lib/i18n/I18nProvider";
 
 type HeaderActionsProps = {
@@ -42,6 +43,7 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
           </Link>
         </>
       )}
+      {isAuthenticated && <ProfileSettingsMenu />}
       <div className="shrink-0">
         <LocaleSwitcher />
       </div>

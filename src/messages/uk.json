@@ -85,6 +85,25 @@
     "getStarted": "Почати",
     "logout": "Вийти"
   },
+  "profileSettings": {
+    "sectionLabel": "ПРОФІЛЬ",
+    "title": "Налаштування профілю",
+    "buttonLabel": "Профіль",
+    "close": "Закрити",
+    "publicLabel": "Публічний профіль",
+    "publicDescription": "Якщо вимкнено, профіль недоступний публічно",
+    "toggleLabel": "Перемкнути публічність профілю",
+    "status": {
+      "public": "Публічний",
+      "private": "Приватний"
+    },
+    "loading": "Завантаження профілю…",
+    "errors": {
+      "unavailable": "Автентифікація недоступна в цьому превʼю",
+      "notAuthenticated": "Не автентифіковано",
+      "saveFailed": "Не вдалося оновити профіль"
+    }
+  },
   "promises": {
     "overview": {
       "eyebrow": "УГОДИ",
