@@ -337,7 +337,11 @@
       "emailPlaceholder": "you@example.com",
       "sendLink": "Надіслати magic link",
       "sending": "Надсилання...",
-      "sent": "Лінк надіслано ✅ Перевірте пошту (і Spam).",
+      "sentLabel": "Надіслано",
+      "successTitle": "Лінк надіслано",
+      "successInstruction": "Перевірте пошту (і Spam) за лінком.",
+      "resendLink": "Надіслати ще раз",
+      "cooldown": "Повторно можна надіслати через {seconds}с",
       "back": "Назад на головну",
       "secure": "Безпечний доступ без пароля"
     }

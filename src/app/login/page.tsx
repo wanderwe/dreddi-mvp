@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -14,6 +14,26 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const cooldownActive = cooldownSeconds > 0;
+  const cooldownTotalSeconds = 8;
+
+  useEffect(() => {
+    if (!cooldownUntil) {
+      setCooldownSeconds(0);
+      return;
+    }
+
+    const update = () => {
+      const remaining = Math.ceil((cooldownUntil - Date.now()) / 1000);
+      setCooldownSeconds(Math.max(0, remaining));
+    };
+
+    update();
+    const interval = window.setInterval(update, 500);
+    return () => window.clearInterval(interval);
+  }, [cooldownUntil]);
 
   async function sendMagicLink() {
     setBusy(true);
@@ -39,8 +59,16 @@ export default function LoginPage() {
 
     setBusy(false);
 
-    if (error) setError(error.message);
-    else setSent(true);
+    if (error) {
+      setError(error.message);
+    } else {
+      setSent(true);
+      setCooldownUntil(Date.now() + cooldownTotalSeconds * 1000);
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement) {
+        activeElement.blur();
+      }
+    }
   }
 
   return (
@@ -76,17 +104,42 @@ export default function LoginPage() {
 
             <button
               onClick={sendMagicLink}
-              disabled={busy || !email}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
+              disabled={busy || !email || cooldownActive}
+              className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold transition ${
+                sent
+                  ? "border border-white/10 bg-white/5 text-slate-100 shadow-inner shadow-black/30 disabled:opacity-70"
+                  : "bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30 hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+              } disabled:translate-y-0`}
             >
-              {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
+              {busy
+                ? t("auth.login.sending")
+                : sent
+                  ? cooldownActive
+                    ? t("auth.login.sentLabel")
+                    : t("auth.login.resendLink")
+                  : t("auth.login.sendLink")}
+              {sent && cooldownActive && <span aria-hidden>✓</span>}
             </button>
 
+            {sent && cooldownActive && (
+              <p className="text-xs text-slate-400">
+                {t("auth.login.cooldown", { seconds: cooldownSeconds })}
+              </p>
+            )}
+
             {sent && (
-              <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-200 shadow-inner shadow-black/30">
-                <span className="block border-l-2 border-emerald-400/50 pl-3">
-                  {t("auth.login.sent")}
-                </span>
+              <div className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-100 shadow-inner shadow-black/30">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 text-emerald-300">✓</span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      {t("auth.login.successTitle")}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-300">
+                      {t("auth.login.successInstruction")}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 

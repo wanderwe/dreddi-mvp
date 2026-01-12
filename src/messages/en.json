@@ -337,7 +337,11 @@
       "emailPlaceholder": "you@example.com",
       "sendLink": "Send magic link",
       "sending": "Sending...",
-      "sent": "Link sent ✅ Check your inbox (and Spam).",
+      "sentLabel": "Sent",
+      "successTitle": "Link sent",
+      "successInstruction": "Check your email (and Spam) for the link.",
+      "resendLink": "Resend link",
+      "cooldown": "You can resend in {seconds}s",
       "back": "Back to landing",
       "secure": "Secure, zero-password access"
     }
