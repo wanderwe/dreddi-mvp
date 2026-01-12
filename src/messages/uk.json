@@ -346,12 +346,11 @@
     "confirmed": "Підтверджено",
     "disputed": "Оскаржено",
     "loading": "Завантаження профілю…",
-    "recentDealsMeta": "Фіналізовано {date}",
+    "reputationNote": "Репутація враховує всі підтверджені результати. Деталі видно лише для публічних угод.",
     "sections": {
-      "responsibilityStatus": "Статус публічних відповідальностей",
-      "whatsHappening": "Що відбувається зараз",
-      "trackRecord": "Публічна історія",
-      "recentConfirmations": "Останні публічні підтвердження"
+      "responsibilityStatus": "Статус відповідальностей",
+      "trackRecord": "Історія",
+      "publicDeals": "Публічні угоди"
     },
     "status": {
       "active": "Активні",
@@ -366,12 +365,12 @@
       "overdue": "Прострочено з {date}",
       "noDue": "Без терміну"
     },
-    "emptyStatus": "Немає активних публічних відповідальностей.",
+    "emptyStatus": "Немає активних відповідальностей.",
     "emptyInProgress": "Немає активних відповідальностей.",
     "emptyAwaitingAcceptance": "Нічого не очікує прийняття.",
     "emptyOverdue": "Немає прострочених відповідальностей.",
-    "emptyHistory": "Поки немає публічної історії.",
-    "emptyRecent": "Поки немає публічних підтверджень.",
+    "emptyHistory": "Поки немає історії.",
+    "emptyPublicDeals": "Публічних угод ще немає.",
     "errors": {
       "supabase": "Supabase не налаштовано.",
       "missing": "Відсутній хендл профілю.",
