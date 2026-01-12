@@ -1,10 +1,11 @@
--- Public deal request + mutual opt-in visibility
+-- Fix public visibility backfill and public stats definitions.
+-- Safe to run even if the earlier migration failed partway.
 
 ALTER TABLE promises
   ADD COLUMN IF NOT EXISTS public_opt_in_promisor boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS public_opt_in_promisee boolean NOT NULL DEFAULT false;
 
--- Backfill from legacy mutual visibility flags
+-- Backfill canonical visibility from legacy flags.
 UPDATE promises
 SET is_public = true
 WHERE is_public = false

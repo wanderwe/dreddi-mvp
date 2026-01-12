@@ -222,7 +222,7 @@
       },
       "publicRequest": {
         "label": "Public deal",
-        "helper": "The other side will confirm public visibility when accepting"
+        "helper": "Public deals appear on your public profile once confirmed."
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact"
@@ -253,14 +253,12 @@
     "processing": "Processing...",
     "accept": "Accept deal",
     "publicProposal": {
-      "title": "This deal is proposed as PUBLIC.",
+      "title": "This deal is PUBLIC.",
       "body": "If you accept, the deal details will be visible on public profiles."
     },
     "publicModal": {
       "title": "Accept public deal?",
-      "body": "This deal is proposed as public. If you proceed, your acceptance will make its details visible publicly (after confirmation).",
-      "acceptPublic": "Accept as public",
-      "acceptPrivate": "Accept as private",
+      "body": "This deal is public. If you proceed, its details will be visible on public profiles after confirmation.",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
