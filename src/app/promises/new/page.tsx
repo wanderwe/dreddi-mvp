@@ -43,7 +43,7 @@ export default function NewPromisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
-  const [publicRequested, setPublicRequested] = useState(false);
+  const [isPublicDeal, setIsPublicDeal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -272,7 +272,7 @@ export default function NewPromisePage() {
 
   useEffect(() => {
     if (!isPublicProfile) {
-      setPublicRequested(false);
+      setIsPublicDeal(false);
     }
   }, [isPublicProfile]);
 
@@ -311,11 +311,9 @@ export default function NewPromisePage() {
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     const publicPayload =
-      publicRequested && isPublicProfile
+      isPublicDeal && isPublicProfile
         ? {
-            public_requested: true,
-            public_opt_in_promisor: executor === "me",
-            public_opt_in_promisee: executor === "other",
+            is_public: true,
           }
         : {};
 
@@ -512,18 +510,18 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     role="switch"
-                    aria-checked={publicRequested}
+                    aria-checked={isPublicDeal}
                     aria-label={t("promises.new.publicRequest.label")}
-                    onClick={() => setPublicRequested((prev) => !prev)}
+                    onClick={() => setIsPublicDeal((prev) => !prev)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                      publicRequested
+                      isPublicDeal
                         ? "border-emerald-300/50 bg-emerald-400/70"
                         : "border-white/20 bg-white/10"
                     } hover:border-emerald-300/60`}
                   >
                     <span
                       className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        publicRequested ? "translate-x-5" : "translate-x-1"
+                        isPublicDeal ? "translate-x-5" : "translate-x-1"
                       }`}
                     />
                   </button>
