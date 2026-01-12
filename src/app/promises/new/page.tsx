@@ -500,22 +500,34 @@ export default function NewPromisePage() {
 
             {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="mt-1 h-4 w-4 accent-emerald-400"
-                    checked={publicRequested}
-                    onChange={(event) => setPublicRequested(event.target.checked)}
-                  />
+                <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <span className="font-semibold text-white">
+                    <div className="text-sm font-semibold text-white">
                       {t("promises.new.publicRequest.label")}
-                    </span>
+                    </div>
                     <p className="text-xs text-slate-400">
                       {t("promises.new.publicRequest.helper")}
                     </p>
                   </div>
-                </label>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={publicRequested}
+                    aria-label={t("promises.new.publicRequest.label")}
+                    onClick={() => setPublicRequested((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                      publicRequested
+                        ? "border-emerald-300/50 bg-emerald-400/70"
+                        : "border-white/20 bg-white/10"
+                    } hover:border-emerald-300/60`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                        publicRequested ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
             )}
           </div>
