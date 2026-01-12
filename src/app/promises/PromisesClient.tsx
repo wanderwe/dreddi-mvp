@@ -7,6 +7,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 
 type PromiseRow = {
   id: string;
@@ -116,13 +117,9 @@ export default function PromisesClient() {
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
           .map((row) => {
             const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
-            const isPromisor =
-              (r.promisor_id ? r.promisor_id === user.id : false) ||
-              (!r.promisee_id && r.creator_id === user.id);
-            const isPromisee =
-              (r.promisee_id ? r.promisee_id === user.id : false) ||
-              (!r.promisee_id && r.counterparty_id === user.id);
-            const role: PromiseRole = isPromisor ? "promisor" : "counterparty";
+            const executorId = resolveExecutorId(r);
+            const role: PromiseRole =
+              executorId && executorId === user.id ? "promisor" : "counterparty";
             return {
               ...r,
               status: r.status as PromiseStatus,
