@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { HeaderActions } from "@/app/components/HeaderActions";
+import { MobileMenu } from "@/app/components/MobileMenu";
 import { useLocale } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
@@ -51,6 +53,16 @@ export default function Home() {
           ],
           primaryCta: "Створити угоду",
           secondaryCta: "Переглянути публічні профілі",
+          reputationTitle: "Репутація в реальному часі",
+          reputationSubtitle:
+            "Кожна домовленість створює слід, який бачать обидві сторони.",
+          reputationStats: [
+            { label: "Угод підтверджено", value: "128" },
+            { label: "Активних зобовʼязань", value: "24" },
+            { label: "Вирішених спорів", value: "6" },
+          ],
+          reputationNote:
+            "Видимість репутації вмикається одразу після прийняття домовленості.",
         }
       : {
           name: "Dreddi knows",
@@ -63,15 +75,31 @@ export default function Home() {
           ],
           primaryCta: "Create deal",
           secondaryCta: "View public profiles",
+          reputationTitle: "Reputation, visible instantly",
+          reputationSubtitle:
+            "Every accepted agreement leaves a trace both parties can see.",
+          reputationStats: [
+            { label: "Agreements confirmed", value: "128" },
+            { label: "Active commitments", value: "24" },
+            { label: "Disputes resolved", value: "6" },
+          ],
+          reputationNote:
+            "Reputation visibility starts right after an agreement is accepted.",
         };
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <header className="absolute inset-x-0 top-0 z-10">
-        <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-6">
+      <header className="relative z-10 border-b border-white/10 bg-black/30/70 backdrop-blur">
+        <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
           <Link href="/" className="flex min-w-0 items-center text-white">
             <DreddiLogo
               accentClassName="text-xs"
@@ -80,11 +108,17 @@ export default function Home() {
               titleClassName="truncate text-lg"
             />
           </Link>
+          <HeaderActions
+            className="hidden md:flex"
+            isAuthenticated={isAuthenticated}
+            onLogout={supabase ? handleLogout : undefined}
+          />
+          <MobileMenu isAuthenticated={isAuthenticated} onLogout={supabase ? handleLogout : undefined} />
         </div>
       </header>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-6 md:gap-8">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-12 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-16">
+        <div className="flex flex-1 flex-col gap-6 md:gap-8">
           <div className="order-2 space-y-4">
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
@@ -117,6 +151,28 @@ export default function Home() {
             >
               {content.secondaryCta}
             </Link>
+          </div>
+        </div>
+        <div className="flex w-full flex-col gap-4 md:w-[360px]">
+          <div className="glass-panel rounded-3xl p-6 sm:p-7">
+            <div className="space-y-3">
+              <div className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-200">
+                {content.reputationTitle}
+              </div>
+              <p className="text-lg font-semibold text-white">{content.reputationSubtitle}</p>
+            </div>
+            <div className="mt-6 space-y-4">
+              {content.reputationStats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
+                >
+                  <span className="text-slate-300">{stat.label}</span>
+                  <span className="text-base font-semibold text-white">{stat.value}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-sm text-slate-300">{content.reputationNote}</p>
           </div>
         </div>
       </div>
