@@ -11,23 +11,23 @@ SELECT
   profiles.handle,
   profiles.display_name,
   profiles.avatar_url,
-  COALESCE(stats.confirmed_count, 0) AS confirmed_count,
-  COALESCE(stats.disputed_count, 0) AS disputed_count,
-  COALESCE(stats.active_count, 0) AS active_count,
-  COALESCE(stats.pending_acceptance_count, 0) AS pending_acceptance_count,
-  COALESCE(stats.overdue_count, 0) AS overdue_count,
+  COALESCE(stats.confirmed_count, 0::bigint) AS confirmed_count,
+  COALESCE(stats.disputed_count, 0::bigint) AS disputed_count,
+  COALESCE(stats.active_count, 0::bigint) AS active_count,
+  COALESCE(stats.pending_acceptance_count, 0::bigint) AS pending_acceptance_count,
+  COALESCE(stats.overdue_count, 0::bigint) AS overdue_count,
   stats.last_activity_at
 FROM profiles
 LEFT JOIN (
   SELECT
     creator_id,
-    COUNT(*) FILTER (WHERE status = 'confirmed') AS confirmed_count,
-    COUNT(*) FILTER (WHERE status = 'disputed') AS disputed_count,
+    COUNT(*) FILTER (WHERE status = 'confirmed')::bigint AS confirmed_count,
+    COUNT(*) FILTER (WHERE status = 'disputed')::bigint AS disputed_count,
     COUNT(*) FILTER (
       WHERE status IN ('active', 'completed_by_promisor')
         AND due_at IS NOT NULL
         AND due_at < NOW()
-    ) AS overdue_count,
+    )::bigint AS overdue_count,
     COUNT(*) FILTER (
       WHERE status = 'active'
         AND (due_at IS NULL OR due_at >= NOW())
@@ -35,7 +35,7 @@ LEFT JOIN (
           counterparty_id IS NOT NULL
           OR (promisor_id IS NOT NULL AND promisee_id IS NOT NULL)
         )
-    ) AS pending_acceptance_count,
+    )::bigint AS pending_acceptance_count,
     COUNT(*) FILTER (
       WHERE (due_at IS NULL OR due_at >= NOW())
         AND (
@@ -48,7 +48,7 @@ LEFT JOIN (
             )
           )
         )
-    ) AS active_count,
+    )::bigint AS active_count,
     MAX(COALESCE(confirmed_at, disputed_at, created_at)) AS last_activity_at
   FROM promises
   WHERE is_public = true
