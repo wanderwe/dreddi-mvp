@@ -60,6 +60,8 @@ export default function PublicProfilePage() {
   const [promises, setPromises] = useState<PublicPromise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const formatDateShort = useMemo(
     () =>
@@ -150,12 +152,34 @@ export default function PublicProfilePage() {
     };
   }, [handle, t]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const activeCount = profile?.active_count ?? 0;
   const pendingAcceptanceCount = profile?.pending_acceptance_count ?? 0;
   const overdueCount = profile?.overdue_count ?? 0;
+  const publicProfilePath = useMemo(
+    () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
+    [handle]
+  );
+  const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
+
+  const handleCopyLink = async () => {
+    if (!publicProfileUrl) return;
+    try {
+      await navigator.clipboard.writeText(publicProfileUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const overdueItems = useMemo(
     () =>
@@ -223,25 +247,34 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                  {profile?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={profile.avatar_url}
-                      alt={displayName}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xl font-semibold text-white/80">
-                      {displayName.slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    {profile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={profile.avatar_url}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xl font-semibold text-white/80">
+                        {displayName.slice(0, 1).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold">{displayName}</h1>
+                    <p className="text-sm text-white/60">@{profile?.handle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-semibold">{displayName}</h1>
-                  <p className="text-sm text-white/60">@{profile?.handle}</p>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                </button>
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">

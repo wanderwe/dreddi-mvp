@@ -298,7 +298,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="flex flex-col">
+        <SheetContent className="flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-auto lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
