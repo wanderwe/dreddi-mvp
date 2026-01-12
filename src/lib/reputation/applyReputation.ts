@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
-import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { calcLatePenalty, calcOnTime, calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 
 export type PromiseRecord = {
   id: string;
@@ -45,7 +46,6 @@ function computeDeltas(promise: PromiseRecord): EventInput[] {
   const events: EventInput[] = [];
   const executorId = resolveExecutorId(promise);
   if (!executorId) return events;
-  const counterpartyId = resolveCounterpartyId(promise);
   const baseMeta = {
     promise_title: promise.title,
     completed_at: promise.completed_at,
@@ -54,49 +54,36 @@ function computeDeltas(promise: PromiseRecord): EventInput[] {
     due_at: promise.due_at,
   };
 
-  const completedAt = promise.completed_at ? new Date(promise.completed_at) : null;
-  const dueAt = promise.due_at ? new Date(promise.due_at) : null;
-  const onTime = Boolean(completedAt && dueAt && completedAt.getTime() <= dueAt.getTime());
-  const late = Boolean(completedAt && dueAt && completedAt.getTime() > dueAt.getTime());
+  const impactInput = {
+    status: promise.status,
+    due_at: promise.due_at,
+    completed_at: promise.completed_at,
+  };
+  const onTime = calcOnTime(impactInput);
+  const late = calcLatePenalty(impactInput);
 
   if (promise.status === "confirmed") {
+    const executorDelta = calc_score_impact(impactInput);
     events.push({
       user_id: executorId,
       promise_id: promise.id,
       kind: "promise_confirmed",
-      delta: onTime ? 4 : 3,
+      delta: executorDelta,
       meta: { ...baseMeta, on_time: onTime },
     });
 
-    if (counterpartyId) {
-      events.push({
-        user_id: counterpartyId,
-        promise_id: promise.id,
-        kind: "promise_confirmed",
-        delta: 1,
-        meta: { ...baseMeta, role: "counterparty" },
-      });
-    }
   }
 
   if (promise.status === "disputed") {
+    const executorDelta = calc_score_impact(impactInput);
     events.push({
       user_id: executorId,
       promise_id: promise.id,
       kind: "promise_disputed",
-      delta: late ? -7 : -6,
+      delta: executorDelta,
       meta: { ...baseMeta, late_penalty: late },
     });
 
-    if (counterpartyId) {
-      events.push({
-        user_id: counterpartyId,
-        promise_id: promise.id,
-        kind: "promise_disputed",
-        delta: 1,
-        meta: { ...baseMeta, role: "counterparty" },
-      });
-    }
   }
 
   return events;

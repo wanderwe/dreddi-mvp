@@ -8,6 +8,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 
 type PromiseRow = {
   id: string;
@@ -328,22 +329,13 @@ export default function PromisesClient() {
                 const impact = (() => {
                   if (!isPromisor) return null;
 
-                  if (p.status === "confirmed") {
-                    const onTime = Boolean(
-                      p.due_at &&
-                        p.completed_at &&
-                        new Date(p.completed_at).getTime() <= new Date(p.due_at).getTime()
-                    );
-                    return `+${onTime ? 4 : 3}`;
-                  }
-
-                  if (p.status === "disputed") {
-                    const late = Boolean(
-                      p.due_at &&
-                        p.completed_at &&
-                        new Date(p.completed_at).getTime() > new Date(p.due_at).getTime()
-                    );
-                    return late ? "-7" : "-6";
+                  if (p.status === "confirmed" || p.status === "disputed") {
+                    const delta = calc_score_impact({
+                      status: p.status,
+                      due_at: p.due_at,
+                      completed_at: p.completed_at,
+                    });
+                    return delta >= 0 ? `+${delta}` : `${delta}`;
                   }
 
                   return null;
