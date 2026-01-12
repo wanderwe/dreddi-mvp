@@ -9,7 +9,8 @@
     "highlights": {
       "promisesTracked": "Deals tracked",
       "reputationIntact": "Reputation intact",
-      "dreddiKnows": "Dreddi knows"
+      "dreddiKnows": "Dreddi knows",
+      "dreddiKnowsTooltip": "The system records what was promised, accepted, and delivered."
     },
     "showcase": {
       "0": {
@@ -381,6 +382,8 @@
   },
   "publicDirectory": {
     "title": "Public profiles",
+    "reputationScore": "Reputation score",
+    "viewProfile": "View profile",
     "loading": "Loading profiles…",
     "empty": "No public profiles yet.",
     "errors": {

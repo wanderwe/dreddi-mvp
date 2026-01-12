@@ -9,6 +9,7 @@ type PublicProfileDirectoryRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  reputation_score: number | null;
   confirmed_count: number | null;
   disputed_count: number | null;
 };
@@ -21,20 +22,23 @@ export default function PublicProfilesDirectoryPage() {
 
   useEffect(() => {
     let active = true;
+    let intervalId: number | null = null;
 
-    const loadProfiles = async () => {
+    const loadProfiles = async (showLoading = false) => {
       if (!supabase) {
         setError(t("publicDirectory.errors.supabase"));
         setLoading(false);
         return;
       }
 
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       setError(null);
 
       const { data, error: listError } = await supabase
         .from("public_profile_stats")
-        .select("handle,display_name,avatar_url,confirmed_count,disputed_count")
+        .select("handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count")
         .order("confirmed_count", { ascending: false })
         .order("handle", { ascending: true });
 
@@ -50,10 +54,16 @@ export default function PublicProfilesDirectoryPage() {
       setLoading(false);
     };
 
-    void loadProfiles();
+    void loadProfiles(true);
+    intervalId = window.setInterval(() => {
+      void loadProfiles();
+    }, 30000);
 
     return () => {
       active = false;
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
     };
   }, [t]);
 
@@ -61,13 +71,13 @@ export default function PublicProfilesDirectoryPage() {
     () =>
       profiles.map((profile) => {
         const displayName = profile.display_name?.trim() || profile.handle;
+        const reputationScore = profile.reputation_score ?? 0;
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
 
         return (
-          <Link
+          <div
             key={profile.handle}
-            href={`/u/${encodeURIComponent(profile.handle)}`}
             className="group flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-5 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
           >
             <div className="flex items-center gap-4">
@@ -85,20 +95,40 @@ export default function PublicProfilesDirectoryPage() {
                   </span>
                 )}
               </div>
-              <div>
-                <div className="text-lg font-semibold text-white">{displayName}</div>
+              <div className="flex-1">
+                <Link
+                  href={`/u/${encodeURIComponent(profile.handle)}`}
+                  className="text-lg font-semibold text-white transition group-hover:text-emerald-100"
+                >
+                  {displayName}
+                </Link>
                 <div className="text-sm text-white/60">@{profile.handle}</div>
               </div>
+              <div className="text-right">
+                <div className="text-xs text-white/60">
+                  {t("publicDirectory.reputationScore")}
+                </div>
+                <div className="text-lg font-semibold text-emerald-200">
+                  {reputationScore}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 text-xs text-white/70">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
               <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-1">
                 {t("publicProfile.confirmed")}: {confirmedCount}
               </span>
               <span className="rounded-full border border-red-300/30 bg-red-500/10 px-2 py-1">
                 {t("publicProfile.disputed")}: {disputedCount}
               </span>
+              <Link
+                href={`/u/${encodeURIComponent(profile.handle)}`}
+                className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+              >
+                {t("publicDirectory.viewProfile")}
+                <span aria-hidden>→</span>
+              </Link>
             </div>
-          </Link>
+          </div>
         );
       }),
     [profiles, t]

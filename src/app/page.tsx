@@ -66,6 +66,9 @@ export default function Home() {
       text: t("home.highlights.dreddiKnows"),
     },
   ];
+  const highlightTooltips: Partial<Record<string, string>> = {
+    dreddiKnows: t("home.highlights.dreddiKnowsTooltip"),
+  };
   const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
 
   const demoDeals: DealRow[] =
@@ -403,6 +406,12 @@ export default function Home() {
               <div
                 key={item.key}
                 className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
+                title={
+                  highlightTooltips[item.key] &&
+                  !highlightTooltips[item.key]?.startsWith("⟦missing:")
+                    ? highlightTooltips[item.key]
+                    : undefined
+                }
               >
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
                   ✓
