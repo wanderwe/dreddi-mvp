@@ -6,6 +6,11 @@
     "getStarted": "Get started",
     "logout": "Log out"
   },
+  "landing": {
+    "hero": {
+      "brandSuffix": "knows"
+    }
+  },
   "profileSettings": {
     "sectionLabel": "PROFILE",
     "title": "Profile settings",

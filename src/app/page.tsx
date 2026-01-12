@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { MobileMenu } from "@/app/components/MobileMenu";
-import { useLocale } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -42,6 +42,7 @@ type ReputationResponse = {
 
 export default function Home() {
   const locale = useLocale();
+  const t = useT();
   const copy = getLandingCopy(locale);
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -333,7 +334,7 @@ export default function Home() {
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
                 <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-                <span className="text-white">knows</span>
+                <span className="text-white">{t("landing.hero.brandSuffix")}</span>
               </div>
             </div>
             <p className="max-w-xl text-xl font-semibold text-white">
