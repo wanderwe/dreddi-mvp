@@ -1,23 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { isPromiseStatus } from "@/lib/promiseStatus";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 
-type PromiseRecord = {
-  id: string;
-  title: string;
+type PromiseRecord = PromiseRowMin & {
   details: string | null;
-  status: PromiseStatus;
-  due_at: string | null;
-  creator_id: string;
-  counterparty_id: string | null;
   counterparty_accepted_at: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-  completed_at: string | null;
-  confirmed_at: string | null;
-  disputed_at: string | null;
-  disputed_code: string | null;
-  dispute_reason: string | null;
 };
 
 export const DISPUTE_CODES = ["not_completed", "partial", "late", "other"] as const;

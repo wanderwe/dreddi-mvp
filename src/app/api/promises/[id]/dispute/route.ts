@@ -14,6 +14,7 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -43,7 +44,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const admin = getAdminClient();
     const disputedAt = new Date().toISOString();
-    const { error } = await admin
+    const { data: updatedPromise, error } = await admin
       .from("promises")
       .update({
         status: "disputed",
@@ -51,22 +52,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         disputed_code: code,
         dispute_reason: reason ?? null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select(
+        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+      )
+      .single<PromiseRowMin>();
 
-    if (error) {
+    if (error || !updatedPromise) {
       return NextResponse.json(
-        { error: "Could not update promise", detail: error.message },
+        { error: "Could not update promise", detail: error?.message },
         { status: 500 }
       );
     }
-
-    const updatedPromise = {
-      ...promise,
-      status: "disputed",
-      disputed_at: disputedAt,
-      disputed_code: code,
-      dispute_reason: reason ?? null,
-    };
 
     try {
       await applyReputationForPromiseFinalization(admin, updatedPromise);

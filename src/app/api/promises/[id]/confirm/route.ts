@@ -9,6 +9,7 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -37,8 +38,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         confirmed_at: confirmedAt,
       })
       .eq("id", id)
-      .select("*")
-      .single();
+      .select(
+        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+      )
+      .single<PromiseRowMin>();
 
     if (error || !updatedPromise) {
       return NextResponse.json(
