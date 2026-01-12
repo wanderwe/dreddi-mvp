@@ -23,9 +23,7 @@ type PromiseRow = {
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
-  public_requested: boolean;
-  public_opt_in_promisor: boolean;
-  public_opt_in_promisee: boolean;
+  is_public: boolean;
 };
 
 function Card({
@@ -193,7 +191,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id,public_requested,public_opt_in_promisor,public_opt_in_promisee"
+        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,is_public"
       )
       .eq("id", id)
       .single();
@@ -330,26 +328,8 @@ export default function PromisePage() {
   const isInviteAccepted = Boolean(p?.counterparty_accepted_at ?? (p?.promisor_id && p?.promisee_id));
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const publicOptInCount = p
-    ? Number(p.public_opt_in_promisor) + Number(p.public_opt_in_promisee)
-    : 0;
-  const isPublicDeal = Boolean(
-    p &&
-      p.public_requested &&
-      p.status === "confirmed" &&
-      p.public_opt_in_promisor &&
-      p.public_opt_in_promisee
-  );
-  const showPublicStatus = Boolean(p && (p.public_requested || isPublicDeal));
-  const publicStatusText = p
-    ? isPublicDeal
-      ? t("promises.detail.publicStatus.public")
-      : publicOptInCount === 2 && p.status !== "confirmed"
-      ? t("promises.detail.publicStatus.waitingConfirmation")
-      : publicOptInCount >= 1
-      ? t("promises.detail.publicStatus.waitingOtherSide")
-      : t("promises.detail.publicStatus.privateAfterProposal")
-    : "";
+  const showPublicStatus = Boolean(p?.is_public);
+  const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -383,7 +363,7 @@ export default function PromisePage() {
                   <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
                     {t("promises.detail.publicStatus.label")}
                   </span>
-                  <span className={isPublicDeal ? "text-emerald-200" : "text-neutral-200"}>
+                  <span className="text-emerald-200">
                     {publicStatusText}
                   </span>
                 </div>

@@ -43,7 +43,7 @@ export default function NewPromisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
-  const [publicRequested, setPublicRequested] = useState(false);
+  const [isPublicDeal, setIsPublicDeal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -272,7 +272,7 @@ export default function NewPromisePage() {
 
   useEffect(() => {
     if (!isPublicProfile) {
-      setPublicRequested(false);
+      setIsPublicDeal(false);
     }
   }, [isPublicProfile]);
 
@@ -307,26 +307,32 @@ export default function NewPromisePage() {
       return;
     }
 
-    const publicRequestedPayload = Boolean(publicRequested && isPublicProfile);
-    const payload = {
-      title: title.trim(),
-      details: details.trim() || null,
-      counterpartyContact,
-      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-      executor,
-      publicRequested: publicRequestedPayload,
-      publicOptInPromisor: publicRequestedPayload && executor === "me",
-      publicOptInPromisee: publicRequestedPayload && executor === "other",
-    };
+    const inviteToken =
+      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-    const res = await fetch("/api/promises/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    const publicPayload =
+      isPublicDeal && isPublicProfile
+        ? {
+            is_public: true,
+          }
+        : {};
+
+    const { data: insertData, error: insertError } = await supabase
+      .from("promises")
+      .insert({
+        creator_id: user.id,
+        promisor_id: executor === "me" ? user.id : null,
+        promisee_id: executor === "other" ? user.id : null,
+        title: title.trim(),
+        details: details.trim() || null,
+        counterparty_contact: counterpartyContact,
+        due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+        status: "active",
+        invite_token: inviteToken,
+        ...publicPayload,
+      })
+      .select("id")
+      .single();
 
     setBusy(false);
 
@@ -511,18 +517,18 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     role="switch"
-                    aria-checked={publicRequested}
+                    aria-checked={isPublicDeal}
                     aria-label={t("promises.new.publicRequest.label")}
-                    onClick={() => setPublicRequested((prev) => !prev)}
+                    onClick={() => setIsPublicDeal((prev) => !prev)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                      publicRequested
+                      isPublicDeal
                         ? "border-emerald-300/50 bg-emerald-400/70"
                         : "border-white/20 bg-white/10"
                     } hover:border-emerald-300/60`}
                   >
                     <span
                       className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        publicRequested ? "translate-x-5" : "translate-x-1"
+                        isPublicDeal ? "translate-x-5" : "translate-x-1"
                       }`}
                     />
                   </button>

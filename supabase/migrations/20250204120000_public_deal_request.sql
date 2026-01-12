@@ -1,14 +1,13 @@
 -- Public deal request + mutual opt-in visibility
 
 ALTER TABLE promises
-  ADD COLUMN IF NOT EXISTS public_requested boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS public_opt_in_promisor boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS public_opt_in_promisee boolean NOT NULL DEFAULT false;
 
 -- Backfill from legacy mutual visibility flags
 UPDATE promises
-SET public_requested = (public_by_creator = true OR public_by_counterparty = true)
-WHERE public_requested = false
+SET is_public = true
+WHERE is_public = false
   AND (public_by_creator = true OR public_by_counterparty = true);
 
 UPDATE promises
@@ -49,9 +48,7 @@ LEFT JOIN (
   JOIN profiles creator ON creator.id = promises.creator_id
   JOIN profiles counterparty ON counterparty.id = promises.counterparty_id
   WHERE promises.status = 'confirmed'
-    AND promises.public_requested = true
-    AND promises.public_opt_in_promisor = true
-    AND promises.public_opt_in_promisee = true
+    AND promises.is_public = true
     AND creator.is_public = true
     AND counterparty.is_public = true
   GROUP BY promises.creator_id
@@ -89,9 +86,7 @@ AS $$
     AND profiles.is_public = true
     AND counterparty.is_public = true
     AND promises.status = 'confirmed'
-    AND promises.public_requested = true
-    AND promises.public_opt_in_promisor = true
-    AND promises.public_opt_in_promisee = true
+    AND promises.is_public = true
   ORDER BY promises.created_at DESC
   LIMIT LEAST(GREATEST(public_get_profile_public_promises.p_limit, 1), 500);
 $$;
