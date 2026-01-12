@@ -307,6 +307,11 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       <header className="absolute inset-x-0 top-0 z-10">
+        <div className="border-b border-emerald-400/30 bg-emerald-500/10">
+          <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200 sm:px-6">
+            {t("home.eyebrow")}
+          </div>
+        </div>
         <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-6">
           <Link href="/" className="flex min-w-0 items-center text-white">
             <DreddiLogo
@@ -328,9 +333,6 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-28 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-              {t("home.eyebrow")}
-            </p>
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
