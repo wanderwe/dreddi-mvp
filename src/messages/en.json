@@ -124,14 +124,6 @@
         "awaitingOthers": "Awaiting others"
       }
     },
-    "profile": {
-      "eyebrow": "PROFILE",
-      "publicTitle": "Public profile",
-      "publicHelper": "If off, your profile isn’t accessible publicly.",
-      "publicOn": "Public",
-      "publicOff": "Private",
-      "loading": "Loading…"
-    },
     "empty": {
       "title": "Nothing here yet",
       "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
