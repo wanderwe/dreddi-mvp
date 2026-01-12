@@ -24,8 +24,6 @@ type PromiseRow = {
 
 type TabKey = "i-promised" | "promised-to-me";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
-type ProfileSettingsRow = { is_public: boolean | null };
-
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -66,8 +64,6 @@ export default function PromisesClient() {
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [profilePublic, setProfilePublic] = useState<boolean | null>(null);
-  const [profileBusy, setProfileBusy] = useState(false);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -129,19 +125,6 @@ export default function PromisesClient() {
           });
 
         setAllRows(filtered);
-      }
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("is_public")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        const profileRow = profileData as ProfileSettingsRow | null;
-        setProfilePublic(profileRow?.is_public ?? false);
       }
 
       setLoading(false);
@@ -246,41 +229,6 @@ export default function PromisesClient() {
 
   const metricValueClass = "mt-1 text-base font-semibold leading-tight";
 
-  const updateProfilePublic = async (nextValue: boolean) => {
-    setProfileBusy(true);
-    setError(null);
-
-    let supabase;
-    try {
-      supabase = requireSupabase();
-    } catch (error) {
-      setError(supabaseErrorMessage(error));
-      setProfileBusy(false);
-      return;
-    }
-
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      window.location.href = `/login?next=${encodeURIComponent("/promises")}`;
-      setProfileBusy(false);
-      return;
-    }
-
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ is_public: nextValue })
-      .eq("id", data.session.user.id);
-
-    setProfileBusy(false);
-
-    if (updateError) {
-      setError(updateError.message);
-      return;
-    }
-
-    setProfilePublic(nextValue);
-  };
-
   return (
     <main className="relative py-10">
       <div
@@ -325,37 +273,6 @@ export default function PromisesClient() {
               </div>
               <div className={metricValueClass}>{overview.awaitingOthers}</div>
             </div>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-black/40 p-6 shadow-2xl shadow-black/40 backdrop-blur">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
-                {t("promises.profile.eyebrow")}
-              </div>
-              <h2 className="text-lg font-semibold text-white">
-                {t("promises.profile.publicTitle")}
-              </h2>
-              <p className="text-sm text-slate-300">{t("promises.profile.publicHelper")}</p>
-            </div>
-
-            <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
-              <input
-                type="checkbox"
-                className="h-5 w-5 accent-emerald-400"
-                checked={Boolean(profilePublic)}
-                disabled={profileBusy || profilePublic === null}
-                onChange={(event) => updateProfilePublic(event.target.checked)}
-              />
-              <span className="text-xs uppercase tracking-[0.18em] text-slate-300">
-                {profilePublic === null
-                  ? t("promises.profile.loading")
-                  : profilePublic
-                  ? t("promises.profile.publicOn")
-                  : t("promises.profile.publicOff")}
-              </span>
-            </label>
           </div>
         </div>
 
