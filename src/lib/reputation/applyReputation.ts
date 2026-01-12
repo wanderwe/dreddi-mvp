@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 
 export type PromiseRecord = {
   id: string;
@@ -9,6 +10,8 @@ export type PromiseRecord = {
   completed_at: string | null;
   creator_id: string;
   counterparty_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
   disputed_code: string | null;
@@ -40,6 +43,9 @@ const clampScore = (value: number) => Math.max(0, Math.min(100, value));
 
 function computeDeltas(promise: PromiseRecord): EventInput[] {
   const events: EventInput[] = [];
+  const executorId = resolveExecutorId(promise);
+  if (!executorId) return events;
+  const counterpartyId = resolveCounterpartyId(promise);
   const baseMeta = {
     promise_title: promise.title,
     completed_at: promise.completed_at,
@@ -55,16 +61,16 @@ function computeDeltas(promise: PromiseRecord): EventInput[] {
 
   if (promise.status === "confirmed") {
     events.push({
-      user_id: promise.creator_id,
+      user_id: executorId,
       promise_id: promise.id,
       kind: "promise_confirmed",
       delta: onTime ? 4 : 3,
       meta: { ...baseMeta, on_time: onTime },
     });
 
-    if (promise.counterparty_id) {
+    if (counterpartyId) {
       events.push({
-        user_id: promise.counterparty_id,
+        user_id: counterpartyId,
         promise_id: promise.id,
         kind: "promise_confirmed",
         delta: 1,
@@ -75,16 +81,16 @@ function computeDeltas(promise: PromiseRecord): EventInput[] {
 
   if (promise.status === "disputed") {
     events.push({
-      user_id: promise.creator_id,
+      user_id: executorId,
       promise_id: promise.id,
       kind: "promise_disputed",
       delta: late ? -7 : -6,
       meta: { ...baseMeta, late_penalty: late },
     });
 
-    if (promise.counterparty_id) {
+    if (counterpartyId) {
       events.push({
-        user_id: promise.counterparty_id,
+        user_id: counterpartyId,
         promise_id: promise.id,
         kind: "promise_disputed",
         delta: 1,
