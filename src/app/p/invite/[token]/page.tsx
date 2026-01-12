@@ -15,7 +15,7 @@ type InviteInfo = {
   creator_display_name: string | null;
   counterparty_id: string | null;
   counterparty_contact: string | null;
-  public_requested: boolean;
+  is_public: boolean;
 };
 
 export default function InvitePage() {
@@ -34,7 +34,6 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [acceptAsPublic, setAcceptAsPublic] = useState(true);
 
   async function load() {
     if (!token) return;
@@ -82,7 +81,7 @@ export default function InvitePage() {
 
     if (!info.counterparty_id) {
       setAutoAcceptAttempted(true);
-      if (info.public_requested) {
+      if (info.is_public) {
         setShowAcceptModal(true);
         return;
       }
@@ -90,7 +89,7 @@ export default function InvitePage() {
     }
   }, [autoAcceptAttempted, info, router, searchParams, signedIn, userId]);
 
-  async function accept(acceptPublic?: boolean) {
+  async function accept() {
     if (!token) return;
 
     setBusy(true);
@@ -118,7 +117,6 @@ export default function InvitePage() {
         "content-type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ acceptPublic }),
     });
 
     const j = await res.json();
@@ -221,7 +219,7 @@ export default function InvitePage() {
                   : t("invite.accepted")}
               </div>
             )}
-            {info.public_requested && (
+            {info.is_public && (
               <div className="mb-4 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
                 <p className="font-semibold">{t("invite.publicProposal.title")}</p>
                 <p className="mt-1 text-xs text-amber-100/80">{t("invite.publicProposal.body")}</p>
@@ -286,9 +284,8 @@ export default function InvitePage() {
                     <button
                       disabled={busy}
                       onClick={() => {
-                        if (info.public_requested) {
+                        if (info.is_public) {
                           setShowAcceptModal(true);
-                          setAcceptAsPublic(true);
                         } else {
                           void accept();
                         }
@@ -315,29 +312,6 @@ export default function InvitePage() {
               {t("invite.publicModal.body")}
             </p>
 
-            <div className="mt-4 space-y-3 text-sm text-neutral-200">
-              <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                <input
-                  type="radio"
-                  name="public-accept"
-                  className="mt-1 h-4 w-4 accent-emerald-400"
-                  checked={acceptAsPublic}
-                  onChange={() => setAcceptAsPublic(true)}
-                />
-                <span>{t("invite.publicModal.acceptPublic")}</span>
-              </label>
-              <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                <input
-                  type="radio"
-                  name="public-accept"
-                  className="mt-1 h-4 w-4 accent-emerald-400"
-                  checked={!acceptAsPublic}
-                  onChange={() => setAcceptAsPublic(false)}
-                />
-                <span>{t("invite.publicModal.acceptPrivate")}</span>
-              </label>
-            </div>
-
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
@@ -350,7 +324,7 @@ export default function InvitePage() {
                 type="button"
                 onClick={async () => {
                   setShowAcceptModal(false);
-                  await accept(acceptAsPublic);
+                  await accept();
                 }}
                 className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
               >
