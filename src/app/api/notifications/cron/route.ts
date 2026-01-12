@@ -12,6 +12,51 @@ import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 const HOURS_24 = 24 * 60 * 60 * 1000;
 const HOURS_72 = 72 * 60 * 60 * 1000;
 
+type PromiseNotificationState = {
+  invite_notified_at?: string | null;
+  invite_followup_notified_at?: string | null;
+  due_soon_notified_at?: string | null;
+  overdue_notified_at?: string | null;
+  overdue_creator_notified_at?: string | null;
+  completion_notified_at?: string | null;
+  completion_followups_count?: number | null;
+  completion_cycle_id?: number | null;
+  completion_cycle_started_at?: string | null;
+  completion_followup_last_at?: string | null;
+};
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const readString = (value: unknown): string | null | undefined => {
+  if (typeof value === "string") return value;
+  if (value === null) return null;
+  return undefined;
+};
+
+const readNumber = (value: unknown): number | null | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (value === null) return null;
+  return undefined;
+};
+
+const getNotificationState = (raw: unknown): PromiseNotificationState => {
+  if (!isPlainRecord(raw)) return {};
+
+  return {
+    invite_notified_at: readString(raw.invite_notified_at),
+    invite_followup_notified_at: readString(raw.invite_followup_notified_at),
+    due_soon_notified_at: readString(raw.due_soon_notified_at),
+    overdue_notified_at: readString(raw.overdue_notified_at),
+    overdue_creator_notified_at: readString(raw.overdue_creator_notified_at),
+    completion_notified_at: readString(raw.completion_notified_at),
+    completion_followups_count: readNumber(raw.completion_followups_count),
+    completion_cycle_id: readNumber(raw.completion_cycle_id),
+    completion_cycle_started_at: readString(raw.completion_cycle_started_at),
+    completion_followup_last_at: readString(raw.completion_followup_last_at),
+  };
+};
+
 const isAccepted = (row: {
   counterparty_accepted_at: string | null;
   promisor_id: string | null;
@@ -48,7 +93,7 @@ export async function POST(req: Request) {
     .not("invite_token", "is", null);
 
   for (const row of invites ?? []) {
-    const state = row.promise_notification_state ?? {};
+    const state = getNotificationState(row.promise_notification_state);
     if (!row.counterparty_id) continue;
     if (!state.invite_notified_at || state.invite_followup_notified_at) continue;
 
@@ -89,7 +134,7 @@ export async function POST(req: Request) {
 
   for (const row of dueSoonRows ?? []) {
     if (!row.due_at || !isAccepted(row)) continue;
-    const state = row.promise_notification_state ?? {};
+    const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
     const executorId = resolveExecutorId(row);
     if (!executorId) continue;
@@ -129,7 +174,7 @@ export async function POST(req: Request) {
     if (!row.due_at || !isAccepted(row)) continue;
     const executorId = resolveExecutorId(row);
     if (!executorId) continue;
-    const state = row.promise_notification_state ?? {};
+    const state = getNotificationState(row.promise_notification_state);
 
     const lastOverdue = state.overdue_notified_at ? new Date(state.overdue_notified_at) : null;
     const canNotifyExecutor =
@@ -190,7 +235,7 @@ export async function POST(req: Request) {
     .eq("status", "completed_by_promisor");
 
   for (const row of completionRows ?? []) {
-    const state = row.promise_notification_state ?? {};
+    const state = getNotificationState(row.promise_notification_state);
     if (!state.completion_notified_at) continue;
     if (row.completed_at && state.completion_cycle_started_at) {
       if (row.completed_at !== state.completion_cycle_started_at) continue;
