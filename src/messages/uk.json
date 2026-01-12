@@ -79,6 +79,25 @@
       }
     }
   },
+  "dealList": {
+    "duePrefix": "Строк",
+    "noDeadline": "Без строку",
+    "outcomeLabel": "Результат",
+    "outcome": {
+      "underReview": "перегляд"
+    },
+    "role": {
+      "responsible": "Ви відповідальні",
+      "promised": "Вам пообіцяли",
+      "participant": "Учасник угоди"
+    },
+    "status": {
+      "active": "Активна",
+      "completed_by_promisor": "Позначено виконаною",
+      "confirmed": "Підтверджено",
+      "disputed": "Оскаржено"
+    }
+  },
   "nav": {
     "myPromises": "Мої угоди",
     "newPromise": "Нова угода",

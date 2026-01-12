@@ -79,6 +79,25 @@
       }
     }
   },
+  "dealList": {
+    "duePrefix": "Due",
+    "noDeadline": "No deadline",
+    "outcomeLabel": "Outcome",
+    "outcome": {
+      "underReview": "under review"
+    },
+    "role": {
+      "responsible": "You’re responsible",
+      "promised": "Promised to you",
+      "participant": "Deal participant"
+    },
+    "status": {
+      "active": "Active",
+      "completed_by_promisor": "Marked complete",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed"
+    }
+  },
   "nav": {
     "myPromises": "My deals",
     "newPromise": "New deal",

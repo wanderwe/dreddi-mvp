@@ -329,6 +329,7 @@ export default function NewPromisePage() {
         details: details.trim() || null,
         counterparty_contact: counterpartyContact,
         due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+        due_precision: "date",
         status: "active",
         invite_token: inviteToken,
         ...publicPayload,

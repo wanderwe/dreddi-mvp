@@ -9,12 +9,14 @@ import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promi
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
+import { DealListItem } from "@/app/components/DealListItem";
 
 type PromiseRow = {
   id: string;
   title: string;
   status: PromiseStatus;
   due_at: string | null;
+  due_precision?: "date" | "datetime" | null;
   created_at: string;
   completed_at: string | null;
   counterparty_id: string | null;
@@ -32,17 +34,6 @@ export default function PromisesClient() {
   const searchParams = useSearchParams();
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
-
-  const formatDue = (dueAt: string | null) => {
-    if (!dueAt) return t("promises.list.noDeadline");
-    return new Intl.DateTimeFormat(locale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(dueAt));
-  };
 
   const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
     if (role === "promisor") {
@@ -65,6 +56,7 @@ export default function PromisesClient() {
   const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [viewerUserId, setViewerUserId] = useState<string | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -93,12 +85,13 @@ export default function PromisesClient() {
       }
 
       const user = session.user;
+      setViewerUserId(user.id);
 
       const { data, error } = await supabase
         .from("promises")
         // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
         .select(
-          "id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
+          "id,title,status,due_at,due_precision,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
         )
         .or(
           `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
@@ -358,68 +351,70 @@ export default function PromisesClient() {
                     key={p.id}
                     className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
                   >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-1">
-                        <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">
-                          {t("promises.list.cardLabel")}
-                        </div>
-                        <Link
-                          href={`/promises/${p.id}`}
-                          className="text-lg font-semibold text-white transition hover:text-emerald-100"
-                        >
-                          {p.title}
-                        </Link>
-                        <div className="text-sm text-slate-300">
-                          {t("promises.list.dueLabel")}: {formatDue(p.due_at)}
-                        </div>
-                        {waiting && (
+                    <DealListItem
+                      deal={{
+                        id: p.id,
+                        title: p.title,
+                        status: p.status,
+                        due_at: p.due_at,
+                        due_precision: p.due_precision,
+                        creator_id: p.creator_id,
+                        executor_id: resolveExecutorId(p),
+                      }}
+                      viewerUserId={viewerUserId}
+                      locale={locale}
+                      href={`/promises/${p.id}`}
+                      eyebrow={t("promises.list.cardLabel")}
+                      statusLabel={statusLabel}
+                      detailContent={
+                        waiting ? (
                           <p className="text-xs text-amber-200">
                             {isPromisor
                               ? t("promises.list.waitingNotePromisor")
                               : t("promises.list.waitingNoteCounterparty")}
                           </p>
-                        )}
-                      </div>
+                        ) : null
+                      }
+                      rightContent={
+                        <>
+                          {actionLabel && (
+                            <span className="text-xs text-amber-200">{actionLabel}</span>
+                          )}
 
-                      <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                          {statusLabel}
-                        </span>
-                        {actionLabel && <span className="text-xs text-amber-200">{actionLabel}</span>}
+                          {impact && (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
+                              {t("promises.list.scoreImpact", { impact })}
+                            </span>
+                          )}
 
-                        {impact && (
-                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
-                            {t("promises.list.scoreImpact", { impact })}
-                          </span>
-                        )}
+                          {isPromisor && p.status === "active" && acceptedBySecondSide && (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={() => setConfirmingId(p.id)}
+                              className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+                            >
+                              {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
+                            </button>
+                          )}
 
-                        {isPromisor && p.status === "active" && acceptedBySecondSide && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => setConfirmingId(p.id)}
-                            className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
-                          >
-                            {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
-                          </button>
-                        )}
+                          {isPromisor && p.status === "active" && !acceptedBySecondSide && (
+                            <span className="text-xs text-slate-400">
+                              {t("promises.status.awaitingInviteAcceptance")}
+                            </span>
+                          )}
 
-                        {isPromisor && p.status === "active" && !acceptedBySecondSide && (
-                          <span className="text-xs text-slate-400">
-                            {t("promises.status.awaitingInviteAcceptance")}
-                          </span>
-                        )}
-
-                        {!isPromisor && p.status === "completed_by_promisor" && (
-                          <Link
-                            href={`/promises/${p.id}/confirm`}
-                            className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
-                          >
-                            {t("promises.list.reviewConfirm")}
-                          </Link>
-                        )}
-                      </div>
-                    </div>
+                          {!isPromisor && p.status === "completed_by_promisor" && (
+                            <Link
+                              href={`/promises/${p.id}/confirm`}
+                              className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
+                            >
+                              {t("promises.list.reviewConfirm")}
+                            </Link>
+                          )}
+                        </>
+                      }
+                    />
                   </div>
                 );
               })}

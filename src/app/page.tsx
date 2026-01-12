@@ -5,16 +5,14 @@ import { useEffect, useState } from "react";
 import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { MobileMenu } from "@/app/components/MobileMenu";
+import { DealListItem } from "@/app/components/DealListItem";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { DealListDeal } from "@/lib/dealList";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 
-type DealRow = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  meta?: string;
-  due_at?: string | null;
+type DealRow = DealListDeal & {
   created_at?: string;
 };
 
@@ -43,6 +41,7 @@ export default function Home() {
   const t = useT();
   const locale = useLocale();
   const [email, setEmail] = useState<string | null>(null);
+  const [viewerUserId, setViewerUserId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
@@ -66,76 +65,60 @@ export default function Home() {
             title: "Підготувати pitch deck для інвесторів",
             status: "active",
             due_at: null,
+            due_precision: "date",
+            creator_id: "demo-user-1",
+            executor_id: "demo-user-1",
           },
           {
             id: "demo-2",
             title: "Допомогти з переїздом у вихідні",
             status: "confirmed",
             due_at: nextSaturday.toISOString(),
+            due_precision: "date",
+            creator_id: "demo-user-2",
+            executor_id: "demo-user-3",
           },
           {
             id: "demo-3",
             title: "Повернути $500 до 1 березня",
             status: "disputed",
             due_at: nextMarchFirst.toISOString(),
-            meta: "Результат: перегляд",
+            due_precision: "date",
+            creator_id: "demo-user-4",
+            executor_id: "demo-user-4",
+            outcome: t("dealList.outcome.underReview"),
           },
         ]
       : [
           {
             id: "demo-1",
-            title: "Підготувати pitch deck для інвесторів",
+            title: "Prepare investor pitch deck",
             status: "active",
             due_at: null,
+            due_precision: "date",
+            creator_id: "demo-user-1",
+            executor_id: "demo-user-1",
           },
           {
             id: "demo-2",
-            title: "Допомогти з переїздом у вихідні",
+            title: "Help with moving over the weekend",
             status: "confirmed",
             due_at: nextSaturday.toISOString(),
+            due_precision: "date",
+            creator_id: "demo-user-2",
+            executor_id: "demo-user-3",
           },
           {
             id: "demo-3",
-            title: "Повернути $500 до 1 березня",
+            title: "Return $500 by March 1",
             status: "disputed",
             due_at: nextMarchFirst.toISOString(),
-            meta: "Результат: перегляд",
+            due_precision: "date",
+            creator_id: "demo-user-4",
+            executor_id: "demo-user-4",
+            outcome: t("dealList.outcome.underReview"),
           },
         ];
-
-  const statusLabels: Record<PromiseStatus, string> = {
-    active: t("home.recentDeals.status.active"),
-    completed_by_promisor: t("home.recentDeals.status.completed_by_promisor"),
-    confirmed: t("home.recentDeals.status.confirmed"),
-    disputed: t("home.recentDeals.status.disputed"),
-  };
-
-  const statusTones: Record<PromiseStatus, string> = {
-    active: "bg-white/5 text-emerald-200 border border-white/10",
-    completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
-    confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
-    disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
-  };
-
-  const formatDateShort = (value: string) =>
-    new Intl.DateTimeFormat(locale, {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
-
-  const getMetaText = (item: DealRow) =>
-    item.meta ??
-    (item.due_at
-      ? t("home.recentDeals.placeholderMetaDue", {
-          date: formatDateShort(item.due_at),
-        })
-      : item.created_at
-      ? t("home.recentDeals.placeholderMetaCreated", {
-          date: formatDateShort(item.created_at),
-        })
-      : "");
 
   useEffect(() => {
     let active = true;
@@ -150,6 +133,7 @@ export default function Home() {
       const { data: sessionData } = await client.auth.getSession();
       if (!active) return;
       setEmail(sessionData.session?.user?.email ?? null);
+      setViewerUserId(sessionData.session?.user?.id ?? null);
       setReady(true);
     };
 
@@ -158,6 +142,7 @@ export default function Home() {
     const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       setEmail(session?.user?.email ?? null);
+      setViewerUserId(session?.user?.id ?? null);
       setReady(true);
     });
 
@@ -200,10 +185,14 @@ export default function Home() {
         return;
       }
 
+      setViewerUserId(userId);
+
       const { data, error } = await client
         .from("promises")
-        .select("id,title,status,due_at,created_at")
-        .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
+        .select("id,title,status,due_at,due_precision,created_at,creator_id,promisor_id,promisee_id,counterparty_id")
+        .or(
+          `creator_id.eq.${userId},counterparty_id.eq.${userId},promisor_id.eq.${userId},promisee_id.eq.${userId}`
+        )
         .order("created_at", { ascending: false })
         .limit(3);
 
@@ -214,13 +203,17 @@ export default function Home() {
       } else {
         const normalized: DealRow[] = (data ?? []).flatMap((row) => {
           if (!isPromiseStatus(row.status)) return [];
+          const executorId = resolveExecutorId(row);
           return [
             {
               id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
               due_at: row.due_at,
+              due_precision: row.due_precision,
               created_at: row.created_at,
+              creator_id: row.creator_id,
+              executor_id: executorId,
             },
           ];
         });
@@ -483,27 +476,19 @@ export default function Home() {
                   <div className="mt-3">
                     <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
                     <div className="mt-3 space-y-2 text-sm">
-                      {demoDeals.map((item) => {
-                        const metaText = getMetaText(item);
-                        return (
+                        {demoDeals.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                            className="rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                           >
-                            <div>
-                              <div className="font-semibold text-white">{item.title}</div>
-                              {metaText ? (
-                                <div className="text-xs text-slate-400">{metaText}</div>
-                              ) : null}
-                            </div>
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                            >
-                              {statusLabels[item.status] ?? item.status}
-                            </span>
+                            <DealListItem
+                              deal={item}
+                              viewerUserId={null}
+                              locale={locale}
+                              showNoDeadline={false}
+                            />
                           </div>
-                        );
-                      })}
+                        ))}
                     </div>
                   </div>
                 ) : (
@@ -558,26 +543,19 @@ export default function Home() {
                             {t("home.recentDeals.empty")}
                           </div>
                         ) : (
-                          recentDealsLimited.map((item) => {
-                            const metaText = getMetaText(item);
-
-                            return (
-                              <div
-                                key={item.id}
-                                className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                              >
-                                <div>
-                                  <div className="font-semibold text-white">{item.title}</div>
-                                  <div className="text-xs text-slate-400">{metaText}</div>
-                                </div>
-                                <span
-                                  className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                                >
-                                  {statusLabels[item.status] ?? item.status}
-                                </span>
-                              </div>
-                            );
-                          })
+                          recentDealsLimited.map((item) => (
+                            <div
+                              key={item.id}
+                              className="rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                            >
+                              <DealListItem
+                                deal={item}
+                                viewerUserId={viewerUserId}
+                                locale={locale}
+                                showNoDeadline={false}
+                              />
+                            </div>
+                          ))
                         )}
                       </div>
                     </div>
