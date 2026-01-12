@@ -230,7 +230,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
           {isPublic && publicProfilePath ? (
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex-1 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+              <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
                 {publicProfileUrl}
               </div>
               <div className="flex flex-wrap gap-2">
