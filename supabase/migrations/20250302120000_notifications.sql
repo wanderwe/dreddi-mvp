@@ -50,18 +50,45 @@ CREATE INDEX IF NOT EXISTS notifications_user_unread
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS notifications_self_select
-  ON notifications FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'notifications'
+      AND policyname = 'notifications_self_select'
+  ) THEN
+    CREATE POLICY notifications_self_select
+      ON notifications FOR SELECT
+      USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY IF NOT EXISTS notifications_self_update
-  ON notifications FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'notifications'
+      AND policyname = 'notifications_self_update'
+  ) THEN
+    CREATE POLICY notifications_self_update
+      ON notifications FOR UPDATE
+      USING (auth.uid() = user_id)
+      WITH CHECK (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY IF NOT EXISTS notifications_self_insert
-  ON notifications FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'notifications'
+      AND policyname = 'notifications_self_insert'
+  ) THEN
+    CREATE POLICY notifications_self_insert
+      ON notifications FOR INSERT
+      WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS promise_notification_state (
   promise_id uuid PRIMARY KEY REFERENCES promises(id) ON DELETE CASCADE,
