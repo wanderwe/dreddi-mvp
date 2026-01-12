@@ -378,5 +378,13 @@
       "private": "Profile is private.",
       "notFound": "Profile not found."
     }
+  },
+  "publicDirectory": {
+    "title": "Public profiles",
+    "loading": "Loading profiles…",
+    "empty": "No public profiles yet.",
+    "errors": {
+      "supabase": "Supabase is not configured."
+    }
   }
 }

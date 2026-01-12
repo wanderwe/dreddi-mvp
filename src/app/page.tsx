@@ -375,7 +375,7 @@ export default function Home() {
                 {t("home.cta.getStarted")}
               </Link>
               <Link
-                href="/p"
+                href="/u"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
                 {t("home.cta.publicProfiles")}
