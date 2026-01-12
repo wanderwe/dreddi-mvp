@@ -30,22 +30,22 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const admin = getAdminClient();
     const confirmedAt = new Date().toISOString();
-    const { error } = await admin
+    const { data: updatedPromise, error } = await admin
       .from("promises")
       .update({
         status: "confirmed",
         confirmed_at: confirmedAt,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("*")
+      .single();
 
-    if (error) {
+    if (error || !updatedPromise) {
       return NextResponse.json(
-        { error: "Could not update promise", detail: error.message },
+        { error: "Could not update promise", detail: error?.message },
         { status: 500 }
       );
     }
-
-    const updatedPromise = { ...promise, status: "confirmed", confirmed_at: confirmedAt };
 
     try {
       await applyReputationForPromiseFinalization(admin, updatedPromise);
