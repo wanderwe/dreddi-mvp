@@ -350,8 +350,8 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-4">
-            <div className="inline-flex max-w-full items-center gap-3 whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-emerald-100 shadow-[0_0_0_1px_rgba(16,185,129,0.2),0_10px_30px_rgba(2,6,23,0.45)] backdrop-blur sm:text-base">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+            <div className="inline-flex max-w-full items-center gap-3 whitespace-nowrap rounded-full border border-emerald-400/20 bg-emerald-500/10 px-4 py-1.5 text-sm font-semibold text-emerald-200 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25),0_12px_30px_rgba(2,6,23,0.5)] backdrop-blur sm:text-base">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
               {t("home.eyebrow")}
             </div>
             <div className="flex items-center gap-4">
