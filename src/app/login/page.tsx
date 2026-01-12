@@ -83,8 +83,10 @@ export default function LoginPage() {
             </button>
 
             {sent && (
-              <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                {t("auth.login.sent")}
+              <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-200 shadow-inner shadow-black/30">
+                <span className="block border-l-2 border-emerald-400/50 pl-3">
+                  {t("auth.login.sent")}
+                </span>
               </div>
             )}
 
