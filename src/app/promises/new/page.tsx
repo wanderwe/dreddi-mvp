@@ -42,6 +42,8 @@ export default function NewPromisePage() {
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPublicProfile, setIsPublicProfile] = useState(false);
+  const [publicRequested, setPublicRequested] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -248,7 +250,17 @@ export default function NewPromisePage() {
       if (!active) return;
       if (!sessionData.session) {
         router.replace(`/login?next=${encodeURIComponent("/promises/new")}`);
+        return;
       }
+
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("is_public")
+        .eq("id", sessionData.session.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+      setIsPublicProfile(profileData?.is_public ?? false);
     };
 
     void ensureSession();
@@ -257,6 +269,12 @@ export default function NewPromisePage() {
       active = false;
     };
   }, [router]);
+
+  useEffect(() => {
+    if (!isPublicProfile) {
+      setPublicRequested(false);
+    }
+  }, [isPublicProfile]);
 
   async function createPromise() {
     setBusy(true);
@@ -292,6 +310,15 @@ export default function NewPromisePage() {
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+    const publicPayload =
+      publicRequested && isPublicProfile
+        ? {
+            public_requested: true,
+            public_opt_in_promisor: executor === "me",
+            public_opt_in_promisee: executor === "other",
+          }
+        : {};
+
     const { data: insertData, error: insertError } = await supabase
       .from("promises")
       .insert({
@@ -304,6 +331,7 @@ export default function NewPromisePage() {
         due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
         status: "active",
         invite_token: inviteToken,
+        ...publicPayload,
       })
       .select("id")
       .single();
@@ -459,17 +487,38 @@ export default function NewPromisePage() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {executor && (
-                <p
-                  id="counterparty-helper"
-                  className="mt-2 text-sm leading-relaxed text-slate-400"
-                >
-                  {t("promises.new.fields.counterpartyHelper")}
-                </p>
-              )}
             </div>
+
+            {executor && (
+              <p
+                id="counterparty-helper"
+                className="mt-2 text-sm leading-relaxed text-slate-400"
+              >
+                {t("promises.new.fields.counterpartyHelper")}
+              </p>
+            )}
+
+            {isPublicProfile && (
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 accent-emerald-400"
+                    checked={publicRequested}
+                    onChange={(event) => setPublicRequested(event.target.checked)}
+                  />
+                  <div className="space-y-1">
+                    <span className="font-semibold text-white">
+                      {t("promises.new.publicRequest.label")}
+                    </span>
+                    <p className="text-xs text-slate-400">
+                      {t("promises.new.publicRequest.helper")}
+                    </p>
+                  </div>
+                </label>
+              </div>
+            )}
+          </div>
           </div>
 
           <div className="space-y-3">

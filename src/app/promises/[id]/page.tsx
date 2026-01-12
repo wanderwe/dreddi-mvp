@@ -22,8 +22,9 @@ type PromiseRow = {
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
-  public_by_creator: boolean;
-  public_by_counterparty: boolean;
+  public_requested: boolean;
+  public_opt_in_promisor: boolean;
+  public_opt_in_promisee: boolean;
 };
 
 function Card({
@@ -145,7 +146,6 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
-  const [publicBusy, setPublicBusy] = useState<"creator" | "counterparty" | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
@@ -192,7 +192,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,public_by_creator,public_by_counterparty"
+        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,public_requested,public_opt_in_promisor,public_opt_in_promisee"
       )
       .eq("id", id)
       .single();
@@ -325,74 +325,30 @@ export default function PromisePage() {
   const isExecutor = Boolean(userId && executorId && userId === executorId);
   const isCounterparty = Boolean(userId && counterpartyId && userId === counterpartyId);
   const isCreator = Boolean(p && userId === p.creator_id);
-  const counterpartyUserId = p
-    ? p.counterparty_id ??
-      (p.promisor_id && p.promisee_id
-        ? p.promisor_id === p.creator_id
-          ? p.promisee_id
-          : p.promisor_id
-        : null)
-    : null;
-  const isPublicCounterparty = Boolean(
-    userId && counterpartyUserId && userId === counterpartyUserId
-  );
   const waitingForReview = p?.status === "completed_by_promisor";
   const isInviteAccepted = Boolean(p?.counterparty_id ?? (p?.promisor_id && p?.promisee_id));
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const publicVisibilityDisabled = Boolean(!p || p.status !== "confirmed" || !isInviteAccepted);
-
-  async function updatePublicConsent(target: "creator" | "counterparty", value: boolean) {
-    if (!p) return;
-    setError(null);
-    setPublicBusy(target);
-
-    let supabase;
-    try {
-      supabase = requireSupabase();
-    } catch (err) {
-      setError(supabaseErrorMessage(err));
-      setPublicBusy(null);
-      return;
-    }
-
-    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
-    if (!session) {
-      setPublicBusy(null);
-      return;
-    }
-
-    const patch =
-      target === "creator"
-        ? { public_by_creator: value }
-        : { public_by_counterparty: value };
-
-    const { data, error } = await supabase
-      .from("promises")
-      .update(patch)
-      .eq("id", p.id)
-      .select("public_by_creator,public_by_counterparty")
-      .single();
-
-    setPublicBusy(null);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
-
-    if (data) {
-      setP((prev) =>
-        prev
-          ? {
-              ...prev,
-              public_by_creator: data.public_by_creator,
-              public_by_counterparty: data.public_by_counterparty,
-            }
-          : prev
-      );
-    }
-  }
+  const publicOptInCount = p
+    ? Number(p.public_opt_in_promisor) + Number(p.public_opt_in_promisee)
+    : 0;
+  const isPublicDeal = Boolean(
+    p &&
+      p.public_requested &&
+      p.status === "confirmed" &&
+      p.public_opt_in_promisor &&
+      p.public_opt_in_promisee
+  );
+  const showPublicStatus = Boolean(p && (p.public_requested || isPublicDeal));
+  const publicStatusText = p
+    ? isPublicDeal
+      ? t("promises.detail.publicStatus.public")
+      : publicOptInCount === 2 && p.status !== "confirmed"
+      ? t("promises.detail.publicStatus.waitingConfirmation")
+      : publicOptInCount >= 1
+      ? t("promises.detail.publicStatus.waitingOtherSide")
+      : t("promises.detail.publicStatus.privateAfterProposal")
+    : "";
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -420,6 +376,17 @@ export default function PromisePage() {
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
               </div>
+
+              {showPublicStatus && (
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-200">
+                  <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
+                    {t("promises.detail.publicStatus.label")}
+                  </span>
+                  <span className={isPublicDeal ? "text-emerald-200" : "text-neutral-200"}>
+                    {publicStatusText}
+                  </span>
+                </div>
+              )}
 
               <div className="text-sm text-neutral-400">
                 {t("promises.detail.acceptedBySecondSide")}:{" "}
@@ -504,52 +471,6 @@ export default function PromisePage() {
               )}
             </div>
           </Card>
-
-          {(isCreator || isPublicCounterparty) && (
-            <Card title={t("promises.detail.publicVisibility.title")}>
-              <div className="space-y-4 text-sm text-neutral-300">
-                <p className="text-neutral-400">{t("promises.detail.publicVisibility.helper")}</p>
-
-                {isCreator && (
-                  <label className="flex items-center justify-between gap-4 rounded-xl border border-neutral-800 bg-black/30 px-4 py-3">
-                    <span>{t("promises.detail.publicVisibility.creatorConsent")}</span>
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 accent-emerald-400"
-                      checked={p.public_by_creator}
-                      disabled={publicVisibilityDisabled || publicBusy !== null}
-                      onChange={(event) => updatePublicConsent("creator", event.target.checked)}
-                    />
-                  </label>
-                )}
-
-                {isPublicCounterparty && (
-                  <label className="flex items-center justify-between gap-4 rounded-xl border border-neutral-800 bg-black/30 px-4 py-3">
-                    <span>{t("promises.detail.publicVisibility.counterpartyConsent")}</span>
-                    <input
-                      type="checkbox"
-                      className="h-5 w-5 accent-emerald-400"
-                      checked={p.public_by_counterparty}
-                      disabled={publicVisibilityDisabled || publicBusy !== null}
-                      onChange={(event) => updatePublicConsent("counterparty", event.target.checked)}
-                    />
-                  </label>
-                )}
-
-                {p.status !== "confirmed" && (
-                  <p className="text-xs text-neutral-500">
-                    {t("promises.detail.publicVisibility.confirmedOnly")}
-                  </p>
-                )}
-
-                {!isInviteAccepted && (
-                  <p className="text-xs text-neutral-500">
-                    {t("promises.detail.publicVisibility.awaitingAcceptance")}
-                  </p>
-                )}
-              </div>
-            </Card>
-          )}
 
           {!isFinal && canManageInvite && (
             <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>

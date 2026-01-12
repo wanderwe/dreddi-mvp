@@ -42,11 +42,14 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    const body = await _req.json().catch(() => ({}));
+    const acceptPublic = body?.acceptPublic === true;
+
     // 4) шукаємо promise по invite_token
     const { data: p, error: pErr } = await admin
       .from("promises")
       .select(
-        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id"
+        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id, public_requested"
       )
       .eq("invite_token", token)
       .maybeSingle();
@@ -81,18 +84,33 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       counterparty_accepted_at: string;
       promisor_id?: string;
       promisee_id?: string;
+      public_opt_in_promisor?: boolean;
+      public_opt_in_promisee?: boolean;
     } = {
       counterparty_id: userId,
       counterparty_accepted_at: new Date().toISOString(),
     };
 
+    let acceptingRole: "promisor" | "promisee" | null = null;
+
     if (p.promisor_id && !p.promisee_id) {
       updateData.promisee_id = userId;
+      acceptingRole = "promisee";
     } else if (p.promisee_id && !p.promisor_id) {
       updateData.promisor_id = userId;
+      acceptingRole = "promisor";
     } else if (!p.promisee_id && !p.promisor_id) {
       updateData.promisor_id = userId;
       updateData.promisee_id = p.creator_id;
+      acceptingRole = "promisor";
+    }
+
+    if (p.public_requested && acceptingRole) {
+      if (acceptingRole === "promisor") {
+        updateData.public_opt_in_promisor = acceptPublic;
+      } else {
+        updateData.public_opt_in_promisee = acceptPublic;
+      }
     }
 
     // 5) пишемо counterparty_id
