@@ -359,6 +359,9 @@ export default function Home() {
             <p className="max-w-xl text-lg text-slate-300">
               {t("home.tagline")}
             </p>
+            <p className="max-w-xl whitespace-pre-line text-sm text-slate-400">
+              {t("home.description")}
+            </p>
           </div>
 
           {!ready ? (

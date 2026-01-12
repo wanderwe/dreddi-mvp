@@ -1,15 +1,16 @@
 {
   "home": {
-    "eyebrow": "Reputation intelligence for deals and promises",
+    "eyebrow": "When an agreement is accepted, it matters.",
     "brand": {
       "name": "Dreddi",
       "suffix": "knows"
     },
-    "tagline": "Track every deal, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
+    "tagline": "Dreddi helps two people fix an agreement and explicitly accept it — so expectations are clear and outcomes don’t disappear.",
+    "description": "Track agreements, see when responsibility is accepted, and understand how commitments actually turn out.\n\nDreddi focuses on clarity — not contracts.",
     "highlights": {
-      "promisesTracked": "Deals tracked",
-      "reputationIntact": "Reputation intact",
-      "dreddiKnows": "Dreddi knows"
+      "promisesTracked": "Accepted agreements",
+      "reputationIntact": "Clear responsibility",
+      "dreddiKnows": "Outcomes recorded"
     },
     "showcase": {
       "0": {
