@@ -53,7 +53,7 @@ export async function GET(req: Request) {
       .select("id,kind,delta,meta,created_at,promise:promise_id(title)")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(3);
 
     if (eventsErr) {
       return NextResponse.json({ error: "Failed to load events", detail: eventsErr.message }, { status: 500 });
