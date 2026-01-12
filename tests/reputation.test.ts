@@ -178,9 +178,60 @@ test("reputation applies to executor and is idempotent", async () => {
   assert.equal(executor?.on_time_count, 1);
   assert.equal(executor?.total_promises_completed, 1);
 
-  assert.equal(creator?.score, 51);
-  assert.equal(creator?.confirmed_count, 0);
-  assert.equal(creator?.total_promises_completed, 0);
+  assert.equal(creator, undefined);
 
-  assert.equal(admin.events.length, 2);
+  assert.equal(admin.events.length, 1);
+});
+
+test("reputation applies to creator on self deals", async () => {
+  const admin = new FakeAdmin();
+  const promise = {
+    id: "promise-2",
+    title: "Solo work",
+    status: "confirmed" as PromiseStatus,
+    due_at: new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    creator_id: "creator",
+    counterparty_id: null,
+    promisor_id: null,
+    promisee_id: null,
+    confirmed_at: new Date().toISOString(),
+    disputed_at: null,
+    disputed_code: null,
+    dispute_reason: null,
+  };
+
+  await applyReputationForPromiseFinalization(admin as never, promise);
+
+  const creator = admin.reputation.get("creator");
+
+  assert.equal(creator?.score, 54);
+  assert.equal(creator?.confirmed_count, 1);
+  assert.equal(creator?.on_time_count, 1);
+  assert.equal(creator?.total_promises_completed, 1);
+  assert.equal(admin.events.length, 1);
+});
+
+test("reputation does not apply when executor is missing", async () => {
+  const admin = new FakeAdmin();
+  const promise = {
+    id: "promise-3",
+    title: "Pending invite",
+    status: "confirmed" as PromiseStatus,
+    due_at: new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    creator_id: "creator",
+    counterparty_id: null,
+    promisor_id: null,
+    promisee_id: "creator",
+    confirmed_at: new Date().toISOString(),
+    disputed_at: null,
+    disputed_code: null,
+    dispute_reason: null,
+  };
+
+  await applyReputationForPromiseFinalization(admin as never, promise);
+
+  assert.equal(admin.reputation.size, 0);
+  assert.equal(admin.events.length, 0);
 });
