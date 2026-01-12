@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PublicProfileRow = {
@@ -46,6 +47,7 @@ export default function PublicProfilePage() {
   const params = useParams();
   const t = useT();
   const locale = useLocale();
+  const landingCopy = getLandingCopy(locale);
   const handle = useMemo(() => {
     const raw = params?.handle;
     return Array.isArray(raw) ? raw[0] : raw;
@@ -179,8 +181,8 @@ export default function PublicProfilePage() {
   const statusLabels: Partial<Record<PromiseStatus, string>> = {
     active: t("publicProfile.status.inProgress"),
     completed_by_promisor: t("publicProfile.status.awaitingOutcome"),
-    confirmed: t("home.recentDeals.status.confirmed"),
-    disputed: t("home.recentDeals.status.disputed"),
+    confirmed: landingCopy.recentDeals.status.confirmed,
+    disputed: landingCopy.recentDeals.status.disputed,
   };
 
   const activeSummaryEmpty = activeCount + pendingAcceptanceCount + overdueCount === 0;
