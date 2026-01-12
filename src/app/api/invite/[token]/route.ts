@@ -18,6 +18,7 @@ type PromiseInviteRow = {
   counterparty_id: string | null;
   invite_token: string | null;
   counterparty_contact: string | null;
+  public_requested: boolean;
 };
 
 export async function GET(_req: Request, ctx: { params: Promise<{ token: string }> }) {
@@ -34,7 +35,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const { data: p, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,due_at,status,created_at,creator_id,counterparty_id,invite_token,counterparty_contact"
+        "id,title,details,due_at,status,created_at,creator_id,counterparty_id,invite_token,counterparty_contact,public_requested"
       )
       .eq("invite_token", token)
       .maybeSingle<PromiseInviteRow>(); // ✅ якщо TS не любить — прибери generic
@@ -73,6 +74,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         creator_display_name,
         counterparty_id: p.counterparty_id ?? null,
         counterparty_contact: p.counterparty_contact ?? null,
+        public_requested: p.public_requested ?? false,
       },
       { status: 200 }
     );

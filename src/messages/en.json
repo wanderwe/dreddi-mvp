@@ -199,6 +199,13 @@
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
+      "publicStatus": {
+        "label": "Visibility",
+        "public": "Public deal",
+        "waitingOtherSide": "Public proposed — waiting for other side",
+        "waitingConfirmation": "Public proposed — waiting for confirmation",
+        "privateAfterProposal": "Private (public was proposed)"
+      },
       "publicVisibility": {
         "title": "Public visibility (confirmed only)",
         "helper": "This deal will appear on your public profile only if both sides agree.",
@@ -288,6 +295,10 @@
       "actions": {
         "clearDate": "Clear date"
       },
+      "publicRequest": {
+        "label": "Propose this deal as public",
+        "helper": "The other side will confirm public visibility when accepting."
+      },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact."
       },
@@ -316,6 +327,18 @@
     "nextStepHint": "By accepting, you confirm you understand this deal.",
     "processing": "Processing...",
     "accept": "Accept deal",
+    "publicProposal": {
+      "title": "This deal is proposed as PUBLIC.",
+      "body": "If you accept, the deal details will be visible on public profiles."
+    },
+    "publicModal": {
+      "title": "Accept public deal?",
+      "body": "This deal is proposed as public. If you proceed, your acceptance will make its details visible publicly (after confirmation).",
+      "acceptPublic": "Accept as public",
+      "acceptPrivate": "Accept as private",
+      "cancel": "Cancel",
+      "confirm": "Continue"
+    },
     "unknown": "Unknown",
     "noDeadline": "No deadline",
     "errors": {
