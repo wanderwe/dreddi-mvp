@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Locale, locales } from "@/lib/i18n/locales";
 import { useLocale } from "@/lib/i18n/I18nProvider";
+import { requireSupabase } from "@/lib/supabaseClient";
 
 export function LocaleSwitcher({ className }: { className?: string }) {
   const router = useRouter();
@@ -18,9 +19,21 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     setError(null);
 
     try {
+      let authHeader: Record<string, string> = {};
+      try {
+        const supabase = requireSupabase();
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        if (token) {
+          authHeader = { Authorization: `Bearer ${token}` };
+        }
+      } catch {
+        authHeader = {};
+      }
+
       const res = await fetch("/api/locale", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeader },
         body: JSON.stringify({ locale: nextLocale }),
       });
 

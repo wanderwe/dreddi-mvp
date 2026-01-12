@@ -4,7 +4,8 @@
     "newPromise": "Нова угода",
     "login": "Увійти",
     "getStarted": "Почати",
-    "logout": "Вийти"
+    "logout": "Вийти",
+    "notifications": "Сповіщення"
   },
   "landing": {
     "hero": {
@@ -35,7 +36,17 @@
       "notAuthenticated": "Не автентифіковано",
       "copyFailed": "Не вдалося скопіювати посилання",
       "saveFailed": "Не вдалося оновити профіль"
-    }
+    },
+    "notificationsLabel": "Сповіщення",
+    "notificationsDescription": "Керуйте нагадуваннями та сповіщеннями",
+    "pushLabel": "Push-сповіщення",
+    "pushDescription": "Сповіщення в застосунку завжди доступні у центрі",
+    "deadlineLabel": "Нагадування про дедлайн",
+    "quietHoursLabel": "Тихі години",
+    "quietHoursDescription": "Відкладати некритичні сповіщення у тихі години",
+    "quietHoursRangeLabel": "Діапазон тихих годин",
+    "quietHoursHelper": "Типово 22:00–09:00",
+    "save": "Зберегти"
   },
   "promises": {
     "overview": {
@@ -233,7 +244,8 @@
         "helper": "Публічні угоди з'являються у вашому профілі після підтвердження."
       },
       "errors": {
-        "counterpartyRequired": "Додайте контакт іншої сторони"
+        "counterpartyRequired": "Додайте контакт іншої сторони",
+        "createFailed": "Не вдалося створити домовленість"
       },
       "submit": "Створити угоду",
       "creating": "Створення…"
@@ -332,6 +344,17 @@
     "empty": "Публічних профілів поки немає.",
     "errors": {
       "supabase": "Supabase не налаштовано."
+    }
+  },
+  "notifications": {
+    "eyebrow": "СПОВІЩЕННЯ",
+    "title": "Сповіщення",
+    "subtitle": "Будьте в курсі домовленостей.",
+    "loading": "Завантаження сповіщень…",
+    "empty": "Сповіщень поки немає.",
+    "markRead": "Позначити як прочитане",
+    "errors": {
+      "unavailable": "Аутентифікація недоступна в цьому превʼю."
     }
   }
 }

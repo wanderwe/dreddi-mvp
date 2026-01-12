@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
+import {
+  buildCtaUrl,
+  buildDedupeKey,
+  createNotification,
+  mapPriorityForType,
+} from "@/lib/notifications/service";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -65,7 +72,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     // якщо вже прийнято
-    const alreadyAccepted = Boolean(p.counterparty_id || p.counterparty_accepted_at);
+    const alreadyAccepted = Boolean(p.counterparty_accepted_at);
     const alreadyParticipant =
       p.counterparty_id === userId || p.promisor_id === userId || p.promisee_id === userId;
 
@@ -108,6 +115,38 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
 
     if (upErr) {
       return NextResponse.json({ error: "Accept failed", detail: upErr.message }, { status: 500 });
+    }
+
+    const { data: updatedPromise } = await admin
+      .from("promises")
+      .select("id, creator_id, counterparty_id, promisor_id, promisee_id")
+      .eq("id", p.id)
+      .single();
+
+    if (updatedPromise) {
+      const executorId = resolveExecutorId(updatedPromise);
+
+      if (executorId) {
+        await createNotification(admin, {
+          userId: executorId,
+          promiseId: updatedPromise.id,
+          type: "N2",
+          role: "executor",
+          dedupeKey: buildDedupeKey(["N2", updatedPromise.id, "executor"]),
+          ctaUrl: buildCtaUrl(updatedPromise.id),
+          priority: mapPriorityForType("N2"),
+        });
+      }
+
+      await createNotification(admin, {
+        userId: updatedPromise.creator_id,
+        promiseId: updatedPromise.id,
+        type: "N2",
+        role: "creator",
+        dedupeKey: buildDedupeKey(["N2", updatedPromise.id, "creator"]),
+        ctaUrl: buildCtaUrl(updatedPromise.id),
+        priority: mapPriorityForType("N2"),
+      });
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

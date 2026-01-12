@@ -336,12 +336,19 @@ export default function NewPromisePage() {
 
     setBusy(false);
 
-    if (insertError) {
-      setError(insertError.message);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? t("promises.new.errors.createFailed"));
       return;
     }
 
-    router.push(`/promises/${insertData.id}`);
+    const body = await res.json().catch(() => ({}));
+    if (!body?.id) {
+      setError(t("promises.new.errors.createFailed"));
+      return;
+    }
+
+    router.push(`/promises/${body.id}`);
   }
 
   return (

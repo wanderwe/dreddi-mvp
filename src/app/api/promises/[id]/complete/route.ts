@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
+import {
+  buildDedupeKey,
+  createNotification,
+  mapPriorityForType,
+} from "@/lib/notifications/service";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -17,7 +22,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const acceptedBySecondSide = Boolean(
-      promise.counterparty_id ?? (promise.promisor_id && promise.promisee_id)
+      promise.counterparty_accepted_at ?? (promise.promisor_id && promise.promisee_id)
     );
 
     if (!acceptedBySecondSide) {
@@ -29,11 +34,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const admin = getAdminClient();
+    const nowIso = new Date().toISOString();
     const { error } = await admin
       .from("promises")
       .update({
         status: "completed_by_promisor",
-        completed_at: new Date().toISOString(),
+        completed_at: nowIso,
         confirmed_at: null,
         disputed_at: null,
         disputed_code: null,
@@ -47,6 +53,34 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         { status: 500 }
       );
     }
+
+    const { data: state } = await admin
+      .from("promise_notification_state")
+      .select("completion_cycle_id")
+      .eq("promise_id", id)
+      .maybeSingle();
+
+    const nextCycle = (state?.completion_cycle_id ?? 0) + 1;
+
+    await admin.from("promise_notification_state").upsert({
+      promise_id: id,
+      completion_cycle_id: nextCycle,
+      completion_cycle_started_at: nowIso,
+      completion_notified_at: nowIso,
+      completion_followups_count: 0,
+      completion_followup_last_at: null,
+      updated_at: nowIso,
+    });
+
+    await createNotification(admin, {
+      userId: promise.creator_id,
+      promiseId: id,
+      type: "N5",
+      role: "creator",
+      dedupeKey: buildDedupeKey(["N5", id, nextCycle, "initial"]),
+      ctaUrl: `/promises/${id}/confirm`,
+      priority: mapPriorityForType("N5"),
+    });
 
     return NextResponse.json({ ok: true });
   } catch (e) {
