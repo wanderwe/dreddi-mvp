@@ -57,19 +57,31 @@ export default function Home() {
       ? [
           {
             id: "demo-1",
-            title: "Підготувати лендинг до 10 січня",
+            title: "Надіслати план запуску клієнтів за Q3 до п’ятниці",
             meta: "Відповідальність прийнята • Результат: підтверджено",
             status: "confirmed",
           },
           {
             id: "demo-2",
-            title: "Підготувати пітч для інвесторів",
-            meta: "Відповідальність в роботі • Результат: в процесі",
+            title: "Повернути 250$ Маї за нестачу оренди",
+            meta: "Погашення боргу заплановано • Результат: в процесі",
             status: "active",
           },
           {
             id: "demo-3",
-            title: "Завершити монтаж кухні до кінця року",
+            title: "Полагодити протікання кухонного крана до перевірки",
+            meta: "Роботу здали • Результат: очікує підтвердження",
+            status: "completed_by_promisor",
+          },
+          {
+            id: "demo-4",
+            title: "Виконати вправи з реабілітації два тижні поспіль",
+            meta: "Відповідальність в роботі • Результат: в процесі",
+            status: "active",
+          },
+          {
+            id: "demo-5",
+            title: "Організувати вечерю на день народження Алекса і купити продукти",
             meta: "Відповідальність оскаржено • Результат: перегляд",
             status: "disputed",
           },
@@ -77,19 +89,31 @@ export default function Home() {
       : [
           {
             id: "demo-1",
-            title: "Deliver landing page by Jan 10",
+            title: "Send the Q3 customer rollout plan by Friday",
             meta: "Responsibility accepted • Outcome: confirmed",
             status: "confirmed",
           },
           {
             id: "demo-2",
-            title: "Prepare investor pitch",
-            meta: "Responsibility in motion • Outcome: active",
+            title: "Pay back $250 to Maya for the rent shortfall",
+            meta: "Debt repayment scheduled • Outcome: active",
             status: "active",
           },
           {
             id: "demo-3",
-            title: "Complete kitchen installation by year-end",
+            title: "Fix the kitchen sink leak before the inspection",
+            meta: "Work submitted • Outcome: awaiting confirmation",
+            status: "completed_by_promisor",
+          },
+          {
+            id: "demo-4",
+            title: "Complete physical therapy exercises for two straight weeks",
+            meta: "Responsibility in motion • Outcome: active",
+            status: "active",
+          },
+          {
+            id: "demo-5",
+            title: "Host Alex’s birthday dinner and cover the groceries",
             meta: "Responsibility disputed • Outcome: under review",
             status: "disputed",
           },
@@ -462,26 +486,38 @@ export default function Home() {
                   </Link>
                 </div>
                 {!isAuthenticated ? (
-                  <div className="mt-3 space-y-2 text-sm">
+                  <div className="mt-3">
                     <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
-                    {demoDeals.map((item) => (
+                    <div className="relative mt-3">
                       <div
-                        key={item.id}
-                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">{item.title}</div>
-                          {item.meta ? (
-                            <div className="text-xs text-slate-400">{item.meta}</div>
-                          ) : null}
-                        </div>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                        >
-                          {statusLabels[item.status] ?? item.status}
-                        </span>
+                        className="pointer-events-none absolute inset-x-0 top-0 h-6 rounded-t-2xl bg-gradient-to-b from-[#0a0f17] via-[#0a0f17]/80 to-transparent"
+                        aria-hidden
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 rounded-b-2xl bg-gradient-to-t from-[#0a0f17] via-[#0a0f17]/80 to-transparent"
+                        aria-hidden
+                      />
+                      <div className="deal-scroll max-h-64 space-y-2 overflow-y-auto pr-2 text-sm">
+                        {demoDeals.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                          >
+                            <div>
+                              <div className="font-semibold text-white">{item.title}</div>
+                              {item.meta ? (
+                                <div className="text-xs text-slate-400">{item.meta}</div>
+                              ) : null}
+                            </div>
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                            >
+                              {statusLabels[item.status] ?? item.status}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -491,80 +527,90 @@ export default function Home() {
                       </div>
                     )}
 
-                    <div className="mt-3 space-y-2 text-sm">
-                      {reputationLoading || recentLoading ? (
-                        <div className="space-y-2">
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
-                          ))}
-                        </div>
-                      ) : recentEvents.length > 0 ? (
-                        recentEvents.map((event) => (
-                          <div
-                            key={event.id}
-                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                          >
-                            <div>
-                              <div className="font-semibold text-white">
-                                {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
-                                {event.kind.replace("promise_", "").replace("_", " ")}
-                              </div>
-                              <div className="text-xs text-slate-400">
-                                {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
-                                {" • "}
-                                {new Date(event.created_at).toLocaleString(locale)}
-                              </div>
-                            </div>
-                            <span
-                              className={[
-                                "rounded-full px-3 py-1 text-xs",
-                                event.delta >= 0
-                                  ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                                  : "bg-red-500/10 text-red-100 border border-red-400/30",
-                              ].join(" ")}
-                            >
-                              {event.delta >= 0
-                                ? t("home.recentDeals.sentiment.positive")
-                                : t("home.recentDeals.sentiment.negative")}
-                            </span>
+                    <div className="relative mt-3">
+                      <div
+                        className="pointer-events-none absolute inset-x-0 top-0 h-6 rounded-t-2xl bg-gradient-to-b from-[#0a0f17] via-[#0a0f17]/80 to-transparent"
+                        aria-hidden
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-x-0 bottom-0 h-8 rounded-b-2xl bg-gradient-to-t from-[#0a0f17] via-[#0a0f17]/80 to-transparent"
+                        aria-hidden
+                      />
+                      <div className="deal-scroll max-h-64 space-y-2 overflow-y-auto pr-2 text-sm">
+                        {reputationLoading || recentLoading ? (
+                          <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                              <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                            ))}
                           </div>
-                        ))
-                      ) : recentDeals.length === 0 ? (
-                        <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                          {t("home.recentDeals.empty")}
-                        </div>
-                      ) : (
-                        recentDeals.map((item) => {
-                          const metaText =
-                            item.meta ??
-                            (item.due_at
-                              ? t("home.recentDeals.placeholderMetaDue", {
-                                  date: formatDateShort(item.due_at),
-                                })
-                              : item.created_at
-                              ? t("home.recentDeals.placeholderMetaCreated", {
-                                  date: formatDateShort(item.created_at),
-                                })
-                              : "");
-
-                          return (
+                        ) : recentEvents.length > 0 ? (
+                          recentEvents.map((event) => (
                             <div
-                              key={item.id}
+                              key={event.id}
                               className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                             >
                               <div>
-                                <div className="font-semibold text-white">{item.title}</div>
-                                <div className="text-xs text-slate-400">{metaText}</div>
+                                <div className="font-semibold text-white">
+                                  {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
+                                  {event.kind.replace("promise_", "").replace("_", " ")}
+                                </div>
+                                <div className="text-xs text-slate-400">
+                                  {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
+                                  {" • "}
+                                  {new Date(event.created_at).toLocaleString(locale)}
+                                </div>
                               </div>
                               <span
-                                className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                className={[
+                                  "rounded-full px-3 py-1 text-xs",
+                                  event.delta >= 0
+                                    ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                                    : "bg-red-500/10 text-red-100 border border-red-400/30",
+                                ].join(" ")}
                               >
-                                {statusLabels[item.status] ?? item.status}
+                                {event.delta >= 0
+                                  ? t("home.recentDeals.sentiment.positive")
+                                  : t("home.recentDeals.sentiment.negative")}
                               </span>
                             </div>
-                          );
-                        })
-                      )}
+                          ))
+                        ) : recentDeals.length === 0 ? (
+                          <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                            {t("home.recentDeals.empty")}
+                          </div>
+                        ) : (
+                          recentDeals.map((item) => {
+                            const metaText =
+                              item.meta ??
+                              (item.due_at
+                                ? t("home.recentDeals.placeholderMetaDue", {
+                                    date: formatDateShort(item.due_at),
+                                  })
+                                : item.created_at
+                                ? t("home.recentDeals.placeholderMetaCreated", {
+                                    date: formatDateShort(item.created_at),
+                                  })
+                                : "");
+
+                            return (
+                              <div
+                                key={item.id}
+                                className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                              >
+                                <div>
+                                  <div className="font-semibold text-white">{item.title}</div>
+                                  <div className="text-xs text-slate-400">{metaText}</div>
+                                </div>
+                                <span
+                                  className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                >
+                                  {statusLabels[item.status] ?? item.status}
+                                </span>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

@@ -40,3 +40,25 @@ body {
   background-size: 140px 140px, 140px 140px;
   opacity: 0.15;
 }
+
+.deal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+}
+
+.deal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.deal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.deal-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+}
+
+.deal-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.6);
+}
