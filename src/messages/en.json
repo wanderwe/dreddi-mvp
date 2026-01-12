@@ -5,7 +5,8 @@
       "name": "Dreddi",
       "suffix": "knows"
     },
-    "tagline": "Accepted agreements lock responsibility and outcomes into your reputation trail — Dreddi knows.",
+    "taglineTitle": "Agreements matter only after they’re accepted.",
+    "taglineBody": "Dreddi helps two people fix an agreement, explicitly accept responsibility, and leave a factual reputation trail — without legal enforcement, but with real accountability.",
     "highlights": {
       "promisesTracked": "Agreement accepted",
       "reputationIntact": "Responsibility fixed",
@@ -34,8 +35,8 @@
       "reputation": "Unable to load reputation"
     },
     "cta": {
-      "getStarted": "Get started",
-      "publicProfiles": "See public profiles",
+      "getStarted": "Create deal",
+      "publicProfiles": "View public profiles",
       "createPromise": "Create deal",
       "reviewDeals": "Review deals",
       "logout": "Log out"

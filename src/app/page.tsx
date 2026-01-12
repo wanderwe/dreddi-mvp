@@ -52,22 +52,6 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const isAuthenticated = Boolean(email);
 
-  const highlights = [
-    {
-      key: "promisesTracked",
-      text: t("home.highlights.promisesTracked"),
-    },
-    {
-      key: "reputationIntact",
-      text: t("home.highlights.reputationIntact"),
-    },
-    {
-      key: "dreddiKnows",
-      text: t("home.highlights.dreddiKnows"),
-    },
-  ];
-  const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
-
   const demoDeals: DealRow[] =
     locale === "uk"
       ? [
@@ -343,12 +327,7 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
-          <div className="order-1 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-emerald-200 sm:px-4 sm:py-2 sm:text-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(74,222,128,0.25)]" />
-            {t("home.eyebrow")}
-          </div>
-
-          <div className="order-2 space-y-4">
+          <div className="order-1 space-y-4">
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
@@ -356,8 +335,11 @@ export default function Home() {
                 <span className="text-white">knows</span>
               </div>
             </div>
+            <p className="max-w-xl text-xl font-semibold text-white">
+              {t("home.taglineTitle")}
+            </p>
             <p className="max-w-xl text-lg text-slate-300">
-              {t("home.tagline")}
+              {t("home.taglineBody")}
             </p>
           </div>
 
@@ -398,19 +380,6 @@ export default function Home() {
             </div>
           )}
 
-          <div className="order-4 grid max-w-lg gap-2 md:order-3 md:grid-cols-3">
-            {highlightItems.map((item) => (
-              <div
-                key={item.key}
-                className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
-              >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
-                  ✓
-                </span>
-                {item.text}
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="flex-1">
