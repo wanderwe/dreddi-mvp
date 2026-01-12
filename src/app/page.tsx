@@ -51,71 +51,55 @@ export default function Home() {
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
   const isAuthenticated = Boolean(email);
+  const now = new Date();
+  const nextSaturday = new Date(now);
+  const daysUntilSaturday = (6 - nextSaturday.getDay() + 7) % 7;
+  nextSaturday.setDate(nextSaturday.getDate() + daysUntilSaturday);
+  nextSaturday.setHours(12, 0, 0, 0);
+  const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1, 12, 0, 0, 0);
 
   const demoDeals: DealRow[] =
     locale === "uk"
       ? [
           {
             id: "demo-1",
-            title: "Передати лендинг до 10 січня",
-            meta: "Дедлайн 10 січня • Підтверджено",
-            status: "confirmed",
+            title: "Підготувати pitch deck для інвесторів",
+            status: "active",
+            due_at: null,
           },
           {
             id: "demo-2",
-            title: "Повернути $250 за нестачу оренди",
-            meta: "Погашення боргу • Активна",
-            status: "active",
+            title: "Допомогти з переїздом у вихідні",
+            status: "confirmed",
+            due_at: nextSaturday.toISOString(),
           },
           {
             id: "demo-3",
-            title: "Полагодити протікання кухонної раковини після огляду",
-            meta: "Роботу здали • Очікує підтвердження",
-            status: "completed_by_promisor",
-          },
-          {
-            id: "demo-4",
-            title: "Виконувати реабілітаційні вправи щодня 2 тижні",
-            meta: "В роботі • Активна",
-            status: "active",
-          },
-          {
-            id: "demo-5",
-            title: "Організувати день народження і купити продукти",
-            meta: "Оскаржено • Перегляд",
+            title: "Повернути $500 до 1 березня",
             status: "disputed",
+            due_at: nextMarchFirst.toISOString(),
+            meta: "Результат: перегляд",
           },
         ]
       : [
           {
             id: "demo-1",
-            title: "Deliver landing page by Jan 10",
-            meta: "Due Jan 10 • Confirmed",
-            status: "confirmed",
+            title: "Підготувати pitch deck для інвесторів",
+            status: "active",
+            due_at: null,
           },
           {
             id: "demo-2",
-            title: "Repay $250 rent shortfall",
-            meta: "Debt repayment • Active",
-            status: "active",
+            title: "Допомогти з переїздом у вихідні",
+            status: "confirmed",
+            due_at: nextSaturday.toISOString(),
           },
           {
             id: "demo-3",
-            title: "Fix kitchen sink leak after inspection",
-            meta: "Work submitted • Pending confirmation",
-            status: "completed_by_promisor",
-          },
-          {
-            id: "demo-4",
-            title: "Do rehab exercises daily for 2 weeks",
-            meta: "In progress • Active",
-            status: "active",
-          },
-          {
-            id: "demo-5",
-            title: "Organize birthday dinner and buy groceries",
-            meta: "Disputed • Under review",
+            title: "Повернути $500 до 1 березня",
             status: "disputed",
+            due_at: nextMarchFirst.toISOString(),
+            meta: "Результат: перегляд",
           },
         ];
 
@@ -140,6 +124,18 @@ export default function Home() {
       hour: "numeric",
       minute: "2-digit",
     }).format(new Date(value));
+
+  const getMetaText = (item: DealRow) =>
+    item.meta ??
+    (item.due_at
+      ? t("home.recentDeals.placeholderMetaDue", {
+          date: formatDateShort(item.due_at),
+        })
+      : item.created_at
+      ? t("home.recentDeals.placeholderMetaCreated", {
+          date: formatDateShort(item.created_at),
+        })
+      : "");
 
   useEffect(() => {
     let active = true;
@@ -483,17 +479,18 @@ export default function Home() {
                 {!isAuthenticated ? (
                   <div className="mt-3">
                     <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
-                    <div className="relative mt-3">
-                      <div className="max-h-72 space-y-2 overflow-y-auto pr-2 text-sm">
-                        {demoDeals.map((item) => (
+                    <div className="mt-3 space-y-2 text-sm">
+                      {demoDeals.map((item) => {
+                        const metaText = getMetaText(item);
+                        return (
                           <div
                             key={item.id}
                             className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                           >
                             <div>
                               <div className="font-semibold text-white">{item.title}</div>
-                              {item.meta ? (
-                                <div className="text-xs text-slate-400">{item.meta}</div>
+                              {metaText ? (
+                                <div className="text-xs text-slate-400">{metaText}</div>
                               ) : null}
                             </div>
                             <span
@@ -502,9 +499,8 @@ export default function Home() {
                               {statusLabels[item.status] ?? item.status}
                             </span>
                           </div>
-                        ))}
-                      </div>
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/40 to-transparent" />
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
@@ -515,8 +511,8 @@ export default function Home() {
                       </div>
                     )}
 
-                    <div className="relative mt-3">
-                      <div className="max-h-72 space-y-2 overflow-y-auto pr-2 text-sm">
+                    <div className="mt-3 space-y-2 text-sm">
+                      <div className="space-y-2">
                         {reputationLoading || recentLoading ? (
                           <div className="space-y-2">
                             {[1, 2, 3].map((i) => (
@@ -560,17 +556,7 @@ export default function Home() {
                           </div>
                         ) : (
                           recentDeals.map((item) => {
-                            const metaText =
-                              item.meta ??
-                              (item.due_at
-                                ? t("home.recentDeals.placeholderMetaDue", {
-                                    date: formatDateShort(item.due_at),
-                                  })
-                                : item.created_at
-                                ? t("home.recentDeals.placeholderMetaCreated", {
-                                    date: formatDateShort(item.created_at),
-                                  })
-                                : "");
+                            const metaText = getMetaText(item);
 
                             return (
                               <div
@@ -591,7 +577,6 @@ export default function Home() {
                           })
                         )}
                       </div>
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
                   </>
                 )}
