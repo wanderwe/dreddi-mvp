@@ -1,23 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { isPromiseStatus } from "@/lib/promiseStatus";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calcLatePenalty, calcOnTime, calc_score_impact } from "@/lib/reputation/calcScoreImpact";
-
-export type PromiseRecord = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  due_at: string | null;
-  completed_at: string | null;
-  creator_id: string;
-  counterparty_id: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-  confirmed_at: string | null;
-  disputed_at: string | null;
-  disputed_code: string | null;
-  dispute_reason: string | null;
-};
 
 type ReputationEventKind = "promise_confirmed" | "promise_disputed" | "manual_adjustment";
 
@@ -42,7 +27,7 @@ type EventInput = {
 
 const clampScore = (value: number) => Math.max(0, Math.min(100, value));
 
-function computeDeltas(promise: PromiseRecord): EventInput[] {
+function computeDeltas(promise: PromiseRowMin): EventInput[] {
   const events: EventInput[] = [];
   const executorId = resolveExecutorId(promise);
   if (!executorId) return events;
@@ -95,7 +80,10 @@ async function ensureReputationRows(admin: SupabaseClient, userIds: string[]) {
   await admin.from("user_reputation").upsert(rows, { onConflict: "user_id", ignoreDuplicates: true });
 }
 
-export async function applyReputationForPromiseFinalization(admin: SupabaseClient, promise: PromiseRecord) {
+export async function applyReputationForPromiseFinalization(
+  admin: SupabaseClient,
+  promise: PromiseRowMin
+) {
   if (!promise.creator_id) return;
   if (!isPromiseStatus(promise.status)) return;
   if (promise.status !== "confirmed" && promise.status !== "disputed") return;
