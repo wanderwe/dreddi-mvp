@@ -296,11 +296,11 @@
         "clearDate": "Clear date"
       },
       "publicRequest": {
-        "label": "Propose this deal as public",
-        "helper": "The other side will confirm public visibility when accepting."
+        "label": "Public deal",
+        "helper": "The other side will confirm public visibility when accepting"
       },
       "errors": {
-        "counterpartyRequired": "Please add the other party's contact."
+        "counterpartyRequired": "Please add the other party's contact"
       },
       "submit": "Create deal",
       "creating": "Creating…"
