@@ -57,64 +57,64 @@ export default function Home() {
       ? [
           {
             id: "demo-1",
-            title: "Надіслати план запуску клієнтів за Q3 до п’ятниці",
-            meta: "Відповідальність прийнята • Результат: підтверджено",
+            title: "Передати лендинг до 10 січня",
+            meta: "Дедлайн 10 січня • Підтверджено",
             status: "confirmed",
           },
           {
             id: "demo-2",
-            title: "Повернути 250$ Маї за нестачу оренди",
-            meta: "Погашення боргу заплановано • Результат: в процесі",
+            title: "Повернути $250 за нестачу оренди",
+            meta: "Погашення боргу • Активна",
             status: "active",
           },
           {
             id: "demo-3",
-            title: "Полагодити протікання кухонного крана до перевірки",
-            meta: "Роботу здали • Результат: очікує підтвердження",
+            title: "Полагодити протікання кухонної раковини після огляду",
+            meta: "Роботу здали • Очікує підтвердження",
             status: "completed_by_promisor",
           },
           {
             id: "demo-4",
-            title: "Виконати вправи з реабілітації два тижні поспіль",
-            meta: "Відповідальність в роботі • Результат: в процесі",
+            title: "Виконувати реабілітаційні вправи щодня 2 тижні",
+            meta: "В роботі • Активна",
             status: "active",
           },
           {
             id: "demo-5",
-            title: "Організувати вечерю на день народження Алекса і купити продукти",
-            meta: "Відповідальність оскаржено • Результат: перегляд",
+            title: "Організувати день народження і купити продукти",
+            meta: "Оскаржено • Перегляд",
             status: "disputed",
           },
         ]
       : [
           {
             id: "demo-1",
-            title: "Send the Q3 customer rollout plan by Friday",
-            meta: "Responsibility accepted • Outcome: confirmed",
+            title: "Deliver landing page by Jan 10",
+            meta: "Due Jan 10 • Confirmed",
             status: "confirmed",
           },
           {
             id: "demo-2",
-            title: "Pay back $250 to Maya for the rent shortfall",
-            meta: "Debt repayment scheduled • Outcome: active",
+            title: "Repay $250 rent shortfall",
+            meta: "Debt repayment • Active",
             status: "active",
           },
           {
             id: "demo-3",
-            title: "Fix the kitchen sink leak before the inspection",
-            meta: "Work submitted • Outcome: awaiting confirmation",
+            title: "Fix kitchen sink leak after inspection",
+            meta: "Work submitted • Pending confirmation",
             status: "completed_by_promisor",
           },
           {
             id: "demo-4",
-            title: "Complete physical therapy exercises for two straight weeks",
-            meta: "Responsibility in motion • Outcome: active",
+            title: "Do rehab exercises daily for 2 weeks",
+            meta: "In progress • Active",
             status: "active",
           },
           {
             id: "demo-5",
-            title: "Host Alex’s birthday dinner and cover the groceries",
-            meta: "Responsibility disputed • Outcome: under review",
+            title: "Organize birthday dinner and buy groceries",
+            meta: "Disputed • Under review",
             status: "disputed",
           },
         ];
@@ -352,7 +352,7 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-4">
-            <div className="inline-flex max-w-full whitespace-nowrap overflow-hidden text-ellipsis rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-emerald-200 sm:text-xs">
+            <div className="inline-flex max-w-full whitespace-nowrap rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-emerald-200 sm:text-xs">
               {t("home.eyebrow")}
             </div>
             <div className="flex items-center gap-4">
@@ -483,25 +483,28 @@ export default function Home() {
                 {!isAuthenticated ? (
                   <div className="mt-3">
                     <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
-                    <div className="mt-3 space-y-2 text-sm">
-                      {demoDeals.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                        >
-                          <div>
-                            <div className="font-semibold text-white">{item.title}</div>
-                            {item.meta ? (
-                              <div className="text-xs text-slate-400">{item.meta}</div>
-                            ) : null}
-                          </div>
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                    <div className="relative mt-3">
+                      <div className="max-h-72 space-y-2 overflow-y-auto pr-2 text-sm">
+                        {demoDeals.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                           >
-                            {statusLabels[item.status] ?? item.status}
-                          </span>
-                        </div>
-                      ))}
+                            <div>
+                              <div className="font-semibold text-white">{item.title}</div>
+                              {item.meta ? (
+                                <div className="text-xs text-slate-400">{item.meta}</div>
+                              ) : null}
+                            </div>
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                            >
+                              {statusLabels[item.status] ?? item.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
                   </div>
                 ) : (
@@ -512,80 +515,83 @@ export default function Home() {
                       </div>
                     )}
 
-                    <div className="mt-3 space-y-2 text-sm">
-                      {reputationLoading || recentLoading ? (
-                        <div className="space-y-2">
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
-                          ))}
-                        </div>
-                      ) : recentEvents.length > 0 ? (
-                        recentEvents.map((event) => (
-                          <div
-                            key={event.id}
-                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                          >
-                            <div>
-                              <div className="font-semibold text-white">
-                                {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
-                                {event.kind.replace("promise_", "").replace("_", " ")}
-                              </div>
-                              <div className="text-xs text-slate-400">
-                                {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
-                                {" • "}
-                                {new Date(event.created_at).toLocaleString(locale)}
-                              </div>
-                            </div>
-                            <span
-                              className={[
-                                "rounded-full px-3 py-1 text-xs",
-                                event.delta >= 0
-                                  ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                                  : "bg-red-500/10 text-red-100 border border-red-400/30",
-                              ].join(" ")}
-                            >
-                              {event.delta >= 0
-                                ? t("home.recentDeals.sentiment.positive")
-                                : t("home.recentDeals.sentiment.negative")}
-                            </span>
+                    <div className="relative mt-3">
+                      <div className="max-h-72 space-y-2 overflow-y-auto pr-2 text-sm">
+                        {reputationLoading || recentLoading ? (
+                          <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                              <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                            ))}
                           </div>
-                        ))
-                      ) : recentDeals.length === 0 ? (
-                        <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                          {t("home.recentDeals.empty")}
-                        </div>
-                      ) : (
-                        recentDeals.map((item) => {
-                          const metaText =
-                            item.meta ??
-                            (item.due_at
-                              ? t("home.recentDeals.placeholderMetaDue", {
-                                  date: formatDateShort(item.due_at),
-                                })
-                              : item.created_at
-                              ? t("home.recentDeals.placeholderMetaCreated", {
-                                  date: formatDateShort(item.created_at),
-                                })
-                              : "");
-
-                          return (
+                        ) : recentEvents.length > 0 ? (
+                          recentEvents.map((event) => (
                             <div
-                              key={item.id}
+                              key={event.id}
                               className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                             >
                               <div>
-                                <div className="font-semibold text-white">{item.title}</div>
-                                <div className="text-xs text-slate-400">{metaText}</div>
+                                <div className="font-semibold text-white">
+                                  {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
+                                  {event.kind.replace("promise_", "").replace("_", " ")}
+                                </div>
+                                <div className="text-xs text-slate-400">
+                                  {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
+                                  {" • "}
+                                  {new Date(event.created_at).toLocaleString(locale)}
+                                </div>
                               </div>
                               <span
-                                className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                className={[
+                                  "rounded-full px-3 py-1 text-xs",
+                                  event.delta >= 0
+                                    ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                                    : "bg-red-500/10 text-red-100 border border-red-400/30",
+                                ].join(" ")}
                               >
-                                {statusLabels[item.status] ?? item.status}
+                                {event.delta >= 0
+                                  ? t("home.recentDeals.sentiment.positive")
+                                  : t("home.recentDeals.sentiment.negative")}
                               </span>
                             </div>
-                          );
-                        })
-                      )}
+                          ))
+                        ) : recentDeals.length === 0 ? (
+                          <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                            {t("home.recentDeals.empty")}
+                          </div>
+                        ) : (
+                          recentDeals.map((item) => {
+                            const metaText =
+                              item.meta ??
+                              (item.due_at
+                                ? t("home.recentDeals.placeholderMetaDue", {
+                                    date: formatDateShort(item.due_at),
+                                  })
+                                : item.created_at
+                                ? t("home.recentDeals.placeholderMetaCreated", {
+                                    date: formatDateShort(item.created_at),
+                                  })
+                                : "");
+
+                            return (
+                              <div
+                                key={item.id}
+                                className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                              >
+                                <div>
+                                  <div className="font-semibold text-white">{item.title}</div>
+                                  <div className="text-xs text-slate-400">{metaText}</div>
+                                </div>
+                                <span
+                                  className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                >
+                                  {statusLabels[item.status] ?? item.status}
+                                </span>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
                   </>
                 )}
