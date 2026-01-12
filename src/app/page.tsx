@@ -328,9 +328,9 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-28 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+            <div className="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
               {t("home.eyebrow")}
-            </p>
+            </div>
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
