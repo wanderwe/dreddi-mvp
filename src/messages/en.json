@@ -346,12 +346,11 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
-    "recentDealsMeta": "Finalized {date}",
+    "reputationNote": "Reputation reflects all confirmed outcomes. Only public deals show details.",
     "sections": {
-      "responsibilityStatus": "Public responsibility status",
-      "whatsHappening": "What’s happening now",
-      "trackRecord": "Public track record",
-      "recentConfirmations": "Recent public confirmations"
+      "responsibilityStatus": "Responsibility status",
+      "trackRecord": "Track record",
+      "publicDeals": "Public deals"
     },
     "status": {
       "active": "Active",
@@ -366,16 +365,16 @@
       "overdue": "Overdue since {date}",
       "noDue": "No due date"
     },
-    "emptyStatus": "No active public responsibilities.",
+    "emptyStatus": "No active responsibilities.",
     "emptyInProgress": "No in-progress responsibilities.",
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
     "emptyOverdue": "No overdue responsibilities.",
-    "emptyHistory": "No public history yet.",
-    "emptyRecent": "No public confirmations yet.",
+    "emptyHistory": "No history yet.",
+    "emptyPublicDeals": "No public deals to show yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
-      "private": "Profile is private.",
+      "private": "This profile is private.",
       "notFound": "Profile not found."
     }
   },
