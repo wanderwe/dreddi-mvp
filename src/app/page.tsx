@@ -320,6 +320,8 @@ export default function Home() {
       : "home.score.onTime.helper";
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
   const recentEvents = reputation?.recent_events ?? [];
+  const recentEventsLimited = recentEvents.slice(0, 3);
+  const recentDealsLimited = recentDeals.slice(0, 3);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -520,7 +522,7 @@ export default function Home() {
                             ))}
                           </div>
                         ) : recentEvents.length > 0 ? (
-                          recentEvents.map((event) => (
+                          recentEventsLimited.map((event) => (
                             <div
                               key={event.id}
                               className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
@@ -555,7 +557,7 @@ export default function Home() {
                             {t("home.recentDeals.empty")}
                           </div>
                         ) : (
-                          recentDeals.map((item) => {
+                          recentDealsLimited.map((item) => {
                             const metaText = getMetaText(item);
 
                             return (
