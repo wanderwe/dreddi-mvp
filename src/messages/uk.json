@@ -6,6 +6,11 @@
     "getStarted": "Почати",
     "logout": "Вийти"
   },
+  "landing": {
+    "hero": {
+      "brandSuffix": "знає"
+    }
+  },
   "profileSettings": {
     "sectionLabel": "ПРОФІЛЬ",
     "title": "Налаштування профілю",
