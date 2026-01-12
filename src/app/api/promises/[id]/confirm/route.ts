@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { resolveCounterpartyId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
+import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
+import {
+  buildDedupeKey,
+  createNotification,
+  mapPriorityForType,
+} from "@/lib/notifications/service";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -38,15 +45,32 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
+    const updatedPromise = { ...promise, status: "confirmed", confirmed_at: confirmedAt };
+
     try {
-      await applyReputationForPromiseFinalization(admin, {
-        ...promise,
-        status: "confirmed",
-        confirmed_at: confirmedAt,
-      });
+      await applyReputationForPromiseFinalization(admin, updatedPromise);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to update reputation";
       return NextResponse.json({ error: message }, { status: 500 });
+    }
+
+    const executorId = resolveExecutorId(updatedPromise);
+    if (executorId) {
+      const delta = calc_score_impact({
+        status: updatedPromise.status,
+        due_at: updatedPromise.due_at,
+        completed_at: updatedPromise.completed_at,
+      });
+      await createNotification(admin, {
+        userId: executorId,
+        promiseId: updatedPromise.id,
+        type: "N6",
+        role: "executor",
+        dedupeKey: buildDedupeKey(["N6", updatedPromise.id]),
+        ctaUrl: `/promises/${updatedPromise.id}`,
+        priority: mapPriorityForType("N6"),
+        delta,
+      });
     }
 
     return NextResponse.json({ ok: true });
