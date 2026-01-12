@@ -237,7 +237,8 @@
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact",
-        "createFailed": "Failed to create deal"
+        "createFailed": "Failed to create deal",
+        "network": "Unable to reach the server. Please try again."
       },
       "submit": "Create deal",
       "creating": "Creating…"

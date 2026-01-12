@@ -298,7 +298,6 @@ export default function NewPromisePage() {
       return;
     }
 
-    const user = session.user;
     const counterpartyContact = counterparty.trim();
 
     if (!counterpartyContact) {
@@ -307,46 +306,53 @@ export default function NewPromisePage() {
       return;
     }
 
-    const inviteToken =
-      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const shouldRequestPublic = isPublicDeal && isPublicProfile;
+    const payload = {
+      title: title.trim(),
+      details: details.trim() || null,
+      counterpartyContact,
+      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+      executor,
+      publicRequested: shouldRequestPublic,
+      publicOptInPromisor: shouldRequestPublic && executor === "me",
+      publicOptInPromisee: shouldRequestPublic && executor === "other",
+    };
 
-    const publicPayload =
-      isPublicDeal && isPublicProfile
-        ? {
-            is_public: true,
-          }
-        : {};
-
-    const { data: insertData, error: insertError } = await supabase
-      .from("promises")
-      .insert({
-        creator_id: user.id,
-        promisor_id: executor === "me" ? user.id : null,
-        promisee_id: executor === "other" ? user.id : null,
-        title: title.trim(),
-        details: details.trim() || null,
-        counterparty_contact: counterpartyContact,
-        due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-        status: "active",
-        invite_token: inviteToken,
-        ...publicPayload,
-      })
-      .select("id")
-      .single();
-
-    setBusy(false);
-
-    if (insertError) {
-      setError(insertError.message ?? t("promises.new.errors.createFailed"));
+    let res: Response;
+    try {
+      res = await fetch("/api/promises/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      setBusy(false);
+      setError(t("promises.new.errors.network"));
       return;
     }
 
-    if (!insertData?.id) {
+    setBusy(false);
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
+        return;
+      }
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? t("promises.new.errors.createFailed"));
+      return;
+    }
+
+    const body = (await res.json().catch(() => null)) as { id?: string } | null;
+
+    if (!body?.id) {
       setError(t("promises.new.errors.createFailed"));
       return;
     }
 
-    router.push(`/promises/${insertData.id}`);
+    router.push(`/promises/${body.id}`);
   }
 
   return (
