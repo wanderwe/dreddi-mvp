@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 
 type PromiseRow = {
   id: string;
@@ -258,7 +259,7 @@ export default function PromisePage() {
     const isInviteAccepted = Boolean(p.counterparty_id);
     const isFinal = p.status === "confirmed" || p.status === "disputed";
 
-    if (!isPromisor || isInviteAccepted || isFinal) return;
+    if (!isCreator || isInviteAccepted || isFinal) return;
 
     setError(null);
     setInviteBusy(regenerate ? "regen" : "generate");
@@ -319,16 +320,10 @@ export default function PromisePage() {
     }
   }
 
-  const isPromisor = Boolean(
-    p &&
-      ((p.promisor_id ? userId === p.promisor_id : false) ||
-        (!p.promisee_id && userId === p.creator_id))
-  );
-  const isCounterparty = Boolean(
-    p &&
-      ((p.promisee_id ? userId === p.promisee_id : false) ||
-        (!p.promisee_id && userId === p.counterparty_id))
-  );
+  const executorId = p ? resolveExecutorId(p) : null;
+  const counterpartyId = p ? resolveCounterpartyId(p) : null;
+  const isExecutor = Boolean(userId && executorId && userId === executorId);
+  const isCounterparty = Boolean(userId && counterpartyId && userId === counterpartyId);
   const isCreator = Boolean(p && userId === p.creator_id);
   const counterpartyUserId = p
     ? p.counterparty_id ??
@@ -459,7 +454,7 @@ export default function PromisePage() {
                 {t("promises.detail.currentStatus")}: <StatusPill status={p.status} />
               </div>
 
-              {isPromisor && p.status === "active" && (
+              {isExecutor && p.status === "active" && (
                 isInviteAccepted ? (
                   <ActionButton
                     label={t("promises.detail.markCompleted")}
@@ -473,6 +468,12 @@ export default function PromisePage() {
                     {t("promises.detail.shareInvite")}
                   </div>
                 )
+              )}
+
+              {!isExecutor && isCounterparty && p.status === "active" && isInviteAccepted && (
+                <div className="text-sm text-neutral-400">
+                  {t("promises.detail.awaitingExecutor")}
+                </div>
               )}
 
               {isCounterparty && p.status === "completed_by_promisor" && (
@@ -498,7 +499,7 @@ export default function PromisePage() {
                 <div className="text-sm text-red-300">{t("promises.detail.disputed")}</div>
               )}
 
-              {!isPromisor && !isCounterparty && (
+              {!isExecutor && !isCounterparty && (
                 <div className="text-xs text-neutral-500">{t("promises.detail.guestView")}</div>
               )}
             </div>

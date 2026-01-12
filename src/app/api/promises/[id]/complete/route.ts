@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -10,8 +11,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const promise = await loadPromiseForUser(id, user.id);
     if (promise instanceof NextResponse) return promise;
 
-    if (promise.creator_id !== user.id) {
-      return NextResponse.json({ error: "Only the promisor can complete" }, { status: 403 });
+    const executorId = resolveExecutorId(promise);
+    if (!executorId || executorId !== user.id) {
+      return NextResponse.json({ error: "Only the executor can complete" }, { status: 403 });
     }
 
     const acceptedBySecondSide = Boolean(

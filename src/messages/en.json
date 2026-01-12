@@ -189,6 +189,7 @@
       "markCompleted": "Mark as completed",
       "shareInvite": "Share the invite and wait for acceptance to request confirmation.",
       "reviewConfirm": "Review & confirm",
+      "awaitingExecutor": "Waiting for the executor to mark this complete.",
       "waitingReview": "Waiting for the counterparty to review.",
       "confirmed": "Deal confirmed ✅",
       "disputed": "Deal disputed.",

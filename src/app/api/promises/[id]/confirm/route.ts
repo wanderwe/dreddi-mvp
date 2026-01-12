@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveCounterpartyId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 
@@ -11,7 +12,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const promise = await loadPromiseForUser(id, user.id);
     if (promise instanceof NextResponse) return promise;
 
-    if (promise.counterparty_id !== user.id) {
+    const counterpartyId = resolveCounterpartyId(promise);
+    if (!counterpartyId || counterpartyId !== user.id) {
       return NextResponse.json({ error: "Only the counterparty can confirm" }, { status: 403 });
     }
 
