@@ -17,17 +17,17 @@ SELECT
   profiles.handle,
   profiles.display_name,
   profiles.avatar_url,
-  COALESCE(stats.confirmed_count, 0) AS confirmed_count,
-  0 AS disputed_count,
-  0 AS active_count,
-  0 AS pending_acceptance_count,
-  0 AS overdue_count,
+  COALESCE(stats.confirmed_count, 0::bigint) AS confirmed_count,
+  0::bigint AS disputed_count,
+  0::bigint AS active_count,
+  0::bigint AS pending_acceptance_count,
+  0::bigint AS overdue_count,
   stats.last_activity_at
 FROM profiles
 LEFT JOIN (
   SELECT
     creator_id,
-    COUNT(*) AS confirmed_count,
+    COUNT(*)::bigint AS confirmed_count,
     MAX(COALESCE(confirmed_at, created_at)) AS last_activity_at
   FROM promises
   WHERE status = 'confirmed'

@@ -9,8 +9,8 @@ SELECT
   profiles.display_name,
   profiles.avatar_url,
   user_reputation.score AS reputation_score,
-  COALESCE(user_reputation.confirmed_count, 0) AS confirmed_count,
-  COALESCE(user_reputation.disputed_count, 0) AS disputed_count,
+  COALESCE(user_reputation.confirmed_count::bigint, 0::bigint) AS confirmed_count,
+  COALESCE(user_reputation.disputed_count::bigint, 0::bigint) AS disputed_count,
   activity.last_activity_at
 FROM profiles
 LEFT JOIN user_reputation ON user_reputation.user_id = profiles.id
