@@ -23,7 +23,7 @@ type PromiseRow = {
 
 type TabKey = "i-promised" | "promised-to-me";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
-type ProfileSettingsRow = { is_public_profile: boolean | null };
+type ProfileSettingsRow = { is_public: boolean | null };
 
 export default function PromisesClient() {
   const t = useT();
@@ -136,7 +136,7 @@ export default function PromisesClient() {
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("is_public_profile")
+        .select("is_public")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -144,7 +144,7 @@ export default function PromisesClient() {
         setError(profileError.message);
       } else {
         const profileRow = profileData as ProfileSettingsRow | null;
-        setProfilePublic(profileRow?.is_public_profile ?? false);
+        setProfilePublic(profileRow?.is_public ?? false);
       }
 
       setLoading(false);
@@ -271,7 +271,7 @@ export default function PromisesClient() {
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ is_public_profile: nextValue })
+      .update({ is_public: nextValue })
       .eq("id", data.session.user.id);
 
     setProfileBusy(false);

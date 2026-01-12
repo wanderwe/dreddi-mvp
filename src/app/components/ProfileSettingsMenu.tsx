@@ -22,6 +22,7 @@ type ProfileState = {
   userId: string;
   email: string | null;
   handle: string | null;
+  isPublic: boolean;
 };
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
@@ -65,7 +66,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       const { data, error: profileError } = await supabase
         .from("profiles")
-        .select("handle")
+        .select("handle,is_public")
         .eq("id", session.user.id)
         .single();
 
@@ -77,12 +78,15 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         return;
       }
 
-      const handle = (data as { handle?: string | null } | null)?.handle ?? null;
+      const profileRow = data as { handle?: string | null; is_public?: boolean | null } | null;
+      const handle = profileRow?.handle ?? null;
+      const isPublic = profileRow?.is_public ?? false;
       if (handle) lastHandleRef.current = handle;
       setProfile({
         userId: session.user.id,
         email: session.user.email ?? null,
         handle,
+        isPublic,
       });
       setLoading(false);
     };
@@ -105,7 +109,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
   }, [profile]);
 
-  const isPublic = Boolean(profile?.handle);
+  const isPublic = Boolean(profile?.isPublic);
   const publicProfilePath = useMemo(() => {
     if (!profile?.handle) return "";
     return `/u/${encodeURIComponent(profile.handle)}`;
@@ -129,15 +133,15 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     const nextPublic = !isPublic;
     const nextHandle = nextPublic
       ? lastHandleRef.current ?? profile.handle ?? defaultHandle
-      : null;
+      : profile.handle;
 
-    if (!nextPublic && profile.handle) {
+    if (profile.handle) {
       lastHandleRef.current = profile.handle;
     }
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ handle: nextHandle })
+      .update({ is_public: nextPublic, handle: nextHandle })
       .eq("id", profile.userId);
 
     if (updateError) {
@@ -146,7 +150,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       return;
     }
 
-    setProfile((prev) => (prev ? { ...prev, handle: nextHandle } : prev));
+    setProfile((prev) => (prev ? { ...prev, handle: nextHandle, isPublic: nextPublic } : prev));
     setSaving(false);
   };
 
