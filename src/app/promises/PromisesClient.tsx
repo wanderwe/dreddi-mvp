@@ -18,6 +18,7 @@ type PromiseRow = {
   created_at: string;
   completed_at: string | null;
   counterparty_id: string | null;
+  counterparty_accepted_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -98,7 +99,7 @@ export default function PromisesClient() {
         .from("promises")
         // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
         .select(
-          "id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
+          "id,title,status,due_at,created_at,completed_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
         )
         .or(
           `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
@@ -121,7 +122,9 @@ export default function PromisesClient() {
               ...r,
               status: r.status as PromiseStatus,
               role,
-              acceptedBySecondSide: Boolean(r.counterparty_id ?? (r.promisor_id && r.promisee_id)),
+              acceptedBySecondSide: Boolean(
+                r.counterparty_accepted_at ?? (r.promisor_id && r.promisee_id)
+              ),
             };
           });
 

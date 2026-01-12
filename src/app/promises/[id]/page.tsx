@@ -19,6 +19,7 @@ type PromiseRow = {
 
   invite_token: string | null;
   counterparty_id: string | null;
+  counterparty_accepted_at: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -192,7 +193,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,public_requested,public_opt_in_promisor,public_opt_in_promisee"
+        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id,public_requested,public_opt_in_promisor,public_opt_in_promisee"
       )
       .eq("id", id)
       .single();
@@ -256,7 +257,7 @@ export default function PromisePage() {
   async function generateInvite(regenerate = false) {
     if (!p) return;
 
-    const isInviteAccepted = Boolean(p.counterparty_id);
+    const isInviteAccepted = Boolean(p.counterparty_accepted_at);
     const isFinal = p.status === "confirmed" || p.status === "disputed";
 
     if (!isCreator || isInviteAccepted || isFinal) return;
@@ -326,7 +327,7 @@ export default function PromisePage() {
   const isCounterparty = Boolean(userId && counterpartyId && userId === counterpartyId);
   const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
-  const isInviteAccepted = Boolean(p?.counterparty_id ?? (p?.promisor_id && p?.promisee_id));
+  const isInviteAccepted = Boolean(p?.counterparty_accepted_at ?? (p?.promisor_id && p?.promisee_id));
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const publicOptInCount = p

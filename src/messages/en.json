@@ -84,7 +84,8 @@
     "newPromise": "New deal",
     "login": "Sign in",
     "getStarted": "Get started",
-    "logout": "Log out"
+    "logout": "Log out",
+    "notifications": "Notifications"
   },
   "profileSettings": {
     "sectionLabel": "PROFILE",
@@ -110,7 +111,17 @@
       "notAuthenticated": "Not authenticated",
       "copyFailed": "Failed to copy link",
       "saveFailed": "Failed to update profile"
-    }
+    },
+    "notificationsLabel": "Notifications",
+    "notificationsDescription": "Control when we send reminders and alerts",
+    "pushLabel": "Push notifications",
+    "pushDescription": "In-app alerts always appear in your notification center",
+    "deadlineLabel": "Deadline reminders",
+    "quietHoursLabel": "Quiet hours",
+    "quietHoursDescription": "Delay non-critical alerts during quiet hours",
+    "quietHoursRangeLabel": "Quiet hours range",
+    "quietHoursHelper": "Default 22:00–09:00",
+    "save": "Save"
   },
   "promises": {
     "overview": {
@@ -300,7 +311,8 @@
         "helper": "The other side will confirm public visibility when accepting"
       },
       "errors": {
-        "counterpartyRequired": "Please add the other party's contact"
+        "counterpartyRequired": "Please add the other party's contact",
+        "createFailed": "Failed to create deal"
       },
       "submit": "Create deal",
       "creating": "Creating…"
@@ -401,6 +413,17 @@
     "empty": "No public profiles yet.",
     "errors": {
       "supabase": "Supabase is not configured."
+    }
+  },
+  "notifications": {
+    "eyebrow": "NOTIFICATIONS",
+    "title": "Notifications",
+    "subtitle": "Stay on top of agreements.",
+    "loading": "Loading notifications…",
+    "empty": "No notifications yet.",
+    "markRead": "Mark as read",
+    "errors": {
+      "unavailable": "Authentication is unavailable in this preview."
     }
   }
 }

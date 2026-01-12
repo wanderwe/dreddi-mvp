@@ -307,43 +307,42 @@ export default function NewPromisePage() {
       return;
     }
 
-    const inviteToken =
-      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const publicRequestedPayload = Boolean(publicRequested && isPublicProfile);
+    const payload = {
+      title: title.trim(),
+      details: details.trim() || null,
+      counterpartyContact,
+      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+      executor,
+      publicRequested: publicRequestedPayload,
+      publicOptInPromisor: publicRequestedPayload && executor === "me",
+      publicOptInPromisee: publicRequestedPayload && executor === "other",
+    };
 
-    const publicPayload =
-      publicRequested && isPublicProfile
-        ? {
-            public_requested: true,
-            public_opt_in_promisor: executor === "me",
-            public_opt_in_promisee: executor === "other",
-          }
-        : {};
-
-    const { data: insertData, error: insertError } = await supabase
-      .from("promises")
-      .insert({
-        creator_id: user.id,
-        promisor_id: executor === "me" ? user.id : null,
-        promisee_id: executor === "other" ? user.id : null,
-        title: title.trim(),
-        details: details.trim() || null,
-        counterparty_contact: counterpartyContact,
-        due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-        status: "active",
-        invite_token: inviteToken,
-        ...publicPayload,
-      })
-      .select("id")
-      .single();
+    const res = await fetch("/api/promises/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
     setBusy(false);
 
-    if (insertError) {
-      setError(insertError.message);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? t("promises.new.errors.createFailed"));
       return;
     }
 
-    router.push(`/promises/${insertData.id}`);
+    const body = await res.json().catch(() => ({}));
+    if (!body?.id) {
+      setError(t("promises.new.errors.createFailed"));
+      return;
+    }
+
+    router.push(`/promises/${body.id}`);
   }
 
   return (
