@@ -75,11 +75,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     await createNotification(admin, {
       userId: promise.creator_id,
       promiseId: id,
-      type: "N5",
+      type: "completion_waiting",
       role: "creator",
-      dedupeKey: buildDedupeKey(["N5", id, nextCycle, "initial"]),
+      dedupeKey: buildDedupeKey(["completion_waiting", id, nextCycle, "initial"]),
       ctaUrl: `/promises/${id}/confirm`,
-      priority: mapPriorityForType("N5"),
+      priority: mapPriorityForType("completion_waiting"),
     });
 
     return NextResponse.json({ ok: true });

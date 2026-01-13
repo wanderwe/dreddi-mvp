@@ -13,12 +13,14 @@ import type {
   NotificationRole,
   NotificationSettings,
   NotificationType,
+  NotificationTypeInput,
+  normalizeNotificationType,
 } from "./types";
 
 export type NotificationRequest = {
   userId: string;
   promiseId: string;
-  type: NotificationType;
+  type: NotificationTypeInput;
   role?: NotificationRole;
   dedupeKey: string;
   ctaUrl: string;
@@ -103,6 +105,7 @@ export async function createNotification(
   now = new Date()
 ): Promise<NotificationOutcome> {
   const settings = await getUserNotificationSettings(admin, request.userId);
+  const normalizedType = normalizeNotificationType(request.type);
 
   const { data: existing } = await admin
     .from("notifications")
@@ -151,12 +154,13 @@ export async function createNotification(
   });
 
   const deliverNow =
-    settings.pushEnabled && (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(request.type));
+    settings.pushEnabled &&
+    (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
 
   const { error } = await admin.from("notifications").insert({
     user_id: request.userId,
     promise_id: request.promiseId,
-    type: request.type,
+    type: normalizedType,
     title: copy.title,
     body: copy.body,
     cta_label: copy.ctaLabel,
@@ -194,21 +198,21 @@ export const buildCtaUrl = (promiseId: string, path?: string) => {
   return `/promises/${promiseId}`;
 };
 
-export const mapPriorityForType = (type: NotificationType): NotificationPriority => {
-  switch (type) {
-    case "N5":
+export const mapPriorityForType = (type: NotificationTypeInput): NotificationPriority => {
+  switch (normalizeNotificationType(type)) {
+    case "completion_waiting":
       return "critical";
-    case "N6":
-    case "N7":
+    case "completion_followup":
+    case "dispute":
       return "high";
-    case "N4":
+    case "overdue":
       return "high";
     default:
       return "normal";
   }
 };
 
-export const shouldBypassDailyCap = (type: NotificationType) =>
-  CRITICAL_NOTIFICATION_TYPES.includes(type);
+export const shouldBypassDailyCap = (type: NotificationTypeInput) =>
+  CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
 
 export const getDailyCap = () => DAILY_NOTIFICATION_CAP;
