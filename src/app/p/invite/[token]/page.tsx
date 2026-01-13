@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type InviteInfo = {
   id: string;
@@ -141,13 +142,7 @@ export default function InvitePage() {
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("invite.noDeadline");
-    return new Intl.DateTimeFormat(locale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(dueAt));
+    return formatDueDate(dueAt, locale, { includeYear: true }) ?? dueAt;
   };
 
   return (

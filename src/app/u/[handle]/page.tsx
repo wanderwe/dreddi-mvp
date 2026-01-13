@@ -6,6 +6,7 @@ import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type PublicProfileRow = {
   handle: string;
@@ -59,18 +60,6 @@ export default function PublicProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
-
-  const formatDateShort = useMemo(
-    () =>
-      (value: string) =>
-        new Intl.DateTimeFormat(locale, {
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        }).format(new Date(value)),
-    [locale]
-  );
 
   useEffect(() => {
     let active = true;
@@ -310,7 +299,9 @@ export default function PublicProfilePage() {
                         <p className="text-xs text-white/50">
                           {promise.due_at
                             ? t("publicProfile.meta.due", {
-                                date: formatDateShort(promise.due_at),
+                                date:
+                                  formatDueDate(promise.due_at, locale, { includeYear: false }) ??
+                                  promise.due_at,
                               })
                             : t("publicProfile.meta.noDue")}
                         </p>

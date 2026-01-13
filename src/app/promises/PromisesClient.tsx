@@ -9,6 +9,7 @@ import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promi
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type PromiseRow = {
   id: string;
@@ -36,13 +37,7 @@ export default function PromisesClient() {
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("promises.list.noDeadline");
-    return new Intl.DateTimeFormat(locale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(dueAt));
+    return formatDueDate(dueAt, locale, { includeYear: true }) ?? dueAt;
   };
 
   const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {

@@ -9,6 +9,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type DealRow = {
   id: string;
@@ -139,13 +140,21 @@ export default function Home() {
     return new Intl.DateTimeFormat(locale, options).format(new Date(value));
   };
 
-  const getMetaText = (item: DealRow) =>
-    item.meta ??
-    (item.due_at
-      ? copy.recentDeals.placeholderMetaDue(formatDateShort(item.due_at))
-      : item.created_at
-      ? copy.recentDeals.placeholderMetaCreated(formatDateShort(item.created_at))
-      : "");
+  const getMetaText = (item: DealRow) => {
+    if (item.meta) return item.meta;
+    if (item.due_at) {
+      const formatted = formatDueDate(item.due_at, locale, { includeYear: false });
+      if (formatted) {
+        return copy.recentDeals.placeholderMetaDue(formatted);
+      }
+    }
+
+    if (item.created_at) {
+      return copy.recentDeals.placeholderMetaCreated(formatDateShort(item.created_at));
+    }
+
+    return "";
+  };
 
   useEffect(() => {
     let active = true;

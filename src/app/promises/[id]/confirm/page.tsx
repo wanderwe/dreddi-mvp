@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type PromiseRow = {
   id: string;
@@ -41,20 +42,8 @@ export default function ConfirmPromisePage() {
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
 
-  const formatDate = (value: string | null) => {
-    if (!value) return t("promises.confirm.noDeadline");
-    try {
-      return new Intl.DateTimeFormat(locale, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      }).format(new Date(value));
-    } catch {
-      return value ?? t("promises.confirm.noDeadline");
-    }
-  };
+  const formatDate = (value: string | null) =>
+    formatDueDate(value, locale, { includeYear: true }) ?? t("promises.confirm.noDeadline");
 
   const disputeOptions = useMemo(
     () =>
