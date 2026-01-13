@@ -13,9 +13,7 @@ type CreatePromisePayload = {
   counterpartyContact?: string | null;
   dueAt?: string | null;
   executor?: "me" | "other";
-  publicRequested?: boolean;
-  publicOptInPromisor?: boolean;
-  publicOptInPromisee?: boolean;
+  visibility?: "private" | "public";
 };
 
 export async function POST(req: Request) {
@@ -44,6 +42,16 @@ export async function POST(req: Request) {
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     const admin = getAdminClient();
+    const requestedVisibility = body?.visibility === "public" ? "public" : "private";
+
+    const { data: profileRow } = await admin
+      .from("profiles")
+      .select("is_public_profile")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const visibility =
+      requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
 
     const { data: matchingProfile } = await admin
       .from("profiles")
@@ -65,9 +73,7 @@ export async function POST(req: Request) {
       status: "active",
       invite_token: inviteToken,
       counterparty_id: counterpartyId,
-      public_requested: body?.publicRequested ?? false,
-      public_opt_in_promisor: body?.publicOptInPromisor ?? false,
-      public_opt_in_promisee: body?.publicOptInPromisee ?? false,
+      visibility,
     };
 
     const { data: insertData, error: insertError } = await admin
@@ -97,13 +103,13 @@ export async function POST(req: Request) {
       const created = await createNotification(admin, {
         userId: insertData.counterparty_id,
         promiseId: insertData.id,
-        type: "N1",
+        type: "invite",
         role: "executor",
-        dedupeKey: buildDedupeKey(["N1", insertData.id]),
+        dedupeKey: buildDedupeKey(["invite", insertData.id]),
         ctaUrl: insertData.invite_token
           ? `/p/invite/${insertData.invite_token}`
           : buildCtaUrl(insertData.id),
-        priority: mapPriorityForType("N1"),
+        priority: mapPriorityForType("invite"),
       });
 
       if (created.created) {

@@ -103,12 +103,12 @@ export async function POST(req: Request) {
     const created = await createNotification(admin, {
       userId: row.counterparty_id,
       promiseId: row.id,
-      type: "N1",
+      type: "invite",
       role: "executor",
       followup: "invite",
-      dedupeKey: buildDedupeKey(["N1", row.id, "followup"]),
+      dedupeKey: buildDedupeKey(["invite", row.id, "followup"]),
       ctaUrl: row.invite_token ? `/p/invite/${row.invite_token}` : buildCtaUrl(row.id),
-      priority: mapPriorityForType("N1"),
+      priority: mapPriorityForType("invite"),
     });
 
     if (created.created) {
@@ -142,11 +142,11 @@ export async function POST(req: Request) {
     const created = await createNotification(admin, {
       userId: executorId,
       promiseId: row.id,
-      type: "N3",
+      type: "due_soon",
       role: "executor",
-      dedupeKey: buildDedupeKey(["N3", row.id]),
+      dedupeKey: buildDedupeKey(["due_soon", row.id]),
       ctaUrl: buildCtaUrl(row.id),
-      priority: mapPriorityForType("N3"),
+      priority: mapPriorityForType("due_soon"),
       requiresDeadlineReminder: true,
     });
 
@@ -184,11 +184,11 @@ export async function POST(req: Request) {
       const created = await createNotification(admin, {
         userId: executorId,
         promiseId: row.id,
-        type: "N4",
+        type: "overdue",
         role: "executor",
-        dedupeKey: buildDedupeKey(["N4", row.id, "executor", lastOverdue ? "repeat" : "first"]),
+        dedupeKey: buildDedupeKey(["overdue", row.id, "executor", lastOverdue ? "repeat" : "first"]),
         ctaUrl: buildCtaUrl(row.id),
-        priority: mapPriorityForType("N4"),
+        priority: mapPriorityForType("overdue"),
       });
 
       if (created.created) {
@@ -207,11 +207,11 @@ export async function POST(req: Request) {
       const created = await createNotification(admin, {
         userId: row.creator_id,
         promiseId: row.id,
-        type: "N4",
+        type: "overdue",
         role: "creator",
-        dedupeKey: buildDedupeKey(["N4", row.id, "creator"]),
+        dedupeKey: buildDedupeKey(["overdue", row.id, "creator"]),
         ctaUrl: buildCtaUrl(row.id),
-        priority: mapPriorityForType("N4"),
+        priority: mapPriorityForType("overdue"),
       });
 
       if (created.created) {
@@ -253,12 +253,17 @@ export async function POST(req: Request) {
     const created = await createNotification(admin, {
       userId: row.creator_id,
       promiseId: row.id,
-      type: "N5",
+      type: "completion_waiting",
       role: "creator",
       followup,
-      dedupeKey: buildDedupeKey(["N5", row.id, state.completion_cycle_id ?? 0, followup]),
+      dedupeKey: buildDedupeKey([
+        "completion_waiting",
+        row.id,
+        state.completion_cycle_id ?? 0,
+        followup,
+      ]),
       ctaUrl: `/promises/${row.id}/confirm`,
-      priority: mapPriorityForType("N5"),
+      priority: mapPriorityForType("completion_waiting"),
     });
 
     if (created.created) {

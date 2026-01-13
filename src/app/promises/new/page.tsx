@@ -255,12 +255,12 @@ export default function NewPromisePage() {
 
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("is_public")
+        .select("is_public_profile")
         .eq("id", sessionData.session.user.id)
         .maybeSingle();
 
       if (!active) return;
-      setIsPublicProfile(profileData?.is_public ?? false);
+      setIsPublicProfile(profileData?.is_public_profile ?? false);
     };
 
     void ensureSession();
@@ -313,9 +313,7 @@ export default function NewPromisePage() {
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
-      publicRequested: shouldRequestPublic,
-      publicOptInPromisor: shouldRequestPublic && executor === "me",
-      publicOptInPromisee: shouldRequestPublic && executor === "other",
+      visibility: shouldRequestPublic ? "public" : "private",
     };
 
     let res: Response;
