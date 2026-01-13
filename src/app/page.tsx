@@ -6,6 +6,7 @@ import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { HeaderActions } from "@/app/components/HeaderActions";
 import { MobileMenu } from "@/app/components/MobileMenu";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
@@ -40,8 +41,9 @@ type ReputationResponse = {
 };
 
 export default function Home() {
-  const t = useT();
   const locale = useLocale();
+  const t = useT();
+  const copy = getLandingCopy(locale);
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
@@ -51,71 +53,35 @@ export default function Home() {
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
   const isAuthenticated = Boolean(email);
+  const now = new Date();
+  const nextSaturday = new Date(now);
+  const daysUntilSaturday = (6 - nextSaturday.getDay() + 7) % 7;
+  nextSaturday.setDate(nextSaturday.getDate() + daysUntilSaturday);
+  nextSaturday.setHours(12, 0, 0, 0);
+  const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1, 12, 0, 0, 0);
 
-  const highlights = [
-    {
-      key: "promisesTracked",
-      text: t("home.highlights.promisesTracked"),
-    },
-    {
-      key: "reputationIntact",
-      text: t("home.highlights.reputationIntact"),
-    },
-    {
-      key: "dreddiKnows",
-      text: t("home.highlights.dreddiKnows"),
-    },
-  ];
-  const highlightItems = highlights.filter((item) => !item.text.startsWith("⟦missing:"));
+  const demoDeals: DealRow[] = copy.demoDeals.map((deal) => {
+    const due_at =
+      deal.dueDate === "nextSaturday"
+        ? nextSaturday.toISOString()
+        : deal.dueDate === "nextMarchFirst"
+        ? nextMarchFirst.toISOString()
+        : null;
 
-  const demoDeals: DealRow[] =
-    locale === "uk"
-      ? [
-          {
-            id: "demo-1",
-            title: "Підготувати лендинг до 10 січня",
-            meta: "Відповідальність прийнята • Результат: підтверджено",
-            status: "confirmed",
-          },
-          {
-            id: "demo-2",
-            title: "Підготувати пітч для інвесторів",
-            meta: "Відповідальність в роботі • Результат: в процесі",
-            status: "active",
-          },
-          {
-            id: "demo-3",
-            title: "Завершити монтаж кухні до кінця року",
-            meta: "Відповідальність оскаржено • Результат: перегляд",
-            status: "disputed",
-          },
-        ]
-      : [
-          {
-            id: "demo-1",
-            title: "Deliver landing page by Jan 10",
-            meta: "Responsibility accepted • Outcome: confirmed",
-            status: "confirmed",
-          },
-          {
-            id: "demo-2",
-            title: "Prepare investor pitch",
-            meta: "Responsibility in motion • Outcome: active",
-            status: "active",
-          },
-          {
-            id: "demo-3",
-            title: "Complete kitchen installation by year-end",
-            meta: "Responsibility disputed • Outcome: under review",
-            status: "disputed",
-          },
-        ];
+    return {
+      id: deal.id,
+      title: deal.title,
+      status: deal.status,
+      meta: deal.meta,
+      due_at,
+    };
+  });
 
   const statusLabels: Record<PromiseStatus, string> = {
-    active: t("home.recentDeals.status.active"),
-    completed_by_promisor: t("home.recentDeals.status.completed_by_promisor"),
-    confirmed: t("home.recentDeals.status.confirmed"),
-    disputed: t("home.recentDeals.status.disputed"),
+    active: copy.recentDeals.status.active,
+    completed_by_promisor: copy.recentDeals.status.completedByPromisor,
+    confirmed: copy.recentDeals.status.confirmed,
+    disputed: copy.recentDeals.status.disputed,
   };
 
   const statusTones: Record<PromiseStatus, string> = {
@@ -132,6 +98,14 @@ export default function Home() {
       hour: "numeric",
       minute: "2-digit",
     }).format(new Date(value));
+
+  const getMetaText = (item: DealRow) =>
+    item.meta ??
+    (item.due_at
+      ? copy.recentDeals.placeholderMetaDue(formatDateShort(item.due_at))
+      : item.created_at
+      ? copy.recentDeals.placeholderMetaCreated(formatDateShort(item.created_at))
+      : "");
 
   useEffect(() => {
     let active = true;
@@ -190,7 +164,7 @@ export default function Home() {
 
       if (userErr || !userId) {
         if (!cancelled) {
-          setRecentError(userErr?.message ?? t("home.errors.userSession"));
+          setRecentError(userErr?.message ?? copy.errors.userSession);
           setRecentLoading(false);
         }
         return;
@@ -261,7 +235,7 @@ export default function Home() {
 
       if (sessionError || !token) {
         if (!cancelled) {
-          setReputationError(sessionError?.message ?? t("home.errors.notAuthenticated"));
+          setReputationError(sessionError?.message ?? copy.errors.notAuthenticated);
           setReputationLoading(false);
         }
         return;
@@ -277,7 +251,7 @@ export default function Home() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setReputationError(body.error ?? t("home.errors.reputation"));
+        setReputationError(body.error ?? copy.errors.reputation);
       } else {
         const body = (await res.json()) as ReputationResponse;
         setReputation(body);
@@ -310,12 +284,20 @@ export default function Home() {
       ? Math.round((onTimeCount / confirmedWithDeadlineCount) * 100)
       : null;
   const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
-  const onTimeHelperKey =
-    confirmedWithDeadlineCount === 0
-      ? "home.score.onTime.empty"
-      : "home.score.onTime.helper";
+  const onTimeHelper =
+    confirmedWithDeadlineCount === 0 ? copy.score.onTime.empty : copy.score.onTime.helper;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
   const recentEvents = reputation?.recent_events ?? [];
+  const recentEventsLimited = recentEvents.slice(0, 3);
+  const recentDealsLimited = recentDeals.slice(0, 3);
+
+  const renderMultiline = (text: string) =>
+    text.split("\n").map((line, index, lines) => (
+      <span key={`${line}-${index}`}>
+        {line}
+        {index < lines.length - 1 ? <br /> : null}
+      </span>
+    ));
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -343,28 +325,30 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
-          <div className="order-1 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-emerald-200 sm:px-4 sm:py-2 sm:text-sm">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(74,222,128,0.25)]" />
-            {t("home.eyebrow")}
-          </div>
-
-          <div className="order-2 space-y-4">
+          <div className="order-1 space-y-5 sm:space-y-4">
+            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold leading-snug tracking-wide text-emerald-200 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25),0_12px_30px_rgba(2,6,23,0.5)] backdrop-blur sm:max-w-full sm:gap-3 sm:whitespace-nowrap sm:px-4 sm:py-1.5 sm:text-base sm:leading-normal sm:tracking-normal">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+              {copy.hero.eyebrow}
+            </div>
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
                 <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-                <span className="text-white">knows</span>
+                <span className="text-white">{t("landing.hero.brandSuffix")}</span>
               </div>
             </div>
+            <p className="max-w-xl text-xl font-semibold text-white">
+              {copy.hero.headline}
+            </p>
             <p className="max-w-xl text-lg text-slate-300">
-              {t("home.tagline")}
+              {renderMultiline(copy.hero.description)}
             </p>
           </div>
 
           {!ready ? (
             <div className="order-3 flex items-center gap-3 text-slate-400 md:order-4">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-              {t("home.loading")}
+              {copy.loading.session}
             </div>
           ) : !isAuthenticated ? (
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
@@ -372,13 +356,13 @@ export default function Home() {
                 href="/login"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
-                {t("home.cta.getStarted")}
+                {copy.cta.getStarted}
               </Link>
               <Link
-                href="/p"
+                href="/u"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                {t("home.cta.publicProfiles")}
+                {copy.cta.publicProfiles}
               </Link>
             </div>
           ) : (
@@ -387,30 +371,17 @@ export default function Home() {
                 href="/promises/new"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
-                {t("home.cta.createPromise")}
+                {copy.cta.createPromise}
               </Link>
               <Link
                 href="/promises"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                {t("home.cta.reviewDeals")}
+                {copy.cta.reviewDeals}
               </Link>
             </div>
           )}
 
-          <div className="order-4 grid max-w-lg gap-2 md:order-3 md:grid-cols-3">
-            {highlightItems.map((item) => (
-              <div
-                key={item.key}
-                className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-200 ring-1 ring-white/10"
-              >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
-                  ✓
-                </span>
-                {item.text}
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="flex-1">
@@ -421,34 +392,34 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
-                    <p className="text-sm text-slate-300">{t("home.score.label")}</p>
+                    <p className="text-sm text-slate-300">{copy.score.label}</p>
                     <p className="text-2xl font-semibold text-white">
-                      {reputationLoading ? t("home.loadingShort") : score}
+                      {reputationLoading ? copy.loading.short : score}
                     </p>
                   </div>
                 </div>
                 {email ? (
                   <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
-                    {t("home.score.live")}
+                    {copy.score.live}
                   </span>
                 ) : (
                   <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
-                    {t("home.score.signIn")}
+                    {copy.score.signIn}
                   </span>
                 )}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">{t("home.score.cards.confirmed")}</div>
+                  <div className="text-xs text-emerald-200">{copy.score.cards.confirmed}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading ? t("home.loadingPlaceholder") : confirmedCount}
+                    {reputationLoading ? copy.loading.placeholder : confirmedCount}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">{t("home.score.cards.disputed")}</div>
+                  <div className="text-xs text-amber-200">{copy.score.cards.disputed}</div>
                   <div className="text-lg font-semibold">
-                    {reputationLoading ? t("home.loadingPlaceholder") : disputedCount}
+                    {reputationLoading ? copy.loading.placeholder : disputedCount}
                   </div>
                 </div>
               </div>
@@ -462,49 +433,54 @@ export default function Home() {
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
                 <div className="flex items-center gap-3 text-sm text-emerald-200">
                   <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  <span>{t("home.score.onTime.label")}</span>
+                  <span>{copy.score.onTime.label}</span>
                   {hasDueDateDeals ? (
                     <span className="ml-auto text-lg font-semibold text-white">
-                      {reputationLoading ? t("home.loadingPlaceholder") : onTimeSummary}
+                      {reputationLoading ? copy.loading.placeholder : onTimeSummary}
                     </span>
                   ) : null}
                 </div>
                 <p className="mt-2 text-xs text-emerald-100/80">
-                  {t(onTimeHelperKey)}
+                  {onTimeHelper}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
                 <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>{t("home.recentDeals.title")}</span>
+                  <span>{copy.recentDeals.title}</span>
                   <Link
                     href={isAuthenticated ? "/promises" : "/login?next=%2Fpromises"}
                     className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
                   >
-                    {t("home.recentDeals.seeAll")}
+                    {copy.recentDeals.seeAll}
                   </Link>
                 </div>
                 {!isAuthenticated ? (
-                  <div className="mt-3 space-y-2 text-sm">
-                    <p className="text-xs text-slate-400">{t("home.recentDeals.guestHint")}</p>
-                    {demoDeals.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                      >
-                        <div>
-                          <div className="font-semibold text-white">{item.title}</div>
-                          {item.meta ? (
-                            <div className="text-xs text-slate-400">{item.meta}</div>
-                          ) : null}
-                        </div>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                        >
-                          {statusLabels[item.status] ?? item.status}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="mt-3">
+                    <p className="text-xs text-slate-400">{copy.recentDeals.guestHint}</p>
+                    <div className="mt-3 space-y-2 text-sm">
+                      {demoDeals.map((item) => {
+                        const metaText = getMetaText(item);
+                        return (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                          >
+                            <div>
+                              <div className="font-semibold text-white">{item.title}</div>
+                              {metaText ? (
+                                <div className="text-xs text-slate-400">{metaText}</div>
+                              ) : null}
+                            </div>
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                            >
+                              {statusLabels[item.status] ?? item.status}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -515,79 +491,71 @@ export default function Home() {
                     )}
 
                     <div className="mt-3 space-y-2 text-sm">
-                      {reputationLoading || recentLoading ? (
-                        <div className="space-y-2">
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
-                          ))}
-                        </div>
-                      ) : recentEvents.length > 0 ? (
-                        recentEvents.map((event) => (
-                          <div
-                            key={event.id}
-                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                          >
-                            <div>
-                              <div className="font-semibold text-white">
-                                {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
-                                {event.kind.replace("promise_", "").replace("_", " ")}
-                              </div>
-                              <div className="text-xs text-slate-400">
-                                {event.promise?.title ?? t("home.recentDeals.eventFallbackTitle")}
-                                {" • "}
-                                {new Date(event.created_at).toLocaleString(locale)}
-                              </div>
-                            </div>
-                            <span
-                              className={[
-                                "rounded-full px-3 py-1 text-xs",
-                                event.delta >= 0
-                                  ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                                  : "bg-red-500/10 text-red-100 border border-red-400/30",
-                              ].join(" ")}
-                            >
-                              {event.delta >= 0
-                                ? t("home.recentDeals.sentiment.positive")
-                                : t("home.recentDeals.sentiment.negative")}
-                            </span>
+                      <div className="space-y-2">
+                        {reputationLoading || recentLoading ? (
+                          <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                              <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                            ))}
                           </div>
-                        ))
-                      ) : recentDeals.length === 0 ? (
-                        <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
-                          {t("home.recentDeals.empty")}
-                        </div>
-                      ) : (
-                        recentDeals.map((item) => {
-                          const metaText =
-                            item.meta ??
-                            (item.due_at
-                              ? t("home.recentDeals.placeholderMetaDue", {
-                                  date: formatDateShort(item.due_at),
-                                })
-                              : item.created_at
-                              ? t("home.recentDeals.placeholderMetaCreated", {
-                                  date: formatDateShort(item.created_at),
-                                })
-                              : "");
-
-                          return (
+                        ) : recentEvents.length > 0 ? (
+                          recentEventsLimited.map((event) => (
                             <div
-                              key={item.id}
+                              key={event.id}
                               className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
                             >
                               <div>
-                                <div className="font-semibold text-white">{item.title}</div>
-                                <div className="text-xs text-slate-400">{metaText}</div>
+                                <div className="font-semibold text-white">
+                                  {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
+                                  {event.kind.replace("promise_", "").replace("_", " ")}
+                                </div>
+                                <div className="text-xs text-slate-400">
+                                  {event.promise?.title ?? copy.recentDeals.eventFallbackTitle}
+                                  {" • "}
+                                  {new Date(event.created_at).toLocaleString(locale)}
+                                </div>
                               </div>
                               <span
-                                className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                className={[
+                                  "rounded-full px-3 py-1 text-xs",
+                                  event.delta >= 0
+                                    ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
+                                    : "bg-red-500/10 text-red-100 border border-red-400/30",
+                                ].join(" ")}
                               >
-                                {statusLabels[item.status] ?? item.status}
+                                {event.delta >= 0
+                                  ? copy.recentDeals.sentiment.positive
+                                  : copy.recentDeals.sentiment.negative}
                               </span>
                             </div>
-                          );
-                        })
-                      )}
+                          ))
+                        ) : recentDeals.length === 0 ? (
+                          <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                            {copy.recentDeals.empty}
+                          </div>
+                        ) : (
+                          recentDealsLimited.map((item) => {
+                            const metaText = getMetaText(item);
+
+                            return (
+                              <div
+                                key={item.id}
+                                className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
+                              >
+                                <div>
+                                  <div className="font-semibold text-white">{item.title}</div>
+                                  <div className="text-xs text-slate-400">{metaText}</div>
+                                </div>
+                                <span
+                                  className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+                                >
+                                  {statusLabels[item.status] ?? item.status}
+                                </span>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

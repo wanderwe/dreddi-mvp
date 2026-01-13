@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 
 type PromiseRow = {
   id: string;
@@ -18,9 +19,11 @@ type PromiseRow = {
 
   invite_token: string | null;
   counterparty_id: string | null;
+  counterparty_accepted_at: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
+  is_public: boolean;
 };
 
 function Card({
@@ -188,7 +191,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id"
+        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,is_public"
       )
       .eq("id", id)
       .single();
@@ -252,10 +255,10 @@ export default function PromisePage() {
   async function generateInvite(regenerate = false) {
     if (!p) return;
 
-    const isInviteAccepted = Boolean(p.counterparty_id);
+    const isInviteAccepted = Boolean(p.counterparty_accepted_at);
     const isFinal = p.status === "confirmed" || p.status === "disputed";
 
-    if (!isPromisor || isInviteAccepted || isFinal) return;
+    if (!isCreator || isInviteAccepted || isFinal) return;
 
     setError(null);
     setInviteBusy(regenerate ? "regen" : "generate");
@@ -316,20 +319,17 @@ export default function PromisePage() {
     }
   }
 
-  const isPromisor = Boolean(
-    p &&
-      ((p.promisor_id ? userId === p.promisor_id : false) ||
-        (!p.promisee_id && userId === p.creator_id))
-  );
-  const isCounterparty = Boolean(
-    p &&
-      ((p.promisee_id ? userId === p.promisee_id : false) ||
-        (!p.promisee_id && userId === p.counterparty_id))
-  );
+  const executorId = p ? resolveExecutorId(p) : null;
+  const counterpartyId = p ? resolveCounterpartyId(p) : null;
+  const isExecutor = Boolean(userId && executorId && userId === executorId);
+  const isCounterparty = Boolean(userId && counterpartyId && userId === counterpartyId);
+  const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
-  const isInviteAccepted = Boolean(p?.counterparty_id ?? (p?.promisor_id && p?.promisee_id));
+  const isInviteAccepted = Boolean(p?.counterparty_accepted_at ?? (p?.promisor_id && p?.promisee_id));
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
+  const showPublicStatus = Boolean(p?.is_public);
+  const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -357,6 +357,17 @@ export default function PromisePage() {
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
               </div>
+
+              {showPublicStatus && (
+                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-200">
+                  <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
+                    {t("promises.detail.publicStatus.label")}
+                  </span>
+                  <span className="text-emerald-200">
+                    {publicStatusText}
+                  </span>
+                </div>
+              )}
 
               <div className="text-sm text-neutral-400">
                 {t("promises.detail.acceptedBySecondSide")}:{" "}
@@ -391,7 +402,7 @@ export default function PromisePage() {
                 {t("promises.detail.currentStatus")}: <StatusPill status={p.status} />
               </div>
 
-              {isPromisor && p.status === "active" && (
+              {isExecutor && p.status === "active" && (
                 isInviteAccepted ? (
                   <ActionButton
                     label={t("promises.detail.markCompleted")}
@@ -405,6 +416,12 @@ export default function PromisePage() {
                     {t("promises.detail.shareInvite")}
                   </div>
                 )
+              )}
+
+              {!isExecutor && isCounterparty && p.status === "active" && isInviteAccepted && (
+                <div className="text-sm text-neutral-400">
+                  {t("promises.detail.awaitingExecutor")}
+                </div>
               )}
 
               {isCounterparty && p.status === "completed_by_promisor" && (
@@ -430,7 +447,7 @@ export default function PromisePage() {
                 <div className="text-sm text-red-300">{t("promises.detail.disputed")}</div>
               )}
 
-              {!isPromisor && !isCounterparty && (
+              {!isExecutor && !isCounterparty && (
                 <div className="text-xs text-neutral-500">{t("promises.detail.guestView")}</div>
               )}
             </div>

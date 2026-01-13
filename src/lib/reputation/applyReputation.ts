@@ -1,19 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
-
-export type PromiseRecord = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  due_at: string | null;
-  completed_at: string | null;
-  creator_id: string;
-  counterparty_id: string | null;
-  confirmed_at: string | null;
-  disputed_at: string | null;
-  disputed_code: string | null;
-  dispute_reason: string | null;
-};
+import { isPromiseStatus } from "@/lib/promiseStatus";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { calcLatePenalty, calcOnTime, calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 
 type ReputationEventKind = "promise_confirmed" | "promise_disputed" | "manual_adjustment";
 
@@ -38,8 +27,10 @@ type EventInput = {
 
 const clampScore = (value: number) => Math.max(0, Math.min(100, value));
 
-function computeDeltas(promise: PromiseRecord): EventInput[] {
+function computeDeltas(promise: PromiseRowMin): EventInput[] {
   const events: EventInput[] = [];
+  const executorId = resolveExecutorId(promise);
+  if (!executorId) return events;
   const baseMeta = {
     promise_title: promise.title,
     completed_at: promise.completed_at,
@@ -48,49 +39,36 @@ function computeDeltas(promise: PromiseRecord): EventInput[] {
     due_at: promise.due_at,
   };
 
-  const completedAt = promise.completed_at ? new Date(promise.completed_at) : null;
-  const dueAt = promise.due_at ? new Date(promise.due_at) : null;
-  const onTime = Boolean(completedAt && dueAt && completedAt.getTime() <= dueAt.getTime());
-  const late = Boolean(completedAt && dueAt && completedAt.getTime() > dueAt.getTime());
+  const impactInput = {
+    status: promise.status,
+    due_at: promise.due_at,
+    completed_at: promise.completed_at,
+  };
+  const onTime = calcOnTime(impactInput);
+  const late = calcLatePenalty(impactInput);
 
   if (promise.status === "confirmed") {
+    const executorDelta = calc_score_impact(impactInput);
     events.push({
-      user_id: promise.creator_id,
+      user_id: executorId,
       promise_id: promise.id,
       kind: "promise_confirmed",
-      delta: onTime ? 4 : 3,
+      delta: executorDelta,
       meta: { ...baseMeta, on_time: onTime },
     });
 
-    if (promise.counterparty_id) {
-      events.push({
-        user_id: promise.counterparty_id,
-        promise_id: promise.id,
-        kind: "promise_confirmed",
-        delta: 1,
-        meta: { ...baseMeta, role: "counterparty" },
-      });
-    }
   }
 
   if (promise.status === "disputed") {
+    const executorDelta = calc_score_impact(impactInput);
     events.push({
-      user_id: promise.creator_id,
+      user_id: executorId,
       promise_id: promise.id,
       kind: "promise_disputed",
-      delta: late ? -7 : -6,
+      delta: executorDelta,
       meta: { ...baseMeta, late_penalty: late },
     });
 
-    if (promise.counterparty_id) {
-      events.push({
-        user_id: promise.counterparty_id,
-        promise_id: promise.id,
-        kind: "promise_disputed",
-        delta: 1,
-        meta: { ...baseMeta, role: "counterparty" },
-      });
-    }
   }
 
   return events;
@@ -102,7 +80,10 @@ async function ensureReputationRows(admin: SupabaseClient, userIds: string[]) {
   await admin.from("user_reputation").upsert(rows, { onConflict: "user_id", ignoreDuplicates: true });
 }
 
-export async function applyReputationForPromiseFinalization(admin: SupabaseClient, promise: PromiseRecord) {
+export async function applyReputationForPromiseFinalization(
+  admin: SupabaseClient,
+  promise: PromiseRowMin
+) {
   if (!promise.creator_id) return;
   if (!isPromiseStatus(promise.status)) return;
   if (promise.status !== "confirmed" && promise.status !== "disputed") return;

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 
 type PublicProfileRow = {
@@ -24,7 +25,6 @@ type PublicPromiseRow = {
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
-  accepted_by_second_side: boolean | null;
 };
 
 type PublicPromise = {
@@ -34,7 +34,6 @@ type PublicPromise = {
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
-  accepted_by_second_side: boolean;
 };
 
 const statusTones: Record<PromiseStatus, string> = {
@@ -44,15 +43,11 @@ const statusTones: Record<PromiseStatus, string> = {
   disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
 };
 
-const isOverdue = (dueAt: string | null) => {
-  if (!dueAt) return false;
-  return new Date(dueAt).getTime() < Date.now();
-};
-
 export default function PublicProfilePage() {
   const params = useParams();
   const t = useT();
   const locale = useLocale();
+  const landingCopy = getLandingCopy(locale);
   const handle = useMemo(() => {
     const raw = params?.handle;
     return Array.isArray(raw) ? raw[0] : raw;
@@ -62,6 +57,8 @@ export default function PublicProfilePage() {
   const [promises, setPromises] = useState<PublicPromise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const formatDateShort = useMemo(
     () =>
@@ -105,7 +102,7 @@ export default function PublicProfilePage() {
       if (!active) return;
 
       if (profileErr || !profileRow) {
-        setError(profileErr?.message ?? t("publicProfile.errors.notFound"));
+        setError(profileErr?.message ?? t("publicProfile.errors.private"));
         setLoading(false);
         return;
       }
@@ -136,7 +133,6 @@ export default function PublicProfilePage() {
               due_at: row.due_at,
               confirmed_at: row.confirmed_at,
               disputed_at: row.disputed_at,
-              accepted_by_second_side: Boolean(row.accepted_by_second_side),
             },
           ];
         });
@@ -153,67 +149,45 @@ export default function PublicProfilePage() {
     };
   }, [handle, t]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const activeCount = profile?.active_count ?? 0;
   const pendingAcceptanceCount = profile?.pending_acceptance_count ?? 0;
   const overdueCount = profile?.overdue_count ?? 0;
-
-  const overdueItems = useMemo(
-    () =>
-      promises.filter(
-        (promise) =>
-          isOverdue(promise.due_at) &&
-          (promise.status === "active" || promise.status === "completed_by_promisor")
-      ),
-    [promises]
+  const publicProfilePath = useMemo(
+    () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
+    [handle]
   );
+  const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
 
-  const awaitingAcceptanceItems = useMemo(
-    () =>
-      promises.filter(
-        (promise) =>
-          promise.status === "active" &&
-          !promise.accepted_by_second_side &&
-          !isOverdue(promise.due_at)
-      ),
-    [promises]
-  );
-
-  const inProgressWithOutcomeItems = useMemo(
-    () =>
-      promises.filter(
-        (promise) =>
-          ((promise.status === "active" && promise.accepted_by_second_side) ||
-            promise.status === "completed_by_promisor") &&
-          !isOverdue(promise.due_at)
-      ),
-    [promises]
-  );
-
-  const recentConfirmations = useMemo(() => {
-    const finalized = promises.filter(
-      (promise) => promise.status === "confirmed" || promise.status === "disputed"
-    );
-    return finalized
-      .sort((a, b) => {
-        const aDate = new Date(a.confirmed_at ?? a.disputed_at ?? a.created_at).getTime();
-        const bDate = new Date(b.confirmed_at ?? b.disputed_at ?? b.created_at).getTime();
-        return bDate - aDate;
-      })
-      .slice(0, 5);
-  }, [promises]);
+  const handleCopyLink = async () => {
+    if (!publicProfileUrl) return;
+    try {
+      await navigator.clipboard.writeText(publicProfileUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const statusLabels: Partial<Record<PromiseStatus, string>> = {
     active: t("publicProfile.status.inProgress"),
     completed_by_promisor: t("publicProfile.status.awaitingOutcome"),
-    confirmed: t("home.recentDeals.status.confirmed"),
-    disputed: t("home.recentDeals.status.disputed"),
+    confirmed: landingCopy.recentDeals.status.confirmed,
+    disputed: landingCopy.recentDeals.status.disputed,
   };
 
   const activeSummaryEmpty = activeCount + pendingAcceptanceCount + overdueCount === 0;
   const trackRecordEmpty = confirmedCount + disputedCount === 0;
+  const publicDealsEmpty = promises.length === 0;
 
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
@@ -229,25 +203,34 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                  {profile?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={profile.avatar_url}
-                      alt={displayName}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xl font-semibold text-white/80">
-                      {displayName.slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    {profile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={profile.avatar_url}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xl font-semibold text-white/80">
+                        {displayName.slice(0, 1).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold">{displayName}</h1>
+                    <p className="text-sm text-white/60">@{profile?.handle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-semibold">{displayName}</h1>
-                  <p className="text-sm text-white/60">@{profile?.handle}</p>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                </button>
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -286,88 +269,9 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <h2 className="text-lg font-semibold">{t("publicProfile.sections.whatsHappening")}</h2>
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.status.inProgress")}
-                  </p>
-                  {inProgressWithOutcomeItems.length === 0 ? (
-                    <p className="mt-3 text-sm text-white/60">
-                      {t("publicProfile.emptyInProgress")}
-                    </p>
-                  ) : (
-                    <div className="mt-3 flex flex-col gap-3">
-                      {inProgressWithOutcomeItems.map((promise) => (
-                        <div key={`${promise.title}-${promise.created_at}`}>
-                          <p className="text-sm font-medium text-white">{promise.title}</p>
-                          <p className="text-xs text-white/50">
-                            {promise.due_at
-                              ? t("publicProfile.meta.due", { date: formatDateShort(promise.due_at) })
-                              : t("publicProfile.meta.noDue")}
-                          </p>
-                          <span className="mt-2 inline-flex w-fit rounded-full px-3 py-1 text-[11px] uppercase tracking-wide text-white/70">
-                            {promise.status === "completed_by_promisor"
-                              ? t("publicProfile.status.awaitingOutcome")
-                              : t("publicProfile.status.inProgress")}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.status.awaitingAcceptance")}
-                  </p>
-                  {awaitingAcceptanceItems.length === 0 ? (
-                    <p className="mt-3 text-sm text-white/60">
-                      {t("publicProfile.emptyAwaitingAcceptance")}
-                    </p>
-                  ) : (
-                    <div className="mt-3 flex flex-col gap-3">
-                      {awaitingAcceptanceItems.map((promise) => (
-                        <div key={`${promise.title}-${promise.created_at}`}>
-                          <p className="text-sm font-medium text-white">{promise.title}</p>
-                          <p className="text-xs text-white/50">
-                            {promise.due_at
-                              ? t("publicProfile.meta.due", { date: formatDateShort(promise.due_at) })
-                              : t("publicProfile.meta.noDue")}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.status.overdue")}
-                  </p>
-                  {overdueItems.length === 0 ? (
-                    <p className="mt-3 text-sm text-white/60">{t("publicProfile.emptyOverdue")}</p>
-                  ) : (
-                    <div className="mt-3 flex flex-col gap-3">
-                      {overdueItems.map((promise) => (
-                        <div key={`${promise.title}-${promise.created_at}`}>
-                          <p className="text-sm font-medium text-white">{promise.title}</p>
-                          <p className="text-xs text-white/50">
-                            {promise.due_at
-                              ? t("publicProfile.meta.overdue", {
-                                  date: formatDateShort(promise.due_at),
-                                })
-                              : t("publicProfile.meta.noDue")}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-2">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.trackRecord")}</h2>
+                <p className="text-sm text-white/60">{t("publicProfile.reputationNote")}</p>
                 {trackRecordEmpty ? (
                   <span className="text-sm text-white/60">{t("publicProfile.emptyHistory")}</span>
                 ) : null}
@@ -390,40 +294,36 @@ export default function PublicProfilePage() {
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">
-                  {t("publicProfile.sections.recentConfirmations")}
-                </h2>
+                <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
-              {recentConfirmations.length === 0 ? (
-                <p className="text-sm text-white/60">{t("publicProfile.emptyRecent")}</p>
+              {publicDealsEmpty ? (
+                <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
               ) : (
                 <div className="flex flex-col gap-4">
-                  {recentConfirmations.map((promise) => {
-                    const finalizedAt =
-                      promise.confirmed_at ?? promise.disputed_at ?? promise.created_at;
-                    return (
-                      <div
-                        key={`${promise.title}-${promise.created_at}`}
-                        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-white">{promise.title}</p>
-                          <p className="text-xs text-white/50">
-                            {t("publicProfile.recentDealsMeta", {
-                              date: formatDateShort(finalizedAt),
-                            })}
-                          </p>
-                        </div>
-                        <span
-                          className={`w-fit rounded-full px-3 py-1 text-xs ${
-                            statusTones[promise.status] ?? "bg-white/5 text-white/70"
-                          }`}
-                        >
-                          {statusLabels[promise.status] ?? promise.status}
-                        </span>
+                  {promises.map((promise) => (
+                    <div
+                      key={`${promise.title}-${promise.created_at}`}
+                      className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-white">{promise.title}</p>
+                        <p className="text-xs text-white/50">
+                          {promise.due_at
+                            ? t("publicProfile.meta.due", {
+                                date: formatDateShort(promise.due_at),
+                              })
+                            : t("publicProfile.meta.noDue")}
+                        </p>
                       </div>
-                    );
-                  })}
+                      <span
+                        className={`w-fit rounded-full px-3 py-1 text-xs ${
+                          statusTones[promise.status] ?? "bg-white/5 text-white/70"
+                        }`}
+                      >
+                        {statusLabels[promise.status] ?? promise.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </section>

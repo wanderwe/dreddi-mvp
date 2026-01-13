@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "test": "node --require ./tests/register-ts.js --test tests/**/*.test.ts",
+    "prepare": "bash scripts/install-githooks.sh",
     "validate:package-json": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\""
   },
   "dependencies": {

@@ -1,22 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { isPromiseStatus } from "@/lib/promiseStatus";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 
-type PromiseRecord = {
-  id: string;
-  title: string;
+type PromiseRecord = PromiseRowMin & {
   details: string | null;
-  status: PromiseStatus;
-  due_at: string | null;
-  creator_id: string;
-  counterparty_id: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-  completed_at: string | null;
-  confirmed_at: string | null;
-  disputed_at: string | null;
-  disputed_code: string | null;
-  dispute_reason: string | null;
+  counterparty_accepted_at: string | null;
 };
 
 export const DISPUTE_CODES = ["not_completed", "partial", "late", "other"] as const;
@@ -64,7 +53,7 @@ export async function loadPromiseForUser(id: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason"
+      "id,title,details,status,due_at,creator_id,counterparty_id,counterparty_accepted_at,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason"
     )
     .eq("id", id)
     .maybeSingle<PromiseRecord>();

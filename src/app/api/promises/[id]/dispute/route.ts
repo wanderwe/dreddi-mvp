@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   DISPUTE_CODES,
   DisputeCode,
@@ -7,6 +8,13 @@ import {
   requireUser,
 } from "../common";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
+import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
+import {
+  buildDedupeKey,
+  createNotification,
+  mapPriorityForType,
+} from "@/lib/notifications/service";
+import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -25,7 +33,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const promise = await loadPromiseForUser(id, user.id);
     if (promise instanceof NextResponse) return promise;
 
-    if (promise.counterparty_id !== user.id) {
+    const counterpartyId = resolveCounterpartyId(promise);
+    if (!counterpartyId || counterpartyId !== user.id) {
       return NextResponse.json({ error: "Only the counterparty can dispute" }, { status: 403 });
     }
 
@@ -35,7 +44,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const admin = getAdminClient();
     const disputedAt = new Date().toISOString();
-    const { error } = await admin
+    const { data: updatedPromise, error } = await admin
       .from("promises")
       .update({
         status: "disputed",
@@ -43,26 +52,43 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         disputed_code: code,
         dispute_reason: reason ?? null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select(
+        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+      )
+      .single<PromiseRowMin>();
 
-    if (error) {
+    if (error || !updatedPromise) {
       return NextResponse.json(
-        { error: "Could not update promise", detail: error.message },
+        { error: "Could not update promise", detail: error?.message },
         { status: 500 }
       );
     }
 
     try {
-      await applyReputationForPromiseFinalization(admin, {
-        ...promise,
-        status: "disputed",
-        disputed_at: disputedAt,
-        disputed_code: code,
-        dispute_reason: reason ?? null,
-      });
+      await applyReputationForPromiseFinalization(admin, updatedPromise);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to update reputation";
       return NextResponse.json({ error: message }, { status: 500 });
+    }
+
+    const executorId = resolveExecutorId(updatedPromise);
+    if (executorId) {
+      const delta = calc_score_impact({
+        status: updatedPromise.status,
+        due_at: updatedPromise.due_at,
+        completed_at: updatedPromise.completed_at,
+      });
+      await createNotification(admin, {
+        userId: executorId,
+        promiseId: updatedPromise.id,
+        type: "N7",
+        role: "executor",
+        dedupeKey: buildDedupeKey(["N7", updatedPromise.id]),
+        ctaUrl: `/promises/${updatedPromise.id}`,
+        priority: mapPriorityForType("N7"),
+        delta,
+      });
     }
 
     return NextResponse.json({ ok: true });

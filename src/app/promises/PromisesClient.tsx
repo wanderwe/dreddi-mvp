@@ -7,6 +7,8 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 
 type PromiseRow = {
   id: string;
@@ -16,6 +18,7 @@ type PromiseRow = {
   created_at: string;
   completed_at: string | null;
   counterparty_id: string | null;
+  counterparty_accepted_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -23,7 +26,6 @@ type PromiseRow = {
 
 type TabKey = "i-promised" | "promised-to-me";
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
-
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -97,7 +99,7 @@ export default function PromisesClient() {
         .from("promises")
         // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
         .select(
-          "id,title,status,due_at,created_at,completed_at,counterparty_id,creator_id,promisor_id,promisee_id"
+          "id,title,status,due_at,created_at,completed_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
         )
         .or(
           `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
@@ -113,18 +115,16 @@ export default function PromisesClient() {
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
           .map((row) => {
             const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
-            const isPromisor =
-              (r.promisor_id ? r.promisor_id === user.id : false) ||
-              (!r.promisee_id && r.creator_id === user.id);
-            const isPromisee =
-              (r.promisee_id ? r.promisee_id === user.id : false) ||
-              (!r.promisee_id && r.counterparty_id === user.id);
-            const role: PromiseRole = isPromisor ? "promisor" : "counterparty";
+            const executorId = resolveExecutorId(r);
+            const role: PromiseRole =
+              executorId && executorId === user.id ? "promisor" : "counterparty";
             return {
               ...r,
               status: r.status as PromiseStatus,
               role,
-              acceptedBySecondSide: Boolean(r.counterparty_id ?? (r.promisor_id && r.promisee_id)),
+              acceptedBySecondSide: Boolean(
+                r.counterparty_accepted_at ?? (r.promisor_id && r.promisee_id)
+              ),
             };
           });
 
@@ -332,22 +332,13 @@ export default function PromisesClient() {
                 const impact = (() => {
                   if (!isPromisor) return null;
 
-                  if (p.status === "confirmed") {
-                    const onTime = Boolean(
-                      p.due_at &&
-                        p.completed_at &&
-                        new Date(p.completed_at).getTime() <= new Date(p.due_at).getTime()
-                    );
-                    return `+${onTime ? 4 : 3}`;
-                  }
-
-                  if (p.status === "disputed") {
-                    const late = Boolean(
-                      p.due_at &&
-                        p.completed_at &&
-                        new Date(p.completed_at).getTime() > new Date(p.due_at).getTime()
-                    );
-                    return late ? "-7" : "-6";
+                  if (p.status === "confirmed" || p.status === "disputed") {
+                    const delta = calc_score_impact({
+                      status: p.status,
+                      due_at: p.due_at,
+                      completed_at: p.completed_at,
+                    });
+                    return delta >= 0 ? `+${delta}` : `${delta}`;
                   }
 
                   return null;

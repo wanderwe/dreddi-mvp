@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
+import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
 import {
   Sheet,
   SheetClose,
@@ -55,6 +56,14 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
+                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                    href="/notifications"
+                  >
+                    {t("nav.notifications")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
                     className="rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
                     href="/promises/new"
                   >
@@ -75,6 +84,14 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
             <div className="w-fit">
               <LocaleSwitcher />
             </div>
+            {isAuthenticated && (
+              <div className="mt-2 border-t border-white/10 pt-4">
+                <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                  {t("profileSettings.sectionLabel")}
+                </div>
+                <ProfileSettingsPanel showTitle={false} className="mt-3" />
+              </div>
+            )}
             {isAuthenticated && onLogout && (
               <SheetClose asChild>
                 <button

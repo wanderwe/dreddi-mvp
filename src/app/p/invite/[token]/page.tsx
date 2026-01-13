@@ -15,6 +15,7 @@ type InviteInfo = {
   creator_display_name: string | null;
   counterparty_id: string | null;
   counterparty_contact: string | null;
+  is_public: boolean;
 };
 
 export default function InvitePage() {
@@ -32,6 +33,7 @@ export default function InvitePage() {
   const [signedIn, setSignedIn] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
 
   async function load() {
     if (!token) return;
@@ -79,6 +81,10 @@ export default function InvitePage() {
 
     if (!info.counterparty_id) {
       setAutoAcceptAttempted(true);
+      if (info.is_public) {
+        setShowAcceptModal(true);
+        return;
+      }
       void accept();
     }
   }, [autoAcceptAttempted, info, router, searchParams, signedIn, userId]);
@@ -213,6 +219,12 @@ export default function InvitePage() {
                   : t("invite.accepted")}
               </div>
             )}
+            {info.is_public && (
+              <div className="mb-4 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+                <p className="font-semibold">{t("invite.publicProposal.title")}</p>
+                <p className="mt-1 text-xs text-amber-100/80">{t("invite.publicProposal.body")}</p>
+              </div>
+            )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
@@ -271,7 +283,13 @@ export default function InvitePage() {
                     </p>
                     <button
                       disabled={busy}
-                      onClick={accept}
+                      onClick={() => {
+                        if (info.is_public) {
+                          setShowAcceptModal(true);
+                        } else {
+                          void accept();
+                        }
+                      }}
                       className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                     >
                       {busy ? t("invite.processing") : t("invite.accept")}
@@ -283,6 +301,39 @@ export default function InvitePage() {
           </div>
         )}
       </div>
+
+      {showAcceptModal && info && !info.counterparty_id && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("invite.publicModal.title")}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              {t("invite.publicModal.body")}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAcceptModal(false)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                {t("invite.publicModal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowAcceptModal(false);
+                  await accept();
+                }}
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+              >
+                {t("invite.publicModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

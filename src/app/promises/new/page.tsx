@@ -42,6 +42,8 @@ export default function NewPromisePage() {
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPublicProfile, setIsPublicProfile] = useState(false);
+  const [isPublicDeal, setIsPublicDeal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -248,7 +250,17 @@ export default function NewPromisePage() {
       if (!active) return;
       if (!sessionData.session) {
         router.replace(`/login?next=${encodeURIComponent("/promises/new")}`);
+        return;
       }
+
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("is_public")
+        .eq("id", sessionData.session.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+      setIsPublicProfile(profileData?.is_public ?? false);
     };
 
     void ensureSession();
@@ -257,6 +269,12 @@ export default function NewPromisePage() {
       active = false;
     };
   }, [router]);
+
+  useEffect(() => {
+    if (!isPublicProfile) {
+      setIsPublicDeal(false);
+    }
+  }, [isPublicProfile]);
 
   async function createPromise() {
     setBusy(true);
@@ -280,7 +298,6 @@ export default function NewPromisePage() {
       return;
     }
 
-    const user = session.user;
     const counterpartyContact = counterparty.trim();
 
     if (!counterpartyContact) {
@@ -289,33 +306,53 @@ export default function NewPromisePage() {
       return;
     }
 
-    const inviteToken =
-      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const shouldRequestPublic = isPublicDeal && isPublicProfile;
+    const payload = {
+      title: title.trim(),
+      details: details.trim() || null,
+      counterpartyContact,
+      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+      executor,
+      publicRequested: shouldRequestPublic,
+      publicOptInPromisor: shouldRequestPublic && executor === "me",
+      publicOptInPromisee: shouldRequestPublic && executor === "other",
+    };
 
-    const { data: insertData, error: insertError } = await supabase
-      .from("promises")
-      .insert({
-        creator_id: user.id,
-        promisor_id: executor === "me" ? user.id : null,
-        promisee_id: executor === "other" ? user.id : null,
-        title: title.trim(),
-        details: details.trim() || null,
-        counterparty_contact: counterpartyContact,
-        due_at: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-        status: "active",
-        invite_token: inviteToken,
-      })
-      .select("id")
-      .single();
-
-    setBusy(false);
-
-    if (insertError) {
-      setError(insertError.message);
+    let res: Response;
+    try {
+      res = await fetch("/api/promises/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      setBusy(false);
+      setError(t("promises.new.errors.network"));
       return;
     }
 
-    router.push(`/promises/${insertData.id}`);
+    setBusy(false);
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
+        return;
+      }
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? t("promises.new.errors.createFailed"));
+      return;
+    }
+
+    const body = (await res.json().catch(() => null)) as { id?: string } | null;
+
+    if (!body?.id) {
+      setError(t("promises.new.errors.createFailed"));
+      return;
+    }
+
+    router.push(`/promises/${body.id}`);
   }
 
   return (
@@ -459,17 +496,50 @@ export default function NewPromisePage() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {executor && (
-                <p
-                  id="counterparty-helper"
-                  className="mt-2 text-sm leading-relaxed text-slate-400"
-                >
-                  {t("promises.new.fields.counterpartyHelper")}
-                </p>
-              )}
             </div>
+
+            {executor && (
+              <p
+                id="counterparty-helper"
+                className="mt-2 text-sm leading-relaxed text-slate-400"
+              >
+                {t("promises.new.fields.counterpartyHelper")}
+              </p>
+            )}
+
+            {isPublicProfile && (
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="text-sm font-semibold text-white">
+                      {t("promises.new.publicRequest.label")}
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      {t("promises.new.publicRequest.helper")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isPublicDeal}
+                    aria-label={t("promises.new.publicRequest.label")}
+                    onClick={() => setIsPublicDeal((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                      isPublicDeal
+                        ? "border-emerald-300/50 bg-emerald-400/70"
+                        : "border-white/20 bg-white/10"
+                    } hover:border-emerald-300/60`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                        isPublicDeal ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           </div>
 
           <div className="space-y-3">

@@ -1,89 +1,52 @@
 {
-  "home": {
-    "eyebrow": "Reputation intelligence for deals and promises",
-    "brand": {
-      "name": "Dreddi",
-      "suffix": "knows"
-    },
-    "tagline": "Track every deal, measure delivery, and keep your reputation sharp. Dreddi watches the details so your deals stay honest.",
-    "highlights": {
-      "promisesTracked": "Deals tracked",
-      "reputationIntact": "Reputation intact",
-      "dreddiKnows": "Dreddi knows"
-    },
-    "showcase": {
-      "0": {
-        "title": "Deal: Vendor onboarding deck by Wed",
-        "meta": "Commitment kept • Outcome: approved • Reputation +2"
-      },
-      "1": {
-        "title": "Deal: Refund within 24h",
-        "meta": "Commitment met • Outcome: case closed • Reputation +1"
-      },
-      "2": {
-        "title": "Deal: Launch UA landing page",
-        "meta": "Commitment delivered • Outcome: live • Reputation +3"
-      }
-    },
-    "loading": "Loading your session…",
-    "loadingShort": "Loading…",
-    "loadingPlaceholder": "…",
-    "errors": {
-      "userSession": "Unable to load user session",
-      "notAuthenticated": "Not authenticated",
-      "reputation": "Unable to load reputation"
-    },
-    "cta": {
-      "getStarted": "Get started",
-      "publicProfiles": "See public profiles",
-      "createPromise": "Create deal",
-      "reviewDeals": "Review deals",
-      "logout": "Log out"
-    },
-    "score": {
-      "label": "Reputation Score",
-      "live": "Live",
-      "signIn": "Sign in for live score",
-      "cards": {
-        "score": "Score",
-        "confirmed": "Confirmed",
-        "confirmedSuffix": "{count} complete",
-        "disputed": "Disputed",
-        "disputedSuffix": "{count} recorded"
-      },
-      "onTime": {
-        "label": "On-time completions",
-        "suffix": "{count} delivered on time",
-        "helper": "Based on deals with a due date",
-        "empty": "No due-date deals yet"
-      }
-    },
-    "recentDeals": {
-      "title": "Recent deals",
-      "seeAll": "See all",
-      "guestHint": "Sign in to see your live deals",
-      "empty": "Create your first deal to populate your reputation feed.",
-      "sentiment": {
-        "positive": "Positive",
-        "negative": "Negative"
-      },
-      "eventFallbackTitle": "Deal",
-      "placeholderMetaDue": "Due {date}",
-      "placeholderMetaCreated": "Created {date}",
-      "status": {
-        "active": "Active",
-        "completed_by_promisor": "Marked complete (waiting for confirmation)",
-        "confirmed": "Confirmed",
-        "disputed": "Disputed"
-      }
-    }
-  },
   "nav": {
     "myPromises": "My deals",
     "newPromise": "New deal",
     "login": "Sign in",
     "getStarted": "Get started",
-    "logout": "Log out"
+    "logout": "Log out",
+    "notifications": "Notifications"
+  },
+  "landing": {
+    "hero": {
+      "brandSuffix": "knows"
+    }
+  },
+  "profileSettings": {
+    "sectionLabel": "PROFILE",
+    "title": "Profile settings",
+    "buttonLabel": "Profile",
+    "close": "Close",
+    "publicLabel": "Public profile",
+    "publicDescription": "If disabled, your profile isn't publicly visible",
+    "toggleLabel": "Toggle public profile",
+    "publicLinkLabel": "Public profile link",
+    "publicLinkDescription": "Share this link so others can view your public profile.",
+    "publicLinkPrivate": "Enable your public profile to get a shareable link.",
+    "viewPublicProfile": "View",
+    "copyLink": "Copy link",
+    "copySuccess": "Copied",
+    "status": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "loading": "Loading profile…",
+    "errors": {
+      "unavailable": "Authentication is unavailable in this preview",
+      "notAuthenticated": "Not authenticated",
+      "copyFailed": "Failed to copy link",
+      "saveFailed": "Failed to update profile"
+    },
+    "notificationsLabel": "Notifications",
+    "notificationsDescription": "Control when we send reminders and alerts",
+    "pushLabel": "Push notifications",
+    "pushDescription": "In-app alerts always appear in your notification center",
+    "deadlineLabel": "Deadline reminders",
+    "quietHoursLabel": "Quiet hours",
+    "quietHoursDescription": "Delay non-critical alerts during quiet hours",
+    "quietHoursRangeLabel": "Quiet hours range",
+    "quietHoursHelper": "Default 22:00–09:00",
+    "save": "Save"
   },
   "promises": {
     "overview": {
@@ -154,6 +117,7 @@
       "markCompleted": "Mark as completed",
       "shareInvite": "Share the invite and wait for acceptance to request confirmation.",
       "reviewConfirm": "Review & confirm",
+      "awaitingExecutor": "Waiting for the executor to mark this complete.",
       "waitingReview": "Waiting for the counterparty to review.",
       "confirmed": "Deal confirmed ✅",
       "disputed": "Deal disputed.",
@@ -171,6 +135,21 @@
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
+      "publicStatus": {
+        "label": "Visibility",
+        "public": "Public deal",
+        "waitingOtherSide": "Public proposed — waiting for other side",
+        "waitingConfirmation": "Public proposed — waiting for confirmation",
+        "privateAfterProposal": "Private (public was proposed)"
+      },
+      "publicVisibility": {
+        "title": "Public visibility (confirmed only)",
+        "helper": "This deal will appear on your public profile only if both sides agree.",
+        "creatorConsent": "I agree to show this confirmed deal publicly.",
+        "counterpartyConsent": "I agree to show this confirmed deal publicly.",
+        "confirmedOnly": "Only confirmed responsibilities can be shown publicly.",
+        "awaitingAcceptance": "The other side must accept the deal before it can be made public."
+      },
       "errors": {
         "unsupportedStatus": "Deal has an unsupported status value",
         "updateStatus": "Could not update status",
@@ -252,8 +231,14 @@
       "actions": {
         "clearDate": "Clear date"
       },
+      "publicRequest": {
+        "label": "Public deal",
+        "helper": "Public deals appear on your public profile once confirmed."
+      },
       "errors": {
-        "counterpartyRequired": "Please add the other party's contact."
+        "counterpartyRequired": "Please add the other party's contact",
+        "createFailed": "Failed to create deal",
+        "network": "Unable to reach the server. Please try again."
       },
       "submit": "Create deal",
       "creating": "Creating…"
@@ -280,6 +265,16 @@
     "nextStepHint": "By accepting, you confirm you understand this deal.",
     "processing": "Processing...",
     "accept": "Accept deal",
+    "publicProposal": {
+      "title": "This deal is PUBLIC.",
+      "body": "If you accept, the deal details will be visible on public profiles."
+    },
+    "publicModal": {
+      "title": "Accept public deal?",
+      "body": "This deal is public. If you proceed, its details will be visible on public profiles after confirmation.",
+      "cancel": "Cancel",
+      "confirm": "Continue"
+    },
     "unknown": "Unknown",
     "noDeadline": "No deadline",
     "errors": {
@@ -304,12 +299,11 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
-    "recentDealsMeta": "Finalized {date}",
+    "reputationNote": "Reputation reflects all confirmed outcomes. Only public deals show details.",
     "sections": {
-      "responsibilityStatus": "Public responsibility status",
-      "whatsHappening": "What’s happening now",
-      "trackRecord": "Public track record",
-      "recentConfirmations": "Recent public confirmations"
+      "responsibilityStatus": "Responsibility status",
+      "trackRecord": "Track record",
+      "publicDeals": "Public deals"
     },
     "status": {
       "active": "Active",
@@ -324,16 +318,36 @@
       "overdue": "Overdue since {date}",
       "noDue": "No due date"
     },
-    "emptyStatus": "No active public responsibilities.",
+    "emptyStatus": "No active responsibilities.",
     "emptyInProgress": "No in-progress responsibilities.",
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
     "emptyOverdue": "No overdue responsibilities.",
-    "emptyHistory": "No public history yet.",
-    "emptyRecent": "No public confirmations yet.",
+    "emptyHistory": "No history yet.",
+    "emptyPublicDeals": "No public deals to show yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
+      "private": "This profile is private.",
       "notFound": "Profile not found."
+    }
+  },
+  "publicDirectory": {
+    "title": "Public profiles",
+    "loading": "Loading profiles…",
+    "empty": "No public profiles yet.",
+    "errors": {
+      "supabase": "Supabase is not configured."
+    }
+  },
+  "notifications": {
+    "eyebrow": "NOTIFICATIONS",
+    "title": "Notifications",
+    "subtitle": "Stay on top of agreements.",
+    "loading": "Loading notifications…",
+    "empty": "No notifications yet.",
+    "markRead": "Mark as read",
+    "errors": {
+      "unavailable": "Authentication is unavailable in this preview."
     }
   }
 }
