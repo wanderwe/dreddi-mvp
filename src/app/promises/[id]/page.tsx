@@ -7,6 +7,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { formatDueDate } from "@/lib/formatDueDate";
 
 type PromiseRow = {
   id: string;
@@ -152,11 +153,7 @@ export default function PromisePage() {
 
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
-    try {
-      return new Date(p.due_at).toLocaleString(locale);
-    } catch {
-      return t("promises.detail.noDeadline");
-    }
+    return formatDueDate(p.due_at, locale, { includeYear: true }) ?? t("promises.detail.noDeadline");
   }, [locale, p, t]);
 
   async function requireSessionOrRedirect(
