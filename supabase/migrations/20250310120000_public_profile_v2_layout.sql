@@ -1,4 +1,6 @@
-CREATE OR REPLACE VIEW public_profile_stats AS
+DROP VIEW IF EXISTS public_profile_stats;
+
+CREATE VIEW public_profile_stats AS
 SELECT
   profiles.id AS profile_id,
   profiles.handle,
