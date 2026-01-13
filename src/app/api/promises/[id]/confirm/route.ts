@@ -67,11 +67,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       await createNotification(admin, {
         userId: executorId,
         promiseId: updatedPromise.id,
-        type: "N6",
+        type: "completion_followup",
         role: "executor",
-        dedupeKey: buildDedupeKey(["N6", updatedPromise.id]),
+        dedupeKey: buildDedupeKey(["completion_followup", updatedPromise.id]),
         ctaUrl: `/promises/${updatedPromise.id}`,
-        priority: mapPriorityForType("N6"),
+        priority: mapPriorityForType("completion_followup"),
         delta,
       });
     }

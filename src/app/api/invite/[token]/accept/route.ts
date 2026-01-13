@@ -130,22 +130,22 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
         await createNotification(admin, {
           userId: executorId,
           promiseId: updatedPromise.id,
-          type: "N2",
+          type: "invite_followup",
           role: "executor",
-          dedupeKey: buildDedupeKey(["N2", updatedPromise.id, "executor"]),
+          dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "executor"]),
           ctaUrl: buildCtaUrl(updatedPromise.id),
-          priority: mapPriorityForType("N2"),
+          priority: mapPriorityForType("invite_followup"),
         });
       }
 
       await createNotification(admin, {
         userId: updatedPromise.creator_id,
         promiseId: updatedPromise.id,
-        type: "N2",
+        type: "invite_followup",
         role: "creator",
-        dedupeKey: buildDedupeKey(["N2", updatedPromise.id, "creator"]),
+        dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "creator"]),
         ctaUrl: buildCtaUrl(updatedPromise.id),
-        priority: mapPriorityForType("N2"),
+        priority: mapPriorityForType("invite_followup"),
       });
     }
 

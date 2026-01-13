@@ -1,4 +1,30 @@
-export type NotificationType = "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "N7";
+export type LegacyNotificationType = "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "N7";
+
+export type NotificationType =
+  | "invite"
+  | "invite_followup"
+  | "due_soon"
+  | "overdue"
+  | "completion_waiting"
+  | "completion_followup"
+  | "dispute";
+
+export type NotificationTypeInput = NotificationType | LegacyNotificationType;
+
+export const LEGACY_NOTIFICATION_TYPE_MAP: Record<LegacyNotificationType, NotificationType> = {
+  N1: "invite",
+  N2: "invite_followup",
+  N3: "due_soon",
+  N4: "overdue",
+  N5: "completion_waiting",
+  N6: "completion_followup",
+  N7: "dispute",
+};
+
+export const normalizeNotificationType = (type: NotificationTypeInput): NotificationType =>
+  type in LEGACY_NOTIFICATION_TYPE_MAP
+    ? LEGACY_NOTIFICATION_TYPE_MAP[type as LegacyNotificationType]
+    : type;
 
 export type NotificationPriority = "low" | "normal" | "high" | "critical";
 

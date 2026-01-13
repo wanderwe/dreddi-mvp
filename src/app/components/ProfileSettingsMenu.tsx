@@ -74,7 +74,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const { data, error: profileError } = await supabase
         .from("profiles")
         .select(
-          "handle,is_public,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+          "handle,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
         )
         .eq("id", session.user.id)
         .single();
@@ -89,7 +89,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       const profileRow = data as {
         handle?: string | null;
-        is_public?: boolean | null;
+        is_public_profile?: boolean | null;
         push_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
         quiet_hours_enabled?: boolean | null;
@@ -97,7 +97,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         quiet_hours_end?: string | null;
       } | null;
       const handle = profileRow?.handle ?? null;
-      const isPublic = profileRow?.is_public ?? false;
+      const isPublic = profileRow?.is_public_profile ?? false;
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
       const quietHoursEnabled = profileRow?.quiet_hours_enabled ?? true;
@@ -195,7 +195,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     }
 
     await updateProfileRow(
-      { is_public: nextPublic, handle: nextHandle },
+      { is_public_profile: nextPublic, handle: nextHandle },
       { handle: nextHandle, isPublic: nextPublic }
     );
   };

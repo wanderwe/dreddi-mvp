@@ -1,8 +1,12 @@
-import { NotificationType } from "./types";
+import { NotificationType, NotificationTypeInput, normalizeNotificationType } from "./types";
 
 export const DAILY_NOTIFICATION_CAP = 3;
 
-export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = ["N5", "N6", "N7"];
+export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
+  "completion_waiting",
+  "completion_followup",
+  "dispute",
+];
 
 const parseTimeToMinutes = (value: string) => {
   const [h, m] = value.split(":").map((part) => Number(part));
@@ -28,17 +32,17 @@ export const isWithinQuietHours = (
   return nowMinutes >= startMinutes || nowMinutes < endMinutes;
 };
 
-export const isDailyCapExceeded = (count: number, type: NotificationType) => {
-  if (CRITICAL_NOTIFICATION_TYPES.includes(type)) return false;
+export const isDailyCapExceeded = (count: number, type: NotificationTypeInput) => {
+  if (CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;
   return count >= DAILY_NOTIFICATION_CAP;
 };
 
 export const isPerDealCapExceeded = (
   lastSentAt: Date | null,
   now: Date,
-  type: NotificationType
+  type: NotificationTypeInput
 ) => {
-  if (CRITICAL_NOTIFICATION_TYPES.includes(type)) return false;
+  if (CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;
   if (!lastSentAt) return false;
   return now.getTime() - lastSentAt.getTime() < 24 * 60 * 60 * 1000;
 };

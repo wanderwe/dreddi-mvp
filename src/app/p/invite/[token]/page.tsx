@@ -15,7 +15,7 @@ type InviteInfo = {
   creator_display_name: string | null;
   counterparty_id: string | null;
   counterparty_contact: string | null;
-  is_public: boolean;
+  visibility: "private" | "public";
 };
 
 export default function InvitePage() {
@@ -81,7 +81,7 @@ export default function InvitePage() {
 
     if (!info.counterparty_id) {
       setAutoAcceptAttempted(true);
-      if (info.is_public) {
+      if (info.visibility === "public") {
         setShowAcceptModal(true);
         return;
       }
@@ -219,7 +219,7 @@ export default function InvitePage() {
                   : t("invite.accepted")}
               </div>
             )}
-            {info.is_public && (
+            {info.visibility === "public" && (
               <div className="mb-4 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
                 <p className="font-semibold">{t("invite.publicProposal.title")}</p>
                 <p className="mt-1 text-xs text-amber-100/80">{t("invite.publicProposal.body")}</p>
@@ -284,7 +284,7 @@ export default function InvitePage() {
                     <button
                       disabled={busy}
                       onClick={() => {
-                        if (info.is_public) {
+                        if (info.visibility === "public") {
                           setShowAcceptModal(true);
                         } else {
                           void accept();
