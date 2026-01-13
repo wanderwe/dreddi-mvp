@@ -12,11 +12,10 @@ type PublicProfileRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  reputation_score: number | null;
   confirmed_count: number | null;
   disputed_count: number | null;
-  active_count: number | null;
-  pending_acceptance_count: number | null;
-  overdue_count: number | null;
+  last_activity_at: string | null;
 };
 
 type PublicPromiseRow = {
@@ -61,6 +60,26 @@ export default function PublicProfilePage() {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const formatDateShort = useMemo(
+    () =>
+      (value: string) =>
+        new Intl.DateTimeFormat(locale, {
+          month: "short",
+          day: "numeric",
+        }).format(new Date(value)),
+    [locale]
+  );
+  const formatRelativeDays = useMemo(() => {
+    const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    return (value: string) => {
+      const now = Date.now();
+      const time = new Date(value).getTime();
+      if (Number.isNaN(time)) return "";
+      const diffDays = Math.round((time - now) / (1000 * 60 * 60 * 24));
+      return formatter.format(diffDays, "day");
+    };
+  }, [locale]);
+
   useEffect(() => {
     let active = true;
 
@@ -83,7 +102,7 @@ export default function PublicProfilePage() {
       const { data: profileRow, error: profileErr } = await supabase
         .from("public_profile_stats")
         .select(
-          "handle,display_name,avatar_url,confirmed_count,disputed_count,active_count,pending_acceptance_count,overdue_count"
+          "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
         )
         .eq("handle", handle)
         .maybeSingle();
@@ -145,11 +164,10 @@ export default function PublicProfilePage() {
   }, []);
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
+  const reputationScore = profile?.reputation_score ?? 50;
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
-  const activeCount = profile?.active_count ?? 0;
-  const pendingAcceptanceCount = profile?.pending_acceptance_count ?? 0;
-  const overdueCount = profile?.overdue_count ?? 0;
+  const lastActivityAt = profile?.last_activity_at ?? null;
   const publicProfilePath = useMemo(
     () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
     [handle]
@@ -174,9 +192,10 @@ export default function PublicProfilePage() {
     disputed: landingCopy.recentDeals.status.disputed,
   };
 
-  const activeSummaryEmpty = activeCount + pendingAcceptanceCount + overdueCount === 0;
-  const trackRecordEmpty = confirmedCount + disputedCount === 0;
   const publicDealsEmpty = promises.length === 0;
+  const lastActivityLabel = lastActivityAt
+    ? t("publicProfile.summary.lastActivity", { time: formatRelativeDays(lastActivityAt) })
+    : t("publicProfile.summary.lastActivityEmpty");
 
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
@@ -192,7 +211,7 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {profile?.avatar_url ? (
@@ -213,66 +232,37 @@ export default function PublicProfilePage() {
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                </button>
-              </div>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="text-lg font-semibold">
-                    {t("publicProfile.sections.responsibilityStatus")}
-                  </h2>
-                  {activeSummaryEmpty ? (
-                    <span className="text-sm text-white/60">
-                      {t("publicProfile.emptyStatus")}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
+                <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:items-end">
+                  <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-center sm:text-right">
                     <p className="text-xs uppercase tracking-wide text-white/50">
-                      {t("publicProfile.status.active")}
+                      {t("publicProfile.reputationScore")}
                     </p>
-                    <p className="mt-2 text-3xl font-semibold text-emerald-200">{activeCount}</p>
+                    <p className="mt-2 text-3xl font-semibold text-white">{reputationScore}</p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      {t("publicProfile.status.pendingAcceptance")}
-                    </p>
-                    <p className="mt-2 text-3xl font-semibold text-amber-200">
-                      {pendingAcceptanceCount}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      {t("publicProfile.status.overdue")}
-                    </p>
-                    <p className="mt-2 text-3xl font-semibold text-red-200">{overdueCount}</p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
+                  >
+                    {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                  </button>
                 </div>
               </div>
-            </section>
-
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-2">
-                <h2 className="text-lg font-semibold">{t("publicProfile.sections.trackRecord")}</h2>
-                <p className="text-sm text-white/60">{t("publicProfile.reputationNote")}</p>
-                {trackRecordEmpty ? (
-                  <span className="text-sm text-white/60">{t("publicProfile.emptyHistory")}</span>
-                ) : null}
+              <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
+                <span>{t("publicProfile.summary.confirmed", { count: confirmedCount })}</span>
+                <span className="text-white/40">•</span>
+                <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
+                <span className="text-white/40">•</span>
+                <span>{lastActivityLabel}</span>
               </div>
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
                   <p className="text-xs uppercase tracking-wide text-white/50">
                     {t("publicProfile.confirmed")}
                   </p>
                   <p className="mt-2 text-3xl font-semibold text-emerald-200">{confirmedCount}</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
+                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
                   <p className="text-xs uppercase tracking-wide text-white/50">
                     {t("publicProfile.disputed")}
                   </p>

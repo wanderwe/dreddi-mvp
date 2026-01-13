@@ -299,7 +299,13 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
-    "reputationNote": "Reputation reflects all confirmed outcomes. Only public deals show details.",
+    "reputationScore": "Reputation score",
+    "summary": {
+      "confirmed": "{count} confirmed",
+      "disputed": "{count} disputed",
+      "lastActivity": "Last activity {time}",
+      "lastActivityEmpty": "No activity yet"
+    },
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
