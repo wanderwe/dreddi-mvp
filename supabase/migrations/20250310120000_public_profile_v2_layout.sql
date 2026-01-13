@@ -4,40 +4,15 @@ SELECT
   profiles.handle,
   profiles.display_name,
   profiles.avatar_url,
-  COALESCE(stats.reputation_score, 50) AS reputation_score,
-  COALESCE(stats.confirmed_count, 0::bigint) AS confirmed_count,
-  COALESCE(stats.disputed_count, 0::bigint) AS disputed_count,
+  COALESCE(user_reputation.score, 50) AS reputation_score,
+  COALESCE(user_reputation.confirmed_count::bigint, 0::bigint) AS confirmed_count,
+  COALESCE(user_reputation.disputed_count::bigint, 0::bigint) AS disputed_count,
   stats.last_activity_at
 FROM profiles
+LEFT JOIN user_reputation ON user_reputation.user_id = profiles.id
 LEFT JOIN (
   SELECT
     promises.creator_id,
-    COUNT(*) FILTER (WHERE promises.status = 'confirmed')::bigint AS confirmed_count,
-    COUNT(*) FILTER (WHERE promises.status = 'disputed')::bigint AS disputed_count,
-    50 + COALESCE(
-      SUM(
-        CASE
-          WHEN promises.status = 'confirmed' THEN
-            CASE
-              WHEN promises.due_at IS NOT NULL
-                AND promises.completed_at IS NOT NULL
-                AND promises.completed_at <= promises.due_at
-                THEN 4
-              ELSE 3
-            END
-          WHEN promises.status = 'disputed' THEN
-            CASE
-              WHEN promises.due_at IS NOT NULL
-                AND promises.completed_at IS NOT NULL
-                AND promises.completed_at > promises.due_at
-                THEN -7
-              ELSE -6
-            END
-          ELSE 0
-        END
-      ),
-      0
-    ) AS reputation_score,
     MAX(
       GREATEST(
         promises.created_at,
@@ -58,6 +33,26 @@ WHERE profiles.handle IS NOT NULL
   AND profiles.is_public_profile = true;
 
 GRANT SELECT ON public_profile_stats TO anon, authenticated;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'user_reputation'
+      AND policyname = 'public_reputation_read'
+  ) THEN
+    CREATE POLICY public_reputation_read ON user_reputation
+      FOR SELECT USING (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = user_reputation.user_id
+            AND profiles.is_public_profile = true
+        )
+      );
+  END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION public_get_profile_public_promises(
   p_handle text,
