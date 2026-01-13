@@ -8,13 +8,13 @@ import {
   isWithinQuietHours,
 } from "./policy";
 import { getNotificationCopy } from "./copy";
+import { normalizeNotificationType } from "./types";
 import type {
   NotificationPriority,
   NotificationRole,
   NotificationSettings,
   NotificationType,
   NotificationTypeInput,
-  normalizeNotificationType,
 } from "./types";
 
 export type NotificationRequest = {
