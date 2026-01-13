@@ -40,6 +40,33 @@ type ReputationResponse = {
   }[];
 };
 
+type DealRowProps = {
+  item: DealRow;
+  href: string;
+  metaText: string;
+  statusLabels: Record<PromiseStatus, string>;
+  statusTones: Record<PromiseStatus, string>;
+};
+
+function DealRow({ item, href, metaText, statusLabels, statusTones }: DealRowProps) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-emerald-500/10"
+    >
+      <div>
+        <div className="font-semibold text-white">{item.title}</div>
+        {metaText ? <div className="text-xs text-slate-400">{metaText}</div> : null}
+      </div>
+      <span
+        className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
+      >
+        {statusLabels[item.status] ?? item.status}
+      </span>
+    </Link>
+  );
+}
+
 export default function Home() {
   const locale = useLocale();
   const t = useT();
@@ -57,15 +84,21 @@ export default function Home() {
   const nextSaturday = new Date(now);
   const daysUntilSaturday = (6 - nextSaturday.getDay() + 7) % 7;
   nextSaturday.setDate(nextSaturday.getDate() + daysUntilSaturday);
-  nextSaturday.setHours(12, 0, 0, 0);
-  const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1, 12, 0, 0, 0);
+  nextSaturday.setHours(0, 0, 0, 0);
+  const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1);
+  nextMarchFirst.setHours(0, 0, 0, 0);
+
+  const toIsoDate = (date: Date) => {
+    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    return utcDate.toISOString().split("T")[0];
+  };
 
   const demoDeals: DealRow[] = copy.demoDeals.map((deal) => {
     const due_at =
       deal.dueDate === "nextSaturday"
-        ? nextSaturday.toISOString()
+        ? toIsoDate(nextSaturday)
         : deal.dueDate === "nextMarchFirst"
-        ? nextMarchFirst.toISOString()
+        ? toIsoDate(nextMarchFirst)
         : null;
 
     return {
@@ -91,13 +124,20 @@ export default function Home() {
     disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
   };
 
-  const formatDateShort = (value: string) =>
-    new Intl.DateTimeFormat(locale, {
+  const formatDateShort = (value: string) => {
+    const hasTime = /\d{2}:\d{2}/.test(value);
+    const options: Intl.DateTimeFormatOptions = {
       month: "short",
       day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }).format(new Date(value));
+    };
+
+    if (hasTime) {
+      options.hour = "numeric";
+      options.minute = "2-digit";
+    }
+
+    return new Intl.DateTimeFormat(locale, options).format(new Date(value));
+  };
 
   const getMetaText = (item: DealRow) =>
     item.meta ??
@@ -287,8 +327,6 @@ export default function Home() {
   const onTimeHelper =
     confirmedWithDeadlineCount === 0 ? copy.score.onTime.empty : copy.score.onTime.helper;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
-  const recentEvents = reputation?.recent_events ?? [];
-  const recentEventsLimited = recentEvents.slice(0, 3);
   const recentDealsLimited = recentDeals.slice(0, 3);
 
   const renderMultiline = (text: string) =>
@@ -445,121 +483,67 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-                <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>{copy.recentDeals.title}</span>
-                  <Link
-                    href={isAuthenticated ? "/promises" : "/login?next=%2Fpromises"}
-                    className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
-                  >
-                    {copy.recentDeals.seeAll}
-                  </Link>
-                </div>
-                {!isAuthenticated ? (
-                  <div className="mt-3">
-                    <p className="text-xs text-slate-400">{copy.recentDeals.guestHint}</p>
-                    <div className="mt-3 space-y-2 text-sm">
-                      {demoDeals.map((item) => {
-                        const metaText = getMetaText(item);
-                        return (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                          >
-                            <div>
-                              <div className="font-semibold text-white">{item.title}</div>
-                              {metaText ? (
-                                <div className="text-xs text-slate-400">{metaText}</div>
-                              ) : null}
-                            </div>
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                            >
-                              {statusLabels[item.status] ?? item.status}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
+                  <div className="flex items-center justify-between text-sm text-slate-300">
+                    <span>{copy.recentDeals.title}</span>
+                    <Link
+                      href={isAuthenticated ? "/promises" : "/login?next=%2Fpromises"}
+                      className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
+                    >
+                      {copy.recentDeals.seeAll}
+                    </Link>
                   </div>
-                ) : (
-                  <>
-                    {recentError && (
-                      <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                        {recentError}
+                  {!isAuthenticated ? (
+                    <div className="mt-3">
+                      <p className="text-xs text-slate-400">{copy.recentDeals.guestHint}</p>
+                      <div className="mt-3 space-y-2 text-sm">
+                        {demoDeals.map((item) => (
+                          <DealRow
+                            key={item.id}
+                            item={item}
+                            href="/login?next=%2Fpromises"
+                            metaText={getMetaText(item)}
+                            statusLabels={statusLabels}
+                            statusTones={statusTones}
+                          />
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  ) : (
+                    <>
+                      {recentError && (
+                        <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                          {recentError}
+                        </div>
+                      )}
 
-                    <div className="mt-3 space-y-2 text-sm">
-                      <div className="space-y-2">
+                      <div className="mt-3 space-y-2 text-sm">
                         {reputationLoading || recentLoading ? (
                           <div className="space-y-2">
                             {[1, 2, 3].map((i) => (
                               <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
                             ))}
                           </div>
-                        ) : recentEvents.length > 0 ? (
-                          recentEventsLimited.map((event) => (
-                            <div
-                              key={event.id}
-                              className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                            >
-                              <div>
-                                <div className="font-semibold text-white">
-                                  {event.delta > 0 ? `+${event.delta}` : event.delta}{" "}
-                                  {event.kind.replace("promise_", "").replace("_", " ")}
-                                </div>
-                                <div className="text-xs text-slate-400">
-                                  {event.promise?.title ?? copy.recentDeals.eventFallbackTitle}
-                                  {" • "}
-                                  {new Date(event.created_at).toLocaleString(locale)}
-                                </div>
-                              </div>
-                              <span
-                                className={[
-                                  "rounded-full px-3 py-1 text-xs",
-                                  event.delta >= 0
-                                    ? "bg-emerald-500/15 text-emerald-100 border border-emerald-400/30"
-                                    : "bg-red-500/10 text-red-100 border border-red-400/30",
-                                ].join(" ")}
-                              >
-                                {event.delta >= 0
-                                  ? copy.recentDeals.sentiment.positive
-                                  : copy.recentDeals.sentiment.negative}
-                              </span>
-                            </div>
-                          ))
                         ) : recentDeals.length === 0 ? (
                           <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
                             {copy.recentDeals.empty}
                           </div>
                         ) : (
-                          recentDealsLimited.map((item) => {
-                            const metaText = getMetaText(item);
-
-                            return (
-                              <div
-                                key={item.id}
-                                className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200"
-                              >
-                                <div>
-                                  <div className="font-semibold text-white">{item.title}</div>
-                                  <div className="text-xs text-slate-400">{metaText}</div>
-                                </div>
-                                <span
-                                  className={`rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`}
-                                >
-                                  {statusLabels[item.status] ?? item.status}
-                                </span>
-                              </div>
-                            );
-                          })
+                          recentDealsLimited.map((item) => (
+                            <DealRow
+                              key={item.id}
+                              item={item}
+                              href={`/promises/${item.id}`}
+                              metaText={getMetaText(item)}
+                              statusLabels={statusLabels}
+                              statusTones={statusTones}
+                            />
+                          ))
                         )}
                       </div>
-                    </div>
-                  </>
-                )}
-              </div>
+                    </>
+                  )}
+                </div>
             </div>
           </div>
         </div>
