@@ -19,7 +19,8 @@ import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req, cookies());
+    const cookieStore = await cookies();
+    const user = await requireUser(req, cookieStore);
     if (user instanceof NextResponse) return user;
 
     const body = await req.json().catch(() => null);

@@ -19,7 +19,8 @@ type CreatePromisePayload = {
 
 export async function POST(req: Request) {
   try {
-    const user = await requireUser(req, cookies());
+    const cookieStore = await cookies();
+    const user = await requireUser(req, cookieStore);
     if (user instanceof NextResponse) return user;
 
     const body = (await req.json().catch(() => null)) as CreatePromisePayload | null;
