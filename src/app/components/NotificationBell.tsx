@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { IconButton } from "@/app/components/ui/IconButton";
 
 export function NotificationBell({ className = "" }: { className?: string }) {
   const t = useT();
@@ -43,17 +43,20 @@ export function NotificationBell({ className = "" }: { className?: string }) {
   }, []);
 
   return (
-    <Link
+    <IconButton
       href="/notifications"
-      className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 ${className}`}
-      aria-label={t("nav.notifications")}
-    >
-      <Bell className="h-4 w-4" />
-      {count > 0 && (
-        <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[10px] font-semibold text-slate-950">
-          {count}
-        </span>
-      )}
-    </Link>
+      ariaLabel={t("nav.notifications")}
+      className={className}
+      icon={
+        <>
+          <Bell className="h-4 w-4" />
+          {count > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[10px] font-semibold text-slate-950">
+              {count}
+            </span>
+          )}
+        </>
+      }
+    />
   );
 }

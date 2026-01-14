@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRound, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { IconButton } from "@/app/components/ui/IconButton";
 import {
   Sheet,
   SheetClose,
@@ -523,13 +524,11 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
 
   const trigger =
     variant === "icon" ? (
-      <button
-        type="button"
-        aria-label={t("profileSettings.buttonLabel")}
-        className={`inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${className}`}
-      >
-        <UserRound className="h-4 w-4" aria-hidden />
-      </button>
+      <IconButton
+        ariaLabel={t("profileSettings.buttonLabel")}
+        icon={<UserRound className="h-4 w-4" aria-hidden />}
+        className={className}
+      />
     ) : (
       <button
         type="button"
