@@ -373,21 +373,19 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-5 sm:space-y-4">
-            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold leading-snug tracking-wide text-emerald-200 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25),0_12px_30px_rgba(2,6,23,0.5)] backdrop-blur sm:max-w-full sm:gap-3 sm:whitespace-nowrap sm:px-4 sm:py-1.5 sm:text-base sm:leading-normal sm:tracking-normal">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium leading-snug text-slate-300 shadow-sm backdrop-blur sm:max-w-full sm:whitespace-nowrap sm:px-4">
               {copy.hero.eyebrow}
             </div>
-            <div className="flex items-center gap-4">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
-                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-                <span className="text-white">{t("landing.hero.brandSuffix")}</span>
-              </div>
+            <div className="flex items-center gap-3">
+              <DreddiLogoMark className="h-10 w-10 text-emerald-300 drop-shadow-[0_0_16px_rgba(52,211,153,0.25)] sm:h-12 sm:w-12" />
+              <h1 className="text-3xl font-semibold leading-tight text-white sm:text-5xl">
+                {copy.hero.title}
+              </h1>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
-              {copy.hero.headline}
+            <p className="max-w-2xl text-lg font-medium text-slate-200">
+              {copy.hero.subtitle}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-2xl text-lg text-slate-400">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
@@ -401,7 +399,7 @@ export default function Home() {
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/login"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-md shadow-emerald-500/20 transition hover:shadow-emerald-400/30"
               >
                 {copy.cta.getStarted}
               </Link>
@@ -416,7 +414,7 @@ export default function Home() {
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/promises/new"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-md shadow-emerald-500/20 transition hover:shadow-emerald-400/30"
               >
                 {copy.cta.createPromise}
               </Link>

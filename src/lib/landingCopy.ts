@@ -14,7 +14,8 @@ export type DemoDeal = {
 export type LandingCopy = {
   hero: {
     eyebrow: string;
-    headline: string;
+    title: string;
+    subtitle: string;
     description: string;
   };
   cta: {
@@ -73,9 +74,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
       eyebrow: "Аналітика репутації для угод та обіцянок",
-      headline: "Домовленість починається з підтвердження.",
+      title: "Dreddi знає, хто тримає слово",
+      subtitle: "Домовленості фіксуються. Репутація формується результатами.",
       description:
-        "Dreddi — це сервіс-посередник між розмовою і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску — але з реальними наслідками для довіри.",
+        "Dreddi допомагає фіксувати домовленості між людьми та будувати репутацію на основі підтверджених результатів — без юридичної складності.",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -151,9 +153,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   en: {
     hero: {
       eyebrow: "Reputation analytics for deals and promises",
-      headline: "An agreement starts with confirmation.",
+      title: "Dreddi knows who keeps their word",
+      subtitle: "Agreements are captured. Reputation is built on outcomes.",
       description:
-        "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure — but with real consequences for trust.",
+        "Dreddi helps capture agreements between people and build reputation on verified results without legal complexity.",
     },
     cta: {
       getStarted: "Create a deal",
