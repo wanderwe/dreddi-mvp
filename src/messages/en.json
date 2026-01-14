@@ -48,7 +48,7 @@
     "notificationsLabel": "Notifications",
     "notificationsDescription": "Control when we send reminders and alerts",
     "pushLabel": "Push notifications",
-    "pushDescription": "In-app alerts always appear in your notification center",
+    "pushDescription": "In-app notifications about important deal events\nDelivered immediately, even during quiet hours",
     "deadlineLabel": "Deadline reminders",
     "quietHoursLabel": "Quiet hours",
     "quietHoursDescription": "Delay non-critical alerts during quiet hours",
