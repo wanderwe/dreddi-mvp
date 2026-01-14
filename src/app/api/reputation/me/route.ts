@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getAdminClient, requireUser } from "../../promises/[id]/common";
+import { cookies } from "next/headers";
 
 export async function GET(req: Request) {
   try {
-    const user = await requireUser(req);
+    const user = await requireUser(req, cookies());
     if (user instanceof NextResponse) return user;
 
     const admin = getAdminClient();

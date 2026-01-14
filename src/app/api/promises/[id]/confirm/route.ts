@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { resolveCounterpartyId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
@@ -13,7 +14,7 @@ import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req);
+    const user = await requireUser(req, cookies());
     if (user instanceof NextResponse) return user;
 
     const { id } = await ctx.params;

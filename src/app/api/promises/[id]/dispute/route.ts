@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   DISPUTE_CODES,
@@ -18,7 +19,7 @@ import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req);
+    const user = await requireUser(req, cookies());
     if (user instanceof NextResponse) return user;
 
     const body = await req.json().catch(() => null);

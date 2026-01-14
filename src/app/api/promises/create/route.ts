@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getAdminClient, requireUser } from "../[id]/common";
 import {
   buildCtaUrl,
@@ -18,13 +19,8 @@ type CreatePromisePayload = {
 
 export async function POST(req: Request) {
   try {
-    const user = await requireUser(req);
-    if (user instanceof NextResponse) {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("[promises:create] Missing or invalid auth token");
-      }
-      return user;
-    }
+    const user = await requireUser(req, cookies());
+    if (user instanceof NextResponse) return user;
 
     const body = (await req.json().catch(() => null)) as CreatePromisePayload | null;
 
