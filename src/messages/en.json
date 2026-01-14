@@ -348,6 +348,7 @@
   },
   "publicDirectory": {
     "title": "Public profiles",
+    "back": "Back",
     "loading": "Loading profiles…",
     "empty": "No public profiles yet.",
     "errors": {
