@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { NewDealButton } from "@/app/components/NewDealButton";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -368,13 +369,7 @@ export default function PromisesClient() {
               <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
             </div>
 
-            <Link
-              href="/promises/new"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
-            >
-              <span className="text-lg">＋</span>
-              {t("promises.overview.cta")}
-            </Link>
+            <NewDealButton label={t("promises.overview.cta")} />
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
