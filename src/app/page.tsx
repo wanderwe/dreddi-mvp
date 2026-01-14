@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { DreddiLogo, DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { HeaderActions } from "@/app/components/HeaderActions";
-import { MobileMenu } from "@/app/components/MobileMenu";
+import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { AppHeader } from "@/app/components/nav/AppHeader";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -351,24 +350,14 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <header className="absolute inset-x-0 top-0 z-10">
-        <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-6">
-          <Link href="/" className="flex min-w-0 items-center text-white">
-            <DreddiLogo
-              accentClassName="text-xs"
-              markClassName="h-10 w-10"
-              textClassName="min-w-0"
-              titleClassName="truncate text-lg"
-            />
-          </Link>
-          <HeaderActions
-            className="hidden md:flex"
-            isAuthenticated={isAuthenticated}
-            onLogout={logout}
-          />
-          <MobileMenu isAuthenticated={isAuthenticated} onLogout={logout} />
-        </div>
-      </header>
+      <AppHeader
+        className="absolute inset-x-0 top-0 z-10"
+        variant="transparent"
+        isAuthenticated={isAuthenticated}
+        onLogout={logout}
+        navItems={[]}
+        showAuthCta
+      />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">

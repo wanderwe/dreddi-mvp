@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { AppHeader } from "@/app/components/nav/AppHeader";
+import { BackButton } from "@/app/components/nav/BackButton";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -44,13 +45,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+    <div className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
+      <AppHeader navItems={[]} showAuthCta={false} className="relative z-10" />
+
+      <main className="relative flex min-h-screen items-center justify-center px-4 py-10">
         <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div className="space-y-2">
               <p className="text-sm uppercase tracking-[0.2em] text-emerald-200">
                 {t("auth.login.eyebrow")}
@@ -93,9 +96,7 @@ export default function LoginPage() {
             {error && <div className="text-sm text-red-400">{error}</div>}
 
             <div className="flex items-center justify-between text-sm text-slate-400">
-              <Link href="/" className="text-emerald-200 hover:text-emerald-100">
-                ← {t("auth.login.back")}
-              </Link>
+              <BackButton fallbackHref="/" />
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 {t("auth.login.secure")}
@@ -103,7 +104,7 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

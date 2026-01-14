@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { AppHeader } from "@/app/components/nav/AppHeader";
+import { BackButton } from "@/app/components/nav/BackButton";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 
@@ -16,18 +17,9 @@ type PublicProfileDirectoryRow = {
 
 export default function PublicProfilesDirectoryPage() {
   const t = useT();
-  const router = useRouter();
   const [profiles, setProfiles] = useState<PublicProfileDirectoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const handleBack = useCallback(() => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-      return;
-    }
-
-    router.push("/");
-  }, [router]);
 
   useEffect(() => {
     let active = true;
@@ -115,19 +107,14 @@ export default function PublicProfilesDirectoryPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#0b0f1a] text-white">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-10">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-screen bg-[#0b0f1a] text-white">
+      <AppHeader navItems={[{ href: "/u", label: t("nav.publicProfiles") }]} showAuthCta />
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold">{t("publicDirectory.title")}</h1>
           </div>
-          <button
-            type="button"
-            onClick={handleBack}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
-          >
-            ← {t("publicDirectory.back")}
-          </button>
+          <BackButton fallbackHref="/" />
         </div>
 
         {loading ? (
@@ -147,7 +134,7 @@ export default function PublicProfilesDirectoryPage() {
             {cards}
           </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { BackButton } from "@/app/components/nav/BackButton";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -331,9 +332,7 @@ export default function PromisePage() {
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <Link href="/promises" className="text-neutral-400 hover:text-white">
-          ← {t("promises.detail.back")}
-        </Link>
+        <BackButton fallbackHref="/promises" />
 
         <div className="flex items-center gap-3">{p && <StatusPill status={p.status} />}</div>
       </div>
