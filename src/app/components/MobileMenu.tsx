@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
 import {
   Sheet,
@@ -16,12 +15,13 @@ import { useT } from "@/lib/i18n/I18nProvider";
 
 type MobileMenuProps = {
   isAuthenticated?: boolean;
-  onLogout?: () => void;
 };
 
-export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProps) {
+export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
+
+  if (!isAuthenticated) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -44,65 +44,36 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
         <SheetOverlay />
         <SheetContent id="mobile-menu" className="md:hidden">
           <nav className="flex flex-col gap-4 text-sm font-medium text-slate-200">
-            {isAuthenticated ? (
-              <>
-                <SheetClose asChild>
-                  <Link
-                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                    href="/promises"
-                  >
-                    {t("nav.myPromises")}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link
-                    className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                    href="/notifications"
-                  >
-                    {t("nav.notifications")}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link
-                    className="rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
-                    href="/promises/new"
-                  >
-                    {t("nav.newPromise")}
-                  </Link>
-                </SheetClose>
-              </>
-            ) : (
-              <SheetClose asChild>
-                <Link
-                  className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                  href="/login"
-                >
-                  {t("nav.login")}
-                </Link>
-              </SheetClose>
-            )}
-            <div className="w-fit">
-              <LocaleSwitcher />
-            </div>
-            {isAuthenticated && (
-              <div className="mt-2 border-t border-white/10 pt-4">
-                <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
-                  {t("profileSettings.sectionLabel")}
-                </div>
-                <ProfileSettingsPanel showTitle={false} className="mt-3" />
+            <SheetClose asChild>
+              <Link
+                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                href="/promises"
+              >
+                {t("nav.myPromises")}
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                href="/notifications"
+              >
+                {t("nav.notifications")}
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                className="rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
+                href="/promises/new"
+              >
+                {t("nav.newPromise")}
+              </Link>
+            </SheetClose>
+            <div className="mt-2 border-t border-white/10 pt-4">
+              <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                {t("profileSettings.sectionLabel")}
               </div>
-            )}
-            {isAuthenticated && onLogout && (
-              <SheetClose asChild>
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                >
-                  {t("nav.logout")}
-                </button>
-              </SheetClose>
-            )}
+              <ProfileSettingsPanel showTitle={false} className="mt-3" />
+            </div>
           </nav>
         </SheetContent>
       </SheetPortal>

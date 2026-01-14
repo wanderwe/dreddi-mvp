@@ -37,6 +37,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [quietHoursStartInput, setQuietHoursStartInput] = useState("22:00");
@@ -486,6 +487,35 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         )}
 
+        <div className="mt-4 border-t border-white/10 pt-4">
+          <button
+            type="button"
+            onClick={async () => {
+              setLogoutError(null);
+              try {
+                const supabase = requireSupabase();
+                const { error: signOutError } = await supabase.auth.signOut();
+                if (signOutError) {
+                  setLogoutError(signOutError.message);
+                }
+              } catch (err) {
+                setLogoutError(
+                  err instanceof Error
+                    ? err.message
+                    : t("profileSettings.errors.unavailable")
+                );
+              }
+            }}
+            className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+          >
+            {t("nav.logout")}
+          </button>
+          {logoutError && (
+            <div className="mt-2 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+              {logoutError}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
