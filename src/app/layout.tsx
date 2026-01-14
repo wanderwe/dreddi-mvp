@@ -15,10 +15,38 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Dreddi knows",
-  description: "Deals tracked. Reputation earned."
+const OG_COPY = {
+  en: {
+    title: "Dreddi",
+    description: "Track agreements, confirm outcomes, build reputation.",
+    locale: "en_US",
+  },
+  uk: {
+    title: "Dreddi",
+    description: "Фіксуйте домовленості, підтверджуйте результати, будуйте репутацію.",
+    locale: "uk_UA",
+  },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const copy = OG_COPY[locale] ?? OG_COPY.en;
+
+  return {
+    title: copy.title,
+    description: copy.description,
+    openGraph: {
+      title: copy.title,
+      description: copy.description,
+      locale: copy.locale,
+      type: "website",
+    },
+    twitter: {
+      title: copy.title,
+      description: copy.description,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
