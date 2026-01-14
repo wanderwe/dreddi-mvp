@@ -54,7 +54,8 @@
     "quietHoursDescription": "Delay non-critical alerts during quiet hours",
     "quietHoursRangeLabel": "Quiet hours range",
     "quietHoursHelper": "Default 22:00–09:00",
-    "save": "Save"
+    "save": "Save",
+    "legalLabel": "LEGAL"
   },
   "promises": {
     "overview": {
