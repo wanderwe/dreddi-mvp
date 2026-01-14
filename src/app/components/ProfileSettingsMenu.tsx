@@ -263,44 +263,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       <div className="mt-4 space-y-3">
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">
-              {t("profileSettings.publicLinkLabel")}
-            </div>
-            <p className="text-xs text-slate-300">{t("profileSettings.publicLinkDescription")}</p>
-          </div>
-          {publicProfilePath ? (
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
-                {publicProfileUrl}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={publicProfilePath}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                >
-                  {t("profileSettings.viewPublicProfile")}
-                </a>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <p className="mt-3 text-xs text-slate-400">{t("profileSettings.publicLinkPrivate")}</p>
-          )}
-          {!isPublic && publicProfilePath && (
-            <p className="mt-3 text-xs text-slate-400">{t("profileSettings.publicLinkPrivate")}</p>
-          )}
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-sm font-semibold text-white">
@@ -345,6 +307,41 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
           {loading && (
             <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+          <div className="space-y-1">
+            <div className="text-sm font-semibold text-white">
+              {t("profileSettings.publicLinkLabel")}
+            </div>
+            <p className="text-xs text-slate-300">{t("profileSettings.publicLinkDescription")}</p>
+          </div>
+          {isPublic && publicProfilePath ? (
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+                {publicProfileUrl}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={publicProfilePath}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                >
+                  {t("profileSettings.viewPublicProfile")}
+                </a>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-3 text-xs text-slate-400">{t("profileSettings.publicLinkPrivate")}</p>
           )}
         </div>
 
