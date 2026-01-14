@@ -5,7 +5,15 @@
     "login": "Увійти",
     "getStarted": "Почати",
     "logout": "Вийти",
-    "notifications": "Сповіщення"
+    "notifications": "Сповіщення",
+    "privacy": "Політика конфіденційності",
+    "terms": "Умови користування"
+  },
+  "legal": {
+    "sectionEyebrow": "ЮРИДИЧНЕ",
+    "lastUpdated": "Оновлено {date}",
+    "unavailableTitle": "Юридичний документ недоступний",
+    "unavailableBody": "Зараз ми не можемо завантажити цей документ. Спробуйте пізніше."
   },
   "landing": {
     "hero": {

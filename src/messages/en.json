@@ -5,7 +5,15 @@
     "login": "Sign in",
     "getStarted": "Get started",
     "logout": "Log out",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "legal": {
+    "sectionEyebrow": "LEGAL",
+    "lastUpdated": "Last updated {date}",
+    "unavailableTitle": "Legal document unavailable",
+    "unavailableBody": "We couldn't load this document right now. Please check back soon."
   },
   "landing": {
     "hero": {
