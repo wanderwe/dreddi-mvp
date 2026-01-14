@@ -103,8 +103,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
       onTime: {
         label: "Вчасні виконання",
-        helper: "Ви бачите лише угоди зі строком.",
-        empty: "Ще немає угод зі строком.",
+        helper: "Тут враховуються лише підтверджені угоди зі строком",
+        empty: "Поки що немає угод зі строком",
       },
     },
     recentDeals: {
@@ -181,8 +181,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
       onTime: {
         label: "On-time outcomes",
-        helper: "You only see deals with a due date.",
-        empty: "No deals with a due date yet.",
+        helper: "Only confirmed deals with a due date count here",
+        empty: "No deals with a due date yet",
       },
     },
     recentDeals: {
