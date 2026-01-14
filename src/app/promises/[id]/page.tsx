@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -330,11 +330,7 @@ export default function PromisePage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <Link href="/promises" className="text-neutral-400 hover:text-white">
-          ← {t("promises.detail.back")}
-        </Link>
-
+      <div className="flex items-center justify-end gap-3">
         <div className="flex items-center gap-3">{p && <StatusPill status={p.status} />}</div>
       </div>
 

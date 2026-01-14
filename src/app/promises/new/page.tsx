@@ -379,12 +379,6 @@ export default function NewPromisePage() {
               </h1>
               <p className="text-sm text-slate-300">{t("promises.new.subtitle")}</p>
             </div>
-            <Link
-              href="/promises"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
-            >
-              ← {t("promises.new.back")}
-            </Link>
           </div>
 
           <div className="grid items-start gap-4 sm:grid-cols-2">

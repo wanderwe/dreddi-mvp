@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -159,15 +158,7 @@ export default function InvitePage() {
       />
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
-        <div className="flex items-center justify-between gap-3">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-300/60 hover:bg-emerald-500/10"
-          >
-            <span aria-hidden>←</span>
-            {t("invite.back")}
-          </Link>
-
+        <div className="flex items-center justify-end gap-3">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
