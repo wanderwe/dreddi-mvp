@@ -5,6 +5,7 @@ import { UserRound, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { TimePicker } from "@/app/components/ui/TimePicker";
 import {
   Sheet,
   SheetClose,
@@ -443,20 +444,22 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   }`}
                 >
                   <span className="sr-only">{t("profileSettings.quietHoursRangeLabel")}</span>
-                  <input
-                    type="time"
+                  <TimePicker
                     value={quietHoursStartInput}
-                    onChange={(event) => setQuietHoursStartInput(event.target.value)}
+                    onChange={setQuietHoursStartInput}
                     disabled={!profile?.quietHoursEnabled || loading || saving}
-                    className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white"
+                    ariaLabel={t("profileSettings.quietHoursRangeLabel")}
+                    className="w-[150px]"
+                    buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
                   />
                   <span className="inline-flex h-9 items-center text-xs text-slate-400">→</span>
-                  <input
-                    type="time"
+                  <TimePicker
                     value={quietHoursEndInput}
-                    onChange={(event) => setQuietHoursEndInput(event.target.value)}
+                    onChange={setQuietHoursEndInput}
                     disabled={!profile?.quietHoursEnabled || loading || saving}
-                    className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white"
+                    ariaLabel={t("profileSettings.quietHoursRangeLabel")}
+                    className="w-[150px]"
+                    buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
                   />
                   <button
                     type="button"
