@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { MobileMenu } from "@/app/components/MobileMenu";
+import { NewDealButton } from "@/app/components/NewDealButton";
 import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { useT } from "@/lib/i18n/I18nProvider";
@@ -68,12 +69,7 @@ export function AppHeader() {
                 <Link className={linkBaseClasses} href="/promises">
                   {t("nav.myPromises")}
                 </Link>
-                <Link
-                  className="whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                  href="/promises/new"
-                >
-                  {t("nav.newPromise")}
-                </Link>
+                <NewDealButton label={t("nav.newPromise")} />
                 <NotificationBell />
                 <ProfileSettingsMenu />
                 <LocaleSwitcher />
