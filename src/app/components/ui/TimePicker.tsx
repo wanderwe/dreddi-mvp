@@ -9,7 +9,7 @@ const padTime = (value: number) => value.toString().padStart(2, "0");
 
 const parseTimeValue = (value: string | null | undefined) => {
   if (!value) return null;
-  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+  const match = value.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
   if (!match) return null;
   const hour = Number(match[1]);
   const minute = Number(match[2]);
@@ -50,6 +50,9 @@ export function TimePicker({
   } | null>(null);
 
   const parsedValue = useMemo(() => parseTimeValue(value), [value]);
+  const displayValue = parsedValue
+    ? `${padTime(parsedValue.hour)}:${padTime(parsedValue.minute)}`
+    : value;
   const hours = useMemo(() => Array.from({ length: 24 }, (_, index) => index), []);
   const minutes = useMemo(() => {
     const safeStep = stepMinutes > 0 ? stepMinutes : 15;
@@ -78,7 +81,7 @@ export function TimePicker({
               width: popoverStyles?.width ?? 320,
             }}
             className={clsx(
-              "fixed z-50 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
+              "fixed z-[10000] rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
               !popoverStyles && "pointer-events-none opacity-0"
             )}
           >
@@ -214,8 +217,8 @@ export function TimePicker({
         )}
       >
         <Clock className="h-4 w-4 text-emerald-200" aria-hidden />
-        <span className={clsx("flex-1", value ? "text-slate-100" : "text-slate-500")}>
-          {value || placeholder}
+        <span className={clsx("flex-1", displayValue ? "text-slate-100" : "text-slate-500")}>
+          {displayValue || placeholder}
         </span>
       </button>
       {popover}
