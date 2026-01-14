@@ -308,6 +308,7 @@
     "disputed": "Оскаржено",
     "loading": "Завантаження профілю…",
     "reputationScore": "Репутаційний бал",
+    "stableReputation": "Стабільна репутація",
     "summary": {
       "confirmed": "{count} підтверджено",
       "disputed": "{count} оскаржено",

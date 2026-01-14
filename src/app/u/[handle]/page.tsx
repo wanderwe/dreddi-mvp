@@ -167,7 +167,23 @@ export default function PublicProfilePage() {
   const reputationScore = profile?.reputation_score ?? 50;
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
-  const lastActivityAt = profile?.last_activity_at ?? null;
+  const lastActivityFromPromises = useMemo(() => {
+    if (promises.length === 0) return null;
+    const timestamps = promises.flatMap((promise) => [
+      promise.confirmed_at,
+      promise.disputed_at,
+      promise.created_at,
+    ]);
+    const latest = timestamps.reduce<string | null>((currentLatest, timestamp) => {
+      if (!timestamp) return currentLatest;
+      if (!currentLatest) return timestamp;
+      return new Date(timestamp).getTime() > new Date(currentLatest).getTime()
+        ? timestamp
+        : currentLatest;
+    }, null);
+    return latest;
+  }, [promises]);
+  const lastActivityAt = profile?.last_activity_at ?? lastActivityFromPromises;
   const publicProfilePath = useMemo(
     () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
     [handle]
@@ -211,7 +227,7 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {profile?.avatar_url ? (
@@ -232,12 +248,15 @@ export default function PublicProfilePage() {
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>
-                <div className="flex w-full flex-col items-start gap-4 sm:w-auto sm:items-end">
-                  <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-center sm:text-right">
+                <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
+                  <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-left sm:text-right">
                     <p className="text-xs uppercase tracking-wide text-white/50">
                       {t("publicProfile.reputationScore")}
                     </p>
                     <p className="mt-2 text-3xl font-semibold text-white">{reputationScore}</p>
+                    <p className="mt-1 text-xs text-white/60">
+                      {t("publicProfile.stableReputation")}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -254,20 +273,6 @@ export default function PublicProfilePage() {
                 <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
                 <span className="text-white/40">•</span>
                 <span>{lastActivityLabel}</span>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.confirmed")}
-                  </p>
-                  <p className="mt-2 text-3xl font-semibold text-emerald-200">{confirmedCount}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.disputed")}
-                  </p>
-                  <p className="mt-2 text-3xl font-semibold text-red-200">{disputedCount}</p>
-                </div>
               </div>
             </section>
 
