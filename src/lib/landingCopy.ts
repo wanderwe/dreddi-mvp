@@ -75,7 +75,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Аналітика репутації для угод та обіцянок",
       headline: "Домовленість починається з підтвердження.",
       description:
-        "Dreddi — це сервіс-посередник між розмовою і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску — але з реальними наслідками для довіри.",
+        "Dreddi — сервіс між словами і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску —\nале з реальними наслідками для довіри.",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -153,7 +153,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Reputation analytics for deals and promises",
       headline: "An agreement starts with confirmation.",
       description:
-        "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure — but with real consequences for trust.",
+        "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure —\nbut with real consequences for trust.",
     },
     cta: {
       getStarted: "Create a deal",
