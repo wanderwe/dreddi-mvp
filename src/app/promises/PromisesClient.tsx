@@ -26,7 +26,43 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
+type PromiseRoleBase = Pick<
+  PromiseRow,
+  | "id"
+  | "status"
+  | "counterparty_accepted_at"
+  | "creator_id"
+  | "promisor_id"
+  | "promisee_id"
+  | "counterparty_id"
+>;
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
+type PromiseSummary = PromiseRoleBase & { role: PromiseRole; acceptedBySecondSide: boolean };
+
+const PAGE_SIZE = 5;
+
+const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
+  const executorId = resolveExecutorId(row);
+  const role: PromiseRole =
+    executorId && executorId === userId ? "promisor" : "counterparty";
+  return {
+    ...row,
+    status: row.status as PromiseStatus,
+    role,
+    acceptedBySecondSide: Boolean(
+      row.counterparty_accepted_at ?? (row.promisor_id && row.promisee_id)
+    ),
+  };
+};
+
+const buildBaseFilter = (id: string) =>
+  `promisor_id.eq.${id},promisee_id.eq.${id},creator_id.eq.${id},counterparty_id.eq.${id}`;
+
+const buildPromisorFilter = (id: string) =>
+  `promisor_id.eq.${id},and(promisor_id.is.null,promisee_id.is.null,creator_id.eq.${id})`;
+
+const buildCounterpartyFilter = (id: string) =>
+  `promisee_id.eq.${id},counterparty_id.eq.${id},and(creator_id.eq.${id},or(promisor_id.not.is.null,promisee_id.not.is.null),promisor_id.not.eq.${id})`;
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -56,11 +92,25 @@ export default function PromisesClient() {
     return status;
   };
 
-  const [allRows, setAllRows] = useState<PromiseWithRole[]>([]);
+  const [summaryRows, setSummaryRows] = useState<PromiseSummary[]>([]);
+  const [listRowsByTab, setListRowsByTab] = useState<Record<TabKey, PromiseWithRole[]>>({
+    "i-promised": [],
+    "promised-to-me": [],
+  });
+  const [pageByTab, setPageByTab] = useState<Record<TabKey, number>>({
+    "i-promised": 0,
+    "promised-to-me": 0,
+  });
+  const [hasMoreByTab, setHasMoreByTab] = useState<Record<TabKey, boolean>>({
+    "i-promised": true,
+    "promised-to-me": true,
+  });
+  const [listLoading, setListLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -69,7 +119,6 @@ export default function PromisesClient() {
     let cancelled = false;
 
     (async () => {
-      setLoading(true);
       setError(null);
 
       let supabase;
@@ -77,7 +126,7 @@ export default function PromisesClient() {
         supabase = requireSupabase();
       } catch (error) {
         setError(supabaseErrorMessage(error));
-        setLoading(false);
+        setListLoading(false);
         return;
       }
 
@@ -89,44 +138,25 @@ export default function PromisesClient() {
       }
 
       const user = session.user;
+      setUserId(user.id);
 
       const { data, error } = await supabase
         .from("promises")
-        // accepted_by_second_side is a derived state (not a DB column); compute it locally for UI gating
         .select(
-          "id,title,status,due_at,created_at,completed_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
+          "id,status,counterparty_accepted_at,creator_id,promisor_id,promisee_id,counterparty_id"
         )
-        .or(
-          `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
-        )
-        .order("created_at", { ascending: false });
+        .or(buildBaseFilter(user.id));
 
       if (cancelled) return;
 
       if (error) setError(error.message);
       else {
-        // ✅ Explicitly type the result as PromiseWithRole[] so role can't widen to string
-        const filtered: PromiseWithRole[] = (data ?? [])
+        const filtered: PromiseSummary[] = (data ?? [])
           .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
-          .map((row) => {
-            const r = row as PromiseRow; // supabase returns loosely typed rows; we narrow to our shape
-            const executorId = resolveExecutorId(r);
-            const role: PromiseRole =
-              executorId && executorId === user.id ? "promisor" : "counterparty";
-            return {
-              ...r,
-              status: r.status as PromiseStatus,
-              role,
-              acceptedBySecondSide: Boolean(
-                r.counterparty_accepted_at ?? (r.promisor_id && r.promisee_id)
-              ),
-            };
-          });
+          .map((row) => withRole(row as PromiseRoleBase, user.id));
 
-        setAllRows(filtered);
+        setSummaryRows(filtered);
       }
-
-      setLoading(false);
     })();
 
     return () => {
@@ -140,9 +170,87 @@ export default function PromisesClient() {
     router.push(`/promises?${sp.toString()}`);
   };
 
+  const fetchTabPage = async ({
+    tabKey,
+    page,
+    replace,
+  }: {
+    tabKey: TabKey;
+    page: number;
+    replace: boolean;
+  }) => {
+    if (!userId) return;
+    setError(null);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (error) {
+      setError(supabaseErrorMessage(error));
+      setListLoading(false);
+      return;
+    }
+
+    const offset = page * PAGE_SIZE;
+    const rangeEnd = offset + PAGE_SIZE - 1;
+    const roleFilter =
+      tabKey === "i-promised"
+        ? buildPromisorFilter(userId)
+        : buildCounterpartyFilter(userId);
+
+    const { data, error } = await supabase
+      .from("promises")
+      .select(
+        "id,title,status,due_at,created_at,completed_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
+      )
+      .or(roleFilter)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, rangeEnd);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    const parsed: PromiseWithRole[] = (data ?? [])
+      .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
+      .map((row) => withRole(row as PromiseRow, userId));
+
+    setListRowsByTab((prev) => ({
+      ...prev,
+      [tabKey]: replace ? parsed : [...prev[tabKey], ...parsed],
+    }));
+    setHasMoreByTab((prev) => ({
+      ...prev,
+      [tabKey]: parsed.length === PAGE_SIZE,
+    }));
+    setPageByTab((prev) => ({ ...prev, [tabKey]: page }));
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+
+    const loadFirstPage = async () => {
+      setListLoading(true);
+      setHasMoreByTab((prev) => ({ ...prev, [tab]: true }));
+      setPageByTab((prev) => ({ ...prev, [tab]: 0 }));
+      setListRowsByTab((prev) => ({ ...prev, [tab]: [] }));
+      await fetchTabPage({ tabKey: tab, page: 0, replace: true });
+      if (!cancelled) setListLoading(false);
+    };
+
+    loadFirstPage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, userId]);
+
   const roleCounts = useMemo(
     () =>
-      allRows.reduce(
+      summaryRows.reduce(
         (acc, row) => {
           if (row.role === "promisor") acc.promisor += 1;
           else if (row.role === "counterparty") acc.counterparty += 1;
@@ -151,41 +259,38 @@ export default function PromisesClient() {
         },
         { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
       ),
-    [allRows]
+    [summaryRows]
   );
 
-  const tabRows = useMemo(
-    () =>
-      allRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      ),
-    [allRows, tab]
-  );
-
-  const rows = tabRows;
+  const rows = listRowsByTab[tab];
 
   const overview = useMemo(() => {
-    const total = allRows.length;
-    const awaitingYou = allRows.filter((row) => isAwaitingYourAction(row)).length;
-    const awaitingOthers = allRows.filter((row) => isAwaitingOthers(row)).length;
+    const total = summaryRows.length;
+    const awaitingYou = summaryRows.filter((row) => isAwaitingYourAction(row)).length;
+    const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row)).length;
 
     return { total, awaitingYou, awaitingOthers };
-  }, [allRows]);
+  }, [summaryRows]);
 
   useEffect(() => {
     const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
     if (
       process.env.NODE_ENV !== "production" &&
-      categorizedTotal !== allRows.length
+      categorizedTotal !== summaryRows.length
     ) {
       console.warn("[promises] Tab counts do not sum to total", {
-        total: allRows.length,
+        total: summaryRows.length,
         promisorCount: roleCounts.promisor,
         counterpartyCount: roleCounts.counterparty,
         uncategorizedIds: roleCounts.uncategorized,
       });
     }
-  }, [allRows.length, roleCounts.counterparty, roleCounts.promisor, roleCounts.uncategorized]);
+  }, [
+    roleCounts.counterparty,
+    roleCounts.promisor,
+    roleCounts.uncategorized,
+    summaryRows.length,
+  ]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -210,19 +315,36 @@ export default function PromisesClient() {
         throw new Error(body.error ?? t("promises.list.errors.markComplete"));
       }
 
-      setAllRows((prev) =>
+      setSummaryRows((prev) =>
         prev.map((row) =>
-          row.id === promiseId
-            ? { ...row, status: "completed_by_promisor" as PromiseStatus }
-            : row
+          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
         )
       );
+      setListRowsByTab((prev) => ({
+        "i-promised": prev["i-promised"].map((row) =>
+          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
+        ),
+        "promised-to-me": prev["promised-to-me"].map((row) =>
+          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
+        ),
+      }));
     } catch (e) {
       setError(
         e instanceof Error ? e.message : t("promises.list.errors.updateFailed")
       );
     } finally {
       setBusyMap((m) => ({ ...m, [promiseId]: false }));
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (loadingMore || listLoading || !hasMoreByTab[tab]) return;
+    const nextPage = pageByTab[tab] + 1;
+    setLoadingMore(true);
+    try {
+      await fetchTabPage({ tabKey: tab, page: nextPage, replace: false });
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -311,7 +433,7 @@ export default function PromisesClient() {
           )}
 
           <div className="mt-4 space-y-3">
-            {loading && (
+            {listLoading && (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-white/5" />
@@ -319,7 +441,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!loading &&
+            {!listLoading &&
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
@@ -422,7 +544,7 @@ export default function PromisesClient() {
                 );
               })}
 
-            {!loading && rows.length === 0 && (
+            {!listLoading && rows.length === 0 && (
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
                 <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
                 <p className="text-sm text-slate-400">
@@ -438,6 +560,26 @@ export default function PromisesClient() {
                     {t("promises.empty.cta")}
                   </Link>
                 </div>
+              </div>
+            )}
+
+            {!listLoading && rows.length > 0 && hasMoreByTab[tab] && (
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loadingMore ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      {t("promises.list.loadingMore")}
+                    </>
+                  ) : (
+                    t("promises.list.loadMore")
+                  )}
+                </button>
               </div>
             )}
           </div>

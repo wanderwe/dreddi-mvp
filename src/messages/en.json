@@ -104,6 +104,8 @@
       "scoreImpact": "Score impact: {impact}",
       "markCompleted": "Mark as completed",
       "updating": "Updating…",
+      "loadMore": "Load more",
+      "loadingMore": "Loading…",
       "reviewConfirm": "Review & confirm",
       "errors": {
         "markComplete": "Could not mark complete",
