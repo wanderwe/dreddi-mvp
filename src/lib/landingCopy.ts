@@ -94,7 +94,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       reputation: "Не вдалося завантажити репутацію",
     },
     score: {
-      label: "Ваш репутаційний бал",
+      label: "Репутаційний бал",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення наживо",
       cards: {
@@ -172,7 +172,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       reputation: "We couldn’t load reputation",
     },
     score: {
-      label: "Your reputation score",
+      label: "Reputation score",
       live: "Live",
       signIn: "Sign in to see live updates",
       cards: {
