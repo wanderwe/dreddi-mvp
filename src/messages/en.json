@@ -295,7 +295,7 @@
   "auth": {
     "login": {
       "eyebrow": "Welcome back",
-      "subtitle": "Sign in to create deals and track reputation.",
+      "subtitle": "Sign in to create deals and track reputation",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "sendLink": "Send magic link",
