@@ -344,23 +344,23 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-6 md:gap-8">
-          <div className="order-1 space-y-5 sm:space-y-4">
-            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/10 bg-emerald-500/5 px-3 py-1 text-[11px] font-medium leading-relaxed tracking-wide text-emerald-200/80 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)] backdrop-blur sm:max-w-full sm:gap-2.5 sm:whitespace-nowrap sm:px-3.5 sm:py-1.5 sm:text-sm">
+        <div className="flex flex-1 flex-col gap-5 md:gap-7">
+          <div className="order-1 flex flex-col gap-4 sm:gap-5">
+            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/10 bg-emerald-500/5 px-2.5 py-0.5 text-[10px] font-normal leading-5 tracking-wide text-emerald-200/80 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)] backdrop-blur sm:max-w-full sm:gap-2.5 sm:whitespace-nowrap sm:px-3 sm:py-1 sm:text-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-300/70 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
               {copy.hero.eyebrow}
             </div>
             <div className="flex items-center gap-4">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
-                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
+              <div className="flex items-center gap-3 text-3xl font-semibold leading-none tracking-tight sm:text-4xl md:text-5xl">
+                <span className="rounded-2xl bg-emerald-500/10 px-3.5 py-1.5 text-emerald-300 sm:px-4 sm:py-2">Dreddi</span>
                 <span className="text-white">{t("landing.hero.brandSuffix")}</span>
               </div>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
+            <p className="max-w-xl text-2xl font-semibold leading-snug tracking-tight text-white sm:text-3xl">
               {copy.hero.headline}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
