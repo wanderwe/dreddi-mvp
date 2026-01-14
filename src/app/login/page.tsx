@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { stripTrailingPeriod } from "@/lib/text";
 
 export default function LoginPage() {
   const t = useT();
@@ -55,7 +56,9 @@ export default function LoginPage() {
                 {t("auth.login.eyebrow")}
               </p>
               <h1 className="text-4xl font-semibold text-white">Dreddi knows</h1>
-              <p className="text-slate-300">{t("auth.login.subtitle")}</p>
+              <p className="text-slate-300">
+                {stripTrailingPeriod(t("auth.login.subtitle"))}
+              </p>
               <div className="flex items-center gap-2 text-xs text-emerald-200/80">
                 <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
                 <span>{t("auth.login.secure")}</span>

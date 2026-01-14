@@ -6,6 +6,8 @@ import { useT } from "@/lib/i18n/I18nProvider";
 export function AppFooter() {
   const t = useT();
   const year = new Date().getFullYear();
+  const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA;
+  const shortSha = commitSha ? commitSha.slice(0, 7) : null;
 
   return (
     <footer className="border-t border-white/5 bg-slate-950/60 text-slate-400">
@@ -18,6 +20,11 @@ export function AppFooter() {
           <Link href="/terms" className="transition hover:text-emerald-200">
             {t("nav.terms")}
           </Link>
+          {shortSha && (
+            <span className="text-[10px] uppercase tracking-[0.15em] text-slate-500">
+              build {shortSha}
+            </span>
+          )}
         </div>
       </div>
     </footer>

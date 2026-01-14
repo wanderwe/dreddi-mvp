@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { stripTrailingPeriod } from "@/lib/text";
 
 type NotificationRow = {
   id: string;
@@ -135,8 +136,12 @@ export default function NotificationsClient() {
                       aria-hidden
                     />
                     <div className="space-y-1">
-                      <div className="text-sm font-semibold text-white">{row.title}</div>
-                      <p className="text-sm text-slate-200">{row.body}</p>
+                      <div className="text-sm font-semibold text-white">
+                        {stripTrailingPeriod(row.title)}
+                      </div>
+                      <p className="text-sm text-slate-200">
+                        {stripTrailingPeriod(row.body)}
+                      </p>
                       <div className="text-xs text-slate-400">
                         {formatDate(row.created_at)}
                       </div>

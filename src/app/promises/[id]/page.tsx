@@ -8,6 +8,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { stripTrailingPeriod } from "@/lib/text";
 
 type PromiseRow = {
   id: string;
@@ -406,14 +407,14 @@ export default function PromisePage() {
                   />
                 ) : (
                   <div className="text-sm text-neutral-400">
-                    {t("promises.detail.shareInvite")}
+                    {stripTrailingPeriod(t("promises.detail.shareInvite"))}
                   </div>
                 )
               )}
 
               {!isExecutor && isCounterparty && p.status === "active" && isInviteAccepted && (
                 <div className="text-sm text-neutral-400">
-                  {t("promises.detail.awaitingExecutor")}
+                  {stripTrailingPeriod(t("promises.detail.awaitingExecutor"))}
                 </div>
               )}
 
@@ -428,7 +429,7 @@ export default function PromisePage() {
 
               {waitingForReview && !isCounterparty && (
                 <div className="text-sm text-neutral-400">
-                  {t("promises.detail.waitingReview")}
+                  {stripTrailingPeriod(t("promises.detail.waitingReview"))}
                 </div>
               )}
 
