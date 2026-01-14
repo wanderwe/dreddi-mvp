@@ -14,7 +14,6 @@ export function NewDealButton({ label, className }: NewDealButtonProps) {
       href="/promises/new"
       className={[baseClasses, className].filter(Boolean).join(" ")}
     >
-      <span className="text-lg leading-none">＋</span>
       {label}
     </Link>
   );
