@@ -110,7 +110,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     recentDeals: {
       title: "Ваші останні угоди",
       seeAll: "Переглянути всі",
-      guestHint: "Увійдіть, щоб бачити свої актуальні угоди.",
+      guestHint: "Увійдіть, щоб бачити свої актуальні угоди",
       empty: "Створіть свою першу угоду, щоб наповнити стрічку репутації.",
       sentiment: {
         positive: "Позитивно",
@@ -188,7 +188,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     recentDeals: {
       title: "Your recent deals",
       seeAll: "View all",
-      guestHint: "Sign in to see your active deals.",
+      guestHint: "Sign in to see your active deals",
       empty: "Create your first deal to populate your reputation feed.",
       sentiment: {
         positive: "Positive",
