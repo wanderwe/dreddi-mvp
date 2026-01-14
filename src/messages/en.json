@@ -30,7 +30,7 @@
     "toggleLabel": "Toggle public profile",
     "publicLinkLabel": "Public profile link",
     "publicLinkDescription": "Share this link so others can view your public profile.",
-    "publicLinkPrivate": "Enable your public profile to get a shareable link.",
+    "publicLinkPrivate": "This link won’t be publicly visible until you enable your public profile.",
     "viewPublicProfile": "View",
     "copyLink": "Copy link",
     "copySuccess": "Copied",
