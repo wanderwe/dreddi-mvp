@@ -36,6 +36,23 @@ type PublicPromise = {
   disputed_at: string | null;
 };
 
+const getPublicProfileStats = async (handle: string) => {
+  if (!supabase) {
+    return {
+      data: null,
+      error: { message: "Supabase client is not available." },
+    };
+  }
+
+  return supabase
+    .from("public_profile_stats")
+    .select(
+      "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
+    )
+    .eq("handle", handle)
+    .maybeSingle();
+};
+
 const statusTones: Record<PromiseStatus, string> = {
   active: "bg-white/5 text-emerald-200 border border-white/10",
   completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
@@ -69,14 +86,23 @@ export default function PublicProfilePage() {
         }).format(new Date(value)),
     [locale]
   );
-  const formatRelativeDays = useMemo(() => {
+  const formatRelativeTime = useMemo(() => {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
     return (value: string) => {
       const now = Date.now();
       const time = new Date(value).getTime();
-      if (Number.isNaN(time)) return "";
-      const diffDays = Math.round((time - now) / (1000 * 60 * 60 * 24));
-      return formatter.format(diffDays, "day");
+      if (Number.isNaN(time)) return null;
+      const diffMinutes = (time - now) / (1000 * 60);
+      const diffHours = diffMinutes / 60;
+      const diffDays = diffHours / 24;
+
+      if (Math.abs(diffMinutes) < 60) {
+        return formatter.format(Math.round(diffMinutes), "minute");
+      }
+      if (Math.abs(diffHours) < 24) {
+        return formatter.format(Math.round(diffHours), "hour");
+      }
+      return formatter.format(Math.round(diffDays), "day");
     };
   }, [locale]);
 
@@ -99,13 +125,7 @@ export default function PublicProfilePage() {
       setLoading(true);
       setError(null);
 
-      const { data: profileRow, error: profileErr } = await supabase
-        .from("public_profile_stats")
-        .select(
-          "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
-        )
-        .eq("handle", handle)
-        .maybeSingle();
+      const { data: profileRow, error: profileErr } = await getPublicProfileStats(handle);
 
       if (!active) return;
 
@@ -145,6 +165,17 @@ export default function PublicProfilePage() {
           ];
         });
         setPromises(normalized);
+
+        if (
+          process.env.NODE_ENV !== "production" &&
+          normalized.length > 0 &&
+          !profileRow.last_activity_at
+        ) {
+          console.info("public_profile_stats missing last_activity_at despite promises", {
+            handle: profileRow.handle,
+            promiseCount: normalized.length,
+          });
+        }
       }
 
       setLoading(false);
@@ -169,19 +200,31 @@ export default function PublicProfilePage() {
   const disputedCount = profile?.disputed_count ?? 0;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
-    const timestamps = promises.flatMap((promise) => [
-      promise.confirmed_at,
-      promise.disputed_at,
-      promise.created_at,
-    ]);
-    const latest = timestamps.reduce<string | null>((currentLatest, timestamp) => {
-      if (!timestamp) return currentLatest;
-      if (!currentLatest) return timestamp;
-      return new Date(timestamp).getTime() > new Date(currentLatest).getTime()
-        ? timestamp
+    const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
+      const statusTimestamp = [promise.confirmed_at, promise.disputed_at].reduce<string | null>(
+        (latest, timestamp) => {
+          if (!timestamp) return latest;
+          if (!latest) return timestamp;
+          return new Date(timestamp).getTime() > new Date(latest).getTime() ? timestamp : latest;
+        },
+        null
+      );
+      if (!statusTimestamp) return currentLatest;
+      if (!currentLatest) return statusTimestamp;
+      return new Date(statusTimestamp).getTime() > new Date(currentLatest).getTime()
+        ? statusTimestamp
         : currentLatest;
     }, null);
-    return latest;
+
+    if (latestStatusChange) return latestStatusChange;
+
+    return promises.reduce<string | null>((currentLatest, promise) => {
+      if (!promise.created_at) return currentLatest;
+      if (!currentLatest) return promise.created_at;
+      return new Date(promise.created_at).getTime() > new Date(currentLatest).getTime()
+        ? promise.created_at
+        : currentLatest;
+    }, null);
   }, [promises]);
   const lastActivityAt = profile?.last_activity_at ?? lastActivityFromPromises;
   const publicProfilePath = useMemo(
@@ -209,8 +252,9 @@ export default function PublicProfilePage() {
   };
 
   const publicDealsEmpty = promises.length === 0;
+  const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
-    ? t("publicProfile.summary.lastActivity", { time: formatRelativeDays(lastActivityAt) })
+    ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
     : t("publicProfile.summary.lastActivityEmpty");
 
   return (
@@ -227,7 +271,7 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {profile?.avatar_url ? (
@@ -248,24 +292,13 @@ export default function PublicProfilePage() {
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>
-                <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
-                  <div className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-left sm:text-right">
-                    <p className="text-xs uppercase tracking-wide text-white/50">
-                      {t("publicProfile.reputationScore")}
-                    </p>
-                    <p className="mt-2 text-3xl font-semibold text-white">{reputationScore}</p>
-                    <p className="mt-1 text-xs text-white/60">
-                      {t("publicProfile.stableReputation")}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyLink}
-                    className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
-                  >
-                    {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                </button>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
                 <span>{t("publicProfile.summary.confirmed", { count: confirmedCount })}</span>
@@ -273,6 +306,13 @@ export default function PublicProfilePage() {
                 <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
                 <span className="text-white/40">•</span>
                 <span>{lastActivityLabel}</span>
+                <span className="text-white/40">•</span>
+                <span className="inline-flex items-center gap-2">
+                  <span className="text-xs uppercase tracking-wide text-white/50">
+                    {t("publicProfile.reputationScore")}
+                  </span>
+                  <span className="text-sm font-semibold text-white">{reputationScore}</span>
+                </span>
               </div>
             </section>
 
