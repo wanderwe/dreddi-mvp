@@ -266,7 +266,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       <div className="mt-4 space-y-3">
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
           <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
+            <div className="min-w-0 flex-1 space-y-1">
               <div className="text-sm font-semibold text-white">
                 {t("profileSettings.publicLabel")}
               </div>
@@ -274,7 +274,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 {t("profileSettings.publicDescription")}
               </p>
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex shrink-0 flex-col items-end gap-2">
               <span
                 className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
                   isPublic
@@ -358,8 +358,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             </p>
           </div>
           <div className="mt-4 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
+            <div className="flex items-start justify-between gap-4 sm:items-center">
+              <div className="min-w-0 flex-1">
                 <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
                 <p className="text-xs text-slate-400">
                   {t("profileSettings.pushDescription")}
@@ -371,7 +371,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 aria-checked={profile?.pushEnabled ?? false}
                 onClick={togglePushNotifications}
                 disabled={loading || saving || !profile}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
                   profile?.pushEnabled
                     ? "border-emerald-300/50 bg-emerald-400/70"
                     : "border-white/20 bg-white/10"
@@ -385,8 +385,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               </button>
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-              <div>
+            <div className="flex items-start justify-between gap-4 sm:items-center">
+              <div className="min-w-0 flex-1">
                 <div className="text-sm text-white">{t("profileSettings.deadlineLabel")}</div>
               </div>
               <button
@@ -395,7 +395,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 aria-checked={profile?.deadlineRemindersEnabled ?? false}
                 onClick={toggleDeadlineReminders}
                 disabled={loading || saving || !profile}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
                   profile?.deadlineRemindersEnabled
                     ? "border-emerald-300/50 bg-emerald-400/70"
                     : "border-white/20 bg-white/10"
@@ -410,8 +410,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <div>
+              <div className="flex items-start justify-between gap-4 sm:items-center">
+                <div className="min-w-0 flex-1">
                   <div className="text-sm text-white">{t("profileSettings.quietHoursLabel")}</div>
                   <p className="text-xs text-slate-400">
                     {t("profileSettings.quietHoursDescription")}
@@ -423,7 +423,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   aria-checked={profile?.quietHoursEnabled ?? false}
                   onClick={toggleQuietHours}
                   disabled={loading || saving || !profile}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
                     profile?.quietHoursEnabled
                       ? "border-emerald-300/50 bg-emerald-400/70"
                       : "border-white/20 bg-white/10"
