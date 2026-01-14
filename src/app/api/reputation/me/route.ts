@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 
 export async function GET(req: Request) {
   try {
-    const user = await requireUser(req, cookies());
+    const cookieStore = await cookies();
+    const user = await requireUser(req, cookieStore);
     if (user instanceof NextResponse) return user;
 
     const admin = getAdminClient();

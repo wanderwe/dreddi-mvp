@@ -21,7 +21,8 @@ export async function POST(request: Request) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  const user = await requireUser(request, cookies());
+  const cookieStore = await cookies();
+  const user = await requireUser(request, cookieStore);
   if (!(user instanceof NextResponse)) {
     const admin = getAdminClient();
     await admin.from("profiles").update({ locale }).eq("id", user.id);

@@ -10,7 +10,8 @@ import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req, cookies());
+    const cookieStore = await cookies();
+    const user = await requireUser(req, cookieStore);
     if (user instanceof NextResponse) return user;
 
     const { id } = await ctx.params;
