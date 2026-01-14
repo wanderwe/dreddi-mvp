@@ -1,40 +1,46 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Locale, locales } from "@/lib/i18n/locales";
 import { useLocale } from "@/lib/i18n/I18nProvider";
-import { requireSupabase } from "@/lib/supabaseClient";
 import { IconButton } from "@/app/components/ui/IconButton";
 
 export function LocaleSwitcher({ className }: { className?: string }) {
   const router = useRouter();
   const locale = useLocale();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+      }
+    };
+  }, []);
+
+  const showToast = (message: string) => {
+    setToast(message);
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current);
+    }
+    toastTimer.current = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
 
   const updateLocale = async (nextLocale: Locale) => {
     if (nextLocale === locale) return;
 
     setBusy(true);
-    setError(null);
+    setToast(null);
 
     try {
-      let authHeader: Record<string, string> = {};
-      try {
-        const supabase = requireSupabase();
-        const { data } = await supabase.auth.getSession();
-        const token = data.session?.access_token;
-        if (token) {
-          authHeader = { Authorization: `Bearer ${token}` };
-        }
-      } catch {
-        authHeader = {};
-      }
-
       const res = await fetch("/api/locale", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeader },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale: nextLocale }),
       });
 
@@ -43,10 +49,16 @@ export function LocaleSwitcher({ className }: { className?: string }) {
         throw new Error(body.error ?? "Could not update language");
       }
 
-      router.refresh();
+      try {
+        router.refresh();
+      } catch {
+        window.location.reload();
+      }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      setError(message);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Failed to switch locale", err);
+      }
+      showToast("We couldn't switch the language. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -72,7 +84,15 @@ export function LocaleSwitcher({ className }: { className?: string }) {
           />
         ))}
       </div>
-      {error && <div className="mt-1 text-[11px] text-red-300">{error}</div>}
+      {toast && (
+        <div
+          className="mt-2 w-max rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1 text-[11px] text-red-100 shadow-sm"
+          role="status"
+          aria-live="polite"
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
