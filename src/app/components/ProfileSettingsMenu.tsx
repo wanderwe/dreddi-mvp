@@ -243,6 +243,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     );
   };
 
+  const quietHoursRangeChanged =
+    !!profile &&
+    (quietHoursStartInput !== profile.quietHoursStart ||
+      quietHoursEndInput !== profile.quietHoursEnd);
+  const quietHoursRangeDisabled = !profile?.quietHoursEnabled;
+
   return (
     <div className={className}>
       {showTitle && (
@@ -399,7 +405,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="text-sm text-white">{t("profileSettings.quietHoursLabel")}</div>
@@ -427,36 +433,43 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 </button>
               </div>
 
-              <div className="flex flex-wrap items-end gap-3">
-                <label className="flex flex-col text-xs text-slate-400">
-                  {t("profileSettings.quietHoursRangeLabel")}
+              <div className="space-y-1">
+                <div
+                  className={`flex flex-wrap items-center gap-3 ${
+                    quietHoursRangeDisabled ? "pointer-events-none opacity-50" : ""
+                  }`}
+                >
+                  <span className="sr-only">{t("profileSettings.quietHoursRangeLabel")}</span>
                   <input
                     type="time"
                     value={quietHoursStartInput}
                     onChange={(event) => setQuietHoursStartInput(event.target.value)}
                     disabled={!profile?.quietHoursEnabled || loading || saving}
-                    className="mt-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-sm text-white"
+                    className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white"
                   />
-                </label>
-                <span className="text-xs text-slate-400">→</span>
-                <label className="flex flex-col text-xs text-slate-400">
-                  <span className="sr-only">{t("profileSettings.quietHoursRangeLabel")}</span>
+                  <span className="inline-flex h-9 items-center text-xs text-slate-400">→</span>
                   <input
                     type="time"
                     value={quietHoursEndInput}
                     onChange={(event) => setQuietHoursEndInput(event.target.value)}
                     disabled={!profile?.quietHoursEnabled || loading || saving}
-                    className="mt-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-sm text-white"
+                    className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-white"
                   />
-                </label>
-                <button
-                  type="button"
-                  onClick={saveQuietHoursRange}
-                  disabled={loading || saving || !profile}
-                  className="rounded-lg border border-white/10 px-3 py-1 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 disabled:opacity-60"
-                >
-                  {t("profileSettings.save")}
-                </button>
+                  <button
+                    type="button"
+                    onClick={saveQuietHoursRange}
+                    disabled={
+                      loading ||
+                      saving ||
+                      !profile ||
+                      !profile?.quietHoursEnabled ||
+                      !quietHoursRangeChanged
+                    }
+                    className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 disabled:opacity-60"
+                  >
+                    {t("profileSettings.save")}
+                  </button>
+                </div>
                 <span className="text-xs text-slate-500">
                   {t("profileSettings.quietHoursHelper")}
                 </span>
