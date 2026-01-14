@@ -57,8 +57,8 @@ export default function LoginPage() {
               <h1 className="text-4xl font-semibold text-white">Dreddi knows</h1>
               <p className="text-slate-300">{t("auth.login.subtitle")}</p>
               <div className="flex items-center gap-2 text-xs text-emerald-200/80">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/70" />
-                {t("auth.login.secure")}
+                <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
+                <span>{t("auth.login.secure")}</span>
               </div>
             </div>
             <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
