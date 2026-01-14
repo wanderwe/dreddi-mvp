@@ -86,7 +86,7 @@
     },
     "confirmModal": {
       "title": "Request confirmation?",
-      "body": "You’re asking the other side to confirm you delivered this deal.",
+      "body": "You’re asking the other side to confirm you delivered this deal",
       "cancel": "Not yet",
       "confirm": "Yes, request confirmation"
     },
@@ -276,7 +276,7 @@
     "processing": "Processing...",
     "accept": "Accept deal",
     "publicProposal": {
-      "title": "This deal is PUBLIC.",
+      "title": "This deal is PUBLIC",
       "body": "If you accept, the deal details will be visible on public profiles"
     },
     "publicModal": {
@@ -335,17 +335,17 @@
       "overdue": "Overdue since {date}",
       "noDue": "No due date"
     },
-    "emptyStatus": "No active responsibilities.",
-    "emptyInProgress": "No in-progress responsibilities.",
-    "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
-    "emptyOverdue": "No overdue responsibilities.",
-    "emptyHistory": "No history yet.",
-    "emptyPublicDeals": "No public deals yet.",
+    "emptyStatus": "No active responsibilities",
+    "emptyInProgress": "No in-progress responsibilities",
+    "emptyAwaitingAcceptance": "Nothing is awaiting acceptance",
+    "emptyOverdue": "No overdue responsibilities",
+    "emptyHistory": "No history yet",
+    "emptyPublicDeals": "No public deals yet",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
-      "private": "This profile is private.",
-      "notFound": "Profile not found."
+      "private": "This profile is private",
+      "notFound": "Profile not found"
     }
   },
   "publicDirectory": {
