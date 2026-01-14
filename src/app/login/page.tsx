@@ -56,6 +56,10 @@ export default function LoginPage() {
               </p>
               <h1 className="text-4xl font-semibold text-white">Dreddi knows</h1>
               <p className="text-slate-300">{t("auth.login.subtitle")}</p>
+              <div className="flex items-center gap-2 text-xs text-emerald-200/80">
+                <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
+                <span>{t("auth.login.secure")}</span>
+              </div>
             </div>
             <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           </div>
@@ -91,12 +95,6 @@ export default function LoginPage() {
 
             {error && <div className="text-sm text-red-400">{error}</div>}
 
-            <div className="flex items-center justify-end text-sm text-slate-400">
-              <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-emerald-200">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                {t("auth.login.secure")}
-              </div>
-            </div>
           </div>
         </div>
       </div>
