@@ -1,6 +1,7 @@
 import { LOCALE_COOKIE_NAME, Locale, isLocale } from "@/lib/i18n/locales";
 import { NextResponse } from "next/server";
-import { getAdminClient, requireUser } from "@/app/api/promises/[id]/common";
+import { getAdminClient } from "@/app/api/promises/[id]/common";
+import { requireUser } from "@/lib/auth/requireUser";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {

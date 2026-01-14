@@ -42,6 +42,7 @@ export default function NewPromisePage() {
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
 
@@ -279,6 +280,7 @@ export default function NewPromisePage() {
   async function createPromise() {
     setBusy(true);
     setError(null);
+    setSessionExpired(false);
 
     let supabase;
     try {
@@ -294,7 +296,8 @@ export default function NewPromisePage() {
 
     if (!session) {
       setBusy(false);
-      router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
+      setSessionExpired(true);
+      setError("Session expired. Please sign in again to create this deal.");
       return;
     }
 
@@ -340,7 +343,8 @@ export default function NewPromisePage() {
         if (process.env.NODE_ENV !== "production") {
           console.warn("[promises:new] Missing/expired session while creating deal");
         }
-        router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
+        setSessionExpired(true);
+        setError("Session expired. Please sign in again to create this deal.");
         return;
       }
       setError(body.error ?? t("promises.new.errors.createFailed"));
@@ -553,7 +557,19 @@ export default function NewPromisePage() {
               {busy ? t("promises.new.creating") : t("promises.new.submit")}
             </button>
 
-            {error && <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
+            {error && (
+              <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+                <p>{error}</p>
+                {sessionExpired && (
+                  <Link
+                    href={`/login?next=${encodeURIComponent("/promises/new")}`}
+                    className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"
+                  >
+                    Sign in again →
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
