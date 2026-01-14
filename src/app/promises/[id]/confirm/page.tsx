@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -198,10 +197,7 @@ export default function ConfirmPromisePage() {
       />
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-6">
-        <div className="flex items-center justify-between text-sm text-emerald-100/80">
-          <Link href="/promises" className="hover:text-emerald-200">
-            ← {t("promises.confirm.back")}
-          </Link>
+        <div className="flex items-center justify-end text-sm text-emerald-100/80">
           <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
             {t("promises.confirm.badge")}
           </span>
