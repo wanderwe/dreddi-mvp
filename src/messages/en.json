@@ -300,6 +300,7 @@
     "disputed": "Disputed",
     "loading": "Loading profile…",
     "reputationScore": "Reputation score",
+    "stableReputation": "Stable reputation",
     "summary": {
       "confirmed": "{count} confirmed",
       "disputed": "{count} disputed",
@@ -329,7 +330,7 @@
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
     "emptyOverdue": "No overdue responsibilities.",
     "emptyHistory": "No history yet.",
-    "emptyPublicDeals": "No public deals to show yet.",
+    "emptyPublicDeals": "No public deals yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
