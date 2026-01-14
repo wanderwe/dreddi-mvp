@@ -6,6 +6,7 @@ import {
   NotificationTypeInput,
   normalizeNotificationType,
 } from "./types";
+import { stripTrailingPeriod } from "@/lib/text";
 
 const fallbackLocale: NotificationLocale = "en";
 
@@ -175,5 +176,9 @@ export const getNotificationCopy = ({ locale, type, role, followup, delta }: Not
       : `Reputation updated: ${formatted}`;
   }
 
-  return { title, body, ctaLabel };
+  return {
+    title: stripTrailingPeriod(title),
+    body: stripTrailingPeriod(body),
+    ctaLabel,
+  };
 };
