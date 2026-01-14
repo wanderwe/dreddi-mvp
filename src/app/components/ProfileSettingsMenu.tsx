@@ -317,7 +317,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             </div>
             <p className="text-xs text-slate-300">{t("profileSettings.publicLinkDescription")}</p>
           </div>
-          {isPublic && publicProfilePath ? (
+          {publicProfilePath ? (
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
                 {publicProfileUrl}
@@ -340,9 +340,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 </button>
               </div>
             </div>
-          ) : (
+          ) : null}
+          {!isPublic && publicProfilePath ? (
             <p className="mt-3 text-xs text-slate-400">{t("profileSettings.publicLinkPrivate")}</p>
-          )}
+          ) : null}
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
