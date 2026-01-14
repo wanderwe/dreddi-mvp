@@ -125,23 +125,23 @@
       "statusActions": "Status actions",
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
-      "shareInvite": "Share the invite and wait for acceptance to request confirmation.",
+      "shareInvite": "Share the invite and wait for acceptance to request confirmation",
       "reviewConfirm": "Review & confirm",
-      "awaitingExecutor": "Waiting for the executor to mark this complete.",
-      "waitingReview": "Waiting for the counterparty to review.",
+      "awaitingExecutor": "Waiting for the executor to mark this complete",
+      "waitingReview": "Waiting for the counterparty to review",
       "confirmed": "Deal confirmed ✅",
-      "disputed": "Deal disputed.",
-      "guestView": "You are viewing this deal as a guest.",
+      "disputed": "Deal disputed",
+      "guestView": "You are viewing this deal as a guest",
       "inviteTitle": "Invite",
       "inviteLinkTitle": "Invite link",
       "inviteAccepted": "Invite accepted",
-      "inviteAcceptedBy": "Invite accepted by {name}.",
-      "noInviteToken": "No invite token yet. Press “Generate” to create one.",
+      "inviteAcceptedBy": "Invite accepted by {name}",
+      "noInviteToken": "No invite token yet. Press “Generate” to create one",
       "generate": "Generate",
       "copyLink": "Copy link",
       "regenerate": "Regenerate",
       "openInvite": "Open invite page",
-      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link.",
+      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link",
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
@@ -154,16 +154,16 @@
       },
       "publicVisibility": {
         "title": "Public visibility (confirmed only)",
-        "helper": "This deal will appear on your public profile only if both sides agree.",
-        "creatorConsent": "I agree to show this confirmed deal publicly.",
-        "counterpartyConsent": "I agree to show this confirmed deal publicly.",
-        "confirmedOnly": "Only confirmed responsibilities can be shown publicly.",
-        "awaitingAcceptance": "The other side must accept the deal before it can be made public."
+        "helper": "This deal will appear on your public profile only if both sides agree",
+        "creatorConsent": "I agree to show this confirmed deal publicly",
+        "counterpartyConsent": "I agree to show this confirmed deal publicly",
+        "confirmedOnly": "Only confirmed responsibilities can be shown publicly",
+        "awaitingAcceptance": "The other side must accept the deal before it can be made public"
       },
       "errors": {
         "unsupportedStatus": "Deal has an unsupported status value",
         "updateStatus": "Could not update status",
-        "copyClipboard": "Could not copy to clipboard."
+        "copyClipboard": "Could not copy to clipboard"
       }
     },
     "confirm": {
@@ -181,11 +181,11 @@
       "confirm": "Confirm completion",
       "sending": "Sending…",
       "dispute": "Dispute",
-      "noActions": "No actions available.",
-      "notFound": "Deal not found.",
+      "noActions": "No actions available",
+      "notFound": "Deal not found",
       "disputeBadge": "Dispute",
       "disputeTitle": "Tell us what went wrong",
-      "disputeSubtitle": "Choose the issue and provide optional context.",
+      "disputeSubtitle": "Choose the issue and provide optional context",
       "disputePlaceholder": "Add context",
       "submitDispute": "Submit dispute",
       "submitting": "Submitting…",
@@ -243,7 +243,7 @@
       },
       "publicRequest": {
         "label": "Public deal",
-        "helper": "Public deals appear on your public profile once confirmed."
+        "helper": "Public deals appear on your public profile once confirmed"
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact",
@@ -261,35 +261,35 @@
     "eyebrow": "Invitation",
     "title": "Join this deal on Dreddi",
     "subtitle": "Review the deal details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
-    "accepted": "This invite was already accepted.",
-    "acceptedBy": "This invite was already accepted by {name}.",
+    "accepted": "This invite was already accepted",
+    "acceptedBy": "This invite was already accepted by {name}",
     "badge": "Deal invite",
     "createdBy": "Created by {name}",
     "deadline": "Deadline",
     "statusLabel": "Status",
     "statusAccepted": "Already accepted",
     "statusAwaiting": "Awaiting acceptance",
-    "statusAcceptedBody": "This deal is ready—jump into your dashboard to follow progress.",
-    "statusAwaitingBody": "Accept to join the deal and it will appear in your dashboard.",
+    "statusAcceptedBody": "This deal is ready—jump into your dashboard to follow progress",
+    "statusAwaitingBody": "Accept to join the deal and it will appear in your dashboard",
     "nextStep": "Next step",
-    "nextStepHint": "By accepting, you confirm you understand this deal.",
+    "nextStepHint": "By accepting, you confirm you understand this deal",
     "processing": "Processing...",
     "accept": "Accept deal",
     "publicProposal": {
       "title": "This deal is PUBLIC.",
-      "body": "If you accept, the deal details will be visible on public profiles."
+      "body": "If you accept, the deal details will be visible on public profiles"
     },
     "publicModal": {
       "title": "Accept public deal?",
-      "body": "This deal is public. If you proceed, its details will be visible on public profiles after confirmation.",
+      "body": "This deal is public. If you proceed, its details will be visible on public profiles after confirmation",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
     "unknown": "Unknown",
     "noDeadline": "No deadline",
     "errors": {
-      "notFound": "Invite not found or expired.",
-      "acceptFailed": "Accept failed."
+      "notFound": "Invite not found or expired",
+      "acceptFailed": "Accept failed"
     }
   },
   "auth": {
