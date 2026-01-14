@@ -112,6 +112,8 @@
       "scoreImpact": "Вплив на бал: {impact}",
       "markCompleted": "Позначити як виконану",
       "updating": "Оновлення…",
+      "loadMore": "Завантажити ще",
+      "loadingMore": "Завантаження…",
       "reviewConfirm": "Переглянути та підтвердити",
       "errors": {
         "markComplete": "Не вдалося позначити як виконану",
