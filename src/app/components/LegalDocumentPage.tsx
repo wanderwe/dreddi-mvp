@@ -1,5 +1,6 @@
-import { PublicHeader } from "@/app/components/PublicHeader";
 import { LegalDocumentContent } from "@/app/components/LegalDocumentContent";
+import { AppHeader } from "@/app/components/nav/AppHeader";
+import { BackButton } from "@/app/components/nav/BackButton";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { createTranslator } from "@/lib/i18n/t";
@@ -26,9 +27,12 @@ export async function LegalDocumentPage({ type }: { type: LegalDocumentType }) {
         aria-hidden
       />
 
-      <PublicHeader />
+      <AppHeader navItems={[]} showAuthCta />
 
       <main className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
+        <div>
+          <BackButton fallbackHref="/" />
+        </div>
         <div className="rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">
           {document ? (
             <>

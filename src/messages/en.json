@@ -3,9 +3,12 @@
     "myPromises": "My deals",
     "newPromise": "New deal",
     "login": "Sign in",
+    "back": "Back",
     "getStarted": "Get started",
     "logout": "Log out",
     "notifications": "Notifications",
+    "profileSettings": "Profile / Settings",
+    "publicProfiles": "Public profiles",
     "privacy": "Privacy",
     "terms": "Terms"
   },

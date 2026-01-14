@@ -496,16 +496,25 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 type ProfileSettingsMenuProps = {
   variant?: "icon" | "text";
   className?: string;
+  label?: string;
+  ariaLabel?: string;
 };
 
-export function ProfileSettingsMenu({ variant = "icon", className = "" }: ProfileSettingsMenuProps) {
+export function ProfileSettingsMenu({
+  variant = "icon",
+  className = "",
+  label,
+  ariaLabel,
+}: ProfileSettingsMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const resolvedLabel = label ?? t("profileSettings.buttonLabel");
+  const resolvedAriaLabel = ariaLabel ?? resolvedLabel;
 
   const trigger =
     variant === "icon" ? (
       <IconButton
-        ariaLabel={t("profileSettings.buttonLabel")}
+        ariaLabel={resolvedAriaLabel}
         icon={<UserRound className="h-4 w-4" aria-hidden />}
         className={className}
       />
@@ -514,7 +523,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
         type="button"
         className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 ${className}`}
       >
-        {t("profileSettings.buttonLabel")}
+        {resolvedLabel}
       </button>
     );
 

@@ -3,9 +3,12 @@
     "myPromises": "Мої угоди",
     "newPromise": "Нова угода",
     "login": "Увійти",
+    "back": "Назад",
     "getStarted": "Почати",
     "logout": "Вийти",
     "notifications": "Сповіщення",
+    "profileSettings": "Профіль / Налаштування",
+    "publicProfiles": "Публічні профілі",
     "privacy": "Політика конфіденційності",
     "terms": "Умови користування"
   },

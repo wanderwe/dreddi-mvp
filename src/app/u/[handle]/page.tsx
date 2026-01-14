@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { AppHeader } from "@/app/components/nav/AppHeader";
+import { BackButton } from "@/app/components/nav/BackButton";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
@@ -258,8 +260,9 @@ export default function PublicProfilePage() {
     : t("publicProfile.summary.lastActivityEmpty");
 
   return (
-    <main className="min-h-screen bg-[#0b0f1a] text-white">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
+    <div className="min-h-screen bg-[#0b0f1a] text-white">
+      <AppHeader navItems={[{ href: "/u", label: t("nav.publicProfiles") }]} showAuthCta />
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}
@@ -271,6 +274,16 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <BackButton fallbackHref="/u" />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                </button>
+              </div>
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
@@ -292,13 +305,6 @@ export default function PublicProfilePage() {
                     <p className="text-sm text-white/60">@{profile?.handle}</p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                </button>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
                 <span>{t("publicProfile.summary.confirmed", { count: confirmedCount })}</span>

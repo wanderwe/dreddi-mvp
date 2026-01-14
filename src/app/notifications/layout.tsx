@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { DreddiLogo } from "@/app/components/DreddiLogo";
-import { HeaderActions } from "@/app/components/HeaderActions";
-import { MobileMenu } from "@/app/components/MobileMenu";
+import Link from "next/link";
+import { AppHeader } from "@/app/components/nav/AppHeader";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function NotificationsLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +12,11 @@ export default function NotificationsLayout({ children }: { children: React.Reac
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const pathname = usePathname();
   const isAuthenticated = Boolean(email);
+  const t = useT();
+  const navItems = [
+    { href: "/promises", label: t("nav.myPromises") },
+    { href: "/promises/new", label: t("nav.newPromise"), emphasis: true },
+  ];
 
   useEffect(() => {
     let active = true;
@@ -89,24 +93,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
         aria-hidden
       />
 
-      <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
-        <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
-          <Link href="/" className="flex min-w-0 items-center text-white">
-            <DreddiLogo
-              accentClassName="text-xs"
-              markClassName="h-11 w-11"
-              titleClassName="text-lg"
-            />
-          </Link>
-
-          <HeaderActions
-            className="hidden md:flex"
-            isAuthenticated={isAuthenticated}
-            onLogout={logout}
-          />
-          <MobileMenu isAuthenticated={isAuthenticated} onLogout={logout} />
-        </div>
-      </header>
+      <AppHeader isAuthenticated={isAuthenticated} onLogout={logout} navItems={navItems} />
 
       <main className="relative">
         {supabaseError ? (
