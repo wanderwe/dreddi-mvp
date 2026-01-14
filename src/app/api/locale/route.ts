@@ -1,6 +1,7 @@
 import { LOCALE_COOKIE_NAME, Locale, isLocale } from "@/lib/i18n/locales";
 import { NextResponse } from "next/server";
 import { getAdminClient, requireUser } from "@/app/api/promises/[id]/common";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  const user = await requireUser(request);
+  const user = await requireUser(request, cookies());
   if (!(user instanceof NextResponse)) {
     const admin = getAdminClient();
     await admin.from("profiles").update({ locale }).eq("id", user.id);

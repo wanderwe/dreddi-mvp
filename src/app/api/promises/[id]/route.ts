@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { loadPromiseForUser, requireUser, resolveCreatorLabel } from "./common";
+import { cookies } from "next/headers";
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req);
+    const user = await requireUser(req, cookies());
     if (user instanceof NextResponse) return user;
 
     const { id } = await ctx.params;

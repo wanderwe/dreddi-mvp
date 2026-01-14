@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   buildDedupeKey,
@@ -9,7 +10,7 @@ import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireUser(req);
+    const user = await requireUser(req, cookies());
     if (user instanceof NextResponse) return user;
 
     const { id } = await ctx.params;
