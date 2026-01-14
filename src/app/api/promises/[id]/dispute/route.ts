@@ -6,8 +6,8 @@ import {
   DisputeCode,
   getAdminClient,
   loadPromiseForUser,
-  requireUser,
 } from "../common";
+import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import {

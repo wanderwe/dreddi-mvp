@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { resolveCounterpartyId } from "@/lib/promiseParticipants";
-import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
+import { getAdminClient, loadPromiseForUser } from "../common";
+import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { resolveExecutorId } from "@/lib/promiseParticipants";

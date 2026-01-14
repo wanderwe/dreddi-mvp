@@ -6,7 +6,8 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
-import { getAdminClient, loadPromiseForUser, requireUser } from "../common";
+import { getAdminClient, loadPromiseForUser } from "../common";
+import { requireUser } from "@/lib/auth/requireUser";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAdminClient, requireUser } from "../[id]/common";
+import { getAdminClient } from "../[id]/common";
+import { requireUser } from "@/lib/auth/requireUser";
 import {
   buildCtaUrl,
   buildDedupeKey,

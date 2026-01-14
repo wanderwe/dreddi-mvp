@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadPromiseForUser, requireUser, resolveCreatorLabel } from "./common";
+import { loadPromiseForUser, resolveCreatorLabel } from "./common";
+import { requireUser } from "@/lib/auth/requireUser";
 import { cookies } from "next/headers";
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getAdminClient, requireUser } from "../../promises/[id]/common";
+import { getAdminClient } from "../../promises/[id]/common";
+import { requireUser } from "@/lib/auth/requireUser";
 import { cookies } from "next/headers";
 
 export async function GET(req: Request) {
