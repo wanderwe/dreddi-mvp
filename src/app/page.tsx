@@ -372,22 +372,24 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
-          <div className="order-1 space-y-5 sm:space-y-4">
-            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold leading-snug tracking-wide text-emerald-200 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.25),0_12px_30px_rgba(2,6,23,0.5)] backdrop-blur sm:max-w-full sm:gap-3 sm:whitespace-nowrap sm:px-4 sm:py-1.5 sm:text-base sm:leading-normal sm:tracking-normal">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+          <div className="order-1 space-y-4 sm:space-y-5">
+            <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/10 bg-emerald-500/5 px-3 py-1 text-[11px] font-medium leading-relaxed tracking-wide text-emerald-200/80 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)] backdrop-blur sm:max-w-full sm:gap-2.5 sm:whitespace-nowrap sm:px-3.5 sm:py-1.5 sm:text-sm">
+              <span className="h-2 w-2 rounded-full bg-emerald-300/70 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
               {copy.hero.eyebrow}
             </div>
-            <div className="flex items-center gap-4">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="flex items-center gap-3 text-3xl font-semibold leading-tight sm:text-5xl">
-                <span className="rounded-2xl bg-emerald-500/10 px-4 py-2 text-emerald-300">Dreddi</span>
-                <span className="text-white">{t("landing.hero.brandSuffix")}</span>
+            <div className="flex items-center gap-3">
+              <DreddiLogoMark className="h-10 w-10 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)] sm:h-12 sm:w-12" />
+              <div className="flex flex-wrap items-baseline gap-2 text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
+                <span className="text-emerald-200">Dreddi</span>
+                <span className="text-white font-medium">
+                  {t("landing.hero.brandSuffix")}
+                </span>
               </div>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
+            <p className="max-w-xl text-lg font-semibold leading-snug text-white sm:text-2xl">
               {copy.hero.headline}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-xl text-base leading-relaxed text-slate-300/90 sm:text-lg">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
@@ -401,13 +403,13 @@ export default function Home() {
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/login"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
                 {copy.cta.getStarted}
               </Link>
               <Link
                 href="/u"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
                 {copy.cta.publicProfiles}
               </Link>
@@ -416,13 +418,13 @@ export default function Home() {
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/promises/new"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
                 {copy.cta.createPromise}
               </Link>
               <Link
                 href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
                 {copy.cta.reviewDeals}
               </Link>
