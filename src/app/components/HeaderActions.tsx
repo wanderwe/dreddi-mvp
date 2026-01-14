@@ -14,6 +14,8 @@ type HeaderActionsProps = {
 
 export function HeaderActions({ isAuthenticated = false, onLogout, className = "" }: HeaderActionsProps) {
   const t = useT();
+  const linkBaseClasses =
+    "whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
   return (
     <nav
@@ -22,7 +24,7 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
       {isAuthenticated ? (
         <>
           <Link
-            className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className={linkBaseClasses}
             href="/promises"
           >
             {t("nav.myPromises")}
@@ -37,13 +39,19 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
       ) : (
         <>
           <Link
-            className="whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className={linkBaseClasses}
             href="/login"
           >
             {t("nav.login")}
           </Link>
         </>
       )}
+      <Link className={linkBaseClasses} href="/privacy">
+        {t("nav.privacy")}
+      </Link>
+      <Link className={linkBaseClasses} href="/terms">
+        {t("nav.terms")}
+      </Link>
       {isAuthenticated && <ProfileSettingsMenu />}
       {isAuthenticated && <NotificationBell />}
       <div className="shrink-0">
