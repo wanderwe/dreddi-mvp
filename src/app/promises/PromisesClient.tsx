@@ -39,7 +39,7 @@ type PromiseRoleBase = Pick<
 type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
 type PromiseSummary = PromiseRoleBase & { role: PromiseRole; acceptedBySecondSide: boolean };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
