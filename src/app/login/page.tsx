@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
@@ -92,10 +91,7 @@ export default function LoginPage() {
 
             {error && <div className="text-sm text-red-400">{error}</div>}
 
-            <div className="flex items-center justify-between text-sm text-slate-400">
-              <Link href="/" className="text-emerald-200 hover:text-emerald-100">
-                ← {t("auth.login.back")}
-              </Link>
+            <div className="flex items-center justify-end text-sm text-slate-400">
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 {t("auth.login.secure")}

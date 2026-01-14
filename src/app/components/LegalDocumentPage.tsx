@@ -1,4 +1,3 @@
-import { PublicHeader } from "@/app/components/PublicHeader";
 import { LegalDocumentContent } from "@/app/components/LegalDocumentContent";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getMessages } from "@/lib/i18n/getMessages";
@@ -25,8 +24,6 @@ export async function LegalDocumentPage({ type }: { type: LegalDocumentType }) {
         className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]"
         aria-hidden
       />
-
-      <PublicHeader />
 
       <main className="relative mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
         <div className="rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">

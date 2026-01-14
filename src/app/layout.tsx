@@ -4,6 +4,7 @@ import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { AppFooter } from "@/app/components/AppFooter";
+import { AppHeader } from "@/app/components/AppHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,6 +64,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <I18nProvider locale={locale} messages={messages}>
+          <AppHeader />
           {children}
           <AppFooter />
         </I18nProvider>
