@@ -84,9 +84,17 @@ export async function POST(req: Request) {
       .single();
 
     if (insertError || !insertData) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[promises:create] Insert failed", {
+          code: insertError?.code,
+          message: insertError?.message,
+          details: insertError?.details,
+          hint: insertError?.hint,
+        });
+      }
       return NextResponse.json(
         { error: insertError?.message ?? "Insert failed" },
-        { status: 500 }
+        { status: 400 }
       );
     }
 

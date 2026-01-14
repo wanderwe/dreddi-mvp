@@ -322,6 +322,7 @@ export default function NewPromisePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -334,11 +335,14 @@ export default function NewPromisePage() {
     setBusy(false);
 
     if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
       if (res.status === 401) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[promises:new] Missing/expired session while creating deal");
+        }
         router.push(`/login?next=${encodeURIComponent("/promises/new")}`);
         return;
       }
-      const body = await res.json().catch(() => ({}));
       setError(body.error ?? t("promises.new.errors.createFailed"));
       return;
     }
