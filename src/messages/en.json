@@ -296,6 +296,7 @@
     "login": {
       "eyebrow": "Welcome back",
       "subtitle": "Sign in to create deals and track reputation",
+      "signInCta": "Sign in",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "sendLink": "Send magic link",

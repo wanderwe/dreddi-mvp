@@ -18,6 +18,7 @@ export function AppHeader() {
   const [email, setEmail] = useState<string | null>(null);
   const isAuthenticated = Boolean(email);
   const showBackLink = !isAuthenticated && pathname !== "/";
+  const showSignIn = !isAuthenticated && pathname !== "/login";
   const linkBaseClasses =
     "whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
@@ -80,7 +81,23 @@ export function AppHeader() {
               </div>
             </>
           ) : (
-            <LocaleSwitcher />
+            <>
+              <nav className="hidden items-center gap-3 text-sm font-medium text-slate-200 md:flex">
+                {showSignIn && (
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  >
+                    {t("auth.login.signInCta")}
+                  </Link>
+                )}
+                <LocaleSwitcher />
+              </nav>
+              <div className="flex items-center gap-2 md:hidden">
+                <LocaleSwitcher />
+                <MobileMenu isAuthenticated={isAuthenticated} />
+              </div>
+            </>
           )}
         </div>
       </div>

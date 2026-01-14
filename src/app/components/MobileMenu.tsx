@@ -20,8 +20,10 @@ type MobileMenuProps = {
 export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
-
-  if (!isAuthenticated) return null;
+  const baseLinkClasses =
+    "rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100";
+  const primaryLinkClasses =
+    "rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -44,36 +46,37 @@ export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
         <SheetOverlay />
         <SheetContent id="mobile-menu" className="md:hidden">
           <nav className="flex flex-col gap-4 text-sm font-medium text-slate-200">
-            <SheetClose asChild>
-              <Link
-                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                href="/promises"
-              >
-                {t("nav.myPromises")}
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
-              <Link
-                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                href="/notifications"
-              >
-                {t("nav.notifications")}
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
-              <Link
-                className="rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45"
-                href="/promises/new"
-              >
-                {t("nav.newPromise")}
-              </Link>
-            </SheetClose>
-            <div className="mt-2 border-t border-white/10 pt-4">
-              <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
-                {t("profileSettings.sectionLabel")}
-              </div>
-              <ProfileSettingsPanel showTitle={false} className="mt-3" />
-            </div>
+            {isAuthenticated ? (
+              <>
+                <SheetClose asChild>
+                  <Link className={baseLinkClasses} href="/promises">
+                    {t("nav.myPromises")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link className={baseLinkClasses} href="/notifications">
+                    {t("nav.notifications")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link className={primaryLinkClasses} href="/promises/new">
+                    {t("nav.newPromise")}
+                  </Link>
+                </SheetClose>
+                <div className="mt-2 border-t border-white/10 pt-4">
+                  <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                    {t("profileSettings.sectionLabel")}
+                  </div>
+                  <ProfileSettingsPanel showTitle={false} className="mt-3" />
+                </div>
+              </>
+            ) : (
+              <SheetClose asChild>
+                <Link className={primaryLinkClasses} href="/login">
+                  {t("auth.login.signInCta")}
+                </Link>
+              </SheetClose>
+            )}
           </nav>
         </SheetContent>
       </SheetPortal>
