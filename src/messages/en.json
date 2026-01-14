@@ -30,7 +30,7 @@
     "toggleLabel": "Toggle public profile",
     "publicLinkLabel": "Public profile link",
     "publicLinkDescription": "Share this link so others can view your public profile.",
-    "publicLinkPrivate": "Enable your public profile to get a shareable link.",
+    "publicLinkPrivate": "This link won’t be publicly visible until you enable your public profile.",
     "viewPublicProfile": "View",
     "copyLink": "Copy link",
     "copySuccess": "Copied",
@@ -307,7 +307,14 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
-    "reputationNote": "Reputation reflects all confirmed outcomes. Only public deals show details.",
+    "reputationScore": "Reputation score",
+    "stableReputation": "Stable reputation",
+    "summary": {
+      "confirmed": "{count} confirmed",
+      "disputed": "{count} disputed",
+      "lastActivity": "Last activity {time}",
+      "lastActivityEmpty": "No activity yet"
+    },
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
@@ -331,7 +338,7 @@
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
     "emptyOverdue": "No overdue responsibilities.",
     "emptyHistory": "No history yet.",
-    "emptyPublicDeals": "No public deals to show yet.",
+    "emptyPublicDeals": "No public deals yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",
