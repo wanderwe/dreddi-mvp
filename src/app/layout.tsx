@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getMessages } from "@/lib/i18n/getMessages";
+import { AppFooter } from "@/app/components/AppFooter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,6 +64,7 @@ export default async function RootLayout({
       >
         <I18nProvider locale={locale} messages={messages}>
           {children}
+          <AppFooter />
         </I18nProvider>
       </body>
     </html>

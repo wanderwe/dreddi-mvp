@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRound, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -486,6 +487,26 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             {error}
           </div>
         )}
+
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+            {t("profileSettings.legalLabel")}
+          </div>
+          <div className="mt-3 flex flex-col gap-2 text-sm text-slate-200">
+            <Link
+              href="/privacy"
+              className="rounded-lg border border-white/10 px-3 py-2 transition hover:border-emerald-300/50 hover:text-emerald-100"
+            >
+              {t("nav.privacy")}
+            </Link>
+            <Link
+              href="/terms"
+              className="rounded-lg border border-white/10 px-3 py-2 transition hover:border-emerald-300/50 hover:text-emerald-100"
+            >
+              {t("nav.terms")}
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

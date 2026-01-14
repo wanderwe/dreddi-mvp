@@ -46,12 +46,6 @@ export function HeaderActions({ isAuthenticated = false, onLogout, className = "
           </Link>
         </>
       )}
-      <Link className={linkBaseClasses} href="/privacy">
-        {t("nav.privacy")}
-      </Link>
-      <Link className={linkBaseClasses} href="/terms">
-        {t("nav.terms")}
-      </Link>
       {isAuthenticated && <ProfileSettingsMenu />}
       {isAuthenticated && <NotificationBell />}
       <div className="shrink-0">

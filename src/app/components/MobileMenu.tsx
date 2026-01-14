@@ -81,22 +81,6 @@ export function MobileMenu({ isAuthenticated = false, onLogout }: MobileMenuProp
                 </Link>
               </SheetClose>
             )}
-            <SheetClose asChild>
-              <Link
-                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                href="/privacy"
-              >
-                {t("nav.privacy")}
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
-              <Link
-                className="rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
-                href="/terms"
-              >
-                {t("nav.terms")}
-              </Link>
-            </SheetClose>
             <div className="w-fit">
               <LocaleSwitcher />
             </div>
