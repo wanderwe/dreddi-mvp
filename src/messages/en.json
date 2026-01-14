@@ -360,12 +360,12 @@
   "notifications": {
     "eyebrow": "NOTIFICATIONS",
     "title": "Notifications",
-    "subtitle": "Stay on top of agreements.",
+    "subtitle": "Stay on top of agreements",
     "loading": "Loading notifications…",
-    "empty": "No notifications yet.",
+    "empty": "No notifications yet",
     "markRead": "Mark as read",
     "errors": {
-      "unavailable": "Authentication is unavailable in this preview."
+      "unavailable": "Authentication is unavailable in this preview"
     }
   }
 }

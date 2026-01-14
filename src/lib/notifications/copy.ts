@@ -13,22 +13,22 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
   en: {
     invite: {
       title: "New agreement invitation",
-      body: "Confirm only if you’re ready to take responsibility.",
+      body: "Confirm only if you’re ready to take responsibility",
       ctaLabel: "Review",
     },
     invite_followup: {
       title: "Agreement confirmed",
-      body: "Responsibility is now active.",
+      body: "Responsibility is now active",
       ctaLabel: "Open",
     },
     due_soon: {
       title: "Deadline approaching",
-      body: "Time is running out on a confirmed agreement.",
+      body: "Time is running out on a confirmed agreement",
       ctaLabel: "View",
     },
     overdue: {
       title: "Agreement is overdue",
-      body: "Update the status or mark it completed.",
+      body: "Update the status or mark it completed",
       ctaLabel: "Open",
     },
     completion_waiting: {
@@ -38,7 +38,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Outcome confirmed",
-      body: "Reputation updated.",
+      body: "Reputation updated",
       ctaLabel: "View",
     },
     dispute: {
@@ -50,22 +50,22 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
   uk: {
     invite: {
       title: "Запрошення до домовленості",
-      body: "Підтверджуйте лише якщо готові взяти відповідальність.",
+      body: "Підтверджуйте лише якщо готові взяти відповідальність",
       ctaLabel: "Переглянути",
     },
     invite_followup: {
       title: "Домовленість підтверджено",
-      body: "Відповідальність активна.",
+      body: "Відповідальність активна",
       ctaLabel: "Відкрити",
     },
     due_soon: {
       title: "Наближається дедлайн",
-      body: "Час спливає для підтвердженої домовленості.",
+      body: "Час спливає для підтвердженої домовленості",
       ctaLabel: "Переглянути",
     },
     overdue: {
       title: "Дедлайн минув",
-      body: "Оновіть статус або позначте виконаною.",
+      body: "Оновіть статус або позначте виконаною",
       ctaLabel: "Відкрити",
     },
     completion_waiting: {
@@ -75,7 +75,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Результат підтверджено",
-      body: "Репутацію оновлено.",
+      body: "Репутацію оновлено",
       ctaLabel: "Переглянути",
     },
     dispute: {
@@ -91,14 +91,14 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
     invite_followup: {
       creator: {
         title: "Agreement accepted",
-        body: "The other side confirmed the agreement.",
+        body: "The other side confirmed the agreement",
         ctaLabel: "Open",
       },
     },
     overdue: {
       creator: {
         title: "Agreement overdue",
-        body: "An agreement you’re waiting for is overdue.",
+        body: "An agreement you’re waiting for is overdue",
         ctaLabel: "Open",
       },
     },
@@ -107,14 +107,14 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
     invite_followup: {
       creator: {
         title: "Домовленість прийнято",
-        body: "Інша сторона підтвердила домовленість.",
+        body: "Інша сторона підтвердила домовленість",
         ctaLabel: "Відкрити",
       },
     },
     overdue: {
       creator: {
         title: "Домовленість прострочена",
-        body: "Домовленість, на яку ви очікуєте, прострочена.",
+        body: "Домовленість, на яку ви очікуєте, прострочена",
         ctaLabel: "Відкрити",
       },
     },
@@ -171,8 +171,8 @@ export const getNotificationCopy = ({ locale, type, role, followup, delta }: Not
   if (normalizedType === "completion_followup" && typeof delta === "number") {
     const formatted = delta >= 0 ? `+${delta}` : `${delta}`;
     body = baseLocale === "uk"
-      ? `Репутацію оновлено: ${formatted}.`
-      : `Reputation updated: ${formatted}.`;
+      ? `Репутацію оновлено: ${formatted}`
+      : `Reputation updated: ${formatted}`;
   }
 
   return { title, body, ctaLabel };
