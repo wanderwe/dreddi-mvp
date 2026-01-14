@@ -19,7 +19,12 @@ type CreatePromisePayload = {
 export async function POST(req: Request) {
   try {
     const user = await requireUser(req);
-    if (user instanceof NextResponse) return user;
+    if (user instanceof NextResponse) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[promises:create] Missing or invalid auth token");
+      }
+      return user;
+    }
 
     const body = (await req.json().catch(() => null)) as CreatePromisePayload | null;
 
@@ -83,9 +88,17 @@ export async function POST(req: Request) {
       .single();
 
     if (insertError || !insertData) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[promises:create] Insert failed", {
+          code: insertError?.code,
+          message: insertError?.message,
+          details: insertError?.details,
+          hint: insertError?.hint,
+        });
+      }
       return NextResponse.json(
         { error: insertError?.message ?? "Insert failed" },
-        { status: 500 }
+        { status: 400 }
       );
     }
 
