@@ -304,6 +304,7 @@
     "login": {
       "eyebrow": "З поверненням",
       "subtitle": "Увійдіть, щоб створювати угоди та відстежувати репутацію",
+      "signInCta": "Увійти",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "sendLink": "Надіслати magic link",
