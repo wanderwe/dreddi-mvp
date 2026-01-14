@@ -307,14 +307,7 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
-    "reputationScore": "Reputation score",
-    "stableReputation": "Stable reputation",
-    "summary": {
-      "confirmed": "{count} confirmed",
-      "disputed": "{count} disputed",
-      "lastActivity": "Last activity {time}",
-      "lastActivityEmpty": "No activity yet"
-    },
+    "reputationNote": "Reputation reflects all confirmed outcomes. Only public deals show details.",
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
@@ -338,7 +331,7 @@
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance.",
     "emptyOverdue": "No overdue responsibilities.",
     "emptyHistory": "No history yet.",
-    "emptyPublicDeals": "No public deals yet.",
+    "emptyPublicDeals": "No public deals to show yet.",
     "errors": {
       "supabase": "Supabase is not configured.",
       "missing": "Profile handle is missing.",

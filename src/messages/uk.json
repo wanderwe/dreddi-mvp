@@ -315,14 +315,7 @@
     "confirmed": "Підтверджено",
     "disputed": "Оскаржено",
     "loading": "Завантаження профілю…",
-    "reputationScore": "Репутаційний бал",
-    "stableReputation": "Стабільна репутація",
-    "summary": {
-      "confirmed": "{count} підтверджено",
-      "disputed": "{count} оскаржено",
-      "lastActivity": "Остання активність {time}",
-      "lastActivityEmpty": "Ще немає активності"
-    },
+    "reputationNote": "Репутація враховує всі підтверджені результати. Деталі видно лише для публічних угод.",
     "sections": {
       "responsibilityStatus": "Статус відповідальностей",
       "trackRecord": "Історія",
