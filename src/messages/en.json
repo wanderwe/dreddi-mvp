@@ -360,7 +360,7 @@
   },
   "notifications": {
     "eyebrow": "NOTIFICATIONS",
-    "title": "Notifications",
+    "title": "Your notifications",
     "subtitle": "Stay on top of agreements",
     "loading": "Loading notifications…",
     "empty": "No notifications yet",
