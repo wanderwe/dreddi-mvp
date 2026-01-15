@@ -19,6 +19,8 @@ type PromiseRow = {
   due_at: string | null;
   created_at: string;
   completed_at: string | null;
+  condition_text: string | null;
+  condition_met_at: string | null;
   counterparty_id: string | null;
   counterparty_accepted_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
@@ -142,11 +144,11 @@ export default function PromisesClient() {
       setUserId(user.id);
 
       const { data, error } = await supabase
-        .from("promises")
-        .select(
-          "id,status,counterparty_accepted_at,creator_id,promisor_id,promisee_id,counterparty_id"
-        )
-        .or(buildBaseFilter(user.id));
+      .from("promises")
+      .select(
+        "id,status,condition_text,condition_met_at,counterparty_accepted_at,creator_id,promisor_id,promisee_id,counterparty_id"
+      )
+      .or(buildBaseFilter(user.id));
 
       if (cancelled) return;
 
@@ -202,7 +204,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -467,6 +469,8 @@ export default function PromisesClient() {
                 const statusLabel = statusLabelForRole(p.status, p.role);
 
                 const busy = busyMap[p.id];
+                const blockedByCondition =
+                  Boolean(p.condition_text?.trim()) && !p.condition_met_at;
 
                 return (
                   <div
@@ -492,6 +496,11 @@ export default function PromisesClient() {
                             {isPromisor
                               ? t("promises.list.waitingNotePromisor")
                               : t("promises.list.waitingNoteCounterparty")}
+                          </p>
+                        )}
+                        {blockedByCondition && (
+                          <p className="text-xs text-slate-400">
+                            {t("promises.list.blockedByCondition")}
                           </p>
                         )}
                       </div>

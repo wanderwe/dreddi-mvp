@@ -12,6 +12,7 @@ import {
 type CreatePromisePayload = {
   title?: string;
   details?: string | null;
+  conditionText?: string | null;
   counterpartyContact?: string | null;
   dueAt?: string | null;
   executor?: "me" | "other";
@@ -71,6 +72,7 @@ export async function POST(req: Request) {
       promisee_id: executor === "other" ? user.id : null,
       title,
       details: body?.details?.trim() || null,
+      condition_text: body?.conditionText?.trim() || null,
       counterparty_contact: counterpartyContact,
       due_at: dueAtIso,
       status: "active",

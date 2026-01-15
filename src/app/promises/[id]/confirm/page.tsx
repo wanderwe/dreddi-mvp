@@ -136,6 +136,9 @@ export default function ConfirmPromisePage() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
+      if (body?.error_code === "condition_not_met") {
+        throw new Error(t("promises.confirm.errors.conditionNotMet"));
+      }
       throw new Error(body.error ?? t("promises.confirm.errors.actionFailed"));
     }
   }

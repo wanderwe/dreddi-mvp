@@ -14,6 +14,9 @@ type PromiseRow = {
   id: string;
   title: string;
   details: string | null;
+  condition_text: string | null;
+  condition_met_at: string | null;
+  condition_met_by: string | null;
   counterparty_contact: string | null;
   due_at: string | null;
   status: PromiseStatus;
@@ -146,6 +149,7 @@ export default function PromisePage() {
 
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
+  const [conditionBusy, setConditionBusy] = useState(false);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -192,7 +196,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -300,6 +304,44 @@ export default function PromisePage() {
     else load();
   }
 
+  async function markConditionMet() {
+    if (!p) return;
+    setError(null);
+    setConditionBusy(true);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setConditionBusy(false);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setConditionBusy(false);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/condition-met`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setConditionBusy(false);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    load();
+  }
+
   const inviteLink = useMemo(() => {
     if (!p?.invite_token) return null;
     if (typeof window === "undefined") return null;
@@ -331,6 +373,8 @@ export default function PromisePage() {
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const showPublicStatus = p?.visibility === "public";
   const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
+  const hasCondition = Boolean(p?.condition_text?.trim());
+  const conditionMet = Boolean(p?.condition_met_at);
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -389,6 +433,33 @@ export default function PromisePage() {
                 <div className="pt-2 text-neutral-200 whitespace-pre-wrap">{p.details}</div>
               ) : (
                 <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
+              )}
+
+              {hasCondition && (
+                <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                    {t("promises.detail.conditionLabel")}
+                  </p>
+                  <div className="mt-2 whitespace-pre-wrap text-slate-100">
+                    {p?.condition_text}
+                  </div>
+                  <div className="mt-3 text-xs text-slate-400">
+                    {conditionMet
+                      ? t("promises.detail.conditionMet")
+                      : t("promises.detail.conditionWaiting")}
+                  </div>
+                  {isCounterparty && !conditionMet && (
+                    <div className="mt-3">
+                      <ActionButton
+                        label={t("promises.detail.conditionMark")}
+                        variant="ok"
+                        loading={conditionBusy}
+                        disabled={conditionBusy}
+                        onClick={markConditionMet}
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </Card>

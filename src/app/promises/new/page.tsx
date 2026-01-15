@@ -28,6 +28,7 @@ export default function NewPromisePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
+  const [conditionText, setConditionText] = useState("");
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -445,6 +446,7 @@ export default function NewPromisePage() {
     const payload = {
       title: title.trim(),
       details: details.trim() || null,
+      conditionText: conditionText.trim() || null,
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
@@ -567,6 +569,21 @@ export default function NewPromisePage() {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.condition")}
+              </span>
+              <textarea
+                className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                placeholder={t("promises.new.placeholders.condition")}
+                value={conditionText}
+                onChange={(e) => setConditionText(e.target.value)}
+              />
+              <p className="text-xs text-slate-400">
+                {t("promises.new.fields.conditionHint")}
+              </p>
             </label>
 
             <div className="sm:col-span-2">

@@ -112,6 +112,7 @@
       "scoreImpact": "Вплив на бал: {impact}",
       "markCompleted": "Позначити як виконану",
       "updating": "Оновлення…",
+      "blockedByCondition": "Заблоковано умовою",
       "loadMore": "Завантажити ще",
       "loadingMore": "Завантаження…",
       "reviewConfirm": "Переглянути та підтвердити",
@@ -130,6 +131,10 @@
       "counterparty": "Контрагент",
       "counterpartyFallback": "контрагент",
       "noDetails": "Без деталей",
+      "conditionLabel": "Контрумова",
+      "conditionWaiting": "Очікує виконання умови контрагентом",
+      "conditionMet": "Умову виконано",
+      "conditionMark": "Умову виконано",
       "statusActions": "Дії зі статусом",
       "currentStatus": "Поточний статус",
       "markCompleted": "Позначити як виконану",
@@ -212,6 +217,7 @@
         "loadFailed": "Не вдалося завантажити угоду",
         "unsupportedStatus": "Угода має непідтримуваний статус",
         "actionFailed": "Дія не виконана",
+        "conditionNotMet": "Неможливо підтвердити/оскаржити, поки контрумова не виконана.",
         "confirmFailed": "Не вдалося підтвердити",
         "disputeFailed": "Не вдалося оскаржити"
       }
@@ -230,6 +236,8 @@
       "fields": {
         "title": "Назва",
         "details": "Деталі",
+        "condition": "Контрумова",
+        "conditionHint": "Виконання можливе після…",
         "executor": "Виконавець",
         "counterparty": "Контрагент",
         "counterpartyHelper": "Контрагент має прийняти угоду — відповідальність не фіксується до прийняття",
@@ -243,6 +251,7 @@
       "placeholders": {
         "title": "Коротко: про що угода?",
         "details": "Деталі (опціонально)",
+        "condition": "Виконання можливе після…",
         "counterpartyMe": "Email або телефон контрагента",
         "counterpartyOther": "Email або телефон контрагента",
         "dueDate": "Оберіть дату"
