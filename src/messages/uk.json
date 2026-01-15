@@ -248,7 +248,10 @@
         "dueDate": "Оберіть дату"
       },
       "actions": {
-        "clearDate": "Очистити дату"
+        "clearDate": "Очистити дату",
+        "changeTime": "Змінити час",
+        "selectTime": "Оберіть час",
+        "closeTimePicker": "Закрити вибір часу"
       },
       "publicRequest": {
         "label": "Публічна угода",
