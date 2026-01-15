@@ -154,7 +154,10 @@ export default function PromisePage() {
 
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
-    return formatDueDate(p.due_at, locale, { includeYear: true }) ?? t("promises.detail.noDeadline");
+    return (
+      formatDueDate(p.due_at, locale, { includeYear: true, includeTime: true }) ??
+      t("promises.detail.noDeadline")
+    );
   }, [locale, p, t]);
 
   async function requireSessionOrRedirect(

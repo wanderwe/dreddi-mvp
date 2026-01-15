@@ -31,6 +31,7 @@ export default function NewPromisePage() {
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
+  const defaultDueTime = { hour: 18, minute: 0 };
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [popoverStyles, setPopoverStyles] = useState<{
@@ -50,14 +51,14 @@ export default function NewPromisePage() {
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
 
   const formattedDueAt = useMemo(
-    () => (dueAt ? format(dueAt, "dd.MM.yyyy") : t("promises.new.placeholders.dueDate")),
+    () => (dueAt ? format(dueAt, "dd.MM.yyyy, HH:mm") : t("promises.new.placeholders.dueDate")),
     [dueAt, t]
   );
 
   const normalizedDueAt = useMemo(() => {
     if (!dueAt) return null;
     const normalized = new Date(dueAt);
-    normalized.setHours(12, 0, 0, 0);
+    normalized.setSeconds(0, 0);
     return normalized;
   }, [dueAt]);
 
@@ -130,7 +131,11 @@ export default function NewPromisePage() {
                     type="button"
                     onClick={() => {
                       const next = new Date(day);
-                      next.setHours(12, 0, 0, 0);
+                      if (dueAt) {
+                        next.setHours(dueAt.getHours(), dueAt.getMinutes(), 0, 0);
+                      } else {
+                        next.setHours(defaultDueTime.hour, defaultDueTime.minute, 0, 0);
+                      }
                       setDueAt(next);
                       setIsCalendarOpen(false);
                     }}
@@ -480,6 +485,22 @@ export default function NewPromisePage() {
                         {formattedDueAt}
                       </span>
                     </button>
+                    {dueAt && (
+                      <input
+                        type="time"
+                        step={60}
+                        value={format(dueAt, "HH:mm")}
+                        aria-label={t("promises.new.fields.dueTime")}
+                        onChange={(event) => {
+                          const [hours, minutes] = event.target.value.split(":").map(Number);
+                          if (Number.isNaN(hours) || Number.isNaN(minutes)) return;
+                          const next = new Date(dueAt);
+                          next.setHours(hours, minutes, 0, 0);
+                          setDueAt(next);
+                        }}
+                        className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-100 outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40 sm:mt-0 sm:ml-3 sm:w-32"
+                      />
+                    )}
                     {dueAt && (
                       <button
                         type="button"

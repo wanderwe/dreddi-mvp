@@ -74,7 +74,7 @@ export default function PromisesClient() {
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("promises.list.noDeadline");
-    return formatDueDate(dueAt, locale, { includeYear: true }) ?? dueAt;
+    return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
   };
 
   const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {

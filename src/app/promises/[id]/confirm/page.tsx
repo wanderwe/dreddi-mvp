@@ -42,7 +42,8 @@ export default function ConfirmPromisePage() {
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
 
   const formatDate = (value: string | null) =>
-    formatDueDate(value, locale, { includeYear: true }) ?? t("promises.confirm.noDeadline");
+    formatDueDate(value, locale, { includeYear: true, includeTime: true }) ??
+    t("promises.confirm.noDeadline");
 
   const disputeOptions = useMemo(
     () =>
