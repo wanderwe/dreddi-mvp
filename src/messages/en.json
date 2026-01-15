@@ -240,7 +240,10 @@
         "dueDate": "Select date"
       },
       "actions": {
-        "clearDate": "Clear date"
+        "clearDate": "Clear date",
+        "changeTime": "Change time",
+        "selectTime": "Select time",
+        "closeTimePicker": "Close time picker"
       },
       "publicRequest": {
         "label": "Public deal",

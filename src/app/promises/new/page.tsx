@@ -20,16 +20,18 @@ import {
 } from "date-fns";
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
 export default function NewPromisePage() {
   const t = useT();
+  const locale = useLocale();
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()));
   const defaultDueTime = { hour: 18, minute: 0 };
   const popoverRef = useRef<HTMLDivElement | null>(null);
@@ -50,9 +52,21 @@ export default function NewPromisePage() {
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
 
+  const dueDateFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" }),
+    [locale]
+  );
+  const dueTimeFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hour12: false }),
+    [locale]
+  );
+
   const formattedDueAt = useMemo(
-    () => (dueAt ? format(dueAt, "dd.MM.yyyy, HH:mm") : t("promises.new.placeholders.dueDate")),
-    [dueAt, t]
+    () =>
+      dueAt
+        ? `${dueDateFormatter.format(dueAt)}, ${dueTimeFormatter.format(dueAt)}`
+        : t("promises.new.placeholders.dueDate"),
+    [dueAt, dueDateFormatter, dueTimeFormatter, t]
   );
 
   const normalizedDueAt = useMemo(() => {
@@ -78,6 +92,31 @@ export default function NewPromisePage() {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });
     return Array.from({ length: 7 }, (_, index) => format(addDays(start, index), "EE"));
   }, []);
+
+  const timePresets = [
+    { label: "09:00", hour: 9, minute: 0 },
+    { label: "12:00", hour: 12, minute: 0 },
+    { label: "18:00", hour: 18, minute: 0 },
+    { label: "23:59", hour: 23, minute: 59 },
+  ];
+
+  const timeOptions = useMemo(() => {
+    const options: Array<{ label: string; hour: number; minute: number }> = [];
+    for (let hour = 0; hour < 24; hour += 1) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+        options.push({ label, hour, minute });
+      }
+    }
+    return options;
+  }, []);
+
+  const applyTimeChange = (hour: number, minute: number) => {
+    if (!dueAt) return;
+    const next = new Date(dueAt);
+    next.setHours(hour, minute, 0, 0);
+    setDueAt(next);
+  };
 
   const calendarPopover =
     isCalendarOpen && typeof document !== "undefined"
@@ -158,6 +197,79 @@ export default function NewPromisePage() {
         )
       : null;
 
+  const timePicker =
+    isTimePickerOpen && dueAt && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/60"
+              aria-label={t("promises.new.actions.closeTimePicker")}
+              onClick={() => setIsTimePickerOpen(false)}
+            />
+            <div className="relative w-full max-w-md rounded-t-3xl border border-white/10 bg-slate-950/95 p-5 text-slate-100 shadow-2xl shadow-black/60 backdrop-blur sm:rounded-3xl">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold text-slate-100">
+                  {t("promises.new.actions.selectTime")}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTimePickerOpen(false)}
+                  aria-label={t("promises.new.actions.closeTimePicker")}
+                  className="rounded-full border border-white/10 p-1 text-slate-300 transition hover:border-emerald-300/40 hover:text-white"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {timePresets.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      applyTimeChange(preset.hour, preset.minute);
+                      setIsTimePickerOpen(false);
+                    }}
+                    className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/60 hover:text-emerald-100"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-white/10 bg-black/30 p-2">
+                <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-4">
+                  {timeOptions.map((option) => {
+                    const isSelected =
+                      dueAt.getHours() === option.hour && dueAt.getMinutes() === option.minute;
+                    return (
+                      <button
+                        key={option.label}
+                        type="button"
+                        onClick={() => {
+                          applyTimeChange(option.hour, option.minute);
+                          setIsTimePickerOpen(false);
+                        }}
+                        className={clsx(
+                          "rounded-xl border px-2 py-2 text-sm transition",
+                          isSelected
+                            ? "border-emerald-300/70 bg-emerald-400/20 text-emerald-100"
+                            : "border-white/10 text-slate-200 hover:border-emerald-300/50 hover:text-emerald-100"
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   useEffect(() => {
     if (!isCalendarOpen) return;
     setCalendarMonth(startOfMonth(dueAt ?? new Date()));
@@ -181,6 +293,21 @@ export default function NewPromisePage() {
       document.removeEventListener("keydown", handleKey);
     };
   }, [isCalendarOpen, calendarMonth]);
+
+  useEffect(() => {
+    if (!isTimePickerOpen) return;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsTimePickerOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [isTimePickerOpen]);
+
+  useEffect(() => {
+    if (!dueAt) setIsTimePickerOpen(false);
+  }, [dueAt]);
 
   useEffect(() => {
     if (!isCalendarOpen) {
@@ -369,6 +496,7 @@ export default function NewPromisePage() {
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
       {calendarPopover}
+      {timePicker}
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
@@ -486,22 +614,6 @@ export default function NewPromisePage() {
                       </span>
                     </button>
                     {dueAt && (
-                      <input
-                        type="time"
-                        step={60}
-                        value={format(dueAt, "HH:mm")}
-                        aria-label={t("promises.new.fields.dueTime")}
-                        onChange={(event) => {
-                          const [hours, minutes] = event.target.value.split(":").map(Number);
-                          if (Number.isNaN(hours) || Number.isNaN(minutes)) return;
-                          const next = new Date(dueAt);
-                          next.setHours(hours, minutes, 0, 0);
-                          setDueAt(next);
-                        }}
-                        className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-100 outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40 sm:mt-0 sm:ml-3 sm:w-32"
-                      />
-                    )}
-                    {dueAt && (
                       <button
                         type="button"
                         onClick={(event) => {
@@ -516,6 +628,20 @@ export default function NewPromisePage() {
                       </button>
                     )}
                   </div>
+                  {dueAt && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
+                        {dueTimeFormatter.format(dueAt)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsTimePickerOpen(true)}
+                        className="text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+                      >
+                        {t("promises.new.actions.changeTime")}
+                      </button>
+                    </div>
+                  )}
                 </div>
             </div>
 
