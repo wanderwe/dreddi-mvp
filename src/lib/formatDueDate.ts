@@ -1,5 +1,6 @@
 export type FormatDueDateOptions = {
   includeYear?: boolean;
+  includeTime?: boolean;
 };
 
 export const formatDueDate = (
@@ -9,18 +10,29 @@ export const formatDueDate = (
 ) => {
   if (!value) return null;
 
-  const { includeYear = true } = options;
-  const formatOptions: Intl.DateTimeFormatOptions = {
+  const { includeYear = true, includeTime = false } = options;
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
   };
 
   if (includeYear) {
-    formatOptions.year = "numeric";
+    dateOptions.year = "numeric";
   }
 
   try {
-    return new Intl.DateTimeFormat(locale, formatOptions).format(new Date(value));
+    const date = new Date(value);
+    const dateText = new Intl.DateTimeFormat(locale, dateOptions).format(date);
+    if (!includeTime) {
+      return dateText;
+    }
+    const timeText = new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(date);
+    return `${dateText}, ${timeText}`;
   } catch {
     return value;
   }

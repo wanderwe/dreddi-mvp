@@ -335,7 +335,10 @@ export default function PublicProfilePage() {
                           {promise.due_at
                             ? t("publicProfile.meta.due", {
                                 date:
-                                  formatDueDate(promise.due_at, locale, { includeYear: false }) ??
+                                  formatDueDate(promise.due_at, locale, {
+                                    includeYear: false,
+                                    includeTime: true,
+                                  }) ??
                                   promise.due_at,
                               })
                             : t("publicProfile.meta.noDue")}

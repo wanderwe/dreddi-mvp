@@ -141,7 +141,7 @@ export default function InvitePage() {
 
   const formatDue = (dueAt: string | null) => {
     if (!dueAt) return t("invite.noDeadline");
-    return formatDueDate(dueAt, locale, { includeYear: true }) ?? dueAt;
+    return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
   };
 
   return (

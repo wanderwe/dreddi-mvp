@@ -13,7 +13,6 @@ type DealRow = {
   id: string;
   title: string;
   status: PromiseStatus;
-  meta?: string;
   due_at?: string | null;
   created_at?: string;
 };
@@ -87,25 +86,29 @@ export default function Home() {
   const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1);
   nextMarchFirst.setHours(0, 0, 0, 0);
 
-  const toIsoDate = (date: Date) => {
-    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    return utcDate.toISOString().split("T")[0];
+  const defaultDueHour = 18;
+  const defaultDueMinute = 0;
+
+  const toIsoDateTime = (date: Date) => {
+    const localDate = new Date(date);
+    localDate.setHours(defaultDueHour, defaultDueMinute, 0, 0);
+    return localDate.toISOString();
   };
 
   const demoDeals: DealRow[] = copy.demoDeals.map((deal) => {
     const due_at =
       deal.dueDate === "nextSaturday"
-        ? toIsoDate(nextSaturday)
+        ? toIsoDateTime(nextSaturday)
         : deal.dueDate === "nextMarchFirst"
-        ? toIsoDate(nextMarchFirst)
+        ? toIsoDateTime(nextMarchFirst)
         : null;
 
     return {
       id: deal.id,
       title: deal.title,
       status: deal.status,
-      meta: deal.meta,
       due_at,
+      created_at: new Date().toISOString(),
     };
   });
 
@@ -123,32 +126,34 @@ export default function Home() {
     disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
   };
 
-  const formatDateShort = (value: string) => {
-    const hasTime = /\d{2}:\d{2}/.test(value);
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-    };
-
-    if (hasTime) {
-      options.hour = "numeric";
-      options.minute = "2-digit";
+  const formatDateTimeShort = (value: string) => {
+    try {
+      const date = new Date(value);
+      const dateText = new Intl.DateTimeFormat(locale, {
+        month: "short",
+        day: "numeric",
+      }).format(date);
+      const timeText = new Intl.DateTimeFormat(locale, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(date);
+      return `${dateText}, ${timeText}`;
+    } catch {
+      return value;
     }
-
-    return new Intl.DateTimeFormat(locale, options).format(new Date(value));
   };
 
   const getMetaText = (item: DealRow) => {
-    if (item.meta) return item.meta;
     if (item.due_at) {
-      const formatted = formatDueDate(item.due_at, locale, { includeYear: false });
+      const formatted = formatDueDate(item.due_at, locale, { includeYear: false, includeTime: true });
       if (formatted) {
         return copy.recentDeals.placeholderMetaDue(formatted);
       }
     }
 
     if (item.created_at) {
-      return copy.recentDeals.placeholderMetaCreated(formatDateShort(item.created_at));
+      return copy.recentDeals.placeholderMetaCreated(formatDateTimeShort(item.created_at));
     }
 
     return "";

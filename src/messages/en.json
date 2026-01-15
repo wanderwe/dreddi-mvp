@@ -225,7 +225,8 @@
         "executor": "Executor",
         "counterparty": "Counterparty",
         "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
-        "dueDate": "Due date"
+        "dueDate": "Due date",
+        "dueTime": "Due time"
       },
       "executor": {
         "me": "Me",
