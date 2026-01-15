@@ -40,6 +40,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Only the counterparty can dispute" }, { status: 403 });
     }
 
+    if (promise.condition_text && !promise.condition_met_at) {
+      return NextResponse.json(
+        {
+          error: "You can’t confirm/dispute until the counter-condition is met.",
+          error_code: "condition_not_met",
+        },
+        { status: 409 }
+      );
+    }
+
     if (promise.status !== "completed_by_promisor") {
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
     }

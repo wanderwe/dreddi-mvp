@@ -14,4 +14,7 @@ export type PromiseRowMin = {
   disputed_at: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
+  condition_text: string | null;
+  condition_met_at: string | null;
+  condition_met_by: string | null;
 };

@@ -104,6 +104,7 @@
       "scoreImpact": "Score impact: {impact}",
       "markCompleted": "Mark as completed",
       "updating": "Updating…",
+      "blockedByCondition": "Blocked by condition",
       "loadMore": "Load more",
       "loadingMore": "Loading…",
       "reviewConfirm": "Review & confirm",
@@ -122,6 +123,10 @@
       "counterparty": "Counterparty",
       "counterpartyFallback": "counterparty",
       "noDetails": "No details provided",
+      "conditionLabel": "Counter-condition",
+      "conditionWaiting": "Waiting for counterparty to meet the condition",
+      "conditionMet": "Condition met",
+      "conditionMark": "Mark condition met",
       "statusActions": "Status actions",
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
@@ -204,6 +209,7 @@
         "loadFailed": "Failed to load deal",
         "unsupportedStatus": "Deal has unsupported status",
         "actionFailed": "Action failed",
+        "conditionNotMet": "You can’t confirm/dispute until the counter-condition is met.",
         "confirmFailed": "Failed to confirm",
         "disputeFailed": "Failed to dispute"
       }
@@ -222,6 +228,8 @@
       "fields": {
         "title": "Title",
         "details": "Details",
+        "condition": "Counter-condition",
+        "conditionHint": "Execution becomes possible after…",
         "executor": "Executor",
         "counterparty": "Counterparty",
         "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
@@ -235,6 +243,7 @@
       "placeholders": {
         "title": "Short summary of the deal",
         "details": "Details (optional)",
+        "condition": "Execution becomes possible after…",
         "counterpartyMe": "Counterparty email or phone",
         "counterpartyOther": "Counterparty email or phone",
         "dueDate": "Select date"
