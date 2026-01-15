@@ -209,7 +209,7 @@
         "loadFailed": "Failed to load deal",
         "unsupportedStatus": "Deal has unsupported status",
         "actionFailed": "Action failed",
-        "conditionNotMet": "You can’t confirm/dispute until the counter-condition is met.",
+        "conditionNotMet": "You can’t confirm/dispute until the counter-condition is met",
         "confirmFailed": "Failed to confirm",
         "disputeFailed": "Failed to dispute"
       }
