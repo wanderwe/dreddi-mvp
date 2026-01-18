@@ -581,9 +581,6 @@ export default function NewPromisePage() {
                 value={conditionText}
                 onChange={(e) => setConditionText(e.target.value)}
               />
-              <p className="text-xs text-slate-400">
-                {t("promises.new.fields.conditionHint")}
-              </p>
             </label>
 
             <div className="sm:col-span-2">
