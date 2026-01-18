@@ -97,10 +97,14 @@ export default function NotificationsClient() {
     <div className="space-y-6">
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
-          {t("notifications.eyebrow")}
+          {t("notifications.header.eyebrow")}
         </p>
-        <h1 className="text-3xl font-semibold text-white">{t("notifications.title")}</h1>
-        <p className="mt-2 text-sm text-slate-300">{t("notifications.subtitle")}</p>
+        <h1 className="text-3xl font-semibold text-white">
+          {t("notifications.header.title")}
+        </h1>
+        <p className="mt-2 text-sm text-slate-300">
+          {t("notifications.header.subtitle")}
+        </p>
       </div>
 
       {loading ? (
