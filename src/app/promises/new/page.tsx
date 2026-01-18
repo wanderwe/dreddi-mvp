@@ -46,6 +46,8 @@ export default function NewPromisePage() {
   const [executor, setExecutor] = useState<"me" | "other">("me");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [counterpartyError, setCounterpartyError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
@@ -413,6 +415,8 @@ export default function NewPromisePage() {
   async function createPromise() {
     setBusy(true);
     setError(null);
+    setTitleError(null);
+    setCounterpartyError(null);
     setSessionExpired(false);
 
     let supabase;
@@ -434,17 +438,24 @@ export default function NewPromisePage() {
       return;
     }
 
+    const trimmedTitle = title.trim();
     const counterpartyContact = counterparty.trim();
+
+    if (!trimmedTitle) {
+      setBusy(false);
+      setTitleError(t("promises.new.errors.titleRequired"));
+      return;
+    }
 
     if (!counterpartyContact) {
       setBusy(false);
-      setError(t("promises.new.errors.counterpartyRequired"));
+      setCounterpartyError(t("promises.new.errors.counterpartyRequired"));
       return;
     }
 
     const shouldRequestPublic = isPublicDeal && isPublicProfile;
     const payload = {
-      title: title.trim(),
+      title: trimmedTitle,
       details: details.trim() || null,
       conditionText: conditionText.trim() || null,
       counterpartyContact,
@@ -555,13 +566,20 @@ export default function NewPromisePage() {
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                 placeholder={t("promises.new.placeholders.title")}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (titleError) setTitleError(null);
+                }}
               />
+              {titleError && <p className="text-xs text-rose-200">{titleError}</p>}
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.details")}
+                {t("promises.new.fields.details")}{" "}
+                <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
+                  {t("promises.new.optionalLabel")}
+                </span>
               </span>
               <textarea
                 className="min-h-[130px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
@@ -573,7 +591,10 @@ export default function NewPromisePage() {
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.condition")}
+                {t("promises.new.fields.condition")}{" "}
+                <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
+                  {t("promises.new.optionalLabel")}
+                </span>
               </span>
               <textarea
                 className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
@@ -601,15 +622,24 @@ export default function NewPromisePage() {
                             : t("promises.new.placeholders.counterpartyOther")
                         }
                         value={counterparty}
-                        onChange={(e) => setCounterparty(e.target.value)}
+                        onChange={(e) => {
+                          setCounterparty(e.target.value);
+                          if (counterpartyError) setCounterpartyError(null);
+                        }}
                       />
                     </label>
+                    {counterpartyError && (
+                      <p className="mt-2 text-xs text-rose-200">{counterpartyError}</p>
+                    )}
                   </div>
                 )}
 
                 <div className="text-sm text-slate-200">
                   <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.dueDate")}
+                    {t("promises.new.fields.dueDate")}{" "}
+                    <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
+                      {t("promises.new.optionalLabel")}
+                    </span>
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
                     <button
@@ -657,6 +687,7 @@ export default function NewPromisePage() {
                     </div>
                   )}
                 </div>
+              </div>
             </div>
 
             {executor && (
@@ -701,12 +732,14 @@ export default function NewPromisePage() {
               </div>
             )}
           </div>
-          </div>
 
           <div className="space-y-3">
+            <p className="text-xs text-slate-400">
+              {t("promises.new.requiredHelper")}
+            </p>
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim() || !counterparty.trim()}
+              disabled={busy}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("promises.new.creating") : t("promises.new.submit")}
