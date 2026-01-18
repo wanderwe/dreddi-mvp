@@ -1,0 +1,5 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Anchor frame logo concept">
+  <rect width="128" height="128" fill="none" />
+  <rect x="24" y="24" width="80" height="80" fill="none" stroke="#0f172a" stroke-width="8" rx="8" />
+  <path d="M24 56 V24 H56" fill="none" stroke="#0f172a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
