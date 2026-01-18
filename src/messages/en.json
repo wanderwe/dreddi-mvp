@@ -382,6 +382,43 @@
     "markRead": "Mark as read",
     "errors": {
       "unavailable": "Authentication is unavailable in this preview"
+    },
+    "types": {
+      "invite": {
+        "title": "New deal invitation",
+        "description": "Confirm only if you’re ready to take responsibility",
+        "cta": "Review"
+      },
+      "invite_followup": {
+        "title": "Deal confirmed",
+        "description": "Responsibility is now active",
+        "cta": "Open"
+      },
+      "due_soon": {
+        "title": "Deadline approaching",
+        "description": "Time is running out on a confirmed deal",
+        "cta": "View"
+      },
+      "overdue": {
+        "title": "Deal is overdue",
+        "description": "Update the status or mark it completed",
+        "cta": "Open"
+      },
+      "completion_waiting": {
+        "title": "Action needed",
+        "description": "Deal marked completed, confirm or dispute",
+        "cta": "Review"
+      },
+      "completion_followup": {
+        "title": "Outcome confirmed",
+        "description": "Reputation updated",
+        "cta": "View"
+      },
+      "dispute": {
+        "title": "Outcome disputed",
+        "description": "The deal was disputed, check details",
+        "cta": "View"
+      }
     }
   }
 }

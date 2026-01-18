@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { stripTrailingPeriod } from "@/lib/text";
+import { normalizeNotificationType } from "@/lib/notifications/types";
 
 type NotificationRow = {
   id: string;
@@ -15,6 +16,7 @@ type NotificationRow = {
   created_at: string;
   read_at: string | null;
   priority: string;
+  type: string | null;
 };
 
 export default function NotificationsClient() {
@@ -50,7 +52,7 @@ export default function NotificationsClient() {
 
       const { data, error } = await supabase
         .from("notifications")
-        .select("id,title,body,cta_label,cta_url,created_at,read_at,priority")
+        .select("id,type,title,body,cta_label,cta_url,created_at,read_at,priority")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -93,6 +95,20 @@ export default function NotificationsClient() {
       minute: "2-digit",
     }).format(new Date(value));
 
+  const resolveLocalized = (key: string, fallback?: string | null) => {
+    const resolved = t(key);
+    if (resolved.startsWith("⟦missing:")) {
+      return fallback ?? "";
+    }
+    return resolved;
+  };
+
+  const resolveTypeKey = (value?: string | null) => {
+    if (!value) return null;
+    const normalized = normalizeNotificationType(value as never);
+    return `notifications.types.${normalized}`;
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -122,6 +138,16 @@ export default function NotificationsClient() {
           {rows.map((row) => {
             const unread = !row.read_at;
             const ctaUrl = row.cta_url ?? "/promises";
+            const typeKey = resolveTypeKey(row.type);
+            const title = typeKey
+              ? resolveLocalized(`${typeKey}.title`, row.title)
+              : row.title;
+            const description = typeKey
+              ? resolveLocalized(`${typeKey}.description`, row.body)
+              : row.body;
+            const ctaLabel = typeKey
+              ? resolveLocalized(`${typeKey}.cta`, row.cta_label)
+              : row.cta_label ?? "";
             return (
               <div
                 key={row.id}
@@ -141,10 +167,10 @@ export default function NotificationsClient() {
                     />
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-white">
-                        {stripTrailingPeriod(row.title)}
+                        {stripTrailingPeriod(title)}
                       </div>
                       <p className="text-sm text-slate-200">
-                        {stripTrailingPeriod(row.body)}
+                        {stripTrailingPeriod(description)}
                       </p>
                       <div className="text-xs text-slate-400">
                         {formatDate(row.created_at)}
@@ -152,13 +178,13 @@ export default function NotificationsClient() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    {row.cta_label && (
+                    {ctaLabel && (
                       <Link
                         href={ctaUrl}
                         onClick={() => unread && void markAsRead(row.id)}
                         className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100"
                       >
-                        {row.cta_label}
+                        {ctaLabel}
                       </Link>
                     )}
                     {unread && (
