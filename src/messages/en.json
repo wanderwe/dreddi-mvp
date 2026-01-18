@@ -224,6 +224,8 @@
       "eyebrow": "New deal",
       "title": "Document the deal",
       "subtitle": "Name the deal, add context, and an optional deadline",
+      "optionalLabel": "(optional)",
+      "requiredHelper": "All fields without the ‘optional’ label are required",
       "back": "Back",
       "fields": {
         "title": "Title",
@@ -259,7 +261,8 @@
         "helper": "Public deals appear on your public profile once confirmed"
       },
       "errors": {
-        "counterpartyRequired": "Please add the other party's contact",
+        "titleRequired": "Add a title",
+        "counterpartyRequired": "Add the counterparty contact",
         "createFailed": "Failed to create deal",
         "network": "Unable to reach the server. Please try again."
       },
