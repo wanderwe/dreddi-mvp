@@ -1,4 +1,4 @@
-alter table promises
+alter table public.promises
   add column if not exists condition_text text,
   add column if not exists condition_met_at timestamptz,
   add column if not exists condition_met_by uuid references auth.users(id);
@@ -13,10 +13,10 @@ create policy promises_participant_update on public.promises
       auth.uid() = counterparty_id
       or (
         condition_met_at is not distinct from (
-          select p.condition_met_at from promises p where p.id = promises.id
+          select p.condition_met_at from public.promises p where p.id = public.promises.id
         )
         and condition_met_by is not distinct from (
-          select p.condition_met_by from promises p where p.id = promises.id
+          select p.condition_met_by from public.promises p where p.id = public.promises.id
         )
       )
     )
