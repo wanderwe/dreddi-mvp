@@ -13,10 +13,10 @@ create policy promises_participant_update on public.promises
       auth.uid() = counterparty_id
       or (
         condition_met_at is not distinct from (
-          select p.condition_met_at from public.promises p where p.id = public.promises.id
+          select p.condition_met_at from public.promises p where p.id = promises.id
         )
         and condition_met_by is not distinct from (
-          select p.condition_met_by from public.promises p where p.id = public.promises.id
+          select p.condition_met_by from public.promises p where p.id = promises.id
         )
       )
     )
