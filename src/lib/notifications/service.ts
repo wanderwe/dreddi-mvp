@@ -7,7 +7,6 @@ import {
   isPerDealCapExceeded,
   isWithinQuietHours,
 } from "./policy";
-import { getNotificationCopy } from "./copy";
 import { normalizeNotificationType } from "./types";
 import type {
   NotificationPriority,
@@ -145,14 +144,6 @@ export async function createNotification(
     end: settings.quietHoursEnd,
   });
 
-  const copy = getNotificationCopy({
-    locale: settings.locale,
-    type: request.type,
-    role: request.role,
-    followup: request.followup,
-    delta: request.delta,
-  });
-
   const deliverNow =
     settings.pushEnabled &&
     (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
@@ -161,9 +152,9 @@ export async function createNotification(
     user_id: request.userId,
     promise_id: request.promiseId,
     type: normalizedType,
-    title: copy.title,
-    body: copy.body,
-    cta_label: copy.ctaLabel,
+    title: "",
+    body: "",
+    cta_label: null,
     cta_url: request.ctaUrl,
     priority: request.priority,
     delivered_at: deliverNow ? now.toISOString() : null,
@@ -177,15 +168,15 @@ export async function createNotification(
   if (deliverNow) {
     await sendPush({
       userId: request.userId,
-      title: copy.title,
-      body: copy.body,
+      type: normalizedType,
+      ctaUrl: request.ctaUrl,
     });
   }
 
   return { created: true };
 }
 
-export async function sendPush(payload: { userId: string; title: string; body: string }) {
+export async function sendPush(payload: { userId: string; type: NotificationType; ctaUrl: string }) {
   if (process.env.NODE_ENV !== "production") {
     console.info("[notifications] push stub", payload);
   }
