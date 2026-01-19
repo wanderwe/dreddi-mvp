@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   buildDedupeKey,
   createNotification,
@@ -20,7 +20,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (promise instanceof NextResponse) return promise;
 
     const executorId = resolveExecutorId(promise);
-    if (!executorId || executorId !== user.id) {
+    const counterpartyId = resolveCounterpartyId(promise);
+    if (!executorId || executorId !== user.id || counterpartyId === user.id) {
       return NextResponse.json({ error: "Only the executor can complete" }, { status: 403 });
     }
 
