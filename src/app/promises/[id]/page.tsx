@@ -94,7 +94,7 @@ function ActionButton({
 }) {
   const base =
     "inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
-    "transition select-none focus:outline-none focus:ring-2 focus:ring-white/15 " +
+    "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
     "disabled:opacity-60 disabled:cursor-not-allowed";
 
   const ghost =
