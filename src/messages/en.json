@@ -149,7 +149,6 @@
       "copyLink": "Copy link",
       "regenerate": "Regenerate",
       "openInvite": "Open invite page",
-      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link",
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
@@ -302,7 +301,6 @@
       "declined": "Declined",
       "ignored": "Ignored"
     },
-    "helperNoResponsibility": "No responsibility until you accept.",
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this deal",
     "processing": "Processing...",
@@ -310,7 +308,7 @@
     "decline": "Decline",
     "declinedMessage": "You declined this invite.",
     "ignoredMessage": "This invite expired without a response.",
-    "awaitingCounterparty": "Waiting for the counterparty to respond.",
+    "awaitingCounterparty": "Waiting for the counterparty to respond",
     "publicProposal": {
       "title": "This deal is PUBLIC",
       "body": "If you accept, the deal details will be visible on public profiles"
@@ -407,6 +405,7 @@
     },
     "loading": "Loading notifications…",
     "empty": "No notifications yet",
+    "loadMore": "Load more",
     "markRead": "Mark as read",
     "errors": {
       "unavailable": "Authentication is unavailable in this preview"

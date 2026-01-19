@@ -57,7 +57,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       return NextResponse.json({ error: "Creator cannot decline their own promise" }, { status: 400 });
     }
 
-    if (p.counterparty_id && p.counterparty_id !== userId) {
+    if (!p.counterparty_id || p.counterparty_id !== userId) {
       return NextResponse.json({ error: "Only the counterparty can decline" }, { status: 403 });
     }
 
@@ -76,7 +76,6 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     const { error: updateError } = await admin
       .from("promises")
       .update({
-        counterparty_id: p.counterparty_id ?? userId,
         invite_status: "declined",
         declined_at: nowIso,
       })

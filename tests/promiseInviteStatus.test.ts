@@ -53,14 +53,3 @@ test("canCounterpartyRespond blocks mismatched counterparty", () => {
 
   assert.equal(canRespond, false);
 });
-
-test("canCounterpartyRespond allows response when counterparty is not yet assigned", () => {
-  const canRespond = canCounterpartyRespond({
-    userId: "invitee",
-    creatorId: "creator",
-    counterpartyId: null,
-    inviteStatus: "awaiting_acceptance",
-  });
-
-  assert.equal(canRespond, true);
-});
