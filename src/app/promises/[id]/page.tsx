@@ -596,9 +596,6 @@ export default function PromisePage() {
                     )}
                   </div>
 
-                  <div className="text-xs text-neutral-500">
-                    {t("promises.detail.inviteTip")}
-                  </div>
                 </div>
               )}
             </Card>
