@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { resolveCounterpartyId } from "@/lib/promiseParticipants";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 
@@ -15,7 +15,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (promise instanceof NextResponse) return promise;
 
     const counterpartyId = resolveCounterpartyId(promise);
-    if (!counterpartyId || counterpartyId !== user.id) {
+    const executorId = resolveExecutorId(promise);
+    if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json(
         { error: "Only the counterparty can mark the condition" },
         { status: 403 }
