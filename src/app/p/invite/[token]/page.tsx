@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 type InviteInfo = {
   id: string;
@@ -16,6 +17,7 @@ type InviteInfo = {
   creator_handle: string | null;
   creator_display_name: string | null;
   counterparty_id: string | null;
+  counterparty_accepted_at: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
 };
@@ -75,13 +77,13 @@ export default function InvitePage() {
     if (!shouldAutoAccept || autoAcceptAttempted) return;
     if (!signedIn || !info) return;
 
-    if (info.counterparty_id && userId === info.counterparty_id) {
+    if (isPromiseAccepted(info) && info.counterparty_id && userId === info.counterparty_id) {
       setAutoAcceptAttempted(true);
       router.push("/promises");
       return;
     }
 
-    if (!info.counterparty_id) {
+    if (!isPromiseAccepted(info)) {
       setAutoAcceptAttempted(true);
       if (info.visibility === "public") {
         setShowAcceptModal(true);
@@ -148,6 +150,7 @@ export default function InvitePage() {
 
   const counterCondition = info?.condition_text?.trim();
   const conditionMet = Boolean(info?.condition_met_at);
+  const inviteAccepted = isPromiseAccepted(info);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -203,7 +206,7 @@ export default function InvitePage() {
 
         {info && (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
-            {info.counterparty_id && (
+            {inviteAccepted && (
               <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
                 {info.counterparty_contact
                   ? t("invite.acceptedBy", { name: info.counterparty_contact })
@@ -268,10 +271,10 @@ export default function InvitePage() {
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.statusLabel")}</p>
                 <p className="mt-1 text-lg font-semibold text-white">
-                  {info.counterparty_id ? t("invite.statusAccepted") : t("invite.statusAwaiting")}
+                  {inviteAccepted ? t("invite.statusAccepted") : t("invite.statusAwaiting")}
                 </p>
                 <p className="text-sm text-slate-300">
-                  {info.counterparty_id
+                  {inviteAccepted
                     ? t("invite.statusAcceptedBody")
                     : t("invite.statusAwaitingBody")}
                 </p>
@@ -280,7 +283,7 @@ export default function InvitePage() {
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.nextStep")}</p>
 
-                {info.counterparty_id ? (
+                {inviteAccepted ? (
                   <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
                     <span aria-hidden>✅</span> {t("invite.statusAccepted")}
                   </div>
@@ -310,7 +313,7 @@ export default function InvitePage() {
         )}
       </div>
 
-      {showAcceptModal && info && !info.counterparty_id && (
+      {showAcceptModal && info && !inviteAccepted && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-white">

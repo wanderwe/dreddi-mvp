@@ -9,6 +9,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { stripTrailingPeriod } from "@/lib/text";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 type PromiseRow = {
   id: string;
@@ -196,7 +197,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -370,7 +371,7 @@ export default function PromisePage() {
   );
   const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
-  const isInviteAccepted = Boolean(p?.counterparty_accepted_at ?? (p?.promisor_id && p?.promisee_id));
+  const isInviteAccepted = isPromiseAccepted(p);
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const showPublicStatus = p?.visibility === "public";
