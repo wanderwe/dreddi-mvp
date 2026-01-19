@@ -8,6 +8,7 @@ import {
   mapPriorityForType,
 } from "@/lib/notifications/service";
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
 const HOURS_72 = 72 * 60 * 60 * 1000;
@@ -56,12 +57,6 @@ const getNotificationState = (raw: unknown): PromiseNotificationState => {
     completion_followup_last_at: readString(raw.completion_followup_last_at),
   };
 };
-
-const isAccepted = (row: {
-  counterparty_accepted_at: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-}) => Boolean(row.counterparty_accepted_at ?? (row.promisor_id && row.promisee_id));
 
 export async function POST(req: Request) {
   const secret = process.env.NOTIFICATIONS_CRON_SECRET;
@@ -133,7 +128,7 @@ export async function POST(req: Request) {
     .lte("due_at", dueSoonCutoff);
 
   for (const row of dueSoonRows ?? []) {
-    if (!row.due_at || !isAccepted(row)) continue;
+    if (!row.due_at || !isPromiseAccepted(row)) continue;
     const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
     const executorId = resolveExecutorId(row);
@@ -171,7 +166,7 @@ export async function POST(req: Request) {
     .lt("due_at", nowIso);
 
   for (const row of overdueRows ?? []) {
-    if (!row.due_at || !isAccepted(row)) continue;
+    if (!row.due_at || !isPromiseAccepted(row)) continue;
     const executorId = resolveExecutorId(row);
     if (!executorId) continue;
     const state = getNotificationState(row.promise_notification_state);

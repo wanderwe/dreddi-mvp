@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import {
   buildDedupeKey,
   createNotification,
@@ -25,11 +26,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Only the executor can complete" }, { status: 403 });
     }
 
-    const acceptedBySecondSide = Boolean(
-      promise.counterparty_accepted_at ?? (promise.promisor_id && promise.promisee_id)
-    );
-
-    if (!acceptedBySecondSide) {
+    if (!isPromiseAccepted(promise)) {
       return NextResponse.json({ error: "PROMISE_NOT_ACCEPTED" }, { status: 400 });
     }
 

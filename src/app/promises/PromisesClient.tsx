@@ -11,6 +11,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 type PromiseRow = {
   id: string;
@@ -52,9 +53,7 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
     ...row,
     status: row.status as PromiseStatus,
     role,
-    acceptedBySecondSide: Boolean(
-      row.counterparty_accepted_at ?? (row.promisor_id && row.promisee_id)
-    ),
+    acceptedBySecondSide: isPromiseAccepted(row),
   };
 };
 
