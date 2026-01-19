@@ -182,7 +182,7 @@ export default function NotificationsClient() {
                       <Link
                         href={ctaUrl}
                         onClick={() => unread && void markAsRead(row.id)}
-                        className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                        className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                       >
                         {ctaLabel}
                       </Link>
@@ -191,7 +191,7 @@ export default function NotificationsClient() {
                       <button
                         type="button"
                         onClick={() => void markAsRead(row.id)}
-                        className="text-xs text-emerald-200 hover:text-emerald-100"
+                        className="cursor-pointer text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                       >
                         {t("notifications.markRead")}
                       </button>
