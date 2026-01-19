@@ -18,10 +18,14 @@ export type LandingCopy = {
     description: string;
   };
   useDreddi: {
+    label: string;
     title: string;
+    lead: string;
+    triggersTitle: string;
     bullets: string[];
     scenariosTitle: string;
     scenarios: string[];
+    noteTitle: string;
     framing: string;
   };
   cta: {
@@ -85,7 +89,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Dreddi — сервіс між словами і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску —\nале з реальними наслідками для довіри.",
     },
     useDreddi: {
+      label: "Сценарії використання",
       title: "Коли варто використовувати Dreddi",
+      lead:
+        "Сигнали, що домовленість уже потребує фіксації, навіть якщо контракт ще попереду.",
+      triggersTitle: "Коли фіксувати домовленість",
       bullets: [
         "Ви погодили дедлайни, але нічого не підписано",
         "На кону гроші, час або репутація",
@@ -100,8 +108,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Підрядники та довгі проєкти",
         "Пілотні проєкти / тестова співпраця",
       ],
+      noteTitle: "Не для всього.",
       framing:
-        "Не для всього.\nДля домовленостей, де ще рано для контрактів,\nале вже занадто ризиковано покладатися лише на слова.",
+        "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -182,7 +191,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure —\nbut with real consequences for trust.",
     },
     useDreddi: {
+      label: "Use cases",
       title: "Use Dreddi when",
+      lead:
+        "Signals that an agreement should be captured, even before contracts enter the picture.",
+      triggersTitle: "Capture it when",
       bullets: [
         "You agree on deadlines, but nothing is signed yet",
         "Money, time, or reputation is at stake",
@@ -197,8 +210,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Contractors & long-term jobs",
         "Pilot projects / test collaborations",
       ],
+      noteTitle: "Not for everything.",
       framing:
-        "Not for everything.\nFor agreements where it’s too early for contracts,\nbut already too risky to rely on words.",
+        "For agreements where it’s too early for contracts but already too risky to rely on words.",
     },
     cta: {
       getStarted: "Create a deal",
