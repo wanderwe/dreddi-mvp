@@ -35,8 +35,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const promise = await loadPromiseForUser(id, user.id);
     if (promise instanceof NextResponse) return promise;
 
+    const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
-    if (!counterpartyId || counterpartyId !== user.id) {
+    if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json({ error: "Only the counterparty can dispute" }, { status: 403 });
     }
 
@@ -84,15 +85,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: message }, { status: 500 });
     }
 
-    const executorId = resolveExecutorId(updatedPromise);
-    if (executorId) {
+    const finalExecutorId = resolveExecutorId(updatedPromise);
+    if (finalExecutorId) {
       const delta = calc_score_impact({
         status: updatedPromise.status,
         due_at: updatedPromise.due_at,
         completed_at: updatedPromise.completed_at,
       });
       await createNotification(admin, {
-        userId: executorId,
+        userId: finalExecutorId,
         promiseId: updatedPromise.id,
         type: "dispute",
         role: "executor",

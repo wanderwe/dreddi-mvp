@@ -6,6 +6,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 
 type PromiseRow = {
   id: string;
@@ -16,6 +17,8 @@ type PromiseRow = {
   creator_id: string;
   creator_display_name: string | null;
   counterparty_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
 };
@@ -28,6 +31,7 @@ export default function ConfirmPromisePage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [promise, setPromise] = useState<PromiseRow | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<"confirm" | "dispute" | null>(null);
@@ -76,6 +80,7 @@ export default function ConfirmPromisePage() {
         router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm`)}`);
         return;
       }
+      setUserId(data.session.user.id);
 
       const res = await fetch(`/api/promises/${params.id}`, {
         headers: {
@@ -115,6 +120,14 @@ export default function ConfirmPromisePage() {
     if (status === "active") return t("promises.confirm.statusNote.active");
     return null;
   }
+
+  const executorId = promise ? resolveExecutorId(promise) : null;
+  const counterpartyId = promise ? resolveCounterpartyId(promise) : null;
+  const isExecutor = Boolean(userId && executorId && userId === executorId);
+  const isCounterparty = Boolean(
+    userId && counterpartyId && userId === counterpartyId && !isExecutor
+  );
+  const canReview = Boolean(promise && promise.status === "completed_by_promisor" && isCounterparty);
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
@@ -274,7 +287,7 @@ export default function ConfirmPromisePage() {
                 </div>
               )}
 
-              {promise.status === "completed_by_promisor" ? (
+              {canReview ? (
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
                     type="button"

@@ -7,11 +7,20 @@ export type PromiseParticipants = {
 
 export function resolveExecutorId(record: PromiseParticipants): string | null {
   if (record.promisor_id) return record.promisor_id;
-  if (record.promisee_id) return null;
+  if (record.promisee_id) {
+    if (record.counterparty_id && record.counterparty_id !== record.promisee_id) {
+      return record.counterparty_id;
+    }
+    return null;
+  }
   return record.creator_id;
 }
 
 export function resolveCounterpartyId(record: PromiseParticipants): string | null {
   if (record.promisee_id) return record.promisee_id;
+  if (record.promisor_id && record.counterparty_id) {
+    if (record.promisor_id === record.creator_id) return record.counterparty_id;
+    if (record.promisor_id === record.counterparty_id) return record.creator_id;
+  }
   return record.counterparty_id ?? null;
 }

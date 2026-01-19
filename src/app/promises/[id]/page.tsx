@@ -365,7 +365,9 @@ export default function PromisePage() {
   const executorId = p ? resolveExecutorId(p) : null;
   const counterpartyId = p ? resolveCounterpartyId(p) : null;
   const isExecutor = Boolean(userId && executorId && userId === executorId);
-  const isCounterparty = Boolean(userId && counterpartyId && userId === counterpartyId);
+  const isCounterparty = Boolean(
+    userId && counterpartyId && userId === counterpartyId && !isExecutor
+  );
   const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
   const isInviteAccepted = Boolean(p?.counterparty_accepted_at ?? (p?.promisor_id && p?.promisee_id));
