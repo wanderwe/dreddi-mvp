@@ -345,7 +345,6 @@ export default function InvitePage() {
                     ? t("invite.statusAwaitingBody")
                     : t("invite.statusClosedBody")}
                 </p>
-                <p className="mt-2 text-xs text-slate-400">{t("invite.helperNoResponsibility")}</p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
