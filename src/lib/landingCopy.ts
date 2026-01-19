@@ -17,6 +17,13 @@ export type LandingCopy = {
     headline: string;
     description: string;
   };
+  useDreddi: {
+    title: string;
+    bullets: string[];
+    scenariosTitle: string;
+    scenarios: string[];
+    framing: string;
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -76,6 +83,25 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "Домовленість починається з підтвердження.",
       description:
         "Dreddi — сервіс між словами і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску —\nале з реальними наслідками для довіри.",
+    },
+    useDreddi: {
+      title: "Коли варто використовувати Dreddi",
+      bullets: [
+        "Ви погодили дедлайни, але нічого не підписано",
+        "На кону гроші, час або репутація",
+        "Ви чуєте «давайте поки просто домовимось»",
+        "Ви ще не хочете юристів — але й хаосу теж",
+      ],
+      scenariosTitle: "Типові сценарії",
+      scenarios: [
+        "Фріланс і послуги до контрактів",
+        "Партнерства на ранніх етапах",
+        "Переговори з нерухомості",
+        "Підрядники та довгі проєкти",
+        "Пілотні проєкти / тестова співпраця",
+      ],
+      framing:
+        "Не для всього.\nДля домовленостей, де ще рано для контрактів,\nале вже занадто ризиковано покладатися лише на слова.",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -154,6 +180,25 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "An agreement starts with confirmation.",
       description:
         "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure —\nbut with real consequences for trust.",
+    },
+    useDreddi: {
+      title: "Use Dreddi when",
+      bullets: [
+        "You agree on deadlines, but nothing is signed yet",
+        "Money, time, or reputation is at stake",
+        "You hear “let’s just agree for now”",
+        "You don’t want lawyers yet — but don’t want chaos either",
+      ],
+      scenariosTitle: "Typical scenarios",
+      scenarios: [
+        "Freelance & services before contracts",
+        "Early-stage partnerships",
+        "Real estate negotiations",
+        "Contractors & long-term jobs",
+        "Pilot projects / test collaborations",
+      ],
+      framing:
+        "Not for everything.\nFor agreements where it’s too early for contracts,\nbut already too risky to rely on words.",
     },
     cta: {
       getStarted: "Create a deal",

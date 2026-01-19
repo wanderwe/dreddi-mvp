@@ -559,6 +559,34 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <div className="grid gap-10 rounded-3xl border border-white/10 bg-white/5 px-6 py-10 shadow-inner shadow-black/30 md:grid-cols-2 md:px-10">
+          <div className="space-y-4">
+            <p className="text-lg font-semibold text-white">{copy.useDreddi.title}</p>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {copy.useDreddi.bullets.map((item) => (
+                <li key={item} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-emerald-300/70" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="space-y-4">
+            <p className="text-lg font-semibold text-white">{copy.useDreddi.scenariosTitle}</p>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {copy.useDreddi.scenarios.map((item) => (
+                <li key={item} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-emerald-300/70" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-slate-400">{renderMultiline(copy.useDreddi.framing)}</p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
