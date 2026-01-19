@@ -9,7 +9,11 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { stripTrailingPeriod } from "@/lib/text";
-import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import {
+  getPromiseInviteStatus,
+  isPromiseAccepted,
+  InviteStatus,
+} from "@/lib/promiseAcceptance";
 
 type PromiseRow = {
   id: string;
@@ -26,6 +30,11 @@ type PromiseRow = {
   invite_token: string | null;
   counterparty_id: string | null;
   counterparty_accepted_at: string | null;
+  invite_status: InviteStatus | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -197,7 +206,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -371,6 +380,7 @@ export default function PromisePage() {
   );
   const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
+  const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
@@ -414,14 +424,14 @@ export default function PromisePage() {
               )}
 
               <div className="text-sm text-neutral-400">
-                {t("promises.detail.acceptedBySecondSide")}:{" "}
+                {t("promises.detail.inviteStatusLabel")}:{" "}
                 <span
                   className={
                     "text-sm font-medium " +
-                    (isInviteAccepted ? "text-emerald-300" : "text-neutral-200")
+                    (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
                   }
                 >
-                  {isInviteAccepted ? t("promises.detail.yes") : t("promises.detail.no")}
+                  {t(`promises.inviteStatus.${inviteStatus}`)}
                 </span>
               </div>
 
@@ -484,7 +494,9 @@ export default function PromisePage() {
                   />
                 ) : (
                   <div className="text-sm text-neutral-400">
-                    {stripTrailingPeriod(t("promises.detail.shareInvite"))}
+                    {inviteStatus === "awaiting_acceptance"
+                      ? stripTrailingPeriod(t("promises.detail.shareInvite"))
+                      : t(`promises.inviteStatus.${inviteStatus}`)}
                   </div>
                 )
               )}

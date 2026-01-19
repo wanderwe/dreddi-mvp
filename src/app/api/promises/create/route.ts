@@ -78,6 +78,11 @@ export async function POST(req: Request) {
       status: "active",
       invite_token: inviteToken,
       counterparty_id: counterpartyId,
+      invite_status: "awaiting_acceptance",
+      invited_at: new Date().toISOString(),
+      accepted_at: null,
+      declined_at: null,
+      ignored_at: null,
       visibility,
     };
 

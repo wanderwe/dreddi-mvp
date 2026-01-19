@@ -120,6 +120,7 @@
       "loading": "Loading…",
       "cardTitle": "Deal",
       "acceptedBySecondSide": "Accepted by second side",
+      "inviteStatusLabel": "Invite status",
       "yes": "Yes",
       "no": "No",
       "counterparty": "Counterparty",
@@ -172,6 +173,12 @@
         "updateStatus": "Could not update status",
         "copyClipboard": "Could not copy to clipboard"
       }
+    },
+    "inviteStatus": {
+      "awaiting_acceptance": "Awaiting acceptance",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "ignored": "Ignored"
     },
     "confirm": {
       "back": "Back to deals",
@@ -288,10 +295,22 @@
     "statusAwaiting": "Awaiting acceptance",
     "statusAcceptedBody": "This deal is ready—jump into your dashboard to follow progress",
     "statusAwaitingBody": "Accept to join the deal and it will appear in your dashboard",
+    "statusClosedBody": "This invite is no longer active",
+    "status": {
+      "awaiting_acceptance": "Awaiting acceptance",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "ignored": "Ignored"
+    },
+    "helperNoResponsibility": "No responsibility until you accept.",
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this deal",
     "processing": "Processing...",
     "accept": "Accept deal",
+    "decline": "Decline",
+    "declinedMessage": "You declined this invite.",
+    "ignoredMessage": "This invite expired without a response.",
+    "awaitingCounterparty": "Waiting for the counterparty to respond.",
     "publicProposal": {
       "title": "This deal is PUBLIC",
       "body": "If you accept, the deal details will be visible on public profiles"
@@ -306,7 +325,8 @@
     "noDeadline": "No deadline",
     "errors": {
       "notFound": "Invite not found or expired",
-      "acceptFailed": "Accept failed"
+      "acceptFailed": "Accept failed",
+      "declineFailed": "Decline failed"
     }
   },
   "auth": {
