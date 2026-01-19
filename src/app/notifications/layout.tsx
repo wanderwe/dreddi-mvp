@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function NotificationsLayout({ children }: { children: React.ReactNode }) {
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const pathname = usePathname();
+  const mockMode = isMockAuthEnabled();
   useEffect(() => {
     let active = true;
+
+    if (mockMode) {
+      setSupabaseError(null);
+      return () => {
+        active = false;
+      };
+    }
 
     const syncSession = async () => {
       let supabase;
@@ -57,7 +66,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
       active = false;
       subscription?.data.subscription.unsubscribe();
     };
-  }, [pathname]);
+  }, [pathname, mockMode]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -68,7 +77,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
       />
 
       <main className="relative">
-        {supabaseError ? (
+        {supabaseError && !mockMode ? (
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-16 text-center text-slate-200">
             <h1 className="text-3xl font-semibold text-white">Authentication unavailable</h1>
             <p className="text-sm text-slate-300">{supabaseError}</p>
