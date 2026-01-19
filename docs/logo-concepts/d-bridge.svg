@@ -1,0 +1,5 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="D bridge logo concept">
+  <rect width="128" height="128" fill="none" />
+  <path d="M28 48 H64 C86 48 100 62 100 80 C100 98 86 112 64 112 H28" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" />
+  <path d="M28 48 L48 68 L28 88" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

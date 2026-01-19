@@ -9,8 +9,10 @@ Some Git clients (including GitHub mobile/PR views) do not render SVG images inl
 Use one of the options below:
 
 1. Open the preview page locally (no Python required):
-   - `npx --yes http-server docs -p 8000`
-   - visit `http://localhost:8000/` (auto-redirects to the preview)
+   - in PowerShell, first go to the repo root (example): `cd C:\\projects\\dreddi-mvp`
+   - run `npx --yes http-server .\\docs -p 8000`
+   - open `http://127.0.0.1:8000/logo-concepts-preview.html`
+   - if you see a directory listing, click `logo-concepts-preview.html`
 2. Open any SVG file directly in the repo:
    - `docs/logo-concepts/confirmed-node.svg`
    - `docs/logo-concepts/agreement-fold.svg`
@@ -25,3 +27,8 @@ Use one of the options below:
 | Outcome Mark | ![Outcome Mark](./logo-concepts/outcome-mark.svg) | Angular mark resolves into a solid corner block (recorded outcome). |
 | Dual Trace | ![Dual Trace](./logo-concepts/dual-trace.svg) | Two traces converge into a single signal line. |
 | Anchor Frame | ![Anchor Frame](./logo-concepts/anchor-frame.svg) | Minimal frame with a reinforced corner. |
+| Double-D Seal | ![Double-D Seal](./logo-concepts/double-d-seal.svg) | Overlapping D arcs form a compact, confident seal. |
+| D-Mark | ![D-Mark](./logo-concepts/d-mark.svg) | Geometric D as a clean confirmation mark. |
+| Twin Rail D | ![Twin Rail D](./logo-concepts/twin-rail-d.svg) | Parallel rails forming a restrained D silhouette. |
+| D-Imprint | ![D-Imprint](./logo-concepts/d-imprint.svg) | D shape as an imprint inside a stable frame. |
+| D-Bridge | ![D-Bridge](./logo-concepts/d-bridge.svg) | D as a bridge between two sides. |
