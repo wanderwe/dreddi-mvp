@@ -33,7 +33,7 @@ export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label="Open menu"
-          className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
+          className="flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
         >
           <span className="flex h-5 w-5 flex-col items-center justify-center gap-1">
             <span className="h-0.5 w-5 rounded-full bg-white" />
