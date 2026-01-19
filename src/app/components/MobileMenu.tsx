@@ -54,6 +54,11 @@ export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
+                  <Link className={baseLinkClasses} href="/u">
+                    {t("nav.publicProfiles")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
                   <Link className={baseLinkClasses} href="/notifications">
                     {t("nav.notifications")}
                   </Link>
