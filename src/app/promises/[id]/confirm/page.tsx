@@ -293,7 +293,7 @@ export default function ConfirmPromisePage() {
                     type="button"
                     onClick={onConfirm}
                     disabled={actionBusy !== null}
-                    className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
                   >
                     {actionBusy === "confirm" ? t("promises.confirm.confirming") : t("promises.confirm.confirm")}
                   </button>
@@ -302,7 +302,7 @@ export default function ConfirmPromisePage() {
                     type="button"
                     onClick={() => setShowDispute(true)}
                     disabled={actionBusy !== null}
-                    className="inline-flex items-center justify-center rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-100 shadow-lg shadow-red-900/30 transition hover:bg-red-500/20 disabled:opacity-60"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-100 shadow-lg shadow-red-900/30 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:bg-red-500/10"
                   >
                     {actionBusy === "dispute" ? t("promises.confirm.sending") : t("promises.confirm.dispute")}
                   </button>
@@ -322,7 +322,7 @@ export default function ConfirmPromisePage() {
               <button
                 type="button"
                 onClick={() => setShowDispute(false)}
-                className="absolute right-4 top-4 text-slate-400 hover:text-white"
+                className="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 ✕
               </button>
@@ -374,14 +374,14 @@ export default function ConfirmPromisePage() {
                   type="button"
                   onClick={onDispute}
                   disabled={actionBusy !== null || disputeDisabled}
-                  className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/25 transition hover:translate-y-[-1px] hover:shadow-amber-400/40 disabled:opacity-60"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/25 transition hover:translate-y-[-1px] hover:shadow-amber-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
                 >
                   {actionBusy === "dispute" ? t("promises.confirm.submitting") : t("promises.confirm.submitDispute")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDispute(false)}
-                  className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/10"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                 >
                   {t("promises.confirm.cancel")}
                 </button>
