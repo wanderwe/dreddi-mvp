@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function PromisesLayout({ children }: { children: React.ReactNode }) {
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const pathname = usePathname();
+  const mockMode = isMockAuthEnabled();
   useEffect(() => {
     let active = true;
+
+    if (mockMode) {
+      setSupabaseError(null);
+      return () => {
+        active = false;
+      };
+    }
 
     const syncSession = async () => {
       let supabase;
@@ -57,7 +66,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
       active = false;
       subscription?.data.subscription.unsubscribe();
     };
-  }, [pathname]);
+  }, [pathname, mockMode]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
@@ -65,7 +74,7 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]" aria-hidden />
 
       <main className="relative">
-        {supabaseError ? (
+        {supabaseError && !mockMode ? (
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-16 text-center text-slate-200">
             <h1 className="text-3xl font-semibold text-white">Authentication unavailable</h1>
             <p className="text-sm text-slate-300">{supabaseError}</p>

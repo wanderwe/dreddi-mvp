@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -69,7 +69,7 @@ function DealRow({ item, href, metaText, statusLabels, statusTones }: DealRowPro
 export default function Home() {
   const locale = useLocale();
   const t = useT();
-  const copy = getLandingCopy(locale);
+  const copy = useMemo(() => getLandingCopy(locale), [locale]);
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
@@ -78,14 +78,18 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
-  const now = new Date();
-  const nextSaturday = new Date(now);
-  const daysUntilSaturday = (6 - nextSaturday.getDay() + 7) % 7;
-  nextSaturday.setDate(nextSaturday.getDate() + daysUntilSaturday);
-  nextSaturday.setHours(0, 0, 0, 0);
-  const nextMarchFirst = new Date(now.getFullYear() + 1, 2, 1);
-  nextMarchFirst.setHours(0, 0, 0, 0);
+  const { nextSaturday, nextMarchFirst } = useMemo(() => {
+    const now = new Date();
+    const upcomingSaturday = new Date(now);
+    const daysUntilSaturday = (6 - upcomingSaturday.getDay() + 7) % 7;
+    upcomingSaturday.setDate(upcomingSaturday.getDate() + daysUntilSaturday);
+    upcomingSaturday.setHours(0, 0, 0, 0);
+    const upcomingMarchFirst = new Date(now.getFullYear() + 1, 2, 1);
+    upcomingMarchFirst.setHours(0, 0, 0, 0);
+    return { nextSaturday: upcomingSaturday, nextMarchFirst: upcomingMarchFirst };
+  }, []);
 
   const defaultDueHour = 18;
   const defaultDueMinute = 0;
@@ -96,22 +100,26 @@ export default function Home() {
     return localDate.toISOString();
   };
 
-  const demoDeals: DealRow[] = copy.demoDeals.map((deal) => {
-    const due_at =
-      deal.dueDate === "nextSaturday"
-        ? toIsoDateTime(nextSaturday)
-        : deal.dueDate === "nextMarchFirst"
-        ? toIsoDateTime(nextMarchFirst)
-        : null;
+  const demoDeals: DealRow[] = useMemo(
+    () =>
+      copy.demoDeals.map((deal) => {
+        const due_at =
+          deal.dueDate === "nextSaturday"
+            ? toIsoDateTime(nextSaturday)
+            : deal.dueDate === "nextMarchFirst"
+            ? toIsoDateTime(nextMarchFirst)
+            : null;
 
-    return {
-      id: deal.id,
-      title: deal.title,
-      status: deal.status,
-      due_at,
-      created_at: new Date().toISOString(),
-    };
-  });
+        return {
+          id: deal.id,
+          title: deal.title,
+          status: deal.status,
+          due_at,
+          created_at: new Date().toISOString(),
+        };
+      }),
+    [copy, nextSaturday, nextMarchFirst]
+  );
 
   const statusLabels: Record<PromiseStatus, string> = {
     active: copy.recentDeals.status.active,
@@ -173,7 +181,7 @@ export default function Home() {
 
     void syncSession();
 
-    if (isMockAuthEnabled() || !client) {
+    if (mockMode || !client) {
       return () => {
         active = false;
       };
@@ -189,13 +197,20 @@ export default function Home() {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [mockMode]);
 
   useEffect(() => {
     let cancelled = false;
     const client = supabase;
 
     const loadRecentDeals = async () => {
+      if (mockMode) {
+        setRecentDeals(demoDeals);
+        setRecentError(null);
+        setRecentLoading(false);
+        return;
+      }
+
       if (!client) {
         setRecentDeals([]);
         setRecentError(null);
@@ -260,13 +275,20 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [email]);
+  }, [email, mockMode, demoDeals]);
 
   useEffect(() => {
     let cancelled = false;
     const client = supabase;
 
     const loadReputation = async () => {
+      if (mockMode) {
+        setReputation(null);
+        setReputationError(null);
+        setReputationLoading(false);
+        return;
+      }
+
       if (!client) {
         setReputation(null);
         setReputationError(null);
@@ -319,7 +341,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [email]);
+  }, [email, mockMode]);
 
   const rep = reputation?.reputation;
   const score = rep?.score ?? 50;
