@@ -1,0 +1,5 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Confirmed node logo concept">
+  <rect width="128" height="128" fill="none" />
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" stroke-dasharray="220 30" transform="rotate(-25 64 64)" />
+  <circle cx="64" cy="64" r="14" fill="#0f172a" />
+</svg>

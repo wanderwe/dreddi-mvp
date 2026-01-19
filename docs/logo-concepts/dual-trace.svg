@@ -1,0 +1,7 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dual trace logo concept">
+  <rect width="128" height="128" fill="none" />
+  <path d="M24 40 L64 80" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" />
+  <path d="M24 88 L64 80" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" />
+  <path d="M64 80 L104 80" fill="none" stroke="#0f172a" stroke-width="10" stroke-linecap="round" />
+  <circle cx="104" cy="80" r="8" fill="#0f172a" />
+</svg>
