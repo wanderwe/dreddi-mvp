@@ -11,6 +11,7 @@ import { NewDealButton } from "@/app/components/NewDealButton";
 import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import {
@@ -94,15 +95,21 @@ export function AppHeader() {
                   <Link className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </Link>
-                  <NewDealButton label={t("nav.newPromise")} />
+                  <Tooltip label={t("nav.newPromise")}>
+                    <NewDealButton label={t("nav.newPromise")} variant="icon" />
+                  </Tooltip>
                 </div>
                 <div className="ml-auto flex items-center gap-3">
-                  <IconButton
-                    href="/u"
-                    ariaLabel={t("nav.publicProfiles")}
-                    icon={<UsersRound className="h-4 w-4" aria-hidden />}
-                  />
-                  <NotificationBell />
+                  <Tooltip label={t("nav.publicProfiles")}>
+                    <IconButton
+                      href="/u"
+                      ariaLabel={t("nav.publicProfiles")}
+                      icon={<UsersRound className="h-4 w-4" aria-hidden />}
+                    />
+                  </Tooltip>
+                  <Tooltip label={t("nav.notifications")}>
+                    <NotificationBell />
+                  </Tooltip>
                   <LocaleSwitcher />
                   <ProfileSettingsMenu />
                 </div>

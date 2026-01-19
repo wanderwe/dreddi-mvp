@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Locale, locales } from "@/lib/i18n/locales";
-import { useLocale } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 
 export function LocaleSwitcher({ className }: { className?: string }) {
   const router = useRouter();
   const locale = useLocale();
+  const t = useT();
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -70,16 +72,18 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     <div className={className}>
       <div className="flex items-center gap-2">
         {nextLocale && (
-          <IconButton
-            onClick={() => void updateLocale(nextLocale)}
-            disabled={busy}
-            ariaLabel={`Switch to ${nextLocale.toUpperCase()}`}
-            icon={
-              <span className="text-[11px] font-semibold uppercase tracking-wide">
-                {nextLocale.toUpperCase()}
-              </span>
-            }
-          />
+          <Tooltip label={t("nav.switchLanguage")} placement="bottom-right">
+            <IconButton
+              onClick={() => void updateLocale(nextLocale)}
+              disabled={busy}
+              ariaLabel={t("nav.switchLanguage")}
+              icon={
+                <span className="text-[11px] font-semibold uppercase tracking-wide">
+                  {nextLocale.toUpperCase()}
+                </span>
+              }
+            />
+          </Tooltip>
         )}
       </div>
       {toast && (

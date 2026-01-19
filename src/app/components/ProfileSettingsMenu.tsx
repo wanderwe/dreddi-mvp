@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n/I18nProvider";
 import { SettingRow } from "@/app/components/SettingRow";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { TimePicker } from "@/app/components/ui/TimePicker";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import {
   Sheet,
   SheetClose,
@@ -564,25 +565,28 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
   const t = useT();
   const [open, setOpen] = useState(false);
 
-  const trigger =
-    variant === "icon" ? (
-      <IconButton
-        ariaLabel={t("profileSettings.buttonLabel")}
-        icon={<UserRound className="h-4 w-4" aria-hidden />}
-        className={className}
-      />
-    ) : (
-      <button
-        type="button"
-        className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 ${className}`}
-      >
-        {t("profileSettings.buttonLabel")}
-      </button>
-    );
-
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
+      {variant === "icon" ? (
+        <Tooltip label={t("profileSettings.buttonLabel")} placement="bottom-right">
+          <SheetTrigger asChild>
+            <IconButton
+              ariaLabel={t("profileSettings.buttonLabel")}
+              icon={<UserRound className="h-4 w-4" aria-hidden />}
+              className={className}
+            />
+          </SheetTrigger>
+        </Tooltip>
+      ) : (
+        <SheetTrigger asChild>
+          <button
+            type="button"
+            className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 ${className}`}
+          >
+            {t("profileSettings.buttonLabel")}
+          </button>
+        </SheetTrigger>
+      )}
       <SheetPortal>
         <SheetOverlay />
         <SheetContent className="flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-auto lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
