@@ -29,6 +29,7 @@ export default function NewPromisePage() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
+  const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -49,6 +50,7 @@ export default function NewPromisePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
+  const shouldShowCondition = showCondition || conditionText.trim().length > 0;
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -571,17 +573,29 @@ export default function NewPromisePage() {
               />
             </label>
 
-            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.condition")}
-              </span>
-              <textarea
-                className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                placeholder={t("promises.new.placeholders.condition")}
-                value={conditionText}
-                onChange={(e) => setConditionText(e.target.value)}
-              />
-            </label>
+            {!shouldShowCondition ? (
+              <div className="sm:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCondition(true)}
+                  className="inline-flex items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                >
+                  {t("promises.new.actions.addCondition")}
+                </button>
+              </div>
+            ) : (
+              <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.fields.condition")}
+                </span>
+                <textarea
+                  className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                  placeholder={t("promises.new.placeholders.condition")}
+                  value={conditionText}
+                  onChange={(e) => setConditionText(e.target.value)}
+                />
+              </label>
+            )}
 
             <div className="sm:col-span-2">
               <div className="grid items-start gap-4 sm:grid-cols-2">
