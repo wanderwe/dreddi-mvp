@@ -251,6 +251,7 @@
         "dueDate": "Select date (optional)"
       },
       "actions": {
+        "addCondition": "+ Add counter-condition",
         "clearDate": "Clear date",
         "changeTime": "Change time",
         "selectTime": "Select time",

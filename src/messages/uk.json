@@ -259,6 +259,7 @@
         "dueDate": "Оберіть дату (опціонально)"
       },
       "actions": {
+        "addCondition": "+ Додати контрумову",
         "clearDate": "Очистити дату",
         "changeTime": "Змінити час",
         "selectTime": "Оберіть час",
