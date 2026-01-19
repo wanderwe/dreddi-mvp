@@ -1,6 +1,7 @@
 {
   "nav": {
     "myPromises": "My deals",
+    "publicProfiles": "Public profiles",
     "newPromise": "New deal",
     "login": "Sign in",
     "getStarted": "Get started",

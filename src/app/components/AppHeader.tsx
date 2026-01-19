@@ -70,6 +70,9 @@ export function AppHeader() {
                 <Link className={linkBaseClasses} href="/promises">
                   {t("nav.myPromises")}
                 </Link>
+                <Link className={linkBaseClasses} href="/u">
+                  {t("nav.publicProfiles")}
+                </Link>
                 <NewDealButton label={t("nav.newPromise")} />
                 <NotificationBell />
                 <ProfileSettingsMenu />
