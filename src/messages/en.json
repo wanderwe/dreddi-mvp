@@ -149,7 +149,6 @@
       "copyLink": "Copy link",
       "regenerate": "Regenerate",
       "openInvite": "Open invite page",
-      "inviteTip": "Tip: open the invite in Incognito to test another user. Regenerating invalidates the old link",
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
