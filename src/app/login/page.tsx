@@ -95,10 +95,6 @@ export default function LoginPage() {
               <p className="text-slate-300">
                 {stripTrailingPeriod(t("auth.login.subtitle"))}
               </p>
-              <div className="flex items-center gap-2 text-xs text-emerald-200/80">
-                <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
-                <span>{t("auth.login.secure")}</span>
-              </div>
             </div>
             <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           </div>
@@ -117,27 +113,32 @@ export default function LoginPage() {
             </label>
 
             <button
-              onClick={signInWithGoogle}
-              disabled={oauthBusy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-white/20 transition hover:translate-y-[-1px] hover:shadow-white/30 disabled:translate-y-0 disabled:opacity-60"
+              onClick={sendMagicLink}
+              disabled={busy || !email || oauthBusy}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:bg-emerald-300 hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60"
             >
-              {oauthBusy
-                ? t("auth.login.googleSigningIn")
-                : t("auth.login.googleCta")}
+              {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
             </button>
 
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+            <div className="flex items-center gap-2 text-xs text-emerald-200/80">
+              <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
+              <span>{t("auth.login.secure")}</span>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
               <span className="h-px flex-1 bg-white/10" />
               <span>{t("auth.login.or")}</span>
               <span className="h-px flex-1 bg-white/10" />
             </div>
 
             <button
-              onClick={sendMagicLink}
-              disabled={busy || !email || oauthBusy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-transparent px-4 py-3 text-base font-semibold text-emerald-200 transition hover:border-emerald-300/70 hover:text-emerald-100 disabled:opacity-60"
+              onClick={signInWithGoogle}
+              disabled={oauthBusy}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10 disabled:opacity-60"
             >
-              {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
+              {oauthBusy
+                ? t("auth.login.googleSigningIn")
+                : t("auth.login.googleCta")}
             </button>
 
             {sent && (
