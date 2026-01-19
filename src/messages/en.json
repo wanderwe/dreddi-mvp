@@ -243,10 +243,10 @@
       "placeholders": {
         "title": "Short summary of the deal",
         "details": "Details (optional)",
-        "condition": "Execution becomes possible after…",
+        "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "Counterparty email or phone",
         "counterpartyOther": "Counterparty email or phone",
-        "dueDate": "Select date"
+        "dueDate": "Select date (optional)"
       },
       "actions": {
         "clearDate": "Clear date",
