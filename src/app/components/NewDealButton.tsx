@@ -22,12 +22,14 @@ export function NewDealButton({
         href="/promises/new"
         ariaLabel={label}
         className={[
-          "bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30 hover:bg-emerald-300 hover:text-slate-950 border-emerald-300/60",
+          "bg-emerald-400 text-slate-50 shadow-lg shadow-emerald-500/30 hover:bg-emerald-300 hover:text-slate-50 focus-visible:text-slate-50 active:text-slate-50 border-emerald-300/60",
           className,
         ]
           .filter(Boolean)
           .join(" ")}
-        icon={<Plus className="h-5 w-5" strokeWidth={2.5} aria-hidden />}
+        icon={
+          <Plus className="h-5 w-5 text-slate-50 opacity-100" strokeWidth={2.5} aria-hidden />
+        }
       />
     );
   }
