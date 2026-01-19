@@ -24,9 +24,20 @@ const MOCK_EMAIL = "mock.user@example.com";
 const MOCK_HANDLE = "mock-user";
 const MOCK_DISPLAY_NAME = "Mock User";
 
-export const isMockAuthEnabled = () =>
+const getVercelEnv = () => process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.VERCEL_ENV;
+
+const isPreviewEnv = () => getVercelEnv() === "preview";
+
+export const isMockAuthEnabled = () => {
+  const mockFlagEnabled = process.env.NEXT_PUBLIC_MOCK_AUTH === "true";
+
+  if (isPreviewEnv()) {
+    return true;
+  }
+
   // for design/dev preview only
-  process.env.NEXT_PUBLIC_MOCK_AUTH === "true" && process.env.NODE_ENV !== "production";
+  return mockFlagEnabled && process.env.NODE_ENV !== "production";
+};
 
 export const buildAuthState = (user: AuthUser | null): AuthState => ({
   user,
