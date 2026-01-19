@@ -301,7 +301,6 @@
       "declined": "Declined",
       "ignored": "Ignored"
     },
-    "helperNoResponsibility": "No responsibility until you accept.",
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this deal",
     "processing": "Processing...",
@@ -309,7 +308,7 @@
     "decline": "Decline",
     "declinedMessage": "You declined this invite.",
     "ignoredMessage": "This invite expired without a response.",
-    "awaitingCounterparty": "Waiting for the counterparty to respond.",
+    "awaitingCounterparty": "Waiting for the counterparty to respond",
     "publicProposal": {
       "title": "This deal is PUBLIC",
       "body": "If you accept, the deal details will be visible on public profiles"
