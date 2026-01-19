@@ -57,7 +57,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       return NextResponse.json({ error: "Creator cannot decline their own promise" }, { status: 400 });
     }
 
-    if (!p.counterparty_id || p.counterparty_id !== userId) {
+    if (p.counterparty_id && p.counterparty_id !== userId) {
       return NextResponse.json({ error: "Only the counterparty can decline" }, { status: 403 });
     }
 
@@ -73,12 +73,22 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
 
     const nowIso = new Date().toISOString();
 
+    const updatePayload: {
+      invite_status: "declined";
+      declined_at: string;
+      counterparty_id?: string;
+    } = {
+      invite_status: "declined",
+      declined_at: nowIso,
+    };
+
+    if (!p.counterparty_id) {
+      updatePayload.counterparty_id = userId;
+    }
+
     const { error: updateError } = await admin
       .from("promises")
-      .update({
-        invite_status: "declined",
-        declined_at: nowIso,
-      })
+      .update(updatePayload)
       .eq("id", p.id);
 
     if (updateError) {

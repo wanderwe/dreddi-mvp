@@ -47,7 +47,7 @@ export const canCounterpartyRespond = (args: {
   if (!userId) return false;
   if (userId === creatorId) return false;
   if (inviteStatus !== "awaiting_acceptance") return false;
-  if (!counterpartyId || counterpartyId !== userId) return false;
+  if (counterpartyId && counterpartyId !== userId) return false;
 
   return true;
 };
