@@ -154,8 +154,8 @@ export const getNotificationCopy = ({ locale, type, role, followup, delta }: Not
   const roleOverride = role ? roleOverrides[baseLocale]?.[normalizedType]?.[role] : undefined;
 
   let body = roleOverride?.body ?? base.body;
-  let title = roleOverride?.title ?? base.title;
-  let ctaLabel = roleOverride?.ctaLabel ?? base.ctaLabel;
+  const title = roleOverride?.title ?? base.title;
+  const ctaLabel = roleOverride?.ctaLabel ?? base.ctaLabel;
 
   if (normalizedType === "invite" && followup === "invite") {
     body = followupOverrides[baseLocale].invite;
