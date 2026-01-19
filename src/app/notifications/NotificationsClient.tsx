@@ -24,13 +24,24 @@ export default function NotificationsClient() {
   const locale = useLocale();
   const [rows, setRows] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  const pageSize = 12;
 
   useEffect(() => {
     let active = true;
 
-    const loadNotifications = async () => {
-      setLoading(true);
+    const loadNotifications = async (pageIndex: number, replace = false) => {
+      const isInitial = pageIndex === 0 && replace;
+
+      if (isInitial) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError(null);
 
       let supabase;
@@ -50,29 +61,85 @@ export default function NotificationsClient() {
         return;
       }
 
+      const from = pageIndex * pageSize;
+      const to = from + pageSize - 1;
       const { data, error } = await supabase
         .from("notifications")
         .select("id,type,title,body,cta_label,cta_url,created_at,read_at,priority")
         .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (!active) return;
 
       if (error) {
         setError(error.message);
       } else {
-        setRows((data ?? []) as NotificationRow[]);
+        const payload = (data ?? []) as NotificationRow[];
+        setRows((prev) => (replace ? payload : [...prev, ...payload]));
+        setHasMore(payload.length === pageSize);
+        setPage(pageIndex);
       }
 
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      } else {
+        setLoadingMore(false);
+      }
     };
 
-    void loadNotifications();
+    void loadNotifications(0, true);
 
     return () => {
       active = false;
     };
-  }, [t]);
+  }, [pageSize, t]);
+
+  const loadMore = () => {
+    if (loadingMore || !hasMore) return;
+    void (async () => {
+      setLoadingMore(true);
+      setError(null);
+
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t("notifications.errors.unavailable"));
+        setLoadingMore(false);
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        window.location.href = `/login?next=${encodeURIComponent("/notifications")}`;
+        return;
+      }
+
+      const nextPage = page + 1;
+      const from = nextPage * pageSize;
+      const to = from + pageSize - 1;
+
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("id,type,title,body,cta_label,cta_url,created_at,read_at,priority")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false })
+        .range(from, to);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        const payload = (data ?? []) as NotificationRow[];
+        setRows((prev) => [...prev, ...payload]);
+        setHasMore(payload.length === pageSize);
+        setPage(nextPage);
+      }
+
+      setLoadingMore(false);
+    })();
+  };
 
   const markAsRead = async (id: string) => {
     setRows((prev) =>
@@ -134,73 +201,87 @@ export default function NotificationsClient() {
           {t("notifications.empty")}
         </div>
       ) : (
-        <div className="space-y-3">
-          {rows.map((row) => {
-            const unread = !row.read_at;
-            const ctaUrl = row.cta_url ?? "/promises";
-            const typeKey = resolveTypeKey(row.type);
-            const title = typeKey
-              ? resolveLocalized(`${typeKey}.title`, row.title)
-              : row.title;
-            const description = typeKey
-              ? resolveLocalized(`${typeKey}.description`, row.body)
-              : row.body;
-            const ctaLabel = typeKey
-              ? resolveLocalized(`${typeKey}.cta`, row.cta_label)
-              : row.cta_label ?? "";
-            return (
-              <div
-                key={row.id}
-                className={`rounded-2xl border px-4 py-4 transition ${
-                  unread
-                    ? "border-emerald-400/40 bg-emerald-500/10"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`mt-1 h-2 w-2 rounded-full ${
-                        unread ? "bg-emerald-300" : "bg-transparent"
-                      }`}
-                      aria-hidden
-                    />
-                    <div className="space-y-1">
-                      <div className="text-sm font-semibold text-white">
-                        {stripTrailingPeriod(title)}
-                      </div>
-                      <p className="text-sm text-slate-200">
-                        {stripTrailingPeriod(description)}
-                      </p>
-                      <div className="text-xs text-slate-400">
-                        {formatDate(row.created_at)}
+        <div className="space-y-4">
+          <div className="space-y-3">
+            {rows.map((row) => {
+              const unread = !row.read_at;
+              const ctaUrl = row.cta_url ?? "/promises";
+              const typeKey = resolveTypeKey(row.type);
+              const title = typeKey
+                ? resolveLocalized(`${typeKey}.title`, row.title)
+                : row.title;
+              const description = typeKey
+                ? resolveLocalized(`${typeKey}.description`, row.body)
+                : row.body;
+              const ctaLabel = typeKey
+                ? resolveLocalized(`${typeKey}.cta`, row.cta_label)
+                : row.cta_label ?? "";
+              return (
+                <div
+                  key={row.id}
+                  className={`rounded-2xl border px-4 py-4 transition ${
+                    unread
+                      ? "border-emerald-400/40 bg-emerald-500/10"
+                      : "border-white/10 bg-white/5"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <span
+                        className={`mt-1 h-2 w-2 rounded-full ${
+                          unread ? "bg-emerald-300" : "bg-transparent"
+                        }`}
+                        aria-hidden
+                      />
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-white">
+                          {stripTrailingPeriod(title)}
+                        </div>
+                        <p className="text-sm text-slate-200">
+                          {stripTrailingPeriod(description)}
+                        </p>
+                        <div className="text-xs text-slate-400">
+                          {formatDate(row.created_at)}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {ctaLabel && (
-                      <Link
-                        href={ctaUrl}
-                        onClick={() => unread && void markAsRead(row.id)}
-                        className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                      >
-                        {ctaLabel}
-                      </Link>
-                    )}
-                    {unread && (
-                      <button
-                        type="button"
-                        onClick={() => void markAsRead(row.id)}
-                        className="cursor-pointer text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                      >
-                        {t("notifications.markRead")}
-                      </button>
-                    )}
+                    <div className="flex flex-col items-end gap-2">
+                      {ctaLabel && (
+                        <Link
+                          href={ctaUrl}
+                          onClick={() => unread && void markAsRead(row.id)}
+                          className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                        >
+                          {ctaLabel}
+                        </Link>
+                      )}
+                      {unread && (
+                        <button
+                          type="button"
+                          onClick={() => void markAsRead(row.id)}
+                          className="cursor-pointer text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                        >
+                          {t("notifications.markRead")}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {hasMore && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="cursor-pointer rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              >
+                {loadingMore ? t("notifications.loading") : t("notifications.loadMore")}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
