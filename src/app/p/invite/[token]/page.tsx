@@ -10,6 +10,7 @@ type InviteInfo = {
   id: string;
   title: string;
   details: string | null;
+  condition_text: string | null;
   due_at: string | null;
   creator_handle: string | null;
   creator_display_name: string | null;
@@ -144,6 +145,8 @@ export default function InvitePage() {
     return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
   };
 
+  const counterCondition = info?.condition_text?.trim();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       <div
@@ -231,14 +234,26 @@ export default function InvitePage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
-                <div className="rounded-full bg-white/10 p-2 text-emerald-300" aria-hidden>
-                  ⏰
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
+                  <div className="rounded-full bg-white/10 p-2 text-emerald-300" aria-hidden>
+                    ⏰
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.deadline")}</p>
+                    <p className="font-semibold text-white">{formatDue(info.due_at)}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.deadline")}</p>
-                  <p className="font-semibold text-white">{formatDue(info.due_at)}</p>
-                </div>
+                {counterCondition && (
+                  <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
+                    <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                      {t("invite.counterCondition")}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap font-semibold text-white">
+                      {counterCondition}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -288,6 +288,7 @@
     "badge": "Запрошення до угоди",
     "createdBy": "Створив(ла) {name}",
     "deadline": "Строк",
+    "counterCondition": "Контрумова",
     "statusLabel": "Статус",
     "statusAccepted": "Вже прийнято",
     "statusAwaiting": "Очікує прийняття",

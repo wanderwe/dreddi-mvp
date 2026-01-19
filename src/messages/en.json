@@ -280,6 +280,7 @@
     "badge": "Deal invite",
     "createdBy": "Created by {name}",
     "deadline": "Deadline",
+    "counterCondition": "Counter-condition",
     "statusLabel": "Status",
     "statusAccepted": "Already accepted",
     "statusAwaiting": "Awaiting acceptance",
