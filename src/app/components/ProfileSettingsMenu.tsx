@@ -568,7 +568,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {variant === "icon" ? (
-        <Tooltip label={t("profileSettings.buttonLabel")} placement="bottom-right">
+        <Tooltip label={t("profileSettings.buttonLabel")} placement="top-right">
           <SheetTrigger asChild>
             <IconButton
               ariaLabel={t("profileSettings.buttonLabel")}

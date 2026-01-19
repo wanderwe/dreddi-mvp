@@ -91,23 +91,23 @@ export function AppHeader() {
           {isAuthenticated ? (
             <>
               <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-slate-200 md:flex">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pr-4">
                   <Link className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </Link>
-                  <Tooltip label={t("nav.newPromise")}>
+                  <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
                 </div>
                 <div className="ml-auto flex items-center gap-3">
-                  <Tooltip label={t("nav.publicProfiles")}>
+                  <Tooltip label={t("nav.publicProfiles")} placement="top">
                     <IconButton
                       href="/u"
                       ariaLabel={t("nav.publicProfiles")}
                       icon={<UsersRound className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
-                  <Tooltip label={t("nav.notifications")}>
+                  <Tooltip label={t("nav.notifications")} placement="top">
                     <NotificationBell />
                   </Tooltip>
                   <LocaleSwitcher />

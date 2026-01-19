@@ -72,7 +72,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     <div className={className}>
       <div className="flex items-center gap-2">
         {nextLocale && (
-          <Tooltip label={t("nav.switchLanguage")} placement="bottom-right">
+          <Tooltip label={t("nav.switchLanguage")} placement="top-right">
             <IconButton
               onClick={() => void updateLocale(nextLocale)}
               disabled={busy}
