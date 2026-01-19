@@ -43,6 +43,45 @@ test("canCounterpartyRespond requires awaiting acceptance and matching counterpa
   );
 });
 
+test("canCounterpartyRespond allows pending invitee when counterparty is unset", () => {
+  const canRespond = canCounterpartyRespond({
+    userId: "invitee",
+    creatorId: "creator",
+    counterpartyId: null,
+    inviteStatus: "awaiting_acceptance",
+  });
+
+  assert.equal(canRespond, true);
+});
+
+test("canCounterpartyRespond blocks creator even when pending", () => {
+  const canRespond = canCounterpartyRespond({
+    userId: "creator",
+    creatorId: "creator",
+    counterpartyId: null,
+    inviteStatus: "awaiting_acceptance",
+  });
+
+  assert.equal(canRespond, false);
+});
+
+test("canCounterpartyRespond blocks decline after acceptance/decline", () => {
+  const base = {
+    userId: "invitee",
+    creatorId: "creator",
+    counterpartyId: "invitee",
+  };
+
+  assert.equal(
+    canCounterpartyRespond({ ...base, inviteStatus: "accepted" }),
+    false
+  );
+  assert.equal(
+    canCounterpartyRespond({ ...base, inviteStatus: "declined" }),
+    false
+  );
+});
+
 test("canCounterpartyRespond blocks mismatched counterparty", () => {
   const canRespond = canCounterpartyRespond({
     userId: "other",
