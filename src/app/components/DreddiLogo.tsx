@@ -32,33 +32,21 @@ export function DreddiLogoMark({ className = "h-12 w-12" }: { className?: string
       <rect x="6.5" y="6.5" width="51" height="51" rx="13" stroke="#9DE8C9" strokeOpacity="0.15" />
 
       <path
-        d="M21 15.5h12.8c10 0 18.2 7.8 18.2 16.9C52 42.5 43.8 50 33.8 50H21V15.5Z"
-        fill="url(#dreddi-core)"
-        fillOpacity="0.95"
-      />
-      <path
-        d="M30.8 41.2c6.46 0 10.96-4.18 10.96-9.8 0-5.58-4.5-9.8-10.96-9.8H29v19.6h1.8Z"
-        fill="#0B1220"
-        fillOpacity="0.9"
-      />
-      <path
-        d="M27.6 34.4 31.8 38 41 26.4"
-        stroke="#0B1220"
-        strokeWidth="3"
+        d="M20 18H33.5C43 18 50 25 50 32C50 39 43 46 33.5 46H20"
+        fill="none"
+        stroke="url(#dreddi-core)"
+        strokeWidth="6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M27.6 34.4 31.8 38 41 26.4"
+        d="M20 24 28 32 20 40"
+        fill="none"
         stroke="#36D399"
-        strokeWidth="1.5"
+        strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-
-      <circle cx="20" cy="20" r="4.5" fill="#29D99D" fillOpacity="0.9" />
-      <circle cx="44" cy="46" r="3.6" fill="#51A3FF" fillOpacity="0.9" />
-      <circle cx="18" cy="44" r="2.8" fill="#E4FCEB" fillOpacity="0.8" />
     </svg>
   );
 }
