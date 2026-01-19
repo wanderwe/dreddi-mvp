@@ -1,0 +1,6 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Oracle frame logo concept">
+  <rect width="128" height="128" fill="none" />
+  <rect x="24" y="24" width="80" height="80" fill="none" stroke="#0f172a" stroke-width="8" rx="12" />
+  <circle cx="64" cy="64" r="8" fill="#0f172a" />
+  <path d="M64 28 V44" stroke="#0f172a" stroke-width="6" stroke-linecap="round" />
+</svg>
