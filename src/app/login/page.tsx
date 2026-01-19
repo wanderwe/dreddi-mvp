@@ -32,13 +32,21 @@ export default function LoginPage() {
       redirectTo.searchParams.set("next", next);
     }
 
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: redirectTo.toString() },
+      options: { redirectTo: redirectTo.toString(), skipBrowserRedirect: true },
     });
 
     if (error) {
       setError(error.message);
+      setOauthBusy(false);
+      return;
+    }
+
+    if (data?.url) {
+      window.location.assign(data.url);
+    } else {
+      setError(t("auth.login.googleError"));
       setOauthBusy(false);
     }
   }

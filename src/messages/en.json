@@ -315,6 +315,7 @@
       "emailPlaceholder": "you@example.com",
       "googleCta": "Continue with Google",
       "googleSigningIn": "Connecting...",
+      "googleError": "Unable to start Google sign-in. Please try again.",
       "or": "Or",
       "sendLink": "Send magic link",
       "sending": "Sending...",

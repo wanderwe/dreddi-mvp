@@ -323,6 +323,7 @@
       "emailPlaceholder": "you@example.com",
       "googleCta": "Увійти через Google",
       "googleSigningIn": "Підключення...",
+      "googleError": "Не вдалося запустити вхід через Google. Спробуйте ще раз.",
       "or": "Або",
       "sendLink": "Надіслати magic link",
       "sending": "Надсилання...",
