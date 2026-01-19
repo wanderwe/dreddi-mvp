@@ -7,6 +7,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { isPromiseAccepted, InviteStatus } from "@/lib/promiseAcceptance";
 
 type PromiseRow = {
   id: string;
@@ -21,6 +22,10 @@ type PromiseRow = {
   promisee_id: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
+  invite_status: InviteStatus | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
 };
 
 const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
@@ -127,7 +132,12 @@ export default function ConfirmPromisePage() {
   const isCounterparty = Boolean(
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
-  const canReview = Boolean(promise && promise.status === "completed_by_promisor" && isCounterparty);
+  const canReview = Boolean(
+    promise &&
+      promise.status === "completed_by_promisor" &&
+      isCounterparty &&
+      isPromiseAccepted(promise)
+  );
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;

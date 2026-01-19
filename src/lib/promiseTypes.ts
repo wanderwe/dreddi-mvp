@@ -1,4 +1,5 @@
 import type { PromiseStatus } from "@/lib/promiseStatus";
+import type { InviteStatus } from "@/lib/promiseAcceptance";
 
 export type PromiseRowMin = {
   id: string;
@@ -17,4 +18,9 @@ export type PromiseRowMin = {
   condition_text: string | null;
   condition_met_at: string | null;
   condition_met_by: string | null;
+  invite_status: InviteStatus | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
 };

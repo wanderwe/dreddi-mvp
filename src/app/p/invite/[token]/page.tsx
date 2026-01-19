@@ -5,7 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { formatDueDate } from "@/lib/formatDueDate";
-import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import {
+  canCounterpartyRespond,
+  getPromiseInviteStatus,
+  isPromiseAccepted,
+  InviteStatus,
+} from "@/lib/promiseAcceptance";
 
 type InviteInfo = {
   id: string;
@@ -16,8 +21,14 @@ type InviteInfo = {
   due_at: string | null;
   creator_handle: string | null;
   creator_display_name: string | null;
+  creator_id: string;
   counterparty_id: string | null;
   counterparty_accepted_at: string | null;
+  invite_status: InviteStatus | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
 };
@@ -77,13 +88,15 @@ export default function InvitePage() {
     if (!shouldAutoAccept || autoAcceptAttempted) return;
     if (!signedIn || !info) return;
 
-    if (isPromiseAccepted(info) && info.counterparty_id && userId === info.counterparty_id) {
+    const inviteStatus = getPromiseInviteStatus(info);
+
+    if (inviteStatus === "accepted" && info.counterparty_id && userId === info.counterparty_id) {
       setAutoAcceptAttempted(true);
       router.push("/promises");
       return;
     }
 
-    if (!isPromiseAccepted(info)) {
+    if (inviteStatus === "awaiting_acceptance") {
       setAutoAcceptAttempted(true);
       if (info.visibility === "public") {
         setShowAcceptModal(true);
@@ -136,6 +149,46 @@ export default function InvitePage() {
     router.push("/promises");
   }
 
+  async function decline() {
+    if (!token) return;
+
+    setBusy(true);
+    setError(null);
+
+    if (!supabase) {
+      setBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
+
+    const { data: s } = await supabase.auth.getSession();
+    if (!s.session) {
+      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}`)}`);
+      setBusy(false);
+      return;
+    }
+
+    const accessToken = s.session.access_token;
+
+    const res = await fetch(`/api/invite/${token}/decline`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const j = await res.json();
+    setBusy(false);
+
+    if (!res.ok) {
+      setError(j?.error ?? t("invite.errors.declineFailed"));
+      return;
+    }
+
+    await load();
+  }
+
   const creatorName = useMemo(() => {
     if (!info) return t("invite.unknown");
     return info.creator_handle
@@ -150,7 +203,19 @@ export default function InvitePage() {
 
   const counterCondition = info?.condition_text?.trim();
   const conditionMet = Boolean(info?.condition_met_at);
+  const inviteStatus = getPromiseInviteStatus(info);
   const inviteAccepted = isPromiseAccepted(info);
+  const canDecline = canCounterpartyRespond({
+    userId,
+    creatorId: info?.creator_id ?? "",
+    counterpartyId: info?.counterparty_id ?? null,
+    inviteStatus,
+  });
+  const canAccept =
+    inviteStatus === "awaiting_acceptance" &&
+    (!userId ||
+      (info?.creator_id !== userId &&
+        (!info?.counterparty_id || info.counterparty_id === userId)));
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -271,40 +336,66 @@ export default function InvitePage() {
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.statusLabel")}</p>
                 <p className="mt-1 text-lg font-semibold text-white">
-                  {inviteAccepted ? t("invite.statusAccepted") : t("invite.statusAwaiting")}
+                  {t(`invite.status.${inviteStatus}`)}
                 </p>
                 <p className="text-sm text-slate-300">
-                  {inviteAccepted
+                  {inviteStatus === "accepted"
                     ? t("invite.statusAcceptedBody")
-                    : t("invite.statusAwaitingBody")}
+                    : inviteStatus === "awaiting_acceptance"
+                    ? t("invite.statusAwaitingBody")
+                    : t("invite.statusClosedBody")}
                 </p>
+                <p className="mt-2 text-xs text-slate-400">{t("invite.helperNoResponsibility")}</p>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
                 <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.nextStep")}</p>
 
-                {inviteAccepted ? (
+                {inviteStatus === "accepted" ? (
                   <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
                     <span aria-hidden>✅</span> {t("invite.statusAccepted")}
                   </div>
+                ) : inviteStatus === "declined" ? (
+                  <div className="mt-2 text-sm text-slate-300">{t("invite.declinedMessage")}</div>
+                ) : inviteStatus === "ignored" ? (
+                  <div className="mt-2 text-sm text-slate-300">{t("invite.ignoredMessage")}</div>
                 ) : (
                   <>
                     <p className="mt-2 text-xs text-slate-400">
                       {t("invite.nextStepHint")}
                     </p>
-                    <button
-                      disabled={busy}
-                      onClick={() => {
-                        if (info.visibility === "public") {
-                          setShowAcceptModal(true);
-                        } else {
-                          void accept();
-                        }
-                      }}
-                      className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-                    >
-                      {busy ? t("invite.processing") : t("invite.accept")}
-                    </button>
+                    {canAccept || canDecline ? (
+                      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                        {canAccept && (
+                          <button
+                            disabled={busy}
+                            onClick={() => {
+                              if (info.visibility === "public") {
+                                setShowAcceptModal(true);
+                              } else {
+                                void accept();
+                              }
+                            }}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                          >
+                            {busy ? t("invite.processing") : t("invite.accept")}
+                          </button>
+                        )}
+                        {canDecline && (
+                          <button
+                            disabled={busy}
+                            onClick={() => void decline()}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+                          >
+                            {busy ? t("invite.processing") : t("invite.decline")}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mt-2 text-sm text-slate-300">
+                        {t("invite.awaitingCounterparty")}
+                      </div>
+                    )}
                   </>
                 )}
               </div>

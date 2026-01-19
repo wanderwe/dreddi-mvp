@@ -53,7 +53,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     const { data: p, error: pErr } = await admin
       .from("promises")
       .select(
-        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id"
+        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id, invite_status"
       )
       .eq("invite_token", token)
       .maybeSingle();
@@ -70,9 +70,16 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     if (p.creator_id === userId) {
       return NextResponse.json({ error: "Creator cannot accept their own promise" }, { status: 400 });
     }
+    if (p.counterparty_id && p.counterparty_id !== userId) {
+      return NextResponse.json({ error: "Only the counterparty can accept" }, { status: 403 });
+    }
 
     // якщо вже прийнято
-    const alreadyAccepted = Boolean(p.counterparty_accepted_at);
+    const alreadyAccepted =
+      p.invite_status === "accepted" || Boolean(p.counterparty_accepted_at);
+    if (p.invite_status === "declined" || p.invite_status === "ignored") {
+      return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+    }
     const alreadyParticipant =
       p.counterparty_id === userId || p.promisor_id === userId || p.promisee_id === userId;
 
@@ -83,14 +90,19 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       return NextResponse.json({ error: "Already accepted by another user" }, { status: 409 });
     }
 
+    const nowIso = new Date().toISOString();
     const updateData: {
       counterparty_id: string;
       counterparty_accepted_at: string;
+      invite_status: "accepted";
+      accepted_at: string;
       promisor_id?: string;
       promisee_id?: string;
     } = {
       counterparty_id: userId,
-      counterparty_accepted_at: new Date().toISOString(),
+      counterparty_accepted_at: nowIso,
+      invite_status: "accepted",
+      accepted_at: nowIso,
     };
 
     let acceptingRole: "promisor" | "promisee" | null = null;
