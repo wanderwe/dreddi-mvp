@@ -115,7 +115,7 @@ export default function LoginPage() {
             <button
               onClick={sendMagicLink}
               disabled={busy || !email || oauthBusy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:bg-emerald-300 hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:bg-emerald-300 hover:shadow-emerald-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
             </button>
@@ -134,8 +134,31 @@ export default function LoginPage() {
             <button
               onClick={signInWithGoogle}
               disabled={oauthBusy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10 disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
             >
+              <svg
+                aria-hidden="true"
+                className="h-4 w-4"
+                viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="#EA4335"
+                  d="M24 9.5c3.45 0 6.55 1.2 8.98 3.55l6.67-6.67C35.6 2.55 30.1 0 24 0 14.62 0 6.52 5.38 2.7 13.22l7.77 6.04C12.24 13.1 17.7 9.5 24 9.5z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M46.15 24.5c0-1.64-.15-3.22-.43-4.75H24v9h12.5c-.54 2.9-2.18 5.35-4.67 7l7.18 5.57c4.2-3.88 6.64-9.6 6.64-16.82z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M10.47 28.26a14.5 14.5 0 0 1 0-8.52L2.7 13.7a24 24 0 0 0 0 20.6l7.77-6.04z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M24 48c6.1 0 11.23-2.02 14.97-5.5l-7.18-5.57c-2 1.34-4.56 2.12-7.79 2.12-6.3 0-11.76-3.6-13.53-8.76l-7.77 6.04C6.52 42.62 14.62 48 24 48z"
+                />
+              </svg>
               {oauthBusy
                 ? t("auth.login.googleSigningIn")
                 : t("auth.login.googleCta")}

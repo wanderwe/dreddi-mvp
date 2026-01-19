@@ -104,7 +104,7 @@ function ActionButton({
   const base =
     "inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
     "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
-    "disabled:opacity-60 disabled:cursor-not-allowed";
+    "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
   const ghost =
     "border-neutral-800 bg-transparent text-neutral-200 hover:bg-white/5 hover:border-neutral-700";
@@ -510,7 +510,7 @@ export default function PromisePage() {
               {isCounterparty && p.status === "completed_by_promisor" && (
                 <Link
                   href={`/promises/${p.id}/confirm`}
-                  className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                 >
                   {t("promises.detail.reviewConfirm")}
                 </Link>
@@ -589,7 +589,7 @@ export default function PromisePage() {
                     {inviteLink && (
                       <Link
                         href={`/p/invite/${p.invite_token}`}
-                        className="inline-flex items-center justify-center rounded-xl border border-neutral-800 bg-transparent text-neutral-200 px-4 py-2 text-sm font-medium transition hover:bg-white/5 hover:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white/15"
+                        className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                       >
                         {t("promises.detail.openInvite")}
                       </Link>
@@ -620,7 +620,7 @@ export default function PromisePage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("promises.confirmModal.cancel")}
               </button>
@@ -630,7 +630,7 @@ export default function PromisePage() {
                   setShowConfirmModal(false);
                   await markCompleted();
                 }}
-                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("promises.confirmModal.confirm")}
               </button>
