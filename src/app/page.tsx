@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -163,19 +164,20 @@ export default function Home() {
     let active = true;
     const client = supabase;
 
-    if (!client) {
-      setReady(true);
-      return;
-    }
-
     const syncSession = async () => {
-      const { data: sessionData } = await client.auth.getSession();
+      const authState = await getAuthState();
       if (!active) return;
-      setEmail(sessionData.session?.user?.email ?? null);
+      setEmail(authState.user?.email ?? null);
       setReady(true);
     };
 
     void syncSession();
+
+    if (isMockAuthEnabled() || !client) {
+      return () => {
+        active = false;
+      };
+    }
 
     const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       if (!active) return;

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRound, X } from "lucide-react";
+import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { SettingRow } from "@/app/components/SettingRow";
@@ -35,6 +36,7 @@ type ProfileState = {
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
   const t = useT();
+  const [authState, setAuthState] = useState<AuthState | null>(null);
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,6 +54,30 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     const loadProfile = async () => {
       setLoading(true);
       setError(null);
+
+      const nextAuthState = await getAuthState();
+      if (!active) return;
+      setAuthState(nextAuthState);
+
+      if (nextAuthState.isMock) {
+        const profileSnapshot = nextAuthState.profile;
+        if (profileSnapshot?.handle) {
+          lastHandleRef.current = profileSnapshot.handle;
+        }
+        setProfile({
+          userId: nextAuthState.user?.id ?? "mock-user",
+          email: nextAuthState.user?.email ?? null,
+          handle: profileSnapshot?.handle ?? "mock-user",
+          isPublic: true,
+          pushEnabled: true,
+          deadlineRemindersEnabled: true,
+          quietHoursEnabled: true,
+          quietHoursStart: "22:00",
+          quietHoursEnd: "09:00",
+        });
+        setLoading(false);
+        return;
+      }
 
       let supabase;
       try {
@@ -160,6 +186,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (!profile || saving) return false;
     setSaving(true);
     setError(null);
+
+    if (authState?.isMock) {
+      setProfile((prev) => (prev ? { ...prev, ...statePatch } : prev));
+      setSaving(false);
+      return true;
+    }
 
     let supabase;
     try {
@@ -491,6 +523,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             type="button"
             onClick={async () => {
               setLogoutError(null);
+              if (authState?.isMock) {
+                return;
+              }
               try {
                 const supabase = requireSupabase();
                 const { error: signOutError } = await supabase.auth.signOut();

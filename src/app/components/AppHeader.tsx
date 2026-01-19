@@ -11,12 +11,18 @@ import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
+import {
+  buildAuthState,
+  getAuthState,
+  isMockAuthEnabled,
+  type AuthState,
+} from "@/lib/auth/getAuthState";
 
 export function AppHeader() {
   const t = useT();
   const pathname = usePathname();
-  const [email, setEmail] = useState<string | null>(null);
-  const isAuthenticated = Boolean(email);
+  const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
+  const isAuthenticated = authState.isLoggedIn;
   const showBackLink = !isAuthenticated && pathname !== "/";
   const showSignIn = !isAuthenticated && pathname !== "/login";
   const linkBaseClasses =
@@ -26,19 +32,26 @@ export function AppHeader() {
     let active = true;
     const client = supabase;
 
-    if (!client) return;
-
     const syncSession = async () => {
-      const { data: sessionData } = await client.auth.getSession();
+      const nextState = await getAuthState();
       if (!active) return;
-      setEmail(sessionData.session?.user?.email ?? null);
+      setAuthState(nextState);
     };
 
     void syncSession();
 
+    if (isMockAuthEnabled() || !client) {
+      return () => {
+        active = false;
+      };
+    }
+
     const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
-      setEmail(session?.user?.email ?? null);
+      const user = session?.user
+        ? { id: session.user.id, email: session.user.email ?? null }
+        : null;
+      setAuthState(buildAuthState(user));
     });
 
     return () => {
@@ -59,6 +72,11 @@ export function AppHeader() {
         </Link>
 
         <div className="flex items-center gap-3">
+          {authState.isMock && (
+            <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
+              Mock auth
+            </span>
+          )}
           {showBackLink && (
             <Link href="/" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
               ← {t("auth.login.back")}

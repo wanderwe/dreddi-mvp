@@ -2,6 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getAuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { IconButton } from "@/app/components/ui/IconButton";
@@ -14,6 +15,17 @@ export function NotificationBell({ className = "" }: { className?: string }) {
     let active = true;
 
     const loadCount = async () => {
+      const authState = await getAuthState();
+      if (!active) return;
+      if (authState.isMock) {
+        setCount(0);
+        return;
+      }
+      if (!authState.isLoggedIn || !authState.user?.id) {
+        setCount(0);
+        return;
+      }
+
       let supabase;
       try {
         supabase = requireSupabase();
@@ -21,14 +33,10 @@ export function NotificationBell({ className = "" }: { className?: string }) {
         return;
       }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const session = sessionData.session;
-      if (!session || !active) return;
-
       const { count } = await supabase
         .from("notifications")
         .select("id", { count: "exact", head: true })
-        .eq("user_id", session.user.id)
+        .eq("user_id", authState.user.id)
         .is("read_at", null);
 
       if (!active) return;
