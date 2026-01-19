@@ -670,8 +670,8 @@ export default function NewPromisePage() {
 
             {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm font-semibold text-white">
                       {t("promises.new.publicRequest.label")}
                     </div>
@@ -685,7 +685,7 @@ export default function NewPromisePage() {
                     aria-checked={isPublicDeal}
                     aria-label={t("promises.new.publicRequest.label")}
                     onClick={() => setIsPublicDeal((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition ${
                       isPublicDeal
                         ? "border-emerald-300/50 bg-emerald-400/70"
                         : "border-white/20 bg-white/10"
