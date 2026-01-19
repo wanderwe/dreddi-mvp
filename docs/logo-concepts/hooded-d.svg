@@ -1,0 +1,6 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hooded D logo concept">
+  <rect width="128" height="128" fill="none" />
+  <path d="M34 32 H64 C86 32 98 46 98 64 C98 82 86 96 64 96 H34 Z" fill="none" stroke="#0f172a" stroke-width="10" stroke-linejoin="round" />
+  <path d="M34 32 C42 24 52 20 64 20 C82 20 96 30 104 44" fill="none" stroke="#0f172a" stroke-width="8" stroke-linecap="round" />
+  <circle cx="58" cy="64" r="5" fill="#0f172a" />
+</svg>

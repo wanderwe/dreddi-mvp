@@ -1,0 +1,5 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Outcome mark logo concept">
+  <rect width="128" height="128" fill="none" />
+  <path d="M28 70 L54 96 L100 40" fill="none" stroke="#0f172a" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="84" y="24" width="20" height="20" fill="#0f172a" rx="4" />
+</svg>
