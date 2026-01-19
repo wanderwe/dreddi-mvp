@@ -11,7 +11,11 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { formatDueDate } from "@/lib/formatDueDate";
-import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import {
+  getPromiseInviteStatus,
+  isPromiseAccepted,
+  InviteStatus,
+} from "@/lib/promiseAcceptance";
 
 type PromiseRow = {
   id: string;
@@ -24,6 +28,11 @@ type PromiseRow = {
   condition_met_at: string | null;
   counterparty_id: string | null;
   counterparty_accepted_at: string | null;
+  invite_status: string | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -35,13 +44,18 @@ type PromiseRoleBase = Pick<
   | "id"
   | "status"
   | "counterparty_accepted_at"
+  | "invite_status"
+  | "invited_at"
+  | "accepted_at"
+  | "declined_at"
+  | "ignored_at"
   | "creator_id"
   | "promisor_id"
   | "promisee_id"
   | "counterparty_id"
 >;
-type PromiseWithRole = PromiseRow & { role: PromiseRole; acceptedBySecondSide: boolean };
-type PromiseSummary = PromiseRoleBase & { role: PromiseRole; acceptedBySecondSide: boolean };
+type PromiseWithRole = PromiseRow & { role: PromiseRole; inviteStatus: InviteStatus };
+type PromiseSummary = PromiseRoleBase & { role: PromiseRole; inviteStatus: InviteStatus };
 
 const PAGE_SIZE = 5;
 
@@ -53,7 +67,7 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
     ...row,
     status: row.status as PromiseStatus,
     role,
-    acceptedBySecondSide: isPromiseAccepted(row),
+    inviteStatus: getPromiseInviteStatus(row),
   };
 };
 
@@ -147,7 +161,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,status,condition_text,condition_met_at,counterparty_accepted_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,status,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -205,7 +219,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -443,7 +457,8 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
-                const acceptedBySecondSide = p.acceptedBySecondSide;
+                const inviteStatus = p.inviteStatus;
+                const acceptedBySecondSide = isPromiseAccepted(p);
                 const impact = (() => {
                   if (!isPromisor) return null;
 
@@ -531,7 +546,7 @@ export default function PromisesClient() {
 
                         {isPromisor && p.status === "active" && !acceptedBySecondSide && (
                           <span className="text-xs text-slate-400">
-                            {t("promises.status.awaitingInviteAcceptance")}
+                            {t(`promises.inviteStatus.${inviteStatus}`)}
                           </span>
                         )}
 

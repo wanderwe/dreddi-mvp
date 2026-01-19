@@ -69,18 +69,51 @@ export async function POST(req: Request) {
   const now = new Date();
   const nowIso = now.toISOString();
   const dueSoonCutoff = new Date(now.getTime() + HOURS_24).toISOString();
+  const ignoreAfterHours = Number(process.env.IGNORE_AFTER_HOURS ?? "72");
+  const ignoreAfter =
+    (Number.isFinite(ignoreAfterHours) ? ignoreAfterHours : 72) * 60 * 60 * 1000;
+  const ignoreCutoff = new Date(now.getTime() - ignoreAfter);
 
   const results = {
     inviteFollowups: 0,
     dueSoon: 0,
     overdue: 0,
     completionFollowups: 0,
+    ignored: 0,
   };
+
+  const { data: staleInvites } = await admin
+    .from("promises")
+    .select(
+      "id,invited_at,created_at,invite_status,counterparty_accepted_at"
+    )
+    .eq("status", "active")
+    .is("counterparty_accepted_at", null)
+    .not("counterparty_id", "is", null)
+    .or("invite_status.is.null,invite_status.eq.awaiting_acceptance");
+
+  for (const row of staleInvites ?? []) {
+    if (row.invite_status && row.invite_status !== "awaiting_acceptance") continue;
+    const invitedAt = row.invited_at ?? row.created_at;
+    if (!invitedAt || new Date(invitedAt).getTime() > ignoreCutoff.getTime()) continue;
+
+    const { error } = await admin
+      .from("promises")
+      .update({
+        invite_status: "ignored",
+        ignored_at: nowIso,
+      })
+      .eq("id", row.id)
+      .is("counterparty_accepted_at", null)
+      .or("invite_status.is.null,invite_status.eq.awaiting_acceptance");
+
+    if (!error) results.ignored += 1;
+  }
 
   const { data: invites } = await admin
     .from("promises")
     .select(
-      "id,invite_token,counterparty_id,counterparty_accepted_at,creator_id,promisor_id,promisee_id,promise_notification_state(invite_notified_at,invite_followup_notified_at)"
+      "id,invite_token,counterparty_id,counterparty_accepted_at,invite_status,creator_id,promisor_id,promisee_id,promise_notification_state(invite_notified_at,invite_followup_notified_at)"
     )
     .eq("status", "active")
     .is("counterparty_accepted_at", null)
@@ -90,6 +123,7 @@ export async function POST(req: Request) {
   for (const row of invites ?? []) {
     const state = getNotificationState(row.promise_notification_state);
     if (!row.counterparty_id) continue;
+    if (row.invite_status && row.invite_status !== "awaiting_acceptance") continue;
     if (!state.invite_notified_at || state.invite_followup_notified_at) continue;
 
     const notifiedAt = new Date(state.invite_notified_at);

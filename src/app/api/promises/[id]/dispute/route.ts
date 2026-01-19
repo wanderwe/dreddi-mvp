@@ -10,6 +10,7 @@ import {
 import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import {
   buildDedupeKey,
   createNotification,
@@ -39,6 +40,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const counterpartyId = resolveCounterpartyId(promise);
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json({ error: "Only the counterparty can dispute" }, { status: 403 });
+    }
+
+    if (!isPromiseAccepted(promise)) {
+      return NextResponse.json({ error: "Deal is not accepted" }, { status: 400 });
     }
 
     if (promise.condition_text && !promise.condition_met_at) {

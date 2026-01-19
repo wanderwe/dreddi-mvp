@@ -165,6 +165,14 @@ test("reputation applies to executor and is idempotent", async () => {
     disputed_at: null,
     disputed_code: null,
     dispute_reason: null,
+    condition_text: null,
+    condition_met_at: null,
+    condition_met_by: null,
+    invite_status: "accepted" as const,
+    invited_at: new Date().toISOString(),
+    accepted_at: new Date().toISOString(),
+    declined_at: null,
+    ignored_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
@@ -199,6 +207,14 @@ test("reputation applies to creator on self deals", async () => {
     disputed_at: null,
     disputed_code: null,
     dispute_reason: null,
+    condition_text: null,
+    condition_met_at: null,
+    condition_met_by: null,
+    invite_status: "accepted" as const,
+    invited_at: new Date().toISOString(),
+    accepted_at: new Date().toISOString(),
+    declined_at: null,
+    ignored_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
@@ -228,6 +244,14 @@ test("reputation does not apply when executor is missing", async () => {
     disputed_at: null,
     disputed_code: null,
     dispute_reason: null,
+    condition_text: null,
+    condition_met_at: null,
+    condition_met_by: null,
+    invite_status: "awaiting_acceptance" as const,
+    invited_at: new Date().toISOString(),
+    accepted_at: null,
+    declined_at: null,
+    ignored_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
