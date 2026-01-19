@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRound, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { SettingRow } from "@/app/components/SettingRow";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { TimePicker } from "@/app/components/ui/TimePicker";
 import {
@@ -264,17 +265,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       )}
 
       <div className="mt-4 space-y-3">
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="text-sm font-semibold text-white">
-                {t("profileSettings.publicLabel")}
-              </div>
-              <p className="text-xs text-slate-300">
-                {t("profileSettings.publicDescription")}
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-col items-end gap-2">
+        <SettingRow
+          title={t("profileSettings.publicLabel")}
+          description={t("profileSettings.publicDescription")}
+          right={
+            <div className="flex flex-col items-end gap-2">
               <span
                 className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
                   isPublic
@@ -306,11 +301,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 />
               </button>
             </div>
-          </div>
+          }
+        >
           {loading && (
             <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
           )}
-        </div>
+        </SettingRow>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
           <div className="space-y-1">
