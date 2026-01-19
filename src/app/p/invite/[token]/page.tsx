@@ -11,6 +11,7 @@ type InviteInfo = {
   title: string;
   details: string | null;
   condition_text: string | null;
+  condition_met_at: string | null;
   due_at: string | null;
   creator_handle: string | null;
   creator_display_name: string | null;
@@ -146,6 +147,7 @@ export default function InvitePage() {
   };
 
   const counterCondition = info?.condition_text?.trim();
+  const conditionMet = Boolean(info?.condition_met_at);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -251,6 +253,11 @@ export default function InvitePage() {
                     </p>
                     <p className="mt-1 whitespace-pre-wrap font-semibold text-white">
                       {counterCondition}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-400">
+                      {conditionMet
+                        ? t("promises.detail.conditionMet")
+                        : t("promises.detail.conditionWaiting")}
                     </p>
                   </div>
                 )}
