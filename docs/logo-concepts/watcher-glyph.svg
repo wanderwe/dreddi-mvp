@@ -1,0 +1,6 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Watcher glyph logo concept">
+  <rect width="128" height="128" fill="none" />
+  <path d="M20 64 C36 40 52 32 64 32 C76 32 92 40 108 64" fill="none" stroke="#0f172a" stroke-width="8" stroke-linecap="round" />
+  <path d="M20 64 C36 88 52 96 64 96 C76 96 92 88 108 64" fill="none" stroke="#0f172a" stroke-width="8" stroke-linecap="round" />
+  <circle cx="64" cy="64" r="10" fill="#0f172a" />
+</svg>

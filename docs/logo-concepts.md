@@ -32,3 +32,8 @@ Use one of the options below:
 | Twin Rail D | ![Twin Rail D](./logo-concepts/twin-rail-d.svg) | Parallel rails forming a restrained D silhouette. |
 | D-Imprint | ![D-Imprint](./logo-concepts/d-imprint.svg) | D shape as an imprint inside a stable frame. |
 | D-Bridge | ![D-Bridge](./logo-concepts/d-bridge.svg) | D as a bridge between two sides. |
+| Watcher Glyph | ![Watcher Glyph](./logo-concepts/watcher-glyph.svg) | Minimal eye-like glyph with a centered known point. |
+| Hooded D | ![Hooded D](./logo-concepts/hooded-d.svg) | D with a subtle hood arc and a quiet focus point. |
+| Moon Seal | ![Moon Seal](./logo-concepts/moon-seal.svg) | Crescent seal wrapping a single record dot. |
+| Oracle Frame | ![Oracle Frame](./logo-concepts/oracle-frame.svg) | Framed mark with a focal signal point. |
+| Signal Eclipse | ![Signal Eclipse](./logo-concepts/signal-eclipse.svg) | Quiet eclipse arc with a solid core. |
