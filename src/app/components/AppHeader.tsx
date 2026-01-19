@@ -77,7 +77,7 @@ export function AppHeader() {
         <div className="flex items-center gap-3">
           {authState.isMock && (
             <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
-              Mock auth
+              MOCK AUTH
             </span>
           )}
           {showBackLink && (
