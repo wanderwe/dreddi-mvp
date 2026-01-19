@@ -54,6 +54,11 @@ export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
+                  <Link className={primaryLinkClasses} href="/promises/new">
+                    {t("nav.newPromise")}
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
                   <Link className={baseLinkClasses} href="/u">
                     {t("nav.publicProfiles")}
                   </Link>
@@ -61,11 +66,6 @@ export function MobileMenu({ isAuthenticated = false }: MobileMenuProps) {
                 <SheetClose asChild>
                   <Link className={baseLinkClasses} href="/notifications">
                     {t("nav.notifications")}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link className={primaryLinkClasses} href="/promises/new">
-                    {t("nav.newPromise")}
                   </Link>
                 </SheetClose>
                 <div className="mt-2 border-t border-white/10 pt-4">
