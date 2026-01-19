@@ -6,10 +6,22 @@ and track fulfillment or breach over time.
 
 ## MVP features
 - Email magic link auth (Supabase)
+- Google SSO (Supabase OAuth) with magic link fallback
 - Create promises
 - Invite second party via link
 - Accept promises
 - Track status (active / fulfilled / broken)
+
+## Supabase Google OAuth setup
+1) Enable the Google provider in **Supabase → Authentication → Providers**.
+2) Add redirect URLs in **Supabase → Authentication → URL Configuration**:
+   - `https://dreddi.com/auth/callback`
+   - `http://localhost:3000/auth/callback`
+3) In **Google Cloud Console**:
+   - Create an OAuth client (type: Web application).
+   - Copy the client ID + client secret into Supabase’s Google provider settings.
+   - Add the authorized redirect URI pointing to Supabase’s callback endpoint:  
+     `https://<your-project-ref>.supabase.co/auth/v1/callback`
 
 ## Confirm / dispute flow (MVP)
 - A promisor can mark a promise as completed, moving it to a pending state.
