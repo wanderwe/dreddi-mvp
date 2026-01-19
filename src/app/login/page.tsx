@@ -13,7 +13,35 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function signInWithGoogle() {
+    setOauthBusy(true);
+    setError(null);
+
+    if (!supabase) {
+      setOauthBusy(false);
+      setError("Authentication is unavailable in this preview.");
+      return;
+    }
+
+    const next = searchParams.get("next");
+    const redirectTo = new URL("/auth/callback", window.location.origin);
+    if (next && next.startsWith("/") && !next.startsWith("//")) {
+      redirectTo.searchParams.set("next", next);
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: redirectTo.toString() },
+    });
+
+    if (error) {
+      setError(error.message);
+      setOauthBusy(false);
+    }
+  }
 
   async function sendMagicLink() {
     setBusy(true);
@@ -81,9 +109,25 @@ export default function LoginPage() {
             </label>
 
             <button
+              onClick={signInWithGoogle}
+              disabled={oauthBusy}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-white/20 transition hover:translate-y-[-1px] hover:shadow-white/30 disabled:translate-y-0 disabled:opacity-60"
+            >
+              {oauthBusy
+                ? t("auth.login.googleSigningIn")
+                : t("auth.login.googleCta")}
+            </button>
+
+            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+              <span className="h-px flex-1 bg-white/10" />
+              <span>{t("auth.login.or")}</span>
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <button
               onClick={sendMagicLink}
-              disabled={busy || !email}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
+              disabled={busy || !email || oauthBusy}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-transparent px-4 py-3 text-base font-semibold text-emerald-200 transition hover:border-emerald-300/70 hover:text-emerald-100 disabled:opacity-60"
             >
               {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
             </button>
