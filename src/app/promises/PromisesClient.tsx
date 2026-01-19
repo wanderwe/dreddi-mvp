@@ -401,10 +401,10 @@ export default function PromisesClient() {
               type="button"
               onClick={() => setTab("i-promised")}
               className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
+                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
                 tab === "i-promised"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
+                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
+                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
               ].join(" ")}
             >
               {t("promises.list.tabs.executorMe", { count: roleCounts.promisor })}
@@ -414,10 +414,10 @@ export default function PromisesClient() {
               type="button"
               onClick={() => setTab("promised-to-me")}
               className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition",
+                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
                 tab === "promised-to-me"
-                  ? "bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "bg-white/5 text-white ring-white/10 hover:bg-white/10",
+                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
+                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
               ].join(" ")}
             >
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
@@ -485,7 +485,7 @@ export default function PromisesClient() {
                         </div>
                         <Link
                           href={`/promises/${p.id}`}
-                          className="text-lg font-semibold text-white transition hover:text-emerald-100"
+                          className="text-lg font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                         >
                           {p.title}
                         </Link>
@@ -523,7 +523,7 @@ export default function PromisesClient() {
                             type="button"
                             disabled={busy}
                             onClick={() => setConfirmingId(p.id)}
-                            className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:opacity-60"
+                            className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
                           </button>
@@ -538,7 +538,7 @@ export default function PromisesClient() {
                         {!isPromisor && p.status === "completed_by_promisor" && (
                           <Link
                             href={`/promises/${p.id}/confirm`}
-                            className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20"
+                            className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                           >
                             {t("promises.list.reviewConfirm")}
                           </Link>
@@ -560,7 +560,7 @@ export default function PromisesClient() {
                 <div className="mt-4">
                   <Link
                     href="/promises/new"
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                   >
                     {t("promises.empty.cta")}
                   </Link>
@@ -574,7 +574,7 @@ export default function PromisesClient() {
                   type="button"
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loadingMore ? (
                     <>
@@ -605,7 +605,7 @@ export default function PromisesClient() {
               <button
                 type="button"
                 onClick={() => setConfirmingId(null)}
-                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
                 {t("promises.confirmModal.cancel")}
               </button>
@@ -616,7 +616,7 @@ export default function PromisesClient() {
                   setConfirmingId(null);
                   if (id) await handleMarkCompleted(id);
                 }}
-                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50"
+                className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
                 {t("promises.confirmModal.confirm")}
               </button>
