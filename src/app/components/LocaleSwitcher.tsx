@@ -64,25 +64,23 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     }
   };
 
+  const nextLocale = locales.find((code) => code !== locale);
+
   return (
     <div className={className}>
       <div className="flex items-center gap-2">
-        {locales.map((code) => (
+        {nextLocale && (
           <IconButton
-            key={code}
-            onClick={() => void updateLocale(code)}
-            disabled={busy || code === locale}
-            active={code === locale}
-            ariaLabel={
-              code === locale ? `${code.toUpperCase()} selected` : `Switch to ${code.toUpperCase()}`
-            }
+            onClick={() => void updateLocale(nextLocale)}
+            disabled={busy}
+            ariaLabel={`Switch to ${nextLocale.toUpperCase()}`}
             icon={
               <span className="text-[11px] font-semibold uppercase tracking-wide">
-                {code.toUpperCase()}
+                {nextLocale.toUpperCase()}
               </span>
             }
           />
-        ))}
+        )}
       </div>
       {toast && (
         <div
