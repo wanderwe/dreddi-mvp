@@ -224,8 +224,6 @@
       "eyebrow": "New deal",
       "title": "Document the deal",
       "subtitle": "Name the deal, add context, and an optional deadline",
-      "optionalLabel": "(optional)",
-      "requiredHelper": "All fields without the ‘optional’ label are required",
       "back": "Back",
       "fields": {
         "title": "Title",

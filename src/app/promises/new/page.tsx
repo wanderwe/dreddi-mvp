@@ -530,7 +530,7 @@ export default function NewPromisePage() {
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.executor")}
+                {t("promises.new.fields.executor")} *
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
@@ -560,7 +560,7 @@ export default function NewPromisePage() {
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.title")}
+                {t("promises.new.fields.title")} *
               </span>
               <input
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
@@ -576,10 +576,7 @@ export default function NewPromisePage() {
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.details")}{" "}
-                <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
-                  {t("promises.new.optionalLabel")}
-                </span>
+                {t("promises.new.fields.details")}
               </span>
               <textarea
                 className="min-h-[130px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
@@ -591,10 +588,7 @@ export default function NewPromisePage() {
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.condition")}{" "}
-                <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
-                  {t("promises.new.optionalLabel")}
-                </span>
+                {t("promises.new.fields.condition")}
               </span>
               <textarea
                 className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
@@ -610,7 +604,7 @@ export default function NewPromisePage() {
                   <div className="text-sm text-slate-200">
                     <label className="block">
                       <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
-                        {t("promises.new.fields.counterparty")}
+                        {t("promises.new.fields.counterparty")} *
                       </span>
                       <input
                         id="counterparty"
@@ -636,10 +630,7 @@ export default function NewPromisePage() {
 
                 <div className="text-sm text-slate-200">
                   <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.dueDate")}{" "}
-                    <span className="text-[10px] font-medium normal-case tracking-normal text-slate-400">
-                      {t("promises.new.optionalLabel")}
-                    </span>
+                    {t("promises.new.fields.dueDate")}
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
                     <button
@@ -734,9 +725,6 @@ export default function NewPromisePage() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs text-slate-400">
-              {t("promises.new.requiredHelper")}
-            </p>
             <button
               onClick={createPromise}
               disabled={busy}
