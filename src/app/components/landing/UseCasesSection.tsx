@@ -41,20 +41,11 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">
             {copy.title}
           </h2>
-          <p className="mx-auto max-w-2xl text-sm text-slate-300 sm:mx-0 sm:text-base">
-            {copy.lead}
-          </p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="group rounded-3xl border border-white/10 bg-white/5 p-6 shadow-inner shadow-black/40 transition hover:border-emerald-400/30">
-            <div className="flex items-center gap-3 text-sm font-semibold text-white">
-              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-200">
-                <CheckCircle2 className="h-4 w-4" />
-              </span>
-              {copy.triggersTitle}
-            </div>
-            <ul className="mt-5 space-y-3 text-sm text-slate-200/90">
+            <ul className="space-y-3 text-sm text-slate-200/90">
               {copy.bullets.map((item, index) => {
                 const Icon = triggerIcons[index] ?? CheckCircle2;
 
