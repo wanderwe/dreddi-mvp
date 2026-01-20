@@ -57,7 +57,7 @@ type PromiseRoleBase = Pick<
 type PromiseWithRole = PromiseRow & { role: PromiseRole; inviteStatus: InviteStatus };
 type PromiseSummary = PromiseRoleBase & { role: PromiseRole; inviteStatus: InviteStatus };
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 12;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
