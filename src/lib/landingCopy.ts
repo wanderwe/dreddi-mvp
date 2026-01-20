@@ -20,8 +20,6 @@ export type LandingCopy = {
   useDreddi: {
     label: string;
     title: string;
-    lead: string;
-    triggersTitle: string;
     bullets: string[];
     scenariosTitle: string;
     scenarios: string[];
@@ -91,9 +89,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     useDreddi: {
       label: "Сценарії використання",
       title: "Коли варто використовувати Dreddi",
-      lead:
-        "Сигнали, що домовленість уже потребує фіксації, навіть якщо контракт ще попереду.",
-      triggersTitle: "Коли фіксувати домовленість",
       bullets: [
         "Ви погодили дедлайни, але нічого не підписано",
         "На кону гроші, час або репутація",
@@ -193,9 +188,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     useDreddi: {
       label: "Use cases",
       title: "Use Dreddi when",
-      lead:
-        "Signals that an agreement should be captured, even before contracts enter the picture",
-      triggersTitle: "Capture it when",
       bullets: [
         "You agree on deadlines, but nothing is signed yet",
         "Money, time, or reputation is at stake",
