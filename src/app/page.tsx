@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { ReputationSection } from "@/app/components/landing/ReputationSection";
 import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -562,6 +563,7 @@ export default function Home() {
       </div>
 
       <UseCasesSection copy={copy.useDreddi} />
+      <ReputationSection copy={copy.reputationModel} />
     </main>
   );
 }

@@ -26,6 +26,18 @@ export type LandingCopy = {
     noteTitle: string;
     framing: string;
   };
+  reputationModel: {
+    label: string;
+    title: string;
+    steps: {
+      title: string;
+      description: string;
+    }[];
+    profileTitle: string;
+    profileDescription: string;
+    profileHighlights: string[];
+    cta: string;
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -106,6 +118,40 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Не для всього.",
       framing:
         "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
+    },
+    reputationModel: {
+      label: "Репутація",
+      title: "Репутація будується виконанням, а не словами",
+      steps: [
+        {
+          title: "Прийняття = відповідальність",
+          description:
+            "Репутація — не оцінка, а зафіксована історія прийнятих угод",
+        },
+        {
+          title: "Виконання в строк важливіше обіцянок",
+          description:
+            "Результат і своєчасність дають більше сигналів довіри, ніж слова",
+        },
+        {
+          title: "Підтвердження або спір — усе видно",
+          description:
+            "І підтвердження, і оскарження залишають слід — прозорість не приховується",
+        },
+        {
+          title: "Історія формується поступово",
+          description: "Репутація зростає угода за угодою, без різких стрибків",
+        },
+      ],
+      profileTitle: "Публічний профіль як доказ домовленостей",
+      profileDescription:
+        "Профіль можна показати клієнтам, партнерам чи команді — він відображає реальну історію, а не самопрезентацію",
+      profileHighlights: [
+        "Прийняті та виконані угоди",
+        "Підтвердження з обох сторін",
+        "Видимі спори без прикрас",
+      ],
+      cta: "Переглянути приклад профілю",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -205,6 +251,40 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Not for everything.",
       framing:
         "For agreements where it’s too early for contracts but already too risky to rely on words.",
+    },
+    reputationModel: {
+      label: "Reputation",
+      title: "Reputation is built by delivery, not promises",
+      steps: [
+        {
+          title: "Acceptance means responsibility",
+          description:
+            "Reputation isn’t a rating — it’s a recorded history of deals",
+        },
+        {
+          title: "Delivery on time matters most",
+          description:
+            "Outcomes and timeliness signal trust more than promises do",
+        },
+        {
+          title: "Confirmation or dispute stays visible",
+          description:
+            "Both confirmations and disputes are recorded — transparency isn’t hidden",
+        },
+        {
+          title: "History builds gradually",
+          description: "Reputation grows deal by deal, without sudden jumps",
+        },
+      ],
+      profileTitle: "A public profile that proves reliability",
+      profileDescription:
+        "Share your profile with clients, partners, or a team — it reflects real history, not self-promotion",
+      profileHighlights: [
+        "Accepted and completed deals",
+        "Confirmation from both sides",
+        "Visible disputes with context",
+      ],
+      cta: "View a profile example",
     },
     cta: {
       getStarted: "Create a deal",
