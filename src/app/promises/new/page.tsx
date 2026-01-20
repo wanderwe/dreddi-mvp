@@ -396,7 +396,7 @@ export default function NewPromisePage() {
         .maybeSingle();
 
       if (!active) return;
-      setIsPublicProfile(profileData?.is_public_profile ?? false);
+      setIsPublicProfile(profileData?.is_public_profile ?? true);
     };
 
     void ensureSession();
