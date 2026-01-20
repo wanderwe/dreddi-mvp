@@ -2,6 +2,10 @@
 
 ## Current usage audit
 
+### Production audit results (reported)
+
+The legacy-type audit queries were run in production and returned no rows, indicating there are currently **zero** notifications with `N1`–`N7` types.
+
 ### Database audit queries (run against production)
 
 ```sql
