@@ -179,6 +179,20 @@
       "declined": "Declined",
       "ignored": "Ignored"
     },
+    "stakeLevels": {
+      "normal": "Normal",
+      "high": "High"
+    },
+    "stakeReasons": {
+      "deadline": "Time-sensitive deadline",
+      "public": "Public accountability",
+      "reputation_impact": "Reputation impact",
+      "history": "Past history"
+    },
+    "stake": {
+      "highBadge": "High-stake",
+      "reasonLabel": "Reason"
+    },
     "confirm": {
       "back": "Back to deals",
       "badge": "Review",
@@ -242,7 +256,9 @@
         "counterparty": "Counterparty",
         "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
         "dueDate": "Due date",
-        "dueTime": "Due time"
+        "dueTime": "Due time",
+        "stakeLevel": "Stake level",
+        "stakeReason": "Reason"
       },
       "executor": {
         "me": "Me",
@@ -254,14 +270,20 @@
         "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "Counterparty email or phone",
         "counterpartyOther": "Counterparty email or phone",
-        "dueDate": "Select date (optional)"
+        "dueDate": "Select date (optional)",
+        "stakeReason": "Select reason"
       },
       "actions": {
         "addCondition": "+ Add counter-condition",
+        "collapse": "Collapse",
         "clearDate": "Clear date",
         "changeTime": "Change time",
         "selectTime": "Select time",
         "closeTimePicker": "Close time picker"
+      },
+      "advanced": {
+        "title": "Advanced",
+        "helper": "Use high-stake only when the outcome has serious, real-world consequences."
       },
       "publicRequest": {
         "label": "Public deal",
@@ -269,6 +291,7 @@
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact",
+        "stakeReasonRequired": "Select a reason for high-stake deals.",
         "createFailed": "Failed to create deal",
         "network": "Unable to reach the server. Please try again."
       },
