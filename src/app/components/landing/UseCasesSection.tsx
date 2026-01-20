@@ -5,7 +5,6 @@ import {
   Coins,
   Handshake,
   Home,
-  Info,
   MessageSquare,
   Rocket,
   Scale,
@@ -35,7 +34,7 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
       <div className="relative space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center sm:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
             <CheckCircle2 className="h-4 w-4" />
             {copy.label}
           </span>
@@ -101,15 +100,6 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
           </div>
         </div>
 
-        <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-slate-300/90 italic">
-          <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-emerald-200">
-            <Info className="h-4 w-4" />
-          </span>
-          <p>
-            <span className="font-semibold text-slate-200">{copy.noteTitle}</span>{" "}
-            {copy.framing}
-          </p>
-        </div>
       </div>
     </section>
   );
