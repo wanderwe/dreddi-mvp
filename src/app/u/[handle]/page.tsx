@@ -12,7 +12,6 @@ type PublicProfileRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
-  reputation_score: number | null;
   confirmed_count: number | null;
   disputed_count: number | null;
   last_activity_at: string | null;
@@ -47,7 +46,7 @@ const getPublicProfileStats = async (handle: string) => {
   return supabase
     .from("public_profile_stats")
     .select(
-      "handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count,last_activity_at"
+      "handle,display_name,avatar_url,confirmed_count,disputed_count,last_activity_at"
     )
     .eq("handle", handle)
     .maybeSingle();
@@ -77,15 +76,6 @@ export default function PublicProfilePage() {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const formatDateShort = useMemo(
-    () =>
-      (value: string) =>
-        new Intl.DateTimeFormat(locale, {
-          month: "short",
-          day: "numeric",
-        }).format(new Date(value)),
-    [locale]
-  );
   const formatRelativeTime = useMemo(() => {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
     return (value: string) => {
@@ -195,7 +185,6 @@ export default function PublicProfilePage() {
   }, []);
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
-  const reputationScore = profile?.reputation_score ?? 50;
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const lastActivityFromPromises = useMemo(() => {
@@ -306,13 +295,6 @@ export default function PublicProfilePage() {
                 <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
                 <span className="text-white/40">•</span>
                 <span>{lastActivityLabel}</span>
-                <span className="text-white/40">•</span>
-                <span className="inline-flex items-center gap-2">
-                  <span className="text-xs uppercase tracking-wide text-white/50">
-                    {t("publicProfile.reputationScore")}
-                  </span>
-                  <span className="text-sm font-semibold text-white">{reputationScore}</span>
-                </span>
               </div>
             </section>
 

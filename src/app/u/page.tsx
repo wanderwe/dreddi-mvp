@@ -9,7 +9,6 @@ type PublicProfileDirectoryRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
-  reputation_score: number | null;
   confirmed_count: number | null;
   disputed_count: number | null;
 };
@@ -35,7 +34,7 @@ export default function PublicProfilesDirectoryPage() {
 
       const { data, error: listError } = await supabase
         .from("public_profile_stats")
-        .select("handle,display_name,avatar_url,reputation_score,confirmed_count,disputed_count")
+        .select("handle,display_name,avatar_url,confirmed_count,disputed_count")
         .order("confirmed_count", { ascending: false })
         .order("handle", { ascending: true });
 
@@ -62,13 +61,8 @@ export default function PublicProfilesDirectoryPage() {
     () =>
       profiles.map((profile) => {
         const displayName = profile.display_name?.trim() || profile.handle;
-        const reputationScore = profile.reputation_score ?? 50;
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
-        const reputationTone =
-          reputationScore >= 60
-            ? "border-emerald-300/40 bg-emerald-400/10 text-emerald-100"
-            : "border-white/15 bg-white/5 text-white/70";
 
         return (
           <Link
@@ -95,12 +89,6 @@ export default function PublicProfilesDirectoryPage() {
                 <div>
                   <div className="text-lg font-semibold text-white">{displayName}</div>
                   <div className="text-sm text-white/60">@{profile.handle}</div>
-                </div>
-                <div
-                  className={`rounded-full border px-2 py-1 text-xs font-medium ${reputationTone}`}
-                >
-                  <span className="uppercase tracking-wide text-white/60">Rep</span>
-                  <span className="ml-1 text-sm font-semibold text-white">{reputationScore}</span>
                 </div>
               </div>
             </div>
