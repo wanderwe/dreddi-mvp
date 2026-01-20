@@ -13,6 +13,7 @@ type PublicProfileRow = {
   display_name: string | null;
   avatar_url: string | null;
   confirmed_count: number | null;
+  completed_count: number | null;
   disputed_count: number | null;
   last_activity_at: string | null;
 };
@@ -46,7 +47,7 @@ const getPublicProfileStats = async (handle: string) => {
   return supabase
     .from("public_profile_stats")
     .select(
-      "handle,display_name,avatar_url,confirmed_count,disputed_count,last_activity_at"
+      "handle,display_name,avatar_url,confirmed_count,completed_count,disputed_count,last_activity_at"
     )
     .eq("handle", handle)
     .maybeSingle();
@@ -186,6 +187,7 @@ export default function PublicProfilePage() {
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
   const confirmedCount = profile?.confirmed_count ?? 0;
+  const completedCount = profile?.completed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
@@ -291,6 +293,8 @@ export default function PublicProfilePage() {
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
                 <span>{t("publicProfile.summary.confirmed", { count: confirmedCount })}</span>
+                <span className="text-white/40">•</span>
+                <span>{t("publicProfile.summary.completed", { count: completedCount })}</span>
                 <span className="text-white/40">•</span>
                 <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
                 <span className="text-white/40">•</span>
