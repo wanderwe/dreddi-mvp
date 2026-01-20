@@ -35,7 +35,7 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
       <div className="relative space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center sm:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-200">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
             <CheckCircle2 className="h-4 w-4" />
             {copy.label}
           </span>
