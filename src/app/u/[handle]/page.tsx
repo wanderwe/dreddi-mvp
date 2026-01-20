@@ -186,9 +186,21 @@ export default function PublicProfilePage() {
   }, []);
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
+  const hasHistory = [
+    profile?.confirmed_count,
+    profile?.completed_count,
+    profile?.disputed_count,
+  ].some((value) => value !== null && value !== undefined);
   const confirmedCount = profile?.confirmed_count ?? 0;
   const completedCount = profile?.completed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
+  const reputationSummary = hasHistory
+    ? [
+        t("publicProfile.summary.confirmed", { count: confirmedCount }),
+        t("publicProfile.summary.completed", { count: completedCount }),
+        t("publicProfile.summary.disputed", { count: disputedCount }),
+      ].join(" · ")
+    : t("publicProfile.emptyHistory");
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -291,14 +303,12 @@ export default function PublicProfilePage() {
                   {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
                 </button>
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
-                <span>{t("publicProfile.summary.confirmed", { count: confirmedCount })}</span>
-                <span className="text-white/40">•</span>
-                <span>{t("publicProfile.summary.completed", { count: completedCount })}</span>
-                <span className="text-white/40">•</span>
-                <span>{t("publicProfile.summary.disputed", { count: disputedCount })}</span>
-                <span className="text-white/40">•</span>
-                <span>{lastActivityLabel}</span>
+              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wide text-white/50">
+                  {t("publicProfile.reputation.title")}
+                </div>
+                <div className="mt-2 text-sm text-white/80">{reputationSummary}</div>
+                <div className="mt-2 text-xs text-white/50">{lastActivityLabel}</div>
               </div>
             </section>
 

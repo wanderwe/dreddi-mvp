@@ -360,6 +360,9 @@
     "loading": "Завантаження профілю…",
     "reputationScore": "Репутаційний бал",
     "stableReputation": "Стабільна репутація",
+    "reputation": {
+      "title": "Репутація"
+    },
     "summary": {
       "confirmed": "{count} підтверджено",
       "completed": "{count} виконано",

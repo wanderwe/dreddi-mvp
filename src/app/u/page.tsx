@@ -64,9 +64,18 @@ export default function PublicProfilesDirectoryPage() {
     () =>
       profiles.map((profile) => {
         const displayName = profile.display_name?.trim() || profile.handle;
+        const hasHistory = [profile.confirmed_count, profile.completed_count, profile.disputed_count]
+          .some((value) => value !== null && value !== undefined);
         const confirmedCount = profile.confirmed_count ?? 0;
         const completedCount = profile.completed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
+        const reputationSummary = hasHistory
+          ? [
+              t("publicProfile.summary.confirmed", { count: confirmedCount }),
+              t("publicProfile.summary.completed", { count: completedCount }),
+              t("publicProfile.summary.disputed", { count: disputedCount }),
+            ].join(" · ")
+          : t("publicProfile.emptyHistory");
 
         return (
           <Link
@@ -106,6 +115,12 @@ export default function PublicProfilesDirectoryPage() {
               <span className="rounded-full border border-red-300/30 bg-red-500/10 px-2 py-1">
                 {t("publicProfile.disputed")}: {disputedCount}
               </span>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
+              <div className="text-[10px] uppercase tracking-wide text-white/50">
+                {t("publicProfile.reputation.title")}
+              </div>
+              <div className="text-sm text-white/80">{reputationSummary}</div>
             </div>
           </Link>
         );

@@ -352,6 +352,9 @@
     "loading": "Loading profile…",
     "reputationScore": "Reputation score",
     "stableReputation": "Stable reputation",
+    "reputation": {
+      "title": "Reputation"
+    },
     "summary": {
       "confirmed": "{count} confirmed",
       "completed": "{count} completed",
