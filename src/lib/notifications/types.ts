@@ -3,6 +3,8 @@ export type LegacyNotificationType = "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "
 export type NotificationType =
   | "invite"
   | "invite_followup"
+  | "invite_declined"
+  | "invite_ignored"
   | "due_soon"
   | "overdue"
   | "completion_waiting"

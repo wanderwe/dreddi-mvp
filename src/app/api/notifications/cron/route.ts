@@ -5,10 +5,12 @@ import {
   buildCtaUrl,
   buildDedupeKey,
   createNotification,
+  getUserNotificationSettings,
   mapPriorityForType,
 } from "@/lib/notifications/service";
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import { getInviteResponseCopy, resolveInviteActorName } from "@/lib/notifications/inviteResponses";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
 const HOURS_72 = 72 * 60 * 60 * 1000;
@@ -85,12 +87,27 @@ export async function POST(req: Request) {
   const { data: staleInvites } = await admin
     .from("promises")
     .select(
-      "id,invited_at,created_at,invite_status,counterparty_accepted_at"
+      "id,title,creator_id,counterparty_id,invited_at,created_at,invite_status,counterparty_accepted_at"
     )
     .eq("status", "active")
     .is("counterparty_accepted_at", null)
     .not("counterparty_id", "is", null)
     .or("invite_status.is.null,invite_status.eq.awaiting_acceptance");
+
+  const counterpartyIds = Array.from(
+    new Set((staleInvites ?? []).map((row) => row.counterparty_id).filter(Boolean))
+  ) as string[];
+
+  const { data: counterpartyProfiles } = counterpartyIds.length
+    ? await admin
+        .from("profiles")
+        .select("id,handle,display_name")
+        .in("id", counterpartyIds)
+    : { data: [] as Array<{ id: string; handle: string | null; display_name: string | null }> };
+
+  const counterpartyLookup = new Map(
+    (counterpartyProfiles ?? []).map((profile) => [profile.id, profile])
+  );
 
   for (const row of staleInvites ?? []) {
     if (row.invite_status && row.invite_status !== "awaiting_acceptance") continue;
@@ -107,7 +124,30 @@ export async function POST(req: Request) {
       .is("counterparty_accepted_at", null)
       .or("invite_status.is.null,invite_status.eq.awaiting_acceptance");
 
-    if (!error) results.ignored += 1;
+    if (!error) {
+      results.ignored += 1;
+
+      const settings = await getUserNotificationSettings(admin, row.creator_id);
+      const copy = getInviteResponseCopy({
+        locale: settings.locale,
+        response: "ignored",
+        actorName: resolveInviteActorName(counterpartyLookup.get(row.counterparty_id ?? "")),
+        dealTitle: row.title ?? null,
+      });
+
+      await createNotification(admin, {
+        userId: row.creator_id,
+        promiseId: row.id,
+        type: "invite_ignored",
+        role: "creator",
+        dedupeKey: buildDedupeKey(["invite_ignored", row.id]),
+        ctaUrl: buildCtaUrl(row.id),
+        ctaLabel: copy.ctaLabel,
+        priority: mapPriorityForType("invite_ignored"),
+        title: copy.title,
+        body: copy.body,
+      });
+    }
   }
 
   const { data: invites } = await admin

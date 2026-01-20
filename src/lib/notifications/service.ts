@@ -23,7 +23,10 @@ export type NotificationRequest = {
   role?: NotificationRole;
   dedupeKey: string;
   ctaUrl: string;
+  ctaLabel?: string | null;
   priority: NotificationPriority;
+  title?: string;
+  body?: string;
   followup?: "invite" | "completion24" | "completion72";
   delta?: number | null;
   requiresDeadlineReminder?: boolean;
@@ -152,9 +155,9 @@ export async function createNotification(
     user_id: request.userId,
     promise_id: request.promiseId,
     type: normalizedType,
-    title: "",
-    body: "",
-    cta_label: null,
+    title: request.title ?? "",
+    body: request.body ?? "",
+    cta_label: request.ctaLabel ?? null,
     cta_url: request.ctaUrl,
     priority: request.priority,
     delivered_at: deliverNow ? now.toISOString() : null,
