@@ -373,8 +373,8 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-6 md:gap-8">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-14 md:py-16">
+        <div className="flex max-w-3xl flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-5 sm:space-y-4">
             <div className="inline-flex w-fit max-w-[90vw] items-center gap-2 whitespace-normal rounded-full border border-emerald-400/10 bg-emerald-500/5 px-3 py-1 text-[11px] font-medium leading-relaxed tracking-wide text-emerald-200/80 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.18)] backdrop-blur sm:max-w-full sm:gap-2.5 sm:whitespace-nowrap sm:px-3.5 sm:py-1.5 sm:text-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-300/70 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
@@ -389,9 +389,6 @@ export default function Home() {
             </div>
             <p className="max-w-xl text-xl font-semibold text-white">
               {copy.hero.headline}
-            </p>
-            <p className="max-w-xl text-lg text-slate-300">
-              {renderMultiline(copy.hero.description)}
             </p>
           </div>
 
@@ -431,48 +428,64 @@ export default function Home() {
               </Link>
             </div>
           )}
-
         </div>
+      </div>
 
-        <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-white/10 to-sky-400/5" aria-hidden />
-            <div className="relative flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
-                  <div>
-                    <p className="text-sm text-slate-300">{copy.score.label}</p>
-                    <p className="text-2xl font-semibold text-white">
-                      {reputationLoading ? copy.loading.short : score}
-                    </p>
-                  </div>
-                </div>
-                {email ? (
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
-                    {copy.score.live}
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
-                    {copy.score.signIn}
-                  </span>
-                )}
-              </div>
+      <UseCasesSection copy={copy.useDreddi} />
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">{copy.score.cards.confirmed}</div>
-                  <div className="text-lg font-semibold">
-                    {reputationLoading ? copy.loading.placeholder : confirmedCount}
+      <section className="relative mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
+        <div className="space-y-10">
+          <div className="max-w-2xl space-y-4">
+            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+              {copy.reputationSection.title}
+            </h2>
+            <p className="text-sm text-slate-300 sm:text-base">
+              {renderMultiline(copy.hero.description)}
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[1.6fr_0.7fr] lg:items-start">
+            <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-6 sm:p-7">
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-white/10 to-sky-400/5"
+                aria-hidden
+              />
+              <div className="relative flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
+                    <div>
+                      <p className="text-sm text-slate-300">{copy.score.label}</p>
+                      <p className="text-2xl font-semibold text-white">
+                        {reputationLoading ? copy.loading.short : score}
+                      </p>
+                    </div>
+                  </div>
+                  {email ? (
+                    <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
+                      {copy.score.live}
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
+                      {copy.score.signIn}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
+                    <div className="text-xs text-emerald-200">{copy.score.cards.confirmed}</div>
+                    <div className="text-lg font-semibold">
+                      {reputationLoading ? copy.loading.placeholder : confirmedCount}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
+                    <div className="text-xs text-amber-200">{copy.score.cards.disputed}</div>
+                    <div className="text-lg font-semibold">
+                      {reputationLoading ? copy.loading.placeholder : disputedCount}
+                    </div>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">{copy.score.cards.disputed}</div>
-                  <div className="text-lg font-semibold">
-                    {reputationLoading ? copy.loading.placeholder : disputedCount}
-                  </div>
-                </div>
-              </div>
 
                 {reputationError && isAuthenticated && (
                   <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
@@ -480,20 +493,20 @@ export default function Home() {
                   </div>
                 )}
 
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
-                <div className="flex items-center gap-3 text-sm text-emerald-200">
-                  <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  <span>{copy.score.onTime.label}</span>
-                  {hasDueDateDeals ? (
-                    <span className="ml-auto text-lg font-semibold text-white">
-                      {reputationLoading ? copy.loading.placeholder : onTimeSummary}
-                    </span>
-                  ) : null}
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
+                  <div className="flex items-center gap-3 text-sm text-emerald-200">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    <span>{copy.score.onTime.label}</span>
+                    {hasDueDateDeals ? (
+                      <span className="ml-auto text-lg font-semibold text-white">
+                        {reputationLoading ? copy.loading.placeholder : onTimeSummary}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 text-xs text-emerald-100/80">
+                    {onTimeHelper}
+                  </p>
                 </div>
-                <p className="mt-2 text-xs text-emerald-100/80">
-                  {onTimeHelper}
-                </p>
-              </div>
 
                 <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
                   <div className="flex items-center justify-between text-sm text-slate-300">
@@ -556,12 +569,26 @@ export default function Home() {
                     </>
                   )}
                 </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-6 shadow-[0_20px_50px_-30px_rgba(16,185,129,0.6)] lg:translate-y-10">
+              <div className="text-xs font-semibold uppercase tracking-wide text-emerald-200/80">
+                {t("nav.publicProfiles")}
+              </div>
+              <h3 className="mt-3 text-lg font-semibold text-white">
+                {copy.publicProfileSection.title}
+              </h3>
+              <Link
+                href="/u"
+                className="mt-5 inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/60 hover:text-emerald-100"
+              >
+                {copy.cta.publicProfiles}
+              </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      <UseCasesSection copy={copy.useDreddi} />
+      </section>
     </main>
   );
 }
