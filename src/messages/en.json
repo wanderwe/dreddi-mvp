@@ -258,6 +258,7 @@
       },
       "actions": {
         "addCondition": "+ Add counter-condition",
+        "removeCondition": "Remove counter-condition",
         "clearDate": "Clear date",
         "changeTime": "Change time",
         "selectTime": "Select time",

@@ -52,6 +52,11 @@ export default function NewPromisePage() {
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
 
+  const handleRemoveCondition = () => {
+    setConditionText("");
+    setShowCondition(false);
+  };
+
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
 
@@ -594,6 +599,15 @@ export default function NewPromisePage() {
                   value={conditionText}
                   onChange={(e) => setConditionText(e.target.value)}
                 />
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleRemoveCondition}
+                    className="text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
+                  >
+                    {t("promises.new.actions.removeCondition")}
+                  </button>
+                </div>
               </label>
             )}
 
