@@ -121,6 +121,9 @@
       "cardTitle": "Deal",
       "acceptedBySecondSide": "Accepted by second side",
       "inviteStatusLabel": "Invite status",
+      "groupAccepted": "Accepted {accepted}/{total}",
+      "groupThreshold": "Threshold: {threshold}",
+      "groupAwaiting": "Waiting for participants to accept",
       "yes": "Yes",
       "no": "No",
       "counterparty": "Counterparty",
@@ -263,12 +266,28 @@
         "selectTime": "Select time",
         "closeTimePicker": "Close time picker"
       },
+      "advanced": {
+        "label": "Advanced"
+      },
+      "group": {
+        "acceptanceMode": "Acceptance mode",
+        "acceptanceAll": "All participants",
+        "acceptanceThreshold": "Threshold",
+        "thresholdLabel": "Acceptance threshold",
+        "thresholdPlaceholder": "e.g. 3",
+        "participantsLabel": "Participants",
+        "participantsPlaceholder": "Enter emails or handles, one per line or separated by commas",
+        "participantsHelper": "Only flagged users can create group deals."
+      },
       "publicRequest": {
         "label": "Public deal",
         "helper": "Public deals appear on your public profile once confirmed"
       },
       "errors": {
         "counterpartyRequired": "Please add the other party's contact",
+        "participantsRequired": "Please add at least one participant",
+        "thresholdRequired": "Add a valid acceptance threshold",
+        "thresholdTooHigh": "Threshold cannot exceed participant count",
         "createFailed": "Failed to create deal",
         "network": "Unable to reach the server. Please try again."
       },
@@ -300,6 +319,10 @@
       "accepted": "Accepted",
       "declined": "Declined",
       "ignored": "Ignored"
+    },
+    "group": {
+      "acceptedCount": "Accepted {accepted}/{total}",
+      "needCount": "Need {remaining} of {threshold}"
     },
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this deal",

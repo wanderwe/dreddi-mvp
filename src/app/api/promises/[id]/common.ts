@@ -5,6 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 
 type PromiseRecord = PromiseRowMin & {
   details: string | null;
+  acceptance_mode: "all" | "threshold";
+  acceptance_threshold: number | null;
 };
 
 export const DISPUTE_CODES = ["not_completed", "partial", "late", "other"] as const;
@@ -31,7 +33,7 @@ export async function loadPromiseForUser(id: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,condition_text,condition_met_at,condition_met_by,invite_status,invited_at,accepted_at,declined_at,ignored_at"
+      "id,title,details,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,condition_text,condition_met_at,condition_met_by,invite_status,invited_at,accepted_at,declined_at,ignored_at,acceptance_mode,acceptance_threshold"
     )
     .eq("id", id)
     .maybeSingle<PromiseRecord>();
@@ -49,7 +51,16 @@ export async function loadPromiseForUser(id: string, userId: string) {
   }
 
   if (promise.creator_id !== userId && promise.counterparty_id !== userId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const { data: participant } = await admin
+      .from("promise_participants")
+      .select("id")
+      .eq("promise_id", id)
+      .eq("participant_id", userId)
+      .maybeSingle();
+
+    if (!participant) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   return promise;

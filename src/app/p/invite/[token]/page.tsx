@@ -31,6 +31,11 @@ type InviteInfo = {
   ignored_at: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
+  participant_count?: number | null;
+  accepted_count?: number | null;
+  acceptance_mode?: "all" | "threshold";
+  acceptance_threshold?: number | null;
+  is_group_deal?: boolean;
 };
 
 export default function InvitePage() {
@@ -205,6 +210,14 @@ export default function InvitePage() {
   const conditionMet = Boolean(info?.condition_met_at);
   const inviteStatus = getPromiseInviteStatus(info);
   const inviteAccepted = isPromiseAccepted(info);
+  const participantCount = info?.participant_count ?? 0;
+  const acceptedCount = info?.accepted_count ?? 0;
+  const isGroupDeal = Boolean(info?.is_group_deal);
+  const acceptanceThreshold = info?.acceptance_threshold ?? null;
+  const remainingCount =
+    info?.acceptance_mode === "threshold" && acceptanceThreshold !== null
+      ? Math.max(acceptanceThreshold - acceptedCount, 0)
+      : null;
   const canDecline = canCounterpartyRespond({
     userId,
     creatorId: info?.creator_id ?? "",
@@ -345,6 +358,24 @@ export default function InvitePage() {
                     ? t("invite.statusAwaitingBody")
                     : t("invite.statusClosedBody")}
                 </p>
+                {isGroupDeal && (
+                  <div className="mt-3 space-y-1 text-sm text-slate-300">
+                    <div>
+                      {t("invite.group.acceptedCount", {
+                        accepted: acceptedCount,
+                        total: participantCount,
+                      })}
+                    </div>
+                    {info?.acceptance_mode === "threshold" && remainingCount !== null && (
+                      <div>
+                        {t("invite.group.needCount", {
+                          remaining: remainingCount,
+                          threshold: acceptanceThreshold ?? 0,
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">

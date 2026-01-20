@@ -129,6 +129,9 @@
       "cardTitle": "Угода",
       "acceptedBySecondSide": "Прийнято другою стороною",
       "inviteStatusLabel": "Статус запрошення",
+      "groupAccepted": "Прийнято {accepted}/{total}",
+      "groupThreshold": "Поріг: {threshold}",
+      "groupAwaiting": "Очікуємо, що учасники приймуть угоду",
       "yes": "Так",
       "no": "Ні",
       "counterparty": "Контрагент",
@@ -271,12 +274,28 @@
         "selectTime": "Оберіть час",
         "closeTimePicker": "Закрити вибір часу"
       },
+      "advanced": {
+        "label": "Додатково"
+      },
+      "group": {
+        "acceptanceMode": "Режим прийняття",
+        "acceptanceAll": "Усі учасники",
+        "acceptanceThreshold": "Поріг",
+        "thresholdLabel": "Поріг прийняття",
+        "thresholdPlaceholder": "наприклад, 3",
+        "participantsLabel": "Учасники",
+        "participantsPlaceholder": "Вкажіть email або нікнейми, по одному в рядок або через кому",
+        "participantsHelper": "Лише користувачі з доступом можуть створювати групові угоди."
+      },
       "publicRequest": {
         "label": "Публічна угода",
         "helper": "Публічні угоди з'являються у вашому профілі після підтвердження"
       },
       "errors": {
         "counterpartyRequired": "Додайте контакт іншої сторони",
+        "participantsRequired": "Додайте хоча б одного учасника",
+        "thresholdRequired": "Вкажіть коректний поріг прийняття",
+        "thresholdTooHigh": "Поріг не може перевищувати кількість учасників",
         "createFailed": "Не вдалося створити домовленість",
         "network": "Не вдалося під'єднатися до сервера. Спробуйте ще раз."
       },
@@ -308,6 +327,10 @@
       "accepted": "Прийнято",
       "declined": "Відхилено",
       "ignored": "Проігноровано"
+    },
+    "group": {
+      "acceptedCount": "Прийнято {accepted}/{total}",
+      "needCount": "Потрібно {remaining} з {threshold}"
     },
     "nextStep": "Наступний крок",
     "nextStepHint": "Приймаючи, ви підтверджуєте, що розумієте цю угоду",

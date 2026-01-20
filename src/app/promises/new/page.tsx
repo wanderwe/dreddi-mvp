@@ -50,6 +50,10 @@ export default function NewPromisePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
+  const [groupDealsEnabled, setGroupDealsEnabled] = useState(false);
+  const [acceptanceMode, setAcceptanceMode] = useState<"all" | "threshold">("all");
+  const [acceptanceThreshold, setAcceptanceThreshold] = useState("");
+  const [participantsInput, setParticipantsInput] = useState("");
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
 
   const supabaseErrorMessage = (err: unknown) =>
@@ -78,6 +82,16 @@ export default function NewPromisePage() {
     normalized.setSeconds(0, 0);
     return normalized;
   }, [dueAt]);
+
+  const participantList = useMemo(() => {
+    return participantsInput
+      .split(/[\n,]+/)
+      .map((value) => value.trim())
+      .filter(Boolean);
+  }, [participantsInput]);
+
+  const isGroupDeal =
+    groupDealsEnabled && (acceptanceMode === "threshold" || participantList.length > 1);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });
@@ -397,6 +411,24 @@ export default function NewPromisePage() {
 
       if (!active) return;
       setIsPublicProfile(profileData?.is_public_profile ?? true);
+
+      try {
+        const res = await fetch("/api/feature-flags", {
+          headers: {
+            Authorization: `Bearer ${sessionData.session.access_token}`,
+          },
+        });
+        if (!active) return;
+        if (res.ok) {
+          const flags = (await res.json()) as { groupDealsEnabled?: boolean };
+          setGroupDealsEnabled(Boolean(flags.groupDealsEnabled));
+        } else {
+          setGroupDealsEnabled(false);
+        }
+      } catch {
+        if (!active) return;
+        setGroupDealsEnabled(false);
+      }
     };
 
     void ensureSession();
@@ -437,11 +469,31 @@ export default function NewPromisePage() {
     }
 
     const counterpartyContact = counterparty.trim();
+    const thresholdNumber = acceptanceThreshold ? Number(acceptanceThreshold) : null;
 
-    if (!counterpartyContact) {
+    if (!isGroupDeal && !counterpartyContact) {
       setBusy(false);
       setError(t("promises.new.errors.counterpartyRequired"));
       return;
+    }
+
+    if (isGroupDeal && participantList.length < 1) {
+      setBusy(false);
+      setError(t("promises.new.errors.participantsRequired"));
+      return;
+    }
+
+    if (isGroupDeal && acceptanceMode === "threshold") {
+      if (!thresholdNumber || thresholdNumber < 1) {
+        setBusy(false);
+        setError(t("promises.new.errors.thresholdRequired"));
+        return;
+      }
+      if (thresholdNumber > participantList.length) {
+        setBusy(false);
+        setError(t("promises.new.errors.thresholdTooHigh"));
+        return;
+      }
     }
 
     const shouldRequestPublic = isPublicDeal && isPublicProfile;
@@ -449,10 +501,14 @@ export default function NewPromisePage() {
       title: title.trim(),
       details: details.trim() || null,
       conditionText: conditionText.trim() || null,
-      counterpartyContact,
+      counterpartyContact: isGroupDeal ? null : counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldRequestPublic ? "public" : "private",
+      acceptanceMode: groupDealsEnabled ? acceptanceMode : undefined,
+      acceptanceThreshold:
+        isGroupDeal && acceptanceMode === "threshold" ? thresholdNumber : null,
+      participants: isGroupDeal ? participantList : [],
     };
 
     let res: Response;
@@ -465,7 +521,7 @@ export default function NewPromisePage() {
         },
         body: JSON.stringify(payload),
       });
-    } catch (err) {
+    } catch {
       setBusy(false);
       setError(t("promises.new.errors.network"));
       return;
@@ -682,6 +738,76 @@ export default function NewPromisePage() {
               </p>
             )}
 
+            {groupDealsEnabled && (
+              <details className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+                <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.advanced.label")}
+                </summary>
+                <div className="mt-4 space-y-4">
+                  <div className="space-y-2">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.group.acceptanceMode")}
+                    </span>
+                    <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setAcceptanceMode("all")}
+                        className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                          acceptanceMode === "all"
+                            ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                            : "text-slate-200 hover:text-emerald-100"
+                        }`}
+                      >
+                        {t("promises.new.group.acceptanceAll")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAcceptanceMode("threshold")}
+                        className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                          acceptanceMode === "threshold"
+                            ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                            : "text-slate-200 hover:text-emerald-100"
+                        }`}
+                      >
+                        {t("promises.new.group.acceptanceThreshold")}
+                      </button>
+                    </div>
+                  </div>
+
+                  {acceptanceMode === "threshold" && (
+                    <label className="space-y-2 text-sm text-slate-200">
+                      <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                        {t("promises.new.group.thresholdLabel")}
+                      </span>
+                      <input
+                        type="number"
+                        min={1}
+                        className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                        placeholder={t("promises.new.group.thresholdPlaceholder")}
+                        value={acceptanceThreshold}
+                        onChange={(e) => setAcceptanceThreshold(e.target.value)}
+                      />
+                    </label>
+                  )}
+
+                  <label className="space-y-2 text-sm text-slate-200">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.group.participantsLabel")}
+                    </span>
+                    <textarea
+                      className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      placeholder={t("promises.new.group.participantsPlaceholder")}
+                      value={participantsInput}
+                      onChange={(e) => setParticipantsInput(e.target.value)}
+                    />
+                    <p className="text-xs text-slate-400">
+                      {t("promises.new.group.participantsHelper")}
+                    </p>
+                  </label>
+                </div>
+              </details>
+            )}
+
             {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
@@ -720,7 +846,11 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim() || !counterparty.trim()}
+              disabled={
+                busy ||
+                !title.trim() ||
+                (isGroupDeal ? participantList.length < 1 : !counterparty.trim())
+              }
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("promises.new.creating") : t("promises.new.submit")}

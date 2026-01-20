@@ -82,6 +82,7 @@ export async function POST(req: Request) {
     overdue: 0,
     completionFollowups: 0,
     ignored: 0,
+    participantIgnored: 0,
   };
 
   const { data: staleInvites } = await admin
@@ -142,6 +143,72 @@ export async function POST(req: Request) {
         role: "creator",
         dedupeKey: buildDedupeKey(["invite_ignored", row.id]),
         ctaUrl: buildCtaUrl(row.id),
+        ctaLabel: copy.ctaLabel,
+        priority: mapPriorityForType("invite_ignored"),
+        title: copy.title,
+        body: copy.body,
+      });
+    }
+  }
+
+  const { data: staleParticipantInvites } = await admin
+    .from("promise_participants")
+    .select(
+      "id,promise_id,participant_id,participant_contact,invited_at,created_at,invite_status,promises(id,title,creator_id)"
+    )
+    .eq("invite_status", "awaiting_acceptance");
+
+  const participantProfileIds = Array.from(
+    new Set((staleParticipantInvites ?? []).map((row) => row.participant_id).filter(Boolean))
+  ) as string[];
+
+  const { data: participantProfiles } = participantProfileIds.length
+    ? await admin
+        .from("profiles")
+        .select("id,handle,display_name")
+        .in("id", participantProfileIds)
+    : { data: [] as Array<{ id: string; handle: string | null; display_name: string | null }> };
+
+  const participantProfileLookup = new Map(
+    (participantProfiles ?? []).map((profile) => [profile.id, profile])
+  );
+
+  for (const row of staleParticipantInvites ?? []) {
+    const invitedAt = row.invited_at ?? row.created_at;
+    if (!invitedAt || new Date(invitedAt).getTime() > ignoreCutoff.getTime()) continue;
+    const promiseEntry = Array.isArray(row.promises) ? row.promises[0] : row.promises;
+    if (!promiseEntry?.creator_id || !promiseEntry?.id) continue;
+
+    const { error } = await admin
+      .from("promise_participants")
+      .update({
+        invite_status: "ignored",
+        ignored_at: nowIso,
+      })
+      .eq("id", row.id)
+      .eq("invite_status", "awaiting_acceptance");
+
+    if (!error) {
+      results.participantIgnored += 1;
+
+      const settings = await getUserNotificationSettings(admin, promiseEntry.creator_id);
+      const actorName =
+        resolveInviteActorName(participantProfileLookup.get(row.participant_id ?? "")) ??
+        row.participant_contact;
+      const copy = getInviteResponseCopy({
+        locale: settings.locale,
+        response: "ignored",
+        actorName,
+        dealTitle: promiseEntry.title ?? null,
+      });
+
+      await createNotification(admin, {
+        userId: promiseEntry.creator_id,
+        promiseId: promiseEntry.id,
+        type: "invite_ignored",
+        role: "creator",
+        dedupeKey: buildDedupeKey(["invite_ignored", promiseEntry.id, row.id]),
+        ctaUrl: buildCtaUrl(promiseEntry.id),
         ctaLabel: copy.ctaLabel,
         priority: mapPriorityForType("invite_ignored"),
         title: copy.title,
