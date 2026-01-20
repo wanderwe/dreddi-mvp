@@ -39,6 +39,8 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "private" | "public";
+  stake_level: "normal" | "high";
+  stake_reason: "deadline" | "public" | "reputation_impact" | "history" | null;
 };
 
 function Card({
@@ -206,7 +208,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility,stake_level,stake_reason"
       )
       .eq("id", id)
       .single();
@@ -388,6 +390,7 @@ export default function PromisePage() {
   const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
+  const stakeReasonLabel = p?.stake_reason ? t(`promises.stakeReasons.${p.stake_reason}`) : null;
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -410,6 +413,19 @@ export default function PromisePage() {
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
+                {p.stake_level === "high" && (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="rounded-full border border-red-500/40 bg-red-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-100">
+                      {t("promises.stake.highBadge")}
+                    </span>
+                    {stakeReasonLabel && (
+                      <span className="text-xs text-neutral-400">
+                        {t("promises.stake.reasonLabel")}:{" "}
+                        <span className="text-neutral-200">{stakeReasonLabel}</span>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {showPublicStatus && (

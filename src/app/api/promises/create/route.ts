@@ -17,6 +17,8 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
+  stake_level?: "normal" | "high";
+  stake_reason?: "deadline" | "public" | "reputation_impact" | "history" | null;
 };
 
 export async function POST(req: Request) {
@@ -41,6 +43,22 @@ export async function POST(req: Request) {
 
     const dueAt = body?.dueAt ? new Date(body.dueAt) : null;
     const dueAtIso = dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt.toISOString() : null;
+
+    const stakeLevel = body?.stake_level === "high" ? "high" : "normal";
+    const stakeReason =
+      body?.stake_reason === "deadline" ||
+      body?.stake_reason === "public" ||
+      body?.stake_reason === "reputation_impact" ||
+      body?.stake_reason === "history"
+        ? body.stake_reason
+        : null;
+
+    if (stakeLevel === "high" && !stakeReason) {
+      return NextResponse.json(
+        { error: "Stake reason is required when stake level is high" },
+        { status: 400 }
+      );
+    }
 
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -84,6 +102,8 @@ export async function POST(req: Request) {
       declined_at: null,
       ignored_at: null,
       visibility,
+      stake_level: stakeLevel,
+      stake_reason: stakeReason,
     };
 
     const { data: insertData, error: insertError } = await admin

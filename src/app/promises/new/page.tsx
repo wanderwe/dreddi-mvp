@@ -30,6 +30,7 @@ export default function NewPromisePage() {
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [counterparty, setCounterparty] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -45,12 +46,17 @@ export default function NewPromisePage() {
     placement: "top" | "bottom";
   } | null>(null);
   const [executor, setExecutor] = useState<"me" | "other">("me");
+  const [stakeLevel, setStakeLevel] = useState<"normal" | "high">("normal");
+  const [stakeReason, setStakeReason] = useState<
+    "" | "deadline" | "public" | "reputation_impact" | "history"
+  >("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
+  const shouldShowAdvanced = showAdvanced || stakeLevel === "high" || stakeReason.length > 0;
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -444,6 +450,12 @@ export default function NewPromisePage() {
       return;
     }
 
+    if (stakeLevel === "high" && !stakeReason) {
+      setBusy(false);
+      setError(t("promises.new.errors.stakeReasonRequired"));
+      return;
+    }
+
     const shouldRequestPublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
@@ -453,6 +465,8 @@ export default function NewPromisePage() {
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldRequestPublic ? "public" : "private",
+      stake_level: stakeLevel,
+      stake_reason: stakeLevel === "high" ? stakeReason || null : null,
     };
 
     let res: Response;
@@ -595,6 +609,86 @@ export default function NewPromisePage() {
                   onChange={(e) => setConditionText(e.target.value)}
                 />
               </label>
+            )}
+
+            {!shouldShowAdvanced ? (
+              <div className="sm:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(true)}
+                  className="inline-flex items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                >
+                  {t("promises.new.advanced.title")}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4 sm:col-span-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.advanced.title")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(false)}
+                    className="text-xs font-semibold text-slate-400 transition hover:text-slate-200"
+                  >
+                    {t("promises.new.actions.collapse")}
+                  </button>
+                </div>
+                <p className="text-sm text-slate-400">{t("promises.new.advanced.helper")}</p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-2 text-sm text-slate-200">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.fields.stakeLevel")}
+                    </span>
+                    <select
+                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      value={stakeLevel}
+                      onChange={(e) => {
+                        const nextLevel = e.target.value === "high" ? "high" : "normal";
+                        setStakeLevel(nextLevel);
+                        if (nextLevel === "normal") {
+                          setStakeReason("");
+                        }
+                      }}
+                    >
+                      <option value="normal">{t("promises.stakeLevels.normal")}</option>
+                      <option value="high">{t("promises.stakeLevels.high")}</option>
+                    </select>
+                  </label>
+                  {stakeLevel === "high" ? (
+                    <label className="space-y-2 text-sm text-slate-200">
+                      <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                        {t("promises.new.fields.stakeReason")}
+                      </span>
+                      <select
+                        className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                        value={stakeReason}
+                        onChange={(e) =>
+                          setStakeReason(
+                            e.target.value as
+                              | ""
+                              | "deadline"
+                              | "public"
+                              | "reputation_impact"
+                              | "history"
+                          )
+                        }
+                      >
+                        <option value="">{t("promises.new.placeholders.stakeReason")}</option>
+                        <option value="deadline">{t("promises.stakeReasons.deadline")}</option>
+                        <option value="public">{t("promises.stakeReasons.public")}</option>
+                        <option value="reputation_impact">
+                          {t("promises.stakeReasons.reputation_impact")}
+                        </option>
+                        <option value="history">{t("promises.stakeReasons.history")}</option>
+                      </select>
+                    </label>
+                  ) : (
+                    <div />
+                  )}
+                </div>
+              </div>
             )}
 
             <div className="sm:col-span-2">
