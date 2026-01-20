@@ -194,7 +194,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       label: "Use cases",
       title: "Use Dreddi when",
       lead:
-        "Signals that an agreement should be captured, even before contracts enter the picture.",
+        "Signals that an agreement should be captured, even before contracts enter the picture",
       triggersTitle: "Capture it when",
       bullets: [
         "You agree on deadlines, but nothing is signed yet",
