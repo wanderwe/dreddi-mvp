@@ -52,9 +52,9 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
                 return (
                   <li
                     key={item}
-                    className="flex items-start gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-3"
+                    className="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-3"
                   >
-                    <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-emerald-200">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-emerald-200">
                       <Icon className="h-4 w-4" />
                     </span>
                     <span>{item}</span>
