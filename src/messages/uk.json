@@ -266,6 +266,7 @@
       },
       "actions": {
         "addCondition": "+ Додати контрумову",
+        "removeCondition": "Прибрати контрумову",
         "clearDate": "Очистити дату",
         "changeTime": "Змінити час",
         "selectTime": "Оберіть час",
