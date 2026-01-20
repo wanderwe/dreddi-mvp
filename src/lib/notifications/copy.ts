@@ -22,6 +22,16 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Responsibility is now active",
       ctaLabel: "Open",
     },
+    invite_declined: {
+      title: "Invite declined",
+      body: "The deal invite was declined",
+      ctaLabel: "Open",
+    },
+    invite_ignored: {
+      title: "Invite awaiting response",
+      body: "The invite hasn’t received a response yet",
+      ctaLabel: "Open",
+    },
     due_soon: {
       title: "Deadline approaching",
       body: "Time is running out on a confirmed agreement",
@@ -57,6 +67,16 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     invite_followup: {
       title: "Домовленість підтверджено",
       body: "Відповідальність активна",
+      ctaLabel: "Відкрити",
+    },
+    invite_declined: {
+      title: "Запрошення відхилено",
+      body: "Запрошення до угоди було відхилено",
+      ctaLabel: "Відкрити",
+    },
+    invite_ignored: {
+      title: "Запрошення без відповіді",
+      body: "Запрошення до угоди ще без відповіді",
       ctaLabel: "Відкрити",
     },
     due_soon: {

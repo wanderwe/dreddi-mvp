@@ -7,6 +7,7 @@ import {
   isWithinQuietHours,
 } from "../src/lib/notifications/policy";
 import { buildDedupeKey } from "../src/lib/notifications/service";
+import { getInviteResponseCopy } from "../src/lib/notifications/inviteResponses";
 
 const dateAt = (iso: string) => new Date(iso);
 
@@ -86,5 +87,33 @@ describe("notification dedupe keys", () => {
   it("builds consistent dedupe keys", () => {
     assert.equal(buildDedupeKey(["N1", "promise", 1]), "N1:promise:1");
     assert.equal(buildDedupeKey(["N5", "promise", "followup"]), "N5:promise:followup");
+  });
+});
+
+describe("invite response notifications", () => {
+  it("builds decline copy in English", () => {
+    const copy = getInviteResponseCopy({
+      locale: "en",
+      response: "declined",
+      actorName: "@alex",
+      dealTitle: "Design sprint",
+    });
+
+    assert.equal(copy.title, "Invite declined");
+    assert.equal(copy.body, "@alex declined the invite to the deal: Design sprint");
+    assert.equal(copy.ctaLabel, "Open deal");
+  });
+
+  it("builds ignore copy in Ukrainian", () => {
+    const copy = getInviteResponseCopy({
+      locale: "uk",
+      response: "ignored",
+      actorName: "@olena",
+      dealTitle: "UX аудит",
+    });
+
+    assert.equal(copy.title, "Запрошення без відповіді");
+    assert.equal(copy.body, "@olena поки що не відповів(ла) на запрошення до угоди: UX аудит");
+    assert.equal(copy.ctaLabel, "Відкрити угоду");
   });
 });
