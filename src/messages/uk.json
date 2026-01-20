@@ -355,12 +355,14 @@
   },
   "publicProfile": {
     "confirmed": "Підтверджено",
+    "completed": "Виконано",
     "disputed": "Оскаржено",
     "loading": "Завантаження профілю…",
     "reputationScore": "Репутаційний бал",
     "stableReputation": "Стабільна репутація",
     "summary": {
       "confirmed": "{count} підтверджено",
+      "completed": "{count} виконано",
       "disputed": "{count} оскаржено",
       "lastActivity": "Остання активність {time}",
       "lastActivityEmpty": "Ще немає активності"
