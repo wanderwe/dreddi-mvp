@@ -128,7 +128,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         quiet_hours_end?: string | null;
       } | null;
       const handle = profileRow?.handle ?? null;
-      const isPublic = profileRow?.is_public_profile ?? false;
+      const isPublic = profileRow?.is_public_profile ?? true;
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
       const quietHoursEnabled = profileRow?.quiet_hours_enabled ?? true;
