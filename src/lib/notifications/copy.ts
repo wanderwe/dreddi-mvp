@@ -3,7 +3,6 @@ import {
   NotificationLocale,
   NotificationRole,
   NotificationType,
-  NotificationTypeInput,
   normalizeNotificationType,
 } from "./types";
 import { stripTrailingPeriod } from "@/lib/text";
@@ -161,13 +160,19 @@ const followupOverrides: Record<NotificationLocale, {
 
 export type NotificationCopyOptions = {
   locale: NotificationLocale;
-  type: NotificationTypeInput;
+  type: NotificationType;
   role?: NotificationRole;
   followup?: "invite" | "completion24" | "completion72";
   delta?: number | null;
 };
 
-export const getNotificationCopy = ({ locale, type, role, followup, delta }: NotificationCopyOptions) => {
+export const getNotificationCopy = ({
+  locale,
+  type,
+  role,
+  followup,
+  delta,
+}: NotificationCopyOptions) => {
   const normalizedType = normalizeNotificationType(type);
   const baseLocale = copyByLocale[locale] ? locale : fallbackLocale;
   const base = copyByLocale[baseLocale][normalizedType];

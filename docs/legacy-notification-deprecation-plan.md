@@ -72,6 +72,11 @@ This means even if a caller passes `N1`–`N7`, the stored value will be the rea
 
 ## Cleanup plan (proposal only — no execution)
 
+### Prepared changes (not applied)
+
+* Code changes to remove legacy types and simplify normalization have been prepared.
+* A new migration file tightens the `notifications_type_valid` constraint to exclude `N1`–`N7`.
+
 ### Phase 1: Stop new legacy writes (if any remain)
 
 * Ensure all notification creation goes through `createNotification` and uses readable types in app code.

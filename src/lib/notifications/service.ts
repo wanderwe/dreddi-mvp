@@ -13,13 +13,12 @@ import type {
   NotificationRole,
   NotificationSettings,
   NotificationType,
-  NotificationTypeInput,
 } from "./types";
 
 export type NotificationRequest = {
   userId: string;
   promiseId: string;
-  type: NotificationTypeInput;
+  type: NotificationType;
   role?: NotificationRole;
   dedupeKey: string;
   ctaUrl: string;
@@ -192,7 +191,7 @@ export const buildCtaUrl = (promiseId: string, path?: string) => {
   return `/promises/${promiseId}`;
 };
 
-export const mapPriorityForType = (type: NotificationTypeInput): NotificationPriority => {
+export const mapPriorityForType = (type: NotificationType): NotificationPriority => {
   switch (normalizeNotificationType(type)) {
     case "completion_waiting":
       return "critical";
@@ -206,7 +205,7 @@ export const mapPriorityForType = (type: NotificationTypeInput): NotificationPri
   }
 };
 
-export const shouldBypassDailyCap = (type: NotificationTypeInput) =>
+export const shouldBypassDailyCap = (type: NotificationType) =>
   CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
 
 export const getDailyCap = () => DAILY_NOTIFICATION_CAP;
