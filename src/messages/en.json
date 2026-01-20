@@ -347,12 +347,14 @@
   },
   "publicProfile": {
     "confirmed": "Confirmed",
+    "completed": "Completed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
     "reputationScore": "Reputation score",
     "stableReputation": "Stable reputation",
     "summary": {
       "confirmed": "{count} confirmed",
+      "completed": "{count} completed",
       "disputed": "{count} disputed",
       "lastActivity": "Last activity {time}",
       "lastActivityEmpty": "No activity yet"
