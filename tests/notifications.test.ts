@@ -51,9 +51,9 @@ describe("notification policy", () => {
   });
 
   it("enforces daily cap only for non-critical types", () => {
-    assert.equal(isDailyCapExceeded(3, "N1"), true);
-    assert.equal(isDailyCapExceeded(2, "N1"), false);
-    assert.equal(isDailyCapExceeded(10, "N5"), false);
+    assert.equal(isDailyCapExceeded(3, "invite"), true);
+    assert.equal(isDailyCapExceeded(2, "invite"), false);
+    assert.equal(isDailyCapExceeded(10, "completion_waiting"), false);
   });
 
   it("enforces per-deal cap for non-critical types", () => {
@@ -61,9 +61,9 @@ describe("notification policy", () => {
     const recent = dateAt("2024-01-02T06:00:00Z");
     const old = dateAt("2024-01-01T06:00:00Z");
 
-    assert.equal(isPerDealCapExceeded(recent, now, "N1"), true);
-    assert.equal(isPerDealCapExceeded(old, now, "N1"), false);
-    assert.equal(isPerDealCapExceeded(recent, now, "N5"), false);
+    assert.equal(isPerDealCapExceeded(recent, now, "invite"), true);
+    assert.equal(isPerDealCapExceeded(old, now, "invite"), false);
+    assert.equal(isPerDealCapExceeded(recent, now, "completion_waiting"), false);
   });
 
   it("chooses correct completion follow-up stage", () => {
@@ -85,8 +85,11 @@ describe("notification policy", () => {
 
 describe("notification dedupe keys", () => {
   it("builds consistent dedupe keys", () => {
-    assert.equal(buildDedupeKey(["N1", "promise", 1]), "N1:promise:1");
-    assert.equal(buildDedupeKey(["N5", "promise", "followup"]), "N5:promise:followup");
+    assert.equal(buildDedupeKey(["invite", "promise", 1]), "invite:promise:1");
+    assert.equal(
+      buildDedupeKey(["completion_waiting", "promise", "followup"]),
+      "completion_waiting:promise:followup"
+    );
   });
 });
 
