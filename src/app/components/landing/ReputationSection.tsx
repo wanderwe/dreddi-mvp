@@ -54,7 +54,7 @@ export function ReputationSection({ copy }: ReputationSectionProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6 pt-2">
+        <div className="flex flex-col gap-6 pt-2 lg:mt-12">
           <div className="rounded-3xl border border-white/10 bg-black/40 p-6 shadow-inner shadow-black/40">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-emerald-200">

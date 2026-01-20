@@ -126,26 +126,26 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         {
           title: "Прийняття = відповідальність",
           description:
-            "Репутація — не оцінка, а зафіксована історія прийнятих угод.",
+            "Репутація — не оцінка, а зафіксована історія прийнятих угод",
         },
         {
           title: "Виконання в строк важливіше обіцянок",
           description:
-            "Результат і своєчасність дають більше сигналів довіри, ніж слова.",
+            "Результат і своєчасність дають більше сигналів довіри, ніж слова",
         },
         {
           title: "Підтвердження або спір — усе видно",
           description:
-            "І підтвердження, і оскарження залишають слід — прозорість не приховується.",
+            "І підтвердження, і оскарження залишають слід — прозорість не приховується",
         },
         {
           title: "Історія формується поступово",
-          description: "Репутація зростає угода за угодою, без різких стрибків.",
+          description: "Репутація зростає угода за угодою, без різких стрибків",
         },
       ],
       profileTitle: "Публічний профіль як доказ домовленостей",
       profileDescription:
-        "Профіль можна показати клієнтам, партнерам чи команді — він відображає реальну історію, а не самопрезентацію.",
+        "Профіль можна показати клієнтам, партнерам чи команді — він відображає реальну історію, а не самопрезентацію",
       profileHighlights: [
         "Прийняті та виконані угоди",
         "Підтвердження з обох сторін",
@@ -259,26 +259,26 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         {
           title: "Acceptance means responsibility",
           description:
-            "Reputation isn’t a rating — it’s a recorded history of deals.",
+            "Reputation isn’t a rating — it’s a recorded history of deals",
         },
         {
           title: "Delivery on time matters most",
           description:
-            "Outcomes and timeliness signal trust more than promises do.",
+            "Outcomes and timeliness signal trust more than promises do",
         },
         {
           title: "Confirmation or dispute stays visible",
           description:
-            "Both confirmations and disputes are recorded — transparency isn’t hidden.",
+            "Both confirmations and disputes are recorded — transparency isn’t hidden",
         },
         {
           title: "History builds gradually",
-          description: "Reputation grows deal by deal, without sudden jumps.",
+          description: "Reputation grows deal by deal, without sudden jumps",
         },
       ],
       profileTitle: "A public profile that proves reliability",
       profileDescription:
-        "Share your profile with clients, partners, or a team — it reflects real history, not self-promotion.",
+        "Share your profile with clients, partners, or a team — it reflects real history, not self-promotion",
       profileHighlights: [
         "Accepted and completed deals",
         "Confirmation from both sides",
