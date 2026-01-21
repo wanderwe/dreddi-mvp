@@ -18,9 +18,13 @@ type PublicProfileDirectoryRow = {
 
 export default function PublicProfilesDirectoryPage() {
   const t = useT();
+  const pageSize = 12;
   const [profiles, setProfiles] = useState<PublicProfileDirectoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -34,20 +38,25 @@ export default function PublicProfilesDirectoryPage() {
 
       setLoading(true);
       setError(null);
+      setLoadMoreError(null);
 
       const { data, error: listError } = await supabase
         .from("public_profile_stats")
         .select(publicProfileDirectorySelect)
         .order("confirmed_count", { ascending: false })
-        .order("handle", { ascending: true });
+        .order("handle", { ascending: true })
+        .range(0, pageSize - 1);
 
       if (!active) return;
 
       if (listError) {
         setError(listError.message);
         setProfiles([]);
+        setHasMore(false);
       } else {
-        setProfiles((data ?? []) as PublicProfileDirectoryRow[]);
+        const nextProfiles = (data ?? []) as PublicProfileDirectoryRow[];
+        setProfiles(nextProfiles);
+        setHasMore(nextProfiles.length === pageSize);
       }
 
       setLoading(false);
@@ -58,7 +67,38 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [t]);
+  }, [pageSize, t]);
+
+  const loadMore = async () => {
+    if (!supabase) {
+      setLoadMoreError(t("publicDirectory.errors.supabase"));
+      return;
+    }
+
+    if (loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    setLoadMoreError(null);
+
+    const startIndex = profiles.length;
+    const { data, error: listError } = await supabase
+      .from("public_profile_stats")
+      .select(publicProfileDirectorySelect)
+      .order("confirmed_count", { ascending: false })
+      .order("handle", { ascending: true })
+      .range(startIndex, startIndex + pageSize - 1);
+
+    if (listError) {
+      setLoadMoreError(listError.message);
+      setLoadingMore(false);
+      return;
+    }
+
+    const nextProfiles = (data ?? []) as PublicProfileDirectoryRow[];
+    setProfiles((prev) => [...prev, ...nextProfiles]);
+    setHasMore(nextProfiles.length === pageSize);
+    setLoadingMore(false);
+  };
 
   const cards = useMemo(
     () =>
@@ -140,8 +180,29 @@ export default function PublicProfilesDirectoryPage() {
             {t("publicDirectory.empty")}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {cards}
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              {cards}
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              {(hasMore || profiles.length > 0) && (
+                <button
+                  type="button"
+                  onClick={loadMore}
+                  disabled={loadingMore || !hasMore}
+                  className="cursor-pointer rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                >
+                  {loadingMore
+                    ? t("publicDirectory.loadingMore")
+                    : hasMore
+                      ? t("publicDirectory.loadMore")
+                      : t("publicDirectory.noMore")}
+                </button>
+              )}
+              {loadMoreError && (
+                <div className="text-xs text-white/60">{loadMoreError}</div>
+              )}
+            </div>
           </div>
         )}
       </div>
