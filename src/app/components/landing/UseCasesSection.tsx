@@ -45,13 +45,16 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
           <div className="space-y-8">
-            <ul className="space-y-6 text-base text-slate-100/90 sm:space-y-8 sm:text-lg">
+            <ul className="space-y-6 text-center text-base text-slate-100/90 sm:space-y-8 sm:text-lg">
               {copy.bullets.map((item, index) => {
                 const Icon = triggerIcons[index] ?? CheckCircle2;
 
                 return (
-                  <li key={item} className="flex items-start gap-4">
-                    <span className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
+                  <li
+                    key={item}
+                    className="flex items-center justify-center gap-4"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="leading-relaxed">{item}</span>
