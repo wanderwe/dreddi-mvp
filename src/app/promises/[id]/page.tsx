@@ -14,6 +14,7 @@ import {
   isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
+import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 
 type PromiseRow = {
   id: string;
@@ -61,20 +62,26 @@ function Card({
   );
 }
 
-function StatusPill({ status }: { status: PromiseRow["status"] }) {
+function StatusPill({ status }: { status: PromiseUiStatus }) {
   const t = useT();
-  const labelMap: Record<PromiseRow["status"], string> = {
+  const labelMap: Record<PromiseUiStatus, string> = {
     active: t("promises.status.active"),
     completed_by_promisor: t("promises.status.pendingConfirmation"),
     confirmed: t("promises.status.confirmed"),
     disputed: t("promises.status.disputed"),
+    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    declined: t("promises.inviteStatus.declined"),
+    ignored: t("promises.inviteStatus.ignored"),
   };
 
-  const colorMap: Record<PromiseRow["status"], string> = {
+  const colorMap: Record<PromiseUiStatus, string> = {
     active: "border-neutral-700 text-neutral-200 bg-white/0",
     confirmed: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
     disputed: "border-red-700/60 text-red-200 bg-red-500/10",
     completed_by_promisor: "border-amber-500/40 text-amber-100 bg-amber-500/10",
+    awaiting_acceptance: "border-slate-700/60 text-slate-200 bg-slate-500/10",
+    declined: "border-red-700/60 text-red-200 bg-red-500/10",
+    ignored: "border-amber-500/40 text-amber-100 bg-amber-500/10",
   };
 
   return (
@@ -382,6 +389,7 @@ export default function PromisePage() {
   const waitingForReview = p?.status === "completed_by_promisor";
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
+  const uiStatus = p ? getPromiseUiStatus(p) : null;
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const showPublicStatus = p?.visibility === "public";
@@ -392,7 +400,7 @@ export default function PromisePage() {
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
       <div className="flex items-center justify-end gap-3">
-        <div className="flex items-center gap-3">{p && <StatusPill status={p.status} />}</div>
+        <div className="flex items-center gap-3">{uiStatus && <StatusPill status={uiStatus} />}</div>
       </div>
 
       {error && (
@@ -480,7 +488,7 @@ export default function PromisePage() {
           <Card title={t("promises.detail.statusActions")}>
             <div className="space-y-3">
               <div className="text-sm text-neutral-300">
-                {t("promises.detail.currentStatus")}: <StatusPill status={p.status} />
+                {t("promises.detail.currentStatus")}: <StatusPill status={uiStatus ?? p.status} />
               </div>
 
               {isExecutor && p.status === "active" && (
