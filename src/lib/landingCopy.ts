@@ -26,6 +26,14 @@ export type LandingCopy = {
     noteTitle: string;
     framing: string;
   };
+  reputation: {
+    label: string;
+    title: string;
+    steps: string[];
+    outcomeTitle: string;
+    outcomeDescription: string;
+    cta: string;
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -103,9 +111,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Підрядники та довгі проєкти",
         "Пілотні проєкти / тестова співпраця",
       ],
-      noteTitle: "Не для всього.",
+      noteTitle: "Не для всього",
       framing:
-        "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
+        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+    },
+    reputation: {
+      label: "Результат",
+      title: "Репутація будується виконанням",
+      steps: [
+        "Домовленість фіксується в Dreddi",
+        "Виконання підтверджують обидві сторони",
+        "Підтвердження формують репутаційний бал",
+      ],
+      outcomeTitle: "Публічний профіль",
+      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
+      cta: "Переглянути приклад профілю",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -202,9 +222,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Contractors & long-term jobs",
         "Pilot projects / test collaborations",
       ],
-      noteTitle: "Not for everything.",
+      noteTitle: "Not for everything",
       framing:
-        "For agreements where it’s too early for contracts but already too risky to rely on words.",
+        "For agreements where it’s too early for contracts but already risky to rely on words",
+    },
+    reputation: {
+      label: "Outcome",
+      title: "Reputation is built by execution",
+      steps: [
+        "The agreement is recorded in Dreddi",
+        "Both sides confirm the outcome",
+        "Confirmations build the reputation score",
+      ],
+      outcomeTitle: "Public profile",
+      outcomeDescription: "Shows confirmed and disputed deals",
+      cta: "View example profile",
     },
     cta: {
       getStarted: "Create a deal",
