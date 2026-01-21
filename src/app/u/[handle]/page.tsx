@@ -7,11 +7,13 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 
 type PublicProfileRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  reputation_score: number | null;
   confirmed_count: number | null;
   completed_count: number | null;
   disputed_count: number | null;
@@ -46,9 +48,7 @@ const getPublicProfileStats = async (handle: string) => {
 
   return supabase
     .from("public_profile_stats")
-    .select(
-      "handle,display_name,avatar_url,confirmed_count,completed_count,disputed_count,last_activity_at"
-    )
+    .select(publicProfileDetailSelect)
     .eq("handle", handle)
     .maybeSingle();
 };
@@ -194,6 +194,7 @@ export default function PublicProfilePage() {
   const confirmedCount = profile?.confirmed_count ?? 0;
   const completedCount = profile?.completed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
+  const reputationScore = profile?.reputation_score ?? 50;
   const reputationSummary = hasHistory
     ? [
         t("publicProfile.summary.confirmed", { count: confirmedCount }),
@@ -305,8 +306,9 @@ export default function PublicProfilePage() {
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
                 <div className="text-[10px] uppercase tracking-wide text-white/50">
-                  {t("publicProfile.reputation.title")}
+                  {t("publicProfile.reputationScore")}
                 </div>
+                <div className="mt-2 text-3xl font-semibold text-white">{reputationScore}</div>
                 <div className="mt-2 text-sm text-white/80">{reputationSummary}</div>
                 <div className="mt-2 text-xs text-white/50">{lastActivityLabel}</div>
               </div>
