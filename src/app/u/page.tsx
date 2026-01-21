@@ -198,7 +198,7 @@ export default function PublicProfilesDirectoryPage() {
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="public-profile-search" className="sr-only">
-            Search by username or email
+            {t("publicDirectory.searchLabel")}
           </label>
           <input
             id="public-profile-search"
@@ -207,7 +207,7 @@ export default function PublicProfilesDirectoryPage() {
             onChange={(event) => {
               setSearchTerm(event.target.value);
             }}
-            placeholder="Search by username or email"
+            placeholder={t("publicDirectory.searchPlaceholder")}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
           />
         </div>
