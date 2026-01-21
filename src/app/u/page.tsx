@@ -28,6 +28,7 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [hasRequestedMore, setHasRequestedMore] = useState(false);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -52,6 +53,7 @@ export default function PublicProfilesDirectoryPage() {
       setLoading(true);
       setError(null);
       setLoadMoreError(null);
+      setHasRequestedMore(false);
 
       const normalizedSearch = debouncedSearch.startsWith("@")
         ? debouncedSearch.slice(1)
@@ -101,6 +103,7 @@ export default function PublicProfilesDirectoryPage() {
 
     setLoadingMore(true);
     setLoadMoreError(null);
+    setHasRequestedMore(true);
 
     const startIndex = profiles.length;
     const normalizedSearch = debouncedSearch.startsWith("@")
@@ -188,6 +191,10 @@ export default function PublicProfilesDirectoryPage() {
     [profiles, t]
   );
 
+  const isSearchActive = debouncedSearch.length > 0;
+  const showNoMore = hasRequestedMore && !hasMore && !isSearchActive;
+  const showLoadMoreButton = hasMore;
+
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-10">
@@ -230,7 +237,7 @@ export default function PublicProfilesDirectoryPage() {
               {cards}
             </div>
             <div className="flex flex-col items-center gap-2">
-              {(hasMore || profiles.length > 0) && (
+              {(showLoadMoreButton || showNoMore) && (
                 <button
                   type="button"
                   onClick={loadMore}
