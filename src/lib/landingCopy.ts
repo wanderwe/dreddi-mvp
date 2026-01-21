@@ -26,16 +26,12 @@ export type LandingCopy = {
     noteTitle: string;
     framing: string;
   };
-  reputationModel: {
+  reputation: {
     label: string;
     title: string;
-    steps: {
-      title: string;
-      description: string;
-    }[];
-    profileTitle: string;
-    profileDescription: string;
-    profileHighlights: string[];
+    steps: string[];
+    outcomeTitle: string;
+    outcomeDescription: string;
     cta: string;
   };
   cta: {
@@ -115,42 +111,20 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Підрядники та довгі проєкти",
         "Пілотні проєкти / тестова співпраця",
       ],
-      noteTitle: "Не для всього.",
+      noteTitle: "Не для всього",
       framing:
-        "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
+        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
     },
-    reputationModel: {
-      label: "Репутація",
-      title: "Репутація будується виконанням, а не словами",
+    reputation: {
+      label: "Результат",
+      title: "Репутація будується виконанням",
       steps: [
-        {
-          title: "Прийняття = відповідальність",
-          description:
-            "Репутація — не оцінка, а зафіксована історія прийнятих угод",
-        },
-        {
-          title: "Виконання в строк важливіше обіцянок",
-          description:
-            "Результат і своєчасність дають більше сигналів довіри, ніж слова",
-        },
-        {
-          title: "Підтвердження або спір — усе видно",
-          description:
-            "І підтвердження, і оскарження залишають слід — прозорість не приховується",
-        },
-        {
-          title: "Історія формується поступово",
-          description: "Репутація зростає угода за угодою, без різких стрибків",
-        },
+        "Домовленість фіксується в Dreddi",
+        "Виконання підтверджують обидві сторони",
+        "Підтвердження формують репутаційний бал",
       ],
-      profileTitle: "Публічний профіль як доказ домовленостей",
-      profileDescription:
-        "Профіль можна показати клієнтам, партнерам чи команді — він відображає реальну історію, а не самопрезентацію",
-      profileHighlights: [
-        "Прийняті та виконані угоди",
-        "Підтвердження з обох сторін",
-        "Видимі спори без прикрас",
-      ],
+      outcomeTitle: "Публічний профіль",
+      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
       cta: "Переглянути приклад профілю",
     },
     cta: {
@@ -248,43 +222,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Contractors & long-term jobs",
         "Pilot projects / test collaborations",
       ],
-      noteTitle: "Not for everything.",
+      noteTitle: "Not for everything",
       framing:
-        "For agreements where it’s too early for contracts but already too risky to rely on words.",
+        "For agreements where it’s too early for contracts but already risky to rely on words",
     },
-    reputationModel: {
-      label: "Reputation",
-      title: "Reputation is built by delivery, not promises",
+    reputation: {
+      label: "Outcome",
+      title: "Reputation is built by execution",
       steps: [
-        {
-          title: "Acceptance means responsibility",
-          description:
-            "Reputation isn’t a rating — it’s a recorded history of deals",
-        },
-        {
-          title: "Delivery on time matters most",
-          description:
-            "Outcomes and timeliness signal trust more than promises do",
-        },
-        {
-          title: "Confirmation or dispute stays visible",
-          description:
-            "Both confirmations and disputes are recorded — transparency isn’t hidden",
-        },
-        {
-          title: "History builds gradually",
-          description: "Reputation grows deal by deal, without sudden jumps",
-        },
+        "The agreement is recorded in Dreddi",
+        "Both sides confirm the outcome",
+        "Confirmations build the reputation score",
       ],
-      profileTitle: "A public profile that proves reliability",
-      profileDescription:
-        "Share your profile with clients, partners, or a team — it reflects real history, not self-promotion",
-      profileHighlights: [
-        "Accepted and completed deals",
-        "Confirmation from both sides",
-        "Visible disputes with context",
-      ],
-      cta: "View a profile example",
+      outcomeTitle: "Public profile",
+      outcomeDescription: "Shows confirmed and disputed deals",
+      cta: "View example profile",
     },
     cta: {
       getStarted: "Create a deal",

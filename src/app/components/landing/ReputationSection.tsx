@@ -1,90 +1,82 @@
+import { BadgeCheck, CheckCircle2, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { BadgeCheck, Clock, Handshake, Link2, ShieldAlert, UserRound } from "lucide-react";
 
 import type { LandingCopy } from "@/lib/landingCopy";
 
-const reputationIcons = [Handshake, Clock, BadgeCheck, ShieldAlert];
+const stepIcons = [CheckCircle2, BadgeCheck, Sparkles];
 
 type ReputationSectionProps = {
-  copy: LandingCopy["reputationModel"];
+  copy: LandingCopy["reputation"];
+  scoreCopy: LandingCopy["score"];
 };
 
-export function ReputationSection({ copy }: ReputationSectionProps) {
+export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
+    <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-16">
       <div
-        className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-emerald-500/20 via-emerald-500/5 to-transparent blur-3xl"
+        className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-sky-400/25 via-sky-400/10 to-transparent blur-3xl"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-6 -top-2 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent"
+        className="pointer-events-none absolute inset-x-8 -top-2 h-px bg-gradient-to-r from-transparent via-sky-300/40 to-transparent"
         aria-hidden
       />
 
-      <div className="relative grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-        <div className="space-y-6 text-center sm:text-left">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
-              <UserRound className="h-4 w-4" />
-              {copy.label}
-            </span>
-            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-              {copy.title}
-            </h2>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-inner shadow-black/40">
-            <div className="space-y-5">
-              {copy.steps.map((item, index) => {
-                const Icon = reputationIcons[index] ?? BadgeCheck;
-
-                return (
-                  <div key={item.title} className="flex gap-4">
-                    <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-white/10 bg-black/30 text-emerald-200 shadow-inner shadow-black/40">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-white">{item.title}</p>
-                      <p className="text-sm text-slate-300">{item.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+      <div className="relative space-y-8 sm:space-y-10">
+        <div className="space-y-3 text-center sm:text-left">
+          <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-[11px] font-medium text-sky-200 sm:text-sm">
+            <Sparkles className="h-4 w-4" />
+            {copy.label}
+          </span>
+          <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+            {copy.title}
+          </h2>
         </div>
 
-        <div className="flex flex-col gap-6 pt-2 lg:mt-12">
-          <div className="rounded-3xl border border-white/10 bg-black/40 p-6 shadow-inner shadow-black/40">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-emerald-200">
-                <Link2 className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">{copy.profileTitle}</p>
-                <p className="text-xs text-slate-400">public.dreddi.app/username</p>
-              </div>
+        <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <ol className="relative space-y-6 pl-6 text-base text-slate-200/90 before:absolute before:left-4 before:top-2 before:h-[calc(100%-1rem)] before:w-px before:bg-white/10 sm:space-y-8 sm:text-lg">
+            {copy.steps.map((item, index) => {
+              const Icon = stepIcons[index] ?? CheckCircle2;
+
+              return (
+                <li key={item} className="relative flex items-center gap-4">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/15 text-sky-100 ring-1 ring-sky-400/30">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="rounded-3xl bg-gradient-to-br from-white/10 via-white/5 to-slate-900/40 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.6)] ring-1 ring-emerald-500/20">
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+                {copy.outcomeTitle}
+              </p>
+              <h3 className="text-2xl font-semibold text-white">
+                {copy.outcomeDescription}
+              </h3>
             </div>
-            <p className="mt-4 text-sm text-slate-300">{copy.profileDescription}</p>
-            <div className="mt-4 space-y-2 text-sm text-slate-200/90">
-              {copy.profileHighlights.map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-3 py-2"
-                >
-                  <span className="h-2 w-2 rounded-full bg-emerald-300/80" />
-                  <span>{item}</span>
-                </div>
-              ))}
+
+            <div className="mt-6 flex flex-wrap gap-2 text-xs text-slate-200/80">
+              <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-100">
+                {scoreCopy.cards.confirmed}
+              </span>
+              <span className="rounded-full bg-amber-500/15 px-3 py-1 text-amber-100">
+                {scoreCopy.cards.disputed}
+              </span>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-slate-200">
+                {scoreCopy.label}
+              </span>
             </div>
-            <div className="mt-5">
-              <Link
-                href="/u"
-                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta}
-              </Link>
-            </div>
+
+            <Link
+              href="/u"
+              className="mt-8 inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+            >
+              {copy.cta}
+            </Link>
           </div>
         </div>
       </div>
