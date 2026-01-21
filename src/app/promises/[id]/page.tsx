@@ -39,6 +39,11 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "private" | "public";
+  acceptance_mode: "all" | "threshold";
+  acceptance_threshold: number | null;
+  participant_count: number;
+  accepted_count: number;
+  is_active: boolean;
 };
 
 function Card({
@@ -203,23 +208,31 @@ export default function PromisePage() {
     const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
     if (!session) return;
 
-    const { data, error } = await supabase
-      .from("promises")
-      .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
-      )
-      .eq("id", id)
-      .single();
+    let res: Response;
+    try {
+      res = await fetch(`/api/promises/${id}`, {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+    } catch {
+      setError(t("promises.detail.errors.updateStatus"));
+      return;
+    }
 
-    if (error) setError(error.message);
-    else {
-      const status = (data as { status?: unknown }).status;
-      if (!isPromiseStatus(status)) {
-        setError(t("promises.detail.errors.unsupportedStatus"));
-        setP({ ...(data as PromiseRow), status: "active" });
-      } else {
-        setP({ ...(data as PromiseRow), status });
-      }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    const data = (await res.json()) as PromiseRow;
+    const status = (data as { status?: unknown }).status;
+    if (!isPromiseStatus(status)) {
+      setError(t("promises.detail.errors.unsupportedStatus"));
+      setP({ ...(data as PromiseRow), status: "active" });
+    } else {
+      setP({ ...(data as PromiseRow), status });
     }
   }
 
@@ -380,8 +393,12 @@ export default function PromisePage() {
   );
   const isCreator = Boolean(p && userId === p.creator_id);
   const waitingForReview = p?.status === "completed_by_promisor";
+  const participantCount = p?.participant_count ?? 0;
+  const acceptedCount = p?.accepted_count ?? 0;
+  const isGroupDeal = participantCount > 0;
+  const thresholdValue = p?.acceptance_threshold ?? null;
   const inviteStatus = getPromiseInviteStatus(p);
-  const isInviteAccepted = isPromiseAccepted(p);
+  const isInviteAccepted = isGroupDeal ? Boolean(p?.is_active) : isPromiseAccepted(p);
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const showPublicStatus = p?.visibility === "public";
@@ -392,7 +409,17 @@ export default function PromisePage() {
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
       <div className="flex items-center justify-end gap-3">
-        <div className="flex items-center gap-3">{p && <StatusPill status={p.status} />}</div>
+        <div className="flex items-center gap-3">
+          {p && <StatusPill status={p.status} />}
+          {isGroupDeal && (
+            <span className="inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+              {t("promises.detail.groupAccepted", {
+                accepted: acceptedCount,
+                total: participantCount,
+              })}
+            </span>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -411,6 +438,11 @@ export default function PromisePage() {
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
               </div>
+              {isGroupDeal && p.acceptance_mode === "threshold" && thresholdValue !== null && (
+                <div className="text-sm text-neutral-300">
+                  {t("promises.detail.groupThreshold", { threshold: thresholdValue })}
+                </div>
+              )}
 
               {showPublicStatus && (
                 <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-200">
@@ -423,17 +455,19 @@ export default function PromisePage() {
                 </div>
               )}
 
-              <div className="text-sm text-neutral-400">
-                {t("promises.detail.inviteStatusLabel")}:{" "}
-                <span
-                  className={
-                    "text-sm font-medium " +
-                    (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
-                  }
-                >
-                  {t(`promises.inviteStatus.${inviteStatus}`)}
-                </span>
-              </div>
+              {!isGroupDeal && (
+                <div className="text-sm text-neutral-400">
+                  {t("promises.detail.inviteStatusLabel")}:{" "}
+                  <span
+                    className={
+                      "text-sm font-medium " +
+                      (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
+                    }
+                  >
+                    {t(`promises.inviteStatus.${inviteStatus}`)}
+                  </span>
+                </div>
+              )}
 
               {p.counterparty_contact && (
                 <div className="text-sm text-neutral-400">
@@ -494,9 +528,11 @@ export default function PromisePage() {
                   />
                 ) : (
                   <div className="text-sm text-neutral-400">
-                    {inviteStatus === "awaiting_acceptance"
-                      ? stripTrailingPeriod(t("promises.detail.shareInvite"))
-                      : t(`promises.inviteStatus.${inviteStatus}`)}
+                    {isGroupDeal
+                      ? t("promises.detail.groupAwaiting")
+                      : inviteStatus === "awaiting_acceptance"
+                        ? stripTrailingPeriod(t("promises.detail.shareInvite"))
+                        : t(`promises.inviteStatus.${inviteStatus}`)}
                   </div>
                 )
               )}
@@ -536,8 +572,14 @@ export default function PromisePage() {
             </div>
           </Card>
 
-          {!isFinal && canManageInvite && (
-            <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
+          {!isFinal && canManageInvite && !isGroupDeal && (
+            <Card
+              title={
+                isInviteAccepted
+                  ? t("promises.detail.inviteTitle")
+                  : t("promises.detail.inviteLinkTitle")
+              }
+            >
               {isInviteAccepted ? (
                 <div className="flex flex-col gap-2 text-sm text-neutral-300">
                   <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100">

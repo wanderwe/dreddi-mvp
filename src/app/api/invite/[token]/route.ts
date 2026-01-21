@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { loadParticipantCounts, loadParticipantInvite } from "./participantInvites";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -27,6 +28,8 @@ type PromiseInviteRow = {
   invite_token: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
+  acceptance_mode?: "all" | "threshold";
+  acceptance_threshold?: number | null;
 };
 
 export async function GET(_req: Request, ctx: { params: Promise<{ token: string }> }) {
@@ -39,6 +42,53 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const admin = createClient(url, service, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    const participantInvite = await loadParticipantInvite(admin, token);
+    if (participantInvite) {
+      const { participantCount, acceptedCount } = await loadParticipantCounts(
+        admin,
+        participantInvite.promise.id
+      );
+
+      let creator_display_name: string | null = null;
+      try {
+        const { data: u } = await admin.auth.admin.getUserById(
+          participantInvite.promise.creator_id
+        );
+        creator_display_name = u.user?.email ?? null;
+      } catch {
+        creator_display_name = null;
+      }
+
+      return NextResponse.json(
+        {
+          id: participantInvite.promise.id,
+          title: participantInvite.promise.title,
+          details: participantInvite.promise.details ?? null,
+          condition_text: participantInvite.promise.condition_text ?? null,
+          condition_met_at: participantInvite.promise.condition_met_at ?? null,
+          due_at: participantInvite.promise.due_at ?? null,
+          creator_handle: null,
+          creator_display_name,
+          creator_id: participantInvite.promise.creator_id,
+          counterparty_id: participantInvite.participant.participant_id ?? null,
+          counterparty_accepted_at: null,
+          invite_status: participantInvite.participant.invite_status ?? null,
+          invited_at: participantInvite.participant.invited_at ?? null,
+          accepted_at: participantInvite.participant.accepted_at ?? null,
+          declined_at: participantInvite.participant.declined_at ?? null,
+          ignored_at: participantInvite.participant.ignored_at ?? null,
+          counterparty_contact: participantInvite.participant.participant_contact ?? null,
+          visibility: participantInvite.promise.visibility ?? "private",
+          participant_count: participantCount,
+          accepted_count: acceptedCount,
+          acceptance_mode: participantInvite.promise.acceptance_mode ?? "all",
+          acceptance_threshold: participantInvite.promise.acceptance_threshold ?? null,
+          is_group_deal: true,
+        },
+        { status: 200 }
+      );
+    }
 
     const { data: p, error } = await admin
       .from("promises")
@@ -92,6 +142,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         ignored_at: p.ignored_at ?? null,
         counterparty_contact: p.counterparty_contact ?? null,
         visibility: p.visibility ?? "private",
+        participant_count: null,
+        accepted_count: null,
+        acceptance_mode: "all",
+        acceptance_threshold: null,
+        is_group_deal: false,
       },
       { status: 200 }
     );

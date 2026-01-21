@@ -5,8 +5,11 @@ import {
   buildCtaUrl,
   buildDedupeKey,
   createNotification,
+  getUserNotificationSettings,
   mapPriorityForType,
 } from "@/lib/notifications/service";
+import { loadParticipantCounts, loadParticipantInvite } from "../participantInvites";
+import { getNotificationCopy } from "@/lib/notifications/copy";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -43,11 +46,110 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     const userId = userData.user.id;
+    const userEmail = userData.user.email?.toLowerCase() ?? null;
 
     // 3) service client для обходу RLS (сервер only)
     const admin = createClient(url, service, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    const participantInvite = await loadParticipantInvite(admin, token);
+    if (participantInvite) {
+      if (participantInvite.promise.creator_id === userId) {
+        return NextResponse.json(
+          { error: "Creator cannot accept their own promise" },
+          { status: 400 }
+        );
+      }
+
+      if (
+        participantInvite.participant.participant_id &&
+        participantInvite.participant.participant_id !== userId
+      ) {
+        return NextResponse.json({ error: "Only the participant can accept" }, { status: 403 });
+      }
+
+      if (!participantInvite.participant.participant_id && participantInvite.participant.participant_contact) {
+        const contact = participantInvite.participant.participant_contact.toLowerCase();
+        if (!userEmail || contact !== userEmail) {
+          return NextResponse.json(
+            { error: "Invite is not assigned to this account" },
+            { status: 403 }
+          );
+        }
+      }
+
+      if (participantInvite.participant.invite_status === "declined") {
+        return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+      }
+      if (participantInvite.participant.invite_status === "ignored") {
+        return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+      }
+      if (participantInvite.participant.invite_status === "expired") {
+        return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+      }
+      if (participantInvite.participant.invite_status === "accepted") {
+        return NextResponse.json({ ok: true, alreadyAccepted: true }, { status: 200 });
+      }
+
+      const nowIso = new Date().toISOString();
+      const updatePayload: {
+        invite_status: "accepted";
+        accepted_at: string;
+        participant_id?: string;
+      } = {
+        invite_status: "accepted",
+        accepted_at: nowIso,
+      };
+
+      if (!participantInvite.participant.participant_id) {
+        updatePayload.participant_id = userId;
+      }
+
+      const { error: updateError } = await admin
+        .from("promise_participants")
+        .update(updatePayload)
+        .eq("id", participantInvite.participant.id);
+
+      if (updateError) {
+        return NextResponse.json({ error: "Accept failed", detail: updateError.message }, { status: 500 });
+      }
+
+      const { participantCount, acceptedCount } = await loadParticipantCounts(
+        admin,
+        participantInvite.promise.id
+      );
+
+      const requiredCount =
+        participantInvite.promise.acceptance_mode === "threshold"
+          ? participantInvite.promise.acceptance_threshold ?? participantCount
+          : participantCount;
+      const isActive = acceptedCount >= Math.max(requiredCount, 1);
+
+      if (isActive) {
+        const settings = await getUserNotificationSettings(admin, participantInvite.promise.creator_id);
+        const copy = getNotificationCopy({
+          locale: settings.locale,
+          type: "invite_followup",
+          role: "creator",
+        });
+
+        await createNotification(admin, {
+          userId: participantInvite.promise.creator_id,
+          promiseId: participantInvite.promise.id,
+          type: "invite_followup",
+          role: "creator",
+          dedupeKey: buildDedupeKey(["invite_followup", participantInvite.promise.id, "group"]),
+          ctaUrl: buildCtaUrl(participantInvite.promise.id),
+          ctaLabel: copy.ctaLabel,
+          priority: mapPriorityForType("invite_followup"),
+          title: copy.title,
+          body: copy.body,
+        });
+      }
+
+      return NextResponse.json({ ok: true }, { status: 200 });
+    }
 
     // 4) шукаємо promise по invite_token
     const { data: p, error: pErr } = await admin

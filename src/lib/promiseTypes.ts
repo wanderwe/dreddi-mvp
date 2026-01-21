@@ -23,4 +23,6 @@ export type PromiseRowMin = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  acceptance_mode: "all" | "threshold";
+  acceptance_threshold: number | null;
 };

@@ -8,6 +8,7 @@ import {
   mapPriorityForType,
 } from "@/lib/notifications/service";
 import { getInviteResponseCopy, resolveInviteActorName } from "@/lib/notifications/inviteResponses";
+import { loadParticipantInvite } from "../participantInvites";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -42,10 +43,109 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     const userId = userData.user.id;
+    const userEmail = userData.user.email?.toLowerCase() ?? null;
 
     const admin = createClient(url, service, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+
+    const participantInvite = await loadParticipantInvite(admin, token);
+    if (participantInvite) {
+      if (participantInvite.promise.creator_id === userId) {
+        return NextResponse.json(
+          { error: "Creator cannot decline their own promise" },
+          { status: 400 }
+        );
+      }
+
+      if (
+        participantInvite.participant.participant_id &&
+        participantInvite.participant.participant_id !== userId
+      ) {
+        return NextResponse.json({ error: "Only the participant can decline" }, { status: 403 });
+      }
+
+      if (!participantInvite.participant.participant_id && participantInvite.participant.participant_contact) {
+        const contact = participantInvite.participant.participant_contact.toLowerCase();
+        if (!userEmail || contact !== userEmail) {
+          return NextResponse.json(
+            { error: "Invite is not assigned to this account" },
+            { status: 403 }
+          );
+        }
+      }
+
+      const inviteStatus = participantInvite.participant.invite_status;
+
+      if (inviteStatus === "accepted") {
+        return NextResponse.json({ error: "Invite already accepted" }, { status: 409 });
+      }
+
+      if (inviteStatus === "declined" || inviteStatus === "ignored") {
+        return NextResponse.json({ ok: true }, { status: 200 });
+      }
+
+      if (inviteStatus === "expired") {
+        return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+      }
+
+      const nowIso = new Date().toISOString();
+
+      const updatePayload: {
+        invite_status: "declined";
+        declined_at: string;
+        participant_id?: string;
+      } = {
+        invite_status: "declined",
+        declined_at: nowIso,
+      };
+
+      if (!participantInvite.participant.participant_id) {
+        updatePayload.participant_id = userId;
+      }
+
+      const { error: updateError } = await admin
+        .from("promise_participants")
+        .update(updatePayload)
+        .eq("id", participantInvite.participant.id);
+
+      if (updateError) {
+        return NextResponse.json({ error: "Decline failed", detail: updateError.message }, { status: 500 });
+      }
+
+      const { data: actorProfile } = await admin
+        .from("profiles")
+        .select("handle,display_name")
+        .eq("id", userId)
+        .maybeSingle();
+
+      const settings = await getUserNotificationSettings(admin, participantInvite.promise.creator_id);
+      const copy = getInviteResponseCopy({
+        locale: settings.locale,
+        response: "declined",
+        actorName: resolveInviteActorName(actorProfile) ?? participantInvite.participant.participant_contact,
+        dealTitle: participantInvite.promise.title ?? null,
+      });
+
+      await createNotification(admin, {
+        userId: participantInvite.promise.creator_id,
+        promiseId: participantInvite.promise.id,
+        type: "invite_declined",
+        role: "creator",
+        dedupeKey: buildDedupeKey([
+          "invite_declined",
+          participantInvite.promise.id,
+          participantInvite.participant.id,
+        ]),
+        ctaUrl: buildCtaUrl(participantInvite.promise.id),
+        ctaLabel: copy.ctaLabel,
+        priority: mapPriorityForType("invite_declined"),
+        title: copy.title,
+        body: copy.body,
+      });
+
+      return NextResponse.json({ ok: true }, { status: 200 });
+    }
 
     const { data: p, error: pErr } = await admin
       .from("promises")
