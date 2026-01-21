@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import {
+  formatPublicReputationScore,
+  getPublicReputationScore,
+  hasPublicReputationHistory,
+} from "@/lib/reputation/publicReputation";
 
 type PublicProfileDirectoryRow = {
   handle: string;
@@ -16,6 +21,7 @@ type PublicProfileDirectoryRow = {
 
 export default function PublicProfilesDirectoryPage() {
   const t = useT();
+  const locale = useLocale();
   const [profiles, setProfiles] = useState<PublicProfileDirectoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,17 +70,14 @@ export default function PublicProfilesDirectoryPage() {
     () =>
       profiles.map((profile) => {
         const displayName = profile.display_name?.trim() || profile.handle;
-        const hasHistory = [profile.confirmed_count, profile.completed_count, profile.disputed_count]
-          .some((value) => value !== null && value !== undefined);
         const confirmedCount = profile.confirmed_count ?? 0;
         const completedCount = profile.completed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
+        const reputationCounts = { confirmedCount, completedCount, disputedCount };
+        const hasHistory = hasPublicReputationHistory(reputationCounts);
+        const reputationScore = getPublicReputationScore(reputationCounts);
         const reputationSummary = hasHistory
-          ? [
-              t("publicProfile.summary.confirmed", { count: confirmedCount }),
-              t("publicProfile.summary.completed", { count: completedCount }),
-              t("publicProfile.summary.disputed", { count: disputedCount }),
-            ].join(" · ")
+          ? formatPublicReputationScore(reputationScore, locale)
           : t("publicProfile.emptyHistory");
 
         return (
@@ -125,7 +128,7 @@ export default function PublicProfilesDirectoryPage() {
           </Link>
         );
       }),
-    [profiles, t]
+    [locale, profiles, t]
   );
 
   return (
