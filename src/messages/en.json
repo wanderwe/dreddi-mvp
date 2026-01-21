@@ -398,6 +398,9 @@
     "title": "Public profiles",
     "back": "Back",
     "loading": "Loading profiles…",
+    "loadingMore": "Loading more…",
+    "loadMore": "Load more",
+    "noMore": "No more profiles",
     "empty": "No public profiles yet.",
     "errors": {
       "supabase": "Supabase is not configured."
