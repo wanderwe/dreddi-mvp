@@ -187,19 +187,15 @@ export default function PublicProfilePage() {
   }, []);
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
-  const hasHistory = [
-    profile?.confirmed_count,
-    profile?.completed_count,
-    profile?.disputed_count,
-  ].some((value) => value !== null && value !== undefined);
+  const hasHistory = [profile?.confirmed_count, profile?.disputed_count].some(
+    (value) => value !== null && value !== undefined
+  );
   const confirmedCount = profile?.confirmed_count ?? 0;
-  const completedCount = profile?.completed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
   const reputationSummary = hasHistory
     ? [
         t("publicProfile.summary.confirmed", { count: confirmedCount }),
-        t("publicProfile.summary.completed", { count: completedCount }),
         t("publicProfile.summary.disputed", { count: disputedCount }),
       ].join(" · ")
     : t("publicProfile.emptyHistory");
