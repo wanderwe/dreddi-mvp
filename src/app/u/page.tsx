@@ -105,7 +105,6 @@ export default function PublicProfilesDirectoryPage() {
       profiles.map((profile) => {
         const displayName = profile.display_name?.trim() || profile.handle;
         const confirmedCount = profile.confirmed_count ?? 0;
-        const completedCount = profile.completed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
 
@@ -144,9 +143,6 @@ export default function PublicProfilesDirectoryPage() {
             <div className="flex flex-wrap gap-2 text-xs text-white/70">
               <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-1">
                 {t("publicProfile.confirmed")}: {confirmedCount}
-              </span>
-              <span className="rounded-full border border-amber-300/30 bg-amber-500/10 px-2 py-1">
-                {t("publicProfile.completed")}: {completedCount}
               </span>
               <span className="rounded-full border border-red-300/30 bg-red-500/10 px-2 py-1">
                 {t("publicProfile.disputed")}: {disputedCount}
