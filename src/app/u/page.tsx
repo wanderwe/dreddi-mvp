@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { publicProfileDirectorySelect } from "@/lib/publicProfileQueries";
 
 type PublicProfileDirectoryRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  reputation_score: number | null;
   confirmed_count: number | null;
   completed_count: number | null;
   disputed_count: number | null;
@@ -35,9 +37,7 @@ export default function PublicProfilesDirectoryPage() {
 
       const { data, error: listError } = await supabase
         .from("public_profile_stats")
-        .select(
-          "handle,display_name,avatar_url,confirmed_count,completed_count,disputed_count"
-        )
+        .select(publicProfileDirectorySelect)
         .order("confirmed_count", { ascending: false })
         .order("handle", { ascending: true });
 
@@ -69,6 +69,7 @@ export default function PublicProfilesDirectoryPage() {
         const confirmedCount = profile.confirmed_count ?? 0;
         const completedCount = profile.completed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
+        const reputationScore = profile.reputation_score ?? 50;
         const reputationSummary = hasHistory
           ? [
               t("publicProfile.summary.confirmed", { count: confirmedCount }),
@@ -118,9 +119,10 @@ export default function PublicProfilesDirectoryPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
               <div className="text-[10px] uppercase tracking-wide text-white/50">
-                {t("publicProfile.reputation.title")}
+                {t("publicProfile.reputationScore")}
               </div>
-              <div className="text-sm text-white/80">{reputationSummary}</div>
+              <div className="mt-1 text-2xl font-semibold text-white">{reputationScore}</div>
+              <div className="mt-1 text-xs text-white/60">{reputationSummary}</div>
             </div>
           </Link>
         );
