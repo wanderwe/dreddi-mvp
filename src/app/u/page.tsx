@@ -115,7 +115,7 @@ export default function PublicProfilesDirectoryPage() {
             href={`/u/${encodeURIComponent(profile.handle)}`}
             className="group relative flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
           >
-            <div className="absolute right-4 top-4 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+            <div className="absolute right-4 top-4 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30">
               <span className="sr-only">{t("publicProfile.reputationScore")}</span>
               {reputationScore}
             </div>
