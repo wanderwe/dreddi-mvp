@@ -146,7 +146,7 @@ export default function NewPromisePage() {
               <button
                 type="button"
                 onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
-                className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
                 aria-label="Previous month"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -157,7 +157,7 @@ export default function NewPromisePage() {
               <button
                 type="button"
                 onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
-                className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
                 aria-label="Next month"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden />
@@ -187,7 +187,7 @@ export default function NewPromisePage() {
                       setIsCalendarOpen(false);
                     }}
                     className={clsx(
-                      "flex h-9 w-9 items-center justify-center rounded-full text-sm transition",
+                      "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-sm transition",
                       isSelected
                         ? "bg-emerald-400/90 text-slate-950"
                         : "text-slate-200 hover:bg-white/10",
@@ -211,7 +211,7 @@ export default function NewPromisePage() {
           <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
             <button
               type="button"
-              className="absolute inset-0 bg-black/60"
+              className="absolute inset-0 cursor-pointer bg-black/60"
               aria-label={t("promises.new.actions.closeTimePicker")}
               onClick={() => setIsTimePickerOpen(false)}
             />
@@ -224,7 +224,7 @@ export default function NewPromisePage() {
                   type="button"
                   onClick={() => setIsTimePickerOpen(false)}
                   aria-label={t("promises.new.actions.closeTimePicker")}
-                  className="rounded-full border border-white/10 p-1 text-slate-300 transition hover:border-emerald-300/40 hover:text-white"
+                  className="cursor-pointer rounded-full border border-white/10 p-1 text-slate-300 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-white"
                 >
                   <X className="h-4 w-4" aria-hidden />
                 </button>
@@ -239,7 +239,7 @@ export default function NewPromisePage() {
                       applyTimeChange(preset.hour, preset.minute);
                       setIsTimePickerOpen(false);
                     }}
-                    className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/60 hover:text-emerald-100"
+                    className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/60 hover:bg-white/5 hover:text-emerald-100"
                   >
                     {preset.label}
                   </button>
@@ -260,10 +260,10 @@ export default function NewPromisePage() {
                           setIsTimePickerOpen(false);
                         }}
                         className={clsx(
-                          "rounded-xl border px-2 py-2 text-sm transition",
+                          "rounded-xl border px-2 py-2 text-sm transition cursor-pointer",
                           isSelected
                             ? "border-emerald-300/70 bg-emerald-400/20 text-emerald-100"
-                            : "border-white/10 text-slate-200 hover:border-emerald-300/50 hover:text-emerald-100"
+                            : "border-white/10 text-slate-200 hover:border-emerald-300/50 hover:bg-white/5 hover:text-emerald-100"
                         )}
                       >
                         {option.label}
@@ -532,10 +532,10 @@ export default function NewPromisePage() {
                 <button
                   type="button"
                   onClick={() => setExecutor("me")}
-                  className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     executor === "me"
                       ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:text-emerald-100"
+                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
                   }`}
                 >
                   {t("promises.new.executor.me")}
@@ -543,10 +543,10 @@ export default function NewPromisePage() {
                 <button
                   type="button"
                   onClick={() => setExecutor("other")}
-                  className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     executor === "other"
                       ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:text-emerald-100"
+                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
                   }`}
                 >
                   {t("promises.new.executor.other")}
@@ -583,7 +583,7 @@ export default function NewPromisePage() {
                 <button
                   type="button"
                   onClick={() => setShowCondition(true)}
-                  className="inline-flex items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                  className="inline-flex cursor-pointer items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
                 >
                   {t("promises.new.actions.addCondition")}
                 </button>
@@ -603,7 +603,7 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     onClick={handleRemoveCondition}
-                    className="text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
+                    className="cursor-pointer text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
                   >
                     {t("promises.new.actions.removeCondition")}
                   </button>
@@ -646,7 +646,7 @@ export default function NewPromisePage() {
                       onClick={() => setIsCalendarOpen((open) => !open)}
                       aria-expanded={isCalendarOpen}
                       aria-label={t("promises.new.fields.dueDate")}
-                      className="flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                      className="flex h-11 w-full cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
                     >
                       <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
                       <span
@@ -664,7 +664,7 @@ export default function NewPromisePage() {
                         }}
                         aria-label={t("promises.new.actions.clearDate")}
                         title={t("promises.new.actions.clearDate")}
-                        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
+                        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
                       >
                         <X className="h-4 w-4" aria-hidden />
                       </button>
@@ -678,7 +678,7 @@ export default function NewPromisePage() {
                       <button
                         type="button"
                         onClick={() => setIsTimePickerOpen(true)}
-                        className="text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+                        className="cursor-pointer text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
                       >
                         {t("promises.new.actions.changeTime")}
                       </button>
@@ -713,10 +713,10 @@ export default function NewPromisePage() {
                     aria-checked={isPublicDeal}
                     aria-label={t("promises.new.publicRequest.label")}
                     onClick={() => setIsPublicDeal((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition ${
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
                       isPublicDeal
-                        ? "border-emerald-300/50 bg-emerald-400/70"
-                        : "border-white/20 bg-white/10"
+                        ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                        : "border-white/20 bg-white/10 hover:bg-white/20"
                     } hover:border-emerald-300/60`}
                   >
                     <span
@@ -735,7 +735,7 @@ export default function NewPromisePage() {
             <button
               onClick={createPromise}
               disabled={busy || !title.trim() || !counterparty.trim()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:translate-y-0 disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("promises.new.creating") : t("promises.new.submit")}
             </button>
@@ -746,7 +746,7 @@ export default function NewPromisePage() {
                 {sessionExpired && (
                   <Link
                     href={`/login?next=${encodeURIComponent("/promises/new")}`}
-                    className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"
+                    className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"
                   >
                     Sign in again →
                   </Link>
