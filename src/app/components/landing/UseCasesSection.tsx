@@ -70,7 +70,6 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
           <div className="lg:mt-10">
             <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" />
               {copy.scenariosTitle}
             </div>
             <div className="mt-4 flex flex-wrap gap-2.5">
