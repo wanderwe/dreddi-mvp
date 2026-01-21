@@ -128,6 +128,7 @@ export default function Home() {
     completed_by_promisor: copy.recentDeals.status.completedByPromisor,
     confirmed: copy.recentDeals.status.confirmed,
     disputed: copy.recentDeals.status.disputed,
+    declined: copy.recentDeals.status.declined,
   };
 
   const statusTones: Record<PromiseStatus, string> = {
@@ -135,6 +136,7 @@ export default function Home() {
     completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
     confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
     disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
+    declined: "bg-red-500/10 text-red-100 border border-red-300/40",
   };
 
   const formatDateTimeShort = (value: string) => {

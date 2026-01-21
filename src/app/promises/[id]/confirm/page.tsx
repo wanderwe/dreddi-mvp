@@ -214,6 +214,7 @@ export default function ConfirmPromisePage() {
     completed_by_promisor: t("promises.status.pendingConfirmation"),
     confirmed: t("promises.status.confirmed"),
     disputed: t("promises.status.disputed"),
+    declined: t("promises.inviteStatus.declined"),
   };
 
   return (

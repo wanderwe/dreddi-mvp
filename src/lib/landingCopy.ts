@@ -81,6 +81,7 @@ export type LandingCopy = {
       completedByPromisor: string;
       confirmed: string;
       disputed: string;
+      declined: string;
     };
   };
   demoDeals: DemoDeal[];
@@ -174,6 +175,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         completedByPromisor: "Позначено виконаною — очікує підтвердження",
         confirmed: "Підтверджено",
         disputed: "Оскаржено",
+        declined: "Відхилено",
       },
     },
     demoDeals: [
@@ -285,6 +287,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         completedByPromisor: "Marked complete — awaiting confirmation",
         confirmed: "Confirmed",
         disputed: "Disputed",
+        declined: "Declined",
       },
     },
     demoDeals: [

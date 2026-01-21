@@ -3,6 +3,7 @@ export const PROMISE_STATUSES = [
   "completed_by_promisor",
   "confirmed",
   "disputed",
+  "declined",
 ] as const;
 
 export type PromiseStatus = (typeof PROMISE_STATUSES)[number];

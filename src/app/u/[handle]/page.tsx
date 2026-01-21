@@ -58,6 +58,7 @@ const statusTones: Record<PromiseStatus, string> = {
   completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
   confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
   disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
+  declined: "bg-red-500/10 text-red-100 border border-red-300/40",
 };
 
 export default function PublicProfilePage() {
@@ -253,6 +254,7 @@ export default function PublicProfilePage() {
     completed_by_promisor: t("publicProfile.status.awaitingOutcome"),
     confirmed: landingCopy.recentDeals.status.confirmed,
     disputed: landingCopy.recentDeals.status.disputed,
+    declined: landingCopy.recentDeals.status.declined,
   };
 
   const publicDealsEmpty = promises.length === 0;

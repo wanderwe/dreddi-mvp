@@ -84,10 +84,12 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     const updatePayload: {
       invite_status: "declined";
       declined_at: string;
+      status: "declined";
       counterparty_id?: string;
     } = {
       invite_status: "declined",
       declined_at: nowIso,
+      status: "declined",
     };
 
     if (!p.counterparty_id) {
