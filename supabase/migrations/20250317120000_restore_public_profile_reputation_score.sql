@@ -1,5 +1,7 @@
 -- Restore reputation_score on public profile stats view.
 
+DROP VIEW IF EXISTS public_profile_stats;
+
 CREATE OR REPLACE VIEW public_profile_stats AS
 SELECT
   profiles.id AS profile_id,
