@@ -16,6 +16,7 @@ import {
   isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
+import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 
 type PromiseRow = {
   id: string;
@@ -54,8 +55,16 @@ type PromiseRoleBase = Pick<
   | "promisee_id"
   | "counterparty_id"
 >;
-type PromiseWithRole = PromiseRow & { role: PromiseRole; inviteStatus: InviteStatus };
-type PromiseSummary = PromiseRoleBase & { role: PromiseRole; inviteStatus: InviteStatus };
+type PromiseWithRole = PromiseRow & {
+  role: PromiseRole;
+  inviteStatus: InviteStatus;
+  uiStatus: PromiseUiStatus;
+};
+type PromiseSummary = PromiseRoleBase & {
+  role: PromiseRole;
+  inviteStatus: InviteStatus;
+  uiStatus: PromiseUiStatus;
+};
 
 const PAGE_SIZE = 12;
 
@@ -68,6 +77,7 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
     status: row.status as PromiseStatus,
     role,
     inviteStatus: getPromiseInviteStatus(row),
+    uiStatus: getPromiseUiStatus(row),
   };
 };
 
@@ -94,7 +104,15 @@ export default function PromisesClient() {
     return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
   };
 
-  const statusLabelForRole = (status: PromiseStatus, role: PromiseRole) => {
+  const statusLabelForRole = (
+    status: PromiseStatus,
+    role: PromiseRole,
+    uiStatus: PromiseUiStatus
+  ) => {
+    if (uiStatus === "awaiting_acceptance") return t("promises.status.awaitingInviteAcceptance");
+    if (uiStatus === "declined") return t("promises.inviteStatus.declined");
+    if (uiStatus === "ignored") return t("promises.inviteStatus.ignored");
+
     if (role === "promisor") {
       if (status === "active") return t("promises.status.active");
       if (status === "completed_by_promisor") return t("promises.status.pendingConfirmation");
@@ -482,7 +500,7 @@ export default function PromisesClient() {
                   ? t("promises.list.actionRequired")
                   : null;
 
-                const statusLabel = statusLabelForRole(p.status, p.role);
+                const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
 
                 const busy = busyMap[p.id];
                 const blockedByCondition =

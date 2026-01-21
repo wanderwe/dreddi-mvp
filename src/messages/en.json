@@ -84,7 +84,7 @@
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
       "needsReview": "Needs your review",
-      "awaitingInviteAcceptance": "Waiting for invite acceptance"
+      "awaitingInviteAcceptance": "Pending acceptance"
     },
     "confirmModal": {
       "title": "Request confirmation?",

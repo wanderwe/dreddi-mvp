@@ -92,7 +92,7 @@
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
       "needsReview": "Потрібен ваш перегляд",
-      "awaitingInviteAcceptance": "Очікує прийняття запрошення"
+      "awaitingInviteAcceptance": "Очікує прийняття"
     },
     "confirmModal": {
       "title": "Запросити підтвердження?",
