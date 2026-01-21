@@ -50,8 +50,8 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
                 const Icon = triggerIcons[index] ?? CheckCircle2;
 
                 return (
-                  <li key={item} className="flex items-start gap-4">
-                    <span className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
+                  <li key={item} className="flex items-center gap-4">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="leading-relaxed">{item}</span>
