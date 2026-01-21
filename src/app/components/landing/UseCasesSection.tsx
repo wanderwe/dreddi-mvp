@@ -22,7 +22,7 @@ type UseCasesSectionProps = {
 
 export function UseCasesSection({ copy }: UseCasesSectionProps) {
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+    <section className="relative mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 sm:pb-14 -mt-8 sm:-mt-12">
       <div
         className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-emerald-500/30 via-emerald-500/10 to-transparent blur-3xl"
         aria-hidden
@@ -51,7 +51,7 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
                 return (
                   <li key={item} className="flex items-start gap-4">
-                    <span className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
+                    <span className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="leading-relaxed">{item}</span>

@@ -12,7 +12,7 @@ type ReputationSectionProps = {
 
 export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
+    <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-16">
       <div
         className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-sky-400/25 via-sky-400/10 to-transparent blur-3xl"
         aria-hidden
@@ -39,8 +39,8 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
               const Icon = stepIcons[index] ?? CheckCircle2;
 
               return (
-                <li key={item} className="relative flex gap-4">
-                  <span className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/15 text-sky-100 ring-1 ring-sky-400/30">
+                <li key={item} className="relative flex items-center gap-4">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/15 text-sky-100 ring-1 ring-sky-400/30">
                     <Icon className="h-5 w-5" />
                   </span>
                   <span className="leading-relaxed">{item}</span>

@@ -111,9 +111,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Підрядники та довгі проєкти",
         "Пілотні проєкти / тестова співпраця",
       ],
-      noteTitle: "Не для всього.",
+      noteTitle: "Не для всього",
       framing:
-        "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
+        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
     },
     reputation: {
       label: "Результат",
@@ -222,9 +222,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Contractors & long-term jobs",
         "Pilot projects / test collaborations",
       ],
-      noteTitle: "Not for everything.",
+      noteTitle: "Not for everything",
       framing:
-        "For agreements where it’s too early for contracts but already too risky to rely on words.",
+        "For agreements where it’s too early for contracts but already risky to rely on words",
     },
     reputation: {
       label: "Outcome",
