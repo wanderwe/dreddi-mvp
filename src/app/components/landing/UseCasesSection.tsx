@@ -22,7 +22,7 @@ type UseCasesSectionProps = {
 
 export function UseCasesSection({ copy }: UseCasesSectionProps) {
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+    <section className="relative mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6">
       <div
         className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-emerald-500/30 via-emerald-500/10 to-transparent blur-3xl"
         aria-hidden
@@ -32,7 +32,7 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
         aria-hidden
       />
 
-      <div className="relative space-y-8 sm:space-y-10">
+      <div className="relative space-y-6 sm:space-y-8">
         <div className="space-y-3 text-center sm:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
             <CheckCircle2 className="h-4 w-4" />
@@ -43,16 +43,16 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
           </h2>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="group rounded-3xl border border-white/10 bg-white/5 p-6 shadow-inner shadow-black/40 transition hover:border-emerald-400/30">
-            <ul className="space-y-3 text-sm text-slate-200/90">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_0.7fr] lg:items-start">
+          <div className="group rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/40 sm:p-6">
+            <ul className="divide-y divide-white/5 text-sm text-slate-200/90">
               {copy.bullets.map((item, index) => {
                 const Icon = triggerIcons[index] ?? CheckCircle2;
 
                 return (
                   <li
                     key={item}
-                    className="flex items-start gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-3"
+                    className="flex items-start gap-3 px-1 py-3 first:pt-0 last:pb-0"
                   >
                     <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-emerald-200">
                       <Icon className="h-4 w-4" />
@@ -64,21 +64,21 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
             </ul>
           </div>
 
-          <div className="group rounded-3xl border border-white/10 bg-white/5 p-6 shadow-inner shadow-black/40 transition hover:border-emerald-400/30">
-            <div className="flex items-center gap-3 text-sm font-semibold text-white">
+          <div className="group rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-black/40 transition hover:border-emerald-400/30 sm:p-6 lg:translate-y-6">
+            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-emerald-100/80">
               <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-emerald-200">
                 <Briefcase className="h-4 w-4" />
               </span>
               {copy.scenariosTitle}
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 space-y-3">
               {copy.scenarios.map((item, index) => {
                 const Icon = scenarioIcons[index] ?? Briefcase;
 
                 return (
                   <div
                     key={item}
-                    className="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-3 text-xs text-slate-200/90"
+                    className="flex items-center gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2 text-xs text-slate-200/90"
                   >
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-emerald-200">
                       <Icon className="h-4 w-4" />
@@ -87,6 +87,10 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
                   </div>
                 );
               })}
+            </div>
+            <div className="mt-5 space-y-2 border-t border-white/5 pt-4 text-xs text-slate-300/80">
+              <div className="font-semibold text-white/80">{copy.noteTitle}</div>
+              <p>{copy.framing}</p>
             </div>
           </div>
         </div>

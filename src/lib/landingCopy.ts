@@ -26,6 +26,12 @@ export type LandingCopy = {
     noteTitle: string;
     framing: string;
   };
+  reputationSection: {
+    title: string;
+  };
+  publicProfileSection: {
+    title: string;
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -106,6 +112,12 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Не для всього.",
       framing:
         "Для домовленостей, де ще рано для контрактів, але вже занадто ризиковано покладатися лише на слова.",
+    },
+    reputationSection: {
+      title: "Репутація будується виконанням, а не словами",
+    },
+    publicProfileSection: {
+      title: "Публічний профіль як доказ домовленостей",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -205,6 +217,12 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Not for everything.",
       framing:
         "For agreements where it’s too early for contracts but already too risky to rely on words.",
+    },
+    reputationSection: {
+      title: "Reputation is built on execution, not words",
+    },
+    publicProfileSection: {
+      title: "Public profile as proof of agreements",
     },
     cta: {
       getStarted: "Create a deal",
