@@ -417,6 +417,9 @@ export default function Home() {
               >
                 {copy.cta.publicProfiles}
               </Link>
+              <p className="w-full text-xs text-slate-400">
+                No password. Magic link or Google.
+              </p>
             </div>
           ) : (
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
