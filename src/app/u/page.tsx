@@ -8,6 +8,7 @@ import { publicProfileDirectorySelect } from "@/lib/publicProfileQueries";
 
 type PublicProfileDirectoryRow = {
   handle: string;
+  email: string | null;
   display_name: string | null;
   avatar_url: string | null;
   reputation_score: number | null;
@@ -25,6 +26,18 @@ export default function PublicProfilesDirectoryPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+
+    return () => {
+      window.clearTimeout(handle);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     let active = true;
@@ -40,12 +53,21 @@ export default function PublicProfilesDirectoryPage() {
       setError(null);
       setLoadMoreError(null);
 
-      const { data, error: listError } = await supabase
+      const normalizedSearch = debouncedSearch.startsWith("@")
+        ? debouncedSearch.slice(1)
+        : debouncedSearch;
+      let query = supabase
         .from("public_profile_stats")
         .select(publicProfileDirectorySelect)
         .order("confirmed_count", { ascending: false })
-        .order("handle", { ascending: true })
-        .range(0, pageSize - 1);
+        .order("handle", { ascending: true });
+
+      if (normalizedSearch) {
+        const searchPattern = `%${normalizedSearch}%`;
+        query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+      }
+
+      const { data, error: listError } = await query.range(0, pageSize - 1);
 
       if (!active) return;
 
@@ -67,7 +89,7 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [pageSize, t]);
+  }, [debouncedSearch, pageSize, t]);
 
   const loadMore = async () => {
     if (!supabase) {
@@ -81,12 +103,24 @@ export default function PublicProfilesDirectoryPage() {
     setLoadMoreError(null);
 
     const startIndex = profiles.length;
-    const { data, error: listError } = await supabase
+    const normalizedSearch = debouncedSearch.startsWith("@")
+      ? debouncedSearch.slice(1)
+      : debouncedSearch;
+    let query = supabase
       .from("public_profile_stats")
       .select(publicProfileDirectorySelect)
       .order("confirmed_count", { ascending: false })
-      .order("handle", { ascending: true })
-      .range(startIndex, startIndex + pageSize - 1);
+      .order("handle", { ascending: true });
+
+    if (normalizedSearch) {
+      const searchPattern = `%${normalizedSearch}%`;
+      query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+    }
+
+    const { data, error: listError } = await query.range(
+      startIndex,
+      startIndex + pageSize - 1
+    );
 
     if (listError) {
       setLoadMoreError(listError.message);
@@ -161,6 +195,21 @@ export default function PublicProfilesDirectoryPage() {
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold">{t("publicDirectory.title")}</h1>
           </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="public-profile-search" className="sr-only">
+            Search by username or email
+          </label>
+          <input
+            id="public-profile-search"
+            type="search"
+            value={searchTerm}
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
+            }}
+            placeholder="Search by username or email"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+          />
         </div>
 
         {loading ? (
