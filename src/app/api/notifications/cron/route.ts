@@ -119,6 +119,7 @@ export async function POST(req: Request) {
       .update({
         invite_status: "ignored",
         ignored_at: nowIso,
+        status: "declined",
       })
       .eq("id", row.id)
       .is("counterparty_accepted_at", null)

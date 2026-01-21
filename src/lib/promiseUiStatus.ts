@@ -10,6 +10,8 @@ export const getPromiseUiStatus = (
 ): PromiseUiStatus => {
   if (!row) return "awaiting_acceptance";
 
+  if (row.status !== "active") return row.status;
+
   const inviteStatus = getPromiseInviteStatus(row);
   if (inviteStatus !== "accepted") return inviteStatus;
 
