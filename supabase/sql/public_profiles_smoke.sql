@@ -15,4 +15,10 @@ SELECT handle, confirmed_count, completed_count, disputed_count
 FROM public_profile_stats
 WHERE profile_id IN ('<public_user_id>', '<private_user_id>');
 
+-- Sanity check for a known public handle with completed deals.
+-- Example: @allaverdiiev should show non-zero counts if completed deals exist.
+SELECT handle, confirmed_count, completed_count, disputed_count
+FROM public_profile_stats
+WHERE handle = 'allaverdiiev';
+
 ROLLBACK;
