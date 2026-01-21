@@ -34,7 +34,7 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <ol className="relative space-y-6 pl-6 text-base text-slate-200/90 before:absolute before:left-4 before:top-2 before:h-[calc(100%-1rem)] before:w-px before:bg-white/10 sm:space-y-8 sm:text-lg">
+          <ol className="relative space-y-6 pl-6 text-base text-slate-200/90 sm:space-y-8 sm:text-lg">
             {copy.steps.map((item, index) => {
               const Icon = stepIcons[index] ?? CheckCircle2;
 
