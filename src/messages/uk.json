@@ -408,6 +408,8 @@
     "loadMore": "Завантажити ще",
     "noMore": "Більше немає",
     "empty": "Публічних профілів поки немає.",
+    "searchLabel": "Пошук за нікнеймом або email",
+    "searchPlaceholder": "Пошук за нікнеймом або email",
     "errors": {
       "supabase": "Supabase не налаштовано."
     }

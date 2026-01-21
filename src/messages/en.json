@@ -400,6 +400,8 @@
     "loadMore": "Load more",
     "noMore": "No more profiles",
     "empty": "No public profiles yet.",
+    "searchLabel": "Search by username or email",
+    "searchPlaceholder": "Search by username or email",
     "errors": {
       "supabase": "Supabase is not configured."
     }
