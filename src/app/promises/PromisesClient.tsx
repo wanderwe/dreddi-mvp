@@ -40,6 +40,7 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
+type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -147,6 +148,7 @@ export default function PromisesClient() {
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>("total");
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -284,9 +286,26 @@ export default function PromisesClient() {
     };
   }, [tab, userId]);
 
+  const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
+    rows: T[]
+  ): T[] => {
+    if (activeMetricFilter === "awaiting_my_action") {
+      return rows.filter((row) => isAwaitingYourAction(row));
+    }
+    if (activeMetricFilter === "awaiting_others") {
+      return rows.filter((row) => isAwaitingOthers(row));
+    }
+    return rows;
+  };
+
+  const filteredSummaryRows = useMemo(
+    () => applyMetricFilter(summaryRows),
+    [summaryRows, activeMetricFilter]
+  );
+
   const roleCounts = useMemo(
     () =>
-      summaryRows.reduce(
+      filteredSummaryRows.reduce(
         (acc, row) => {
           if (row.role === "promisor") acc.promisor += 1;
           else if (row.role === "counterparty") acc.counterparty += 1;
@@ -295,27 +314,35 @@ export default function PromisesClient() {
         },
         { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
       ),
-    [summaryRows]
+    [filteredSummaryRows]
   );
 
-  const rows = listRowsByTab[tab];
+  const filteredListRowsByTab = useMemo(
+    () => ({
+      "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
+      "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+    }),
+    [listRowsByTab, activeMetricFilter]
+  );
+
+  const rows = filteredListRowsByTab[tab];
 
   const overview = useMemo(() => {
-    const total = summaryRows.length;
-    const awaitingYou = summaryRows.filter((row) => isAwaitingYourAction(row)).length;
-    const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row)).length;
+    const total = filteredSummaryRows.length;
+    const awaitingYou = filteredSummaryRows.filter((row) => isAwaitingYourAction(row)).length;
+    const awaitingOthers = filteredSummaryRows.filter((row) => isAwaitingOthers(row)).length;
 
     return { total, awaitingYou, awaitingOthers };
-  }, [summaryRows]);
+  }, [filteredSummaryRows]);
 
   useEffect(() => {
     const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
     if (
       process.env.NODE_ENV !== "production" &&
-      categorizedTotal !== summaryRows.length
+      categorizedTotal !== filteredSummaryRows.length
     ) {
       console.warn("[promises] Tab counts do not sum to total", {
-        total: summaryRows.length,
+        total: filteredSummaryRows.length,
         promisorCount: roleCounts.promisor,
         counterpartyCount: roleCounts.counterparty,
         uncategorizedIds: roleCounts.uncategorized,
@@ -325,7 +352,7 @@ export default function PromisesClient() {
     roleCounts.counterparty,
     roleCounts.promisor,
     roleCounts.uncategorized,
-    summaryRows.length,
+    filteredSummaryRows.length,
   ]);
 
   const handleMarkCompleted = async (promiseId: string) => {
@@ -385,6 +412,14 @@ export default function PromisesClient() {
   };
 
   const metricValueClass = "mt-1 text-base font-semibold leading-tight";
+  const metricBaseClass =
+    "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+
+  const handleMetricClick = (next: MetricFilter) => {
+    setActiveMetricFilter((current) =>
+      current === next && next !== "total" ? "total" : next
+    );
+  };
 
   return (
     <main className="relative py-10">
@@ -408,22 +443,57 @@ export default function PromisesClient() {
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left shadow-inner shadow-black/30">
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">{t("promises.overview.metrics.total")}</div>
+            <button
+              type="button"
+              onClick={() => handleMetricClick("total")}
+              aria-pressed={activeMetricFilter === "total"}
+              className={[
+                metricBaseClass,
+                "cursor-pointer border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10",
+                activeMetricFilter === "total"
+                  ? "ring-2 ring-emerald-400/60"
+                  : "active:scale-[0.99]",
+              ].join(" ")}
+            >
+              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                {t("promises.overview.metrics.total")}
+              </div>
               <div className={`${metricValueClass} text-white`}>{overview.total}</div>
-            </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-left text-emerald-100 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => handleMetricClick("awaiting_my_action")}
+              aria-pressed={activeMetricFilter === "awaiting_my_action"}
+              className={[
+                metricBaseClass,
+                "cursor-pointer border-emerald-400/20 bg-emerald-500/10 text-emerald-100 hover:border-emerald-300/40 hover:bg-emerald-500/15",
+                activeMetricFilter === "awaiting_my_action"
+                  ? "ring-2 ring-emerald-300/70"
+                  : "active:scale-[0.99]",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className={metricValueClass}>{overview.awaitingYou}</div>
-            </div>
-            <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-left text-amber-50 shadow-inner shadow-black/30">
+            </button>
+            <button
+              type="button"
+              onClick={() => handleMetricClick("awaiting_others")}
+              aria-pressed={activeMetricFilter === "awaiting_others"}
+              className={[
+                metricBaseClass,
+                "cursor-pointer border-amber-300/30 bg-amber-400/10 text-amber-50 hover:border-amber-300/60 hover:bg-amber-400/15",
+                activeMetricFilter === "awaiting_others"
+                  ? "ring-2 ring-amber-300/70"
+                  : "active:scale-[0.99]",
+              ].join(" ")}
+            >
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className={metricValueClass}>{overview.awaitingOthers}</div>
-            </div>
+            </button>
           </div>
         </div>
 
