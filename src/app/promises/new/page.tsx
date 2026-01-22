@@ -615,8 +615,8 @@ export default function NewPromisePage() {
               <div className="grid items-start gap-4 sm:grid-cols-2">
                 {executor && (
                   <div className="text-sm text-slate-200">
-                    <label className="block">
-                      <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    <label className="space-y-2 text-sm text-slate-200">
+                      <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                         {t("promises.new.fields.counterparty")}
                       </span>
                       <input
@@ -635,8 +635,8 @@ export default function NewPromisePage() {
                   </div>
                 )}
 
-                <div className="text-sm text-slate-200">
-                  <span className="mb-2 block min-h-[2rem] text-xs uppercase tracking-[0.2em] text-emerald-200">
+                <div className="space-y-2 text-sm text-slate-200">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                     {t("promises.new.fields.dueDate")}
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
