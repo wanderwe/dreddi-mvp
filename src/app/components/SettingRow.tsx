@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type SettingRowProps = {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   right: ReactNode;
   className?: string;
   children?: ReactNode;
