@@ -91,7 +91,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
       eyebrow: "Аналітика репутації для угод та обіцянок",
-      headline: "Домовленість починається з підтвердження.",
+      headline: "Домовленість починається з підтвердження",
       description:
         "Dreddi — сервіс між словами і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску —\nале з реальними наслідками для довіри.",
     },
@@ -203,7 +203,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   en: {
     hero: {
       eyebrow: "Reputation analytics for deals and promises",
-      headline: "An agreement starts with confirmation.",
+      headline: "An agreement starts with confirmation",
       description:
         "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure —\nbut with real consequences for trust.",
     },
