@@ -30,6 +30,8 @@ const OG_COPY = {
   },
 };
 
+const OG_IMAGE_URL = "https://dreddi.com/og.png";
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const copy = OG_COPY[locale] ?? OG_COPY.en;
@@ -37,15 +39,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: copy.title,
     description: copy.description,
+    metadataBase: new URL("https://dreddi.com"),
     openGraph: {
       title: copy.title,
       description: copy.description,
       locale: copy.locale,
       type: "website",
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: 1200,
+          height: 630,
+          alt: "Dreddi",
+        },
+      ],
     },
     twitter: {
       title: copy.title,
       description: copy.description,
+      card: "summary_large_image",
+      images: [OG_IMAGE_URL],
     },
   };
 }
