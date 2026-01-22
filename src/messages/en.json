@@ -386,8 +386,8 @@
     "emptyHistory": "No history yet",
     "emptyPublicDeals": "No public deals yet",
     "errors": {
-      "supabase": "Supabase is not configured.",
-      "missing": "Profile handle is missing.",
+      "supabase": "Supabase is not configured",
+      "missing": "Profile handle is missing",
       "private": "This profile is private",
       "notFound": "Profile not found"
     }
@@ -399,11 +399,11 @@
     "loadingMore": "Loading more…",
     "loadMore": "Load more",
     "noMore": "No more profiles",
-    "empty": "No public profiles yet.",
+    "empty": "No public profiles yet",
     "searchLabel": "Search by username or email",
     "searchPlaceholder": "Search by username or email",
     "errors": {
-      "supabase": "Supabase is not configured."
+      "supabase": "Supabase is not configured"
     }
   },
   "notifications": {
