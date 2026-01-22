@@ -299,8 +299,23 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       <div className="mt-4 space-y-3">
         <SettingRow
-          title={t("profileSettings.publicLabel")}
-          description={t("profileSettings.publicDescription")}
+          title={
+            <button
+              type="button"
+              onClick={handleToggle}
+              disabled={loading || saving || !profile}
+              className={`-m-2 flex w-full flex-col items-start rounded-lg p-2 text-left transition ${
+                loading || saving || !profile
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+              }`}
+            >
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.publicLabel")}
+              </div>
+              <p className="text-xs text-slate-300">{t("profileSettings.publicDescription")}</p>
+            </button>
+          }
           right={
             <div className="flex flex-col items-end gap-2">
               <span
@@ -325,7 +340,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   isPublic
                     ? "border-emerald-300/50 bg-emerald-400/70"
                     : "border-white/20 bg-white/10"
-                } ${loading || saving ? "opacity-60" : "hover:border-emerald-300/60"}`}
+                } ${
+                  loading || saving || !profile
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                }`}
               >
                 <span
                   className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -358,14 +377,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   href={publicProfilePath}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                  className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
                 >
                   {t("profileSettings.viewPublicProfile")}
                 </a>
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+                  className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
                 >
                   {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
                 </button>
@@ -388,12 +407,21 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
           <div className="mt-4 space-y-4">
             <div className="flex items-start justify-between gap-4 sm:items-center">
-              <div className="min-w-0 flex-1">
+              <button
+                type="button"
+                onClick={togglePushNotifications}
+                disabled={loading || saving || !profile}
+                className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                  loading || saving || !profile
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                }`}
+              >
                 <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
                 <p className="text-xs text-slate-400">
                   {t("profileSettings.pushDescription")}
                 </p>
-              </div>
+              </button>
               <button
                 type="button"
                 role="switch"
@@ -404,7 +432,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   profile?.pushEnabled
                     ? "border-emerald-300/50 bg-emerald-400/70"
                     : "border-white/20 bg-white/10"
-                } ${loading || saving ? "opacity-60" : "hover:border-emerald-300/60"}`}
+                } ${
+                  loading || saving || !profile
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                }`}
               >
                 <span
                   className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -415,9 +447,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             </div>
 
             <div className="flex items-start justify-between gap-4 sm:items-center">
-              <div className="min-w-0 flex-1">
+              <button
+                type="button"
+                onClick={toggleDeadlineReminders}
+                disabled={loading || saving || !profile}
+                className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                  loading || saving || !profile
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                }`}
+              >
                 <div className="text-sm text-white">{t("profileSettings.deadlineLabel")}</div>
-              </div>
+              </button>
               <button
                 type="button"
                 role="switch"
@@ -428,7 +469,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   profile?.deadlineRemindersEnabled
                     ? "border-emerald-300/50 bg-emerald-400/70"
                     : "border-white/20 bg-white/10"
-                } ${loading || saving ? "opacity-60" : "hover:border-emerald-300/60"}`}
+                } ${
+                  loading || saving || !profile
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                }`}
               >
                 <span
                   className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -440,12 +485,23 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-4 sm:items-center">
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-white">{t("profileSettings.quietHoursLabel")}</div>
+                <button
+                  type="button"
+                  onClick={toggleQuietHours}
+                  disabled={loading || saving || !profile}
+                  className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                    loading || saving || !profile
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                  }`}
+                >
+                  <div className="text-sm text-white">
+                    {t("profileSettings.quietHoursLabel")}
+                  </div>
                   <p className="text-xs text-slate-400">
                     {t("profileSettings.quietHoursDescription")}
                   </p>
-                </div>
+                </button>
                 <button
                   type="button"
                   role="switch"
@@ -456,7 +512,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     profile?.quietHoursEnabled
                       ? "border-emerald-300/50 bg-emerald-400/70"
                       : "border-white/20 bg-white/10"
-                  } ${loading || saving ? "opacity-60" : "hover:border-emerald-300/60"}`}
+                  } ${
+                    loading || saving || !profile
+                      ? "cursor-not-allowed opacity-60"
+                      : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                  }`}
                 >
                   <span
                     className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -500,7 +560,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       !profile?.quietHoursEnabled ||
                       !quietHoursRangeChanged
                     }
-                    className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 disabled:opacity-60"
+                    className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {t("profileSettings.save")}
                   </button>
@@ -541,7 +601,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 );
               }
             }}
-            className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100"
+            className="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
           >
             {t("nav.logout")}
           </button>
@@ -581,7 +641,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
         <SheetTrigger asChild>
           <button
             type="button"
-            className={`w-full rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 ${className}`}
+            className={`w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] ${className}`}
           >
             {t("profileSettings.buttonLabel")}
           </button>
@@ -600,7 +660,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
             <SheetClose asChild>
               <button
                 type="button"
-                className="rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 active:scale-[0.98]"
                 aria-label={t("profileSettings.close")}
               >
                 <X className="h-4 w-4" aria-hidden />
