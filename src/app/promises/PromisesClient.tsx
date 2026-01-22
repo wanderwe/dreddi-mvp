@@ -328,12 +328,12 @@ export default function PromisesClient() {
   const rows = filteredListRowsByTab[tab];
 
   const overview = useMemo(() => {
-    const total = filteredSummaryRows.length;
-    const awaitingYou = filteredSummaryRows.filter((row) => isAwaitingYourAction(row)).length;
-    const awaitingOthers = filteredSummaryRows.filter((row) => isAwaitingOthers(row)).length;
+    const total = summaryRows.length;
+    const awaitingYou = summaryRows.filter((row) => isAwaitingYourAction(row)).length;
+    const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row)).length;
 
     return { total, awaitingYou, awaitingOthers };
-  }, [filteredSummaryRows]);
+  }, [summaryRows]);
 
   useEffect(() => {
     const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
