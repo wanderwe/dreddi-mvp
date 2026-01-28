@@ -261,7 +261,7 @@ export default function PublicProfilePage() {
 
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10">
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}
@@ -273,42 +273,50 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                    {profile?.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={profile.avatar_url}
-                        alt={displayName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xl font-semibold text-white/80">
-                        {displayName.slice(0, 1).toUpperCase()}
-                      </span>
-                    )}
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                        {profile?.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={profile.avatar_url}
+                            alt={displayName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xl font-semibold text-white/80">
+                            {displayName.slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <h1 className="text-2xl font-semibold">{displayName}</h1>
+                        <p className="text-sm text-white/60">@{profile?.handle}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:text-emerald-100 sm:w-fit"
+                    >
+                      {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                    </button>
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-semibold">{displayName}</h1>
-                    <p className="text-sm text-white/60">@{profile?.handle}</p>
+                  <div className="flex items-center gap-3 sm:justify-end">
+                    <span className="text-[10px] uppercase tracking-wide text-white/50">
+                      {t("publicProfile.reputationScore")}
+                    </span>
+                    <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-lg font-semibold text-white">
+                      {reputationScore}
+                    </span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 sm:w-auto"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                </button>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                <div className="text-[10px] uppercase tracking-wide text-white/50">
-                  {t("publicProfile.reputationScore")}
+                <div className="flex flex-col gap-1 text-sm text-white/70">
+                  <div>{reputationSummary}</div>
+                  <div className="text-xs text-white/50">{lastActivityLabel}</div>
                 </div>
-                <div className="mt-2 text-3xl font-semibold text-white">{reputationScore}</div>
-                <div className="mt-2 text-sm text-white/80">{reputationSummary}</div>
-                <div className="mt-2 text-xs text-white/50">{lastActivityLabel}</div>
               </div>
             </section>
 
