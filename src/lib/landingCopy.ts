@@ -1,14 +1,14 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
 import { PromiseStatus } from "@/lib/promiseStatus";
 
-type DemoDealDate = "nextSaturday" | "nextMarchFirst" | null;
+type DemoDealDate = "nextMarchFirst" | null;
 
 export type DemoDeal = {
   id: string;
   title: string;
   status: PromiseStatus;
   meta?: string;
-  dueDate: DemoDealDate;
+  dueDate?: DemoDealDate;
 };
 
 export type LandingCopy = {
@@ -66,8 +66,8 @@ export type LandingCopy = {
   };
   recentDeals: {
     title: string;
+    demoTitle: string;
     seeAll: string;
-    guestHint: string;
     empty: string;
     sentiment: {
       positive: string;
@@ -160,8 +160,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     recentDeals: {
       title: "Ваші останні угоди",
+      demoTitle: "Приклади угод у профілі",
       seeAll: "Переглянути всі",
-      guestHint: "Увійдіть, щоб бачити свої актуальні угоди",
       empty: "Створіть свою першу угоду, щоб наповнити стрічку репутації.",
       sentiment: {
         positive: "Позитивно",
@@ -183,20 +183,19 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         id: "demo-1",
         title: "Підготувати pitch deck для інвесторів",
         status: "active",
-        dueDate: null,
+        meta: "Створено 27 січ., 22:39",
       },
       {
         id: "demo-2",
         title: "Допомогти з переїздом у вихідні",
         status: "confirmed",
-        dueDate: "nextSaturday",
+        meta: "Створено 17 січ., 10:15",
       },
       {
         id: "demo-3",
-        title: "Повернути $500 до 1 березня",
+        title: "Внести передплату за авто",
         status: "disputed",
-        dueDate: "nextMarchFirst",
-        meta: "Результат: перегляд",
+        meta: "Строк 1 бер., 18:00",
       },
     ],
   },
@@ -272,8 +271,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     recentDeals: {
       title: "Your recent deals",
+      demoTitle: "Example deals in a profile",
       seeAll: "View all",
-      guestHint: "Sign in to see your active deals",
       empty: "Create your first deal to populate your reputation feed.",
       sentiment: {
         positive: "Positive",
@@ -295,20 +294,19 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         id: "demo-1",
         title: "Prepare an investor pitch deck",
         status: "active",
-        dueDate: null,
+        meta: "Created Jan 27, 22:39",
       },
       {
         id: "demo-2",
-        title: "Help with the move this weekend",
+        title: "Help with apartment move over the weekend",
         status: "confirmed",
-        dueDate: "nextSaturday",
+        meta: "Created Jan 17, 10:15",
       },
       {
         id: "demo-3",
-        title: "Return $500 by March 1",
+        title: "Pay a car deposit",
         status: "disputed",
-        dueDate: "nextMarchFirst",
-        meta: "Outcome: under review",
+        meta: "Due Mar 1, 18:00",
       },
     ],
   },
