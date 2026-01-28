@@ -16,6 +16,7 @@ type DealRow = {
   id: string;
   title: string;
   status: PromiseStatus;
+  meta?: string;
   due_at?: string | null;
   created_at?: string;
 };
@@ -43,18 +44,29 @@ type ReputationResponse = {
 
 type DealRowProps = {
   item: DealRow;
-  href: string;
+  href?: string;
+  isClickable?: boolean;
   metaText: string;
   statusLabels: Record<PromiseStatus, string>;
   statusTones: Record<PromiseStatus, string>;
 };
 
-function DealRow({ item, href, metaText, statusLabels, statusTones }: DealRowProps) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-emerald-500/10"
-    >
+function DealRow({
+  item,
+  href,
+  isClickable = true,
+  metaText,
+  statusLabels,
+  statusTones,
+}: DealRowProps) {
+  const baseClass =
+    "flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200";
+  const interactiveClass = isClickable
+    ? "transition hover:border-emerald-300/40 hover:bg-emerald-500/10"
+    : "cursor-default";
+
+  const content = (
+    <>
       <div>
         <div className="font-semibold text-white">{item.title}</div>
         {metaText ? <div className="text-xs text-slate-400">{metaText}</div> : null}
@@ -64,6 +76,16 @@ function DealRow({ item, href, metaText, statusLabels, statusTones }: DealRowPro
       >
         {statusLabels[item.status] ?? item.status}
       </span>
+    </>
+  );
+
+  if (!isClickable || !href) {
+    return <div className={`${baseClass} ${interactiveClass}`}>{content}</div>;
+  }
+
+  return (
+    <Link href={href} className={`${baseClass} ${interactiveClass}`}>
+      {content}
     </Link>
   );
 }
@@ -82,15 +104,13 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
-  const { nextSaturday, nextMarchFirst } = useMemo(() => {
+  const nextMarchFirst = useMemo(() => {
     const now = new Date();
-    const upcomingSaturday = new Date(now);
-    const daysUntilSaturday = (6 - upcomingSaturday.getDay() + 7) % 7;
-    upcomingSaturday.setDate(upcomingSaturday.getDate() + daysUntilSaturday);
-    upcomingSaturday.setHours(0, 0, 0, 0);
-    const upcomingMarchFirst = new Date(now.getFullYear() + 1, 2, 1);
-    upcomingMarchFirst.setHours(0, 0, 0, 0);
-    return { nextSaturday: upcomingSaturday, nextMarchFirst: upcomingMarchFirst };
+    const currentYearMarchFirst = new Date(now.getFullYear(), 2, 1);
+    const targetYear = now > currentYearMarchFirst ? now.getFullYear() + 1 : now.getFullYear();
+    const marchFirst = new Date(targetYear, 2, 1);
+    marchFirst.setHours(0, 0, 0, 0);
+    return marchFirst;
   }, []);
 
   const defaultDueHour = 18;
@@ -105,22 +125,17 @@ export default function Home() {
   const demoDeals: DealRow[] = useMemo(
     () =>
       copy.demoDeals.map((deal) => {
-        const due_at =
-          deal.dueDate === "nextSaturday"
-            ? toIsoDateTime(nextSaturday)
-            : deal.dueDate === "nextMarchFirst"
-            ? toIsoDateTime(nextMarchFirst)
-            : null;
+        const due_at = deal.dueDate === "nextMarchFirst" ? toIsoDateTime(nextMarchFirst) : null;
 
         return {
           id: deal.id,
           title: deal.title,
           status: deal.status,
+          meta: deal.meta,
           due_at,
-          created_at: new Date().toISOString(),
         };
       }),
-    [copy, nextSaturday, nextMarchFirst]
+    [copy, nextMarchFirst]
   );
 
   const statusLabels: Record<PromiseStatus, string> = {
@@ -158,6 +173,10 @@ export default function Home() {
   };
 
   const getMetaText = (item: DealRow) => {
+    if (item.meta) {
+      return item.meta;
+    }
+
     if (item.due_at) {
       const formatted = formatDueDate(item.due_at, locale, { includeYear: false, includeTime: true });
       if (formatted) {
@@ -362,6 +381,7 @@ export default function Home() {
     confirmedWithDeadlineCount === 0 ? copy.score.onTime.empty : copy.score.onTime.helper;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
   const recentDealsLimited = recentDeals.slice(0, 3);
+  const recentDealsTitle = isAuthenticated ? copy.recentDeals.title : copy.recentDeals.demoTitle;
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index, lines) => (
@@ -496,23 +516,24 @@ export default function Home() {
 
                 <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
                   <div className="flex items-center justify-between text-sm text-slate-300">
-                    <span>{copy.recentDeals.title}</span>
-                    <Link
-                      href={isAuthenticated ? "/promises" : "/login?next=%2Fpromises"}
-                      className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
-                    >
-                      {copy.recentDeals.seeAll}
-                    </Link>
+                    <span>{recentDealsTitle}</span>
+                    {isAuthenticated ? (
+                      <Link
+                        href="/promises"
+                        className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
+                      >
+                        {copy.recentDeals.seeAll}
+                      </Link>
+                    ) : null}
                   </div>
                   {!isAuthenticated ? (
                     <div className="mt-3">
-                      <p className="text-xs text-slate-400">{copy.recentDeals.guestHint}</p>
                       <div className="mt-3 space-y-2 text-sm">
                         {demoDeals.map((item) => (
                           <DealRow
                             key={item.id}
                             item={item}
-                            href="/login?next=%2Fpromises"
+                            isClickable={false}
                             metaText={getMetaText(item)}
                             statusLabels={statusLabels}
                             statusTones={statusTones}
