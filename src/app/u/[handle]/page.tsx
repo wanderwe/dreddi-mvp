@@ -308,10 +308,12 @@ export default function PublicProfilePage() {
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-wide text-white/60">
-                      {t("publicProfile.reputationLabel")}
-                    </span>
-                    <div className="text-3xl font-semibold text-white">{reputationScore}</div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs uppercase tracking-wide text-white/60">
+                        {t("publicProfile.reputationLabel")}
+                      </span>
+                      <span className="text-2xl font-semibold text-white">{reputationScore}</span>
+                    </div>
                     <div className="text-sm text-white/80">{reputationSummary}</div>
                   </div>
                   <div className="text-xs text-white/50 sm:text-right">{lastActivityLabel}</div>
