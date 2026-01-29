@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { stripTrailingPeriod } from "@/lib/text";
@@ -33,6 +34,7 @@ export default function NotificationsClient() {
 
   useEffect(() => {
     let active = true;
+    let channel: ReturnType<SupabaseClient["channel"]> | null = null;
 
     const loadNotifications = async (pageIndex: number, replace = false) => {
       const isInitial = pageIndex === 0 && replace;
@@ -88,10 +90,76 @@ export default function NotificationsClient() {
       }
     };
 
-    void loadNotifications(0, true);
+    const subscribeToNotifications = (supabase: SupabaseClient, userId: string) => {
+      channel = supabase
+        .channel(`notifications-feed-${userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const next = payload.new as NotificationRow;
+            setRows((prev) => {
+              if (prev.some((row) => row.id === next.id)) return prev;
+              return [next, ...prev];
+            });
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const next = payload.new as NotificationRow;
+            setRows((prev) =>
+              prev.map((row) => (row.id === next.id ? { ...row, read_at: next.read_at } : row))
+            );
+          }
+        )
+        .subscribe();
+    };
+
+    const init = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        setError(t("notifications.errors.unavailable"));
+        setLoading(false);
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        window.location.href = `/login?next=${encodeURIComponent("/notifications")}`;
+        return;
+      }
+
+      void loadNotifications(0, true);
+      subscribeToNotifications(supabase, session.user.id);
+    };
+
+    void init();
 
     return () => {
       active = false;
+      if (channel) {
+        try {
+          const supabase = requireSupabase();
+          void supabase.removeChannel(channel);
+        } catch {
+          // ignore
+        }
+      }
     };
   }, [pageSize, t]);
 
