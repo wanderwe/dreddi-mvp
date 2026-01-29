@@ -552,8 +552,10 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const waiting = p.status === "completed_by_promisor";
                 const inviteStatus = p.inviteStatus;
+                const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const acceptedBySecondSide = isPromiseAccepted(p);
                 const impact = (() => {
+                  if (isDeclined) return null;
                   if (!isPromisor) return null;
 
                   if (p.status === "confirmed" || p.status === "disputed") {
@@ -568,7 +570,10 @@ export default function PromisesClient() {
                   return null;
                 })();
 
-                const actionLabel = isPromisor
+                const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
+                const actionLabel = isDeclined
+                  ? null
+                  : isPromisor
                   ? p.status === "completed_by_promisor"
                     ? t("promises.status.waitingConfirmation")
                     : null
@@ -576,11 +581,19 @@ export default function PromisesClient() {
                   ? t("promises.list.actionRequired")
                   : null;
 
-                const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
-
                 const busy = busyMap[p.id];
                 const blockedByCondition =
-                  Boolean(p.condition_text?.trim()) && !p.condition_met_at;
+                  !isDeclined && Boolean(p.condition_text?.trim()) && !p.condition_met_at;
+                const dealMeta = isDeclined
+                  ? formatDealMeta(
+                      {
+                        status: "active",
+                        created_at: p.created_at,
+                      },
+                      locale,
+                      dealMetaLabels
+                    )
+                  : formatDealMeta(p, locale, dealMetaLabels);
 
                 return (
                   <div
@@ -598,10 +611,8 @@ export default function PromisesClient() {
                         >
                           {p.title}
                         </Link>
-                        <div className="text-xs text-slate-400">
-                          {formatDealMeta(p, locale, dealMetaLabels)}
-                        </div>
-                        {waiting && (
+                        <div className="text-xs text-slate-400">{dealMeta}</div>
+                        {waiting && !isDeclined && (
                           <p className="text-xs text-amber-200">
                             {isPromisor
                               ? t("promises.list.waitingNotePromisor")
@@ -638,7 +649,10 @@ export default function PromisesClient() {
                           </button>
                         )}
 
-                        {isPromisor && p.status === "active" && !acceptedBySecondSide && (
+                        {isPromisor &&
+                          p.status === "active" &&
+                          !acceptedBySecondSide &&
+                          !isDeclined && (
                           <span className="text-xs text-slate-400">
                             {t(`promises.inviteStatus.${inviteStatus}`)}
                           </span>
