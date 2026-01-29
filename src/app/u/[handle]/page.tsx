@@ -190,10 +190,6 @@ export default function PublicProfilePage() {
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
-  const reputationSummary = t("publicProfile.summary.metrics", {
-    confirmed: confirmedCount,
-    disputed: disputedCount,
-  });
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -309,30 +305,24 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{t("publicProfile.reputation.title")}</h2>
-              </div>
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap gap-4">
+                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
                   <span className="text-xs uppercase tracking-wide text-white/60">
                     {t("publicProfile.reputationScore")}
                   </span>
-                  <span className="text-4xl font-semibold text-white">{reputationScore}</span>
-                  <span className="text-sm text-white/70">{reputationSummary}</span>
+                  <span className="text-2xl font-semibold text-white">{reputationScore}</span>
                 </div>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex min-w-[140px] flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                    <span className="text-xs uppercase tracking-wide text-white/60">
-                      {t("publicProfile.confirmed")}
-                    </span>
-                    <span className="text-lg font-semibold text-white">{confirmedCount}</span>
-                  </div>
-                  <div className="flex min-w-[140px] flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                    <span className="text-xs uppercase tracking-wide text-white/60">
-                      {t("publicProfile.disputed")}
-                    </span>
-                    <span className="text-lg font-semibold text-white">{disputedCount}</span>
-                  </div>
+                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <span className="text-xs uppercase tracking-wide text-white/60">
+                    {t("publicProfile.confirmed")}
+                  </span>
+                  <span className="text-2xl font-semibold text-white">{confirmedCount}</span>
+                </div>
+                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <span className="text-xs uppercase tracking-wide text-white/60">
+                    {t("publicProfile.disputed")}
+                  </span>
+                  <span className="text-2xl font-semibold text-white">{disputedCount}</span>
                 </div>
               </div>
             </section>
