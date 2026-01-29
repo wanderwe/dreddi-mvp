@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -158,7 +158,9 @@ export default function PromisePage() {
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params?.id;
+  const backFrom = searchParams?.get("from");
 
   const [p, setP] = useState<PromiseRow | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -180,6 +182,13 @@ export default function PromisePage() {
       t("promises.detail.noDeadline")
     );
   }, [locale, p, t]);
+
+  const backLink = useMemo(() => {
+    if (backFrom === "dashboard") {
+      return { href: "/", label: "← Back to dashboard" };
+    }
+    return { href: "/promises", label: "← Back to deals" };
+  }, [backFrom]);
 
   async function requireSessionOrRedirect(
     nextPath: string,
@@ -400,7 +409,13 @@ export default function PromisePage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href={backLink.href}
+          className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        >
+          {backLink.label}
+        </Link>
         <div className="flex items-center gap-3">{uiStatus && <StatusPill status={uiStatus} />}</div>
       </div>
 

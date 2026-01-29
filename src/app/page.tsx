@@ -547,7 +547,7 @@ export default function Home() {
                             <DealRow
                               key={item.id}
                               item={item}
-                              href={`/promises/${item.id}`}
+                              href={`/promises/${item.id}?from=dashboard`}
                               metaText={getMetaText(item)}
                               statusLabels={statusLabels}
                               statusTones={statusTones}

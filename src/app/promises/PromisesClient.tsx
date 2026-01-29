@@ -574,7 +574,7 @@ export default function PromisesClient() {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="space-y-1">
                         <Link
-                          href={`/promises/${p.id}`}
+                          href={`/promises/${p.id}?from=deals`}
                           className="text-lg font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                         >
                           {p.title}
