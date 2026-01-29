@@ -6,7 +6,7 @@ import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
-import { formatDueDate } from "@/lib/formatDueDate";
+import { formatDealMeta } from "@/lib/formatDealMeta";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 
 type PublicProfileRow = {
@@ -258,10 +258,14 @@ export default function PublicProfilePage() {
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
     : t("publicProfile.summary.lastActivityEmpty");
-  const formatPublicDealDate = (value: string | null) =>
-    value
-      ? formatDueDate(value, locale, { includeYear: false, includeTime: true }) ?? value
-      : null;
+  const dealMetaLabels = useMemo(
+    () => ({
+      created: (date: string) => t("deal.meta.created", { date }),
+      due: (date: string) => t("deal.meta.due", { date }),
+      closed: (date: string) => t("deal.meta.closed", { date }),
+    }),
+    [t]
+  );
 
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
@@ -340,44 +344,7 @@ export default function PublicProfilePage() {
                       <div>
                         <p className="text-sm font-medium text-white">{promise.title}</p>
                         <p className="text-xs text-white/50">
-                          {(() => {
-                            if (promise.status === "confirmed") {
-                              const closedAt = formatPublicDealDate(
-                                promise.confirmed_at ?? promise.created_at
-                              );
-                              return closedAt
-                                ? t("publicProfile.meta.closed", { date: closedAt })
-                                : t("publicProfile.meta.created", { date: promise.created_at });
-                            }
-                            if (promise.status === "disputed") {
-                              if (promise.due_at) {
-                                const dueAt = formatPublicDealDate(promise.due_at);
-                                return dueAt
-                                  ? t("publicProfile.meta.due", { date: dueAt })
-                                  : t("publicProfile.meta.noDue");
-                              }
-                              const createdAt = formatPublicDealDate(promise.created_at);
-                              return createdAt
-                                ? t("publicProfile.meta.created", { date: createdAt })
-                                : t("publicProfile.meta.noDue");
-                            }
-                            if (promise.status === "active") {
-                              if (promise.due_at) {
-                                const dueAt = formatPublicDealDate(promise.due_at);
-                                return dueAt
-                                  ? t("publicProfile.meta.due", { date: dueAt })
-                                  : t("publicProfile.meta.noDue");
-                              }
-                              const createdAt = formatPublicDealDate(promise.created_at);
-                              return createdAt
-                                ? t("publicProfile.meta.created", { date: createdAt })
-                                : t("publicProfile.meta.noDue");
-                            }
-                            const createdAt = formatPublicDealDate(promise.created_at);
-                            return createdAt
-                              ? t("publicProfile.meta.created", { date: createdAt })
-                              : t("publicProfile.meta.noDue");
-                          })()}
+                          {formatDealMeta(promise, locale, dealMetaLabels)}
                         </p>
                       </div>
                       <span

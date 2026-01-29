@@ -10,7 +10,7 @@ import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promi
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
-import { formatDueDate } from "@/lib/formatDueDate";
+import { formatDealMeta } from "@/lib/formatDealMeta";
 import {
   getPromiseInviteStatus,
   isPromiseAccepted,
@@ -25,6 +25,8 @@ type PromiseRow = {
   due_at: string | null;
   created_at: string;
   completed_at: string | null;
+  confirmed_at: string | null;
+  disputed_at: string | null;
   condition_text: string | null;
   condition_met_at: string | null;
   counterparty_id: string | null;
@@ -100,10 +102,14 @@ export default function PromisesClient() {
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
 
-  const formatDue = (dueAt: string | null) => {
-    if (!dueAt) return t("promises.list.noDeadline");
-    return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
-  };
+  const dealMetaLabels = useMemo(
+    () => ({
+      created: (date: string) => t("deal.meta.created", { date }),
+      due: (date: string) => t("deal.meta.due", { date }),
+      closed: (date: string) => t("deal.meta.closed", { date }),
+    }),
+    [t]
+  );
 
   const statusLabelForRole = (
     status: PromiseStatus,
@@ -239,7 +245,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -592,8 +598,8 @@ export default function PromisesClient() {
                         >
                           {p.title}
                         </Link>
-                        <div className="text-sm text-slate-300">
-                          {t("promises.list.dueLabel")}: {formatDue(p.due_at)}
+                        <div className="text-xs text-slate-400">
+                          {formatDealMeta(p, locale, dealMetaLabels)}
                         </div>
                         {waiting && (
                           <p className="text-xs text-amber-200">

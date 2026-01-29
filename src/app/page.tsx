@@ -10,7 +10,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
-import { formatDueDate } from "@/lib/formatDueDate";
+import { formatDealMeta } from "@/lib/formatDealMeta";
 
 type DealRow = {
   id: string;
@@ -19,6 +19,10 @@ type DealRow = {
   meta?: string;
   due_at?: string | null;
   created_at?: string;
+  completed_at?: string | null;
+  confirmed_at?: string | null;
+  disputed_at?: string | null;
+  declined_at?: string | null;
 };
 
 type ReputationResponse = {
@@ -154,41 +158,15 @@ export default function Home() {
     declined: "bg-red-500/10 text-red-100 border border-red-300/40",
   };
 
-  const formatDateTimeShort = (value: string) => {
-    try {
-      const date = new Date(value);
-      const dateText = new Intl.DateTimeFormat(locale, {
-        month: "short",
-        day: "numeric",
-      }).format(date);
-      const timeText = new Intl.DateTimeFormat(locale, {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }).format(date);
-      return `${dateText}, ${timeText}`;
-    } catch {
-      return value;
-    }
-  };
-
   const getMetaText = (item: DealRow) => {
     if (item.meta) {
       return item.meta;
     }
-
-    if (item.due_at) {
-      const formatted = formatDueDate(item.due_at, locale, { includeYear: false, includeTime: true });
-      if (formatted) {
-        return copy.recentDeals.placeholderMetaDue(formatted);
-      }
-    }
-
-    if (item.created_at) {
-      return copy.recentDeals.placeholderMetaCreated(formatDateTimeShort(item.created_at));
-    }
-
-    return "";
+    return formatDealMeta(item, locale, {
+      created: (date) => t("deal.meta.created", { date }),
+      due: (date) => t("deal.meta.due", { date }),
+      closed: (date) => t("deal.meta.closed", { date }),
+    });
   };
 
   useEffect(() => {
@@ -264,7 +242,7 @@ export default function Home() {
 
       const { data, error } = await client
         .from("promises")
-        .select("id,title,status,due_at,created_at")
+        .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at")
         .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -283,6 +261,10 @@ export default function Home() {
               status: row.status as PromiseStatus,
               due_at: row.due_at,
               created_at: row.created_at,
+              completed_at: row.completed_at,
+              confirmed_at: row.confirmed_at,
+              disputed_at: row.disputed_at,
+              declined_at: row.declined_at,
             },
           ];
         });

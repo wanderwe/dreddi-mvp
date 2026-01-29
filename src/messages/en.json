@@ -394,6 +394,13 @@
       "notFound": "Profile not found"
     }
   },
+  "deal": {
+    "meta": {
+      "created": "Created {date}",
+      "closed": "Closed {date}",
+      "due": "Due {date}"
+    }
+  },
   "publicDirectory": {
     "title": "Public profiles",
     "back": "Back",
