@@ -606,7 +606,7 @@ export default function PromisesClient() {
                           {t("promises.list.cardLabel")}
                         </div>
                         <Link
-                          href={`/promises/${p.id}`}
+                          href={`/promises/${p.id}?from=deals`}
                           className="text-lg font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                         >
                           {p.title}

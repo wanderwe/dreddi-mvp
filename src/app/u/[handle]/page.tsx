@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
@@ -63,6 +64,7 @@ const statusTones: Record<PromiseStatus, string> = {
 
 export default function PublicProfilePage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const t = useT();
   const locale = useLocale();
   const landingCopy = getLandingCopy(locale);
@@ -70,6 +72,7 @@ export default function PublicProfilePage() {
     const raw = params?.handle;
     return Array.isArray(raw) ? raw[0] : raw;
   }, [params]);
+  const backFrom = searchParams?.get("from");
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
   const [promises, setPromises] = useState<PublicPromise[]>([]);
@@ -97,6 +100,13 @@ export default function PublicProfilePage() {
       return formatter.format(Math.round(diffDays), "day");
     };
   }, [locale]);
+
+  const backLink = useMemo(() => {
+    if (backFrom === "profiles") {
+      return { href: "/u", label: "← Back to public profiles" };
+    }
+    return { href: "/u", label: "← Back to public profiles" };
+  }, [backFrom]);
 
   useEffect(() => {
     let active = true;
@@ -265,6 +275,12 @@ export default function PublicProfilePage() {
   return (
     <main className="min-h-screen bg-[#0b0f1a] text-white">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10">
+        <Link
+          href={backLink.href}
+          className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+        >
+          {backLink.label}
+        </Link>
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}
