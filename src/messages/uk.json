@@ -400,6 +400,13 @@
       "notFound": "Профіль не знайдено"
     }
   },
+  "deal": {
+    "meta": {
+      "created": "Створено {date}",
+      "closed": "Закрито {date}",
+      "due": "Термін до {date}"
+    }
+  },
   "publicDirectory": {
     "title": "Публічні профілі",
     "back": "Назад",
