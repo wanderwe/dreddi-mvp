@@ -9,7 +9,6 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
-import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import {
   getPromiseInviteStatus,
@@ -550,40 +549,12 @@ export default function PromisesClient() {
             {!listLoading &&
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
-                const waiting = p.status === "completed_by_promisor";
-                const inviteStatus = p.inviteStatus;
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const impact = (() => {
-                  if (isDeclined) return null;
-                  if (!isPromisor) return null;
-
-                  if (p.status === "confirmed" || p.status === "disputed") {
-                    const delta = calc_score_impact({
-                      status: p.status,
-                      due_at: p.due_at,
-                      completed_at: p.completed_at,
-                    });
-                    return delta >= 0 ? `+${delta}` : `${delta}`;
-                  }
-
-                  return null;
-                })();
 
                 const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
-                const actionLabel = isDeclined
-                  ? null
-                  : isPromisor
-                  ? p.status === "completed_by_promisor"
-                    ? t("promises.status.waitingConfirmation")
-                    : null
-                  : waiting
-                  ? t("promises.list.actionRequired")
-                  : null;
 
                 const busy = busyMap[p.id];
-                const blockedByCondition =
-                  !isDeclined && Boolean(p.condition_text?.trim()) && !p.condition_met_at;
                 const dealMeta = isDeclined
                   ? formatDealMeta(
                       {
@@ -602,9 +573,6 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="space-y-1">
-                        <div className="text-sm uppercase tracking-[0.18em] text-emerald-200">
-                          {t("promises.list.cardLabel")}
-                        </div>
                         <Link
                           href={`/promises/${p.id}`}
                           className="text-lg font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -612,31 +580,12 @@ export default function PromisesClient() {
                           {p.title}
                         </Link>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
-                        {waiting && !isDeclined && (
-                          <p className="text-xs text-amber-200">
-                            {isPromisor
-                              ? t("promises.list.waitingNotePromisor")
-                              : t("promises.list.waitingNoteCounterparty")}
-                          </p>
-                        )}
-                        {blockedByCondition && (
-                          <p className="text-xs text-slate-400">
-                            {t("promises.list.blockedByCondition")}
-                          </p>
-                        )}
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
                         <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
                           {statusLabel}
                         </span>
-                        {actionLabel && <span className="text-xs text-amber-200">{actionLabel}</span>}
-
-                        {impact && (
-                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-emerald-200">
-                            {t("promises.list.scoreImpact", { impact })}
-                          </span>
-                        )}
 
                         {isPromisor && p.status === "active" && acceptedBySecondSide && (
                           <button
@@ -647,15 +596,6 @@ export default function PromisesClient() {
                           >
                             {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
                           </button>
-                        )}
-
-                        {isPromisor &&
-                          p.status === "active" &&
-                          !acceptedBySecondSide &&
-                          !isDeclined && (
-                          <span className="text-xs text-slate-400">
-                            {t(`promises.inviteStatus.${inviteStatus}`)}
-                          </span>
                         )}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
