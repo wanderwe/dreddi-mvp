@@ -350,15 +350,16 @@
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",
+    "copyLink": "Copy link",
     "reputationScore": "Reputation score",
+    "reputationLabel": "Reputation",
     "stableReputation": "Stable reputation",
     "reputation": {
       "title": "Reputation"
     },
     "summary": {
-      "confirmed": "{count} confirmed",
-      "disputed": "{count} disputed",
-      "lastActivity": "Last activity {time}",
+      "metrics": "{confirmed} confirmed · {disputed} disputed",
+      "lastActivity": "Last activity · {time}",
       "lastActivityEmpty": "No activity yet"
     },
     "sections": {
