@@ -392,6 +392,7 @@ export default function PromisePage() {
   const uiStatus = p ? getPromiseUiStatus(p) : null;
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
+  const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
   const showPublicStatus = p?.visibility === "public";
   const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
@@ -544,7 +545,7 @@ export default function PromisePage() {
             </div>
           </Card>
 
-          {!isFinal && canManageInvite && (
+          {shouldShowInviteBlock && (
             <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
               {isInviteAccepted ? (
                 <div className="flex flex-col gap-2 text-sm text-neutral-300">
