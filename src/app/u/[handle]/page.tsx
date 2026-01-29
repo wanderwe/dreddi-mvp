@@ -187,18 +187,13 @@ export default function PublicProfilePage() {
   }, []);
 
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
-  const hasHistory = [profile?.confirmed_count, profile?.disputed_count].some(
-    (value) => value !== null && value !== undefined
-  );
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
-  const reputationSummary = hasHistory
-    ? [
-        t("publicProfile.summary.confirmed", { count: confirmedCount }),
-        t("publicProfile.summary.disputed", { count: disputedCount }),
-      ].join(" · ")
-    : t("publicProfile.emptyHistory");
+  const reputationSummary = t("publicProfile.summary.metrics", {
+    confirmed: confirmedCount,
+    disputed: disputedCount,
+  });
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -281,51 +276,45 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-stretch sm:justify-between">
-                  <div className="flex flex-1 flex-col gap-3">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                        {profile?.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={profile.avatar_url}
-                            alt={displayName}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-xl font-semibold text-white/80">
-                            {displayName.slice(0, 1).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <h1 className="text-2xl font-semibold">{displayName}</h1>
-                        <p className="text-sm text-white/60">@{profile?.handle}</p>
-                      </div>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                      {profile?.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={profile.avatar_url}
+                          alt={displayName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl font-semibold text-white/80">
+                          {displayName.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex flex-col gap-1 text-sm text-white/70">
-                      <div>{reputationSummary}</div>
-                      <div className="text-xs text-white/50">{lastActivityLabel}</div>
+                    <div>
+                      <h1 className="text-2xl font-semibold">{displayName}</h1>
+                      <p className="text-sm text-white/60">@{profile?.handle}</p>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-4 sm:min-w-[180px] sm:self-stretch sm:items-end sm:justify-between">
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:text-emerald-100 sm:w-auto"
-                    >
-                      {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                    </button>
-                    <div className="flex items-center gap-3 sm:justify-end">
-                      <span className="text-[10px] uppercase tracking-wide text-white/50">
-                        {t("publicProfile.reputationScore")}
-                      </span>
-                      <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-lg font-semibold text-white">
-                        {reputationScore}
-                      </span>
-                    </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                  >
+                    {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
+                  </button>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-wide text-white/50">
+                      {t("publicProfile.reputationLabel")}
+                    </span>
+                    <div className="text-3xl font-semibold text-white">{reputationScore}</div>
+                    <div className="text-sm text-white/70">{reputationSummary}</div>
                   </div>
+                  <div className="text-xs text-white/50">{lastActivityLabel}</div>
                 </div>
               </div>
             </section>
