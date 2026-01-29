@@ -2,6 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
@@ -13,15 +14,28 @@ export function NotificationBell({ className = "" }: { className?: string }) {
 
   useEffect(() => {
     let active = true;
+    let channel: ReturnType<SupabaseClient["channel"]> | null = null;
 
-    const loadCount = async () => {
+    const loadCount = async (supabase: SupabaseClient, userId: string) => {
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .is("read_at", null);
+
+      if (!active) return;
+      setCount(count ?? 0);
+    };
+
+    const init = async () => {
       const authState = await getAuthState();
       if (!active) return;
       if (authState.isMock) {
         setCount(0);
         return;
       }
-      if (!authState.isLoggedIn || !authState.user?.id) {
+      const userId = authState.user?.id;
+      if (!authState.isLoggedIn || !userId) {
         setCount(0);
         return;
       }
@@ -33,20 +47,37 @@ export function NotificationBell({ className = "" }: { className?: string }) {
         return;
       }
 
-      const { count } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", authState.user.id)
-        .is("read_at", null);
+      await loadCount(supabase, userId);
 
-      if (!active) return;
-      setCount(count ?? 0);
+      channel = supabase
+        .channel(`notifications-count-${userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          () => {
+            void loadCount(supabase, userId);
+          }
+        )
+        .subscribe();
     };
 
-    void loadCount();
+    void init();
 
     return () => {
       active = false;
+      if (channel) {
+        try {
+          const supabase = requireSupabase();
+          void supabase.removeChannel(channel);
+        } catch {
+          // ignore
+        }
+      }
     };
   }, []);
 
