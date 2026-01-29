@@ -276,47 +276,63 @@ export default function PublicProfilePage() {
         ) : (
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                      {profile?.avatar_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={profile.avatar_url}
-                          alt={displayName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xl font-semibold text-white/80">
-                          {displayName.slice(0, 1).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <h1 className="text-2xl font-semibold">{displayName}</h1>
-                      <p className="text-sm text-white/60">@{profile?.handle}</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyLink}
-                    className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
-                  >
-                    {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
-                  </button>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs uppercase tracking-wide text-white/60">
-                        {t("publicProfile.reputationLabel")}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    {profile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={profile.avatar_url}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xl font-semibold text-white/80">
+                        {displayName.slice(0, 1).toUpperCase()}
                       </span>
-                      <span className="text-2xl font-semibold text-white">{reputationScore}</span>
-                    </div>
-                    <div className="text-sm text-white/80">{reputationSummary}</div>
+                    )}
                   </div>
-                  <div className="text-xs text-white/50 sm:text-right">{lastActivityLabel}</div>
+                  <div>
+                    <h1 className="text-2xl font-semibold">{displayName}</h1>
+                    <p className="text-sm text-white/60">@{profile?.handle}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                >
+                  {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
+                </button>
+              </div>
+              <div className="text-xs text-white/50">{lastActivityLabel}</div>
+            </section>
+
+            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">{t("publicProfile.reputation.title")}</h2>
+              </div>
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs uppercase tracking-wide text-white/60">
+                    {t("publicProfile.reputationScore")}
+                  </span>
+                  <span className="text-4xl font-semibold text-white">{reputationScore}</span>
+                  <span className="text-sm text-white/70">{reputationSummary}</span>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex min-w-[140px] flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                    <span className="text-xs uppercase tracking-wide text-white/60">
+                      {t("publicProfile.confirmed")}
+                    </span>
+                    <span className="text-lg font-semibold text-white">{confirmedCount}</span>
+                  </div>
+                  <div className="flex min-w-[140px] flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                    <span className="text-xs uppercase tracking-wide text-white/60">
+                      {t("publicProfile.disputed")}
+                    </span>
+                    <span className="text-lg font-semibold text-white">{disputedCount}</span>
+                  </div>
                 </div>
               </div>
             </section>
