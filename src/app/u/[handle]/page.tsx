@@ -282,8 +282,8 @@ export default function PublicProfilePage() {
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
               <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-stretch sm:justify-between">
+                  <div className="flex flex-1 flex-col gap-3">
                     <div className="flex items-center gap-4">
                       <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
                         {profile?.avatar_url ? (
@@ -304,26 +304,28 @@ export default function PublicProfilePage() {
                         <p className="text-sm text-white/60">@{profile?.handle}</p>
                       </div>
                     </div>
+                    <div className="flex flex-col gap-1 text-sm text-white/70">
+                      <div>{reputationSummary}</div>
+                      <div className="text-xs text-white/50">{lastActivityLabel}</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4 sm:min-w-[180px] sm:self-stretch sm:items-end sm:justify-between">
                     <button
                       type="button"
                       onClick={handleCopyLink}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:text-emerald-100 sm:w-fit"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:text-emerald-100 sm:w-auto"
                     >
                       {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
                     </button>
+                    <div className="flex items-center gap-3 sm:justify-end">
+                      <span className="text-[10px] uppercase tracking-wide text-white/50">
+                        {t("publicProfile.reputationScore")}
+                      </span>
+                      <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-lg font-semibold text-white">
+                        {reputationScore}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 sm:justify-end">
-                    <span className="text-[10px] uppercase tracking-wide text-white/50">
-                      {t("publicProfile.reputationScore")}
-                    </span>
-                    <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-lg font-semibold text-white">
-                      {reputationScore}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1 text-sm text-white/70">
-                  <div>{reputationSummary}</div>
-                  <div className="text-xs text-white/50">{lastActivityLabel}</div>
                 </div>
               </div>
             </section>
