@@ -321,24 +321,27 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="flex flex-wrap gap-4">
-                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                  <span className="text-xs uppercase tracking-wide text-white/60">
+              <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
+                {t("publicProfile.reputation.title")}
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-white/60">
                     {t("publicProfile.reputationScore")}
-                  </span>
-                  <span className="text-2xl font-semibold text-white">{reputationScore}</span>
+                  </div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{reputationScore}</div>
                 </div>
-                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                  <span className="text-xs uppercase tracking-wide text-white/60">
+                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100 shadow-inner shadow-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                     {t("publicProfile.confirmed")}
-                  </span>
-                  <span className="text-2xl font-semibold text-white">{confirmedCount}</span>
+                  </div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{confirmedCount}</div>
                 </div>
-                <div className="flex min-w-[160px] flex-1 flex-col gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
-                  <span className="text-xs uppercase tracking-wide text-white/60">
+                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-4 text-sm text-amber-50 shadow-inner shadow-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                     {t("publicProfile.disputed")}
-                  </span>
-                  <span className="text-2xl font-semibold text-white">{disputedCount}</span>
+                  </div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
                 </div>
               </div>
             </section>
