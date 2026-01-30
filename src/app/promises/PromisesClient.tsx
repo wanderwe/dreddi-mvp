@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { CheckCircle2, BadgeCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
+import { IconButton } from "@/app/components/ui/IconButton";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -582,29 +585,32 @@ export default function PromisesClient() {
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
+                      <div className="flex items-center justify-end gap-2 text-right text-sm text-slate-200">
                         <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
                           {statusLabel}
                         </span>
 
                         {isPromisor && p.status === "active" && acceptedBySecondSide && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => setConfirmingId(p.id)}
-                            className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                          >
-                            {busy ? t("promises.list.updating") : t("promises.list.markCompleted")}
-                          </button>
+                          <Tooltip label={t("promises.list.markCompleted")} placement="top">
+                            <IconButton
+                              icon={<CheckCircle2 className="h-4 w-4" />}
+                              ariaLabel={t("promises.list.markCompleted")}
+                              onClick={() => setConfirmingId(p.id)}
+                              disabled={busy}
+                              className="h-9 w-9"
+                            />
+                          </Tooltip>
                         )}
 
                         {!isPromisor && p.status === "completed_by_promisor" && (
-                          <Link
-                            href={`/promises/${p.id}/confirm`}
-                            className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                          >
-                            {t("promises.list.reviewConfirm")}
-                          </Link>
+                          <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
+                            <IconButton
+                              href={`/promises/${p.id}/confirm`}
+                              icon={<BadgeCheck className="h-4 w-4" />}
+                              ariaLabel={t("promises.list.reviewConfirm")}
+                              className="h-9 w-9"
+                            />
+                          </Tooltip>
                         )}
                       </div>
                     </div>
