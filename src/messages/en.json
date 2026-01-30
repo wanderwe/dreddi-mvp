@@ -359,7 +359,7 @@
     },
     "summary": {
       "metrics": "{confirmed} confirmed · {disputed} disputed",
-      "lastActivity": "Last activity · {time}",
+      "lastActivity": "Last activity — {time}",
       "lastActivityEmpty": "No activity yet"
     },
     "sections": {
