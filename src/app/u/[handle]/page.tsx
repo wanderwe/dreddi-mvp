@@ -9,6 +9,7 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
+import { calcOnTime } from "@/lib/reputation/calcScoreImpact";
 
 type PublicProfileRow = {
   handle: string;
@@ -200,6 +201,25 @@ export default function PublicProfilePage() {
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
+  const dueDateConfirmedDeals = useMemo(
+    () => promises.filter((promise) => promise.status === "confirmed" && promise.due_at),
+    [promises]
+  );
+  const onTimeConfirmedCount = useMemo(
+    () =>
+      dueDateConfirmedDeals.filter((promise) =>
+        calcOnTime({
+          status: "confirmed",
+          due_at: promise.due_at,
+          completed_at: promise.confirmed_at,
+        })
+      ).length,
+    [dueDateConfirmedDeals]
+  );
+  const onTimeCompletionPercent =
+    dueDateConfirmedDeals.length > 0
+      ? Math.round((onTimeConfirmedCount / dueDateConfirmedDeals.length) * 100)
+      : null;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -341,6 +361,19 @@ export default function PublicProfilePage() {
                   <span className="text-2xl font-semibold text-white">{disputedCount}</span>
                 </div>
               </div>
+              {onTimeCompletionPercent !== null && (
+                <div className="mt-4 flex flex-col gap-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                  <span className="text-[11px] uppercase tracking-wide text-white/50">
+                    {t("publicProfile.onTimeCompletion")}
+                  </span>
+                  <span className="text-lg font-semibold text-white/90">
+                    {onTimeCompletionPercent}%
+                  </span>
+                  <span className="text-[11px] text-white/45">
+                    {t("publicProfile.onTimeCompletionNote")}
+                  </span>
+                </div>
+              )}
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">

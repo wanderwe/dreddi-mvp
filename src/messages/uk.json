@@ -357,6 +357,8 @@
   "publicProfile": {
     "confirmed": "Підтверджено",
     "disputed": "Оскаржено",
+    "onTimeCompletion": "Вчасне завершення",
+    "onTimeCompletionNote": "Рахуються лише підтверджені угоди з терміном виконання",
     "loading": "Завантаження профілю…",
     "copyLink": "Скопіювати посилання",
     "reputationScore": "Репутаційний бал",

@@ -349,6 +349,8 @@
   "publicProfile": {
     "confirmed": "Confirmed",
     "disputed": "Disputed",
+    "onTimeCompletion": "On-time completion",
+    "onTimeCompletionNote": "Only confirmed deals with a due date are counted",
     "loading": "Loading profile…",
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
