@@ -352,10 +352,10 @@
     "loading": "Loading profile…",
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
-    "reputationLabel": "Reputation",
+    "reputationLabel": "Metrics",
     "stableReputation": "Stable reputation",
     "reputation": {
-      "title": "Reputation"
+      "title": "Metrics"
     },
     "summary": {
       "metrics": "{confirmed} confirmed · {disputed} disputed",

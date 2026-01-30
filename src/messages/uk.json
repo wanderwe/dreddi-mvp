@@ -360,10 +360,10 @@
     "loading": "Завантаження профілю…",
     "copyLink": "Скопіювати посилання",
     "reputationScore": "Репутаційний бал",
-    "reputationLabel": "Репутація",
+    "reputationLabel": "Метрики",
     "stableReputation": "Стабільна репутація",
     "reputation": {
-      "title": "Репутація"
+      "title": "Метрики"
     },
     "summary": {
       "metrics": "{confirmed} підтверджено · {disputed} оскаржено",
