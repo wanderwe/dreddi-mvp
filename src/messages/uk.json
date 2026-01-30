@@ -367,7 +367,7 @@
     },
     "summary": {
       "metrics": "{confirmed} підтверджено · {disputed} оскаржено",
-      "lastActivity": "Остання активність · {time}",
+      "lastActivity": "Остання активність — {time}",
       "lastActivityEmpty": "Ще немає активності"
     },
     "sections": {
