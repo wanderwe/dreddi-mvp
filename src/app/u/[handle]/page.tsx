@@ -199,6 +199,7 @@ export default function PublicProfilePage() {
   const displayName = profile?.display_name?.trim() || profile?.handle || "";
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
+  const reputationScore = profile?.reputation_score ?? 50;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -323,7 +324,13 @@ export default function PublicProfilePage() {
               <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
                 {t("publicProfile.reputation.title")}
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-white/60">
+                    {t("publicProfile.reputationScore")}
+                  </div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{reputationScore}</div>
+                </div>
                 <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100 shadow-inner shadow-black/30">
                   <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                     {t("publicProfile.confirmed")}
