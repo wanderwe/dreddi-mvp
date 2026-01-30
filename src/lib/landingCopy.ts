@@ -1,14 +1,16 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
 import { PromiseStatus } from "@/lib/promiseStatus";
 
-type DemoDealDate = "nextMarchFirst" | null;
-
 export type DemoDeal = {
   id: string;
   title: string;
   status: PromiseStatus;
-  meta?: string;
-  dueDate?: DemoDealDate;
+  due_at?: string | null;
+  created_at?: string | null;
+  completed_at?: string | null;
+  confirmed_at?: string | null;
+  disputed_at?: string | null;
+  declined_at?: string | null;
 };
 
 export type LandingCopy = {
@@ -181,21 +183,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     demoDeals: [
       {
         id: "demo-1",
-        title: "Підготувати pitch deck для інвесторів",
-        status: "active",
-        meta: "Створено 27 січ., 22:39",
+        title: "Agreed to sell the car after receiving a deposit",
+        status: "confirmed",
+        confirmed_at: "2024-01-23T19:54:00",
       },
       {
         id: "demo-2",
-        title: "Допомогти з переїздом у вихідні",
+        title: "Agreed to help with the move over the weekend",
         status: "confirmed",
-        meta: "Створено 17 січ., 10:15",
+        confirmed_at: "2024-01-19T11:20:00",
       },
       {
         id: "demo-3",
-        title: "Внести передплату за авто",
-        status: "disputed",
-        meta: "Строк 1 бер., 18:00",
+        title: "Partner presentation before collaboration",
+        status: "active",
+        due_at: "2024-02-02T18:00:00",
       },
     ],
   },
@@ -292,21 +294,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     demoDeals: [
       {
         id: "demo-1",
-        title: "Prepare an investor pitch deck",
-        status: "active",
-        meta: "Created Jan 27, 22:39",
+        title: "Погодились на продаж авто після отримання авансу",
+        status: "confirmed",
+        confirmed_at: "2024-01-23T19:54:00",
       },
       {
         id: "demo-2",
-        title: "Help with apartment move over the weekend",
+        title: "Домовились про допомогу з переїздом на вихідних",
         status: "confirmed",
-        meta: "Created Jan 17, 10:15",
+        confirmed_at: "2024-01-19T11:20:00",
       },
       {
         id: "demo-3",
-        title: "Pay a car deposit",
-        status: "disputed",
-        meta: "Due Mar 1, 18:00",
+        title: "Презентація партнеру перед співпрацею",
+        status: "active",
+        due_at: "2024-02-02T18:00:00",
       },
     ],
   },
