@@ -1,16 +1,4 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
-import { PromiseStatus } from "@/lib/promiseStatus";
-
-type DemoDealDate = "nextMarchFirst" | null;
-
-export type DemoDeal = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  meta?: string;
-  dueDate?: DemoDealDate;
-};
-
 export type LandingCopy = {
   hero: {
     eyebrow: string;
@@ -84,7 +72,6 @@ export type LandingCopy = {
       declined: string;
     };
   };
-  demoDeals: DemoDeal[];
 };
 
 export const landingCopy: Record<Locale, LandingCopy> = {
@@ -178,26 +165,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Відхилено",
       },
     },
-    demoDeals: [
-      {
-        id: "demo-1",
-        title: "Підготувати pitch deck для інвесторів",
-        status: "active",
-        meta: "Створено 27 січ., 22:39",
-      },
-      {
-        id: "demo-2",
-        title: "Допомогти з переїздом у вихідні",
-        status: "confirmed",
-        meta: "Створено 17 січ., 10:15",
-      },
-      {
-        id: "demo-3",
-        title: "Внести передплату за авто",
-        status: "disputed",
-        meta: "Строк 1 бер., 18:00",
-      },
-    ],
   },
   en: {
     hero: {
@@ -289,26 +256,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Declined",
       },
     },
-    demoDeals: [
-      {
-        id: "demo-1",
-        title: "Prepare an investor pitch deck",
-        status: "active",
-        meta: "Created Jan 27, 22:39",
-      },
-      {
-        id: "demo-2",
-        title: "Help with apartment move over the weekend",
-        status: "confirmed",
-        meta: "Created Jan 17, 10:15",
-      },
-      {
-        id: "demo-3",
-        title: "Pay a car deposit",
-        status: "disputed",
-        meta: "Due Mar 1, 18:00",
-      },
-    ],
   },
 };
 

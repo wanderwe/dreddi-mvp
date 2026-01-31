@@ -18,7 +18,19 @@ type DealRow = {
   status: PromiseStatus;
   meta?: string;
   due_at?: string | null;
-  created_at?: string;
+  created_at?: string | null;
+  completed_at?: string | null;
+  confirmed_at?: string | null;
+  disputed_at?: string | null;
+  declined_at?: string | null;
+};
+
+type DemoDealSource = {
+  id: string;
+  titleKey: string;
+  status: PromiseStatus;
+  due_at?: string | null;
+  created_at?: string | null;
   completed_at?: string | null;
   confirmed_at?: string | null;
   disputed_at?: string | null;
@@ -108,38 +120,45 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
-  const nextMarchFirst = useMemo(() => {
-    const now = new Date();
-    const currentYearMarchFirst = new Date(now.getFullYear(), 2, 1);
-    const targetYear = now > currentYearMarchFirst ? now.getFullYear() + 1 : now.getFullYear();
-    const marchFirst = new Date(targetYear, 2, 1);
-    marchFirst.setHours(0, 0, 0, 0);
-    return marchFirst;
-  }, []);
-
-  const defaultDueHour = 18;
-  const defaultDueMinute = 0;
-
-  const toIsoDateTime = (date: Date) => {
-    const localDate = new Date(date);
-    localDate.setHours(defaultDueHour, defaultDueMinute, 0, 0);
-    return localDate.toISOString();
-  };
-
+  const demoDealsSource: DemoDealSource[] = useMemo(
+    () => [
+      {
+        id: "demo-1",
+        titleKey: "landing.demoDeals.deal1.title",
+        status: "confirmed" as const,
+        confirmed_at: "2024-01-23T19:54:00",
+      },
+      {
+        id: "demo-2",
+        titleKey: "landing.demoDeals.deal2.title",
+        status: "confirmed" as const,
+        confirmed_at: "2024-01-19T11:20:00",
+      },
+      {
+        id: "demo-3",
+        titleKey: "landing.demoDeals.deal3.title",
+        status: "active" as const,
+        due_at: "2024-02-02T18:00:00",
+      },
+    ],
+    []
+  );
   const demoDeals: DealRow[] = useMemo(
     () =>
-      copy.demoDeals.map((deal) => {
-        const due_at = deal.dueDate === "nextMarchFirst" ? toIsoDateTime(nextMarchFirst) : null;
-
+      demoDealsSource.map((deal) => {
         return {
           id: deal.id,
-          title: deal.title,
+          title: t(deal.titleKey),
           status: deal.status,
-          meta: deal.meta,
-          due_at,
+          due_at: deal.due_at ?? null,
+          created_at: deal.created_at ?? null,
+          completed_at: deal.completed_at ?? null,
+          confirmed_at: deal.confirmed_at ?? null,
+          disputed_at: deal.disputed_at ?? null,
+          declined_at: deal.declined_at ?? null,
         };
       }),
-    [copy, nextMarchFirst]
+    [demoDealsSource, t]
   );
 
   const statusLabels: Record<PromiseStatus, string> = {
