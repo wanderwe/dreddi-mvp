@@ -321,10 +321,7 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
-                {t("publicProfile.reputation.title")}
-              </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
                   <div className="text-xs uppercase tracking-[0.2em] text-white/60">
                     {t("publicProfile.reputationScore")}
