@@ -100,12 +100,12 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 space-y-4">
-            <label className="space-y-2 text-sm text-slate-200">
+            <label className="block space-y-2 text-sm text-slate-200">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("auth.login.emailLabel")}
               </span>
               <input
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                className="block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                 placeholder={t("auth.login.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
