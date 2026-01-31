@@ -25,6 +25,18 @@ type DealRow = {
   declined_at?: string | null;
 };
 
+type DemoDealSource = {
+  id: string;
+  titleKey: string;
+  status: PromiseStatus;
+  due_at?: string | null;
+  created_at?: string | null;
+  completed_at?: string | null;
+  confirmed_at?: string | null;
+  disputed_at?: string | null;
+  declined_at?: string | null;
+};
+
 type ReputationResponse = {
   reputation: {
     user_id: string;
@@ -108,12 +120,35 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
+  const demoDealsSource: DemoDealSource[] = useMemo(
+    () => [
+      {
+        id: "demo-1",
+        titleKey: "landing.demoDeals.deal1.title",
+        status: "confirmed" as const,
+        confirmed_at: "2024-01-23T19:54:00",
+      },
+      {
+        id: "demo-2",
+        titleKey: "landing.demoDeals.deal2.title",
+        status: "confirmed" as const,
+        confirmed_at: "2024-01-19T11:20:00",
+      },
+      {
+        id: "demo-3",
+        titleKey: "landing.demoDeals.deal3.title",
+        status: "active" as const,
+        due_at: "2024-02-02T18:00:00",
+      },
+    ],
+    []
+  );
   const demoDeals: DealRow[] = useMemo(
     () =>
-      copy.demoDeals.map((deal) => {
+      demoDealsSource.map((deal) => {
         return {
           id: deal.id,
-          title: deal.title,
+          title: t(deal.titleKey),
           status: deal.status,
           due_at: deal.due_at ?? null,
           created_at: deal.created_at ?? null,
@@ -123,7 +158,7 @@ export default function Home() {
           declined_at: deal.declined_at ?? null,
         };
       }),
-    [copy]
+    [demoDealsSource, t]
   );
 
   const statusLabels: Record<PromiseStatus, string> = {

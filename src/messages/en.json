@@ -20,6 +20,17 @@
   "landing": {
     "hero": {
       "brandSuffix": "knows"
+    },
+    "demoDeals": {
+      "deal1": {
+        "title": "Agreed to sell the car after receiving a deposit"
+      },
+      "deal2": {
+        "title": "Agreed to help with the move over the weekend"
+      },
+      "deal3": {
+        "title": "Partner presentation before collaboration"
+      }
     }
   },
   "profileSettings": {

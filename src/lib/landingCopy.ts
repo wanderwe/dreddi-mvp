@@ -1,18 +1,4 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
-import { PromiseStatus } from "@/lib/promiseStatus";
-
-export type DemoDeal = {
-  id: string;
-  title: string;
-  status: PromiseStatus;
-  due_at?: string | null;
-  created_at?: string | null;
-  completed_at?: string | null;
-  confirmed_at?: string | null;
-  disputed_at?: string | null;
-  declined_at?: string | null;
-};
-
 export type LandingCopy = {
   hero: {
     eyebrow: string;
@@ -86,7 +72,6 @@ export type LandingCopy = {
       declined: string;
     };
   };
-  demoDeals: DemoDeal[];
 };
 
 export const landingCopy: Record<Locale, LandingCopy> = {
@@ -180,26 +165,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Відхилено",
       },
     },
-    demoDeals: [
-      {
-        id: "demo-1",
-        title: "Погодились на продаж авто після отримання авансу",
-        status: "confirmed",
-        confirmed_at: "2024-01-23T19:54:00",
-      },
-      {
-        id: "demo-2",
-        title: "Домовились про допомогу з переїздом на вихідних",
-        status: "confirmed",
-        confirmed_at: "2024-01-19T11:20:00",
-      },
-      {
-        id: "demo-3",
-        title: "Презентація партнеру перед співпрацею",
-        status: "active",
-        due_at: "2024-02-02T18:00:00",
-      },
-    ],
   },
   en: {
     hero: {
@@ -291,26 +256,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Declined",
       },
     },
-    demoDeals: [
-      {
-        id: "demo-1",
-        title: "Agreed to sell the car after receiving a deposit",
-        status: "confirmed",
-        confirmed_at: "2024-01-23T19:54:00",
-      },
-      {
-        id: "demo-2",
-        title: "Agreed to help with the move over the weekend",
-        status: "confirmed",
-        confirmed_at: "2024-01-19T11:20:00",
-      },
-      {
-        id: "demo-3",
-        title: "Partner presentation before collaboration",
-        status: "active",
-        due_at: "2024-02-02T18:00:00",
-      },
-    ],
   },
 };
 
