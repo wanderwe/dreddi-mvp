@@ -82,7 +82,7 @@ function DealRow({
   const interactiveClass = isClickable
     ? "transition hover:border-emerald-300/40 hover:bg-emerald-500/10"
     : "cursor-default";
-  const titleClass = isDemo ? "text-sm font-medium text-slate-100 truncate" : "font-semibold text-white";
+  const titleClass = isDemo ? "text-sm font-medium text-slate-100" : "font-semibold text-white";
   const metaClass = isDemo ? "mt-1 text-[11px] text-slate-400" : "text-xs text-slate-400";
   const statusClass = `rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`;
 

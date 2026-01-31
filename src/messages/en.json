@@ -23,13 +23,13 @@
     },
     "demoDeals": {
       "deal1": {
-        "title": "Car sale..."
+        "title": "Sell the car after receiving a deposit"
       },
       "deal2": {
-        "title": "Help with moving..."
+        "title": "Help with the move over the weekend"
       },
       "deal3": {
-        "title": "Estimate prep..."
+        "title": "Prepare a renovation estimate by Friday"
       }
     }
   },
