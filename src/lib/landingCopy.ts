@@ -183,19 +183,19 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     demoDeals: [
       {
         id: "demo-1",
-        title: "Agreed to sell the car after receiving a deposit",
+        title: "Погодились на продаж авто після отримання авансу",
         status: "confirmed",
         confirmed_at: "2024-01-23T19:54:00",
       },
       {
         id: "demo-2",
-        title: "Agreed to help with the move over the weekend",
+        title: "Домовились про допомогу з переїздом на вихідних",
         status: "confirmed",
         confirmed_at: "2024-01-19T11:20:00",
       },
       {
         id: "demo-3",
-        title: "Partner presentation before collaboration",
+        title: "Презентація партнеру перед співпрацею",
         status: "active",
         due_at: "2024-02-02T18:00:00",
       },
@@ -294,19 +294,19 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     demoDeals: [
       {
         id: "demo-1",
-        title: "Погодились на продаж авто після отримання авансу",
+        title: "Agreed to sell the car after receiving a deposit",
         status: "confirmed",
         confirmed_at: "2024-01-23T19:54:00",
       },
       {
         id: "demo-2",
-        title: "Домовились про допомогу з переїздом на вихідних",
+        title: "Agreed to help with the move over the weekend",
         status: "confirmed",
         confirmed_at: "2024-01-19T11:20:00",
       },
       {
         id: "demo-3",
-        title: "Презентація партнеру перед співпрацею",
+        title: "Partner presentation before collaboration",
         status: "active",
         due_at: "2024-02-02T18:00:00",
       },
