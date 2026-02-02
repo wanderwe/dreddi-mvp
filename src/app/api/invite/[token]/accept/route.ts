@@ -71,7 +71,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       return NextResponse.json({ error: "Creator cannot accept their own promise" }, { status: 400 });
     }
     if (p.counterparty_id && p.counterparty_id !== userId) {
-      return NextResponse.json({ error: "Only the counterparty can accept" }, { status: 403 });
+      return NextResponse.json({ error: "Only the other side can accept" }, { status: 403 });
     }
 
     // якщо вже прийнято

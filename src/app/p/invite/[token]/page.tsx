@@ -196,10 +196,26 @@ export default function InvitePage() {
       : info.creator_display_name ?? t("invite.unknown");
   }, [info, t]);
 
-  const formatDue = (dueAt: string | null) => {
-    if (!dueAt) return t("invite.noDeadline");
-    return formatDueDate(dueAt, locale, { includeYear: true, includeTime: true }) ?? dueAt;
-  };
+  const dueParts = useMemo(() => {
+    if (!info?.due_at) return null;
+    try {
+      const date = new Date(info.due_at);
+      if (Number.isNaN(date.getTime())) {
+        return { dateText: info.due_at, timeText: "" };
+      }
+      const dateText =
+        formatDueDate(info.due_at, locale, { includeYear: true, includeTime: false }) ??
+        info.due_at;
+      const timeText = new Intl.DateTimeFormat(locale, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(date);
+      return { dateText, timeText };
+    } catch {
+      return { dateText: info.due_at, timeText: "" };
+    }
+  }, [info?.due_at, locale]);
 
   const counterCondition = info?.condition_text?.trim();
   const conditionMet = Boolean(info?.condition_met_at);
@@ -311,7 +327,18 @@ export default function InvitePage() {
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.deadline")}</p>
-                    <p className="font-semibold text-white">{formatDue(info.due_at)}</p>
+                    {dueParts ? (
+                      <div className="flex flex-col font-semibold text-white">
+                        <span className="whitespace-nowrap leading-snug">{dueParts.dateText}</span>
+                        {dueParts.timeText && (
+                          <span className="whitespace-nowrap text-sm text-slate-200">
+                            {dueParts.timeText}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="font-semibold text-white">{t("invite.noDeadline")}</p>
+                    )}
                   </div>
                 </div>
                 {counterCondition && (

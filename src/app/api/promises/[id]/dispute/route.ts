@@ -39,7 +39,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
-      return NextResponse.json({ error: "Only the counterparty can dispute" }, { status: 403 });
+      return NextResponse.json({ error: "Only the other side can dispute" }, { status: 403 });
     }
 
     if (!isPromiseAccepted(promise)) {
