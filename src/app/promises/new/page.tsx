@@ -576,19 +576,20 @@ export default function NewPromisePage() {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
+              {!shouldShowCondition && (
+                <div className="flex pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowCondition(true)}
+                    className="inline-flex cursor-pointer items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                  >
+                    {t("promises.new.actions.addCondition")}
+                  </button>
+                </div>
+              )}
             </label>
 
-            {!shouldShowCondition ? (
-              <div className="sm:col-span-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCondition(true)}
-                  className="inline-flex cursor-pointer items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
-                >
-                  {t("promises.new.actions.addCondition")}
-                </button>
-              </div>
-            ) : (
+            {shouldShowCondition && (
               <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
                 <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                   {t("promises.new.fields.condition")}
