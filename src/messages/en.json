@@ -393,7 +393,8 @@
         "onTime": "{count} completed on time"
       },
       "disputes": {
-        "summary": "{count} disputes out of {total} deals"
+        "summary": "{count} disputes out of {total} deals",
+        "rate": "{rate}% of deals ended in a dispute"
       },
       "trackRecord": {
         "activeMonths": "Active for {count} months",
