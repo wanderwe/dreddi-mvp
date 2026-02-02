@@ -149,7 +149,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "Ваші останні угоди",
       demoTitle: "Приклади угод у профілі",
       seeAll: "Переглянути всі",
-      empty: "Створіть свою першу угоду, щоб наповнити стрічку репутації.",
+      empty: "У вас поки що немає жодної угоди",
       sentiment: {
         positive: "Позитивно",
         negative: "Негативно",
@@ -240,7 +240,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "Your recent deals",
       demoTitle: "Example deals in a profile",
       seeAll: "View all",
-      empty: "Create your first deal to populate your reputation feed.",
+      empty: "You don't have any deals yet",
       sentiment: {
         positive: "Positive",
         negative: "Negative",
