@@ -155,30 +155,32 @@ export default function PublicProfilesDirectoryPage() {
             href={`/u/${encodeURIComponent(profile.handle)}?from=profiles`}
             className="group relative flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
           >
-            <div className="absolute right-4 top-4 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30">
-              <span className="sr-only">{t("publicProfile.reputationScore")}</span>
-              {reputationScore}
-            </div>
-            <div className="flex items-center gap-4 pr-12">
-              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                {profile.avatar_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={profile.avatar_url}
-                    alt={displayName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg font-semibold text-white/80">
-                    {displayName.slice(0, 1).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-1 items-start justify-between gap-3">
-                <div>
-                  <div className="text-lg font-semibold text-white">{displayName}</div>
-                  <div className="text-sm text-white/60">@{profile.handle}</div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-4 pr-0 sm:pr-12">
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                  {profile.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={profile.avatar_url}
+                      alt={displayName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg font-semibold text-white/80">
+                      {displayName.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
                 </div>
+                <div className="min-w-0">
+                  <div className="text-lg font-semibold text-white break-words">
+                    {displayName}
+                  </div>
+                  <div className="text-sm text-white/60 break-all">@{profile.handle}</div>
+                </div>
+              </div>
+              <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">
+                <span className="sr-only">{t("publicProfile.reputationScore")}</span>
+                {reputationScore}
               </div>
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-white/70">
@@ -200,7 +202,7 @@ export default function PublicProfilesDirectoryPage() {
   const showLoadMoreButton = hasMore;
 
   return (
-    <main className="min-h-screen bg-[#0b0f1a] text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#0b0f1a] text-white">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">

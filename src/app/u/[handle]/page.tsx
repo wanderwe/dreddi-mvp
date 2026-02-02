@@ -328,7 +328,7 @@ export default function PublicProfilePage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#0b0f1a] text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#0b0f1a] text-white">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10">
         <Link
           href={backLink.href}
@@ -348,7 +348,7 @@ export default function PublicProfilePage() {
           <>
             <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex min-w-0 items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {profile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -363,9 +363,9 @@ export default function PublicProfilePage() {
                       </span>
                     )}
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-semibold">{displayName}</h1>
-                    <p className="text-sm text-white/60">@{profile?.handle}</p>
+                  <div className="min-w-0">
+                    <h1 className="text-2xl font-semibold break-words">{displayName}</h1>
+                    <p className="text-sm text-white/60 break-all">@{profile?.handle}</p>
                   </div>
                 </div>
                 <button
