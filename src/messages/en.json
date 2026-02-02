@@ -373,6 +373,32 @@
       "lastActivity": "Last activity — {time}",
       "lastActivityEmpty": "No activity yet"
     },
+    "reputationDetails": {
+      "title": "Reputation details",
+      "subtitle": "Based on real completed deals, not reviews",
+      "empty": "No completed deals yet",
+      "sections": {
+        "workedWith": "Worked with",
+        "commitments": "Commitments",
+        "disputes": "Disputes",
+        "trackRecord": "Track record"
+      },
+      "workedWith": {
+        "uniquePeople": "Worked with {count} different people",
+        "firstTimeDeals": "{count} first-time deals"
+      },
+      "commitments": {
+        "dealsWithDeadlines": "{count} deals had deadlines",
+        "onTime": "{count} completed on time"
+      },
+      "disputes": {
+        "summary": "{count} disputes out of {total} deals"
+      },
+      "trackRecord": {
+        "activeMonths": "Active for {count} months",
+        "averageDeals": "{count} deals per month"
+      }
+    },
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
