@@ -381,6 +381,33 @@
       "lastActivity": "Остання активність — {time}",
       "lastActivityEmpty": "Ще немає активності"
     },
+    "reputationDetails": {
+      "title": "Деталі репутації",
+      "subtitle": "На основі завершених угод, а не відгуків",
+      "expandLabel": "Розгорнути деталі репутації",
+      "collapseLabel": "Згорнути деталі репутації",
+      "empty": "Ще немає завершених угод",
+      "sections": {
+        "workedWith": "Співпраця",
+        "commitments": "Зобовʼязання",
+        "disputes": "Спори",
+        "trackRecord": "Трек-рекорд"
+      },
+      "workedWith": {
+        "uniquePeople": "Співпраця з {count} різними людьми"
+      },
+      "commitments": {
+        "dealsWithDeadlines": "{count} угод мали дедлайни",
+        "onTime": "{count} виконано вчасно"
+      },
+      "disputes": {
+        "summary": "{count} спорів з {total} угод"
+      },
+      "trackRecord": {
+        "activeMonths": "Активність {count} місяців",
+        "averageDeals": "У середньому {count} угод на місяць"
+      }
+    },
     "sections": {
       "responsibilityStatus": "Статус відповідальностей",
       "trackRecord": "Історія",

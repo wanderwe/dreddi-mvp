@@ -20,9 +20,12 @@ type PublicProfileRow = {
   disputed_count: number | null;
   last_activity_at: string | null;
   unique_counterparties_count: number | null;
+  deals_with_new_people_count: number | null;
   deals_with_due_date_count: number | null;
   on_time_completion_count: number | null;
+  total_confirmed_deals: number | null;
   reputation_age_days: number | null;
+  avg_deals_per_month: number | null;
 };
 
 type PublicPromiseRow = {
@@ -84,6 +87,7 @@ export default function PublicProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
+  const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
 
   const formatRelativeTime = useMemo(() => {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
@@ -204,6 +208,7 @@ export default function PublicProfilePage() {
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
+  const totalConfirmedDeals = profile?.total_confirmed_deals ?? confirmedCount;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -263,6 +268,43 @@ export default function PublicProfilePage() {
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
     : t("publicProfile.summary.lastActivityEmpty");
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const decimalFormatter = useMemo(
+    () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    [locale]
+  );
+  const reputationEvidence = useMemo(() => {
+    const totalDeals = totalConfirmedDeals ?? 0;
+    const hasDeals = totalDeals > 0;
+    const uniquePeople = profile?.unique_counterparties_count ?? null;
+    const dealsWithDeadlines = profile?.deals_with_due_date_count ?? null;
+    const onTimeCompletions = profile?.on_time_completion_count ?? null;
+    const disputes = profile?.disputed_count ?? null;
+    const reputationAgeDays = profile?.reputation_age_days ?? null;
+    const avgDealsPerMonth = profile?.avg_deals_per_month ?? null;
+
+    const monthsActive =
+      reputationAgeDays === null ? null : Math.max(1, Math.round(reputationAgeDays / 30));
+
+    return {
+      totalDeals,
+      hasDeals,
+      uniquePeople,
+      dealsWithDeadlines,
+      onTimeCompletions,
+      disputes,
+      monthsActive,
+      avgDealsPerMonth,
+    };
+  }, [
+    profile?.avg_deals_per_month,
+    profile?.deals_with_due_date_count,
+    profile?.disputed_count,
+    profile?.on_time_completion_count,
+    profile?.reputation_age_days,
+    profile?.unique_counterparties_count,
+    totalConfirmedDeals,
+  ]);
   const dealMetaLabels = useMemo(
     () => ({
       created: (date: string) => t("deal.meta.created", { date }),
@@ -343,6 +385,146 @@ export default function PublicProfilePage() {
                     {t("publicProfile.disputed")}
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <button
+                type="button"
+                onClick={() => setReputationDetailsOpen((prev) => !prev)}
+                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                aria-label={
+                  reputationDetailsOpen
+                    ? t("publicProfile.reputationDetails.collapseLabel")
+                    : t("publicProfile.reputationDetails.expandLabel")
+                }
+                aria-expanded={reputationDetailsOpen}
+              >
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    {t("publicProfile.reputationDetails.title")}
+                  </h2>
+                  <p className="text-xs text-white/60">
+                    {t("publicProfile.reputationDetails.subtitle")}
+                  </p>
+                </div>
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
+                    reputationDetailsOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25 12 15.75 4.5 8.25" />
+                  </svg>
+                </span>
+              </button>
+              <div
+                className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+                  reputationDetailsOpen ? "max-h-[900px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="pt-5">
+                  {!reputationEvidence.hasDeals ? (
+                    <p className="text-sm text-white/60">
+                      {t("publicProfile.reputationDetails.empty")}
+                    </p>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {reputationEvidence.uniquePeople !== null && (
+                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-white">
+                            {t("publicProfile.reputationDetails.sections.workedWith")}
+                          </h3>
+                          <div className="mt-2 flex flex-col gap-1 text-sm text-white/70">
+                            <p>
+                              {t("publicProfile.reputationDetails.workedWith.uniquePeople", {
+                                count: numberFormatter.format(reputationEvidence.uniquePeople),
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {(reputationEvidence.dealsWithDeadlines !== null ||
+                        reputationEvidence.onTimeCompletions !== null) && (
+                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-white">
+                            {t("publicProfile.reputationDetails.sections.commitments")}
+                          </h3>
+                          <div className="mt-2 flex flex-col gap-1 text-sm text-white/70">
+                            {reputationEvidence.dealsWithDeadlines !== null && (
+                              <p>
+                                {t(
+                                  "publicProfile.reputationDetails.commitments.dealsWithDeadlines",
+                                  {
+                                    count: numberFormatter.format(
+                                      reputationEvidence.dealsWithDeadlines
+                                    ),
+                                  }
+                                )}
+                              </p>
+                            )}
+                            {reputationEvidence.onTimeCompletions !== null && (
+                              <p>
+                                {t("publicProfile.reputationDetails.commitments.onTime", {
+                                  count: numberFormatter.format(
+                                    reputationEvidence.onTimeCompletions
+                                  ),
+                                })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {reputationEvidence.disputes !== null && (
+                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-white">
+                            {t("publicProfile.reputationDetails.sections.disputes")}
+                          </h3>
+                          <div className="mt-2 text-sm text-white/70">
+                            {t("publicProfile.reputationDetails.disputes.summary", {
+                              count: numberFormatter.format(reputationEvidence.disputes),
+                              total: numberFormatter.format(reputationEvidence.totalDeals),
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {(reputationEvidence.monthsActive !== null ||
+                        reputationEvidence.avgDealsPerMonth !== null) && (
+                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-white">
+                            {t("publicProfile.reputationDetails.sections.trackRecord")}
+                          </h3>
+                          <div className="mt-2 flex flex-col gap-1 text-sm text-white/70">
+                            {reputationEvidence.monthsActive !== null && (
+                              <p>
+                                {t("publicProfile.reputationDetails.trackRecord.activeMonths", {
+                                  count: numberFormatter.format(reputationEvidence.monthsActive),
+                                })}
+                              </p>
+                            )}
+                            {reputationEvidence.avgDealsPerMonth !== null && (
+                              <p>
+                                {t("publicProfile.reputationDetails.trackRecord.averageDeals", {
+                                  count: decimalFormatter.format(
+                                    reputationEvidence.avgDealsPerMonth
+                                  ),
+                                })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </section>
