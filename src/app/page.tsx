@@ -424,7 +424,7 @@ export default function Home() {
               </div>
               <button
                 type="button"
-                className="rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
+                className="cursor-pointer rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
                 aria-label={t("landing.betaBanner.dismissLabel")}
                 onClick={() => {
                   localStorage.setItem(betaBannerStorageKey, "1");
