@@ -458,6 +458,13 @@ export default function PublicProfilePage() {
                                 count: numberFormatter.format(reputationEvidence.uniquePeople),
                               })}
                             </p>
+                            {reputationEvidence.totalDeals > 0 && (
+                              <p>
+                                {t("publicProfile.reputationDetails.workedWith.totalDeals", {
+                                  count: numberFormatter.format(reputationEvidence.totalDeals),
+                                })}
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}
