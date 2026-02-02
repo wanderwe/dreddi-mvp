@@ -18,6 +18,7 @@ type PublicProfileRow = {
   confirmed_count: number | null;
   completed_count: number | null;
   disputed_count: number | null;
+  dispute_rate: number | null;
   last_activity_at: string | null;
   unique_counterparties_count: number | null;
   deals_with_new_people_count: number | null;
@@ -273,6 +274,10 @@ export default function PublicProfilePage() {
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
     [locale]
   );
+  const percentFormatter = useMemo(
+    () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    [locale]
+  );
   const reputationEvidence = useMemo(() => {
     const totalDeals = totalConfirmedDeals ?? 0;
     const hasDeals = totalDeals > 0;
@@ -280,6 +285,7 @@ export default function PublicProfilePage() {
     const dealsWithDeadlines = profile?.deals_with_due_date_count ?? null;
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
+    const disputeRate = profile?.dispute_rate ?? null;
     const reputationAgeDays = profile?.reputation_age_days ?? null;
     const avgDealsPerMonth = profile?.avg_deals_per_month ?? null;
 
@@ -293,12 +299,14 @@ export default function PublicProfilePage() {
       dealsWithDeadlines,
       onTimeCompletions,
       disputes,
+      disputeRate,
       monthsActive,
       avgDealsPerMonth,
     };
   }, [
     profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
+    profile?.dispute_rate,
     profile?.disputed_count,
     profile?.on_time_completion_count,
     profile?.reputation_age_days,
@@ -489,11 +497,21 @@ export default function PublicProfilePage() {
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.disputes")}
                           </h3>
-                          <div className="mt-2 text-sm text-white/70">
-                            {t("publicProfile.reputationDetails.disputes.summary", {
-                              count: numberFormatter.format(reputationEvidence.disputes),
-                              total: numberFormatter.format(reputationEvidence.totalDeals),
-                            })}
+                          <div className="mt-2 flex flex-col gap-1 text-sm text-white/70">
+                            <p>
+                              {t("publicProfile.reputationDetails.disputes.summary", {
+                                count: numberFormatter.format(reputationEvidence.disputes),
+                                total: numberFormatter.format(reputationEvidence.totalDeals),
+                              })}
+                            </p>
+                            {reputationEvidence.totalDeals > 0 &&
+                              reputationEvidence.disputeRate !== null && (
+                                <p>
+                                  {t("publicProfile.reputationDetails.disputes.rate", {
+                                    rate: percentFormatter.format(reputationEvidence.disputeRate),
+                                  })}
+                                </p>
+                              )}
                           </div>
                         </div>
                       )}

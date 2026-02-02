@@ -401,7 +401,8 @@
         "onTime": "{count} виконано вчасно"
       },
       "disputes": {
-        "summary": "{count} спорів з {total} угод"
+        "summary": "{count} спорів з {total} угод",
+        "rate": "{rate}% угод завершились спором"
       },
       "trackRecord": {
         "activeMonths": "Активність {count} місяців",
