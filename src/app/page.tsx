@@ -412,21 +412,26 @@ export default function Home() {
 
       {isAuthenticated && betaBannerDismissed === false ? (
         <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100 shadow-inner shadow-black/40">
-            <div className="flex items-start justify-between gap-4">
-              <p className="text-sm text-emerald-100/80">
-                {t("landing.betaBanner.body")}
-              </p>
+          <div className="rounded-2xl border border-amber-300/25 bg-gradient-to-r from-amber-500/15 via-slate-900/20 to-rose-500/10 px-4 py-2 text-sm text-slate-50 shadow-[0_8px_24px_rgba(5,15,20,0.35)] backdrop-blur">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.5)]" aria-hidden />
+                <p className="text-sm text-slate-100/80">
+                  {t("landing.betaBanner.body")}
+                </p>
+              </div>
               <button
                 type="button"
-                className="cursor-pointer rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/60"
+                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white/5 text-slate-100/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/60"
                 aria-label={t("landing.betaBanner.dismissLabel")}
                 onClick={() => {
                   localStorage.setItem(betaBannerStorageKey, "1");
                   setBetaBannerDismissed(true);
                 }}
               >
-                <span aria-hidden>×</span>
+                <span aria-hidden className="text-base leading-none">
+                  ×
+                </span>
               </button>
             </div>
           </div>
