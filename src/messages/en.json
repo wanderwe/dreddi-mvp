@@ -386,7 +386,8 @@
         "trackRecord": "Track record"
       },
       "workedWith": {
-        "uniquePeople": "Worked with {count} different people"
+        "uniquePeople": "With {count} different people",
+        "totalDeals": "Out of {count} deals total"
       },
       "commitments": {
         "dealsWithDeadlines": "{count} deals had deadlines",

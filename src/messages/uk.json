@@ -394,7 +394,8 @@
         "trackRecord": "Трек-рекорд"
       },
       "workedWith": {
-        "uniquePeople": "Співпраця з {count} різними людьми"
+        "uniquePeople": "З {count} різними людьми",
+        "totalDeals": "Серед {count} угод взагалом"
       },
       "commitments": {
         "dealsWithDeadlines": "{count} угод мали дедлайни",
