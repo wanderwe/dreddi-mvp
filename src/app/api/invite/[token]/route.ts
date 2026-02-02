@@ -71,6 +71,20 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       creator_display_name = null;
     }
 
+    let counterparty_display_name: string | null = null;
+    if (p.counterparty_id) {
+      try {
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("display_name,email")
+          .eq("id", p.counterparty_id)
+          .maybeSingle();
+        counterparty_display_name = profile?.display_name?.trim() || profile?.email?.trim() || null;
+      } catch {
+        counterparty_display_name = null;
+      }
+    }
+
     // Return shape that InvitePage expects (flat object)
     return NextResponse.json(
       {
@@ -84,6 +98,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         creator_display_name,
         creator_id: p.creator_id,
         counterparty_id: p.counterparty_id ?? null,
+        counterparty_display_name,
         counterparty_accepted_at: p.counterparty_accepted_at ?? null,
         invite_status: p.invite_status ?? null,
         invited_at: p.invited_at ?? null,
