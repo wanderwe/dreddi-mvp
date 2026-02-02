@@ -66,12 +66,15 @@ export function AppHeader() {
   return (
     <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
-        <Link href="/" className="flex min-w-0 cursor-pointer items-center text-white">
+        <Link href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
           <DreddiLogo
             accentClassName="text-xs"
             markClassName="h-11 w-11"
             titleClassName="text-lg"
           />
+          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-200/70">
+            beta
+          </span>
         </Link>
 
         <div className="flex items-center gap-3">
