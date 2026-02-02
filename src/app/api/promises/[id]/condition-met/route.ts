@@ -18,7 +18,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const executorId = resolveExecutorId(promise);
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json(
-        { error: "Only the counterparty can mark the condition" },
+        { error: "Only the other side can mark the condition" },
         { status: 403 }
       );
     }

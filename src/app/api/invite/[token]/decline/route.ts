@@ -66,7 +66,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     if (p.counterparty_id && p.counterparty_id !== userId) {
-      return NextResponse.json({ error: "Only the counterparty can decline" }, { status: 403 });
+      return NextResponse.json({ error: "Only the other side can decline" }, { status: 403 });
     }
 
     const inviteStatus = p.invite_status;

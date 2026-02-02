@@ -142,11 +142,11 @@
       "inviteStatusLabel": "Статус запрошення",
       "yes": "Так",
       "no": "Ні",
-      "counterparty": "Контрагент",
-      "counterpartyFallback": "контрагент",
+      "counterparty": "Друга сторона",
+      "counterpartyFallback": "Друга сторона",
       "noDetails": "Без деталей",
       "conditionLabel": "Контрумова",
-      "conditionWaiting": "Очікує виконання умови контрагентом",
+      "conditionWaiting": "Очікує виконання умови другою стороною",
       "conditionMet": "Умову виконано",
       "conditionMark": "Умову виконано",
       "statusActions": "Дії зі статусом",
@@ -328,7 +328,7 @@
     "decline": "Відхилити",
     "declinedMessage": "Ви відхилили це запрошення.",
     "ignoredMessage": "Це запрошення завершилося без відповіді.",
-    "awaitingCounterparty": "Очікуємо відповіді контрагента",
+    "awaitingCounterparty": "Очікуємо відповіді другої сторони",
     "publicProposal": {
       "title": "Ця угода є ПУБЛІЧНОЮ",
       "body": "Якщо ви приймете, деталі угоди будуть видимі у публічних профілях"

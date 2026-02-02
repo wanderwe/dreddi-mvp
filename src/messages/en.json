@@ -111,7 +111,7 @@
       "cardLabel": "Deal",
       "dueLabel": "Due",
       "noDeadline": "No deadline",
-      "waitingNotePromisor": "You marked this complete. Waiting for the counterparty.",
+      "waitingNotePromisor": "You marked this complete. Waiting for the other side.",
       "waitingNoteCounterparty": "Creator marked this complete. Please confirm or dispute.",
       "actionRequired": "Action required",
       "scoreImpact": "Score impact: {impact}",
@@ -134,11 +134,11 @@
       "inviteStatusLabel": "Invite status",
       "yes": "Yes",
       "no": "No",
-      "counterparty": "Counterparty",
-      "counterpartyFallback": "counterparty",
+      "counterparty": "Other side",
+      "counterpartyFallback": "other side",
       "noDetails": "No details provided",
       "conditionLabel": "Counter-condition",
-      "conditionWaiting": "Waiting for counterparty to meet the condition",
+      "conditionWaiting": "Waiting for the other side to meet the condition",
       "conditionMet": "Condition met",
       "conditionMark": "Mark condition met",
       "statusActions": "Status actions",
@@ -147,7 +147,7 @@
       "shareInvite": "Share the invite and wait for acceptance to request confirmation",
       "reviewConfirm": "Review & confirm",
       "awaitingExecutor": "Waiting for the executor to mark this complete",
-      "waitingReview": "Waiting for the counterparty to review",
+      "waitingReview": "Waiting for the other side to review",
       "confirmed": "Deal confirmed ✅",
       "disputed": "Deal disputed",
       "guestView": "You are viewing this deal as a guest",
@@ -280,7 +280,7 @@
         "helper": "Public deals appear on your public profile once confirmed"
       },
       "errors": {
-        "counterpartyRequired": "Please add the other party's contact",
+        "counterpartyRequired": "Please add the other side's contact",
         "createFailed": "Failed to create deal",
         "network": "Unable to reach the server. Please try again."
       },
@@ -320,7 +320,7 @@
     "decline": "Decline",
     "declinedMessage": "You declined this invite.",
     "ignoredMessage": "This invite expired without a response.",
-    "awaitingCounterparty": "Waiting for the counterparty to respond",
+    "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {
       "title": "This deal is PUBLIC",
       "body": "If you accept, the deal details will be visible on public profiles"
