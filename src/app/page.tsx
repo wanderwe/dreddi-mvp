@@ -111,6 +111,7 @@ export default function Home() {
   const locale = useLocale();
   const t = useT();
   const copy = useMemo(() => getLandingCopy(locale), [locale]);
+  const betaBannerStorageKey = "dreddi-beta-banner-dismissed-v1";
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
@@ -119,6 +120,7 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const [betaBannerDismissed, setBetaBannerDismissed] = useState<boolean | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
   const demoDealsSource: DemoDealSource[] = useMemo(
@@ -368,6 +370,16 @@ export default function Home() {
     };
   }, [email, mockMode]);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setBetaBannerDismissed(null);
+      return;
+    }
+
+    const storedDismissed = localStorage.getItem(betaBannerStorageKey);
+    setBetaBannerDismissed(storedDismissed === "1");
+  }, [betaBannerStorageKey, isAuthenticated]);
+
   const rep = reputation?.reputation;
   const score = rep?.score ?? 50;
   const confirmedCount = rep?.confirmed_count ?? 0;
@@ -415,6 +427,32 @@ export default function Home() {
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
+
+          {isAuthenticated && betaBannerDismissed === false ? (
+            <div className="order-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/40">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-emerald-100">
+                    {t("landing.betaBanner.title")}
+                  </p>
+                  <p className="mt-1 text-sm text-emerald-100/80">
+                    {t("landing.betaBanner.body")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
+                  aria-label={t("landing.betaBanner.dismissLabel")}
+                  onClick={() => {
+                    localStorage.setItem(betaBannerStorageKey, "1");
+                    setBetaBannerDismissed(true);
+                  }}
+                >
+                  <span aria-hidden>×</span>
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {!ready ? (
             <div className="order-3 flex items-center gap-3 text-slate-400 md:order-4">

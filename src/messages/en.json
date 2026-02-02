@@ -21,6 +21,11 @@
     "hero": {
       "brandSuffix": "knows"
     },
+    "betaBanner": {
+      "title": "🧪 Dreddi beta",
+      "body": "Data and deals created during beta will not be carried over to the final version.",
+      "dismissLabel": "Dismiss beta notice"
+    },
     "demoDeals": {
       "deal1": {
         "title": "Sell the car after receiving a deposit"
