@@ -52,6 +52,19 @@ and track fulfillment or breach over time.
 3) Repeat with a disputed promise to see the negative delta and idempotent event handling.
 4) The landing page shows the live score, counts, and recent reputation events when signed in.
 
+## Reputation evidence metrics (public profiles)
+- **unique_counterparties_count**: Total distinct counterparties across confirmed/disputed deals.
+- **deals_with_new_people_count**: Count of first-ever deals with each counterparty (one per counterparty).
+- **repeat_counterparty_rate**: Percentage of completed deals that are repeats with known counterparties.
+- **deals_with_due_date_count**: Completed deals that included a due date.
+- **on_time_completion_count**: Confirmed deals completed on or before the due date.
+- **on_time_completion_rate**: Percentage of due-dated deals completed on time.
+- **disputed_count**: Completed deals that ended in dispute.
+- **dispute_rate**: Percentage of completed deals that ended in dispute.
+- **total_confirmed_deals**: Total confirmed deals (executor-only).
+- **reputation_age_days**: Days since the first confirmed/disputed deal.
+- **avg_deals_per_month**: Average completed deals per month since the first deal.
+
 ## Tech stack
 - Next.js (App Router)
 - Supabase (Auth + DB + RLS)
