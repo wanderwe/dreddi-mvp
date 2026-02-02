@@ -411,20 +411,15 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       {isAuthenticated && betaBannerDismissed === false ? (
-        <div className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
-          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/40">
+        <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100 shadow-inner shadow-black/40">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold text-emerald-100">
-                  {t("landing.betaBanner.title")}
-                </p>
-                <p className="mt-1 text-sm text-emerald-100/80">
-                  {t("landing.betaBanner.body")}
-                </p>
-              </div>
+              <p className="text-sm text-emerald-100/80">
+                {t("landing.betaBanner.body")}
+              </p>
               <button
                 type="button"
-                className="cursor-pointer rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
+                className="cursor-pointer rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/60"
                 aria-label={t("landing.betaBanner.dismissLabel")}
                 onClick={() => {
                   localStorage.setItem(betaBannerStorageKey, "1");
