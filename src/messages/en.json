@@ -250,8 +250,8 @@
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
         "executor": "Executor",
-        "counterparty": "Counterparty",
-        "counterpartyHelper": "The counterparty must accept the deal—responsibility is not fixed until they do",
+        "counterparty": "Other side",
+        "counterpartyHelper": "A deal takes effect after the other side accepts",
         "dueDate": "Due date",
         "dueTime": "Due time"
       },
@@ -263,8 +263,8 @@
         "title": "Short summary of the deal",
         "details": "Details (optional)",
         "condition": "Execution becomes possible after… (optional)",
-        "counterpartyMe": "Counterparty email or phone",
-        "counterpartyOther": "Counterparty email or phone",
+        "counterpartyMe": "Other person’s email or phone",
+        "counterpartyOther": "Other person’s email or phone",
         "dueDate": "Select date (optional)"
       },
       "actions": {
