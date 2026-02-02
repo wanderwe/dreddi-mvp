@@ -376,6 +376,8 @@
     "reputationDetails": {
       "title": "Reputation details",
       "subtitle": "Based on real completed deals, not reviews",
+      "expandLabel": "Expand reputation details",
+      "collapseLabel": "Collapse reputation details",
       "empty": "No completed deals yet",
       "sections": {
         "workedWith": "Worked with",
@@ -384,8 +386,7 @@
         "trackRecord": "Track record"
       },
       "workedWith": {
-        "uniquePeople": "Worked with {count} different people",
-        "firstTimeDeals": "{count} first-time deals"
+        "uniquePeople": "Worked with {count} different people"
       },
       "commitments": {
         "dealsWithDeadlines": "{count} deals had deadlines",

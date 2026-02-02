@@ -5,7 +5,6 @@ This document maps backend fields from `public_profile_stats` to the public prof
 | Backend field | UI section | UI text (EN) | Notes |
 | --- | --- | --- | --- |
 | `unique_counterparties_count` | Worked with | “Worked with {count} different people” | Uses localized number formatting. |
-| `deals_with_new_people_count` | Worked with | “{count} first-time deals” | Shown only when value is available. |
 | `deals_with_due_date_count` | Commitments | “{count} deals had deadlines” | Shown only when value is available. |
 | `on_time_completion_count` | Commitments | “{count} completed on time” | Shown only when value is available. |
 | `disputed_count` + `total_confirmed_deals` | Disputes | “{count} disputes out of {total} deals” | Uses `total_confirmed_deals`, falls back to confirmed count if needed. |

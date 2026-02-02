@@ -384,6 +384,8 @@
     "reputationDetails": {
       "title": "Деталі репутації",
       "subtitle": "На основі завершених угод, а не відгуків",
+      "expandLabel": "Розгорнути деталі репутації",
+      "collapseLabel": "Згорнути деталі репутації",
       "empty": "Ще немає завершених угод",
       "sections": {
         "workedWith": "Співпраця",
@@ -392,8 +394,7 @@
         "trackRecord": "Трек-рекорд"
       },
       "workedWith": {
-        "uniquePeople": "Співпраця з {count} різними людьми",
-        "firstTimeDeals": "{count} перших угод"
+        "uniquePeople": "Співпраця з {count} різними людьми"
       },
       "commitments": {
         "dealsWithDeadlines": "{count} угод мали дедлайни",

@@ -277,7 +277,6 @@ export default function PublicProfilePage() {
     const totalDeals = totalConfirmedDeals ?? 0;
     const hasDeals = totalDeals > 0;
     const uniquePeople = profile?.unique_counterparties_count ?? null;
-    const firstTimeDeals = profile?.deals_with_new_people_count ?? null;
     const dealsWithDeadlines = profile?.deals_with_due_date_count ?? null;
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
@@ -291,7 +290,6 @@ export default function PublicProfilePage() {
       totalDeals,
       hasDeals,
       uniquePeople,
-      firstTimeDeals,
       dealsWithDeadlines,
       onTimeCompletions,
       disputes,
@@ -301,7 +299,6 @@ export default function PublicProfilePage() {
   }, [
     profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
-    profile?.deals_with_new_people_count,
     profile?.disputed_count,
     profile?.on_time_completion_count,
     profile?.reputation_age_days,
@@ -396,7 +393,12 @@ export default function PublicProfilePage() {
               <button
                 type="button"
                 onClick={() => setReputationDetailsOpen((prev) => !prev)}
-                className="flex w-full items-center justify-between gap-4 text-left"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                aria-label={
+                  reputationDetailsOpen
+                    ? t("publicProfile.reputationDetails.collapseLabel")
+                    : t("publicProfile.reputationDetails.expandLabel")
+                }
                 aria-expanded={reputationDetailsOpen}
               >
                 <div>
@@ -437,27 +439,17 @@ export default function PublicProfilePage() {
                     </p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {(reputationEvidence.uniquePeople !== null ||
-                        reputationEvidence.firstTimeDeals !== null) && (
+                      {reputationEvidence.uniquePeople !== null && (
                         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.workedWith")}
                           </h3>
                           <div className="mt-2 flex flex-col gap-1 text-sm text-white/70">
-                            {reputationEvidence.uniquePeople !== null && (
-                              <p>
-                                {t("publicProfile.reputationDetails.workedWith.uniquePeople", {
-                                  count: numberFormatter.format(reputationEvidence.uniquePeople),
-                                })}
-                              </p>
-                            )}
-                            {reputationEvidence.firstTimeDeals !== null && (
-                              <p>
-                                {t("publicProfile.reputationDetails.workedWith.firstTimeDeals", {
-                                  count: numberFormatter.format(reputationEvidence.firstTimeDeals),
-                                })}
-                              </p>
-                            )}
+                            <p>
+                              {t("publicProfile.reputationDetails.workedWith.uniquePeople", {
+                                count: numberFormatter.format(reputationEvidence.uniquePeople),
+                              })}
+                            </p>
                           </div>
                         </div>
                       )}
