@@ -457,9 +457,9 @@ export default function PublicProfilePage() {
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.workedWith")}
                           </h3>
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-2 space-y-2">
                             <div className="flex items-baseline gap-2 text-white">
-                              <span className="text-3xl font-semibold">
+                              <span className="text-2xl font-semibold">
                                 {numberFormatter.format(reputationEvidence.uniquePeople)}
                               </span>
                               <span className="text-sm text-white/70">
@@ -486,10 +486,10 @@ export default function PublicProfilePage() {
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.commitments")}
                           </h3>
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-2 space-y-2">
                             {reputationEvidence.dealsWithDeadlines !== null && (
                               <div className="flex items-baseline gap-2 text-white">
-                                <span className="text-3xl font-semibold">
+                                <span className="text-2xl font-semibold">
                                   {numberFormatter.format(reputationEvidence.dealsWithDeadlines)}
                                 </span>
                                 <span className="text-sm text-white/70">
@@ -517,9 +517,9 @@ export default function PublicProfilePage() {
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.disputes")}
                           </h3>
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-2 space-y-2">
                             <div className="flex items-baseline gap-2 text-white">
-                              <span className="text-3xl font-semibold">
+                              <span className="text-2xl font-semibold">
                                 {numberFormatter.format(reputationEvidence.disputes)}
                               </span>
                               <span className="text-sm text-white/70">
@@ -543,10 +543,10 @@ export default function PublicProfilePage() {
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.trackRecord")}
                           </h3>
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-2 space-y-2">
                             {reputationEvidence.avgDealsPerMonth !== null && (
                               <div className="flex items-baseline gap-2 text-white">
-                                <span className="text-3xl font-semibold">
+                                <span className="text-2xl font-semibold">
                                   {decimalFormatter.format(
                                     reputationEvidence.avgDealsPerMonth
                                   )}
