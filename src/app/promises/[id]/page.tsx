@@ -554,8 +554,10 @@ export default function PromisePage() {
                 <div className="text-sm text-red-300">{t("promises.detail.disputed")}</div>
               )}
 
-              {!isExecutor && !isCounterparty && (
-                <div className="text-xs text-neutral-500">{t("promises.detail.guestView")}</div>
+              {inviteStatus === "awaiting_acceptance" && (
+                <div className="text-xs text-neutral-500">
+                  {t("promises.detail.awaitingAcceptanceHint")}
+                </div>
               )}
             </div>
           </Card>
