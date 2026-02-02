@@ -88,7 +88,7 @@
     },
     "empty": {
       "title": "Nothing here yet",
-      "promisorDescription": "You haven’t created any deals yet. Start a new one to track them.",
+      "promisorDescription": "You haven’t created or accepted any deals yet",
       "counterpartyDescription": "No deals have been created for you yet. Accept an invite link to get started.",
       "cta": "Create deal"
     },
