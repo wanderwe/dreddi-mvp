@@ -410,7 +410,35 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-24 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
+      {isAuthenticated && betaBannerDismissed === false ? (
+        <div className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/40">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-emerald-100">
+                  {t("landing.betaBanner.title")}
+                </p>
+                <p className="mt-1 text-sm text-emerald-100/80">
+                  {t("landing.betaBanner.body")}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
+                aria-label={t("landing.betaBanner.dismissLabel")}
+                onClick={() => {
+                  localStorage.setItem(betaBannerStorageKey, "1");
+                  setBetaBannerDismissed(true);
+                }}
+              >
+                <span aria-hidden>×</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-6 md:gap-8">
           <div className="order-1 space-y-5 sm:space-y-4">
             <div className="flex items-center gap-4">
@@ -427,32 +455,6 @@ export default function Home() {
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
-
-          {isAuthenticated && betaBannerDismissed === false ? (
-            <div className="order-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/40">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-emerald-100">
-                    {t("landing.betaBanner.title")}
-                  </p>
-                  <p className="mt-1 text-sm text-emerald-100/80">
-                    {t("landing.betaBanner.body")}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="rounded-full p-1 text-emerald-100/80 transition hover:bg-white/10 hover:text-emerald-50"
-                  aria-label={t("landing.betaBanner.dismissLabel")}
-                  onClick={() => {
-                    localStorage.setItem(betaBannerStorageKey, "1");
-                    setBetaBannerDismissed(true);
-                  }}
-                >
-                  <span aria-hidden>×</span>
-                </button>
-              </div>
-            </div>
-          ) : null}
 
           {!ready ? (
             <div className="order-3 flex items-center gap-3 text-slate-400 md:order-4">
