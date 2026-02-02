@@ -153,10 +153,10 @@ export default function PublicProfilesDirectoryPage() {
           <Link
             key={profile.handle}
             href={`/u/${encodeURIComponent(profile.handle)}?from=profiles`}
-            className="group relative flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
+            className="group relative flex w-full min-w-0 flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-4 pr-0 sm:pr-12">
+              <div className="flex min-w-0 flex-1 items-center gap-4 pr-0 sm:pr-12">
                 <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/10">
                   {profile.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -176,6 +176,9 @@ export default function PublicProfilesDirectoryPage() {
                     {displayName}
                   </div>
                   <div className="text-sm text-white/60 break-all">@{profile.handle}</div>
+                  {profile.email && (
+                    <div className="text-xs text-white/50 truncate">{profile.email}</div>
+                  )}
                 </div>
               </div>
               <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">
@@ -239,7 +242,7 @@ export default function PublicProfilesDirectoryPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid w-full gap-4 md:grid-cols-2">
               {cards}
             </div>
             <div className="flex flex-col items-center gap-2">
