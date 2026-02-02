@@ -392,20 +392,39 @@
         "trackRecord": "Track record"
       },
       "workedWith": {
-        "uniquePeople": "With {count} different people",
-        "totalDeals": "Out of {count} deals total"
+        "secondary": "out of {count} {label}"
       },
       "commitments": {
-        "dealsWithDeadlines": "{count} deals had deadlines",
-        "onTime": "{count} completed on time"
+        "onTime": "{count} on time"
       },
       "disputes": {
-        "summary": "{count} disputes out of {total} deals",
-        "rate": "{rate}% of deals ended in a dispute"
+        "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "activeMonths": "Active for {count} months",
-        "averageDeals": "{count} deals per month"
+        "perMonth": "/ month",
+        "activeDays": "active {count} {label}"
+      },
+      "labels": {
+        "people": {
+          "one": "person",
+          "other": "people"
+        },
+        "deals": {
+          "one": "deal",
+          "other": "deals"
+        },
+        "deadlines": {
+          "one": "deadline",
+          "other": "deadlines"
+        },
+        "disputes": {
+          "one": "dispute",
+          "other": "disputes"
+        },
+        "days": {
+          "one": "day",
+          "other": "days"
+        }
       }
     },
     "sections": {
