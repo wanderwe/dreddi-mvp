@@ -165,6 +165,7 @@ export default function PromisePage() {
   const [p, setP] = useState<PromiseRow | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
@@ -244,6 +245,44 @@ export default function PromisePage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  useEffect(() => {
+    let active = true;
+    const inviteStatus = p ? getPromiseInviteStatus(p) : null;
+
+    if (!p?.counterparty_id || inviteStatus !== "accepted") {
+      setCounterpartyDisplayName(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadCounterpartyProfile = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name,email")
+        .eq("id", p.counterparty_id)
+        .maybeSingle();
+
+      if (!active) return;
+      const displayName = profile?.display_name?.trim();
+      const email = profile?.email?.trim();
+      setCounterpartyDisplayName(displayName || email || null);
+    };
+
+    void loadCounterpartyProfile();
+
+    return () => {
+      active = false;
+    };
+  }, [p?.counterparty_id, p?.invite_status, p?.counterparty_accepted_at, p?.accepted_at]);
 
   async function markCompleted() {
     if (!p) return;
@@ -406,6 +445,12 @@ export default function PromisePage() {
   const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
+  const acceptingUserName = useMemo(() => {
+    if (!p?.counterparty_id) return t("promises.detail.unknownUser");
+    const displayName = counterpartyDisplayName?.trim();
+    if (displayName) return displayName;
+    return p.counterparty_id.slice(0, 8);
+  }, [counterpartyDisplayName, p?.counterparty_id, t]);
 
   return (
     <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
@@ -571,7 +616,7 @@ export default function PromisePage() {
                   </div>
                   <div className="text-neutral-300">
                     {t("promises.detail.inviteAcceptedBy", {
-                      name: p.counterparty_contact ?? t("promises.detail.counterpartyFallback"),
+                      name: acceptingUserName,
                     })}
                   </div>
                 </div>

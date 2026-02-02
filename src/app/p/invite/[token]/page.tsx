@@ -23,6 +23,7 @@ type InviteInfo = {
   creator_display_name: string | null;
   creator_id: string;
   counterparty_id: string | null;
+  counterparty_display_name: string | null;
   counterparty_accepted_at: string | null;
   invite_status: InviteStatus | null;
   invited_at: string | null;
@@ -196,6 +197,13 @@ export default function InvitePage() {
       : info.creator_display_name ?? t("invite.unknown");
   }, [info, t]);
 
+  const acceptingUserName = useMemo(() => {
+    if (!info?.counterparty_id) return t("invite.unknown");
+    const displayName = info.counterparty_display_name?.trim();
+    if (displayName) return displayName;
+    return info.counterparty_id.slice(0, 8);
+  }, [info, t]);
+
   const dueParts = useMemo(() => {
     if (!info?.due_at) return null;
     try {
@@ -289,8 +297,8 @@ export default function InvitePage() {
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
             {inviteAccepted && (
               <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-                {info.counterparty_contact
-                  ? t("invite.acceptedBy", { name: info.counterparty_contact })
+                {info.counterparty_id
+                  ? t("invite.acceptedBy", { name: acceptingUserName })
                   : t("invite.accepted")}
               </div>
             )}
