@@ -1,5 +1,5 @@
 export const publicProfileDirectorySelect =
-  "handle,email,display_name,avatar_url,reputation_score,confirmed_count,completed_count,disputed_count";
+  "handle,email,display_name,avatar_url,reputation_score,confirmed_count,completed_count,disputed_count,unique_counterparties_count,deals_with_due_date_count,on_time_completion_count,reputation_age_days";
 
 export const publicProfileDetailSelect =
-  "handle,display_name,avatar_url,reputation_score,confirmed_count,completed_count,disputed_count,last_activity_at";
+  "handle,display_name,avatar_url,reputation_score,confirmed_count,completed_count,disputed_count,last_activity_at,unique_counterparties_count,deals_with_due_date_count,on_time_completion_count,reputation_age_days";

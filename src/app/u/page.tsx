@@ -15,6 +15,10 @@ type PublicProfileDirectoryRow = {
   confirmed_count: number | null;
   completed_count: number | null;
   disputed_count: number | null;
+  unique_counterparties_count: number | null;
+  deals_with_due_date_count: number | null;
+  on_time_completion_count: number | null;
+  reputation_age_days: number | null;
 };
 
 export default function PublicProfilesDirectoryPage() {
