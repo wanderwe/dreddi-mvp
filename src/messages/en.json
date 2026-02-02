@@ -150,7 +150,7 @@
       "waitingReview": "Waiting for the counterparty to review",
       "confirmed": "Deal confirmed ✅",
       "disputed": "Deal disputed",
-      "guestView": "You are viewing this deal as a guest",
+      "awaitingAcceptanceHint": "The deal hasn’t been accepted by the other side yet",
       "inviteTitle": "Invite",
       "inviteLinkTitle": "Invite link",
       "inviteAccepted": "Invite accepted",

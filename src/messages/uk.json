@@ -158,7 +158,7 @@
       "waitingReview": "Очікує перегляду другою стороною",
       "confirmed": "Угоду підтверджено ✅",
       "disputed": "Угоду оскаржено",
-      "guestView": "Ви переглядаєте цю угоду як гість",
+      "awaitingAcceptanceHint": "Угода ще не прийнята іншою стороною",
       "inviteTitle": "Запрошення",
       "inviteLinkTitle": "Посилання-запрошення",
       "inviteAccepted": "Запрошення прийнято",
