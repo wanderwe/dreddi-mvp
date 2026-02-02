@@ -400,20 +400,49 @@
         "trackRecord": "Трек-рекорд"
       },
       "workedWith": {
-        "uniquePeople": "З {count} різними людьми",
-        "totalDeals": "Серед {count} угод взагалом"
+        "secondary": "серед {count} {label} загалом"
       },
       "commitments": {
-        "dealsWithDeadlines": "{count} угод мали дедлайни",
-        "onTime": "{count} виконано вчасно"
+        "onTime": "{count} вчасно"
       },
       "disputes": {
-        "summary": "{count} спорів з {total} угод",
-        "rate": "{rate}% угод завершились спором"
+        "rate": "{rate}% угод"
       },
       "trackRecord": {
-        "activeMonths": "Активність {count} місяців",
-        "averageDeals": "У середньому {count} угод на місяць"
+        "perMonth": "/ місяць",
+        "activeDays": "активність {count} {label}"
+      },
+      "labels": {
+        "people": {
+          "one": "людина",
+          "few": "людини",
+          "many": "людей",
+          "other": "людей"
+        },
+        "deals": {
+          "one": "угоди",
+          "few": "угод",
+          "many": "угод",
+          "other": "угод"
+        },
+        "deadlines": {
+          "one": "з дедлайном",
+          "few": "з дедлайном",
+          "many": "з дедлайном",
+          "other": "з дедлайном"
+        },
+        "disputes": {
+          "one": "спір",
+          "few": "спори",
+          "many": "спорів",
+          "other": "спорів"
+        },
+        "days": {
+          "one": "день",
+          "few": "дні",
+          "many": "днів",
+          "other": "днів"
+        }
       }
     },
     "sections": {
