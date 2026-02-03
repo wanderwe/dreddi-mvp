@@ -676,36 +676,35 @@ export default function PromisePage() {
                   />
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="relative space-y-3">
+                  <span
+                    aria-live="polite"
+                    className={`pointer-events-none absolute right-3 top-3 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur transition ${
+                      copyStatus === "success"
+                        ? "border-emerald-400/50 bg-emerald-500/30 text-emerald-100 opacity-100"
+                        : copyStatus === "error"
+                        ? "border-red-400/50 bg-red-500/30 text-red-100 opacity-100"
+                        : "border-transparent bg-transparent text-transparent opacity-0"
+                    }`}
+                  >
+                    {copyStatus === "success"
+                      ? t("promises.detail.copySuccess")
+                      : copyStatus === "error"
+                      ? t("promises.detail.copyFailed")
+                      : t("promises.detail.copySuccess")}
+                  </span>
+
                   <div className="rounded-xl border border-neutral-800 bg-black/30 px-4 py-3 text-sm text-neutral-200 break-all">
                     {inviteLink ?? t("promises.detail.inviteFallback")}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative flex items-center">
-                      <ActionButton
-                        label={t("promises.detail.copyLink")}
-                        variant="primary"
-                        disabled={inviteBusy !== null || !inviteLink}
-                        onClick={copyInvite}
-                      />
-                      <span
-                        aria-live="polite"
-                        className={`pointer-events-none absolute left-0 top-full mt-1 w-[140px] whitespace-nowrap truncate text-xs font-medium transition-opacity ${
-                          copyStatus === "success"
-                            ? "text-emerald-300 opacity-100"
-                            : copyStatus === "error"
-                            ? "text-red-300 opacity-100"
-                            : "text-transparent opacity-0"
-                        }`}
-                      >
-                        {copyStatus === "success"
-                          ? t("promises.detail.copySuccess")
-                          : copyStatus === "error"
-                          ? t("promises.detail.copyFailed")
-                          : t("promises.detail.copySuccess")}
-                      </span>
-                    </div>
+                    <ActionButton
+                      label={t("promises.detail.copyLink")}
+                      variant="primary"
+                      disabled={inviteBusy !== null || !inviteLink}
+                      onClick={copyInvite}
+                    />
 
                     {inviteLink && (
                       <Link
@@ -715,6 +714,7 @@ export default function PromisePage() {
                         {t("promises.detail.openInvite")}
                       </Link>
                     )}
+
                   </div>
 
                 </div>
