@@ -359,7 +359,8 @@
       "or": "Or",
       "sendLink": "Send magic link",
       "sending": "Sending...",
-      "sent": "Link sent ✅ Check your inbox (and Spam).",
+      "sentTitle": "Magic link sent",
+      "sentBody": "We sent a sign-in link to {email}. Check your inbox (and spam).",
       "back": "Back to landing",
       "secure": "Secure, zero-password access"
     }

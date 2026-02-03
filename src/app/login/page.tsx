@@ -12,6 +12,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [sentEmail, setSentEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [oauthBusy, setOauthBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,8 @@ export default function LoginPage() {
   async function sendMagicLink() {
     setBusy(true);
     setError(null);
+    setSent(false);
+    setSentEmail("");
 
     if (!supabase) {
       setBusy(false);
@@ -75,8 +78,12 @@ export default function LoginPage() {
 
     setBusy(false);
 
-    if (error) setError(error.message);
-    else setSent(true);
+    if (error) {
+      setError(error.message);
+    } else {
+      setSentEmail(email);
+      setSent(true);
+    }
   }
 
   return (
@@ -108,7 +115,11 @@ export default function LoginPage() {
                 className="block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                 placeholder={t("auth.login.emailPlaceholder")}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setSent(false);
+                  setSentEmail("");
+                }}
               />
             </label>
 
@@ -119,6 +130,28 @@ export default function LoginPage() {
             >
               {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
             </button>
+
+            {sent && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-xl border border-emerald-400/50 bg-emerald-500/15 p-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/10"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/80 text-xs font-semibold text-slate-950">
+                    ✓
+                  </span>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-emerald-50">
+                      {t("auth.login.sentTitle")}
+                    </p>
+                    <p className="text-sm text-emerald-100/90">
+                      {t("auth.login.sentBody", { email: sentEmail })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-2 text-xs text-emerald-200/80">
               <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
@@ -163,14 +196,6 @@ export default function LoginPage() {
                 ? t("auth.login.googleSigningIn")
                 : t("auth.login.googleCta")}
             </button>
-
-            {sent && (
-              <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-200 shadow-inner shadow-black/30">
-                <span className="block border-l-2 border-emerald-400/50 pl-3">
-                  {t("auth.login.sent")}
-                </span>
-              </div>
-            )}
 
             {error && <div className="text-sm text-red-400">{error}</div>}
 
