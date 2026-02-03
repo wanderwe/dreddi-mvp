@@ -691,7 +691,7 @@ export default function PromisePage() {
                       />
                       <span
                         aria-live="polite"
-                        className={`pointer-events-none absolute left-full top-1/2 ml-2 w-[140px] -translate-y-1/2 whitespace-nowrap truncate text-xs font-medium transition-opacity ${
+                        className={`pointer-events-none absolute left-0 top-full mt-1 w-[140px] whitespace-nowrap truncate text-xs font-medium transition-opacity ${
                           copyStatus === "success"
                             ? "text-emerald-300 opacity-100"
                             : copyStatus === "error"
