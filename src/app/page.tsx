@@ -429,9 +429,19 @@ export default function Home() {
                   setBetaBannerDismissed(true);
                 }}
               >
-                <span aria-hidden className="text-base leading-none">
-                  ×
-                </span>
+                <svg
+                  aria-hidden
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                >
+                  <path
+                    d="M3 3l6 6M9 3L3 9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
