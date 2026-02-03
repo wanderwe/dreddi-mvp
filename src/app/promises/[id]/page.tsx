@@ -682,7 +682,7 @@ export default function PromisePage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2">
+                    <div className="relative flex items-center">
                       <ActionButton
                         label={t("promises.detail.copyLink")}
                         variant="primary"
@@ -691,7 +691,7 @@ export default function PromisePage() {
                       />
                       <span
                         aria-live="polite"
-                        className={`w-[140px] whitespace-nowrap truncate text-xs font-medium transition-opacity ${
+                        className={`pointer-events-none absolute left-full top-1/2 ml-2 w-[140px] -translate-y-1/2 whitespace-nowrap truncate text-xs font-medium transition-opacity ${
                           copyStatus === "success"
                             ? "text-emerald-300 opacity-100"
                             : copyStatus === "error"
