@@ -700,7 +700,7 @@ export default function PromisePage() {
 
                     <span
                       aria-live="polite"
-                      className={`pointer-events-none absolute left-0 top-0 -translate-y-3 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur transition ${
+                      className={`pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-4 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur transition ${
                         copyStatus === "success"
                           ? "border-emerald-400/50 bg-emerald-500/30 text-emerald-100 opacity-100"
                           : copyStatus === "error"
