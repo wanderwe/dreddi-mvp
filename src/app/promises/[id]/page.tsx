@@ -682,7 +682,7 @@ export default function PromisePage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="relative flex items-center">
+                    <div className="flex flex-wrap items-center gap-2">
                       <ActionButton
                         label={t("promises.detail.copyLink")}
                         variant="primary"
@@ -691,12 +691,12 @@ export default function PromisePage() {
                       />
                       <span
                         aria-live="polite"
-                        className={`pointer-events-none absolute left-0 top-full mt-1 w-[140px] whitespace-nowrap truncate text-xs font-medium transition-opacity ${
+                        className={`pointer-events-none min-w-[110px] rounded-full border px-2 py-1 text-center text-[11px] font-semibold uppercase tracking-[0.18em] transition ${
                           copyStatus === "success"
-                            ? "text-emerald-300 opacity-100"
+                            ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200 opacity-100"
                             : copyStatus === "error"
-                            ? "text-red-300 opacity-100"
-                            : "text-transparent opacity-0"
+                            ? "border-red-400/40 bg-red-500/10 text-red-200 opacity-100"
+                            : "border-transparent bg-transparent text-transparent opacity-0"
                         }`}
                       >
                         {copyStatus === "success"
