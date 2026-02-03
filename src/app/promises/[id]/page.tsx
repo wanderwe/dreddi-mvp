@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -170,7 +170,9 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [conditionBusy, setConditionBusy] = useState(false);
-  const [inviteBusy, setInviteBusy] = useState<"generate" | "regen" | "copy" | null>(null);
+  const [inviteBusy, setInviteBusy] = useState<"generate" | null>(null);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
@@ -322,7 +324,7 @@ export default function PromisePage() {
     load();
   }
 
-  async function generateInvite(regenerate = false) {
+  async function generateInvite() {
     if (!p) return;
 
     const isInviteAccepted = Boolean(p.counterparty_accepted_at);
@@ -331,7 +333,7 @@ export default function PromisePage() {
     if (!isCreator || isInviteAccepted || isFinal) return;
 
     setError(null);
-    setInviteBusy(regenerate ? "regen" : "generate");
+    setInviteBusy("generate");
 
     let supabase;
     try {
@@ -350,11 +352,7 @@ export default function PromisePage() {
 
     const token = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-    const patch: Partial<PromiseRow> = regenerate
-      ? { invite_token: token }
-      : p.invite_token
-      ? {}
-      : { invite_token: token };
+    const patch: Partial<PromiseRow> = p.invite_token ? {} : { invite_token: token };
 
     if (!Object.keys(patch).length) {
       setInviteBusy(null);
@@ -413,17 +411,60 @@ export default function PromisePage() {
     return `${window.location.origin}/p/invite/${p.invite_token}`;
   }, [p?.invite_token]);
 
+  useEffect(() => {
+    return () => {
+      if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    };
+  }, []);
+
+  const setCopyFeedback = (status: "success" | "error") => {
+    if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    setCopyStatus(status);
+    copyResetTimer.current = setTimeout(() => {
+      setCopyStatus("idle");
+    }, 1800);
+  };
+
+  const fallbackCopy = (text: string) => {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "true");
+      textarea.style.position = "fixed";
+      textarea.style.top = "-1000px";
+      textarea.style.left = "-1000px";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus({ preventScroll: true });
+      textarea.select();
+      const success = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
   async function copyInvite() {
     if (!inviteLink || !canManageInvite || isInviteAccepted || isFinal) return;
-    setError(null);
-    setInviteBusy("copy");
+    setCopyStatus("idle");
 
+    let didCopy = false;
     try {
-      await navigator.clipboard.writeText(inviteLink);
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteLink);
+        didCopy = true;
+      } else {
+        didCopy = fallbackCopy(inviteLink);
+      }
     } catch {
-      setError(t("promises.detail.errors.copyClipboard"));
-    } finally {
-      setInviteBusy(null);
+      didCopy = fallbackCopy(inviteLink);
+    }
+
+    if (didCopy) {
+      setCopyFeedback("success");
+    } else {
+      setCopyFeedback("error");
     }
   }
 
@@ -631,7 +672,7 @@ export default function PromisePage() {
                     variant="primary"
                     loading={inviteBusy === "generate"}
                     disabled={inviteBusy !== null}
-                    onClick={() => generateInvite(false)}
+                    onClick={generateInvite}
                   />
                 </div>
               ) : (
@@ -640,22 +681,31 @@ export default function PromisePage() {
                     {inviteLink ?? t("promises.detail.inviteFallback")}
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <ActionButton
-                      label={t("promises.detail.copyLink")}
-                      variant="primary"
-                      loading={inviteBusy === "copy"}
-                      disabled={inviteBusy !== null || !inviteLink}
-                      onClick={copyInvite}
-                    />
-
-                    <ActionButton
-                      label={t("promises.detail.regenerate")}
-                      variant="ghost"
-                      loading={inviteBusy === "regen"}
-                      disabled={inviteBusy !== null}
-                      onClick={() => generateInvite(true)}
-                    />
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="relative flex items-center">
+                      <ActionButton
+                        label={t("promises.detail.copyLink")}
+                        variant="primary"
+                        disabled={inviteBusy !== null || !inviteLink}
+                        onClick={copyInvite}
+                      />
+                      <span
+                        aria-live="polite"
+                        className={`pointer-events-none absolute left-full top-1/2 ml-2 w-[140px] -translate-y-1/2 whitespace-nowrap truncate text-xs font-medium transition-opacity ${
+                          copyStatus === "success"
+                            ? "text-emerald-300 opacity-100"
+                            : copyStatus === "error"
+                            ? "text-red-300 opacity-100"
+                            : "text-transparent opacity-0"
+                        }`}
+                      >
+                        {copyStatus === "success"
+                          ? t("promises.detail.copySuccess")
+                          : copyStatus === "error"
+                          ? t("promises.detail.copyFailed")
+                          : t("promises.detail.copySuccess")}
+                      </span>
+                    </div>
 
                     {inviteLink && (
                       <Link
