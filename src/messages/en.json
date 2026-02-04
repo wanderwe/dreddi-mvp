@@ -360,7 +360,7 @@
       "sendLink": "Send magic link",
       "sending": "Sending...",
       "sentTitle": "Magic link sent",
-      "sentBody": "We sent a sign-in link to {email}. Check your inbox (and spam).",
+      "sentBody": "Check your email (and spam)",
       "back": "Back to landing",
       "secure": "Secure, zero-password access"
     }

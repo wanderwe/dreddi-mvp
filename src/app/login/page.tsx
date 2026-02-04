@@ -12,7 +12,6 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-  const [sentEmail, setSentEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [oauthBusy, setOauthBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +55,6 @@ export default function LoginPage() {
     setBusy(true);
     setError(null);
     setSent(false);
-    setSentEmail("");
 
     if (!supabase) {
       setBusy(false);
@@ -81,7 +79,6 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
-      setSentEmail(email);
       setSent(true);
     }
   }
@@ -118,7 +115,6 @@ export default function LoginPage() {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setSent(false);
-                  setSentEmail("");
                 }}
               />
             </label>
@@ -137,8 +133,8 @@ export default function LoginPage() {
                 aria-live="polite"
                 className="rounded-xl border border-emerald-400/50 bg-emerald-500/15 p-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/10"
               >
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/80 text-xs font-semibold text-slate-950">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/80 text-xs font-semibold text-slate-950">
                     ✓
                   </span>
                   <div className="space-y-1">
@@ -146,7 +142,7 @@ export default function LoginPage() {
                       {t("auth.login.sentTitle")}
                     </p>
                     <p className="text-sm text-emerald-100/90">
-                      {t("auth.login.sentBody", { email: sentEmail })}
+                      {t("auth.login.sentBody")}
                     </p>
                   </div>
                 </div>
