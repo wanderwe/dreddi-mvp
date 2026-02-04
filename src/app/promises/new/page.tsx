@@ -21,7 +21,7 @@ import {
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { getPromiseLabels, type PromiseType } from "@/lib/promiseLabels";
+import { getPromiseLabels, type PromiseMode } from "@/lib/promiseLabels";
 
 export default function NewPromisePage() {
   const t = useT();
@@ -32,7 +32,7 @@ export default function NewPromisePage() {
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
-  const [promiseType, setPromiseType] = useState<PromiseType>("deal");
+  const [promiseMode, setPromiseMode] = useState<PromiseMode>("deal");
   const [rewardAmount, setRewardAmount] = useState("");
   const [rewardCurrency, setRewardCurrency] = useState("UAH");
   const [rewardText, setRewardText] = useState("");
@@ -57,7 +57,13 @@ export default function NewPromisePage() {
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
-  const promiseLabels = useMemo(() => getPromiseLabels(t, promiseType), [promiseType, t]);
+  const promiseLabels = useMemo(() => getPromiseLabels(t, promiseMode), [promiseMode, t]);
+
+  useEffect(() => {
+    if (promiseMode === "request") {
+      setIsPublicDeal(false);
+    }
+  }, [promiseMode]);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -460,13 +466,13 @@ export default function NewPromisePage() {
     const rewardAmountValue = rewardAmount.trim()
       ? Number.parseFloat(rewardAmount.replace(",", "."))
       : null;
-    if (promiseType === "assignment" && rewardAmountValue !== null && Number.isNaN(rewardAmountValue)) {
+    if (promiseMode === "request" && rewardAmountValue !== null && Number.isNaN(rewardAmountValue)) {
       setBusy(false);
       setError(t("promises.new.errors.rewardAmountInvalid"));
       return;
     }
 
-    if (promiseType === "assignment" && rewardAmountValue !== null && !rewardCurrency.trim()) {
+    if (promiseMode === "request" && rewardAmountValue !== null && !rewardCurrency.trim()) {
       setBusy(false);
       setError(t("promises.new.errors.rewardCurrencyRequired"));
       return;
@@ -480,12 +486,12 @@ export default function NewPromisePage() {
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
-      visibility: shouldRequestPublic ? "public" : "private",
-      promiseType,
-      rewardAmount: promiseType === "assignment" ? rewardAmountValue : null,
-      rewardCurrency: promiseType === "assignment" ? rewardCurrency.trim() : null,
-      rewardText: promiseType === "assignment" ? rewardText.trim() || null : null,
-      paymentTerms: promiseType === "assignment" ? paymentTerms.trim() || null : null,
+      visibility: promiseMode === "request" ? "private" : shouldRequestPublic ? "public" : "private",
+      promiseMode,
+      rewardAmount: promiseMode === "request" ? rewardAmountValue : null,
+      rewardCurrency: promiseMode === "request" ? rewardCurrency.trim() : null,
+      rewardText: promiseMode === "request" ? rewardText.trim() || null : null,
+      paymentTerms: promiseMode === "request" ? paymentTerms.trim() || null : null,
     };
 
     let res: Response;
@@ -563,9 +569,9 @@ export default function NewPromisePage() {
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
                   type="button"
-                  onClick={() => setPromiseType("deal")}
+                  onClick={() => setPromiseMode("deal")}
                   className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseType === "deal"
+                    promiseMode === "deal"
                       ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
                       : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
                   }`}
@@ -574,14 +580,14 @@ export default function NewPromisePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPromiseType("assignment")}
+                  onClick={() => setPromiseMode("request")}
                   className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseType === "assignment"
+                    promiseMode === "request"
                       ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
                       : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
                   }`}
                 >
-                  {t("promises.new.type.assignment")}
+                  {t("promises.new.type.request")}
                 </button>
               </div>
             </div>
@@ -674,7 +680,7 @@ export default function NewPromisePage() {
               </label>
             )}
 
-            {promiseType === "assignment" && (
+            {promiseMode === "request" && (
               <div className="space-y-4 text-sm text-slate-200 sm:col-span-2">
                 <div className="space-y-2">
                   <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -819,7 +825,7 @@ export default function NewPromisePage() {
               </p>
             )}
 
-            {isPublicProfile && (
+            {isPublicProfile && promiseMode === "deal" && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="min-w-0 flex-1 space-y-1">

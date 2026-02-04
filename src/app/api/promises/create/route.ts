@@ -8,7 +8,7 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
-import { normalizePromiseType } from "@/lib/promiseLabels";
+import { normalizePromiseMode } from "@/lib/promiseLabels";
 
 type CreatePromisePayload = {
   title?: string;
@@ -18,7 +18,7 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
-  promiseType?: "deal" | "assignment";
+  promiseMode?: "deal" | "request" | "assignment";
   rewardAmount?: number | string | null;
   rewardCurrency?: string | null;
   rewardText?: string | null;
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const counterpartyContact = body?.counterpartyContact?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
-    const promiseType = normalizePromiseType(body?.promiseType);
+    const promiseMode = normalizePromiseMode(body?.promiseMode);
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Reward amount must be a number" }, { status: 400 });
     }
 
-    if (promiseType === "assignment" && rewardAmount !== null && !rewardCurrency) {
+    if (promiseMode === "request" && rewardAmount !== null && !rewardCurrency) {
       return NextResponse.json(
         { error: "Reward currency is required when reward amount is set" },
         { status: 400 }
@@ -84,7 +84,11 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     const visibility =
-      requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
+      promiseMode === "request"
+        ? "private"
+        : requestedVisibility === "public" && profileRow?.is_public_profile
+          ? "public"
+          : "private";
 
     const { data: matchingProfile } = await admin
       .from("profiles")
@@ -113,11 +117,11 @@ export async function POST(req: Request) {
       declined_at: null,
       ignored_at: null,
       visibility,
-      promise_type: promiseType,
-      reward_amount: promiseType === "assignment" ? rewardAmount : null,
-      reward_currency: promiseType === "assignment" ? rewardCurrency : null,
-      reward_text: promiseType === "assignment" ? rewardText : null,
-      payment_terms: promiseType === "assignment" ? paymentTerms : null,
+      promise_mode: promiseMode,
+      reward_amount: promiseMode === "request" ? rewardAmount : null,
+      reward_currency: promiseMode === "request" ? rewardCurrency : null,
+      reward_text: promiseMode === "request" ? rewardText : null,
+      payment_terms: promiseMode === "request" ? paymentTerms : null,
     };
 
     const { data: insertData, error: insertError } = await admin

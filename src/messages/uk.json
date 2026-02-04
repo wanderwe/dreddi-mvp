@@ -87,23 +87,23 @@
   "promises": {
     "entity": {
       "deal": "Угода",
-      "assignment": "Доручення"
+      "request": "Доручення"
     },
     "entityLower": {
       "deal": "угода",
-      "assignment": "доручення"
+      "request": "доручення"
     },
     "entityPublic": {
       "deal": "Публічна угода",
-      "assignment": "Публічне доручення"
+      "request": "Публічне доручення"
     },
     "entityNew": {
       "deal": "Нова угода",
-      "assignment": "Нове доручення"
+      "request": "Нове доручення"
     },
     "entityPlural": {
       "deal": "угод",
-      "assignment": "доручень"
+      "request": "доручень"
     },
     "roles": {
       "deal": {
@@ -111,9 +111,9 @@
         "creatorLabel": "Створено",
         "executor": "Виконавець"
       },
-      "assignment": {
-        "creator": "Замовник",
-        "creatorLabel": "Замовник",
+      "request": {
+        "creator": "Запитувач",
+        "creatorLabel": "Запитувач",
         "executor": "Виконавець"
       }
     },
@@ -148,8 +148,8 @@
     },
     "status": {
       "active": "Активна",
-      "pendingConfirmation": "Очікує підтвердження",
-      "waitingConfirmation": "Очікує підтвердження",
+      "pendingConfirmation": "На підтвердженні",
+      "waitingConfirmation": "На підтвердженні",
       "confirmed": "Підтверджено",
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
@@ -329,7 +329,7 @@
       },
       "type": {
         "deal": "Угода",
-        "assignment": "Доручення"
+        "request": "Доручення"
       },
       "executor": {
         "me": "Я",
@@ -528,7 +528,7 @@
       "overdue": "Прострочено",
       "inProgress": "В процесі",
       "awaitingOutcome": "Очікує результату",
-      "awaitingAcceptance": "Очікує підтвердження"
+      "awaitingAcceptance": "На підтвердженні"
     },
     "meta": {
       "due": "Термін до {date}",

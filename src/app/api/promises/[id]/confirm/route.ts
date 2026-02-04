@@ -10,6 +10,7 @@ import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
 import { createNotification } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
+import { normalizePromiseMode } from "@/lib/promiseLabels";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -31,7 +32,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         userId: user.id,
       });
     }
-    if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
+    const promiseMode = normalizePromiseMode(promise.promise_mode);
+    if (promiseMode === "request") {
+      if (user.id !== promise.creator_id) {
+        return NextResponse.json(
+          { error: "Only the requester can confirm" },
+          { status: 403 }
+        );
+      }
+    } else if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json({ error: "Only the other side can confirm" }, { status: 403 });
     }
 
@@ -63,7 +72,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       })
       .eq("id", id)
       .select(
-        "id,title,status,promise_type,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+        "id,title,status,promise_mode,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
       )
       .single<PromiseRowMin>();
 

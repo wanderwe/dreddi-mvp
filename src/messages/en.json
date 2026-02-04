@@ -87,23 +87,23 @@
   "promises": {
     "entity": {
       "deal": "Deal",
-      "assignment": "Assignment"
+      "request": "Request"
     },
     "entityLower": {
       "deal": "deal",
-      "assignment": "assignment"
+      "request": "request"
     },
     "entityPublic": {
       "deal": "Public Deal",
-      "assignment": "Public Assignment"
+      "request": "Public Request"
     },
     "entityNew": {
       "deal": "New deal",
-      "assignment": "New assignment"
+      "request": "New request"
     },
     "entityPlural": {
       "deal": "deals",
-      "assignment": "assignments"
+      "request": "requests"
     },
     "roles": {
       "deal": {
@@ -111,10 +111,10 @@
         "creatorLabel": "Created by",
         "executor": "Executor"
       },
-      "assignment": {
-        "creator": "Client",
-        "creatorLabel": "Client",
-        "executor": "Executor"
+      "request": {
+        "creator": "Requester",
+        "creatorLabel": "Requester",
+        "executor": "Fulfiller"
       }
     },
     "overview": {
@@ -140,8 +140,8 @@
     },
     "status": {
       "active": "Active",
-      "pendingConfirmation": "Pending confirmation",
-      "waitingConfirmation": "Waiting for confirmation",
+      "pendingConfirmation": "Awaiting confirmation",
+      "waitingConfirmation": "Awaiting confirmation",
       "confirmed": "Confirmed",
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
@@ -321,7 +321,7 @@
       },
       "type": {
         "deal": "Deal",
-        "assignment": "Assignment"
+        "request": "Request"
       },
       "executor": {
         "me": "Me",
