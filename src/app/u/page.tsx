@@ -32,7 +32,6 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [hasRequestedMore, setHasRequestedMore] = useState(false);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -57,7 +56,7 @@ export default function PublicProfilesDirectoryPage() {
       setLoading(true);
       setError(null);
       setLoadMoreError(null);
-      setHasRequestedMore(false);
+      setHasMore(true);
 
       const normalizedSearch = debouncedSearch.startsWith("@")
         ? debouncedSearch.slice(1)
@@ -73,7 +72,7 @@ export default function PublicProfilesDirectoryPage() {
         query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
       }
 
-      const { data, error: listError } = await query.range(0, pageSize - 1);
+      const { data, error: listError } = await query.range(0, pageSize);
 
       if (!active) return;
 
@@ -83,8 +82,9 @@ export default function PublicProfilesDirectoryPage() {
         setHasMore(false);
       } else {
         const nextProfiles = (data ?? []) as PublicProfileDirectoryRow[];
-        setProfiles(nextProfiles);
-        setHasMore(nextProfiles.length === pageSize);
+        const nextHasMore = nextProfiles.length > pageSize;
+        setProfiles(nextHasMore ? nextProfiles.slice(0, pageSize) : nextProfiles);
+        setHasMore(nextHasMore);
       }
 
       setLoading(false);
@@ -107,7 +107,6 @@ export default function PublicProfilesDirectoryPage() {
 
     setLoadingMore(true);
     setLoadMoreError(null);
-    setHasRequestedMore(true);
 
     const startIndex = profiles.length;
     const normalizedSearch = debouncedSearch.startsWith("@")
@@ -124,10 +123,7 @@ export default function PublicProfilesDirectoryPage() {
       query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
     }
 
-    const { data, error: listError } = await query.range(
-      startIndex,
-      startIndex + pageSize - 1
-    );
+    const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
 
     if (listError) {
       setLoadMoreError(listError.message);
@@ -136,8 +132,12 @@ export default function PublicProfilesDirectoryPage() {
     }
 
     const nextProfiles = (data ?? []) as PublicProfileDirectoryRow[];
-    setProfiles((prev) => [...prev, ...nextProfiles]);
-    setHasMore(nextProfiles.length === pageSize);
+    const nextHasMore = nextProfiles.length > pageSize;
+    setProfiles((prev) => [
+      ...prev,
+      ...(nextHasMore ? nextProfiles.slice(0, pageSize) : nextProfiles),
+    ]);
+    setHasMore(nextHasMore);
     setLoadingMore(false);
   };
 
@@ -200,8 +200,6 @@ export default function PublicProfilesDirectoryPage() {
     [profiles, t]
   );
 
-  const isSearchActive = debouncedSearch.length > 0;
-  const showNoMore = hasRequestedMore && !hasMore && !isSearchActive;
   const showLoadMoreButton = hasMore;
 
   return (
@@ -246,7 +244,7 @@ export default function PublicProfilesDirectoryPage() {
               {cards}
             </div>
             <div className="flex flex-col items-center gap-2">
-              {(showLoadMoreButton || showNoMore) && (
+              {showLoadMoreButton && (
                 <button
                   type="button"
                   onClick={loadMore}
@@ -255,9 +253,7 @@ export default function PublicProfilesDirectoryPage() {
                 >
                   {loadingMore
                     ? t("publicDirectory.loadingMore")
-                    : hasMore
-                      ? t("publicDirectory.loadMore")
-                      : t("publicDirectory.noMore")}
+                    : t("publicDirectory.loadMore")}
                 </button>
               )}
               {loadMoreError && (
