@@ -7,6 +7,7 @@ import { getAuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { fetchUnreadNotificationCount } from "@/lib/notifications/queries";
 
 export function NotificationBell({ className = "" }: { className?: string }) {
   const t = useT();
@@ -17,14 +18,10 @@ export function NotificationBell({ className = "" }: { className?: string }) {
     let channel: ReturnType<SupabaseClient["channel"]> | null = null;
 
     const loadCount = async (supabase: SupabaseClient, userId: string) => {
-      const { count } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .is("read_at", null);
-
       if (!active) return;
-      setCount(count ?? 0);
+      const count = await fetchUnreadNotificationCount(supabase, userId);
+      if (!active) return;
+      setCount(count);
     };
 
     const init = async () => {

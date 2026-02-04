@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { buildInviteAcceptedNotifications } from "@/lib/notifications/flows";
 import {
-  buildCtaUrl,
-  buildDedupeKey,
   createNotification,
-  mapPriorityForType,
 } from "@/lib/notifications/service";
 
 function getEnv(name: string) {
@@ -136,29 +133,10 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       .single();
 
     if (updatedPromise) {
-      const executorId = resolveExecutorId(updatedPromise);
-
-      if (executorId) {
-        await createNotification(admin, {
-          userId: executorId,
-          promiseId: updatedPromise.id,
-          type: "invite_followup",
-          role: "executor",
-          dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "executor"]),
-          ctaUrl: buildCtaUrl(updatedPromise.id),
-          priority: mapPriorityForType("invite_followup"),
-        });
+      const notifications = buildInviteAcceptedNotifications(updatedPromise);
+      for (const notification of notifications) {
+        await createNotification(admin, notification);
       }
-
-      await createNotification(admin, {
-        userId: updatedPromise.creator_id,
-        promiseId: updatedPromise.id,
-        type: "invite_followup",
-        role: "creator",
-        dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "creator"]),
-        ctaUrl: buildCtaUrl(updatedPromise.id),
-        priority: mapPriorityForType("invite_followup"),
-      });
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

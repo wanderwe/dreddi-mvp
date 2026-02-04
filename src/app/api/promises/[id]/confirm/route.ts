@@ -7,11 +7,8 @@ import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyRep
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import {
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
+import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
+import { createNotification } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -83,16 +80,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         due_at: updatedPromise.due_at,
         completed_at: updatedPromise.completed_at,
       });
-      await createNotification(admin, {
-        userId: finalExecutorId,
-        promiseId: updatedPromise.id,
-        type: "completion_followup",
-        role: "executor",
-        dedupeKey: buildDedupeKey(["completion_followup", updatedPromise.id]),
-        ctaUrl: `/promises/${updatedPromise.id}`,
-        priority: mapPriorityForType("completion_followup"),
-        delta,
-      });
+      await createNotification(
+        admin,
+        buildCompletionOutcomeNotification({
+          promiseId: updatedPromise.id,
+          executorId: finalExecutorId,
+          type: "completion_followup",
+          delta,
+        })
+      );
     }
 
     return NextResponse.json({ ok: true });
