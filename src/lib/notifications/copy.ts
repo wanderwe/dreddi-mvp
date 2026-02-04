@@ -23,22 +23,22 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     invite_declined: {
       title: "Invite declined",
-      body: "The deal invite was declined",
-      ctaLabel: "Open",
+      body: "The invite was declined. No action needed.",
+      ctaLabel: "",
     },
     invite_ignored: {
       title: "Invite awaiting response",
-      body: "The invite hasn’t received a response yet",
-      ctaLabel: "Open",
+      body: "The invite still has no response. No action needed.",
+      ctaLabel: "",
     },
     due_soon: {
       title: "Deadline approaching",
-      body: "Time is running out on a confirmed agreement",
+      body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
       ctaLabel: "View",
     },
     overdue: {
       title: "Agreement is overdue",
-      body: "Update the status or mark it completed",
+      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done.",
       ctaLabel: "Open",
     },
     completion_waiting: {
@@ -48,7 +48,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Outcome confirmed",
-      body: "Reputation updated",
+      body: "Why now: the other party confirmed completion. Review the outcome details.",
       ctaLabel: "View",
     },
     dispute: {
@@ -70,22 +70,22 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     invite_declined: {
       title: "Запрошення відхилено",
-      body: "Запрошення до угоди було відхилено",
-      ctaLabel: "Відкрити",
+      body: "Запрошення було відхилено. Дій не потрібно.",
+      ctaLabel: "",
     },
     invite_ignored: {
       title: "Запрошення без відповіді",
-      body: "Запрошення до угоди ще без відповіді",
-      ctaLabel: "Відкрити",
+      body: "Запрошення досі без відповіді. Дій не потрібно.",
+      ctaLabel: "",
     },
     due_soon: {
       title: "Наближається дедлайн",
-      body: "Час спливає для підтвердженої домовленості",
+      body: "Причина: дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
       ctaLabel: "Переглянути",
     },
     overdue: {
       title: "Дедлайн минув",
-      body: "Оновіть статус або позначте виконаною",
+      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено.",
       ctaLabel: "Відкрити",
     },
     completion_waiting: {
@@ -95,7 +95,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Результат підтверджено",
-      body: "Репутацію оновлено",
+      body: "Причина: інша сторона підтвердила виконання. Перегляньте деталі результату.",
       ctaLabel: "Переглянути",
     },
     dispute: {

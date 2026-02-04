@@ -20,8 +20,8 @@ const fallbackDealByLocale: Record<NotificationLocale, string> = {
 };
 
 const ctaLabelByLocale: Record<NotificationLocale, string> = {
-  en: "Open deal",
-  uk: "Відкрити угоду",
+  en: "",
+  uk: "",
 };
 
 const titleByLocale: Record<NotificationLocale, Record<InviteResponseType, string>> = {
@@ -59,11 +59,11 @@ export const getInviteResponseCopy = ({
   const body =
     response === "declined"
       ? locale === "uk"
-        ? `${actor} відхилив(ла) запрошення до угоди: ${deal}`
-        : `${actor} declined the invite to the deal: ${deal}`
+        ? `${actor} відхилив(ла) запрошення до угоди: ${deal}. Дій не потрібно.`
+        : `${actor} declined the invite to the deal: ${deal}. No action needed.`
       : locale === "uk"
-        ? `${actor} поки що не відповів(ла) на запрошення до угоди: ${deal}`
-        : `${actor} hasn't responded to the invite yet: ${deal}`;
+        ? `${actor} поки що не відповів(ла) на запрошення до угоди: ${deal}. Дій не потрібно.`
+        : `${actor} hasn't responded to the invite yet: ${deal}. No action needed.`;
 
   return {
     title: titleByLocale[locale][response],
