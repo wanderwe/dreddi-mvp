@@ -123,7 +123,7 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
-  const isBeta = process.env.NEXT_PUBLIC_BETA === "true";
+  const isBeta = process.env.NEXT_PUBLIC_BETA !== "false";
   const demoDealsSource: DemoDealSource[] = useMemo(
     () => [
       {
