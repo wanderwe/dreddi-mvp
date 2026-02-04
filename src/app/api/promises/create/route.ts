@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const counterpartyContact = body?.counterpartyContact?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
-    const promiseMode = normalizePromiseMode(body?.promiseMode ?? body?.promiseType);
+    const promiseMode = normalizePromiseMode(body?.promiseMode);
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
