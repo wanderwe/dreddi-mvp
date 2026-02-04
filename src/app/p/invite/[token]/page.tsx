@@ -11,7 +11,7 @@ import {
   isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
-import { getPromiseLabels } from "@/lib/promiseLabels";
+import { getPromiseLabels, type PromiseMode } from "@/lib/promiseLabels";
 
 type InviteInfo = {
   id: string;
@@ -20,11 +20,7 @@ type InviteInfo = {
   condition_text: string | null;
   condition_met_at: string | null;
   due_at: string | null;
-  promise_mode: "deal" | "request" | "assignment" | null;
-  reward_amount: number | null;
-  reward_currency: string | null;
-  reward_text: string | null;
-  payment_terms: string | null;
+  promise_mode: PromiseMode | null;
   creator_handle: string | null;
   creator_display_name: string | null;
   creator_id: string;
@@ -378,32 +374,6 @@ export default function InvitePage() {
                     </p>
                   </div>
                 )}
-                {promiseLabels.type === "request" &&
-                  (info.reward_amount || info.reward_text || info.payment_terms) && (
-                    <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
-                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                        {t("invite.rewardLabel")}
-                      </p>
-                      {info.reward_amount && info.reward_currency ? (
-                        <p className="mt-1 font-semibold text-white">
-                          {`${info.reward_amount} ${info.reward_currency}`}
-                        </p>
-                      ) : !info.reward_text ? (
-                        <p className="mt-1 font-semibold text-white">{t("invite.rewardUnset")}</p>
-                      ) : null}
-                      {info.reward_text && (
-                        <p className="mt-2 whitespace-pre-wrap text-slate-200">
-                          {info.reward_text}
-                        </p>
-                      )}
-                      <p className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-400">
-                        {t("invite.paymentTermsLabel")}
-                      </p>
-                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-200">
-                        {info.payment_terms ?? t("invite.paymentTermsUnset")}
-                      </p>
-                    </div>
-                  )}
               </div>
             </div>
 

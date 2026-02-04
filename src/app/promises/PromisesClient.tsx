@@ -19,7 +19,7 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
-import { normalizePromiseMode, type PromiseMode } from "@/lib/promiseLabels";
+import type { PromiseMode } from "@/lib/promiseLabels";
 
 type PromiseRow = {
   id: string;
@@ -80,8 +80,7 @@ const PAGE_SIZE = 12;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
-  const promiseMode = normalizePromiseMode(row.promise_mode);
-  const isReviewer = promiseMode === "request" ? row.creator_id === userId : executorId !== userId;
+  const isReviewer = Boolean(executorId && executorId !== userId);
   const role: PromiseRole =
     executorId && executorId === userId ? "promisor" : "counterparty";
   return {

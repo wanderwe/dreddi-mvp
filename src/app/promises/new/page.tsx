@@ -21,7 +21,7 @@ import {
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { getPromiseLabels, type PromiseMode } from "@/lib/promiseLabels";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 
 export default function NewPromisePage() {
   const t = useT();
@@ -29,14 +29,7 @@ export default function NewPromisePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
-  const [conditionText, setConditionText] = useState("");
-  const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
-  const [promiseMode, setPromiseMode] = useState<PromiseMode>("deal");
-  const [rewardAmount, setRewardAmount] = useState("");
-  const [rewardCurrency, setRewardCurrency] = useState("UAH");
-  const [rewardText, setRewardText] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -50,25 +43,11 @@ export default function NewPromisePage() {
     width: number;
     placement: "top" | "bottom";
   } | null>(null);
-  const [executor, setExecutor] = useState<"me" | "other">("me");
+  const executor: "me" | "other" = "me";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [isPublicProfile, setIsPublicProfile] = useState(false);
-  const [isPublicDeal, setIsPublicDeal] = useState(false);
-  const shouldShowCondition = showCondition || conditionText.trim().length > 0;
-  const promiseLabels = useMemo(() => getPromiseLabels(t, promiseMode), [promiseMode, t]);
-
-  useEffect(() => {
-    if (promiseMode === "request") {
-      setIsPublicDeal(false);
-    }
-  }, [promiseMode]);
-
-  const handleRemoveCondition = () => {
-    setConditionText("");
-    setShowCondition(false);
-  };
+  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -120,8 +99,6 @@ export default function NewPromisePage() {
     { label: "18:00", hour: 18, minute: 0 },
     { label: "23:59", hour: 23, minute: 59 },
   ];
-  const currencyOptions = ["UAH", "USD", "EUR"];
-
   const timeOptions = useMemo(() => {
     const options: Array<{ label: string; hour: number; minute: number }> = [];
     for (let hour = 0; hour < 24; hour += 1) {
@@ -408,14 +385,7 @@ export default function NewPromisePage() {
         return;
       }
 
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("is_public_profile")
-        .eq("id", sessionData.session.user.id)
-        .maybeSingle();
-
       if (!active) return;
-      setIsPublicProfile(profileData?.is_public_profile ?? true);
     };
 
     void ensureSession();
@@ -424,12 +394,6 @@ export default function NewPromisePage() {
       active = false;
     };
   }, [router]);
-
-  useEffect(() => {
-    if (!isPublicProfile) {
-      setIsPublicDeal(false);
-    }
-  }, [isPublicProfile]);
 
   async function createPromise() {
     setBusy(true);
@@ -463,35 +427,13 @@ export default function NewPromisePage() {
       return;
     }
 
-    const rewardAmountValue = rewardAmount.trim()
-      ? Number.parseFloat(rewardAmount.replace(",", "."))
-      : null;
-    if (promiseMode === "request" && rewardAmountValue !== null && Number.isNaN(rewardAmountValue)) {
-      setBusy(false);
-      setError(t("promises.new.errors.rewardAmountInvalid"));
-      return;
-    }
-
-    if (promiseMode === "request" && rewardAmountValue !== null && !rewardCurrency.trim()) {
-      setBusy(false);
-      setError(t("promises.new.errors.rewardCurrencyRequired"));
-      return;
-    }
-
-    const shouldRequestPublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
       details: details.trim() || null,
-      conditionText: conditionText.trim() || null,
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
-      visibility: promiseMode === "request" ? "private" : shouldRequestPublic ? "public" : "private",
-      promiseMode,
-      rewardAmount: promiseMode === "request" ? rewardAmountValue : null,
-      rewardCurrency: promiseMode === "request" ? rewardCurrency.trim() : null,
-      rewardText: promiseMode === "request" ? rewardText.trim() || null : null,
-      paymentTerms: promiseMode === "request" ? paymentTerms.trim() || null : null,
+      visibility: "private",
     };
 
     let res: Response;
@@ -562,65 +504,6 @@ export default function NewPromisePage() {
           </div>
 
           <div className="grid items-start gap-4 sm:grid-cols-2">
-            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.type")}
-              </span>
-              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setPromiseMode("deal")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseMode === "deal"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
-                  {t("promises.new.type.deal")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPromiseMode("request")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseMode === "request"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
-                  {t("promises.new.type.request")}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
-              </span>
-              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setExecutor("me")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    executor === "me"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
-                  {t("promises.new.executor.me")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setExecutor("other")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    executor === "other"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
-                  {t("promises.new.executor.other")}
-                </button>
-              </div>
-            </div>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -644,122 +527,25 @@ export default function NewPromisePage() {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
-              {!shouldShowCondition && (
-                <div className="flex pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowCondition(true)}
-                    className="inline-flex cursor-pointer items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
-                  >
-                    {t("promises.new.actions.addCondition")}
-                  </button>
-                </div>
-              )}
             </label>
-
-            {shouldShowCondition && (
-              <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                  {t("promises.new.fields.condition")}
-                </span>
-                <textarea
-                  className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                  placeholder={t("promises.new.placeholders.condition")}
-                  value={conditionText}
-                  onChange={(e) => setConditionText(e.target.value)}
-                />
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleRemoveCondition}
-                    className="cursor-pointer text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
-                  >
-                    {t("promises.new.actions.removeCondition")}
-                  </button>
-                </div>
-              </label>
-            )}
-
-            {promiseMode === "request" && (
-              <div className="space-y-4 text-sm text-slate-200 sm:col-span-2">
-                <div className="space-y-2">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.reward")}
-                  </span>
-                  <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
-                    <input
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                      inputMode="decimal"
-                      placeholder={t("promises.new.placeholders.rewardAmount")}
-                      value={rewardAmount}
-                      onChange={(e) => setRewardAmount(e.target.value)}
-                    />
-                    <select
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                      value={rewardCurrency}
-                      onChange={(e) => setRewardCurrency(e.target.value)}
-                    >
-                      {currencyOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {t("promises.new.fields.rewardHelper")}
-                  </div>
-                </div>
-
-                <label className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.rewardText")}
-                  </span>
-                  <textarea
-                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                    placeholder={t("promises.new.placeholders.rewardText")}
-                    value={rewardText}
-                    onChange={(e) => setRewardText(e.target.value)}
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.paymentTerms")}
-                  </span>
-                  <textarea
-                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                    placeholder={t("promises.new.placeholders.paymentTerms")}
-                    value={paymentTerms}
-                    onChange={(e) => setPaymentTerms(e.target.value)}
-                  />
-                </label>
-              </div>
-            )}
 
             <div className="sm:col-span-2">
               <div className="grid items-start gap-4 sm:grid-cols-2">
-                {executor && (
-                  <div className="text-sm text-slate-200">
-                    <label className="space-y-2 text-sm text-slate-200">
-                      <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                        {t("promises.new.fields.counterparty")}
-                      </span>
-                      <input
-                        id="counterparty"
-                        aria-describedby="counterparty-helper"
-                        className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                        placeholder={
-                          executor === "me"
-                            ? t("promises.new.placeholders.counterpartyMe")
-                            : t("promises.new.placeholders.counterpartyOther")
-                        }
-                        value={counterparty}
-                        onChange={(e) => setCounterparty(e.target.value)}
-                      />
-                    </label>
-                  </div>
-                )}
+                <div className="text-sm text-slate-200">
+                  <label className="space-y-2 text-sm text-slate-200">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.fields.counterparty")}
+                    </span>
+                    <input
+                      id="counterparty"
+                      aria-describedby="counterparty-helper"
+                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      placeholder={t("promises.new.placeholders.counterpartyMe")}
+                      value={counterparty}
+                      onChange={(e) => setCounterparty(e.target.value)}
+                    />
+                  </label>
+                </div>
 
                 <div className="space-y-2 text-sm text-slate-200">
                   <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -811,59 +597,18 @@ export default function NewPromisePage() {
                     </div>
                   )}
                 </div>
+              </div>
             </div>
 
-            {executor && (
-              <p
-                id="counterparty-helper"
-                className="mt-2 text-sm leading-relaxed text-slate-400"
-              >
-                {t("promises.new.fields.counterpartyHelper", {
-                  entityLower: promiseLabels.entityLower,
-                  executorRole: promiseLabels.executorRole,
-                })}
-              </p>
-            )}
-
-            {isPublicProfile && promiseMode === "deal" && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="text-sm font-semibold text-white">
-                      {t("promises.new.publicRequest.label", {
-                        publicEntity: promiseLabels.publicEntity,
-                      })}
-                    </div>
-                    <p className="text-xs text-slate-400">
-                      {t("promises.new.publicRequest.helper", {
-                        entityPlural: promiseLabels.entityPlural,
-                      })}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={isPublicDeal}
-                    aria-label={t("promises.new.publicRequest.label", {
-                      publicEntity: promiseLabels.publicEntity,
-                    })}
-                    onClick={() => setIsPublicDeal((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
-                      isPublicDeal
-                        ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                        : "border-white/20 bg-white/10 hover:bg-white/20"
-                    } hover:border-emerald-300/60`}
-                  >
-                    <span
-                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        isPublicDeal ? "translate-x-5" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+            <p
+              id="counterparty-helper"
+              className="mt-2 text-sm leading-relaxed text-slate-400"
+            >
+              {t("promises.new.fields.counterpartyHelper", {
+                entityLower: promiseLabels.entityLower,
+                executorRole: promiseLabels.executorRole,
+              })}
+            </p>
           </div>
 
           <div className="space-y-3">

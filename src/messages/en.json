@@ -87,23 +87,23 @@
   "promises": {
     "entity": {
       "deal": "Deal",
-      "request": "Request"
+      "request": "Deal"
     },
     "entityLower": {
       "deal": "deal",
-      "request": "request"
+      "request": "deal"
     },
     "entityPublic": {
       "deal": "Public Deal",
-      "request": "Public Request"
+      "request": "Public Deal"
     },
     "entityNew": {
       "deal": "New deal",
-      "request": "New request"
+      "request": "New deal"
     },
     "entityPlural": {
       "deal": "deals",
-      "request": "requests"
+      "request": "deals"
     },
     "roles": {
       "deal": {
@@ -112,9 +112,9 @@
         "executor": "Executor"
       },
       "request": {
-        "creator": "Requester",
-        "creatorLabel": "Requester",
-        "executor": "Fulfiller"
+        "creator": "Creator",
+        "creatorLabel": "Created by",
+        "executor": "Executor"
       }
     },
     "overview": {
@@ -149,10 +149,10 @@
       "awaitingInviteAcceptance": "Pending acceptance"
     },
     "confirmModal": {
-      "title": "Request confirmation?",
+      "title": "Confirm completion?",
       "body": "You’re asking the other side to confirm you delivered this {entityLower}",
       "cancel": "Not yet",
-      "confirm": "Yes, request confirmation"
+      "confirm": "Yes, confirm completion"
     },
     "list": {
       "tabs": {
@@ -197,7 +197,7 @@
       "statusActions": "Status actions",
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
-      "shareInvite": "Share the invite and wait for acceptance to request confirmation",
+      "shareInvite": "Share the invite and wait for acceptance before confirming",
       "reviewConfirm": "Review & confirm",
       "awaitingExecutor": "Waiting for the {executorRole} to mark this complete",
       "waitingReview": "Waiting for the other side to review",
@@ -311,7 +311,7 @@
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
         "counterparty": "Other side",
-        "counterpartyHelper": "A {entityLower} takes effect after the {executorRole} accepts",
+        "counterpartyHelper": "A {entityLower} takes effect after the other side accepts",
         "dueDate": "Due date",
         "dueTime": "Due time",
         "reward": "Reward (optional)",
@@ -321,7 +321,7 @@
       },
       "type": {
         "deal": "Deal",
-        "request": "Request"
+        "request": "Deal"
       },
       "executor": {
         "me": "Me",

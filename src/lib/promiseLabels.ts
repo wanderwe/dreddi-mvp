@@ -1,9 +1,8 @@
 import type { TFunction } from "@/lib/i18n/t";
 
-export type PromiseMode = "deal" | "request";
+export type PromiseMode = "deal";
 
 export const normalizePromiseMode = (value?: string | null): PromiseMode => {
-  if (value === "request" || value === "assignment") return "request";
   return "deal";
 };
 
