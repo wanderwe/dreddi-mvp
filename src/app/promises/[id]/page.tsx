@@ -493,6 +493,10 @@ export default function PromisePage() {
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
+  const hasStatusActions = Boolean(
+    (isExecutor && p?.status === "active" && isInviteAccepted) ||
+      (canReview && p?.status === "completed_by_promisor")
+  );
   const showPublicStatus = p?.visibility === "public";
   const publicStatusText = showPublicStatus
     ? t("promises.detail.publicStatus.public", { publicEntity: promiseLabels.publicEntity })
@@ -633,36 +637,38 @@ export default function PromisePage() {
             </div>
           </Card>
 
-          <Card title={t("promises.detail.statusActions")}>
-            <div className="space-y-3">
-              {isExecutor && p.status === "active" && (
-                isInviteAccepted ? (
-                  <ActionButton
-                    label={t("promises.detail.markCompleted")}
-                    variant="ok"
-                    loading={actionBusy === "complete"}
-                    disabled={actionBusy !== null}
-                    onClick={() => setShowConfirmModal(true)}
-                  />
-                ) : (
-                  <div className="text-sm text-neutral-400">
-                    {inviteStatus === "awaiting_acceptance"
-                      ? stripTrailingPeriod(t("promises.detail.shareInvite"))
-                      : t(`promises.inviteStatus.${inviteStatus}`)}
-                  </div>
-                )
-              )}
+          {hasStatusActions && (
+            <Card title={t("promises.detail.statusActions")}>
+              <div className="space-y-3">
+                {isExecutor && p.status === "active" && (
+                  isInviteAccepted ? (
+                    <ActionButton
+                      label={t("promises.detail.markCompleted")}
+                      variant="ok"
+                      loading={actionBusy === "complete"}
+                      disabled={actionBusy !== null}
+                      onClick={() => setShowConfirmModal(true)}
+                    />
+                  ) : (
+                    <div className="text-sm text-neutral-400">
+                      {inviteStatus === "awaiting_acceptance"
+                        ? stripTrailingPeriod(t("promises.detail.shareInvite"))
+                        : t(`promises.inviteStatus.${inviteStatus}`)}
+                    </div>
+                  )
+                )}
 
-              {canReview && p.status === "completed_by_promisor" && (
-                <Link
-                  href={`/promises/${p.id}/confirm`}
-                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                >
-                  {t("promises.detail.reviewConfirm")}
-                </Link>
-              )}
-            </div>
-          </Card>
+                {canReview && p.status === "completed_by_promisor" && (
+                  <Link
+                    href={`/promises/${p.id}/confirm`}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                  >
+                    {t("promises.detail.reviewConfirm")}
+                  </Link>
+                )}
+              </div>
+            </Card>
+          )}
 
           {shouldShowInviteBlock && (
             <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
