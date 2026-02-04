@@ -21,6 +21,7 @@ import {
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { getPromiseLabels, type PromiseType } from "@/lib/promiseLabels";
 
 export default function NewPromisePage() {
   const t = useT();
@@ -31,6 +32,11 @@ export default function NewPromisePage() {
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
+  const [promiseType, setPromiseType] = useState<PromiseType>("deal");
+  const [rewardAmount, setRewardAmount] = useState("");
+  const [rewardCurrency, setRewardCurrency] = useState("UAH");
+  const [rewardText, setRewardText] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -51,6 +57,7 @@ export default function NewPromisePage() {
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
+  const promiseLabels = useMemo(() => getPromiseLabels(t, promiseType), [promiseType, t]);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -107,6 +114,7 @@ export default function NewPromisePage() {
     { label: "18:00", hour: 18, minute: 0 },
     { label: "23:59", hour: 23, minute: 59 },
   ];
+  const currencyOptions = ["UAH", "USD", "EUR"];
 
   const timeOptions = useMemo(() => {
     const options: Array<{ label: string; hour: number; minute: number }> = [];
@@ -449,6 +457,21 @@ export default function NewPromisePage() {
       return;
     }
 
+    const rewardAmountValue = rewardAmount.trim()
+      ? Number.parseFloat(rewardAmount.replace(",", "."))
+      : null;
+    if (promiseType === "assignment" && rewardAmountValue !== null && Number.isNaN(rewardAmountValue)) {
+      setBusy(false);
+      setError(t("promises.new.errors.rewardAmountInvalid"));
+      return;
+    }
+
+    if (promiseType === "assignment" && rewardAmountValue !== null && !rewardCurrency.trim()) {
+      setBusy(false);
+      setError(t("promises.new.errors.rewardCurrencyRequired"));
+      return;
+    }
+
     const shouldRequestPublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
@@ -458,6 +481,11 @@ export default function NewPromisePage() {
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldRequestPublic ? "public" : "private",
+      promiseType,
+      rewardAmount: promiseType === "assignment" ? rewardAmountValue : null,
+      rewardCurrency: promiseType === "assignment" ? rewardCurrency.trim() : null,
+      rewardText: promiseType === "assignment" ? rewardText.trim() || null : null,
+      paymentTerms: promiseType === "assignment" ? paymentTerms.trim() || null : null,
     };
 
     let res: Response;
@@ -488,14 +516,16 @@ export default function NewPromisePage() {
         setError("Session expired. Please sign in again to create this deal.");
         return;
       }
-      setError(body.error ?? t("promises.new.errors.createFailed"));
+      setError(
+        body.error ?? t("promises.new.errors.createFailed", { entityLower: promiseLabels.entityLower })
+      );
       return;
     }
 
     const body = (await res.json().catch(() => null)) as { id?: string } | null;
 
     if (!body?.id) {
-      setError(t("promises.new.errors.createFailed"));
+      setError(t("promises.new.errors.createFailed", { entityLower: promiseLabels.entityLower }));
       return;
     }
 
@@ -514,19 +544,51 @@ export default function NewPromisePage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.eyebrow")}
+                {t("promises.new.eyebrow", { newEntity: promiseLabels.newEntity })}
               </p>
               <h1 className="text-3xl font-semibold text-white sm:text-4xl">
-                {t("promises.new.title")}
+                {t("promises.new.title", { entityLower: promiseLabels.entityLower })}
               </h1>
-              <p className="text-sm text-slate-300">{t("promises.new.subtitle")}</p>
+              <p className="text-sm text-slate-300">
+                {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
+              </p>
             </div>
           </div>
 
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.executor")}
+                {t("promises.new.fields.type")}
+              </span>
+              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
+                <button
+                  type="button"
+                  onClick={() => setPromiseType("deal")}
+                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    promiseType === "deal"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
+                  }`}
+                >
+                  {t("promises.new.type.deal")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPromiseType("assignment")}
+                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    promiseType === "assignment"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
+                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
+                  }`}
+                >
+                  {t("promises.new.type.assignment")}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
@@ -560,7 +622,7 @@ export default function NewPromisePage() {
               </span>
               <input
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                placeholder={t("promises.new.placeholders.title")}
+                placeholder={t("promises.new.placeholders.title", { entityLower: promiseLabels.entityLower })}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -610,6 +672,63 @@ export default function NewPromisePage() {
                   </button>
                 </div>
               </label>
+            )}
+
+            {promiseType === "assignment" && (
+              <div className="space-y-4 text-sm text-slate-200 sm:col-span-2">
+                <div className="space-y-2">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.fields.reward")}
+                  </span>
+                  <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
+                    <input
+                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      inputMode="decimal"
+                      placeholder={t("promises.new.placeholders.rewardAmount")}
+                      value={rewardAmount}
+                      onChange={(e) => setRewardAmount(e.target.value)}
+                    />
+                    <select
+                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      value={rewardCurrency}
+                      onChange={(e) => setRewardCurrency(e.target.value)}
+                    >
+                      {currencyOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {t("promises.new.fields.rewardHelper")}
+                  </div>
+                </div>
+
+                <label className="space-y-2 text-sm text-slate-200">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.fields.rewardText")}
+                  </span>
+                  <textarea
+                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                    placeholder={t("promises.new.placeholders.rewardText")}
+                    value={rewardText}
+                    onChange={(e) => setRewardText(e.target.value)}
+                  />
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-200">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.fields.paymentTerms")}
+                  </span>
+                  <textarea
+                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                    placeholder={t("promises.new.placeholders.paymentTerms")}
+                    value={paymentTerms}
+                    onChange={(e) => setPaymentTerms(e.target.value)}
+                  />
+                </label>
+              </div>
             )}
 
             <div className="sm:col-span-2">
@@ -693,7 +812,10 @@ export default function NewPromisePage() {
                 id="counterparty-helper"
                 className="mt-2 text-sm leading-relaxed text-slate-400"
               >
-                {t("promises.new.fields.counterpartyHelper")}
+                {t("promises.new.fields.counterpartyHelper", {
+                  entityLower: promiseLabels.entityLower,
+                  executorRole: promiseLabels.executorRole,
+                })}
               </p>
             )}
 
@@ -702,17 +824,23 @@ export default function NewPromisePage() {
                 <div className="flex items-center gap-3">
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm font-semibold text-white">
-                      {t("promises.new.publicRequest.label")}
+                      {t("promises.new.publicRequest.label", {
+                        publicEntity: promiseLabels.publicEntity,
+                      })}
                     </div>
                     <p className="text-xs text-slate-400">
-                      {t("promises.new.publicRequest.helper")}
+                      {t("promises.new.publicRequest.helper", {
+                        entityPlural: promiseLabels.entityPlural,
+                      })}
                     </p>
                   </div>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={isPublicDeal}
-                    aria-label={t("promises.new.publicRequest.label")}
+                    aria-label={t("promises.new.publicRequest.label", {
+                      publicEntity: promiseLabels.publicEntity,
+                    })}
                     onClick={() => setIsPublicDeal((prev) => !prev)}
                     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
                       isPublicDeal
@@ -738,7 +866,9 @@ export default function NewPromisePage() {
               disabled={busy || !title.trim() || !counterparty.trim()}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
-              {busy ? t("promises.new.creating") : t("promises.new.submit")}
+              {busy
+                ? t("promises.new.creating", { entityLower: promiseLabels.entityLower })
+                : t("promises.new.submit", { entityLower: promiseLabels.entityLower })}
             </button>
 
             {error && (

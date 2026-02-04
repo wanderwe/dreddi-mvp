@@ -11,6 +11,7 @@ import {
   isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 
 type InviteInfo = {
   id: string;
@@ -19,6 +20,11 @@ type InviteInfo = {
   condition_text: string | null;
   condition_met_at: string | null;
   due_at: string | null;
+  promise_type: "deal" | "assignment" | null;
+  reward_amount: number | null;
+  reward_currency: string | null;
+  reward_text: string | null;
+  payment_terms: string | null;
   creator_handle: string | null;
   creator_display_name: string | null;
   creator_id: string;
@@ -50,6 +56,10 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const promiseLabels = useMemo(
+    () => getPromiseLabels(t, info?.promise_type),
+    [info?.promise_type, t]
+  );
 
   async function load() {
     if (!token) return;
@@ -272,10 +282,10 @@ export default function InvitePage() {
         <div className="space-y-3">
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
           <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            {t("invite.title")}
+            {t("invite.title", { entity: promiseLabels.entity })}
           </h1>
           <p className="max-w-2xl text-base text-slate-200">
-            {t("invite.subtitle")}
+            {t("invite.subtitle", { entityLower: promiseLabels.entityLower })}
           </p>
         </div>
 
@@ -304,14 +314,18 @@ export default function InvitePage() {
             )}
             {info.visibility === "public" && (
               <div className="mb-4 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-                <p className="font-semibold">{t("invite.publicProposal.title")}</p>
-                <p className="mt-1 text-xs text-amber-100/80">{t("invite.publicProposal.body")}</p>
+                <p className="font-semibold">
+                  {t("invite.publicProposal.title", { entityLower: promiseLabels.entityLower })}
+                </p>
+                <p className="mt-1 text-xs text-amber-100/80">
+                  {t("invite.publicProposal.body", { entityLower: promiseLabels.entityLower })}
+                </p>
               </div>
             )}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  {t("invite.badge")}
+                  {t("invite.badge", { entity: promiseLabels.entity })}
                 </div>
 
                 {/* What exactly you accept */}
@@ -324,7 +338,7 @@ export default function InvitePage() {
                 )}
 
                 <p className="text-sm text-slate-300">
-                  {t("invite.createdBy", { name: creatorName })}
+                  {t("invite.createdBy", { creatorLabel: promiseLabels.creatorLabel, name: creatorName })}
                 </p>
               </div>
 
@@ -364,6 +378,32 @@ export default function InvitePage() {
                     </p>
                   </div>
                 )}
+                {promiseLabels.type === "assignment" &&
+                  (info.reward_amount || info.reward_text || info.payment_terms) && (
+                    <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
+                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                        {t("invite.rewardLabel")}
+                      </p>
+                      {info.reward_amount && info.reward_currency ? (
+                        <p className="mt-1 font-semibold text-white">
+                          {`${info.reward_amount} ${info.reward_currency}`}
+                        </p>
+                      ) : !info.reward_text ? (
+                        <p className="mt-1 font-semibold text-white">{t("invite.rewardUnset")}</p>
+                      ) : null}
+                      {info.reward_text && (
+                        <p className="mt-2 whitespace-pre-wrap text-slate-200">
+                          {info.reward_text}
+                        </p>
+                      )}
+                      <p className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-400">
+                        {t("invite.paymentTermsLabel")}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-200">
+                        {info.payment_terms ?? t("invite.paymentTermsUnset")}
+                      </p>
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -375,10 +415,10 @@ export default function InvitePage() {
                 </p>
                 <p className="text-sm text-slate-300">
                   {inviteStatus === "accepted"
-                    ? t("invite.statusAcceptedBody")
+                    ? t("invite.statusAcceptedBody", { entityLower: promiseLabels.entityLower })
                     : inviteStatus === "awaiting_acceptance"
-                    ? t("invite.statusAwaitingBody")
-                    : t("invite.statusClosedBody")}
+                    ? t("invite.statusAwaitingBody", { entityLower: promiseLabels.entityLower })
+                    : t("invite.statusClosedBody", { entityLower: promiseLabels.entityLower })}
                 </p>
               </div>
 
@@ -396,7 +436,7 @@ export default function InvitePage() {
                 ) : (
                   <>
                     <p className="mt-2 text-xs text-slate-400">
-                      {t("invite.nextStepHint")}
+                      {t("invite.nextStepHint", { entityLower: promiseLabels.entityLower })}
                     </p>
                     {canAccept ? (
                       <div className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -411,7 +451,9 @@ export default function InvitePage() {
                           }}
                           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                         >
-                          {busy ? t("invite.processing") : t("invite.accept")}
+                          {busy
+                            ? t("invite.processing")
+                            : t("invite.accept", { entityLower: promiseLabels.entityLower })}
                         </button>
                         {canDecline && (
                           <button
@@ -440,10 +482,10 @@ export default function InvitePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-white">
-              {t("invite.publicModal.title")}
+              {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
             </h2>
             <p className="mt-3 text-sm text-neutral-200">
-              {t("invite.publicModal.body")}
+              {t("invite.publicModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">

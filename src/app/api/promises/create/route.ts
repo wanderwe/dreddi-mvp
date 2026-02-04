@@ -8,6 +8,7 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
+import { normalizePromiseType } from "@/lib/promiseLabels";
 
 type CreatePromisePayload = {
   title?: string;
@@ -17,6 +18,11 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
+  promiseType?: "deal" | "assignment";
+  rewardAmount?: number | string | null;
+  rewardCurrency?: string | null;
+  rewardText?: string | null;
+  paymentTerms?: string | null;
 };
 
 export async function POST(req: Request) {
@@ -30,6 +36,7 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const counterpartyContact = body?.counterpartyContact?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
+    const promiseType = normalizePromiseType(body?.promiseType);
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -41,6 +48,28 @@ export async function POST(req: Request) {
 
     const dueAt = body?.dueAt ? new Date(body.dueAt) : null;
     const dueAtIso = dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt.toISOString() : null;
+    const rewardAmountInput = body?.rewardAmount ?? null;
+    const rewardAmount =
+      rewardAmountInput === null || rewardAmountInput === undefined || rewardAmountInput === ""
+        ? null
+        : typeof rewardAmountInput === "number"
+          ? rewardAmountInput
+          : Number.parseFloat(String(rewardAmountInput));
+    const rewardCurrency =
+      rewardAmount !== null ? body?.rewardCurrency?.trim()?.toUpperCase() || null : null;
+    const rewardText = body?.rewardText?.trim() || null;
+    const paymentTerms = body?.paymentTerms?.trim() || null;
+
+    if (rewardAmount !== null && Number.isNaN(rewardAmount)) {
+      return NextResponse.json({ error: "Reward amount must be a number" }, { status: 400 });
+    }
+
+    if (promiseType === "assignment" && rewardAmount !== null && !rewardCurrency) {
+      return NextResponse.json(
+        { error: "Reward currency is required when reward amount is set" },
+        { status: 400 }
+      );
+    }
 
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -84,6 +113,11 @@ export async function POST(req: Request) {
       declined_at: null,
       ignored_at: null,
       visibility,
+      promise_type: promiseType,
+      reward_amount: promiseType === "assignment" ? rewardAmount : null,
+      reward_currency: promiseType === "assignment" ? rewardCurrency : null,
+      reward_text: promiseType === "assignment" ? rewardText : null,
+      payment_terms: promiseType === "assignment" ? paymentTerms : null,
     };
 
     const { data: insertData, error: insertError } = await admin
