@@ -105,6 +105,17 @@ export async function createNotification(
   request: NotificationRequest,
   now = new Date()
 ): Promise<NotificationOutcome> {
+  const logSkipped = (skippedReason: string): NotificationOutcome => {
+    console.info("[notifications] skipped", {
+      userId: request.userId,
+      promiseId: request.promiseId,
+      type: request.type,
+      dedupeKey: request.dedupeKey,
+      skippedReason,
+    });
+    return { created: false, skippedReason };
+  };
+
   const settings = await getUserNotificationSettings(admin, request.userId);
   const normalizedType = normalizeNotificationType(request.type);
 
@@ -116,11 +127,11 @@ export async function createNotification(
     .maybeSingle();
 
   if (existing?.id) {
-    return { created: false, skippedReason: "dedupe" };
+    return logSkipped("dedupe");
   }
 
   if (request.requiresDeadlineReminder && !settings.deadlineRemindersEnabled) {
-    return { created: false, skippedReason: "deadline_reminders_disabled" };
+    return logSkipped("deadline_reminders_disabled");
   }
 
   const lastDealNotification = await fetchLastDealNotificationTime(
@@ -130,14 +141,14 @@ export async function createNotification(
   );
 
   if (isPerDealCapExceeded(lastDealNotification, now, request.type)) {
-    return { created: false, skippedReason: "per_deal_cap" };
+    return logSkipped("per_deal_cap");
   }
 
   const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const count = await countNotificationsSince(admin, request.userId, cutoff);
 
   if (isDailyCapExceeded(count, request.type)) {
-    return { created: false, skippedReason: "daily_cap" };
+    return logSkipped("daily_cap");
   }
 
   const quietHours = isWithinQuietHours(now, {
@@ -164,7 +175,7 @@ export async function createNotification(
   });
 
   if (error) {
-    return { created: false, skippedReason: error.message };
+    return logSkipped(error.message);
   }
 
   if (deliverNow) {
