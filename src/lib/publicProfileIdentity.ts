@@ -9,6 +9,7 @@ type PublicProfileIdentityInput = {
 type PublicProfileIdentity = {
   title: string;
   subtitle?: string;
+  maskedEmail?: string;
 };
 
 const normalizeValue = (value?: string | null) => value?.trim() ?? "";
@@ -21,41 +22,30 @@ export const getPublicProfileIdentity = ({
   const normalizedDisplayName = normalizeValue(displayName);
   const normalizedHandle = normalizeValue(handle);
   const normalizedEmail = normalizeValue(email);
-  const fallbackEmail =
-    normalizedEmail || (normalizedDisplayName.includes("@") ? normalizedDisplayName : "");
+  const displayNameLooksLikeEmail = normalizedDisplayName.includes("@");
+  const fallbackEmail = normalizedEmail || (displayNameLooksLikeEmail ? normalizedDisplayName : "");
   const maskedEmail = fallbackEmail ? maskEmail(fallbackEmail) : "";
-  const displayNameIsEmail =
-    normalizedDisplayName &&
-    fallbackEmail &&
-    normalizedDisplayName.toLowerCase() === fallbackEmail.toLowerCase();
+  const cleanedDisplayName = displayNameLooksLikeEmail ? "" : normalizedDisplayName;
 
   let title = "";
   let subtitle: string | undefined;
-  let source: "displayName" | "handle" | "email" = "email";
 
-  if (normalizedDisplayName && displayNameIsEmail && maskedEmail) {
-    title = maskedEmail;
-    source = "displayName";
-  } else if (normalizedDisplayName) {
-    title = normalizedDisplayName;
-    source = "displayName";
-  } else if (normalizedHandle) {
+  if (normalizedHandle) {
     title = `@${normalizedHandle}`;
-    source = "handle";
+    subtitle = cleanedDisplayName || undefined;
+  } else if (cleanedDisplayName) {
+    title = cleanedDisplayName;
   } else if (maskedEmail) {
     title = maskedEmail;
-    source = "email";
   }
 
-  if (source === "displayName") {
-    subtitle = normalizedHandle ? `@${normalizedHandle}` : maskedEmail || undefined;
-  } else if (source === "handle") {
-    subtitle = maskedEmail || undefined;
+  if (!subtitle && !normalizedHandle && maskedEmail && title !== maskedEmail) {
+    subtitle = maskedEmail;
   }
 
   if (subtitle && subtitle === title) {
     subtitle = undefined;
   }
 
-  return { title, subtitle };
+  return { title, subtitle, maskedEmail: maskedEmail || undefined };
 };
