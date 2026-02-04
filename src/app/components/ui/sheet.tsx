@@ -25,6 +25,12 @@ type SheetProps = {
 };
 
 export function Sheet({ open, onOpenChange, children }: SheetProps) {
+  const bodyStylesRef = React.useRef<{
+    overflow: string;
+    paddingRight: string;
+    scrollbarGutter: string;
+  } | null>(null);
+
   React.useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -35,6 +41,50 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onOpenChange]);
+
+  React.useEffect(() => {
+    if (!open) {
+      if (bodyStylesRef.current) {
+        document.body.style.overflow = bodyStylesRef.current.overflow;
+        document.body.style.paddingRight = bodyStylesRef.current.paddingRight;
+        document.body.style.setProperty(
+          "scrollbar-gutter",
+          bodyStylesRef.current.scrollbarGutter,
+        );
+        bodyStylesRef.current = null;
+      }
+      return;
+    }
+
+    if (!bodyStylesRef.current) {
+      bodyStylesRef.current = {
+        overflow: document.body.style.overflow,
+        paddingRight: document.body.style.paddingRight,
+        scrollbarGutter: document.body.style.getPropertyValue("scrollbar-gutter"),
+      };
+    }
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const existingPadding = Number.parseFloat(document.body.style.paddingRight) || 0;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.setProperty("scrollbar-gutter", "stable");
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${existingPadding + scrollbarWidth}px`;
+    }
+
+    return () => {
+      if (bodyStylesRef.current) {
+        document.body.style.overflow = bodyStylesRef.current.overflow;
+        document.body.style.paddingRight = bodyStylesRef.current.paddingRight;
+        document.body.style.setProperty(
+          "scrollbar-gutter",
+          bodyStylesRef.current.scrollbarGutter,
+        );
+        bodyStylesRef.current = null;
+      }
+    };
+  }, [open]);
 
   return (
     <SheetContext.Provider value={{ open, setOpen: onOpenChange }}>
