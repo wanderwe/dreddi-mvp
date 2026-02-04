@@ -510,12 +510,12 @@
       },
       "due_soon": {
         "title": "Deadline approaching",
-        "description": "Time is running out on a confirmed deal",
+        "description": "Why now: the due date is within 24 hours. Check the deal details and plan completion.",
         "cta": "View"
       },
       "overdue": {
         "title": "Deal is overdue",
-        "description": "Update the status or mark it completed",
+        "description": "Why now: the due date has passed. Review the deal and mark it completed if it’s done.",
         "cta": "Open"
       },
       "completion_waiting": {
@@ -525,7 +525,7 @@
       },
       "completion_followup": {
         "title": "Outcome confirmed",
-        "description": "Reputation updated",
+        "description": "Why now: the other party confirmed completion. Review the outcome details.",
         "cta": "View"
       },
       "dispute": {
