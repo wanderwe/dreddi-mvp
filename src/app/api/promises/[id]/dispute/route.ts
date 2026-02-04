@@ -17,6 +17,7 @@ import {
   mapPriorityForType,
 } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
+import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -106,6 +107,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         ctaUrl: `/promises/${updatedPromise.id}`,
         priority: mapPriorityForType("dispute"),
         delta,
+      });
+    } else {
+      logMissingNotificationRecipient({
+        promiseId: updatedPromise.id,
+        creatorId: updatedPromise.creator_id,
+        promisorId: updatedPromise.promisor_id,
+        promiseeId: updatedPromise.promisee_id,
+        counterpartyId: updatedPromise.counterparty_id,
+        flowName: "dispute_created",
+        recipientRole: "executor",
       });
     }
 

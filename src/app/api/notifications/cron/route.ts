@@ -11,6 +11,7 @@ import {
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { getInviteResponseCopy, resolveInviteActorName } from "@/lib/notifications/inviteResponses";
+import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
 const HOURS_72 = 72 * 60 * 60 * 1000;
@@ -207,7 +208,18 @@ export async function POST(req: Request) {
     const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
     const executorId = resolveExecutorId(row);
-    if (!executorId) continue;
+    if (!executorId) {
+      logMissingNotificationRecipient({
+        promiseId: row.id,
+        creatorId: row.creator_id,
+        promisorId: row.promisor_id,
+        promiseeId: row.promisee_id,
+        counterpartyId: row.counterparty_id,
+        flowName: "due_soon_cron",
+        recipientRole: "executor",
+      });
+      continue;
+    }
 
     const created = await createNotification(admin, {
       userId: executorId,
@@ -243,7 +255,18 @@ export async function POST(req: Request) {
   for (const row of overdueRows ?? []) {
     if (!row.due_at || !isPromiseAccepted(row)) continue;
     const executorId = resolveExecutorId(row);
-    if (!executorId) continue;
+    if (!executorId) {
+      logMissingNotificationRecipient({
+        promiseId: row.id,
+        creatorId: row.creator_id,
+        promisorId: row.promisor_id,
+        promiseeId: row.promisee_id,
+        counterpartyId: row.counterparty_id,
+        flowName: "overdue_cron",
+        recipientRole: "executor",
+      });
+      continue;
+    }
     const state = getNotificationState(row.promise_notification_state);
 
     const lastOverdue = state.overdue_notified_at ? new Date(state.overdue_notified_at) : null;

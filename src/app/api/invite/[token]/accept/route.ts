@@ -7,6 +7,7 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
+import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -147,6 +148,16 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
           dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "executor"]),
           ctaUrl: buildCtaUrl(updatedPromise.id),
           priority: mapPriorityForType("invite_followup"),
+        });
+      } else {
+        logMissingNotificationRecipient({
+          promiseId: updatedPromise.id,
+          creatorId: updatedPromise.creator_id,
+          promisorId: updatedPromise.promisor_id,
+          promiseeId: updatedPromise.promisee_id,
+          counterpartyId: updatedPromise.counterparty_id,
+          flowName: "invite_accepted",
+          recipientRole: "executor",
         });
       }
 
