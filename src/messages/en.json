@@ -50,6 +50,16 @@
     "viewPublicProfile": "View",
     "copyLink": "Copy link",
     "copySuccess": "Copied",
+    "identityLabel": "Public identity",
+    "identityDescription": "Choose how your name appears on public profiles",
+    "displayNameLabel": "Display name (public)",
+    "displayNamePlaceholder": "Add a display name",
+    "displayNameHelper": "2–40 characters. Leave blank to show your handle.",
+    "handleLabel": "Username/handle (public)",
+    "handlePlaceholder": "your-handle",
+    "handleHelper": "Shown as @handle. Must be unique.",
+    "displayNameError": "Display name must be 2–40 characters.",
+    "handleError": "Handle is required.",
     "status": {
       "public": "Public",
       "private": "Private"
@@ -59,7 +69,9 @@
       "unavailable": "Authentication is unavailable in this preview",
       "notAuthenticated": "Not authenticated",
       "copyFailed": "Failed to copy link",
-      "saveFailed": "Failed to update profile"
+      "saveFailed": "Failed to update profile",
+      "displayNameLength": "Display name must be 2–40 characters",
+      "handleRequired": "Handle is required"
     },
     "notificationsLabel": "Notifications",
     "notificationsDescription": "Control when we send reminders and alerts",

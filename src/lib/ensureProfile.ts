@@ -8,7 +8,7 @@ export async function upsertProfile(user: { id: string; email?: string | null })
   const { error } = await supabase.from("profiles").upsert({
     id: user.id,
     email: user.email ?? null,
-    display_name: user.email ?? "User",
+    display_name: null,
     handle,
     avatar_url: null,
   });
