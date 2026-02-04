@@ -430,9 +430,6 @@ export default function PublicProfilePage() {
                   <h2 className="text-lg font-semibold">
                     {t("publicProfile.reputationDetails.title")}
                   </h2>
-                  <p className="text-xs text-white/60">
-                    {t("publicProfile.reputationDetails.subtitle")}
-                  </p>
                 </div>
                 <span
                   className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
