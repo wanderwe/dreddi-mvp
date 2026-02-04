@@ -148,8 +148,8 @@
     },
     "status": {
       "active": "Активна",
-      "pendingConfirmation": "Очікує підтвердження",
-      "waitingConfirmation": "Очікує підтвердження",
+      "pendingConfirmation": "На підтвердженні",
+      "waitingConfirmation": "На підтвердженні",
       "confirmed": "Підтверджено",
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",

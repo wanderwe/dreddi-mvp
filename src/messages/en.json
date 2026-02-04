@@ -140,8 +140,8 @@
     },
     "status": {
       "active": "Active",
-      "pendingConfirmation": "Pending confirmation",
-      "waitingConfirmation": "Waiting for confirmation",
+      "pendingConfirmation": "Awaiting confirmation",
+      "waitingConfirmation": "Awaiting confirmation",
       "confirmed": "Confirmed",
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
