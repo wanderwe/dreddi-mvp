@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { stripTrailingPeriod } from "../src/lib/text";
+import { maskEmail, stripTrailingPeriod } from "../src/lib/text";
 
 describe("stripTrailingPeriod", () => {
   it("removes a trailing period for single-sentence copy", () => {
@@ -20,5 +20,15 @@ describe("stripTrailingPeriod", () => {
   it("keeps ellipses and other punctuation", () => {
     assert.equal(stripTrailingPeriod("Processing..."), "Processing...");
     assert.equal(stripTrailingPeriod("Ready to go!"), "Ready to go!");
+  });
+});
+
+describe("maskEmail", () => {
+  it("masks the local part and keeps the domain", () => {
+    assert.equal(maskEmail("allison@gmail.com"), "all***@gmail.com");
+  });
+
+  it("handles short local parts", () => {
+    assert.equal(maskEmail("al@domain.com"), "al***@domain.com");
   });
 });
