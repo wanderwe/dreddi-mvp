@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeLocale } from "@/lib/i18n/locales";
 import {
   CRITICAL_NOTIFICATION_TYPES,
+  CAP_BYPASS_NOTIFICATION_TYPES,
   DAILY_NOTIFICATION_CAP,
   isDailyCapExceeded,
   isPerDealCapExceeded,
@@ -45,6 +46,16 @@ const defaultSettings: NotificationSettings = {
   quietHoursEnd: "09:00",
 };
 
+const logNotificationSkip = (request: NotificationRequest, skippedReason: string) => {
+  console.info("[notifications] skipped", {
+    userId: request.userId,
+    promiseId: request.promiseId,
+    type: normalizeNotificationType(request.type),
+    dedupeKey: request.dedupeKey,
+    skippedReason,
+  });
+};
+
 export async function getUserNotificationSettings(
   admin: SupabaseClient,
   userId: string
@@ -80,19 +91,22 @@ async function countNotificationsSince(
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId)
     .gte("created_at", sinceIso);
+
   return count ?? 0;
 }
 
 async function fetchLastDealNotificationTime(
   admin: SupabaseClient,
   userId: string,
-  promiseId: string
+  promiseId: string,
+  type: NotificationType
 ) {
   const { data } = await admin
     .from("notifications")
     .select("created_at")
     .eq("user_id", userId)
     .eq("promise_id", promiseId)
+    .eq("type", type)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -105,14 +119,8 @@ export async function createNotification(
   request: NotificationRequest,
   now = new Date()
 ): Promise<NotificationOutcome> {
-  const logSkipped = (skippedReason: string): NotificationOutcome => {
-    console.info("[notifications] skipped", {
-      userId: request.userId,
-      promiseId: request.promiseId,
-      type: request.type,
-      dedupeKey: request.dedupeKey,
-      skippedReason,
-    });
+  const skip = (skippedReason: string): NotificationOutcome => {
+    logNotificationSkip(request, skippedReason);
     return { created: false, skippedReason };
   };
 
@@ -127,28 +135,29 @@ export async function createNotification(
     .maybeSingle();
 
   if (existing?.id) {
-    return logSkipped("dedupe");
+    return skip("dedupe");
   }
 
   if (request.requiresDeadlineReminder && !settings.deadlineRemindersEnabled) {
-    return logSkipped("deadline_reminders_disabled");
+    return skip("deadline_reminders_disabled");
   }
 
   const lastDealNotification = await fetchLastDealNotificationTime(
     admin,
     request.userId,
-    request.promiseId
+    request.promiseId,
+    normalizedType
   );
 
   if (isPerDealCapExceeded(lastDealNotification, now, request.type)) {
-    return logSkipped("per_deal_cap");
+    return skip("per_deal_cap");
   }
 
   const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const count = await countNotificationsSince(admin, request.userId, cutoff);
 
   if (isDailyCapExceeded(count, request.type)) {
-    return logSkipped("daily_cap");
+    return skip("daily_cap");
   }
 
   const quietHours = isWithinQuietHours(now, {
@@ -157,7 +166,7 @@ export async function createNotification(
     end: settings.quietHoursEnd,
   });
 
-  const deliverNow =
+  const shouldSendPush =
     settings.pushEnabled &&
     (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
 
@@ -170,15 +179,15 @@ export async function createNotification(
     cta_label: request.ctaLabel ?? null,
     cta_url: request.ctaUrl,
     priority: request.priority,
-    delivered_at: deliverNow ? now.toISOString() : null,
+    delivered_at: shouldSendPush ? now.toISOString() : null,
     dedupe_key: request.dedupeKey,
   });
 
   if (error) {
-    return logSkipped(error.message);
+    return skip(error.message);
   }
 
-  if (deliverNow) {
+  if (shouldSendPush) {
     await sendPush({
       userId: request.userId,
       type: normalizedType,
@@ -189,7 +198,11 @@ export async function createNotification(
   return { created: true };
 }
 
-export async function sendPush(payload: { userId: string; type: NotificationType; ctaUrl: string }) {
+export async function sendPush(payload: {
+  userId: string;
+  type: NotificationType;
+  ctaUrl: string;
+}) {
   if (process.env.NODE_ENV !== "production") {
     console.info("[notifications] push stub", payload);
   }
@@ -217,6 +230,6 @@ export const mapPriorityForType = (type: NotificationType): NotificationPriority
 };
 
 export const shouldBypassDailyCap = (type: NotificationType) =>
-  CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
+  CAP_BYPASS_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
 
 export const getDailyCap = () => DAILY_NOTIFICATION_CAP;

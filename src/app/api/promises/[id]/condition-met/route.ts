@@ -16,6 +16,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const counterpartyId = resolveCounterpartyId(promise);
     const executorId = resolveExecutorId(promise);
+    if (!executorId || !counterpartyId) {
+      console.warn("[promises] missing participant id for condition met", {
+        promiseId: id,
+        executorId,
+        counterpartyId,
+        userId: user.id,
+      });
+    }
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json(
         { error: "Only the other side can mark the condition" },

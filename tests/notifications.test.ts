@@ -54,6 +54,7 @@ describe("notification policy", () => {
     assert.equal(isDailyCapExceeded(3, "invite"), true);
     assert.equal(isDailyCapExceeded(2, "invite"), false);
     assert.equal(isDailyCapExceeded(10, "completion_waiting"), false);
+    assert.equal(isDailyCapExceeded(10, "overdue"), false);
   });
 
   it("enforces per-deal cap for non-critical types", () => {

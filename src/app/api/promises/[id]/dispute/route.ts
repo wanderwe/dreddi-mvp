@@ -14,6 +14,7 @@ import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
 import { createNotification } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
+import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -35,6 +36,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
+    if (!executorId || !counterpartyId) {
+      console.warn("[promises] missing participant id for dispute", {
+        promiseId: id,
+        executorId,
+        counterpartyId,
+        userId: user.id,
+      });
+    }
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json({ error: "Only the other side can dispute" }, { status: 403 });
     }
@@ -88,12 +97,23 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const finalExecutorId = resolveExecutorId(updatedPromise);
-    if (finalExecutorId) {
-      const delta = calc_score_impact({
-        status: updatedPromise.status,
-        due_at: updatedPromise.due_at,
-        completed_at: updatedPromise.completed_at,
+    const delta = calc_score_impact({
+      status: updatedPromise.status,
+      due_at: updatedPromise.due_at,
+      completed_at: updatedPromise.completed_at,
+    });
+
+    if (!finalExecutorId) {
+      logMissingNotificationRecipient({
+        promiseId: updatedPromise.id,
+        creatorId: updatedPromise.creator_id,
+        promisorId: updatedPromise.promisor_id,
+        promiseeId: updatedPromise.promisee_id,
+        counterpartyId: updatedPromise.counterparty_id,
+        flowName: "dispute_created",
+        recipientRole: "executor",
       });
+    } else {
       await createNotification(
         admin,
         buildCompletionOutcomeNotification({
