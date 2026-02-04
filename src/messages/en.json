@@ -23,8 +23,7 @@
     },
     "betaBanner": {
       "title": "🧪 Dreddi beta",
-      "body": "Deals and data created during beta testing will likely not be carried over to the final version",
-      "dismissLabel": "Dismiss beta notice"
+      "body": "Deals and data created during beta testing will likely not be carried over to the final version"
     },
     "demoDeals": {
       "deal1": {
