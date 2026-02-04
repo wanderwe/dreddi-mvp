@@ -244,16 +244,32 @@ export default function PublicProfilesDirectoryPage() {
           <label htmlFor="public-profile-search" className="sr-only">
             {t("publicDirectory.searchLabel")}
           </label>
-          <input
-            id="public-profile-search"
-            type="search"
-            value={searchTerm}
-            onChange={(event) => {
-              setSearchTerm(event.target.value);
-            }}
-            placeholder={t("publicDirectory.searchPlaceholder")}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-          />
+          <div className="relative">
+            <input
+              id="public-profile-search"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+              }}
+              placeholder={t("publicDirectory.searchPlaceholder")}
+              className="public-profile-search w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+            />
+            {searchTerm ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm("");
+                }}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full p-1.5 text-white/50 transition hover:bg-white/10 hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] cursor-pointer"
+              >
+                <span aria-hidden="true" className="text-lg leading-none">
+                  ×
+                </span>
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {loading ? (
