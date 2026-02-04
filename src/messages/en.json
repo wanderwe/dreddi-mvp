@@ -60,10 +60,6 @@
     "handleHelper": "Unique identifier used in links and search.\nMay be change-limited or fixed depending on current logic.",
     "displayNameError": "Display name must be 2–40 characters.",
     "handleError": "Handle is required.",
-    "status": {
-      "public": "ON",
-      "private": "OFF"
-    },
     "loading": "Loading profile…",
     "errors": {
       "unavailable": "Authentication is unavailable in this preview",

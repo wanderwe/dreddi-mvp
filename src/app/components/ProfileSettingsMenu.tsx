@@ -488,18 +488,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     </button>
                   }
                   right={
-                    <div className="flex flex-col items-end gap-2">
-                      <span
-                        className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                          isPublic
-                            ? "border-emerald-300/40 bg-emerald-400/10 text-emerald-200"
-                            : "border-white/15 bg-white/5 text-slate-300"
-                        }`}
-                      >
-                        {isPublic
-                          ? t("profileSettings.status.public")
-                          : t("profileSettings.status.private")}
-                      </span>
+                    <div className="flex items-center">
                       <button
                         type="button"
                         role="switch"
