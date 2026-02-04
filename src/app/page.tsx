@@ -111,7 +111,6 @@ export default function Home() {
   const locale = useLocale();
   const t = useT();
   const copy = useMemo(() => getLandingCopy(locale), [locale]);
-  const betaBannerStorageKey = "dreddi-beta-banner-dismissed-v1";
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
@@ -120,9 +119,9 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
-  const [betaBannerDismissed, setBetaBannerDismissed] = useState<boolean | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
+  const isBeta = process.env.NEXT_PUBLIC_BETA === "true";
   const demoDealsSource: DemoDealSource[] = useMemo(
     () => [
       {
@@ -370,16 +369,6 @@ export default function Home() {
     };
   }, [email, mockMode]);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setBetaBannerDismissed(null);
-      return;
-    }
-
-    const storedDismissed = localStorage.getItem(betaBannerStorageKey);
-    setBetaBannerDismissed(storedDismissed === "1");
-  }, [betaBannerStorageKey, isAuthenticated]);
-
   const rep = reputation?.reputation;
   const score = rep?.score ?? 50;
   const confirmedCount = rep?.confirmed_count ?? 0;
@@ -410,39 +399,14 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      {isAuthenticated && betaBannerDismissed === false ? (
+      {isBeta ? (
         <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
           <div className="rounded-2xl border border-amber-300/25 bg-gradient-to-r from-amber-500/15 via-slate-900/20 to-rose-500/10 px-4 py-2 text-sm text-slate-50 shadow-[0_8px_24px_rgba(5,15,20,0.35)] backdrop-blur">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.5)]" aria-hidden />
-                <p className="text-sm text-slate-100/80">
-                  {t("landing.betaBanner.body")}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white/5 text-slate-100/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/60"
-                aria-label={t("landing.betaBanner.dismissLabel")}
-                onClick={() => {
-                  localStorage.setItem(betaBannerStorageKey, "1");
-                  setBetaBannerDismissed(true);
-                }}
-              >
-                <svg
-                  aria-hidden
-                  className="h-3.5 w-3.5"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                >
-                  <path
-                    d="M3 3l6 6M9 3L3 9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+            <div className="flex items-center gap-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.5)]" aria-hidden />
+              <p className="text-sm text-slate-100/80">
+                {t("landing.betaBanner.body")}
+              </p>
             </div>
           </div>
         </div>
