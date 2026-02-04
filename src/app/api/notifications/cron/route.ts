@@ -98,10 +98,19 @@ export async function POST(req: Request) {
   };
 
   const skipReasonCounts: Record<string, number> = {};
+  const missingRecipientCounts: Record<string, number> = {};
 
   const trackSkip = (reason?: string) => {
     if (!reason) return;
     skipReasonCounts[reason] = (skipReasonCounts[reason] ?? 0) + 1;
+  };
+
+  const trackMissingRecipient = (
+    context: Parameters<typeof logMissingNotificationRecipient>[0]
+  ) => {
+    logMissingNotificationRecipient(context);
+    const key = `${context.flowName}:${context.recipientRole}`;
+    missingRecipientCounts[key] = (missingRecipientCounts[key] ?? 0) + 1;
   };
 
   // --- 1) auto-ignore stale invites (and decline promise) ---
@@ -186,7 +195,7 @@ export async function POST(req: Request) {
     const state = getNotificationState(row.promise_notification_state);
 
     if (!row.counterparty_id) {
-      logMissingNotificationRecipient({
+      trackMissingRecipient({
         promiseId: row.id,
         creatorId: row.creator_id,
         promisorId: row.promisor_id,
@@ -245,7 +254,7 @@ export async function POST(req: Request) {
 
     const executorId = resolveExecutorId(row);
     if (!executorId) {
-      logMissingNotificationRecipient({
+      trackMissingRecipient({
         promiseId: row.id,
         creatorId: row.creator_id,
         promisorId: row.promisor_id,
@@ -294,7 +303,7 @@ export async function POST(req: Request) {
 
     const executorId = resolveExecutorId(row);
     if (!executorId) {
-      logMissingNotificationRecipient({
+      trackMissingRecipient({
         promiseId: row.id,
         creatorId: row.creator_id,
         promisorId: row.promisor_id,
@@ -423,7 +432,11 @@ export async function POST(req: Request) {
     processed,
     created: results,
     skipped: skipReasonCounts,
+    missingRecipients: missingRecipientCounts,
   });
 
-  return NextResponse.json({ ok: true, results }, { status: 200 });
+  return NextResponse.json(
+    { ok: true, results, processed, skipped: skipReasonCounts, missingRecipients: missingRecipientCounts },
+    { status: 200 }
+  );
 }
