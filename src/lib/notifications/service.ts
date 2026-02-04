@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeLocale } from "@/lib/i18n/locales";
 import {
   CRITICAL_NOTIFICATION_TYPES,
+  CAP_BYPASS_NOTIFICATION_TYPES,
   DAILY_NOTIFICATION_CAP,
   isDailyCapExceeded,
   isPerDealCapExceeded,
@@ -86,13 +87,15 @@ async function countNotificationsSince(
 async function fetchLastDealNotificationTime(
   admin: SupabaseClient,
   userId: string,
-  promiseId: string
+  promiseId: string,
+  type: NotificationType
 ) {
   const { data } = await admin
     .from("notifications")
     .select("created_at")
     .eq("user_id", userId)
     .eq("promise_id", promiseId)
+    .eq("type", type)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -126,7 +129,8 @@ export async function createNotification(
   const lastDealNotification = await fetchLastDealNotificationTime(
     admin,
     request.userId,
-    request.promiseId
+    request.promiseId,
+    normalizedType
   );
 
   if (isPerDealCapExceeded(lastDealNotification, now, request.type)) {
@@ -206,6 +210,6 @@ export const mapPriorityForType = (type: NotificationType): NotificationPriority
 };
 
 export const shouldBypassDailyCap = (type: NotificationType) =>
-  CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
+  CAP_BYPASS_NOTIFICATION_TYPES.includes(normalizeNotificationType(type));
 
 export const getDailyCap = () => DAILY_NOTIFICATION_CAP;
