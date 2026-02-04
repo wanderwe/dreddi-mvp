@@ -138,9 +138,13 @@
     },
     "empty": {
       "title": "Поки що порожньо",
-      "promisorDescription": "Ви ще не створили або не прийняли жодної угоди",
-      "counterpartyDescription": "Ще немає угод для вас. Прийміть посилання-запрошення, щоб почати.",
-      "cta": "Створити угоду"
+      "globalDescription": "У вас ще немає угод",
+      "filteredTitle": "Немає угод за цим фільтром",
+      "filteredDescription": "Спробуйте інший фільтр, щоб побачити угоди",
+      "awaitingYourActionTitle": "Усе під контролем",
+      "awaitingYourActionDescription": "Зараз немає угод, що очікують ваших дій",
+      "cta": "Створити угоду",
+      "showAll": "Показати всі угоди"
     },
     "status": {
       "active": "Активна",
