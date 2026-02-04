@@ -98,9 +98,13 @@
     },
     "empty": {
       "title": "Nothing here yet",
-      "promisorDescription": "You haven’t created or accepted any deals yet",
-      "counterpartyDescription": "No deals have been created for you yet. Accept an invite link to get started.",
-      "cta": "Create deal"
+      "globalDescription": "You don’t have any deals yet",
+      "filteredTitle": "No deals match this filter",
+      "filteredDescription": "Try a different filter to see your deals",
+      "awaitingYourActionTitle": "You’re all caught up",
+      "awaitingYourActionDescription": "There are no deals waiting for your action right now",
+      "cta": "Create deal",
+      "showAll": "Show all deals"
     },
     "status": {
       "active": "Active",

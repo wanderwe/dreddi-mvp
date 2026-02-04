@@ -336,6 +336,23 @@ export default function PromisesClient() {
   );
 
   const rows = filteredListRowsByTab[tab];
+  const totalPromises = summaryRows.length;
+  const isListEmpty = !listLoading && rows.length === 0;
+  const isGlobalEmpty = isListEmpty && totalPromises === 0;
+  const isAwaitingMyActionEmpty =
+    isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
+  const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
+  const showAllAction = isListEmpty && totalPromises > 0 && activeMetricFilter !== "total";
+  const emptyTitle = isGlobalEmpty
+    ? t("promises.empty.title")
+    : isAwaitingMyActionEmpty
+      ? t("promises.empty.awaitingYourActionTitle")
+      : t("promises.empty.filteredTitle");
+  const emptyDescription = isGlobalEmpty
+    ? t("promises.empty.globalDescription")
+    : isAwaitingMyActionEmpty
+      ? t("promises.empty.awaitingYourActionDescription")
+      : t("promises.empty.filteredDescription");
 
   const overview = useMemo(() => {
     const total = summaryRows.length;
@@ -620,22 +637,31 @@ export default function PromisesClient() {
                 );
               })}
 
-            {!listLoading && rows.length === 0 && (
+            {isListEmpty && (
               <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
-                <p className="text-lg font-semibold text-white">{t("promises.empty.title")}</p>
-                <p className="text-sm text-slate-400">
-                  {tab === "i-promised"
-                    ? t("promises.empty.promisorDescription")
-                    : t("promises.empty.counterpartyDescription")}
-                </p>
-                <div className="mt-4">
-                  <Link
-                    href="/promises/new"
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                  >
-                    {t("promises.empty.cta")}
-                  </Link>
-                </div>
+                <p className="text-lg font-semibold text-white">{emptyTitle}</p>
+                <p className="text-sm text-slate-400">{emptyDescription}</p>
+                {isGlobalEmpty && (
+                  <div className="mt-4">
+                    <Link
+                      href="/promises/new"
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                    >
+                      {t("promises.empty.cta")}
+                    </Link>
+                  </div>
+                )}
+                {isFilteredEmpty && showAllAction && (
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setActiveMetricFilter("total")}
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                    >
+                      {t("promises.empty.showAll")}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
