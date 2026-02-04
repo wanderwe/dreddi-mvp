@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { publicProfileDirectorySelect } from "@/lib/publicProfileQueries";
+import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 
 type PublicProfileDirectoryRow = {
   handle: string;
@@ -144,7 +145,12 @@ export default function PublicProfilesDirectoryPage() {
   const cards = useMemo(
     () =>
       profiles.map((profile) => {
-        const displayName = profile.display_name?.trim() || profile.handle;
+        const { title, subtitle } = getPublicProfileIdentity({
+          displayName: profile.display_name,
+          handle: profile.handle,
+          email: profile.email,
+        });
+        const avatarLabel = (title || profile.handle).replace(/^@/, "");
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
@@ -162,23 +168,18 @@ export default function PublicProfilesDirectoryPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={profile.avatar_url}
-                      alt={displayName}
+                      alt={title}
                       className="h-full w-full object-cover"
                     />
                   ) : (
                     <span className="text-lg font-semibold text-white/80">
-                      {displayName.slice(0, 1).toUpperCase()}
+                      {avatarLabel.slice(0, 1).toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-lg font-semibold text-white break-words">
-                    {displayName}
-                  </div>
-                  <div className="text-sm text-white/60 break-all">@{profile.handle}</div>
-                  {profile.email && (
-                    <div className="text-xs text-white/50 truncate">{profile.email}</div>
-                  )}
+                  <div className="text-lg font-semibold text-white truncate">{title}</div>
+                  {subtitle && <div className="text-sm text-white/60 truncate">{subtitle}</div>}
                 </div>
               </div>
               <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">

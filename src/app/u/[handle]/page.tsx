@@ -9,6 +9,7 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
+import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 
 type PublicProfileRow = {
   handle: string;
@@ -205,7 +206,16 @@ export default function PublicProfilePage() {
     }
   }, []);
 
-  const displayName = profile?.display_name?.trim() || profile?.handle || "";
+  const identity = useMemo(
+    () =>
+      getPublicProfileIdentity({
+        displayName: profile?.display_name,
+        handle: profile?.handle,
+      }),
+    [profile?.display_name, profile?.handle]
+  );
+  const displayName = identity.title || profile?.handle || "";
+  const avatarLabel = displayName.replace(/^@/, "");
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
@@ -359,13 +369,15 @@ export default function PublicProfilePage() {
                       />
                     ) : (
                       <span className="text-xl font-semibold text-white/80">
-                        {displayName.slice(0, 1).toUpperCase()}
+                        {avatarLabel.slice(0, 1).toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold break-words">{displayName}</h1>
-                    <p className="text-sm text-white/60 break-all">@{profile?.handle}</p>
+                    <h1 className="text-2xl font-semibold truncate">{displayName}</h1>
+                    {identity.subtitle && (
+                      <p className="text-sm text-white/60 truncate">{identity.subtitle}</p>
+                    )}
                   </div>
                 </div>
                 <button
