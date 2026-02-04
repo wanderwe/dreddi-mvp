@@ -57,7 +57,7 @@
     "displayNameHelper": "This name is shown in public profiles and deals.\nIf left blank, @handle will be shown.",
     "handleLabel": "Public handle (profile link)",
     "handlePlaceholder": "your-handle",
-    "handleHelper": "Unique identifier used in links and search.\nMay be change-limited or fixed depending on current logic.",
+    "handleHelper": "Unique identifier used in links and search.",
     "displayNameError": "Display name must be 2–40 characters.",
     "handleError": "Handle is required.",
     "loading": "Loading profile…",
