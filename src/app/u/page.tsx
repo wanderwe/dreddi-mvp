@@ -9,7 +9,6 @@ import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 
 type PublicProfileDirectoryRow = {
   handle: string;
-  email: string | null;
   display_name: string | null;
   avatar_url: string | null;
   reputation_score: number | null;
@@ -33,6 +32,7 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [canUseEmailSearch, setCanUseEmailSearch] = useState(false);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -43,6 +43,23 @@ export default function PublicProfilesDirectoryPage() {
       window.clearTimeout(handle);
     };
   }, [searchTerm]);
+
+  useEffect(() => {
+    let active = true;
+
+    const checkAuth = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      setCanUseEmailSearch(Boolean(data.session));
+    };
+
+    void checkAuth();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -70,7 +87,11 @@ export default function PublicProfilesDirectoryPage() {
 
       if (normalizedSearch) {
         const searchPattern = `%${normalizedSearch}%`;
-        query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+        const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+        if (canUseEmailSearch && normalizedSearch.includes("@")) {
+          filters.push(`email.eq.${normalizedSearch.toLowerCase()}`);
+        }
+        query = query.or(filters.join(","));
       }
 
       const { data, error: listError } = await query.range(0, pageSize);
@@ -96,7 +117,7 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [debouncedSearch, pageSize, t]);
+  }, [canUseEmailSearch, debouncedSearch, pageSize, t]);
 
   const loadMore = async () => {
     if (!supabase) {
@@ -121,7 +142,11 @@ export default function PublicProfilesDirectoryPage() {
 
     if (normalizedSearch) {
       const searchPattern = `%${normalizedSearch}%`;
-      query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+      const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+      if (canUseEmailSearch && normalizedSearch.includes("@")) {
+        filters.push(`email.eq.${normalizedSearch.toLowerCase()}`);
+      }
+      query = query.or(filters.join(","));
     }
 
     const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
@@ -145,12 +170,13 @@ export default function PublicProfilesDirectoryPage() {
   const cards = useMemo(
     () =>
       profiles.map((profile) => {
-        const { title, subtitle } = getPublicProfileIdentity({
+        const { title, subtitle, maskedEmail } = getPublicProfileIdentity({
           displayName: profile.display_name,
           handle: profile.handle,
-          email: profile.email,
         });
         const avatarLabel = (title || profile.handle).replace(/^@/, "");
+        const showMaskedEmail =
+          maskedEmail && maskedEmail !== title && maskedEmail !== subtitle ? maskedEmail : null;
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
@@ -180,6 +206,9 @@ export default function PublicProfilesDirectoryPage() {
                 <div className="min-w-0">
                   <div className="text-lg font-semibold text-white truncate">{title}</div>
                   {subtitle && <div className="text-sm text-white/60 truncate">{subtitle}</div>}
+                  {showMaskedEmail && (
+                    <div className="text-xs text-white/40 truncate">{showMaskedEmail}</div>
+                  )}
                 </div>
               </div>
               <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">

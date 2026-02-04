@@ -27,6 +27,7 @@ type ProfileState = {
   userId: string;
   email: string | null;
   handle: string | null;
+  displayName: string | null;
   isPublic: boolean;
   pushEnabled: boolean;
   deadlineRemindersEnabled: boolean;
@@ -47,6 +48,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [copied, setCopied] = useState(false);
   const [quietHoursStartInput, setQuietHoursStartInput] = useState("22:00");
   const [quietHoursEndInput, setQuietHoursEndInput] = useState("09:00");
+  const [displayNameInput, setDisplayNameInput] = useState("");
+  const [handleInput, setHandleInput] = useState("");
   const lastHandleRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -69,6 +72,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           userId: nextAuthState.user?.id ?? "mock-user",
           email: nextAuthState.user?.email ?? null,
           handle: profileSnapshot?.handle ?? "mock-user",
+          displayName: profileSnapshot?.displayName ?? null,
           isPublic: true,
           pushEnabled: true,
           deadlineRemindersEnabled: true,
@@ -105,7 +109,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const { data, error: profileError } = await supabase
         .from("profiles")
         .select(
-          "handle,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+          "handle,display_name,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
         )
         .eq("id", session.user.id)
         .single();
@@ -120,6 +124,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       const profileRow = data as {
         handle?: string | null;
+        display_name?: string | null;
         is_public_profile?: boolean | null;
         push_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
@@ -128,6 +133,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         quiet_hours_end?: string | null;
       } | null;
       const handle = profileRow?.handle ?? null;
+      const displayName = profileRow?.display_name ?? null;
       const isPublic = profileRow?.is_public_profile ?? true;
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
@@ -139,6 +145,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         userId: session.user.id,
         email: session.user.email ?? null,
         handle,
+        displayName,
         isPublic,
         pushEnabled,
         deadlineRemindersEnabled,
@@ -162,16 +169,22 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     }
   }, []);
 
+  const defaultHandle = useMemo(() => {
+    if (!profile) return "";
+    return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
+  }, [profile?.email, profile?.userId]);
+
+  useEffect(() => {
+    if (!profile) return;
+    setDisplayNameInput(profile.displayName ?? "");
+    setHandleInput(profile.handle ?? defaultHandle);
+  }, [defaultHandle, profile?.displayName, profile?.handle, profile]);
+
   useEffect(() => {
     if (!profile) return;
     setQuietHoursStartInput(profile.quietHoursStart);
     setQuietHoursEndInput(profile.quietHoursEnd);
   }, [profile?.quietHoursStart, profile?.quietHoursEnd, profile]);
-
-  const defaultHandle = useMemo(() => {
-    if (!profile) return "";
-    return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
-  }, [profile]);
 
   const isPublic = Boolean(profile?.isPublic);
   const publicProfilePath = useMemo(() => {
@@ -285,6 +298,37 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     (quietHoursStartInput !== profile.quietHoursStart ||
       quietHoursEndInput !== profile.quietHoursEnd);
   const quietHoursRangeDisabled = !profile?.quietHoursEnabled;
+  const normalizedDisplayName = displayNameInput.trim();
+  const nextDisplayName =
+    normalizedDisplayName.length > 0 ? normalizedDisplayName : null;
+  const displayNameTooShort =
+    nextDisplayName !== null && nextDisplayName.length < 2;
+  const displayNameTooLong = nextDisplayName !== null && nextDisplayName.length > 40;
+  const normalizedHandleInput = handleInput.trim().replace(/^@/, "");
+  const nextHandle = normalizedHandleInput ? normalizedHandleInput.toLowerCase() : null;
+  const handleMissing = !nextHandle;
+  const identityChanged =
+    !!profile &&
+    (nextDisplayName !== (profile.displayName ?? null) ||
+      nextHandle !== (profile.handle ?? null));
+  const identityDisabled =
+    loading || saving || !profile || !identityChanged || displayNameTooShort || displayNameTooLong || handleMissing;
+
+  const saveIdentity = async () => {
+    if (!profile) return;
+    if (displayNameTooShort || displayNameTooLong) {
+      setError(t("profileSettings.errors.displayNameLength"));
+      return;
+    }
+    if (handleMissing) {
+      setError(t("profileSettings.errors.handleRequired"));
+      return;
+    }
+    await updateProfileRow(
+      { display_name: nextDisplayName, handle: nextHandle },
+      { displayName: nextDisplayName, handle: nextHandle }
+    );
+  };
 
   return (
     <div className={className}>
@@ -359,6 +403,66 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
           )}
         </SettingRow>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+          <div className="space-y-1">
+            <div className="text-sm font-semibold text-white">
+              {t("profileSettings.identityLabel")}
+            </div>
+            <p className="text-xs text-slate-300">
+              {t("profileSettings.identityDescription")}
+            </p>
+          </div>
+          <div className="mt-4 space-y-3">
+            <label className="flex flex-col gap-2 text-xs text-slate-300">
+              <span>{t("profileSettings.displayNameLabel")}</span>
+              <input
+                type="text"
+                value={displayNameInput}
+                onChange={(event) => setDisplayNameInput(event.target.value)}
+                placeholder={t("profileSettings.displayNamePlaceholder")}
+                maxLength={40}
+                className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+              />
+              <span className="text-[11px] text-slate-500">
+                {t("profileSettings.displayNameHelper")}
+              </span>
+            </label>
+            <label className="flex flex-col gap-2 text-xs text-slate-300">
+              <span>{t("profileSettings.handleLabel")}</span>
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                <span className="text-slate-400">@</span>
+                <input
+                  type="text"
+                  value={handleInput}
+                  onChange={(event) => setHandleInput(event.target.value)}
+                  placeholder={t("profileSettings.handlePlaceholder")}
+                  className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                />
+              </div>
+              <span className="text-[11px] text-slate-500">
+                {t("profileSettings.handleHelper")}
+              </span>
+            </label>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[11px] text-slate-500">
+                {displayNameTooShort || displayNameTooLong
+                  ? t("profileSettings.displayNameError")
+                  : handleMissing
+                    ? t("profileSettings.handleError")
+                    : "\u00A0"}
+              </span>
+              <button
+                type="button"
+                onClick={saveIdentity}
+                disabled={identityDisabled}
+                className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {t("profileSettings.save")}
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
           <div className="space-y-1">
