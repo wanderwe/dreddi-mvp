@@ -163,7 +163,12 @@ export async function POST(req: Request) {
 
   for (const row of invites ?? []) {
     const state = getNotificationState(row.promise_notification_state);
-    if (!row.counterparty_id) continue;
+    if (!row.counterparty_id) {
+      console.warn("[notifications] missing counterparty_id for invite followup", {
+        promiseId: row.id,
+      });
+      continue;
+    }
     if (row.invite_status && row.invite_status !== "awaiting_acceptance") continue;
     if (!state.invite_notified_at || state.invite_followup_notified_at) continue;
 
@@ -207,7 +212,10 @@ export async function POST(req: Request) {
     const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
     const executorId = resolveExecutorId(row);
-    if (!executorId) continue;
+    if (!executorId) {
+      console.warn("[notifications] missing executor_id for due soon", { promiseId: row.id });
+      continue;
+    }
 
     const created = await createNotification(admin, {
       userId: executorId,
@@ -243,7 +251,10 @@ export async function POST(req: Request) {
   for (const row of overdueRows ?? []) {
     if (!row.due_at || !isPromiseAccepted(row)) continue;
     const executorId = resolveExecutorId(row);
-    if (!executorId) continue;
+    if (!executorId) {
+      console.warn("[notifications] missing executor_id for overdue", { promiseId: row.id });
+      continue;
+    }
     const state = getNotificationState(row.promise_notification_state);
 
     const lastOverdue = state.overdue_notified_at ? new Date(state.overdue_notified_at) : null;

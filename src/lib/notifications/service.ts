@@ -45,6 +45,16 @@ const defaultSettings: NotificationSettings = {
   quietHoursEnd: "09:00",
 };
 
+const logNotificationSkip = (request: NotificationRequest, skippedReason: string) => {
+  console.info("[notifications] skipped", {
+    userId: request.userId,
+    promiseId: request.promiseId,
+    type: request.type,
+    dedupeKey: request.dedupeKey,
+    skippedReason,
+  });
+};
+
 export async function getUserNotificationSettings(
   admin: SupabaseClient,
   userId: string
@@ -116,10 +126,12 @@ export async function createNotification(
     .maybeSingle();
 
   if (existing?.id) {
+    logNotificationSkip(request, "dedupe");
     return { created: false, skippedReason: "dedupe" };
   }
 
   if (request.requiresDeadlineReminder && !settings.deadlineRemindersEnabled) {
+    logNotificationSkip(request, "deadline_reminders_disabled");
     return { created: false, skippedReason: "deadline_reminders_disabled" };
   }
 
@@ -130,6 +142,7 @@ export async function createNotification(
   );
 
   if (isPerDealCapExceeded(lastDealNotification, now, request.type)) {
+    logNotificationSkip(request, "per_deal_cap");
     return { created: false, skippedReason: "per_deal_cap" };
   }
 
@@ -137,6 +150,7 @@ export async function createNotification(
   const count = await countNotificationsSince(admin, request.userId, cutoff);
 
   if (isDailyCapExceeded(count, request.type)) {
+    logNotificationSkip(request, "daily_cap");
     return { created: false, skippedReason: "daily_cap" };
   }
 
@@ -146,7 +160,7 @@ export async function createNotification(
     end: settings.quietHoursEnd,
   });
 
-  const deliverNow =
+  const shouldSendPush =
     settings.pushEnabled &&
     (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
 
@@ -159,15 +173,16 @@ export async function createNotification(
     cta_label: request.ctaLabel ?? null,
     cta_url: request.ctaUrl,
     priority: request.priority,
-    delivered_at: deliverNow ? now.toISOString() : null,
+    delivered_at: now.toISOString(),
     dedupe_key: request.dedupeKey,
   });
 
   if (error) {
+    logNotificationSkip(request, error.message);
     return { created: false, skippedReason: error.message };
   }
 
-  if (deliverNow) {
+  if (shouldSendPush) {
     await sendPush({
       userId: request.userId,
       type: normalizedType,
