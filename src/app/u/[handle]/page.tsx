@@ -214,8 +214,8 @@ export default function PublicProfilePage() {
       }),
     [profile?.display_name, profile?.handle]
   );
-  const displayName = identity.title || profile?.handle || "";
-  const avatarLabel = displayName.replace(/^@/, "");
+  const primaryLabel = identity.title || profile?.handle || "";
+  const avatarLabel = primaryLabel.replace(/^@/, "");
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
@@ -364,7 +364,7 @@ export default function PublicProfilePage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={profile.avatar_url}
-                        alt={displayName}
+                        alt={primaryLabel}
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -374,7 +374,7 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold truncate">{displayName}</h1>
+                    <h1 className="text-2xl font-semibold truncate">{primaryLabel}</h1>
                     {identity.subtitle && (
                       <p className="text-sm text-white/60 truncate">{identity.subtitle}</p>
                     )}

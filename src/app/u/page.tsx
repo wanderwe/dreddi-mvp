@@ -70,7 +70,9 @@ export default function PublicProfilesDirectoryPage() {
 
       if (normalizedSearch) {
         const searchPattern = `%${normalizedSearch}%`;
-        query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+        query = query.or(
+          `handle.ilike.${searchPattern},display_name.ilike.${searchPattern},email.ilike.${searchPattern}`
+        );
       }
 
       const { data, error: listError } = await query.range(0, pageSize);
@@ -121,7 +123,9 @@ export default function PublicProfilesDirectoryPage() {
 
     if (normalizedSearch) {
       const searchPattern = `%${normalizedSearch}%`;
-      query = query.or(`handle.ilike.${searchPattern},email.ilike.${searchPattern}`);
+      query = query.or(
+        `handle.ilike.${searchPattern},display_name.ilike.${searchPattern},email.ilike.${searchPattern}`
+      );
     }
 
     const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
@@ -145,12 +149,14 @@ export default function PublicProfilesDirectoryPage() {
   const cards = useMemo(
     () =>
       profiles.map((profile) => {
-        const { title, subtitle } = getPublicProfileIdentity({
+        const { title, subtitle, maskedEmail } = getPublicProfileIdentity({
           displayName: profile.display_name,
           handle: profile.handle,
           email: profile.email,
         });
         const avatarLabel = (title || profile.handle).replace(/^@/, "");
+        const showMaskedEmail =
+          maskedEmail && maskedEmail !== title && maskedEmail !== subtitle ? maskedEmail : null;
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
@@ -180,6 +186,9 @@ export default function PublicProfilesDirectoryPage() {
                 <div className="min-w-0">
                   <div className="text-lg font-semibold text-white truncate">{title}</div>
                   {subtitle && <div className="text-sm text-white/60 truncate">{subtitle}</div>}
+                  {showMaskedEmail && (
+                    <div className="text-xs text-white/40 truncate">{showMaskedEmail}</div>
+                  )}
                 </div>
               </div>
               <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">
