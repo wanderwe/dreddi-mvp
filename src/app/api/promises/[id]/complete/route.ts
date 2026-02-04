@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import {
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
+import { buildCompletionWaitingNotification } from "@/lib/notifications/flows";
+import { createNotification } from "@/lib/notifications/service";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 
@@ -73,15 +70,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       updated_at: nowIso,
     });
 
-    await createNotification(admin, {
-      userId: promise.creator_id,
-      promiseId: id,
-      type: "completion_waiting",
-      role: "creator",
-      dedupeKey: buildDedupeKey(["completion_waiting", id, nextCycle, "initial"]),
-      ctaUrl: `/promises/${id}/confirm`,
-      priority: mapPriorityForType("completion_waiting"),
-    });
+    await createNotification(
+      admin,
+      buildCompletionWaitingNotification({
+        promiseId: id,
+        creatorId: promise.creator_id,
+        cycleId: nextCycle,
+      })
+    );
 
     return NextResponse.json({ ok: true });
   } catch (e) {

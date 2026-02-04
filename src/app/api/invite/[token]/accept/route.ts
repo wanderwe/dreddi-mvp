@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
-import {
-  buildCtaUrl,
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
+import { buildInviteAcceptedNotifications } from "@/lib/notifications/flows";
+import { createNotification } from "@/lib/notifications/service";
 import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 function getEnv(name: string) {
@@ -60,7 +55,10 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       .maybeSingle();
 
     if (pErr) {
-      return NextResponse.json({ error: "Invite lookup failed", detail: pErr.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Invite lookup failed", detail: pErr.message },
+        { status: 500 }
+      );
     }
 
     if (!p) {
@@ -76,8 +74,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     // якщо вже прийнято
-    const alreadyAccepted =
-      p.invite_status === "accepted" || Boolean(p.counterparty_accepted_at);
+    const alreadyAccepted = p.invite_status === "accepted" || Boolean(p.counterparty_accepted_at);
     if (p.invite_status === "declined" || p.invite_status === "ignored") {
       return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
     }
@@ -106,50 +103,42 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       accepted_at: nowIso,
     };
 
-    let acceptingRole: "promisor" | "promisee" | null = null;
-
     if (p.promisor_id && !p.promisee_id) {
       updateData.promisee_id = userId;
-      acceptingRole = "promisee";
     } else if (p.promisee_id && !p.promisor_id) {
       updateData.promisor_id = userId;
-      acceptingRole = "promisor";
     } else if (!p.promisee_id && !p.promisor_id) {
       updateData.promisor_id = userId;
       updateData.promisee_id = p.creator_id;
-      acceptingRole = "promisor";
     }
 
     // 5) пишемо counterparty_id
-    const { error: upErr } = await admin
-      .from("promises")
-      .update(updateData)
-      .eq("id", p.id);
+    const { error: upErr } = await admin.from("promises").update(updateData).eq("id", p.id);
 
     if (upErr) {
       return NextResponse.json({ error: "Accept failed", detail: upErr.message }, { status: 500 });
     }
 
-    const { data: updatedPromise } = await admin
+    // 6) підвантажуємо учасників після апдейту і генеруємо нотифікації
+    const { data: updatedPromise, error: updErr } = await admin
       .from("promises")
       .select("id, creator_id, counterparty_id, promisor_id, promisee_id")
       .eq("id", p.id)
-      .single();
+      .maybeSingle();
+
+    if (updErr) {
+      return NextResponse.json(
+        { error: "Accept succeeded but fetch failed", detail: updErr.message },
+        { status: 500 }
+      );
+    }
 
     if (updatedPromise) {
-      const executorId = resolveExecutorId(updatedPromise);
+      const notifications = buildInviteAcceptedNotifications(updatedPromise);
 
-      if (executorId) {
-        await createNotification(admin, {
-          userId: executorId,
-          promiseId: updatedPromise.id,
-          type: "invite_followup",
-          role: "executor",
-          dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "executor"]),
-          ctaUrl: buildCtaUrl(updatedPromise.id),
-          priority: mapPriorityForType("invite_followup"),
-        });
-      } else {
+      // diagnostics: flows didn't produce executor notification (executor unresolved / null)
+      const hasExecutorNotification = notifications.some((n) => n.role === "executor");
+      if (!hasExecutorNotification) {
         logMissingNotificationRecipient({
           promiseId: updatedPromise.id,
           creatorId: updatedPromise.creator_id,
@@ -161,23 +150,14 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
         });
       }
 
-      await createNotification(admin, {
-        userId: updatedPromise.creator_id,
-        promiseId: updatedPromise.id,
-        type: "invite_followup",
-        role: "creator",
-        dedupeKey: buildDedupeKey(["invite_followup", updatedPromise.id, "creator"]),
-        ctaUrl: buildCtaUrl(updatedPromise.id),
-        priority: mapPriorityForType("invite_followup"),
-      });
+      for (const notification of notifications) {
+        await createNotification(admin, notification);
+      }
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json(
-      { error: "API crashed", message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "API crashed", message }, { status: 500 });
   }
 }

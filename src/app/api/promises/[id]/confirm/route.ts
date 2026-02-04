@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { resolveCounterpartyId } from "@/lib/promiseParticipants";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import {
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
+import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
+import { createNotification } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
@@ -78,23 +74,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const finalExecutorId = resolveExecutorId(updatedPromise);
-    if (finalExecutorId) {
-      const delta = calc_score_impact({
-        status: updatedPromise.status,
-        due_at: updatedPromise.due_at,
-        completed_at: updatedPromise.completed_at,
-      });
-      await createNotification(admin, {
-        userId: finalExecutorId,
-        promiseId: updatedPromise.id,
-        type: "completion_followup",
-        role: "executor",
-        dedupeKey: buildDedupeKey(["completion_followup", updatedPromise.id]),
-        ctaUrl: `/promises/${updatedPromise.id}`,
-        priority: mapPriorityForType("completion_followup"),
-        delta,
-      });
-    } else {
+    const delta = calc_score_impact({
+      status: updatedPromise.status,
+      due_at: updatedPromise.due_at,
+      completed_at: updatedPromise.completed_at,
+    });
+
+    if (!finalExecutorId) {
       logMissingNotificationRecipient({
         promiseId: updatedPromise.id,
         creatorId: updatedPromise.creator_id,
@@ -104,6 +90,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         flowName: "completion_confirmed",
         recipientRole: "executor",
       });
+    } else {
+      await createNotification(
+        admin,
+        buildCompletionOutcomeNotification({
+          promiseId: updatedPromise.id,
+          executorId: finalExecutorId,
+          type: "completion_followup",
+          delta,
+        })
+      );
     }
 
     return NextResponse.json({ ok: true });

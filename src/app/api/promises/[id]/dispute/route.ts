@@ -11,11 +11,8 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import {
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
+import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
+import { createNotification } from "@/lib/notifications/service";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
@@ -92,23 +89,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const finalExecutorId = resolveExecutorId(updatedPromise);
-    if (finalExecutorId) {
-      const delta = calc_score_impact({
-        status: updatedPromise.status,
-        due_at: updatedPromise.due_at,
-        completed_at: updatedPromise.completed_at,
-      });
-      await createNotification(admin, {
-        userId: finalExecutorId,
-        promiseId: updatedPromise.id,
-        type: "dispute",
-        role: "executor",
-        dedupeKey: buildDedupeKey(["dispute", updatedPromise.id]),
-        ctaUrl: `/promises/${updatedPromise.id}`,
-        priority: mapPriorityForType("dispute"),
-        delta,
-      });
-    } else {
+    const delta = calc_score_impact({
+      status: updatedPromise.status,
+      due_at: updatedPromise.due_at,
+      completed_at: updatedPromise.completed_at,
+    });
+
+    if (!finalExecutorId) {
       logMissingNotificationRecipient({
         promiseId: updatedPromise.id,
         creatorId: updatedPromise.creator_id,
@@ -118,6 +105,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         flowName: "dispute_created",
         recipientRole: "executor",
       });
+    } else {
+      await createNotification(
+        admin,
+        buildCompletionOutcomeNotification({
+          promiseId: updatedPromise.id,
+          executorId: finalExecutorId,
+          type: "dispute",
+          delta,
+        })
+      );
     }
 
     return NextResponse.json({ ok: true });
