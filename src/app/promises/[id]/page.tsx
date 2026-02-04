@@ -28,7 +28,7 @@ type PromiseRow = {
   due_at: string | null;
   status: PromiseStatus;
   created_at: string;
-  promise_type: "deal" | "assignment" | null;
+  promise_mode: "deal" | "request" | "assignment" | null;
   reward_amount: number | null;
   reward_currency: string | null;
   reward_text: string | null;
@@ -183,7 +183,7 @@ export default function PromisePage() {
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
-  const promiseLabels = useMemo(() => getPromiseLabels(t, p?.promise_type), [p?.promise_type, t]);
+  const promiseLabels = useMemo(() => getPromiseLabels(t, p?.promise_mode), [p?.promise_mode, t]);
 
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
@@ -235,7 +235,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,promise_type,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,promise_mode,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -244,7 +244,7 @@ export default function PromisePage() {
     else {
       const status = (data as { status?: unknown }).status;
       if (!isPromiseStatus(status)) {
-        const labels = getPromiseLabels(t, (data as PromiseRow)?.promise_type);
+        const labels = getPromiseLabels(t, (data as PromiseRow)?.promise_mode);
         setError(t("promises.detail.errors.unsupportedStatus", { entity: labels.entity }));
         setP({ ...(data as PromiseRow), status: "active" });
       } else {
@@ -486,6 +486,7 @@ export default function PromisePage() {
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
   const isCreator = Boolean(p && userId === p.creator_id);
+  const canReview = promiseLabels.type === "request" ? isCreator : isCounterparty;
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
   const uiStatus = p ? getPromiseUiStatus(p) : null;
@@ -570,7 +571,7 @@ export default function PromisePage() {
                 <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
               )}
 
-              {promiseLabels.type === "assignment" &&
+              {promiseLabels.type === "request" &&
                 (p.reward_amount || p.reward_text || p.payment_terms) && (
                   <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200 space-y-3">
                     <div>
@@ -652,7 +653,7 @@ export default function PromisePage() {
                 )
               )}
 
-              {isCounterparty && p.status === "completed_by_promisor" && (
+              {canReview && p.status === "completed_by_promisor" && (
                 <Link
                   href={`/promises/${p.id}/confirm`}
                   className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"

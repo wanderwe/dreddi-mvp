@@ -20,7 +20,7 @@ type InviteInfo = {
   condition_text: string | null;
   condition_met_at: string | null;
   due_at: string | null;
-  promise_type: "deal" | "assignment" | null;
+  promise_mode: "deal" | "request" | "assignment" | null;
   reward_amount: number | null;
   reward_currency: string | null;
   reward_text: string | null;
@@ -57,8 +57,8 @@ export default function InvitePage() {
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const promiseLabels = useMemo(
-    () => getPromiseLabels(t, info?.promise_type),
-    [info?.promise_type, t]
+    () => getPromiseLabels(t, info?.promise_mode),
+    [info?.promise_mode, t]
   );
 
   async function load() {
@@ -378,7 +378,7 @@ export default function InvitePage() {
                     </p>
                   </div>
                 )}
-                {promiseLabels.type === "assignment" &&
+                {promiseLabels.type === "request" &&
                   (info.reward_amount || info.reward_text || info.payment_terms) && (
                     <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
                       <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
