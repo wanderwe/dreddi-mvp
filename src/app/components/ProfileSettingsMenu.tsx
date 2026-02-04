@@ -169,6 +169,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     }
   }, []);
 
+  const defaultHandle = useMemo(() => {
+    if (!profile) return "";
+    return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
+  }, [profile?.email, profile?.userId]);
+
   useEffect(() => {
     if (!profile) return;
     setDisplayNameInput(profile.displayName ?? "");
@@ -180,11 +185,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     setQuietHoursStartInput(profile.quietHoursStart);
     setQuietHoursEndInput(profile.quietHoursEnd);
   }, [profile?.quietHoursStart, profile?.quietHoursEnd, profile]);
-
-  const defaultHandle = useMemo(() => {
-    if (!profile) return "";
-    return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
-  }, [profile]);
 
   const isPublic = Boolean(profile?.isPublic);
   const publicProfilePath = useMemo(() => {
