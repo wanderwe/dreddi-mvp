@@ -8,6 +8,14 @@ export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
   "dispute",
 ];
 
+export const CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
+  ...CRITICAL_NOTIFICATION_TYPES,
+  "overdue",
+  "due_soon",
+  "invite_declined",
+  "invite_ignored",
+];
+
 const parseTimeToMinutes = (value: string) => {
   const [h, m] = value.split(":").map((part) => Number(part));
   if (Number.isNaN(h) || Number.isNaN(m)) return null;
@@ -33,7 +41,7 @@ export const isWithinQuietHours = (
 };
 
 export const isDailyCapExceeded = (count: number, type: NotificationType) => {
-  if (CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;
+  if (CAP_BYPASS_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;
   return count >= DAILY_NOTIFICATION_CAP;
 };
 
