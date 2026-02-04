@@ -238,7 +238,7 @@ export default function PromisesClient() {
     }
 
     const offset = page * PAGE_SIZE;
-    const rangeEnd = offset + PAGE_SIZE - 1;
+    const rangeEnd = offset + PAGE_SIZE;
     const roleFilter =
       tabKey === "i-promised"
         ? buildPromisorFilter(userId)
@@ -262,14 +262,16 @@ export default function PromisesClient() {
     const parsed: PromiseWithRole[] = (data ?? [])
       .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
       .map((row) => withRole(row as PromiseRow, userId));
+    const nextHasMore = parsed.length > PAGE_SIZE;
+    const pageRows = nextHasMore ? parsed.slice(0, PAGE_SIZE) : parsed;
 
     setListRowsByTab((prev) => ({
       ...prev,
-      [tabKey]: replace ? parsed : [...prev[tabKey], ...parsed],
+      [tabKey]: replace ? pageRows : [...prev[tabKey], ...pageRows],
     }));
     setHasMoreByTab((prev) => ({
       ...prev,
-      [tabKey]: parsed.length === PAGE_SIZE,
+      [tabKey]: nextHasMore,
     }));
     setPageByTab((prev) => ({ ...prev, [tabKey]: page }));
   };
