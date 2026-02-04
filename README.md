@@ -70,5 +70,15 @@ and track fulfillment or breach over time.
 - Supabase (Auth + DB + RLS)
 - Tailwind CSS
 
+## Playwright UI tests (notifications)
+1) Ensure the app is running locally (`npm run dev`).
+2) Export required env vars:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `DREDDI_BASE_URL` (defaults to `http://localhost:3000` if omitted)
+3) Install Playwright (first time only): `npm install -D @playwright/test` then `npx playwright install`.
+4) Run UI tests: `npm run test:ui`.
+
 ## Status
 Early MVP / in active development.

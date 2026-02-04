@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeLocale } from "@/lib/i18n/locales";
+import { getNotificationCopy } from "@/lib/notifications/copy";
 import {
   CRITICAL_NOTIFICATION_TYPES,
   CAP_BYPASS_NOTIFICATION_TYPES,
@@ -198,13 +199,21 @@ export async function createNotification(
     logQuietHoursDefer(request, settings);
   }
 
+  const copy = getNotificationCopy({
+    locale: settings.locale,
+    type: normalizedType,
+    role: request.role,
+    followup: request.followup,
+    delta: request.delta,
+  });
+
   const { error } = await admin.from("notifications").insert({
     user_id: request.userId,
     promise_id: request.promiseId,
     type: normalizedType,
-    title: request.title ?? "",
-    body: request.body ?? "",
-    cta_label: request.ctaLabel ?? null,
+    title: request.title ?? copy.title ?? "",
+    body: request.body ?? copy.body ?? "",
+    cta_label: request.ctaLabel ?? copy.ctaLabel ?? null,
     cta_url: request.ctaUrl,
     priority: request.priority,
     delivered_at: shouldSendPush ? now.toISOString() : null,

@@ -78,6 +78,28 @@ When a notification is skipped, the service logs a single structured entry with 
 - **UI sanity checks** (bell count, list order, CTA navigation): not executed in this report because they require a running browser session and manual confirmation.
 - **End-to-end delivery** (push): intentionally out-of-scope; push is stubbed.
 
+## E2E verification status (DB + cron + UI)
+
+Use the automated verification script and UI test when a running app + Supabase credentials are available:
+- `node --require ./tests/register-ts.js scripts/verify-notifications-e2e.ts`
+- `npm run test:ui`
+
+### Scenario results (latest run)
+
+| Scenario | Status | Notes |
+| --- | --- | --- |
+| S1 Invite created | FAIL (not run) | Run script to validate invite creation + quiet-hours delivered_at semantics. |
+| S2 Invite accepted | FAIL (not run) | Run script to validate creator/executor followups. |
+| S3 Invite declined | FAIL (not run) | Run script to validate creator decline notification. |
+| S4 Mark complete | FAIL (not run) | Run script to validate completion waiting notification + CTA. |
+| S5 Confirm | FAIL (not run) | Run script to validate completion followup + delta body. |
+| S6 Dispute | FAIL (not run) | Run script to validate dispute notification + CTA. |
+| S7 Cron due soon | FAIL (not run) | Run script to validate due soon notifications + reminders enabled. |
+| S8 Cron overdue | FAIL (not run) | Run script to validate executor repeat + creator once. |
+| S9 Cron invite ignored | FAIL (not run) | Run script to validate invite ignored + auto-decline. |
+| S10 Cron completion followups | FAIL (not run) | Run script to validate 24h/72h followups tied to cycle. |
+| UI sanity checks | FAIL (not run) | Run Playwright UI test to validate bell count, list order, CTA navigation, and read state. |
+
 ## What we might have missed
 
 - Edge cases with multiple counterparty roles (promisor/promisee) that affect `resolveExecutorId`.

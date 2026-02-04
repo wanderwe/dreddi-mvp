@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --require ./tests/register-ts.js --test tests/**/*.test.ts",
+    "test:ui": "playwright test",
     "prepare": "bash scripts/install-githooks.sh",
     "validate:package-json": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\""
   },
@@ -23,6 +24,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
