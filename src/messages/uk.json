@@ -148,8 +148,8 @@
     },
     "status": {
       "active": "Активна",
-      "pendingConfirmation": "Очікує підтвердження",
-      "waitingConfirmation": "Очікує підтвердження",
+      "pendingConfirmation": "На підтвердженні",
+      "waitingConfirmation": "На підтвердженні",
       "confirmed": "Підтверджено",
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
@@ -528,7 +528,7 @@
       "overdue": "Прострочено",
       "inProgress": "В процесі",
       "awaitingOutcome": "Очікує результату",
-      "awaitingAcceptance": "Очікує підтвердження"
+      "awaitingAcceptance": "На підтвердженні"
     },
     "meta": {
       "due": "Термін до {date}",
