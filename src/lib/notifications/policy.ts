@@ -10,6 +10,17 @@ export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
 
 export const CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   ...CRITICAL_NOTIFICATION_TYPES,
+  "invite",
+  "invite_followup",
+  "overdue",
+  "due_soon",
+  "invite_declined",
+  "invite_ignored",
+];
+
+export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
+  ...CRITICAL_NOTIFICATION_TYPES,
+  "invite_followup",
   "overdue",
   "due_soon",
   "invite_declined",
@@ -46,7 +57,9 @@ export const isDailyCapExceeded = (count: number, type: NotificationType) => {
 };
 
 export const isPerDealCapExceeded = (lastSentAt: Date | null, now: Date, type: NotificationType) => {
-  if (CRITICAL_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;
+  if (PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) {
+    return false;
+  }
   if (!lastSentAt) return false;
   return now.getTime() - lastSentAt.getTime() < 24 * 60 * 60 * 1000;
 };

@@ -89,6 +89,21 @@ export async function POST(req: Request) {
     ignored: 0,
   };
 
+  const processed = {
+    inviteFollowups: 0,
+    dueSoon: 0,
+    overdue: 0,
+    completionFollowups: 0,
+    ignored: 0,
+  };
+
+  const skipReasonCounts: Record<string, number> = {};
+
+  const trackSkip = (reason?: string) => {
+    if (!reason) return;
+    skipReasonCounts[reason] = (skipReasonCounts[reason] ?? 0) + 1;
+  };
+
   // --- 1) auto-ignore stale invites (and decline promise) ---
   const { data: staleInvites } = await admin
     .from("promises")
@@ -129,6 +144,7 @@ export async function POST(req: Request) {
       .or("invite_status.is.null,invite_status.eq.awaiting_acceptance");
 
     if (!error) {
+      processed.ignored += 1;
       results.ignored += 1;
 
       const settings = await getUserNotificationSettings(admin, row.creator_id);
@@ -139,7 +155,7 @@ export async function POST(req: Request) {
         dealTitle: row.title ?? null,
       });
 
-      await createNotification(admin, {
+      const outcome = await createNotification(admin, {
         userId: row.creator_id,
         promiseId: row.id,
         type: "invite_ignored",
@@ -151,6 +167,7 @@ export async function POST(req: Request) {
         title: copy.title,
         body: copy.body,
       });
+      trackSkip(outcome.skippedReason);
     }
   }
 
@@ -187,6 +204,7 @@ export async function POST(req: Request) {
     const notifiedAt = new Date(state.invite_notified_at);
     if (now.getTime() - notifiedAt.getTime() < HOURS_24) continue;
 
+    processed.inviteFollowups += 1;
     const created = await createNotification(admin, {
       userId: row.counterparty_id,
       promiseId: row.id,
@@ -197,6 +215,7 @@ export async function POST(req: Request) {
       ctaUrl: row.invite_token ? `/p/invite/${row.invite_token}` : buildCtaUrl(row.id),
       priority: mapPriorityForType("invite"),
     });
+    trackSkip(created.skippedReason);
 
     if (created.created) {
       await admin.from("promise_notification_state").upsert({
@@ -238,6 +257,7 @@ export async function POST(req: Request) {
       continue;
     }
 
+    processed.dueSoon += 1;
     const created = await createNotification(admin, {
       userId: executorId,
       promiseId: row.id,
@@ -248,6 +268,7 @@ export async function POST(req: Request) {
       priority: mapPriorityForType("due_soon"),
       requiresDeadlineReminder: true,
     });
+    trackSkip(created.skippedReason);
 
     if (created.created) {
       await admin.from("promise_notification_state").upsert({
@@ -292,6 +313,7 @@ export async function POST(req: Request) {
       !lastOverdue || now.getTime() - lastOverdue.getTime() >= HOURS_72;
 
     if (canNotifyExecutor) {
+      processed.overdue += 1;
       const created = await createNotification(admin, {
         userId: executorId,
         promiseId: row.id,
@@ -306,6 +328,7 @@ export async function POST(req: Request) {
         ctaUrl: buildCtaUrl(row.id),
         priority: mapPriorityForType("overdue"),
       });
+      trackSkip(created.skippedReason);
 
       if (created.created) {
         await admin.from("promise_notification_state").upsert({
@@ -318,6 +341,7 @@ export async function POST(req: Request) {
     }
 
     if (!state.overdue_creator_notified_at) {
+      processed.overdue += 1;
       const created = await createNotification(admin, {
         userId: row.creator_id,
         promiseId: row.id,
@@ -327,6 +351,7 @@ export async function POST(req: Request) {
         ctaUrl: buildCtaUrl(row.id),
         priority: mapPriorityForType("overdue"),
       });
+      trackSkip(created.skippedReason);
 
       if (created.created) {
         await admin.from("promise_notification_state").upsert({
@@ -365,6 +390,7 @@ export async function POST(req: Request) {
     if (!stage) continue;
 
     const followup = stage === "24h" ? "completion24" : "completion72";
+    processed.completionFollowups += 1;
     const created = await createNotification(admin, {
       userId: row.creator_id,
       promiseId: row.id,
@@ -380,6 +406,7 @@ export async function POST(req: Request) {
       ctaUrl: `/promises/${row.id}/confirm`,
       priority: mapPriorityForType("completion_waiting"),
     });
+    trackSkip(created.skippedReason);
 
     if (created.created) {
       await admin.from("promise_notification_state").upsert({
@@ -391,6 +418,12 @@ export async function POST(req: Request) {
       results.completionFollowups += 1;
     }
   }
+
+  console.info("[notifications] cron_summary", {
+    processed,
+    created: results,
+    skipped: skipReasonCounts,
+  });
 
   return NextResponse.json({ ok: true, results }, { status: 200 });
 }

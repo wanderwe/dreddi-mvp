@@ -46,13 +46,36 @@ const defaultSettings: NotificationSettings = {
   quietHoursEnd: "09:00",
 };
 
-const logNotificationSkip = (request: NotificationRequest, skippedReason: string) => {
+const logNotificationSkip = (
+  request: NotificationRequest,
+  skippedReason: string,
+  settings: NotificationSettings | null,
+  extra?: { dbError?: string }
+) => {
   console.info("[notifications] skipped", {
     userId: request.userId,
     promiseId: request.promiseId,
     type: normalizeNotificationType(request.type),
     dedupeKey: request.dedupeKey,
+    role: request.role ?? null,
+    requiresDeadlineReminder: request.requiresDeadlineReminder ?? false,
+    quietHoursEnabled: settings?.quietHoursEnabled ?? null,
+    deadlineRemindersEnabled: settings?.deadlineRemindersEnabled ?? null,
     skippedReason,
+    dbError: extra?.dbError ?? null,
+  });
+};
+
+const logQuietHoursDefer = (request: NotificationRequest, settings: NotificationSettings) => {
+  console.info("[notifications] quiet_hours_defer", {
+    userId: request.userId,
+    promiseId: request.promiseId,
+    type: normalizeNotificationType(request.type),
+    dedupeKey: request.dedupeKey,
+    role: request.role ?? null,
+    requiresDeadlineReminder: request.requiresDeadlineReminder ?? false,
+    quietHoursEnabled: settings.quietHoursEnabled,
+    deadlineRemindersEnabled: settings.deadlineRemindersEnabled,
   });
 };
 
@@ -119,12 +142,13 @@ export async function createNotification(
   request: NotificationRequest,
   now = new Date()
 ): Promise<NotificationOutcome> {
-  const skip = (skippedReason: string): NotificationOutcome => {
-    logNotificationSkip(request, skippedReason);
+  const settings = await getUserNotificationSettings(admin, request.userId);
+
+  const skip = (skippedReason: string, extra?: { dbError?: string }): NotificationOutcome => {
+    logNotificationSkip(request, skippedReason, settings, extra);
     return { created: false, skippedReason };
   };
 
-  const settings = await getUserNotificationSettings(admin, request.userId);
   const normalizedType = normalizeNotificationType(request.type);
 
   const { data: existing } = await admin
@@ -170,6 +194,10 @@ export async function createNotification(
     settings.pushEnabled &&
     (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
 
+  if (settings.pushEnabled && quietHours && !CRITICAL_NOTIFICATION_TYPES.includes(normalizedType)) {
+    logQuietHoursDefer(request, settings);
+  }
+
   const { error } = await admin.from("notifications").insert({
     user_id: request.userId,
     promise_id: request.promiseId,
@@ -184,7 +212,7 @@ export async function createNotification(
   });
 
   if (error) {
-    return skip(error.message);
+    return skip("db_error", { dbError: error.message });
   }
 
   if (shouldSendPush) {

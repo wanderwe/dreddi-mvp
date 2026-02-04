@@ -50,14 +50,15 @@ describe("notification policy", () => {
     );
   });
 
-  it("enforces daily cap only for non-critical types", () => {
-    assert.equal(isDailyCapExceeded(3, "invite"), true);
+  it("enforces daily cap only for capped types", () => {
+    assert.equal(isDailyCapExceeded(3, "invite"), false);
     assert.equal(isDailyCapExceeded(2, "invite"), false);
+    assert.equal(isDailyCapExceeded(3, "invite_followup"), false);
     assert.equal(isDailyCapExceeded(10, "completion_waiting"), false);
     assert.equal(isDailyCapExceeded(10, "overdue"), false);
   });
 
-  it("enforces per-deal cap for non-critical types", () => {
+  it("enforces per-deal cap for capped types", () => {
     const now = dateAt("2024-01-02T12:00:00Z");
     const recent = dateAt("2024-01-02T06:00:00Z");
     const old = dateAt("2024-01-01T06:00:00Z");
@@ -65,6 +66,7 @@ describe("notification policy", () => {
     assert.equal(isPerDealCapExceeded(recent, now, "invite"), true);
     assert.equal(isPerDealCapExceeded(old, now, "invite"), false);
     assert.equal(isPerDealCapExceeded(recent, now, "completion_waiting"), false);
+    assert.equal(isPerDealCapExceeded(recent, now, "invite_followup"), false);
   });
 
   it("chooses correct completion follow-up stage", () => {
