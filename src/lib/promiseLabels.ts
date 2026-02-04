@@ -1,12 +1,14 @@
 import type { TFunction } from "@/lib/i18n/t";
 
-export type PromiseType = "deal" | "assignment";
+export type PromiseMode = "deal" | "request";
 
-export const normalizePromiseType = (value?: string | null): PromiseType =>
-  value === "assignment" ? "assignment" : "deal";
+export const normalizePromiseMode = (value?: string | null): PromiseMode => {
+  if (value === "request" || value === "assignment") return "request";
+  return "deal";
+};
 
-export const getPromiseLabels = (t: TFunction, promiseType?: string | null) => {
-  const normalized = normalizePromiseType(promiseType);
+export const getPromiseLabels = (t: TFunction, promiseMode?: string | null) => {
+  const normalized = normalizePromiseMode(promiseMode);
 
   return {
     type: normalized,
