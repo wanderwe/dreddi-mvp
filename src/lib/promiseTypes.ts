@@ -1,10 +1,12 @@
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import type { InviteStatus } from "@/lib/promiseAcceptance";
+import type { PromiseType } from "@/lib/promiseLabels";
 
 export type PromiseRowMin = {
   id: string;
   title: string;
   status: PromiseStatus;
+  promise_type: PromiseType | null;
   due_at: string | null;
   completed_at: string | null;
   creator_id: string;

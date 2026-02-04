@@ -9,6 +9,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { stripTrailingPeriod } from "@/lib/text";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 import {
   getPromiseInviteStatus,
   isPromiseAccepted,
@@ -27,6 +28,11 @@ type PromiseRow = {
   due_at: string | null;
   status: PromiseStatus;
   created_at: string;
+  promise_type: "deal" | "assignment" | null;
+  reward_amount: number | null;
+  reward_currency: string | null;
+  reward_text: string | null;
+  payment_terms: string | null;
 
   invite_token: string | null;
   counterparty_id: string | null;
@@ -177,6 +183,7 @@ export default function PromisePage() {
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+  const promiseLabels = useMemo(() => getPromiseLabels(t, p?.promise_type), [p?.promise_type, t]);
 
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
@@ -190,8 +197,11 @@ export default function PromisePage() {
     if (backFrom === "dashboard") {
       return { href: "/", label: "← Back to dashboard" };
     }
-    return { href: "/promises", label: "← Back to deals" };
-  }, [backFrom]);
+    return {
+      href: "/promises",
+      label: t("promises.detail.backToList", { entityPlural: promiseLabels.entityPlural }),
+    };
+  }, [backFrom, promiseLabels.entityPlural, t]);
 
   async function requireSessionOrRedirect(
     nextPath: string,
@@ -225,7 +235,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,promise_type,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -234,7 +244,8 @@ export default function PromisePage() {
     else {
       const status = (data as { status?: unknown }).status;
       if (!isPromiseStatus(status)) {
-        setError(t("promises.detail.errors.unsupportedStatus"));
+        const labels = getPromiseLabels(t, (data as PromiseRow)?.promise_type);
+        setError(t("promises.detail.errors.unsupportedStatus", { entity: labels.entity }));
         setP({ ...(data as PromiseRow), status: "active" });
       } else {
         setP({ ...(data as PromiseRow), status });
@@ -482,7 +493,9 @@ export default function PromisePage() {
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
   const showPublicStatus = p?.visibility === "public";
-  const publicStatusText = showPublicStatus ? t("promises.detail.publicStatus.public") : "";
+  const publicStatusText = showPublicStatus
+    ? t("promises.detail.publicStatus.public", { publicEntity: promiseLabels.publicEntity })
+    : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const acceptingUserName = useMemo(() => {
@@ -514,7 +527,7 @@ export default function PromisePage() {
         <div className="text-neutral-400">{t("promises.detail.loading")}</div>
       ) : (
         <>
-          <Card title={t("promises.detail.cardTitle")}>
+          <Card title={t("promises.detail.cardTitle", { entity: promiseLabels.entity })}>
             <div className="space-y-3">
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
@@ -556,6 +569,39 @@ export default function PromisePage() {
               ) : (
                 <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
               )}
+
+              {promiseLabels.type === "assignment" &&
+                (p.reward_amount || p.reward_text || p.payment_terms) && (
+                  <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200 space-y-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                        {t("promises.detail.rewardLabel")}
+                      </p>
+                      {p.reward_amount && p.reward_currency ? (
+                        <div className="mt-2 text-slate-100">
+                          {`${p.reward_amount} ${p.reward_currency}`}
+                        </div>
+                      ) : !p.reward_text ? (
+                        <div className="mt-2 text-slate-100">
+                          {t("promises.detail.rewardUnset")}
+                        </div>
+                      ) : null}
+                      {p.reward_text && (
+                        <div className="mt-2 whitespace-pre-wrap text-slate-100">
+                          {p.reward_text}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                        {t("promises.detail.paymentTermsLabel")}
+                      </p>
+                      <div className="mt-2 whitespace-pre-wrap text-slate-100">
+                        {p.payment_terms ?? t("promises.detail.paymentTermsUnset")}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
               {hasCondition && (
                 <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
@@ -700,7 +746,7 @@ export default function PromisePage() {
               {t("promises.confirmModal.title")}
             </h2>
             <p className="mt-3 text-sm text-neutral-200">
-              {t("promises.confirmModal.body")}
+              {t("promises.confirmModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">

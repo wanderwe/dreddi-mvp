@@ -8,6 +8,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted, InviteStatus } from "@/lib/promiseAcceptance";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 
 type PromiseRow = {
   id: string;
@@ -17,6 +18,7 @@ type PromiseRow = {
   status: PromiseStatus;
   creator_id: string;
   creator_display_name: string | null;
+  promise_type: "deal" | "assignment" | null;
   counterparty_id: string | null;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -49,6 +51,10 @@ export default function ConfirmPromisePage() {
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
+  const promiseLabels = useMemo(
+    () => getPromiseLabels(t, promise?.promise_type),
+    [promise?.promise_type, t]
+  );
 
   const formatDate = (value: string | null) =>
     formatDueDate(value, locale, { includeYear: true, includeTime: true }) ??
@@ -97,14 +103,19 @@ export default function ConfirmPromisePage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setError(body.error ?? t("promises.confirm.errors.loadFailed"));
+        setError(
+          body.error ??
+            t("promises.confirm.errors.loadFailed", {
+              entityLower: promiseLabels.entityLower,
+            })
+        );
         setLoading(false);
         return;
       }
 
       const body = await res.json();
       if (!isPromiseStatus((body as { status?: unknown }).status)) {
-        setError(t("promises.confirm.errors.unsupportedStatus"));
+        setError(t("promises.confirm.errors.unsupportedStatus", { entity: promiseLabels.entity }));
         setLoading(false);
         return;
       }
@@ -178,7 +189,7 @@ export default function ConfirmPromisePage() {
     setError(null);
     try {
       await postAction(`/api/promises/${promise.id}/confirm`);
-      setSuccessMessage(t("promises.confirm.success.confirmed"));
+      setSuccessMessage(t("promises.confirm.success.confirmed", { entity: promiseLabels.entity }));
       setTimeout(() => router.push("/promises"), 1000);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("promises.confirm.errors.confirmFailed"));
@@ -251,13 +262,15 @@ export default function ConfirmPromisePage() {
           ) : error ? (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-100">{error}</div>
           ) : !promise ? (
-            <div className="text-slate-200">{t("promises.confirm.notFound")}</div>
+            <div className="text-slate-200">
+              {t("promises.confirm.notFound", { entity: promiseLabels.entity })}
+            </div>
           ) : (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1">
                   <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.confirm.promiseLabel")}
+                    {t("promises.confirm.promiseLabel", { entity: promiseLabels.entity })}
                   </p>
                   <h1 className="text-3xl font-semibold text-white sm:text-4xl">{promise.title}</h1>
                   <p className="text-sm text-slate-300">
@@ -265,6 +278,7 @@ export default function ConfirmPromisePage() {
                   </p>
                   <p className="text-sm text-slate-400">
                     {t("promises.confirm.createdBy", {
+                      creatorLabel: promiseLabels.creatorLabel,
                       name: promise.creator_display_name ?? promise.creator_id.slice(0, 8),
                     })}
                   </p>

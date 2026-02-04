@@ -63,7 +63,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       })
       .eq("id", id)
       .select(
-        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+        "id,title,status,promise_type,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
       )
       .single<PromiseRowMin>();
 

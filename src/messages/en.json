@@ -73,6 +73,38 @@
     "save": "Save"
   },
   "promises": {
+    "entity": {
+      "deal": "Deal",
+      "assignment": "Assignment"
+    },
+    "entityLower": {
+      "deal": "deal",
+      "assignment": "assignment"
+    },
+    "entityPublic": {
+      "deal": "Public Deal",
+      "assignment": "Public Assignment"
+    },
+    "entityNew": {
+      "deal": "New deal",
+      "assignment": "New assignment"
+    },
+    "entityPlural": {
+      "deal": "deals",
+      "assignment": "assignments"
+    },
+    "roles": {
+      "deal": {
+        "creator": "Creator",
+        "creatorLabel": "Created by",
+        "executor": "Executor"
+      },
+      "assignment": {
+        "creator": "Client",
+        "creatorLabel": "Client",
+        "executor": "Executor"
+      }
+    },
     "overview": {
       "eyebrow": "DEALS",
       "title": "Your deals overview",
@@ -102,7 +134,7 @@
     },
     "confirmModal": {
       "title": "Request confirmation?",
-      "body": "You’re asking the other side to confirm you delivered this deal",
+      "body": "You’re asking the other side to confirm you delivered this {entityLower}",
       "cancel": "Not yet",
       "confirm": "Yes, request confirmation"
     },
@@ -132,7 +164,8 @@
     "detail": {
       "back": "Back",
       "loading": "Loading…",
-      "cardTitle": "Deal",
+      "cardTitle": "{entity}",
+      "backToList": "← Back to {entityPlural}",
       "acceptedBySecondSide": "Accepted by second side",
       "inviteStatusLabel": "Invite status",
       "yes": "Yes",
@@ -150,11 +183,15 @@
       "markCompleted": "Mark as completed",
       "shareInvite": "Share the invite and wait for acceptance to request confirmation",
       "reviewConfirm": "Review & confirm",
-      "awaitingExecutor": "Waiting for the executor to mark this complete",
+      "awaitingExecutor": "Waiting for the {executorRole} to mark this complete",
       "waitingReview": "Waiting for the other side to review",
-      "confirmed": "Deal confirmed ✅",
-      "disputed": "Deal disputed",
-      "awaitingAcceptanceHint": "The deal hasn’t been accepted by the other side yet",
+      "confirmed": "{entity} confirmed ✅",
+      "disputed": "{entity} disputed",
+      "awaitingAcceptanceHint": "The {entityLower} hasn’t been accepted by the other side yet",
+      "rewardLabel": "Reward",
+      "rewardUnset": "Not specified",
+      "paymentTermsLabel": "Payment terms",
+      "paymentTermsUnset": "Not specified",
       "inviteTitle": "Invite",
       "inviteLinkTitle": "Invite link",
       "inviteAccepted": "Invite accepted",
@@ -170,21 +207,21 @@
       "saving": "Saving…",
       "publicStatus": {
         "label": "Visibility",
-        "public": "Public deal",
+        "public": "{publicEntity}",
         "waitingOtherSide": "Public proposed — waiting for other side",
         "waitingConfirmation": "Public proposed — waiting for confirmation",
         "privateAfterProposal": "Private (public was proposed)"
       },
       "publicVisibility": {
         "title": "Public visibility (confirmed only)",
-        "helper": "This deal will appear on your public profile only if both sides agree",
-        "creatorConsent": "I agree to show this confirmed deal publicly",
-        "counterpartyConsent": "I agree to show this confirmed deal publicly",
+        "helper": "This {entityLower} will appear on your public profile only if both sides agree",
+        "creatorConsent": "I agree to show this confirmed {entityLower} publicly",
+        "counterpartyConsent": "I agree to show this confirmed {entityLower} publicly",
         "confirmedOnly": "Only confirmed responsibilities can be shown publicly",
-        "awaitingAcceptance": "The other side must accept the deal before it can be made public"
+        "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public"
       },
       "errors": {
-        "unsupportedStatus": "Deal has an unsupported status value",
+        "unsupportedStatus": "{entity} has an unsupported status value",
         "updateStatus": "Could not update status",
         "copyClipboard": "Could not copy to clipboard"
       }
@@ -198,9 +235,9 @@
     "confirm": {
       "back": "Back to deals",
       "badge": "Review",
-      "promiseLabel": "Deal",
+      "promiseLabel": "{entity}",
       "dueLabel": "Due",
-      "createdBy": "Created by {name}",
+      "createdBy": "{creatorLabel}: {name}",
       "statusLabel": "Status",
       "actionRequired": "Action required from you",
       "awaitingOtherParty": "Waiting for the other party to act",
@@ -212,7 +249,7 @@
       "sending": "Sending…",
       "dispute": "Dispute",
       "noActions": "No actions available",
-      "notFound": "Deal not found",
+      "notFound": "{entity} not found",
       "disputeBadge": "Dispute",
       "disputeTitle": "Tell us what went wrong",
       "disputeSubtitle": "Choose the issue and provide optional context",
@@ -227,12 +264,12 @@
         "active": "Not marked as completed yet"
       },
       "success": {
-        "confirmed": "Deal confirmed. Redirecting…",
+        "confirmed": "{entity} confirmed. Redirecting…",
         "disputed": "Dispute submitted. Redirecting…"
       },
       "errors": {
-        "loadFailed": "Failed to load deal",
-        "unsupportedStatus": "Deal has unsupported status",
+        "loadFailed": "Failed to load {entityLower}",
+        "unsupportedStatus": "{entity} has unsupported status",
         "actionFailed": "Action failed",
         "conditionNotMet": "You can’t confirm/dispute until the counter-condition is met",
         "confirmFailed": "Failed to confirm",
@@ -246,32 +283,44 @@
       "other": "Other"
     },
     "new": {
-      "eyebrow": "New deal",
-      "title": "Document the deal",
-      "subtitle": "Name the deal, add context, and an optional deadline",
+      "eyebrow": "{newEntity}",
+      "title": "Document the {entityLower}",
+      "subtitle": "Name the {entityLower}, add context, and an optional deadline",
       "back": "Back",
       "fields": {
+        "type": "Type",
         "title": "Title",
         "details": "Details",
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
-        "executor": "Executor",
+        "executor": "{executorRole}",
         "counterparty": "Other side",
-        "counterpartyHelper": "A deal takes effect after the other side accepts",
+        "counterpartyHelper": "A {entityLower} takes effect after the {executorRole} accepts",
         "dueDate": "Due date",
-        "dueTime": "Due time"
+        "dueTime": "Due time",
+        "reward": "Reward (optional)",
+        "rewardHelper": "Add an amount + currency or describe the reward in text",
+        "rewardText": "Reward details (optional)",
+        "paymentTerms": "Payment terms (optional)"
+      },
+      "type": {
+        "deal": "Deal",
+        "assignment": "Assignment"
       },
       "executor": {
         "me": "Me",
         "other": "Other person"
       },
       "placeholders": {
-        "title": "Short summary of the deal",
+        "title": "Short summary of the {entityLower}",
         "details": "Details (optional)",
         "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "Other person’s email or phone",
         "counterpartyOther": "Other person’s email or phone",
-        "dueDate": "Select date (optional)"
+        "dueDate": "Select date (optional)",
+        "rewardAmount": "Reward amount",
+        "rewardText": "Describe the reward, deliverable, or scope",
+        "paymentTerms": "Payment terms or milestones"
       },
       "actions": {
         "addCondition": "+ Add counter-condition",
@@ -282,16 +331,18 @@
         "closeTimePicker": "Close time picker"
       },
       "publicRequest": {
-        "label": "Public deal",
-        "helper": "Public deals appear on your public profile once confirmed"
+        "label": "{publicEntity}",
+        "helper": "Public {entityPlural} appear on your public profile once confirmed"
       },
       "errors": {
         "counterpartyRequired": "Please add the other side's contact",
-        "createFailed": "Failed to create deal",
+        "rewardAmountInvalid": "Reward amount must be a number",
+        "rewardCurrencyRequired": "Add a currency when a reward amount is set",
+        "createFailed": "Failed to create {entityLower}",
         "network": "Unable to reach the server. Please try again."
       },
-      "submit": "Create deal",
-      "creating": "Creating…"
+      "submit": "Create {entityLower}",
+      "creating": "Creating {entityLower}…"
     }
   },
   "invite": {
@@ -299,19 +350,23 @@
     "signedIn": "Signed in",
     "guestMode": "Guest mode",
     "eyebrow": "Invitation",
-    "title": "Join this deal on Dreddi",
-    "subtitle": "Review the deal details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
+    "title": "Join this {entity} on Dreddi",
+    "subtitle": "Review the {entityLower} details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
     "accepted": "This invite was already accepted",
     "acceptedBy": "Invitation accepted by: {name}",
-    "badge": "Deal invite",
-    "createdBy": "Created by {name}",
+    "badge": "{entity} invite",
+    "createdBy": "{creatorLabel}: {name}",
     "deadline": "Deadline",
     "counterCondition": "Counter-condition",
+    "rewardLabel": "Reward",
+    "rewardUnset": "Not specified",
+    "paymentTermsLabel": "Payment terms",
+    "paymentTermsUnset": "Not specified",
     "statusLabel": "Status",
     "statusAccepted": "Already accepted",
     "statusAwaiting": "Awaiting acceptance",
-    "statusAcceptedBody": "This deal is ready—jump into your dashboard to follow progress",
-    "statusAwaitingBody": "Accept to join the deal and it will appear in your dashboard",
+    "statusAcceptedBody": "This {entityLower} is ready—jump into your dashboard to follow progress",
+    "statusAwaitingBody": "Accept to join the {entityLower} and it will appear in your dashboard",
     "statusClosedBody": "This invite is no longer active",
     "status": {
       "awaiting_acceptance": "Awaiting acceptance",
@@ -320,20 +375,20 @@
       "ignored": "Ignored"
     },
     "nextStep": "Next step",
-    "nextStepHint": "By accepting, you confirm you understand this deal",
+    "nextStepHint": "By accepting, you confirm you understand this {entityLower}",
     "processing": "Processing...",
-    "accept": "Accept deal",
+    "accept": "Accept {entityLower}",
     "decline": "Decline",
     "declinedMessage": "You declined this invite.",
     "ignoredMessage": "This invite expired without a response.",
     "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {
-      "title": "This deal is PUBLIC",
-      "body": "If you accept, the deal details will be visible on public profiles"
+      "title": "This {entityLower} is PUBLIC",
+      "body": "If you accept, the {entityLower} details will be visible on public profiles"
     },
     "publicModal": {
-      "title": "Accept public deal?",
-      "body": "This deal is public. If you proceed, its details will be visible on public profiles after confirmation",
+      "title": "Accept public {entityLower}?",
+      "body": "This {entityLower} is public. If you proceed, its details will be visible on public profiles after confirmation",
       "cancel": "Cancel",
       "confirm": "Continue"
     },

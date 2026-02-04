@@ -73,6 +73,38 @@
     "save": "Зберегти"
   },
   "promises": {
+    "entity": {
+      "deal": "Угода",
+      "assignment": "Доручення"
+    },
+    "entityLower": {
+      "deal": "угода",
+      "assignment": "доручення"
+    },
+    "entityPublic": {
+      "deal": "Публічна угода",
+      "assignment": "Публічне доручення"
+    },
+    "entityNew": {
+      "deal": "Нова угода",
+      "assignment": "Нове доручення"
+    },
+    "entityPlural": {
+      "deal": "угод",
+      "assignment": "доручень"
+    },
+    "roles": {
+      "deal": {
+        "creator": "Ініціатор",
+        "creatorLabel": "Створено",
+        "executor": "Виконавець"
+      },
+      "assignment": {
+        "creator": "Замовник",
+        "creatorLabel": "Замовник",
+        "executor": "Виконавець"
+      }
+    },
     "overview": {
       "eyebrow": "УГОДИ",
       "title": "Огляд ваших угод",
@@ -110,7 +142,7 @@
     },
     "confirmModal": {
       "title": "Запросити підтвердження?",
-      "body": "Ви просите іншу сторону підтвердити, що угоду виконано",
+      "body": "Ви просите іншу сторону підтвердити, що {entityLower} виконано",
       "cancel": "Ще ні",
       "confirm": "Так, запросити підтвердження"
     },
@@ -140,7 +172,8 @@
     "detail": {
       "back": "Назад",
       "loading": "Завантаження…",
-      "cardTitle": "Угода",
+      "cardTitle": "{entity}",
+      "backToList": "← Назад до {entityPlural}",
       "acceptedBySecondSide": "Прийнято другою стороною",
       "inviteStatusLabel": "Статус запрошення",
       "yes": "Так",
@@ -158,11 +191,15 @@
       "markCompleted": "Позначити як виконану",
       "shareInvite": "Поділіться запрошенням і дочекайтесь прийняття, щоб запросити підтвердження",
       "reviewConfirm": "Переглянути та підтвердити",
-      "awaitingExecutor": "Очікуємо, що виконавець позначить виконання",
+      "awaitingExecutor": "Очікуємо, що {executorRole} позначить виконання",
       "waitingReview": "Очікує перегляду другою стороною",
-      "confirmed": "Угоду підтверджено ✅",
-      "disputed": "Угоду оскаржено",
-      "awaitingAcceptanceHint": "Угода ще не прийнята іншою стороною",
+      "confirmed": "{entity} підтверджено ✅",
+      "disputed": "{entity} оскаржено",
+      "awaitingAcceptanceHint": "{entityLower} ще не прийнята іншою стороною",
+      "rewardLabel": "Винагорода",
+      "rewardUnset": "Не вказано",
+      "paymentTermsLabel": "Умови оплати",
+      "paymentTermsUnset": "Не вказано",
       "inviteTitle": "Запрошення",
       "inviteLinkTitle": "Посилання-запрошення",
       "inviteAccepted": "Запрошення прийнято",
@@ -178,21 +215,21 @@
       "saving": "Збереження…",
       "publicStatus": {
         "label": "Видимість",
-        "public": "Публічна угода",
+        "public": "{publicEntity}",
         "waitingOtherSide": "Публічність запропонована — чекаємо іншу сторону",
         "waitingConfirmation": "Публічність запропонована — чекаємо підтвердження",
         "privateAfterProposal": "Приватна (публічність була запропонована)"
       },
       "publicVisibility": {
         "title": "Публічна видимість (лише підтверджені)",
-        "helper": "Ця угода з’явиться у публічному профілі лише якщо обидві сторони погодяться",
-        "creatorConsent": "Я погоджуюсь показувати цю підтверджену угоду публічно",
-        "counterpartyConsent": "Я погоджуюсь показувати цю підтверджену угоду публічно",
+        "helper": "Це {entityLower} з’явиться у публічному профілі лише якщо обидві сторони погодяться",
+        "creatorConsent": "Я погоджуюсь показувати це підтверджене {entityLower} публічно",
+        "counterpartyConsent": "Я погоджуюсь показувати це підтверджене {entityLower} публічно",
         "confirmedOnly": "Публічно можна показувати лише підтверджені відповідальності",
-        "awaitingAcceptance": "Інша сторона має прийняти угоду, перш ніж її можна зробити публічною"
+        "awaitingAcceptance": "Інша сторона має прийняти {entityLower}, перш ніж її можна зробити публічною"
       },
       "errors": {
-        "unsupportedStatus": "Угода має непідтримуваний статус",
+        "unsupportedStatus": "{entity} має непідтримуваний статус",
         "updateStatus": "Не вдалося оновити статус",
         "copyClipboard": "Не вдалося скопіювати в буфер обміну"
       }
@@ -206,9 +243,9 @@
     "confirm": {
       "back": "Назад до угод",
       "badge": "Перегляд",
-      "promiseLabel": "Угода",
+      "promiseLabel": "{entity}",
       "dueLabel": "Строк",
-      "createdBy": "Створив(ла) {name}",
+      "createdBy": "{creatorLabel}: {name}",
       "statusLabel": "Статус",
       "actionRequired": "Потрібна ваша дія",
       "awaitingOtherParty": "Очікуємо дію від іншої сторони",
@@ -220,7 +257,7 @@
       "sending": "Надсилання…",
       "dispute": "Оскаржити",
       "noActions": "Дії недоступні",
-      "notFound": "Угоду не знайдено",
+      "notFound": "{entity} не знайдено",
       "disputeBadge": "Оскарження",
       "disputeTitle": "Розкажіть, що пішло не так",
       "disputeSubtitle": "Оберіть проблему та додайте контекст за бажанням",
@@ -235,12 +272,12 @@
         "active": "Ще не позначено виконаною"
       },
       "success": {
-        "confirmed": "Угоду підтверджено. Перенаправляємо…",
+        "confirmed": "{entity} підтверджено. Перенаправляємо…",
         "disputed": "Оскарження надіслано. Перенаправляємо…"
       },
       "errors": {
-        "loadFailed": "Не вдалося завантажити угоду",
-        "unsupportedStatus": "Угода має непідтримуваний статус",
+        "loadFailed": "Не вдалося завантажити {entityLower}",
+        "unsupportedStatus": "{entity} має непідтримуваний статус",
         "actionFailed": "Дія не виконана",
         "conditionNotMet": "Неможливо підтвердити/оскаржити, поки контрумова не виконана",
         "confirmFailed": "Не вдалося підтвердити",
@@ -254,32 +291,44 @@
       "other": "Інше"
     },
     "new": {
-      "eyebrow": "Нова угода",
-      "title": "Зафіксуйте угоду",
-      "subtitle": "Назвіть угоду, додайте контекст і опціональний дедлайн",
+      "eyebrow": "{newEntity}",
+      "title": "Оформіть {entityLower}",
+      "subtitle": "Назвіть {entityLower}, додайте контекст і опціональний дедлайн",
       "back": "Назад",
       "fields": {
+        "type": "Тип",
         "title": "Назва",
         "details": "Деталі",
         "condition": "Контрумова",
         "conditionHint": "Виконання можливе після…",
-        "executor": "Виконавець",
+        "executor": "{executorRole}",
         "counterparty": "Друга сторона",
-        "counterpartyHelper": "Угода набирає сили після прийняття іншою стороною",
+        "counterpartyHelper": "{entityLower} набирає сили після того, як {executorRole} прийме запрошення",
         "dueDate": "Строк",
-        "dueTime": "Час строку"
+        "dueTime": "Час строку",
+        "reward": "Винагорода (необов’язково)",
+        "rewardHelper": "Додайте суму й валюту або опишіть винагороду словами",
+        "rewardText": "Деталі винагороди (необов’язково)",
+        "paymentTerms": "Умови оплати (необов’язково)"
+      },
+      "type": {
+        "deal": "Угода",
+        "assignment": "Доручення"
       },
       "executor": {
         "me": "Я",
         "other": "Інша людина"
       },
       "placeholders": {
-        "title": "Коротко: про що угода?",
+        "title": "Короткий опис {entityLower}",
         "details": "Деталі (опціонально)",
         "condition": "Виконання можливе після… (опціонально)",
         "counterpartyMe": "Email або телефон іншої людини",
         "counterpartyOther": "Email або телефон іншої людини",
-        "dueDate": "Оберіть дату (опціонально)"
+        "dueDate": "Оберіть дату (опціонально)",
+        "rewardAmount": "Сума винагороди",
+        "rewardText": "Опишіть винагороду, результат або обсяг",
+        "paymentTerms": "Умови оплати або етапи"
       },
       "actions": {
         "addCondition": "+ Додати контрумову",
@@ -290,16 +339,18 @@
         "closeTimePicker": "Закрити вибір часу"
       },
       "publicRequest": {
-        "label": "Публічна угода",
-        "helper": "Публічні угоди з'являються у вашому профілі після підтвердження"
+        "label": "{publicEntity}",
+        "helper": "Публічні {entityPlural} з'являються у вашому профілі після підтвердження"
       },
       "errors": {
         "counterpartyRequired": "Додайте контакт іншої сторони",
-        "createFailed": "Не вдалося створити домовленість",
+        "rewardAmountInvalid": "Сума винагороди має бути числом",
+        "rewardCurrencyRequired": "Додайте валюту, якщо вказана сума",
+        "createFailed": "Не вдалося створити {entityLower}",
         "network": "Не вдалося під'єднатися до сервера. Спробуйте ще раз."
       },
-      "submit": "Створити угоду",
-      "creating": "Створення…"
+      "submit": "Створити {entityLower}",
+      "creating": "Створення {entityLower}…"
     }
   },
   "invite": {
@@ -307,19 +358,23 @@
     "signedIn": "Увійшли",
     "guestMode": "Гостьовий режим",
     "eyebrow": "Запрошення",
-    "title": "Приєднайтеся до цієї угоди в Dreddi",
-    "subtitle": "Перегляньте деталі угоди нижче. Якщо все влаштовує, прийміть запрошення, щоб почати співпрацювати і тримати відповідальність.",
+    "title": "Приєднайтеся до {entity} в Dreddi",
+    "subtitle": "Перегляньте деталі {entityLower} нижче. Якщо все влаштовує, прийміть запрошення, щоб почати співпрацювати і тримати відповідальність.",
     "accepted": "Це запрошення вже прийнято",
     "acceptedBy": "Запрошення прийняв користувач: {name}",
-    "badge": "Запрошення до угоди",
-    "createdBy": "Створив(ла) {name}",
+    "badge": "Запрошення до {entity}",
+    "createdBy": "{creatorLabel}: {name}",
     "deadline": "Строк",
     "counterCondition": "Контрумова",
+    "rewardLabel": "Винагорода",
+    "rewardUnset": "Не вказано",
+    "paymentTermsLabel": "Умови оплати",
+    "paymentTermsUnset": "Не вказано",
     "statusLabel": "Статус",
     "statusAccepted": "Вже прийнято",
     "statusAwaiting": "Очікує прийняття",
-    "statusAcceptedBody": "Угода готова — відкрийте дашборд, щоб стежити за прогресом",
-    "statusAwaitingBody": "Прийміть запрошення, і угода з'явиться у вашому дашборді",
+    "statusAcceptedBody": "{entityLower} готове — відкрийте дашборд, щоб стежити за прогресом",
+    "statusAwaitingBody": "Прийміть запрошення, і {entityLower} з'явиться у вашому дашборді",
     "statusClosedBody": "Це запрошення більше неактивне",
     "status": {
       "awaiting_acceptance": "Очікує прийняття",
@@ -328,20 +383,20 @@
       "ignored": "Проігноровано"
     },
     "nextStep": "Наступний крок",
-    "nextStepHint": "Приймаючи, ви підтверджуєте, що розумієте цю угоду",
+    "nextStepHint": "Приймаючи, ви підтверджуєте, що розумієте це {entityLower}",
     "processing": "Обробка...",
-    "accept": "Прийняти угоду",
+    "accept": "Прийняти {entityLower}",
     "decline": "Відхилити",
     "declinedMessage": "Ви відхилили це запрошення.",
     "ignoredMessage": "Це запрошення завершилося без відповіді.",
     "awaitingCounterparty": "Очікуємо відповіді другої сторони",
     "publicProposal": {
-      "title": "Ця угода є ПУБЛІЧНОЮ",
-      "body": "Якщо ви приймете, деталі угоди будуть видимі у публічних профілях"
+      "title": "Це {entityLower} є ПУБЛІЧНИМ",
+      "body": "Якщо ви приймете, деталі {entityLower} будуть видимі у публічних профілях"
     },
     "publicModal": {
-      "title": "Прийняти публічну угоду?",
-      "body": "Ця угода є публічною. Якщо ви продовжите, її деталі будуть видимі у публічних профілях після підтвердження",
+      "title": "Прийняти публічне {entityLower}?",
+      "body": "Це {entityLower} є публічним. Якщо ви продовжите, її деталі будуть видимі у публічних профілях після підтвердження",
       "cancel": "Скасувати",
       "confirm": "Продовжити"
     },
