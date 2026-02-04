@@ -212,6 +212,7 @@
       "createdBy": "Створив(ла) {name}",
       "statusLabel": "Статус",
       "actionRequired": "Потрібна ваша дія",
+      "awaitingOtherParty": "Очікуємо дію від іншої сторони",
       "detailsLabel": "Деталі",
       "alreadyDisputed": "Вже оскаржено",
       "reasonLabel": "Причина",
