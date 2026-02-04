@@ -117,6 +117,14 @@ export async function POST(req: Request) {
         updated_at: nowIso,
       });
 
+    if (!insertData.counterparty_id) {
+      console.warn("[promises] missing counterparty id for invite notification", {
+        promiseId: insertData.id,
+        counterpartyContact,
+        userId: user.id,
+      });
+    }
+
     if (insertData.counterparty_id) {
       const created = await createNotification(admin, {
         userId: insertData.counterparty_id,

@@ -36,6 +36,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
+    if (!executorId || !counterpartyId) {
+      console.warn("[promises] missing participant id for dispute", {
+        promiseId: id,
+        executorId,
+        counterpartyId,
+        userId: user.id,
+      });
+    }
     if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
       return NextResponse.json({ error: "Only the other side can dispute" }, { status: 403 });
     }

@@ -10,7 +10,10 @@ import {
 } from "@/lib/notifications/service";
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import { getInviteResponseCopy, resolveInviteActorName } from "@/lib/notifications/inviteResponses";
+import {
+  getInviteResponseCopy,
+  resolveInviteActorName,
+} from "@/lib/notifications/inviteResponses";
 import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
@@ -72,6 +75,7 @@ export async function POST(req: Request) {
   const now = new Date();
   const nowIso = now.toISOString();
   const dueSoonCutoff = new Date(now.getTime() + HOURS_24).toISOString();
+
   const ignoreAfterHours = Number(process.env.IGNORE_AFTER_HOURS ?? "72");
   const ignoreAfter =
     (Number.isFinite(ignoreAfterHours) ? ignoreAfterHours : 72) * 60 * 60 * 1000;
@@ -85,6 +89,7 @@ export async function POST(req: Request) {
     ignored: 0,
   };
 
+  // --- 1) auto-ignore stale invites (and decline promise) ---
   const { data: staleInvites } = await admin
     .from("promises")
     .select(
@@ -100,10 +105,7 @@ export async function POST(req: Request) {
   ) as string[];
 
   const { data: counterpartyProfiles } = counterpartyIds.length
-    ? await admin
-        .from("profiles")
-        .select("id,handle,display_name")
-        .in("id", counterpartyIds)
+    ? await admin.from("profiles").select("id,handle,display_name").in("id", counterpartyIds)
     : { data: [] as Array<{ id: string; handle: string | null; display_name: string | null }> };
 
   const counterpartyLookup = new Map(
@@ -152,6 +154,7 @@ export async function POST(req: Request) {
     }
   }
 
+  // --- 2) invite followups (24h after initial invite) ---
   const { data: invites } = await admin
     .from("promises")
     .select(
@@ -164,7 +167,20 @@ export async function POST(req: Request) {
 
   for (const row of invites ?? []) {
     const state = getNotificationState(row.promise_notification_state);
-    if (!row.counterparty_id) continue;
+
+    if (!row.counterparty_id) {
+      logMissingNotificationRecipient({
+        promiseId: row.id,
+        creatorId: row.creator_id,
+        promisorId: row.promisor_id,
+        promiseeId: row.promisee_id,
+        counterpartyId: row.counterparty_id,
+        flowName: "invite_followup_cron",
+        recipientRole: "counterparty",
+      });
+      continue;
+    }
+
     if (row.invite_status && row.invite_status !== "awaiting_acceptance") continue;
     if (!state.invite_notified_at || state.invite_followup_notified_at) continue;
 
@@ -183,17 +199,16 @@ export async function POST(req: Request) {
     });
 
     if (created.created) {
-      await admin
-        .from("promise_notification_state")
-        .upsert({
-          promise_id: row.id,
-          invite_followup_notified_at: nowIso,
-          updated_at: nowIso,
-        });
+      await admin.from("promise_notification_state").upsert({
+        promise_id: row.id,
+        invite_followup_notified_at: nowIso,
+        updated_at: nowIso,
+      });
       results.inviteFollowups += 1;
     }
   }
 
+  // --- 3) due soon (within 24h) ---
   const { data: dueSoonRows } = await admin
     .from("promises")
     .select(
@@ -205,8 +220,10 @@ export async function POST(req: Request) {
 
   for (const row of dueSoonRows ?? []) {
     if (!row.due_at || !isPromiseAccepted(row)) continue;
+
     const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
+
     const executorId = resolveExecutorId(row);
     if (!executorId) {
       logMissingNotificationRecipient({
@@ -233,17 +250,16 @@ export async function POST(req: Request) {
     });
 
     if (created.created) {
-      await admin
-        .from("promise_notification_state")
-        .upsert({
-          promise_id: row.id,
-          due_soon_notified_at: nowIso,
-          updated_at: nowIso,
-        });
+      await admin.from("promise_notification_state").upsert({
+        promise_id: row.id,
+        due_soon_notified_at: nowIso,
+        updated_at: nowIso,
+      });
       results.dueSoon += 1;
     }
   }
 
+  // --- 4) overdue (executor every 72h; creator once) ---
   const { data: overdueRows } = await admin
     .from("promises")
     .select(
@@ -254,6 +270,7 @@ export async function POST(req: Request) {
 
   for (const row of overdueRows ?? []) {
     if (!row.due_at || !isPromiseAccepted(row)) continue;
+
     const executorId = resolveExecutorId(row);
     if (!executorId) {
       logMissingNotificationRecipient({
@@ -267,6 +284,7 @@ export async function POST(req: Request) {
       });
       continue;
     }
+
     const state = getNotificationState(row.promise_notification_state);
 
     const lastOverdue = state.overdue_notified_at ? new Date(state.overdue_notified_at) : null;
@@ -279,19 +297,22 @@ export async function POST(req: Request) {
         promiseId: row.id,
         type: "overdue",
         role: "executor",
-        dedupeKey: buildDedupeKey(["overdue", row.id, "executor", lastOverdue ? "repeat" : "first"]),
+        dedupeKey: buildDedupeKey([
+          "overdue",
+          row.id,
+          "executor",
+          lastOverdue ? "repeat" : "first",
+        ]),
         ctaUrl: buildCtaUrl(row.id),
         priority: mapPriorityForType("overdue"),
       });
 
       if (created.created) {
-        await admin
-          .from("promise_notification_state")
-          .upsert({
-            promise_id: row.id,
-            overdue_notified_at: nowIso,
-            updated_at: nowIso,
-          });
+        await admin.from("promise_notification_state").upsert({
+          promise_id: row.id,
+          overdue_notified_at: nowIso,
+          updated_at: nowIso,
+        });
         results.overdue += 1;
       }
     }
@@ -308,18 +329,17 @@ export async function POST(req: Request) {
       });
 
       if (created.created) {
-        await admin
-          .from("promise_notification_state")
-          .upsert({
-            promise_id: row.id,
-            overdue_creator_notified_at: nowIso,
-            updated_at: nowIso,
-          });
+        await admin.from("promise_notification_state").upsert({
+          promise_id: row.id,
+          overdue_creator_notified_at: nowIso,
+          updated_at: nowIso,
+        });
         results.overdue += 1;
       }
     }
   }
 
+  // --- 5) completion followups (24h / 72h after completion notification) ---
   const { data: completionRows } = await admin
     .from("promises")
     .select(
@@ -330,6 +350,8 @@ export async function POST(req: Request) {
   for (const row of completionRows ?? []) {
     const state = getNotificationState(row.promise_notification_state);
     if (!state.completion_notified_at) continue;
+
+    // If completion was re-triggered, only follow up on current cycle
     if (row.completed_at && state.completion_cycle_started_at) {
       if (row.completed_at !== state.completion_cycle_started_at) continue;
     }
@@ -360,14 +382,12 @@ export async function POST(req: Request) {
     });
 
     if (created.created) {
-      await admin
-        .from("promise_notification_state")
-        .upsert({
-          promise_id: row.id,
-          completion_followups_count: (state.completion_followups_count ?? 0) + 1,
-          completion_followup_last_at: nowIso,
-          updated_at: nowIso,
-        });
+      await admin.from("promise_notification_state").upsert({
+        promise_id: row.id,
+        completion_followups_count: (state.completion_followups_count ?? 0) + 1,
+        completion_followup_last_at: nowIso,
+        updated_at: nowIso,
+      });
       results.completionFollowups += 1;
     }
   }

@@ -19,6 +19,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
+    if (!executorId || !counterpartyId) {
+      console.warn("[promises] missing participant id for completion", {
+        promiseId: id,
+        executorId,
+        counterpartyId,
+        userId: user.id,
+      });
+    }
     if (!executorId || executorId !== user.id || counterpartyId === user.id) {
       return NextResponse.json({ error: "Only the executor can complete" }, { status: 403 });
     }
