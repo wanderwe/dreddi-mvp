@@ -475,7 +475,6 @@ export default function PromisePage() {
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
   const isCreator = Boolean(p && userId === p.creator_id);
-  const waitingForReview = p?.status === "completed_by_promisor";
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
   const uiStatus = p ? getPromiseUiStatus(p) : null;
@@ -589,10 +588,6 @@ export default function PromisePage() {
 
           <Card title={t("promises.detail.statusActions")}>
             <div className="space-y-3">
-              <div className="text-sm text-neutral-300">
-                {t("promises.detail.currentStatus")}: <StatusPill status={uiStatus ?? p.status} />
-              </div>
-
               {isExecutor && p.status === "active" && (
                 isInviteAccepted ? (
                   <ActionButton
@@ -611,12 +606,6 @@ export default function PromisePage() {
                 )
               )}
 
-              {!isExecutor && isCounterparty && p.status === "active" && isInviteAccepted && (
-                <div className="text-sm text-neutral-400">
-                  {stripTrailingPeriod(t("promises.detail.awaitingExecutor"))}
-                </div>
-              )}
-
               {isCounterparty && p.status === "completed_by_promisor" && (
                 <Link
                   href={`/promises/${p.id}/confirm`}
@@ -624,26 +613,6 @@ export default function PromisePage() {
                 >
                   {t("promises.detail.reviewConfirm")}
                 </Link>
-              )}
-
-              {waitingForReview && !isCounterparty && (
-                <div className="text-sm text-neutral-400">
-                  {stripTrailingPeriod(t("promises.detail.waitingReview"))}
-                </div>
-              )}
-
-              {p.status === "confirmed" && (
-                <div className="text-sm text-emerald-300">{t("promises.detail.confirmed")}</div>
-              )}
-
-              {p.status === "disputed" && (
-                <div className="text-sm text-red-300">{t("promises.detail.disputed")}</div>
-              )}
-
-              {inviteStatus === "awaiting_acceptance" && (
-                <div className="text-xs text-neutral-500">
-                  {t("promises.detail.awaitingAcceptanceHint")}
-                </div>
               )}
             </div>
           </Card>
