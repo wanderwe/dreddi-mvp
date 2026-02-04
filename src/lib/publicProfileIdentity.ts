@@ -6,6 +6,7 @@ type PublicProfileIdentityInput = {
 type PublicProfileIdentity = {
   title: string;
   subtitle?: string;
+  maskedEmail?: string;
 };
 
 const normalizeValue = (value?: string | null) => value?.trim() ?? "";
@@ -33,5 +34,5 @@ export const getPublicProfileIdentity = ({
     subtitle = undefined;
   }
 
-  return { title, subtitle };
+  return { title, subtitle, maskedEmail: maskedEmail || undefined };
 };

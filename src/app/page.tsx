@@ -67,6 +67,8 @@ type DealRowProps = {
   statusTones: Record<PromiseStatus, string>;
 };
 
+const LEGACY_BETA_BANNER_DISMISSED_KEYS = ["betaBannerDismissed", "beta-banner-dismissed"];
+
 function DealRow({
   item,
   href,
@@ -189,6 +191,17 @@ export default function Home() {
       closed: (date) => t("deal.meta.closed", { date }),
     });
   };
+
+  useEffect(() => {
+    if (!isBeta || typeof window === "undefined") return;
+    try {
+      LEGACY_BETA_BANNER_DISMISSED_KEYS.forEach((key) =>
+        window.localStorage.removeItem(key)
+      );
+    } catch {
+      // Ignore storage cleanup errors (private mode, blocked storage, etc.).
+    }
+  }, [isBeta]);
 
   useEffect(() => {
     let active = true;
