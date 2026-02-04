@@ -50,6 +50,16 @@
     "viewPublicProfile": "Переглянути",
     "copyLink": "Скопіювати посилання",
     "copySuccess": "Скопійовано",
+    "identityLabel": "Публічна ідентичність",
+    "identityDescription": "Оберіть, як ваше ім’я відображатиметься у публічних профілях",
+    "displayNameLabel": "Показуване ім’я (публічно)",
+    "displayNamePlaceholder": "Додайте показуване ім’я",
+    "displayNameHelper": "2–40 символів. Залиште порожнім, щоб показувати @handle.",
+    "handleLabel": "Ім’я користувача/handle (публічно)",
+    "handlePlaceholder": "ваш-handle",
+    "handleHelper": "Показується як @handle. Має бути унікальним.",
+    "displayNameError": "Показуване ім’я має містити 2–40 символів.",
+    "handleError": "Handle є обов’язковим.",
     "status": {
       "public": "Публічний",
       "private": "Приватний"
@@ -59,7 +69,9 @@
       "unavailable": "Автентифікація недоступна в цьому превʼю",
       "notAuthenticated": "Не автентифіковано",
       "copyFailed": "Не вдалося скопіювати посилання",
-      "saveFailed": "Не вдалося оновити профіль"
+      "saveFailed": "Не вдалося оновити профіль",
+      "displayNameLength": "Показуване ім’я має містити 2–40 символів",
+      "handleRequired": "Handle є обов’язковим"
     },
     "notificationsLabel": "Сповіщення",
     "notificationsDescription": "Керуйте нагадуваннями та сповіщеннями",

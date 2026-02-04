@@ -9,7 +9,6 @@ import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 
 type PublicProfileDirectoryRow = {
   handle: string;
-  email: string | null;
   display_name: string | null;
   avatar_url: string | null;
   reputation_score: number | null;
@@ -33,6 +32,7 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [canUseEmailSearch, setCanUseEmailSearch] = useState(false);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -43,6 +43,23 @@ export default function PublicProfilesDirectoryPage() {
       window.clearTimeout(handle);
     };
   }, [searchTerm]);
+
+  useEffect(() => {
+    let active = true;
+
+    const checkAuth = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      setCanUseEmailSearch(Boolean(data.session));
+    };
+
+    void checkAuth();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -70,9 +87,11 @@ export default function PublicProfilesDirectoryPage() {
 
       if (normalizedSearch) {
         const searchPattern = `%${normalizedSearch}%`;
-        query = query.or(
-          `handle.ilike.${searchPattern},display_name.ilike.${searchPattern},email.ilike.${searchPattern}`
-        );
+        const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+        if (canUseEmailSearch && normalizedSearch.includes("@")) {
+          filters.push(`email.eq.${normalizedSearch.toLowerCase()}`);
+        }
+        query = query.or(filters.join(","));
       }
 
       const { data, error: listError } = await query.range(0, pageSize);
@@ -98,7 +117,7 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [debouncedSearch, pageSize, t]);
+  }, [canUseEmailSearch, debouncedSearch, pageSize, t]);
 
   const loadMore = async () => {
     if (!supabase) {
@@ -123,9 +142,11 @@ export default function PublicProfilesDirectoryPage() {
 
     if (normalizedSearch) {
       const searchPattern = `%${normalizedSearch}%`;
-      query = query.or(
-        `handle.ilike.${searchPattern},display_name.ilike.${searchPattern},email.ilike.${searchPattern}`
-      );
+      const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+      if (canUseEmailSearch && normalizedSearch.includes("@")) {
+        filters.push(`email.eq.${normalizedSearch.toLowerCase()}`);
+      }
+      query = query.or(filters.join(","));
     }
 
     const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
@@ -152,7 +173,6 @@ export default function PublicProfilesDirectoryPage() {
         const { title, subtitle, maskedEmail } = getPublicProfileIdentity({
           displayName: profile.display_name,
           handle: profile.handle,
-          email: profile.email,
         });
         const avatarLabel = (title || profile.handle).replace(/^@/, "");
         const showMaskedEmail =
