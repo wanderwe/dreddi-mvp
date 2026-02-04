@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { UserRound, X } from "lucide-react";
+import { ChevronDown, UserRound, X } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
@@ -50,6 +50,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [quietHoursEndInput, setQuietHoursEndInput] = useState("09:00");
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [handleInput, setHandleInput] = useState("");
+  const [openSection, setOpenSection] = useState<"identity" | "notifications">("identity");
   const lastHandleRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -331,7 +332,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   };
 
   return (
-    <div className={className}>
+    <div className={`flex min-h-0 flex-col ${className}`}>
       {showTitle && (
         <div className="space-y-1">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
@@ -341,337 +342,399 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         </div>
       )}
 
-      <div className="mt-4 space-y-3">
-        <SettingRow
-          title={
-            <button
-              type="button"
-              onClick={handleToggle}
-              disabled={loading || saving || !profile}
-              className={`-m-2 flex w-full flex-col items-start rounded-lg p-2 text-left transition ${
-                loading || saving || !profile
-                  ? "cursor-not-allowed"
-                  : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+      <div className="mt-4 flex min-h-0 flex-col gap-4">
+        <div className="rounded-2xl border border-white/10 bg-white/5">
+          <button
+            type="button"
+            onClick={() => setOpenSection("identity")}
+            aria-expanded={openSection === "identity"}
+            className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5"
+          >
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.identityLabel")}
+              </div>
+              <p className="text-xs text-slate-300">
+                {t("profileSettings.identityDescription")}
+              </p>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 text-slate-200 transition ${
+                openSection === "identity" ? "rotate-180" : ""
+              }`}
+              aria-hidden
+            />
+          </button>
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              openSection === "identity" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div
+              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+                openSection === "identity" ? "opacity-100" : "opacity-0"
               }`}
             >
-              <div className="text-sm font-semibold text-white">
-                {t("profileSettings.publicLabel")}
-              </div>
-              <p className="text-xs text-slate-300">{t("profileSettings.publicDescription")}</p>
-            </button>
-          }
-          right={
-            <div className="flex flex-col items-end gap-2">
-              <span
-                className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                  isPublic
-                    ? "border-emerald-300/40 bg-emerald-400/10 text-emerald-200"
-                    : "border-white/15 bg-white/5 text-slate-300"
-                }`}
-              >
-                {isPublic
-                  ? t("profileSettings.status.public")
-                  : t("profileSettings.status.private")}
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isPublic}
-                aria-label={t("profileSettings.toggleLabel")}
-                onClick={handleToggle}
-                disabled={loading || saving || !profile}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                  isPublic
-                    ? "border-emerald-300/50 bg-emerald-400/70"
-                    : "border-white/20 bg-white/10"
-                } ${
-                  loading || saving || !profile
-                    ? "cursor-not-allowed opacity-60"
-                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
-                }`}
-              >
-                <span
-                  className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                    isPublic ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-          }
-        >
-          {loading && (
-            <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
-          )}
-        </SettingRow>
-
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">
-              {t("profileSettings.identityLabel")}
-            </div>
-            <p className="text-xs text-slate-300">
-              {t("profileSettings.identityDescription")}
-            </p>
-          </div>
-          <div className="mt-4 space-y-3">
-            <label className="flex flex-col gap-2 text-xs text-slate-300">
-              <span>{t("profileSettings.displayNameLabel")}</span>
-              <input
-                type="text"
-                value={displayNameInput}
-                onChange={(event) => setDisplayNameInput(event.target.value)}
-                placeholder={t("profileSettings.displayNamePlaceholder")}
-                maxLength={40}
-                className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-              />
-              <span className="text-[11px] text-slate-500">
-                {t("profileSettings.displayNameHelper")}
-              </span>
-            </label>
-            <label className="flex flex-col gap-2 text-xs text-slate-300">
-              <span>{t("profileSettings.handleLabel")}</span>
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                <span className="text-slate-400">@</span>
-                <input
-                  type="text"
-                  value={handleInput}
-                  onChange={(event) => setHandleInput(event.target.value)}
-                  placeholder={t("profileSettings.handlePlaceholder")}
-                  className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
-                />
-              </div>
-              <span className="text-[11px] text-slate-500">
-                {t("profileSettings.handleHelper")}
-              </span>
-            </label>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[11px] text-slate-500">
-                {displayNameTooShort || displayNameTooLong
-                  ? t("profileSettings.displayNameError")
-                  : handleMissing
-                    ? t("profileSettings.handleError")
-                    : "\u00A0"}
-              </span>
-              <button
-                type="button"
-                onClick={saveIdentity}
-                disabled={identityDisabled}
-                className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {t("profileSettings.save")}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">
-              {t("profileSettings.publicLinkLabel")}
-            </div>
-            <p className="text-xs text-slate-300">{t("profileSettings.publicLinkDescription")}</p>
-          </div>
-          {publicProfilePath ? (
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
-                {publicProfileUrl}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={publicProfilePath}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
+              <div className="space-y-3 pt-3">
+                <SettingRow
+                  title={
+                    <button
+                      type="button"
+                      onClick={handleToggle}
+                      disabled={loading || saving || !profile}
+                      className={`-m-2 flex w-full flex-col items-start rounded-lg p-2 text-left transition ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                      }`}
+                    >
+                      <div className="text-sm font-semibold text-white">
+                        {t("profileSettings.publicLabel")}
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        {t("profileSettings.publicDescription")}
+                      </p>
+                    </button>
+                  }
+                  right={
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
+                          isPublic
+                            ? "border-emerald-300/40 bg-emerald-400/10 text-emerald-200"
+                            : "border-white/15 bg-white/5 text-slate-300"
+                        }`}
+                      >
+                        {isPublic
+                          ? t("profileSettings.status.public")
+                          : t("profileSettings.status.private")}
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={isPublic}
+                        aria-label={t("profileSettings.toggleLabel")}
+                        onClick={handleToggle}
+                        disabled={loading || saving || !profile}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                          isPublic
+                            ? "border-emerald-300/50 bg-emerald-400/70"
+                            : "border-white/20 bg-white/10"
+                        } ${
+                          loading || saving || !profile
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                        }`}
+                      >
+                        <span
+                          className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                            isPublic ? "translate-x-5" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  }
                 >
-                  {t("profileSettings.viewPublicProfile")}
-                </a>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                </button>
-              </div>
-            </div>
-          ) : null}
-          {!isPublic && publicProfilePath ? (
-            <p className="mt-3 text-xs text-slate-400">{t("profileSettings.publicLinkPrivate")}</p>
-          ) : null}
-        </div>
+                  {loading && (
+                    <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
+                  )}
+                </SettingRow>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">
-              {t("profileSettings.notificationsLabel")}
-            </div>
-            <p className="text-xs text-slate-300">
-              {t("profileSettings.notificationsDescription")}
-            </p>
-          </div>
-          <div className="mt-4 space-y-4">
-            <div className="flex items-start justify-between gap-4 sm:items-center">
-              <button
-                type="button"
-                onClick={togglePushNotifications}
-                disabled={loading || saving || !profile}
-                className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
-                  loading || saving || !profile
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer hover:bg-white/5 active:bg-white/10"
-                }`}
-              >
-                <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
-                <p className="text-xs text-slate-400">
-                  {t("profileSettings.pushDescription")}
-                </p>
-              </button>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={profile?.pushEnabled ?? false}
-                onClick={togglePushNotifications}
-                disabled={loading || saving || !profile}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-                  profile?.pushEnabled
-                    ? "border-emerald-300/50 bg-emerald-400/70"
-                    : "border-white/20 bg-white/10"
-                } ${
-                  loading || saving || !profile
-                    ? "cursor-not-allowed opacity-60"
-                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
-                }`}
-              >
-                <span
-                  className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                    profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex items-start justify-between gap-4 sm:items-center">
-              <button
-                type="button"
-                onClick={toggleDeadlineReminders}
-                disabled={loading || saving || !profile}
-                className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
-                  loading || saving || !profile
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer hover:bg-white/5 active:bg-white/10"
-                }`}
-              >
-                <div className="text-sm text-white">{t("profileSettings.deadlineLabel")}</div>
-              </button>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={profile?.deadlineRemindersEnabled ?? false}
-                onClick={toggleDeadlineReminders}
-                disabled={loading || saving || !profile}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-                  profile?.deadlineRemindersEnabled
-                    ? "border-emerald-300/50 bg-emerald-400/70"
-                    : "border-white/20 bg-white/10"
-                } ${
-                  loading || saving || !profile
-                    ? "cursor-not-allowed opacity-60"
-                    : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
-                }`}
-              >
-                <span
-                  className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                    profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-start justify-between gap-4 sm:items-center">
-                <button
-                  type="button"
-                  onClick={toggleQuietHours}
-                  disabled={loading || saving || !profile}
-                  className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
-                    loading || saving || !profile
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer hover:bg-white/5 active:bg-white/10"
-                  }`}
-                >
-                  <div className="text-sm text-white">
-                    {t("profileSettings.quietHoursLabel")}
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="space-y-3">
+                    <label className="flex flex-col gap-2 text-xs text-slate-300">
+                      <span>{t("profileSettings.displayNameLabel")}</span>
+                      <input
+                        type="text"
+                        value={displayNameInput}
+                        onChange={(event) => setDisplayNameInput(event.target.value)}
+                        placeholder={t("profileSettings.displayNamePlaceholder")}
+                        maxLength={40}
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                      />
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.displayNameHelper")}
+                      </span>
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs text-slate-300">
+                      <span>{t("profileSettings.handleLabel")}</span>
+                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <span className="text-slate-400">@</span>
+                        <input
+                          type="text"
+                          value={handleInput}
+                          onChange={(event) => setHandleInput(event.target.value)}
+                          placeholder={t("profileSettings.handlePlaceholder")}
+                          className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                        />
+                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.handleHelper")}
+                      </span>
+                    </label>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-slate-500">
+                        {displayNameTooShort || displayNameTooLong
+                          ? t("profileSettings.displayNameError")
+                          : handleMissing
+                            ? t("profileSettings.handleError")
+                            : "\u00A0"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={saveIdentity}
+                        disabled={identityDisabled}
+                        className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {t("profileSettings.save")}
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-400">
-                    {t("profileSettings.quietHoursDescription")}
-                  </p>
-                </button>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={profile?.quietHoursEnabled ?? false}
-                  onClick={toggleQuietHours}
-                  disabled={loading || saving || !profile}
-                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-                    profile?.quietHoursEnabled
-                      ? "border-emerald-300/50 bg-emerald-400/70"
-                      : "border-white/20 bg-white/10"
-                  } ${
-                    loading || saving || !profile
-                      ? "cursor-not-allowed opacity-60"
-                      : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
-                  }`}
-                >
-                  <span
-                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                      profile?.quietHoursEnabled ? "translate-x-5" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
+                </div>
 
-              <div className="space-y-1">
-                <div
-                  className={`flex flex-wrap items-center gap-3 ${
-                    quietHoursRangeDisabled ? "pointer-events-none opacity-50" : ""
-                  }`}
-                >
-                  <span className="sr-only">{t("profileSettings.quietHoursRangeLabel")}</span>
-                  <TimePicker
-                    value={quietHoursStartInput}
-                    onChange={setQuietHoursStartInput}
-                    disabled={!profile?.quietHoursEnabled || loading || saving}
-                    ariaLabel={t("profileSettings.quietHoursRangeLabel")}
-                    className="w-[150px]"
-                    buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
-                  />
-                  <span className="inline-flex h-9 items-center text-xs text-slate-400">→</span>
-                  <TimePicker
-                    value={quietHoursEndInput}
-                    onChange={setQuietHoursEndInput}
-                    disabled={!profile?.quietHoursEnabled || loading || saving}
-                    ariaLabel={t("profileSettings.quietHoursRangeLabel")}
-                    className="w-[150px]"
-                    buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
-                  />
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="space-y-1">
+                    <div className="text-sm font-semibold text-white">
+                      {t("profileSettings.publicLinkLabel")}
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      {t("profileSettings.publicLinkDescription")}
+                    </p>
+                  </div>
+                  {publicProfilePath ? (
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+                        {publicProfileUrl}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href={publicProfilePath}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
+                        >
+                          {t("profileSettings.viewPublicProfile")}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={handleCopyLink}
+                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98]"
+                        >
+                          {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                  {!isPublic && publicProfilePath ? (
+                    <p className="mt-3 text-xs text-slate-400">
+                      {t("profileSettings.publicLinkPrivate")}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5">
+          <button
+            type="button"
+            onClick={() => setOpenSection("notifications")}
+            aria-expanded={openSection === "notifications"}
+            className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5"
+          >
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.notificationsLabel")}
+              </div>
+              <p className="text-xs text-slate-300">
+                {t("profileSettings.notificationsDescription")}
+              </p>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 text-slate-200 transition ${
+                openSection === "notifications" ? "rotate-180" : ""
+              }`}
+              aria-hidden
+            />
+          </button>
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              openSection === "notifications" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div
+              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+                openSection === "notifications" ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="space-y-4 pt-3">
+                <div className="flex items-start justify-between gap-4 sm:items-center">
                   <button
                     type="button"
-                    onClick={saveQuietHoursRange}
-                    disabled={
-                      loading ||
-                      saving ||
-                      !profile ||
-                      !profile?.quietHoursEnabled ||
-                      !quietHoursRangeChanged
-                    }
-                    className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={togglePushNotifications}
+                    disabled={loading || saving || !profile}
+                    className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                      loading || saving || !profile
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                    }`}
                   >
-                    {t("profileSettings.save")}
+                    <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
+                    <p className="text-xs text-slate-400">
+                      {t("profileSettings.pushDescription")}
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={profile?.pushEnabled ?? false}
+                    onClick={togglePushNotifications}
+                    disabled={loading || saving || !profile}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+                      profile?.pushEnabled
+                        ? "border-emerald-300/50 bg-emerald-400/70"
+                        : "border-white/20 bg-white/10"
+                    } ${
+                      loading || saving || !profile
+                        ? "cursor-not-allowed opacity-60"
+                        : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                        profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
                   </button>
                 </div>
-                <span className="text-xs text-slate-500">
-                  {t("profileSettings.quietHoursHelper")}
-                </span>
+
+                <div className="flex items-start justify-between gap-4 sm:items-center">
+                  <button
+                    type="button"
+                    onClick={toggleDeadlineReminders}
+                    disabled={loading || saving || !profile}
+                    className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                      loading || saving || !profile
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                    }`}
+                  >
+                    <div className="text-sm text-white">
+                      {t("profileSettings.deadlineLabel")}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={profile?.deadlineRemindersEnabled ?? false}
+                    onClick={toggleDeadlineReminders}
+                    disabled={loading || saving || !profile}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+                      profile?.deadlineRemindersEnabled
+                        ? "border-emerald-300/50 bg-emerald-400/70"
+                        : "border-white/20 bg-white/10"
+                    } ${
+                      loading || saving || !profile
+                        ? "cursor-not-allowed opacity-60"
+                        : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                        profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-4 sm:items-center">
+                    <button
+                      type="button"
+                      onClick={toggleQuietHours}
+                      disabled={loading || saving || !profile}
+                      className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer hover:bg-white/5 active:bg-white/10"
+                      }`}
+                    >
+                      <div className="text-sm text-white">
+                        {t("profileSettings.quietHoursLabel")}
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        {t("profileSettings.quietHoursDescription")}
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={profile?.quietHoursEnabled ?? false}
+                      onClick={toggleQuietHours}
+                      disabled={loading || saving || !profile}
+                      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+                        profile?.quietHoursEnabled
+                          ? "border-emerald-300/50 bg-emerald-400/70"
+                          : "border-white/20 bg-white/10"
+                      } ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer hover:border-emerald-300/60 active:scale-[0.98]"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                          profile?.quietHoursEnabled ? "translate-x-5" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div
+                      className={`flex flex-wrap items-center gap-3 ${
+                        quietHoursRangeDisabled ? "pointer-events-none opacity-50" : ""
+                      }`}
+                    >
+                      <span className="sr-only">{t("profileSettings.quietHoursRangeLabel")}</span>
+                      <TimePicker
+                        value={quietHoursStartInput}
+                        onChange={setQuietHoursStartInput}
+                        disabled={!profile?.quietHoursEnabled || loading || saving}
+                        ariaLabel={t("profileSettings.quietHoursRangeLabel")}
+                        className="w-[150px]"
+                        buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
+                      />
+                      <span className="inline-flex h-9 items-center text-xs text-slate-400">→</span>
+                      <TimePicker
+                        value={quietHoursEndInput}
+                        onChange={setQuietHoursEndInput}
+                        disabled={!profile?.quietHoursEnabled || loading || saving}
+                        ariaLabel={t("profileSettings.quietHoursRangeLabel")}
+                        className="w-[150px]"
+                        buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={saveQuietHoursRange}
+                        disabled={
+                          loading ||
+                          saving ||
+                          !profile ||
+                          !profile?.quietHoursEnabled ||
+                          !quietHoursRangeChanged
+                        }
+                        className="h-9 rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {t("profileSettings.save")}
+                      </button>
+                    </div>
+                    <span className="text-xs text-slate-500">
+                      {t("profileSettings.quietHoursHelper")}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -753,7 +816,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       )}
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-auto lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
+        <SheetContent className="flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
