@@ -28,10 +28,6 @@ type PromiseRow = {
   due_at: string | null;
   status: PromiseStatus;
   created_at: string;
-  reward_amount: number | null;
-  reward_currency: string | null;
-  reward_text: string | null;
-  payment_terms: string | null;
 
   invite_token: string | null;
   counterparty_id: string | null;
@@ -234,7 +230,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -572,38 +568,6 @@ export default function PromisePage() {
                 <div className="pt-2 text-neutral-200 whitespace-pre-wrap">{p.details}</div>
               ) : (
                 <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
-              )}
-
-              {(p.reward_amount || p.reward_text || p.payment_terms) && (
-                <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200 space-y-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                      {t("promises.detail.rewardLabel")}
-                    </p>
-                    {p.reward_amount && p.reward_currency ? (
-                      <div className="mt-2 text-slate-100">
-                        {`${p.reward_amount} ${p.reward_currency}`}
-                      </div>
-                    ) : !p.reward_text ? (
-                      <div className="mt-2 text-slate-100">
-                        {t("promises.detail.rewardUnset")}
-                      </div>
-                    ) : null}
-                    {p.reward_text && (
-                      <div className="mt-2 whitespace-pre-wrap text-slate-100">
-                        {p.reward_text}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                      {t("promises.detail.paymentTermsLabel")}
-                    </p>
-                    <div className="mt-2 whitespace-pre-wrap text-slate-100">
-                      {p.payment_terms ?? t("promises.detail.paymentTermsUnset")}
-                    </div>
-                  </div>
-                </div>
               )}
 
               {hasCondition && (

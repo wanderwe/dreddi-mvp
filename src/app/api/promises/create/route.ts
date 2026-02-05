@@ -17,10 +17,6 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
-  rewardAmount?: number | string | null;
-  rewardCurrency?: string | null;
-  rewardText?: string | null;
-  paymentTerms?: string | null;
 };
 
 export async function POST(req: Request) {
@@ -88,10 +84,6 @@ export async function POST(req: Request) {
       ignored_at: null,
       visibility,
       promise_mode: "deal",
-      reward_amount: null,
-      reward_currency: null,
-      reward_text: null,
-      payment_terms: null,
     };
 
     const { data: insertData, error: insertError } = await admin
