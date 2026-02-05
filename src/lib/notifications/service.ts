@@ -254,12 +254,15 @@ export const buildCtaUrl = (promiseId: string, path?: string) => {
 
 export const mapPriorityForType = (type: NotificationType): NotificationPriority => {
   switch (normalizeNotificationType(type)) {
+    case "marked_completed":
     case "completion_waiting":
       return "critical";
     case "completion_followup":
     case "dispute":
+    case "disputed":
       return "high";
     case "overdue":
+    case "reminder_overdue":
       return "high";
     default:
       return "normal";

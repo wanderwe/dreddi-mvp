@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import { buildCompletionWaitingNotification } from "@/lib/notifications/flows";
-import { createNotification } from "@/lib/notifications/service";
+import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 
@@ -60,17 +59,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    const { data: state } = await admin
-      .from("promise_notification_state")
-      .select("completion_cycle_id")
-      .eq("promise_id", id)
-      .maybeSingle();
-
-    const nextCycle = (state?.completion_cycle_id ?? 0) + 1;
-
     await admin.from("promise_notification_state").upsert({
       promise_id: id,
-      completion_cycle_id: nextCycle,
       completion_cycle_started_at: nowIso,
       completion_notified_at: nowIso,
       completion_followups_count: 0,
@@ -78,14 +68,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       updated_at: nowIso,
     });
 
-    await createNotification(
+    await dispatchNotificationEvent({
       admin,
-      buildCompletionWaitingNotification({
-        promiseId: id,
-        creatorId: promise.creator_id,
-        cycleId: nextCycle,
-      })
-    );
+      event: "marked_completed",
+      promise,
+      actorId: user.id,
+      ctaUrl: `/promises/${id}/confirm`,
+    });
 
     return NextResponse.json({ ok: true });
   } catch (e) {

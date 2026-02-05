@@ -546,6 +546,11 @@
       "unavailable": "Authentication is unavailable in this preview"
     },
     "types": {
+      "accepted": {
+        "title": "Deal accepted",
+        "description": "Why now: the other party accepted the deal.",
+        "cta": "Open"
+      },
       "invite": {
         "title": "New deal invitation",
         "description": "Confirm only if you’re ready to take responsibility",
@@ -554,6 +559,31 @@
       "invite_followup": {
         "title": "Deal confirmed",
         "description": "Responsibility is now active",
+        "cta": "Open"
+      },
+      "marked_completed": {
+        "title": "Action needed",
+        "description": "Deal marked completed, confirm or dispute",
+        "cta": "Review"
+      },
+      "confirmed": {
+        "title": "Outcome confirmed",
+        "description": "Why now: the other party confirmed completion. Review the outcome details.",
+        "cta": "View"
+      },
+      "disputed": {
+        "title": "Outcome disputed",
+        "description": "The deal was disputed, check details",
+        "cta": "View"
+      },
+      "reminder_due_24h": {
+        "title": "Deadline approaching",
+        "description": "Why now: the due date is within 24 hours. Check the deal details and plan completion.",
+        "cta": "View"
+      },
+      "reminder_overdue": {
+        "title": "Deal is overdue",
+        "description": "Why now: the due date has passed. Review the deal and mark it completed if it’s done.",
         "cta": "Open"
       },
       "due_soon": {
