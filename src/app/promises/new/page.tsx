@@ -32,11 +32,7 @@ export default function NewPromisePage() {
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
-  const [promiseMode, setPromiseMode] = useState<PromiseMode>("deal");
-  const [rewardAmount, setRewardAmount] = useState("");
-  const [rewardCurrency, setRewardCurrency] = useState("UAH");
-  const [rewardText, setRewardText] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState("");
+  const promiseMode: PromiseMode = "deal";
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -58,12 +54,6 @@ export default function NewPromisePage() {
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t, promiseMode), [promiseMode, t]);
-
-  useEffect(() => {
-    if (promiseMode === "request") {
-      setIsPublicDeal(false);
-    }
-  }, [promiseMode]);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -120,8 +110,6 @@ export default function NewPromisePage() {
     { label: "18:00", hour: 18, minute: 0 },
     { label: "23:59", hour: 23, minute: 59 },
   ];
-  const currencyOptions = ["UAH", "USD", "EUR"];
-
   const timeOptions = useMemo(() => {
     const options: Array<{ label: string; hour: number; minute: number }> = [];
     for (let hour = 0; hour < 24; hour += 1) {
@@ -463,21 +451,6 @@ export default function NewPromisePage() {
       return;
     }
 
-    const rewardAmountValue = rewardAmount.trim()
-      ? Number.parseFloat(rewardAmount.replace(",", "."))
-      : null;
-    if (promiseMode === "request" && rewardAmountValue !== null && Number.isNaN(rewardAmountValue)) {
-      setBusy(false);
-      setError(t("promises.new.errors.rewardAmountInvalid"));
-      return;
-    }
-
-    if (promiseMode === "request" && rewardAmountValue !== null && !rewardCurrency.trim()) {
-      setBusy(false);
-      setError(t("promises.new.errors.rewardCurrencyRequired"));
-      return;
-    }
-
     const shouldRequestPublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
@@ -486,12 +459,8 @@ export default function NewPromisePage() {
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
-      visibility: promiseMode === "request" ? "private" : shouldRequestPublic ? "public" : "private",
+      visibility: shouldRequestPublic ? "public" : "private",
       promiseMode,
-      rewardAmount: promiseMode === "request" ? rewardAmountValue : null,
-      rewardCurrency: promiseMode === "request" ? rewardCurrency.trim() : null,
-      rewardText: promiseMode === "request" ? rewardText.trim() || null : null,
-      paymentTerms: promiseMode === "request" ? paymentTerms.trim() || null : null,
     };
 
     let res: Response;
@@ -567,28 +536,9 @@ export default function NewPromisePage() {
                 {t("promises.new.fields.type")}
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => setPromiseMode("deal")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseMode === "deal"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
+                <div className="flex-1 rounded-2xl bg-emerald-400/90 px-4 py-2 text-center text-sm font-semibold text-slate-950 shadow shadow-emerald-500/20">
                   {t("promises.new.type.deal")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPromiseMode("request")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    promiseMode === "request"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
-                  }`}
-                >
-                  {t("promises.new.type.request")}
-                </button>
+                </div>
               </div>
             </div>
 
@@ -678,63 +628,6 @@ export default function NewPromisePage() {
                   </button>
                 </div>
               </label>
-            )}
-
-            {promiseMode === "request" && (
-              <div className="space-y-4 text-sm text-slate-200 sm:col-span-2">
-                <div className="space-y-2">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.reward")}
-                  </span>
-                  <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
-                    <input
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                      inputMode="decimal"
-                      placeholder={t("promises.new.placeholders.rewardAmount")}
-                      value={rewardAmount}
-                      onChange={(e) => setRewardAmount(e.target.value)}
-                    />
-                    <select
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                      value={rewardCurrency}
-                      onChange={(e) => setRewardCurrency(e.target.value)}
-                    >
-                      {currencyOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {t("promises.new.fields.rewardHelper")}
-                  </div>
-                </div>
-
-                <label className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.rewardText")}
-                  </span>
-                  <textarea
-                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                    placeholder={t("promises.new.placeholders.rewardText")}
-                    value={rewardText}
-                    onChange={(e) => setRewardText(e.target.value)}
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                    {t("promises.new.fields.paymentTerms")}
-                  </span>
-                  <textarea
-                    className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                    placeholder={t("promises.new.placeholders.paymentTerms")}
-                    value={paymentTerms}
-                    onChange={(e) => setPaymentTerms(e.target.value)}
-                  />
-                </label>
-              </div>
             )}
 
             <div className="sm:col-span-2">

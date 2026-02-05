@@ -80,7 +80,7 @@ const PAGE_SIZE = 12;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
-  const promiseMode = normalizePromiseMode(row.promise_mode);
+  const promiseMode = normalizePromiseMode(row.promise_mode) ?? "deal";
   const isReviewer = promiseMode === "request" ? row.creator_id === userId : executorId !== userId;
   const role: PromiseRole =
     executorId && executorId === userId ? "promisor" : "counterparty";

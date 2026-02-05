@@ -8,7 +8,6 @@ import {
   createNotification,
   mapPriorityForType,
 } from "@/lib/notifications/service";
-import { normalizePromiseMode } from "@/lib/promiseLabels";
 
 type CreatePromisePayload = {
   title?: string;
@@ -36,7 +35,10 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const counterpartyContact = body?.counterpartyContact?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
-    const promiseMode = normalizePromiseMode(body?.promiseMode);
+    if (body?.promiseMode && body.promiseMode !== "deal") {
+      return NextResponse.json({ error: "Only deal promises can be created" }, { status: 400 });
+    }
+    const promiseMode = "deal";
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -48,29 +50,6 @@ export async function POST(req: Request) {
 
     const dueAt = body?.dueAt ? new Date(body.dueAt) : null;
     const dueAtIso = dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt.toISOString() : null;
-    const rewardAmountInput = body?.rewardAmount ?? null;
-    const rewardAmount =
-      rewardAmountInput === null || rewardAmountInput === undefined || rewardAmountInput === ""
-        ? null
-        : typeof rewardAmountInput === "number"
-          ? rewardAmountInput
-          : Number.parseFloat(String(rewardAmountInput));
-    const rewardCurrency =
-      rewardAmount !== null ? body?.rewardCurrency?.trim()?.toUpperCase() || null : null;
-    const rewardText = body?.rewardText?.trim() || null;
-    const paymentTerms = body?.paymentTerms?.trim() || null;
-
-    if (rewardAmount !== null && Number.isNaN(rewardAmount)) {
-      return NextResponse.json({ error: "Reward amount must be a number" }, { status: 400 });
-    }
-
-    if (promiseMode === "request" && rewardAmount !== null && !rewardCurrency) {
-      return NextResponse.json(
-        { error: "Reward currency is required when reward amount is set" },
-        { status: 400 }
-      );
-    }
-
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
@@ -84,11 +63,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     const visibility =
-      promiseMode === "request"
-        ? "private"
-        : requestedVisibility === "public" && profileRow?.is_public_profile
-          ? "public"
-          : "private";
+      requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
 
     const { data: matchingProfile } = await admin
       .from("profiles")
@@ -118,10 +93,10 @@ export async function POST(req: Request) {
       ignored_at: null,
       visibility,
       promise_mode: promiseMode,
-      reward_amount: promiseMode === "request" ? rewardAmount : null,
-      reward_currency: promiseMode === "request" ? rewardCurrency : null,
-      reward_text: promiseMode === "request" ? rewardText : null,
-      payment_terms: promiseMode === "request" ? paymentTerms : null,
+      reward_amount: null,
+      reward_currency: null,
+      reward_text: null,
+      payment_terms: null,
     };
 
     const { data: insertData, error: insertError } = await admin
