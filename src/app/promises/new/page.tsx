@@ -533,17 +533,6 @@ export default function NewPromisePage() {
           <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.type")}
-              </span>
-              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
-                <div className="flex-1 rounded-2xl bg-emerald-400/90 px-4 py-2 text-center text-sm font-semibold text-slate-950 shadow shadow-emerald-500/20">
-                  {t("promises.new.type.deal")}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
