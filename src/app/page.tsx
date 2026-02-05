@@ -370,6 +370,15 @@ export default function Home() {
       } else {
         const body = (await res.json()) as ReputationResponse;
         setReputation(body);
+        if (process.env.NODE_ENV !== "production") {
+          console.info("dashboard on-time metrics", {
+            confirmed: body.reputation.confirmed_count,
+            disputed: body.reputation.disputed_count,
+            confirmedWithDeadline: body.reputation.confirmed_with_deadline_count,
+            onTime: body.reputation.on_time_count,
+            totalCompleted: body.reputation.total_promises_completed,
+          });
+        }
       }
 
       setReputationLoading(false);

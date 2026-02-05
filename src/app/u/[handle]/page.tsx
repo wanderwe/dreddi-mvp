@@ -148,6 +148,13 @@ export default function PublicProfilePage() {
       }
 
       setProfile(profileRow as PublicProfileRow);
+      if (process.env.NODE_ENV !== "production") {
+        console.info("public profile on-time metrics", {
+          handle: profileRow.handle,
+          dealsWithDueDate: profileRow.deals_with_due_date_count,
+          onTime: profileRow.on_time_completion_count,
+        });
+      }
 
       const { data, error: promisesErr } = await supabase.rpc(
         "public_get_profile_public_promises",

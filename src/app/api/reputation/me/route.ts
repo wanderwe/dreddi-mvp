@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAdminClient } from "../../promises/[id]/common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { cookies } from "next/headers";
+import { buildOnTimeMetrics } from "@/lib/reputation/onTimeMetrics";
 
 export async function GET(req: Request) {
   try {
@@ -23,33 +24,19 @@ export async function GET(req: Request) {
 
     const { data: deliveries, error: deliveriesErr } = await admin
       .from("promises")
-      .select("status,due_at,confirmed_at,completed_at")
-      .eq("promisor_id", user.id)
-      .in("status", ["confirmed", "disputed"]);
+      .select(
+        "status,due_at,confirmed_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id"
+      )
+      .in("status", ["confirmed", "disputed"])
+      .or(
+        `promisor_id.eq.${user.id},promisee_id.eq.${user.id},creator_id.eq.${user.id},counterparty_id.eq.${user.id}`
+      );
 
     if (deliveriesErr) {
       return NextResponse.json({ error: "Failed to load deliveries", detail: deliveriesErr.message }, { status: 500 });
     }
 
-    const confirmedDeliveries = (deliveries ?? []).filter((row) => row.status === "confirmed");
-    const disputedDeliveries = (deliveries ?? []).filter((row) => row.status === "disputed");
-
-    const confirmedWithDeadline = confirmedDeliveries.filter((row) => row.due_at);
-
-    const onTimeDeliveries = confirmedWithDeadline.filter((row) => {
-      const deadline = new Date(row.due_at).getTime();
-      const completion = row.confirmed_at ?? row.completed_at;
-      if (!completion) return false;
-      return new Date(completion).getTime() <= deadline;
-    });
-
-    const deliveryMetrics = {
-      confirmed: confirmedDeliveries.length,
-      disputed: disputedDeliveries.length,
-      onTime: onTimeDeliveries.length,
-      confirmedWithDeadline: confirmedWithDeadline.length,
-      totalCompleted: confirmedDeliveries.length + disputedDeliveries.length,
-    };
+    const deliveryMetrics = buildOnTimeMetrics(deliveries ?? [], user.id);
 
     const { data: events, error: eventsErr } = await admin
       .from("reputation_events")
@@ -74,7 +61,7 @@ export async function GET(req: Request) {
         updated_at: new Date().toISOString(),
       };
 
-    return NextResponse.json({
+    const responsePayload = {
       reputation: {
         ...baseReputation,
         confirmed_count: deliveryMetrics.confirmed,
@@ -84,7 +71,22 @@ export async function GET(req: Request) {
         confirmed_with_deadline_count: deliveryMetrics.confirmedWithDeadline,
       },
       recent_events: events ?? [],
-    });
+    };
+
+    if (process.env.NODE_ENV !== "production") {
+      responsePayload.reputation = {
+        ...responsePayload.reputation,
+        on_time_debug: {
+          confirmed: deliveryMetrics.confirmed,
+          disputed: deliveryMetrics.disputed,
+          confirmedWithDeadline: deliveryMetrics.confirmedWithDeadline,
+          onTime: deliveryMetrics.onTime,
+          totalCompleted: deliveryMetrics.totalCompleted,
+        },
+      } as typeof responsePayload.reputation;
+    }
+
+    return NextResponse.json(responsePayload);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: "Unexpected error", message }, { status: 500 });
