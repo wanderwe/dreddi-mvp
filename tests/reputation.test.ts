@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { applyReputationForPromiseFinalization } from "../src/lib/reputation/applyReputation";
+import { buildOnTimeMetrics } from "../src/lib/reputation/onTimeMetrics";
 import type { PromiseStatus } from "../src/lib/promiseStatus";
 
 type ReputationRow = {
@@ -258,4 +259,72 @@ test("reputation does not apply when executor is missing", async () => {
 
   assert.equal(admin.reputation.size, 0);
   assert.equal(admin.events.length, 0);
+});
+
+test("on-time metrics align with executor and completed timestamps", () => {
+  const executorId = "executor";
+  const now = new Date("2025-01-10T10:00:00.000Z");
+  const dueSoon = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+  const duePassed = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+
+  const rows = [
+    {
+      status: "confirmed" as PromiseStatus,
+      due_at: dueSoon,
+      completed_at: new Date(now.getTime() + 10 * 60 * 1000).toISOString(),
+      confirmed_at: now.toISOString(),
+      creator_id: "creator",
+      counterparty_id: "creator",
+      promisor_id: executorId,
+      promisee_id: "creator",
+    },
+    {
+      status: "confirmed" as PromiseStatus,
+      due_at: duePassed,
+      completed_at: new Date(now.getTime() + 5 * 60 * 1000).toISOString(),
+      confirmed_at: now.toISOString(),
+      creator_id: "creator",
+      counterparty_id: "creator",
+      promisor_id: executorId,
+      promisee_id: "creator",
+    },
+    {
+      status: "confirmed" as PromiseStatus,
+      due_at: null,
+      completed_at: now.toISOString(),
+      confirmed_at: now.toISOString(),
+      creator_id: "creator",
+      counterparty_id: "creator",
+      promisor_id: executorId,
+      promisee_id: "creator",
+    },
+    {
+      status: "disputed" as PromiseStatus,
+      due_at: duePassed,
+      completed_at: duePassed,
+      confirmed_at: null,
+      creator_id: "creator",
+      counterparty_id: "creator",
+      promisor_id: executorId,
+      promisee_id: "creator",
+    },
+    {
+      status: "confirmed" as PromiseStatus,
+      due_at: dueSoon,
+      completed_at: dueSoon,
+      confirmed_at: now.toISOString(),
+      creator_id: "creator",
+      counterparty_id: "promisee",
+      promisor_id: null,
+      promisee_id: "promisee",
+    },
+  ];
+
+  const metrics = buildOnTimeMetrics(rows, executorId);
+
+  assert.equal(metrics.confirmed, 3);
+  assert.equal(metrics.disputed, 1);
+  assert.equal(metrics.confirmedWithDeadline, 2);
+  assert.equal(metrics.onTime, 1);
+  assert.equal(metrics.totalCompleted, 4);
 });
