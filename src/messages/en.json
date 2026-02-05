@@ -539,6 +539,7 @@
     "loading": "Loading notifications…",
     "empty": "No notifications yet",
     "loadMore": "Load more",
+    "markAllRead": "Mark all as read",
     "markRead": "Mark as read",
     "errors": {
       "unavailable": "Authentication is unavailable in this preview"

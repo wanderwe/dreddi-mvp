@@ -29,6 +29,7 @@ export default function NotificationsClient() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [markingAll, setMarkingAll] = useState(false);
 
   const pageSize = 12;
 
@@ -230,6 +231,24 @@ export default function NotificationsClient() {
     }
   };
 
+  const markAllAsRead = async () => {
+    if (markingAll) return;
+    const timestamp = new Date().toISOString();
+    setMarkingAll(true);
+    setRows((prev) =>
+      prev.map((row) => (row.read_at ? row : { ...row, read_at: timestamp }))
+    );
+
+    try {
+      const supabase = requireSupabase();
+      await supabase.from("notifications").update({ read_at: timestamp }).is("read_at", null);
+    } catch {
+      // ignore client errors; the UI has already been updated optimistically
+    } finally {
+      setMarkingAll(false);
+    }
+  };
+
   const formatDate = (value: string) =>
     new Intl.DateTimeFormat(locale, {
       month: "short",
@@ -252,18 +271,32 @@ export default function NotificationsClient() {
     return `notifications.types.${normalized}`;
   };
 
+  const hasUnread = rows.some((row) => !row.read_at);
+
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
-          {t("notifications.header.eyebrow")}
-        </p>
-        <h1 className="text-3xl font-semibold text-white">
-          {t("notifications.header.title")}
-        </h1>
-        <p className="mt-2 text-sm text-slate-300">
-          {t("notifications.header.subtitle")}
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+            {t("notifications.header.eyebrow")}
+          </p>
+          <h1 className="text-3xl font-semibold text-white">
+            {t("notifications.header.title")}
+          </h1>
+          <p className="mt-2 text-sm text-slate-300">
+            {t("notifications.header.subtitle")}
+          </p>
+        </div>
+        {hasUnread && (
+          <button
+            type="button"
+            onClick={() => void markAllAsRead()}
+            disabled={markingAll}
+            className="cursor-pointer rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          >
+            {t("notifications.markAllRead")}
+          </button>
+        )}
       </div>
 
       {loading ? (
