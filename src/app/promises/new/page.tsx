@@ -693,18 +693,6 @@ export default function NewPromisePage() {
                 </div>
             </div>
 
-            {executor && (
-              <p
-                id="counterparty-helper"
-                className="mt-2 text-sm leading-relaxed text-slate-400"
-              >
-                {t("promises.new.fields.counterpartyHelper", {
-                  entityLower: promiseLabels.entityLower,
-                  executorRole: promiseLabels.executorRole,
-                })}
-              </p>
-            )}
-
             {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
