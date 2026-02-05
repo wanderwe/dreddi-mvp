@@ -25,7 +25,7 @@ BEGIN
     PERFORM cron.schedule(
       'notifications_retention_cleanup',
       '0 3 * * *',
-      $$SELECT public.cleanup_notifications_retention();$$
+      'SELECT public.cleanup_notifications_retention();'
     );
   END IF;
 END;
