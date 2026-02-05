@@ -304,7 +304,6 @@
         "conditionHint": "Виконання можливе після…",
         "executor": "{executorRole}",
         "counterparty": "Друга сторона",
-        "counterpartyHelper": "{entityLower} набирає сили після того, як {executorRole} прийме запрошення",
         "dueDate": "Строк",
         "dueTime": "Час строку",
         "reward": "Винагорода (необов’язково)",
