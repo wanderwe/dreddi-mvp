@@ -19,7 +19,6 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
-import { normalizePromiseMode, type PromiseMode } from "@/lib/promiseLabels";
 
 type PromiseRow = {
   id: string;
@@ -39,7 +38,6 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
-  promise_mode: PromiseMode | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -61,7 +59,6 @@ type PromiseRoleBase = Pick<
   | "promisor_id"
   | "promisee_id"
   | "counterparty_id"
-  | "promise_mode"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -80,8 +77,7 @@ const PAGE_SIZE = 12;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
-  const promiseMode = normalizePromiseMode(row.promise_mode) ?? "deal";
-  const isReviewer = promiseMode === "request" ? row.creator_id === userId : executorId !== userId;
+  const isReviewer = executorId !== userId;
   const role: PromiseRole =
     executorId && executorId === userId ? "promisor" : "counterparty";
   return {
@@ -197,7 +193,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,status,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,promise_mode,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,status,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -255,7 +251,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,promise_mode,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })

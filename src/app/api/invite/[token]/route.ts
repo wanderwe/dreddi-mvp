@@ -16,7 +16,6 @@ type PromiseInviteRow = {
   due_at: string | null;
   status: string;
   created_at: string;
-  promise_mode: "deal" | "request" | "assignment" | null;
   reward_amount: number | null;
   reward_currency: string | null;
   reward_text: string | null;
@@ -48,7 +47,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const { data: p, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,due_at,status,created_at,promise_mode,reward_amount,reward_currency,reward_text,payment_terms,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,invite_token,counterparty_contact,visibility"
+        "id,title,details,condition_text,condition_met_at,due_at,status,created_at,reward_amount,reward_currency,reward_text,payment_terms,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,invite_token,counterparty_contact,visibility"
       )
       .eq("invite_token", token)
       .maybeSingle<PromiseInviteRow>(); // ✅ якщо TS не любить — прибери generic
@@ -99,7 +98,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         condition_text: p.condition_text ?? null,
         condition_met_at: p.condition_met_at ?? null,
         due_at: p.due_at ?? null,
-        promise_mode: p.promise_mode ?? "deal",
         reward_amount: p.reward_amount ?? null,
         reward_currency: p.reward_currency ?? null,
         reward_text: p.reward_text ?? null,

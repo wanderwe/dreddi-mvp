@@ -17,7 +17,6 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
-  promiseMode?: "deal" | "request" | "assignment";
   rewardAmount?: number | string | null;
   rewardCurrency?: string | null;
   rewardText?: string | null;
@@ -35,10 +34,6 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const counterpartyContact = body?.counterpartyContact?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
-    if (body?.promiseMode && body.promiseMode !== "deal") {
-      return NextResponse.json({ error: "Only deal promises can be created" }, { status: 400 });
-    }
-    const promiseMode = "deal";
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -92,7 +87,7 @@ export async function POST(req: Request) {
       declined_at: null,
       ignored_at: null,
       visibility,
-      promise_mode: promiseMode,
+      promise_mode: "deal",
       reward_amount: null,
       reward_currency: null,
       reward_text: null,
