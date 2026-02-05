@@ -2,12 +2,6 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAdminClient } from "../[id]/common";
 import { requireUser } from "@/lib/auth/requireUser";
-import {
-  buildCtaUrl,
-  buildDedupeKey,
-  createNotification,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
 
 type CreatePromisePayload = {
   title?: string;
@@ -107,43 +101,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const nowIso = new Date().toISOString();
-
-    await admin
-      .from("promise_notification_state")
-      .upsert({
-        promise_id: insertData.id,
-        invite_notified_at: null,
-        updated_at: nowIso,
-      });
-
     if (!insertData.counterparty_id) {
       console.warn("[promises] missing counterparty id for invite notification", {
         promiseId: insertData.id,
         counterpartyContact,
         userId: user.id,
       });
-    }
-
-    if (insertData.counterparty_id) {
-      const created = await createNotification(admin, {
-        userId: insertData.counterparty_id,
-        promiseId: insertData.id,
-        type: "invite",
-        role: "executor",
-        dedupeKey: buildDedupeKey(["invite", insertData.id]),
-        ctaUrl: insertData.invite_token
-          ? `/p/invite/${insertData.invite_token}`
-          : buildCtaUrl(insertData.id),
-        priority: mapPriorityForType("invite"),
-      });
-
-      if (created.created) {
-        await admin
-          .from("promise_notification_state")
-          .update({ invite_notified_at: nowIso, updated_at: nowIso })
-          .eq("promise_id", insertData.id);
-      }
     }
 
     return NextResponse.json({ id: insertData.id }, { status: 200 });

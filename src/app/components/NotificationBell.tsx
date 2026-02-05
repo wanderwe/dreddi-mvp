@@ -16,6 +16,7 @@ export function NotificationBell({ className = "" }: { className?: string }) {
   useEffect(() => {
     let active = true;
     let channel: ReturnType<SupabaseClient["channel"]> | null = null;
+    let pollId: ReturnType<typeof setInterval> | null = null;
 
     const loadCount = async (supabase: SupabaseClient, userId: string) => {
       if (!active) return;
@@ -61,6 +62,10 @@ export function NotificationBell({ className = "" }: { className?: string }) {
           }
         )
         .subscribe();
+
+      pollId = setInterval(() => {
+        void loadCount(supabase, userId);
+      }, 45000);
     };
 
     void init();
@@ -74,6 +79,9 @@ export function NotificationBell({ className = "" }: { className?: string }) {
         } catch {
           // ignore
         }
+      }
+      if (pollId) {
+        clearInterval(pollId);
       }
     };
   }, []);

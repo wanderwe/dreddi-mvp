@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { buildInviteAcceptedNotifications } from "@/lib/notifications/flows";
-import { createNotification } from "@/lib/notifications/service";
-import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
+import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -134,25 +132,12 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     if (updatedPromise) {
-      const notifications = buildInviteAcceptedNotifications(updatedPromise);
-
-      // diagnostics: flows didn't produce executor notification (executor unresolved / null)
-      const hasExecutorNotification = notifications.some((n) => n.role === "executor");
-      if (!hasExecutorNotification) {
-        logMissingNotificationRecipient({
-          promiseId: updatedPromise.id,
-          creatorId: updatedPromise.creator_id,
-          promisorId: updatedPromise.promisor_id,
-          promiseeId: updatedPromise.promisee_id,
-          counterpartyId: updatedPromise.counterparty_id,
-          flowName: "invite_accepted",
-          recipientRole: "executor",
-        });
-      }
-
-      for (const notification of notifications) {
-        await createNotification(admin, notification);
-      }
+      await dispatchNotificationEvent({
+        admin,
+        event: "accepted",
+        promise: updatedPromise,
+        actorId: userId,
+      });
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

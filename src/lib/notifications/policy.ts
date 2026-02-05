@@ -3,26 +3,34 @@ import { NotificationType, normalizeNotificationType } from "./types";
 export const DAILY_NOTIFICATION_CAP = 3;
 
 export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
+  "marked_completed",
   "completion_waiting",
   "completion_followup",
   "dispute",
+  "disputed",
 ];
 
 export const CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   ...CRITICAL_NOTIFICATION_TYPES,
+  "accepted",
   "invite",
   "invite_followup",
   "overdue",
   "due_soon",
+  "reminder_overdue",
+  "reminder_due_24h",
   "invite_declined",
   "invite_ignored",
 ];
 
 export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   ...CRITICAL_NOTIFICATION_TYPES,
+  "accepted",
   "invite_followup",
   "overdue",
   "due_soon",
+  "reminder_overdue",
+  "reminder_due_24h",
   "invite_declined",
   "invite_ignored",
 ];

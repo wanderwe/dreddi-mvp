@@ -9,12 +9,9 @@ import {
 } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
-import { calc_score_impact } from "@/lib/reputation/calcScoreImpact";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import { buildCompletionOutcomeNotification } from "@/lib/notifications/flows";
-import { createNotification } from "@/lib/notifications/service";
+import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
-import { logMissingNotificationRecipient } from "@/lib/notifications/diagnostics";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -96,34 +93,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: message }, { status: 500 });
     }
 
-    const finalExecutorId = resolveExecutorId(updatedPromise);
-    const delta = calc_score_impact({
-      status: updatedPromise.status,
-      due_at: updatedPromise.due_at,
-      completed_at: updatedPromise.completed_at,
+    await dispatchNotificationEvent({
+      admin,
+      event: "disputed",
+      promise: updatedPromise,
+      actorId: user.id,
     });
-
-    if (!finalExecutorId) {
-      logMissingNotificationRecipient({
-        promiseId: updatedPromise.id,
-        creatorId: updatedPromise.creator_id,
-        promisorId: updatedPromise.promisor_id,
-        promiseeId: updatedPromise.promisee_id,
-        counterpartyId: updatedPromise.counterparty_id,
-        flowName: "dispute_created",
-        recipientRole: "executor",
-      });
-    } else {
-      await createNotification(
-        admin,
-        buildCompletionOutcomeNotification({
-          promiseId: updatedPromise.id,
-          executorId: finalExecutorId,
-          type: "dispute",
-          delta,
-        })
-      );
-    }
 
     return NextResponse.json({ ok: true });
   } catch (e) {

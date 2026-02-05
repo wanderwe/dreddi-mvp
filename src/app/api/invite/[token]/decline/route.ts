@@ -1,13 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import {
-  buildCtaUrl,
-  buildDedupeKey,
-  createNotification,
-  getUserNotificationSettings,
-  mapPriorityForType,
-} from "@/lib/notifications/service";
-import { getInviteResponseCopy, resolveInviteActorName } from "@/lib/notifications/inviteResponses";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -104,33 +96,6 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     if (updateError) {
       return NextResponse.json({ error: "Decline failed", detail: updateError.message }, { status: 500 });
     }
-
-    const { data: actorProfile } = await admin
-      .from("profiles")
-      .select("handle,display_name")
-      .eq("id", userId)
-      .maybeSingle();
-
-    const settings = await getUserNotificationSettings(admin, p.creator_id);
-    const copy = getInviteResponseCopy({
-      locale: settings.locale,
-      response: "declined",
-      actorName: resolveInviteActorName(actorProfile),
-      dealTitle: p.title ?? null,
-    });
-
-    await createNotification(admin, {
-      userId: p.creator_id,
-      promiseId: p.id,
-      type: "invite_declined",
-      role: "creator",
-      dedupeKey: buildDedupeKey(["invite_declined", p.id]),
-      ctaUrl: buildCtaUrl(p.id),
-      ctaLabel: copy.ctaLabel,
-      priority: mapPriorityForType("invite_declined"),
-      title: copy.title,
-      body: copy.body,
-    });
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e: unknown) {

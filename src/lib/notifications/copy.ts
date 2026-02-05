@@ -11,6 +11,11 @@ const fallbackLocale: NotificationLocale = "en";
 
 const copyByLocale: Record<NotificationLocale, Record<NotificationType, NotificationCopy>> = {
   en: {
+    accepted: {
+      title: "Agreement accepted",
+      body: "Why now: the other party accepted the agreement.",
+      ctaLabel: "Open",
+    },
     invite: {
       title: "New agreement invitation",
       body: "Confirm only if you’re ready to take responsibility",
@@ -41,6 +46,31 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done.",
       ctaLabel: "Open",
     },
+    marked_completed: {
+      title: "Action needed",
+      body: "Agreement marked completed. Confirm or dispute.",
+      ctaLabel: "Review",
+    },
+    confirmed: {
+      title: "Outcome confirmed",
+      body: "Why now: the other party confirmed completion. Review the outcome details.",
+      ctaLabel: "View",
+    },
+    disputed: {
+      title: "Outcome disputed",
+      body: "The agreement was disputed. Check details.",
+      ctaLabel: "View",
+    },
+    reminder_due_24h: {
+      title: "Deadline approaching",
+      body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
+      ctaLabel: "View",
+    },
+    reminder_overdue: {
+      title: "Agreement is overdue",
+      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done.",
+      ctaLabel: "Open",
+    },
     completion_waiting: {
       title: "Action needed",
       body: "Agreement marked completed. Confirm or dispute.",
@@ -58,6 +88,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
   },
   uk: {
+    accepted: {
+      title: "Домовленість прийнято",
+      body: "Причина: інша сторона прийняла домовленість.",
+      ctaLabel: "Відкрити",
+    },
     invite: {
       title: "Запрошення до домовленості",
       body: "Підтверджуйте лише якщо готові взяти відповідальність",
@@ -84,6 +119,31 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       ctaLabel: "Переглянути",
     },
     overdue: {
+      title: "Дедлайн минув",
+      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено.",
+      ctaLabel: "Відкрити",
+    },
+    marked_completed: {
+      title: "Потрібна дія",
+      body: "Домовленість позначено виконаною. Підтвердіть або оскаржте.",
+      ctaLabel: "Перевірити",
+    },
+    confirmed: {
+      title: "Результат підтверджено",
+      body: "Причина: інша сторона підтвердила виконання. Перегляньте деталі результату.",
+      ctaLabel: "Переглянути",
+    },
+    disputed: {
+      title: "Результат оскаржено",
+      body: "Домовленість оскаржено. Перевірте деталі.",
+      ctaLabel: "Переглянути",
+    },
+    reminder_due_24h: {
+      title: "Наближається дедлайн",
+      body: "Причина: дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
+      ctaLabel: "Переглянути",
+    },
+    reminder_overdue: {
       title: "Дедлайн минув",
       body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено.",
       ctaLabel: "Відкрити",

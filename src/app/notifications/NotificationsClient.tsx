@@ -35,6 +35,7 @@ export default function NotificationsClient() {
   useEffect(() => {
     let active = true;
     let channel: ReturnType<SupabaseClient["channel"]> | null = null;
+    let pollId: ReturnType<typeof setInterval> | null = null;
 
     const loadNotifications = async (pageIndex: number, replace = false) => {
       const isInitial = pageIndex === 0 && replace;
@@ -146,6 +147,10 @@ export default function NotificationsClient() {
 
       void loadNotifications(0, true);
       subscribeToNotifications(supabase, session.user.id);
+
+      pollId = setInterval(() => {
+        void loadNotifications(0, true);
+      }, 45000);
     };
 
     void init();
@@ -159,6 +164,9 @@ export default function NotificationsClient() {
         } catch {
           // ignore
         }
+      }
+      if (pollId) {
+        clearInterval(pollId);
       }
     };
   }, [pageSize, t]);
