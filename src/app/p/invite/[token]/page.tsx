@@ -415,7 +415,7 @@ export default function InvitePage() {
                               void accept();
                             }
                           }}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                         >
                           {busy
                             ? t("invite.processing")
@@ -425,7 +425,7 @@ export default function InvitePage() {
                           <button
                             disabled={busy}
                             onClick={() => void decline()}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+                            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {busy ? t("invite.processing") : t("invite.decline")}
                           </button>
