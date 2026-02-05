@@ -21,7 +21,7 @@ import {
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { getPromiseLabels, type PromiseMode } from "@/lib/promiseLabels";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 
 export default function NewPromisePage() {
   const t = useT();
@@ -32,7 +32,6 @@ export default function NewPromisePage() {
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
   const [counterparty, setCounterparty] = useState("");
-  const promiseMode: PromiseMode = "deal";
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -53,7 +52,7 @@ export default function NewPromisePage() {
   const [isPublicProfile, setIsPublicProfile] = useState(false);
   const [isPublicDeal, setIsPublicDeal] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
-  const promiseLabels = useMemo(() => getPromiseLabels(t, promiseMode), [promiseMode, t]);
+  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -451,7 +450,7 @@ export default function NewPromisePage() {
       return;
     }
 
-    const shouldRequestPublic = isPublicDeal && isPublicProfile;
+    const shouldMakePublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
       details: details.trim() || null,
@@ -459,8 +458,7 @@ export default function NewPromisePage() {
       counterpartyContact,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
-      visibility: shouldRequestPublic ? "public" : "private",
-      promiseMode,
+      visibility: shouldMakePublic ? "public" : "private",
     };
 
     let res: Response;
@@ -707,17 +705,17 @@ export default function NewPromisePage() {
               </p>
             )}
 
-            {isPublicProfile && promiseMode === "deal" && (
+            {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm font-semibold text-white">
-                      {t("promises.new.publicRequest.label", {
+                      {t("promises.new.publicDeal.label", {
                         publicEntity: promiseLabels.publicEntity,
                       })}
                     </div>
                     <p className="text-xs text-slate-400">
-                      {t("promises.new.publicRequest.helper", {
+                      {t("promises.new.publicDeal.helper", {
                         entityPlural: promiseLabels.entityPlural,
                       })}
                     </p>
@@ -726,7 +724,7 @@ export default function NewPromisePage() {
                     type="button"
                     role="switch"
                     aria-checked={isPublicDeal}
-                    aria-label={t("promises.new.publicRequest.label", {
+                    aria-label={t("promises.new.publicDeal.label", {
                       publicEntity: promiseLabels.publicEntity,
                     })}
                     onClick={() => setIsPublicDeal((prev) => !prev)}

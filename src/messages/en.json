@@ -82,35 +82,25 @@
   },
   "promises": {
     "entity": {
-      "deal": "Deal",
-      "request": "Request"
+      "deal": "Deal"
     },
     "entityLower": {
-      "deal": "deal",
-      "request": "request"
+      "deal": "deal"
     },
     "entityPublic": {
-      "deal": "Public Deal",
-      "request": "Public Request"
+      "deal": "Public Deal"
     },
     "entityNew": {
-      "deal": "New deal",
-      "request": "New request"
+      "deal": "New deal"
     },
     "entityPlural": {
-      "deal": "deals",
-      "request": "requests"
+      "deal": "deals"
     },
     "roles": {
       "deal": {
         "creator": "Creator",
         "creatorLabel": "Created by",
         "executor": "Executor"
-      },
-      "request": {
-        "creator": "Requester",
-        "creatorLabel": "Requester",
-        "executor": "Fulfiller"
       }
     },
     "overview": {
@@ -145,10 +135,10 @@
       "awaitingInviteAcceptance": "Pending acceptance"
     },
     "confirmModal": {
-      "title": "Request confirmation?",
+      "title": "Confirm completion?",
       "body": "You’re asking the other side to confirm you delivered this {entityLower}",
       "cancel": "Not yet",
-      "confirm": "Yes, request confirmation"
+      "confirm": "Yes, confirm completion"
     },
     "list": {
       "tabs": {
@@ -193,7 +183,7 @@
       "statusActions": "Status actions",
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
-      "shareInvite": "Share the invite and wait for acceptance to request confirmation",
+      "shareInvite": "Share the invite and wait for acceptance before confirming",
       "reviewConfirm": "Review & confirm",
       "awaitingExecutor": "Waiting for the {executorRole} to mark this complete",
       "waitingReview": "Waiting for the other side to review",
@@ -300,7 +290,6 @@
       "subtitle": "Name the {entityLower}, add context, and an optional deadline",
       "back": "Back",
       "fields": {
-        "type": "Type",
         "title": "Title",
         "details": "Details",
         "condition": "Counter-condition",
@@ -314,10 +303,6 @@
         "rewardHelper": "Add an amount + currency or describe the reward in text",
         "rewardText": "Reward details (optional)",
         "paymentTerms": "Payment terms (optional)"
-      },
-      "type": {
-        "deal": "Deal",
-        "request": "Request"
       },
       "executor": {
         "me": "Me",
@@ -342,7 +327,7 @@
         "selectTime": "Select time",
         "closeTimePicker": "Close time picker"
       },
-      "publicRequest": {
+      "publicDeal": {
         "label": "{publicEntity}",
         "helper": "Public {entityPlural} appear on your public profile once confirmed"
       },

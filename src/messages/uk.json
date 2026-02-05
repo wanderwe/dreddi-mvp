@@ -82,34 +82,24 @@
   },
   "promises": {
     "entity": {
-      "deal": "Угода",
-      "request": "Доручення"
+      "deal": "Угода"
     },
     "entityLower": {
-      "deal": "угода",
-      "request": "доручення"
+      "deal": "угода"
     },
     "entityPublic": {
-      "deal": "Публічна угода",
-      "request": "Публічне доручення"
+      "deal": "Публічна угода"
     },
     "entityNew": {
-      "deal": "Нова угода",
-      "request": "Нове доручення"
+      "deal": "Нова угода"
     },
     "entityPlural": {
-      "deal": "угод",
-      "request": "доручень"
+      "deal": "угод"
     },
     "roles": {
       "deal": {
         "creator": "Ініціатор",
         "creatorLabel": "Створено",
-        "executor": "Виконавець"
-      },
-      "request": {
-        "creator": "Запитувач",
-        "creatorLabel": "Запитувач",
         "executor": "Виконавець"
       }
     },
@@ -153,10 +143,10 @@
       "awaitingInviteAcceptance": "Очікує прийняття"
     },
     "confirmModal": {
-      "title": "Запросити підтвердження?",
+      "title": "Підтвердити виконання?",
       "body": "Ви просите іншу сторону підтвердити, що {entityLower} виконано",
       "cancel": "Ще ні",
-      "confirm": "Так, запросити підтвердження"
+      "confirm": "Так, підтвердити виконання"
     },
     "list": {
       "tabs": {
@@ -201,7 +191,7 @@
       "statusActions": "Дії зі статусом",
       "currentStatus": "Поточний статус",
       "markCompleted": "Позначити як виконану",
-      "shareInvite": "Поділіться запрошенням і дочекайтесь прийняття, щоб запросити підтвердження",
+      "shareInvite": "Поділіться запрошенням і дочекайтесь прийняття перед підтвердженням",
       "reviewConfirm": "Переглянути та підтвердити",
       "awaitingExecutor": "Очікуємо, що {executorRole} позначить виконання",
       "waitingReview": "Очікує перегляду другою стороною",
@@ -308,7 +298,6 @@
       "subtitle": "Назвіть {entityLower}, додайте контекст і опціональний дедлайн",
       "back": "Назад",
       "fields": {
-        "type": "Тип",
         "title": "Назва",
         "details": "Деталі",
         "condition": "Контрумова",
@@ -322,10 +311,6 @@
         "rewardHelper": "Додайте суму й валюту або опишіть винагороду словами",
         "rewardText": "Деталі винагороди (необов’язково)",
         "paymentTerms": "Умови оплати (необов’язково)"
-      },
-      "type": {
-        "deal": "Угода",
-        "request": "Доручення"
       },
       "executor": {
         "me": "Я",
@@ -350,7 +335,7 @@
         "selectTime": "Оберіть час",
         "closeTimePicker": "Закрити вибір часу"
       },
-      "publicRequest": {
+      "publicDeal": {
         "label": "{publicEntity}",
         "helper": "Публічні {entityPlural} з'являються у вашому профілі після підтвердження"
       },

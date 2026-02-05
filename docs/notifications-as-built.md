@@ -140,7 +140,7 @@
 ### Creation / trigger gaps
 - **Missing notification for condition-met**: marking condition met does not notify the executor.
 - **Deal created with non-existing counterparty**: no notification is created (only when a matching profile exists).
-- **Invite accepted flow**: notifications are created, but if `resolveExecutorId` returns `null` (due to unusual role assignments), the executor notification is skipped.
+- **Invite accepted flow**: notifications are created, but if `resolveExecutorId` returns `null` (due to unusual role allocations), the executor notification is skipped.
 
 ### Dedupe & caps blocking
 - **Per-deal cap**: any non-critical notification is blocked if another notification for that promise was created in the last 24h.

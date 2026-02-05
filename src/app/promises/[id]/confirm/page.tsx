@@ -18,7 +18,6 @@ type PromiseRow = {
   status: PromiseStatus;
   creator_id: string;
   creator_display_name: string | null;
-  promise_mode: "deal" | "request" | "assignment" | null;
   counterparty_id: string | null;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -51,10 +50,7 @@ export default function ConfirmPromisePage() {
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
-  const promiseLabels = useMemo(
-    () => getPromiseLabels(t, promise?.promise_mode),
-    [promise?.promise_mode, t]
-  );
+  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   const formatDate = (value: string | null) =>
     formatDueDate(value, locale, { includeYear: true, includeTime: true }) ??
@@ -143,11 +139,10 @@ export default function ConfirmPromisePage() {
   const isCounterparty = Boolean(
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
-  const isRequester = Boolean(promise && userId && userId === promise.creator_id);
   const canReview = Boolean(
     promise &&
       promise.status === "completed_by_promisor" &&
-      (promiseLabels.type === "request" ? isRequester : isCounterparty) &&
+      isCounterparty &&
       isPromiseAccepted(promise)
   );
   const awaitingOtherParty = Boolean(

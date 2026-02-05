@@ -28,7 +28,6 @@ type PromiseRow = {
   due_at: string | null;
   status: PromiseStatus;
   created_at: string;
-  promise_mode: "deal" | "request" | "assignment" | null;
   reward_amount: number | null;
   reward_currency: string | null;
   reward_text: string | null;
@@ -183,7 +182,7 @@ export default function PromisePage() {
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
-  const promiseLabels = useMemo(() => getPromiseLabels(t, p?.promise_mode), [p?.promise_mode, t]);
+  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   const dueText = useMemo(() => {
     if (!p?.due_at) return t("promises.detail.noDeadline");
@@ -235,7 +234,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,promise_mode,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,reward_amount,reward_currency,reward_text,payment_terms,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -244,7 +243,7 @@ export default function PromisePage() {
     else {
       const status = (data as { status?: unknown }).status;
       if (!isPromiseStatus(status)) {
-        const labels = getPromiseLabels(t, (data as PromiseRow)?.promise_mode);
+        const labels = getPromiseLabels(t);
         setError(t("promises.detail.errors.unsupportedStatus", { entity: labels.entity }));
         setP({ ...(data as PromiseRow), status: "active" });
       } else {
@@ -486,7 +485,7 @@ export default function PromisePage() {
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
   const isCreator = Boolean(p && userId === p.creator_id);
-  const canReview = promiseLabels.type === "request" ? isCreator : isCounterparty;
+  const canReview = isCounterparty;
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
   const uiStatus = p ? getPromiseUiStatus(p) : null;
@@ -575,38 +574,37 @@ export default function PromisePage() {
                 <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
               )}
 
-              {promiseLabels.type === "request" &&
-                (p.reward_amount || p.reward_text || p.payment_terms) && (
-                  <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200 space-y-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                        {t("promises.detail.rewardLabel")}
-                      </p>
-                      {p.reward_amount && p.reward_currency ? (
-                        <div className="mt-2 text-slate-100">
-                          {`${p.reward_amount} ${p.reward_currency}`}
-                        </div>
-                      ) : !p.reward_text ? (
-                        <div className="mt-2 text-slate-100">
-                          {t("promises.detail.rewardUnset")}
-                        </div>
-                      ) : null}
-                      {p.reward_text && (
-                        <div className="mt-2 whitespace-pre-wrap text-slate-100">
-                          {p.reward_text}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                        {t("promises.detail.paymentTermsLabel")}
-                      </p>
-                      <div className="mt-2 whitespace-pre-wrap text-slate-100">
-                        {p.payment_terms ?? t("promises.detail.paymentTermsUnset")}
+              {(p.reward_amount || p.reward_text || p.payment_terms) && (
+                <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200 space-y-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                      {t("promises.detail.rewardLabel")}
+                    </p>
+                    {p.reward_amount && p.reward_currency ? (
+                      <div className="mt-2 text-slate-100">
+                        {`${p.reward_amount} ${p.reward_currency}`}
                       </div>
+                    ) : !p.reward_text ? (
+                      <div className="mt-2 text-slate-100">
+                        {t("promises.detail.rewardUnset")}
+                      </div>
+                    ) : null}
+                    {p.reward_text && (
+                      <div className="mt-2 whitespace-pre-wrap text-slate-100">
+                        {p.reward_text}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                      {t("promises.detail.paymentTermsLabel")}
+                    </p>
+                    <div className="mt-2 whitespace-pre-wrap text-slate-100">
+                      {p.payment_terms ?? t("promises.detail.paymentTermsUnset")}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
               {hasCondition && (
                 <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
