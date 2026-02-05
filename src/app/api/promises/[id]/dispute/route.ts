@@ -45,7 +45,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         userId: user.id,
       });
     }
-    const promiseMode = normalizePromiseMode(promise.promise_mode);
+    const promiseMode = normalizePromiseMode(promise.promise_mode) ?? "deal";
     if (promiseMode === "request") {
       if (user.id !== promise.creator_id) {
         return NextResponse.json(
