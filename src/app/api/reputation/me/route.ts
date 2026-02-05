@@ -61,30 +61,31 @@ export async function GET(req: Request) {
         updated_at: new Date().toISOString(),
       };
 
-    const responsePayload = {
-      reputation: {
-        ...baseReputation,
-        confirmed_count: deliveryMetrics.confirmed,
-        disputed_count: deliveryMetrics.disputed,
-        on_time_count: deliveryMetrics.onTime,
-        total_promises_completed: deliveryMetrics.totalCompleted,
-        confirmed_with_deadline_count: deliveryMetrics.confirmedWithDeadline,
-      },
-      recent_events: events ?? [],
+    const includeDebug = process.env.NODE_ENV !== "production";
+    const reputationPayload = {
+      ...baseReputation,
+      confirmed_count: deliveryMetrics.confirmed,
+      disputed_count: deliveryMetrics.disputed,
+      on_time_count: deliveryMetrics.onTime,
+      total_promises_completed: deliveryMetrics.totalCompleted,
+      confirmed_with_deadline_count: deliveryMetrics.confirmedWithDeadline,
+      ...(includeDebug
+        ? {
+            on_time_debug: {
+              confirmed: deliveryMetrics.confirmed,
+              disputed: deliveryMetrics.disputed,
+              confirmedWithDeadline: deliveryMetrics.confirmedWithDeadline,
+              onTime: deliveryMetrics.onTime,
+              totalCompleted: deliveryMetrics.totalCompleted,
+            },
+          }
+        : {}),
     };
 
-    if (process.env.NODE_ENV !== "production") {
-      responsePayload.reputation = {
-        ...responsePayload.reputation,
-        on_time_debug: {
-          confirmed: deliveryMetrics.confirmed,
-          disputed: deliveryMetrics.disputed,
-          confirmedWithDeadline: deliveryMetrics.confirmedWithDeadline,
-          onTime: deliveryMetrics.onTime,
-          totalCompleted: deliveryMetrics.totalCompleted,
-        },
-      } as typeof responsePayload.reputation;
-    }
+    const responsePayload = {
+      reputation: reputationPayload,
+      recent_events: events ?? [],
+    };
 
     return NextResponse.json(responsePayload);
   } catch (e) {
