@@ -145,12 +145,6 @@ export default function ConfirmPromisePage() {
       isCounterparty &&
       isPromiseAccepted(promise)
   );
-  const awaitingOtherParty = Boolean(
-    promise &&
-      promise.status === "completed_by_promisor" &&
-      isPromiseAccepted(promise) &&
-      !canReview
-  );
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
@@ -229,10 +223,7 @@ export default function ConfirmPromisePage() {
     disputed: t("promises.status.disputed"),
     declined: t("promises.inviteStatus.declined"),
   };
-  const actionNote = promise
-    ? statusNote(promise.status) ||
-      (awaitingOtherParty ? t("promises.confirm.awaitingOtherParty") : null)
-    : null;
+  const actionNote = promise ? statusNote(promise.status) : null;
 
   return (
     <main className="relative min-h-screen py-12">
@@ -284,14 +275,6 @@ export default function ConfirmPromisePage() {
                   <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
                     {t("promises.confirm.statusLabel")}: {statusLabelMap[promise.status]}
                   </span>
-                  {promise.status === "completed_by_promisor" &&
-                    (canReview || awaitingOtherParty) && (
-                      <p className="text-xs text-amber-200">
-                        {canReview
-                          ? t("promises.confirm.actionRequired")
-                          : t("promises.confirm.awaitingOtherParty")}
-                      </p>
-                    )}
                 </div>
               </div>
 
