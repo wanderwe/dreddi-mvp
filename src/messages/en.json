@@ -241,8 +241,6 @@
       "dueLabel": "Due",
       "createdBy": "{creatorLabel}: {name}",
       "statusLabel": "Status",
-      "actionRequired": "Action required from you",
-      "awaitingOtherParty": "Waiting for the other party to act",
       "detailsLabel": "Details",
       "alreadyDisputed": "Already disputed",
       "reasonLabel": "Reason",
