@@ -467,6 +467,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         maxLength={40}
                         className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                       />
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.displayNameHelper")}
+                      </span>
                     </div>
                     <div className="flex flex-col gap-2 text-xs text-slate-300">
                       <span>{t("profileSettings.handleLabel")}</span>
@@ -480,23 +483,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                         />
                       </div>
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.handleHelper")}
+                      </span>
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex flex-col gap-1 text-left">
-                        <span className="text-[11px] text-slate-500">
-                          {t("profileSettings.displayNameHelper")}
-                        </span>
-                        <span className="text-[11px] text-slate-500">
-                          {t("profileSettings.handleHelper")}
-                        </span>
-                        <span className="text-[11px] text-slate-500">
-                          {displayNameTooShort || displayNameTooLong
-                            ? t("profileSettings.displayNameError")
-                            : handleMissing
-                              ? t("profileSettings.handleError")
-                              : " "}
-                        </span>
-                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        {displayNameTooShort || displayNameTooLong
+                          ? t("profileSettings.displayNameError")
+                          : handleMissing
+                            ? t("profileSettings.handleError")
+                            : " "}
+                      </span>
                       <button
                         type="button"
                         onClick={saveIdentity}
