@@ -883,9 +883,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         {t("profileSettings.save")}
                       </button>
                     </div>
-                    <span className="text-xs text-slate-500">
-                      {t("profileSettings.quietHoursHelper")}
-                    </span>
                   </div>
                 </div>
               </div>

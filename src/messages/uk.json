@@ -86,7 +86,6 @@
     "quietHoursLabel": "Тихі години",
     "quietHoursDescription": "Відкладати некритичні сповіщення у тихі години",
     "quietHoursRangeLabel": "Діапазон тихих годин",
-    "quietHoursHelper": "Типово 22:00–09:00",
     "save": "Зберегти"
   },
   "promises": {
