@@ -21,6 +21,7 @@ export type PromiseRowMin = {
   invite_status: InviteStatus | null;
   invited_at: string | null;
   accepted_at: string | null;
+  counterparty_accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
 };

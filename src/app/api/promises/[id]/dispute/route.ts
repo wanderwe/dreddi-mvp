@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { getNotificationDedupeKey } from "@/lib/notifications/recipients";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -75,7 +76,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       })
       .eq("id", id)
       .select(
-        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason"
+        "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at"
       )
       .single<PromiseRowMin>();
 
@@ -93,12 +94,25 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: message }, { status: 500 });
     }
 
-    await dispatchNotificationEvent({
+    const notificationResults = await dispatchNotificationEvent({
       admin,
       event: "disputed",
       promise: updatedPromise,
       actorId: user.id,
     });
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[notifications] dispute_dispatch_debug", {
+        event: "disputed",
+        promiseId: updatedPromise.id,
+        actorId: user.id,
+        dedupeKey: getNotificationDedupeKey("disputed", updatedPromise.id),
+        results: notificationResults.map((result) => ({
+          userId: result.userId,
+          created: result.outcome.created,
+          skippedReason: result.outcome.skippedReason ?? null,
+        })),
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e) {
