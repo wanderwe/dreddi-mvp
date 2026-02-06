@@ -181,7 +181,6 @@ export default function PublicProfilesDirectoryPage() {
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
-        const profileTags = profile.profile_tags ?? [];
 
         return (
           <Link
@@ -210,19 +209,6 @@ export default function PublicProfilesDirectoryPage() {
                   {subtitle && <div className="text-sm text-white/60 truncate">{subtitle}</div>}
                   {showMaskedEmail && (
                     <div className="text-xs text-white/40 truncate">{showMaskedEmail}</div>
-                  )}
-                  {profileTags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {profileTags.map((tag) => (
-                        <span
-                          key={tag}
-                          tabIndex={0}
-                          className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200/90 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   )}
                 </div>
               </div>
