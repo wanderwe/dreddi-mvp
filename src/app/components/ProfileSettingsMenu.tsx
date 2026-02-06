@@ -493,17 +493,29 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           {t("profileSettings.save")}
                         </button>
                       </div>
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.handleHelper")}
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        {displayNameTooShort || displayNameTooLong
-                          ? t("profileSettings.displayNameError")
-                          : handleMissing
-                            ? t("profileSettings.handleError")
-                            : " "}
-                      </span>
                     </label>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.handleHelper")}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {displayNameTooShort || displayNameTooLong
+                            ? t("profileSettings.displayNameError")
+                            : handleMissing
+                              ? t("profileSettings.handleError")
+                              : " "}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={saveIdentity}
+                        disabled={identityDisabled}
+                        className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {t("profileSettings.save")}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
