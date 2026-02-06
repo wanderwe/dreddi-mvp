@@ -524,7 +524,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     <div className="text-sm font-semibold text-white">
                       {t("profileSettings.publicLinkLabel")}
                     </div>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-xs text-slate-300">
                       {t("profileSettings.publicLinkDescription")}
                     </p>
                   </div>
@@ -574,7 +574,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.publicLabel")}
                       </div>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-xs text-slate-300">
                         {t("profileSettings.publicDescription")}
                       </p>
                     </button>
