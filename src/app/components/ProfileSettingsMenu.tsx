@@ -433,7 +433,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="text-sm font-semibold text-white">
                 {t("profileSettings.identityLabel")}
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-[11px] text-slate-500">
                 {t("profileSettings.identityDescription")}
               </p>
             </div>
@@ -606,7 +606,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.tagsLabel")}
                       </div>
-                      <p className="text-xs text-slate-300">
+                      <p className="text-[11px] text-slate-500">
                         {t("profileSettings.tagsDescription")}
                       </p>
                     </div>
@@ -694,7 +694,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="text-sm font-semibold text-white">
                 {t("profileSettings.notificationsLabel")}
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-[11px] text-slate-500">
                 {t("profileSettings.notificationsDescription")}
               </p>
             </div>
@@ -728,7 +728,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     }`}
                   >
                     <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
-                    <p className="text-xs text-slate-300">
+                    <p className="text-[11px] text-slate-500">
                       {t("profileSettings.pushDescription")}
                     </p>
                   </button>
@@ -810,7 +810,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm text-white">
                         {t("profileSettings.quietHoursLabel")}
                       </div>
-                      <p className="text-xs text-slate-300">
+                      <p className="text-[11px] text-slate-500">
                         {t("profileSettings.quietHoursDescription")}
                       </p>
                     </button>
