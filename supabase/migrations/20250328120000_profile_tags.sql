@@ -1,5 +1,42 @@
 -- Add profile tags to profiles and public profile stats.
 
+CREATE OR REPLACE FUNCTION public.profile_tags_are_valid(tags text[])
+RETURNS boolean
+LANGUAGE plpgsql
+IMMUTABLE
+AS $$
+DECLARE
+  tag text;
+  unique_tags text[] := '{}'::text[];
+  tag_count int := 0;
+BEGIN
+  IF tags IS NULL THEN
+    RETURN true;
+  END IF;
+
+  tag_count := array_length(tags, 1);
+  IF tag_count IS NULL THEN
+    RETURN true;
+  END IF;
+
+  IF tag_count > 7 THEN
+    RETURN false;
+  END IF;
+
+  FOREACH tag IN ARRAY tags LOOP
+    IF char_length(tag) < 2 OR char_length(tag) > 24 THEN
+      RETURN false;
+    END IF;
+    IF tag = ANY(unique_tags) THEN
+      RETURN false;
+    END IF;
+    unique_tags := array_append(unique_tags, tag);
+  END LOOP;
+
+  RETURN true;
+END;
+$$;
+
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -19,23 +56,7 @@ BEGIN
   ) THEN
     ALTER TABLE profiles
     ADD CONSTRAINT profiles_profile_tags_valid
-    CHECK (
-      profile_tags IS NULL
-      OR (
-        array_length(profile_tags, 1) <= 7
-        AND COALESCE(
-          (
-            SELECT bool_and(char_length(tag) BETWEEN 2 AND 24)
-            FROM unnest(profile_tags) AS tag
-          ),
-          true
-        )
-        AND (
-          SELECT count(DISTINCT tag) = count(*)
-          FROM unnest(profile_tags) AS tag
-        )
-      )
-    );
+    CHECK (public.profile_tags_are_valid(profile_tags));
   END IF;
 END $$;
 
