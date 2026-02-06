@@ -506,6 +506,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         {t("profileSettings.save")}
                       </button>
                     </div>
+                    <span className="text-[11px] text-slate-500">
+                      {displayNameTooShort || displayNameTooLong
+                        ? t("profileSettings.displayNameError")
+                        : handleMissing
+                          ? t("profileSettings.handleError")
+                          : " "}
+                    </span>
                   </div>
                 </div>
 
@@ -730,7 +737,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     }`}
                   >
                     <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-300">
                       {t("profileSettings.pushDescription")}
                     </p>
                   </button>
@@ -812,7 +819,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm text-white">
                         {t("profileSettings.quietHoursLabel")}
                       </div>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-300">
                         {t("profileSettings.quietHoursDescription")}
                       </p>
                     </button>
