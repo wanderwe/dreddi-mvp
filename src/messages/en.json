@@ -60,7 +60,7 @@
     "handleHelper": "Unique identifier used in links and search.",
     "tagsLabel": "Domains / tags",
     "tagsDescription": "Add up to 7 tags that describe the types of agreements you do",
-    "tagsPlaceholder": "e.g. auto repair, startups, design",
+    "tagsPlaceholder": "e.g. auto-repair, startups, design",
     "tagsHelper": "{count}/{max} tags. Press Enter or comma to add.",
     "tagsAdd": "Add",
     "tagsEmpty": "No tags yet",
