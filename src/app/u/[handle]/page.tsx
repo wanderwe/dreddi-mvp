@@ -15,6 +15,7 @@ type PublicProfileRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  profile_tags: string[] | null;
   reputation_score: number | null;
   confirmed_count: number | null;
   completed_count: number | null;
@@ -223,6 +224,7 @@ export default function PublicProfilePage() {
   );
   const primaryLabel = identity.title || profile?.handle || "";
   const avatarLabel = primaryLabel.replace(/^@/, "");
+  const profileTags = profile?.profile_tags ?? [];
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
@@ -384,6 +386,18 @@ export default function PublicProfilePage() {
                     <h1 className="text-2xl font-semibold truncate">{primaryLabel}</h1>
                     {identity.subtitle && (
                       <p className="text-sm text-white/60 truncate">{identity.subtitle}</p>
+                    )}
+                    {profileTags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {profileTags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-100"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
