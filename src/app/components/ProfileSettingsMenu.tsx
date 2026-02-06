@@ -455,6 +455,98 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-3 pt-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="space-y-3">
+                    <label className="flex flex-col gap-2 text-xs text-slate-300">
+                      <span>{t("profileSettings.displayNameLabel")}</span>
+                      <input
+                        type="text"
+                        value={displayNameInput}
+                        onChange={(event) => setDisplayNameInput(event.target.value)}
+                        placeholder={t("profileSettings.displayNamePlaceholder")}
+                        maxLength={40}
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                      />
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.displayNameHelper")}
+                      </span>
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs text-slate-300">
+                      <span>{t("profileSettings.handleLabel")}</span>
+                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <span className="text-slate-400">@</span>
+                        <input
+                          type="text"
+                          value={handleInput}
+                          onChange={(event) => setHandleInput(event.target.value)}
+                          placeholder={t("profileSettings.handlePlaceholder")}
+                          className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                        />
+                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        {t("profileSettings.handleHelper")}
+                      </span>
+                    </label>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-slate-500">
+                        {displayNameTooShort || displayNameTooLong
+                          ? t("profileSettings.displayNameError")
+                          : handleMissing
+                            ? t("profileSettings.handleError")
+                            : " "}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={saveIdentity}
+                        disabled={identityDisabled}
+                        className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {t("profileSettings.save")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="space-y-1">
+                    <div className="text-sm font-semibold text-white">
+                      {t("profileSettings.publicLinkLabel")}
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      {t("profileSettings.publicLinkDescription")}
+                    </p>
+                  </div>
+                  {publicProfilePath ? (
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+                        {publicProfileUrl}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href={publicProfilePath}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                        >
+                          {t("profileSettings.viewPublicProfile")}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={handleCopyLink}
+                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                        >
+                          {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                  {!isPublic && publicProfilePath ? (
+                    <p className="mt-3 text-xs text-slate-400">
+                      {t("profileSettings.publicLinkPrivate")}
+                    </p>
+                  ) : null}
+                </div>
+
                 <SettingRow
                   title={
                     <button
@@ -507,98 +599,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
                   )}
                 </SettingRow>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-white">
-                      {t("profileSettings.publicLinkLabel")}
-                    </div>
-                    <p className="text-xs text-slate-300">
-                      {t("profileSettings.publicLinkDescription")}
-                    </p>
-                  </div>
-                  {publicProfilePath ? (
-                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
-                        {publicProfileUrl}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <a
-                          href={publicProfilePath}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        >
-                          {t("profileSettings.viewPublicProfile")}
-                        </a>
-                        <button
-                          type="button"
-                          onClick={handleCopyLink}
-                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        >
-                          {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                  {!isPublic && publicProfilePath ? (
-                    <p className="mt-3 text-xs text-slate-400">
-                      {t("profileSettings.publicLinkPrivate")}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                  <div className="space-y-3">
-                    <label className="flex flex-col gap-2 text-xs text-slate-300">
-                      <span>{t("profileSettings.displayNameLabel")}</span>
-                      <input
-                        type="text"
-                        value={displayNameInput}
-                        onChange={(event) => setDisplayNameInput(event.target.value)}
-                        placeholder={t("profileSettings.displayNamePlaceholder")}
-                        maxLength={40}
-                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-                      />
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.displayNameHelper")}
-                      </span>
-                    </label>
-                    <label className="flex flex-col gap-2 text-xs text-slate-300">
-                      <span>{t("profileSettings.handleLabel")}</span>
-                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                        <span className="text-slate-400">@</span>
-                        <input
-                          type="text"
-                          value={handleInput}
-                          onChange={(event) => setHandleInput(event.target.value)}
-                          placeholder={t("profileSettings.handlePlaceholder")}
-                          className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
-                        />
-                      </div>
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.handleHelper")}
-                      </span>
-                    </label>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] text-slate-500">
-                        {displayNameTooShort || displayNameTooLong
-                          ? t("profileSettings.displayNameError")
-                          : handleMissing
-                            ? t("profileSettings.handleError")
-                            : "\u00A0"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={saveIdentity}
-                        disabled={identityDisabled}
-                        className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {t("profileSettings.save")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <div className="space-y-3">
