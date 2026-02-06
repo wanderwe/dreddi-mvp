@@ -527,7 +527,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           <button
                             type="button"
                             onClick={() => removeTag(tag)}
-                            className="rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                            className="cursor-pointer rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                             aria-label={t("profileSettings.tagsRemove", { tag })}
                           >
                             <X className="h-3 w-3" aria-hidden />
@@ -556,17 +556,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 addTagsFromInput(profileTagsInput);
                               }
                             }}
+                            onBlur={() => addTagsFromInput(profileTagsInput)}
                             placeholder={t("profileSettings.tagsPlaceholder")}
                             className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                           />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => addTagsFromInput(profileTagsInput)}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] sm:w-auto"
-                        >
-                          {t("profileSettings.tagsAdd")}
-                        </button>
                       </div>
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-[11px] text-slate-500">
