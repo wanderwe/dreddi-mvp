@@ -461,11 +461,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.identityLabel")}
                       </div>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-xs text-slate-300">
                         {t("profileSettings.identityDescription")}
                       </p>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex flex-col gap-2 text-xs text-slate-300">
                         <span>{t("profileSettings.displayNameLabel")}</span>
                         <input
@@ -476,6 +476,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           maxLength={40}
                           className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                         />
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.displayNameHelper")}
+                        </span>
                       </div>
                       <div className="flex flex-col gap-2 text-xs text-slate-300">
                         <span>{t("profileSettings.handleLabel")}</span>
@@ -489,23 +492,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                           />
                         </div>
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.handleHelper")}
+                        </span>
                       </div>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex flex-col gap-1 text-left">
-                          <span className="text-[11px] text-slate-500">
-                            {t("profileSettings.displayNameHelper")}
-                          </span>
-                          <span className="text-[11px] text-slate-500">
-                            {t("profileSettings.handleHelper")}
-                          </span>
-                          <span className="text-[11px] text-slate-500">
-                            {displayNameTooShort || displayNameTooLong
-                              ? t("profileSettings.displayNameError")
-                              : handleMissing
-                                ? t("profileSettings.handleError")
-                                : " "}
-                          </span>
-                        </div>
+                        <span className="text-[11px] text-slate-500">
+                          {displayNameTooShort || displayNameTooLong
+                            ? t("profileSettings.displayNameError")
+                            : handleMissing
+                              ? t("profileSettings.handleError")
+                              : " "}
+                        </span>
                         <button
                           type="button"
                           onClick={saveIdentity}
@@ -646,7 +644,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </span>
                       )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                           <input
