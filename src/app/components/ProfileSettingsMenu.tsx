@@ -483,17 +483,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                         />
                       </div>
+                    </label>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-[11px] text-slate-500">
                         {t("profileSettings.handleHelper")}
-                      </span>
-                    </label>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] text-slate-500">
-                        {displayNameTooShort || displayNameTooLong
-                          ? t("profileSettings.displayNameError")
-                          : handleMissing
-                            ? t("profileSettings.handleError")
-                            : " "}
                       </span>
                       <button
                         type="button"
@@ -504,6 +497,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         {t("profileSettings.save")}
                       </button>
                     </div>
+                    <span className="text-[11px] text-slate-500">
+                      {displayNameTooShort || displayNameTooLong
+                        ? t("profileSettings.displayNameError")
+                        : handleMissing
+                          ? t("profileSettings.handleError")
+                          : " "}
+                    </span>
                   </div>
                 </div>
 
