@@ -483,18 +483,20 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                         />
                       </div>
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.handleHelper")}
-                      </span>
                     </label>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] text-slate-500">
-                        {displayNameTooShort || displayNameTooLong
-                          ? t("profileSettings.displayNameError")
-                          : handleMissing
-                            ? t("profileSettings.handleError")
-                            : " "}
-                      </span>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.handleHelper")}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {displayNameTooShort || displayNameTooLong
+                            ? t("profileSettings.displayNameError")
+                            : handleMissing
+                              ? t("profileSettings.handleError")
+                              : " "}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={saveIdentity}
