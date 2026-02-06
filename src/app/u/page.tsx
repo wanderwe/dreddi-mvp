@@ -216,7 +216,7 @@ export default function PublicProfilesDirectoryPage() {
                       {profileTags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-0.5 text-[11px] text-emerald-100"
+                          className="rounded-full border border-sky-300/20 bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-100/80"
                         >
                           {tag}
                         </span>
