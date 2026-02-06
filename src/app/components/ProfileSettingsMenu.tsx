@@ -473,15 +473,25 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     </label>
                     <label className="flex flex-col gap-2 text-xs text-slate-300">
                       <span>{t("profileSettings.handleLabel")}</span>
-                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                        <span className="text-slate-400">@</span>
-                        <input
-                          type="text"
-                          value={handleInput}
-                          onChange={(event) => setHandleInput(event.target.value)}
-                          placeholder={t("profileSettings.handlePlaceholder")}
-                          className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
-                        />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                          <span className="text-slate-400">@</span>
+                          <input
+                            type="text"
+                            value={handleInput}
+                            onChange={(event) => setHandleInput(event.target.value)}
+                            placeholder={t("profileSettings.handlePlaceholder")}
+                            className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={saveIdentity}
+                          disabled={identityDisabled}
+                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {t("profileSettings.save")}
+                        </button>
                       </div>
                     </label>
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -730,7 +740,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     }`}
                   >
                     <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-300">
                       {t("profileSettings.pushDescription")}
                     </p>
                   </button>
@@ -812,7 +822,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm text-white">
                         {t("profileSettings.quietHoursLabel")}
                       </div>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-300">
                         {t("profileSettings.quietHoursDescription")}
                       </p>
                     </button>
