@@ -28,6 +28,7 @@ type ProfileState = {
   email: string | null;
   handle: string | null;
   displayName: string | null;
+  profileTags: string[];
   isPublic: boolean;
   pushEnabled: boolean;
   deadlineRemindersEnabled: boolean;
@@ -50,8 +51,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [quietHoursEndInput, setQuietHoursEndInput] = useState("09:00");
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [handleInput, setHandleInput] = useState("");
+  const [profileTagsInput, setProfileTagsInput] = useState("");
+  const [profileTags, setProfileTags] = useState<string[]>([]);
+  const [tagsError, setTagsError] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState<"identity" | "notifications">("identity");
   const lastHandleRef = useRef<string | null>(null);
+  const maxTags = 7;
+  const minTagLength = 2;
+  const maxTagLength = 24;
 
   useEffect(() => {
     let active = true;
@@ -74,6 +81,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           email: nextAuthState.user?.email ?? null,
           handle: profileSnapshot?.handle ?? "mock-user",
           displayName: profileSnapshot?.displayName ?? null,
+          profileTags: [],
           isPublic: true,
           pushEnabled: true,
           deadlineRemindersEnabled: true,
@@ -110,7 +118,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const { data, error: profileError } = await supabase
         .from("profiles")
         .select(
-          "handle,display_name,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
         )
         .eq("id", session.user.id)
         .single();
@@ -126,6 +134,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const profileRow = data as {
         handle?: string | null;
         display_name?: string | null;
+        profile_tags?: string[] | null;
         is_public_profile?: boolean | null;
         push_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
@@ -135,6 +144,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       } | null;
       const handle = profileRow?.handle ?? null;
       const displayName = profileRow?.display_name ?? null;
+      const profileTagsRow = profileRow?.profile_tags ?? [];
       const isPublic = profileRow?.is_public_profile ?? true;
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
@@ -147,6 +157,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         email: session.user.email ?? null,
         handle,
         displayName,
+        profileTags: profileTagsRow,
         isPublic,
         pushEnabled,
         deadlineRemindersEnabled,
@@ -186,6 +197,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     setQuietHoursStartInput(profile.quietHoursStart);
     setQuietHoursEndInput(profile.quietHoursEnd);
   }, [profile?.quietHoursStart, profile?.quietHoursEnd, profile]);
+
+  useEffect(() => {
+    if (!profile) return;
+    setProfileTags(profile.profileTags ?? []);
+  }, [profile?.profileTags, profile]);
 
   const isPublic = Boolean(profile?.isPublic);
   const publicProfilePath = useMemo(() => {
@@ -313,6 +329,70 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     (nextDisplayName !== (profile.displayName ?? null) ||
       nextHandle !== (profile.handle ?? null));
   const identityDisabled = loading || saving || !profile || !identityChanged;
+  const normalizeTagValue = (value: string) => value.trim().toLowerCase();
+  const normalizedProfileTags = useMemo(
+    () => profileTags.map((tag) => normalizeTagValue(tag)).filter(Boolean),
+    [profileTags]
+  );
+  const profileTagsSnapshot = useMemo(
+    () => (profile?.profileTags ?? []).map((tag) => normalizeTagValue(tag)).filter(Boolean),
+    [profile?.profileTags]
+  );
+  const tagsChanged =
+    !!profile && normalizedProfileTags.join("|") !== profileTagsSnapshot.join("|");
+  const tagsSaveDisabled = loading || saving || !profile || !tagsChanged;
+
+  const applyTagChanges = (nextTags: string[]) => {
+    setProfileTags(nextTags);
+    setTagsError(null);
+  };
+
+  const addTagsFromInput = (rawInput: string) => {
+    const candidates = rawInput
+      .split(",")
+      .map((tag) => normalizeTagValue(tag))
+      .filter(Boolean);
+
+    if (candidates.length === 0) {
+      return;
+    }
+
+    let nextTags = [...normalizedProfileTags];
+    for (const tag of candidates) {
+      if (tag.length < minTagLength || tag.length > maxTagLength) {
+        setTagsError(
+          t("profileSettings.tagsErrorLength", {
+            min: minTagLength,
+            max: maxTagLength,
+          })
+        );
+        return;
+      }
+      if (nextTags.includes(tag)) {
+        continue;
+      }
+      if (nextTags.length >= maxTags) {
+        setTagsError(t("profileSettings.tagsErrorCount", { count: maxTags }));
+        return;
+      }
+      nextTags = [...nextTags, tag];
+    }
+
+    applyTagChanges(nextTags);
+    setProfileTagsInput("");
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    applyTagChanges(normalizedProfileTags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const saveTags = async () => {
+    if (!profile) return;
+    await updateProfileRow(
+      { profile_tags: normalizedProfileTags },
+      { profileTags: normalizedProfileTags }
+    );
+  };
 
   const saveIdentity = async () => {
     if (!profile) return;
@@ -423,6 +503,90 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.save")}
                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <div className="text-sm font-semibold text-white">
+                        {t("profileSettings.tagsLabel")}
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        {t("profileSettings.tagsDescription")}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {normalizedProfileTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs text-white/80"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeTag(tag)}
+                            className="rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                            aria-label={t("profileSettings.tagsRemove", { tag })}
+                          >
+                            <X className="h-3 w-3" aria-hidden />
+                          </button>
+                        </span>
+                      ))}
+                      {normalizedProfileTags.length === 0 && (
+                        <span className="text-xs text-slate-500">
+                          {t("profileSettings.tagsEmpty")}
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                          <input
+                            type="text"
+                            value={profileTagsInput}
+                            onChange={(event) => {
+                              setProfileTagsInput(event.target.value);
+                              if (tagsError) setTagsError(null);
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === ",") {
+                                event.preventDefault();
+                                addTagsFromInput(profileTagsInput);
+                              }
+                            }}
+                            placeholder={t("profileSettings.tagsPlaceholder")}
+                            className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => addTagsFromInput(profileTagsInput)}
+                          className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] sm:w-auto"
+                        >
+                          {t("profileSettings.tagsAdd")}
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.tagsHelper", {
+                            count: normalizedProfileTags.length,
+                            max: maxTags,
+                          })}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={saveTags}
+                          disabled={tagsSaveDisabled}
+                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {t("profileSettings.save")}
+                        </button>
+                      </div>
+                      {tagsError && (
+                        <span className="text-[11px] text-red-200">{tagsError}</span>
+                      )}
                     </div>
                   </div>
                 </div>
