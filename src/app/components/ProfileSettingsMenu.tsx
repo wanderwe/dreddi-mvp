@@ -484,10 +484,19 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         />
                       </div>
                     </label>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.handleHelper")}
-                      </span>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] text-slate-500">
+                          {t("profileSettings.handleHelper")}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {displayNameTooShort || displayNameTooLong
+                            ? t("profileSettings.displayNameError")
+                            : handleMissing
+                              ? t("profileSettings.handleError")
+                              : " "}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={saveIdentity}
