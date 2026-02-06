@@ -466,7 +466,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </p>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex flex-col gap-2 text-xs text-slate-300">
+                      <div className="space-y-1 text-xs text-slate-300">
                         <span>{t("profileSettings.displayNameLabel")}</span>
                         <input
                           type="text"
@@ -480,7 +480,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           {t("profileSettings.displayNameHelper")}
                         </span>
                       </div>
-                      <div className="flex flex-col gap-2 text-xs text-slate-300">
+                      <div className="space-y-1 text-xs text-slate-300">
                         <span>{t("profileSettings.handleLabel")}</span>
                         <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                           <span className="text-slate-400">@</span>
@@ -492,26 +492,26 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                           />
                         </div>
-                        <span className="text-[11px] text-slate-500">
-                          {t("profileSettings.handleHelper")}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[11px] text-slate-500">
-                          {displayNameTooShort || displayNameTooLong
-                            ? t("profileSettings.displayNameError")
-                            : handleMissing
-                              ? t("profileSettings.handleError")
-                              : " "}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={saveIdentity}
-                          disabled={identityDisabled}
-                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {t("profileSettings.save")}
-                        </button>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[11px] text-slate-500">
+                            {t("profileSettings.handleHelper")}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={saveIdentity}
+                            disabled={identityDisabled}
+                            className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {t("profileSettings.save")}
+                          </button>
+                        </div>
+                        {(displayNameTooShort || displayNameTooLong || handleMissing) && (
+                          <span className="text-[11px] text-slate-500">
+                            {displayNameTooShort || displayNameTooLong
+                              ? t("profileSettings.displayNameError")
+                              : t("profileSettings.handleError")}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
