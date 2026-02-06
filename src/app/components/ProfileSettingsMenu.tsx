@@ -6,6 +6,7 @@ import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { SettingRow } from "@/app/components/SettingRow";
+import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { TimePicker } from "@/app/components/ui/TimePicker";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -522,9 +523,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     <div className="text-sm font-semibold text-white">
                       {t("profileSettings.publicLinkLabel")}
                     </div>
-                    <p className="text-xs text-slate-300">
+                    <HelperText>
                       {t("profileSettings.publicLinkDescription")}
-                    </p>
+                    </HelperText>
                   </div>
                   {publicProfilePath ? (
                     <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
