@@ -79,10 +79,11 @@
       "handleRequired": "Handle is required"
     },
     "notificationsLabel": "Notifications",
-    "notificationsDescription": "Control when we send reminders and alerts",
+    "notificationsDescription": "Control which deal events are accompanied by notifications and reminders",
     "pushLabel": "In-app notifications",
     "pushDescription": "Notifications about important deal events shown inside the app",
     "deadlineLabel": "Deadline reminders",
+    "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
     "quietHoursLabel": "Quiet hours",
     "quietHoursDescription": "Delay non-critical alerts during quiet hours",
     "quietHoursRangeLabel": "Quiet hours range",

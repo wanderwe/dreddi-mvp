@@ -79,10 +79,11 @@
       "handleRequired": "Handle є обов’язковим"
     },
     "notificationsLabel": "Сповіщення",
-    "notificationsDescription": "Керуйте нагадуваннями та сповіщеннями",
+    "notificationsDescription": "Керуйте тим, які події в угодах супроводжуються сповіщеннями та нагадуваннями",
     "pushLabel": "Сповіщення в застосунку",
     "pushDescription": "Сповіщення про важливі події в угодах у межах застосунку",
     "deadlineLabel": "Нагадування про дедлайн",
+    "deadlineDescription": "Коли увімкнено, ви отримуєте нагадування перед завершенням угоди з дедлайном",
     "quietHoursLabel": "Тихі години",
     "quietHoursDescription": "Відкладати некритичні сповіщення у тихі години",
     "quietHoursRangeLabel": "Діапазон тихих годин",

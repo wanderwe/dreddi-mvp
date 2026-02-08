@@ -728,83 +728,92 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-4 pt-3">
-                <div className="flex items-start justify-between gap-4 sm:items-center">
-                  <button
-                    type="button"
-                    onClick={togglePushNotifications}
-                    disabled={loading || saving || !profile}
-                    className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
-                      loading || saving || !profile
-                        ? "cursor-not-allowed"
-                        : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
-                    }`}
-                  >
-                    <div className="text-sm text-white">{t("profileSettings.pushLabel")}</div>
-                    <p className="text-[11px] text-slate-500">
-                      {t("profileSettings.pushDescription")}
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={profile?.pushEnabled ?? false}
-                    onClick={togglePushNotifications}
-                    disabled={loading || saving || !profile}
-                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-                      profile?.pushEnabled
-                        ? "border-emerald-300/50 bg-emerald-400/70"
-                        : "border-white/20 bg-white/10"
-                    } ${
-                      loading || saving || !profile
-                        ? "cursor-not-allowed opacity-60"
-                        : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                    }`}
-                  >
-                    <span
-                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-4 sm:items-center">
+                    <button
+                      type="button"
+                      onClick={togglePushNotifications}
+                      disabled={loading || saving || !profile}
+                      className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
                       }`}
-                    />
-                  </button>
+                    >
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-white">
+                          {t("profileSettings.pushLabel")}
+                        </div>
+                        <HelperText>{t("profileSettings.pushDescription")}</HelperText>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={profile?.pushEnabled ?? false}
+                      onClick={togglePushNotifications}
+                      disabled={loading || saving || !profile}
+                      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+                        profile?.pushEnabled
+                          ? "border-emerald-300/50 bg-emerald-400/70"
+                          : "border-white/20 bg-white/10"
+                      } ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                          profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-start justify-between gap-4 sm:items-center">
-                  <button
-                    type="button"
-                    onClick={toggleDeadlineReminders}
-                    disabled={loading || saving || !profile}
-                    className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
-                      loading || saving || !profile
-                        ? "cursor-not-allowed"
-                        : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
-                    }`}
-                  >
-                    <div className="text-sm text-white">
-                      {t("profileSettings.deadlineLabel")}
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={profile?.deadlineRemindersEnabled ?? false}
-                    onClick={toggleDeadlineReminders}
-                    disabled={loading || saving || !profile}
-                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-                      profile?.deadlineRemindersEnabled
-                        ? "border-emerald-300/50 bg-emerald-400/70"
-                        : "border-white/20 bg-white/10"
-                    } ${
-                      loading || saving || !profile
-                        ? "cursor-not-allowed opacity-60"
-                        : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                    }`}
-                  >
-                    <span
-                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-4 sm:items-center">
+                    <button
+                      type="button"
+                      onClick={toggleDeadlineReminders}
+                      disabled={loading || saving || !profile}
+                      className={`-m-2 flex min-w-0 flex-1 flex-col items-start rounded-lg p-2 text-left transition ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
                       }`}
-                    />
-                  </button>
+                    >
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-white">
+                          {t("profileSettings.deadlineLabel")}
+                        </div>
+                        <HelperText>{t("profileSettings.deadlineDescription")}</HelperText>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={profile?.deadlineRemindersEnabled ?? false}
+                      onClick={toggleDeadlineReminders}
+                      disabled={loading || saving || !profile}
+                      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+                        profile?.deadlineRemindersEnabled
+                          ? "border-emerald-300/50 bg-emerald-400/70"
+                          : "border-white/20 bg-white/10"
+                      } ${
+                        loading || saving || !profile
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                          profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -817,14 +826,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         loading || saving || !profile
                           ? "cursor-not-allowed"
                           : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
-                      }`}
+                    }`}
                     >
-                      <div className="text-sm text-white">
-                        {t("profileSettings.quietHoursLabel")}
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-white">
+                          {t("profileSettings.quietHoursLabel")}
+                        </div>
+                        <HelperText>{t("profileSettings.quietHoursDescription")}</HelperText>
                       </div>
-                      <p className="text-[11px] text-slate-500">
-                        {t("profileSettings.quietHoursDescription")}
-                      </p>
                     </button>
                     <button
                       type="button"
