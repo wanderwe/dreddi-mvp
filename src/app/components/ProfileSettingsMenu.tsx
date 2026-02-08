@@ -5,7 +5,6 @@ import { ChevronDown, UserRound, X } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
-import { SettingRow } from "@/app/components/SettingRow";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { TimePicker } from "@/app/components/ui/TimePicker";
@@ -54,6 +53,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [handleInput, setHandleInput] = useState("");
   const [profileTagsInput, setProfileTagsInput] = useState("");
   const [profileTags, setProfileTags] = useState<string[]>([]);
+  const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState<"identity" | "notifications">("identity");
   const lastHandleRef = useRef<string | null>(null);
@@ -195,6 +195,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
   useEffect(() => {
     if (!profile) return;
+    setPublicProfileInput(profile.isPublic);
+  }, [profile?.isPublic, profile]);
+
+  useEffect(() => {
+    if (!profile) return;
     setQuietHoursStartInput(profile.quietHoursStart);
     setQuietHoursEndInput(profile.quietHoursEnd);
   }, [profile?.quietHoursStart, profile?.quietHoursEnd, profile]);
@@ -205,6 +210,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   }, [profile?.profileTags, profile]);
 
   const isPublic = Boolean(profile?.isPublic);
+  const publicProfileEnabled = publicProfileInput ?? isPublic;
+  const publicProfileDirty =
+    publicProfileInput !== null && Boolean(profile) && publicProfileInput !== profile?.isPublic;
   const publicProfilePath = useMemo(() => {
     if (!profile?.handle) return "";
     return `/u/${encodeURIComponent(profile.handle)}`;
@@ -250,11 +258,16 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     return true;
   };
 
-  const handleToggle = async () => {
+  const handlePublicProfileToggle = () => {
     if (!profile || saving) return;
+    setPublicProfileInput((prev) => !(prev ?? isPublic));
+  };
 
-    const nextPublic = !isPublic;
-    const nextHandle = nextPublic
+  const savePublicProfile = async () => {
+    if (!profile || publicProfileInput === null || saving) return;
+    if (publicProfileInput === profile.isPublic) return;
+
+    const nextHandle = publicProfileInput
       ? lastHandleRef.current ?? profile.handle ?? defaultHandle
       : profile.handle;
 
@@ -263,8 +276,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     }
 
     await updateProfileRow(
-      { is_public_profile: nextPublic, handle: nextHandle },
-      { handle: nextHandle, isPublic: nextPublic }
+      { is_public_profile: publicProfileInput, handle: nextHandle },
+      { handle: nextHandle, isPublic: publicProfileInput }
     );
   };
 
@@ -456,36 +469,43 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="space-y-3 pt-3">
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <div className="space-y-3">
-                    <div className="space-y-1 text-xs text-slate-300">
-                      <span>{t("profileSettings.displayNameLabel")}</span>
-                      <input
-                        type="text"
-                        value={displayNameInput}
-                        onChange={(event) => setDisplayNameInput(event.target.value)}
-                        placeholder={t("profileSettings.displayNamePlaceholder")}
-                        maxLength={40}
-                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-                      />
-                      <span className="text-[11px] text-slate-500">
-                        {t("profileSettings.displayNameHelper")}
-                      </span>
+                    <div className="space-y-1">
+                      <div className="text-sm font-semibold text-white">
+                        {t("profileSettings.displayNameLabel")}
+                      </div>
+                      <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>
                     </div>
-                    <div className="space-y-1 text-xs text-slate-300">
-                      <span>{t("profileSettings.handleLabel")}</span>
-                      <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                        <span className="text-slate-400">@</span>
+                    <div className="space-y-3">
+                      <div className="space-y-1 text-xs text-slate-300">
+                        <label htmlFor="profile-display-name" className="sr-only">
+                          {t("profileSettings.displayNameLabel")}
+                        </label>
                         <input
+                          id="profile-display-name"
                           type="text"
-                          value={handleInput}
-                          onChange={(event) => setHandleInput(event.target.value)}
-                          placeholder={t("profileSettings.handlePlaceholder")}
-                          className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                          value={displayNameInput}
+                          onChange={(event) => setDisplayNameInput(event.target.value)}
+                          placeholder={t("profileSettings.displayNamePlaceholder")}
+                          maxLength={40}
+                          className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                         />
                       </div>
+                      <div className="space-y-1 text-xs text-slate-300">
+                        <label htmlFor="profile-handle">{t("profileSettings.handleLabel")}</label>
+                        <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                          <span className="text-slate-400">@</span>
+                          <input
+                            id="profile-handle"
+                            type="text"
+                            value={handleInput}
+                            onChange={(event) => setHandleInput(event.target.value)}
+                            placeholder={t("profileSettings.handlePlaceholder")}
+                            className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                          />
+                        </div>
+                      </div>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[11px] text-slate-500">
-                          {t("profileSettings.handleHelper")}
-                        </span>
+                        <HelperText>{t("profileSettings.handleHelper")}</HelperText>
                         <button
                           type="button"
                           onClick={saveIdentity}
@@ -496,108 +516,107 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </button>
                       </div>
                       {(displayNameTooShort || displayNameTooLong || handleMissing) && (
-                        <span className="text-[11px] text-slate-500">
+                        <HelperText className="text-slate-500">
                           {displayNameTooShort || displayNameTooLong
                             ? t("profileSettings.displayNameError")
                             : t("profileSettings.handleError")}
-                        </span>
+                        </HelperText>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-white">
-                      {t("profileSettings.publicLinkLabel")}
-                    </div>
-                    <HelperText>
-                      {t("profileSettings.publicLinkDescription")}
-                    </HelperText>
-                  </div>
-                  {publicProfilePath ? (
-                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
-                        {publicProfileUrl}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <a
-                          href={publicProfilePath}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        >
-                          {t("profileSettings.viewPublicProfile")}
-                        </a>
-                        <button
-                          type="button"
-                          onClick={handleCopyLink}
-                          className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        >
-                          {copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")}
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                  {!isPublic && publicProfilePath ? (
-                    <p className="mt-3 text-xs text-slate-400">
-                      {t("profileSettings.publicLinkPrivate")}
-                    </p>
-                  ) : null}
-                </div>
-
-                <SettingRow
-                  title={
-                    <button
-                      type="button"
-                      onClick={handleToggle}
-                      disabled={loading || saving || !profile}
-                      className={`-m-2 flex w-full flex-col items-start rounded-lg p-2 text-left transition ${
-                        loading || saving || !profile
-                          ? "cursor-not-allowed"
-                          : "cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
-                      }`}
-                    >
+                  <div className="space-y-3">
+                    <div className="space-y-1">
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.publicLabel")}
                       </div>
-                      <p className="text-xs text-slate-300">
-                        {t("profileSettings.publicDescription")}
-                      </p>
-                    </button>
-                  }
-                  right={
-                    <div className="flex items-center">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={isPublic}
-                        aria-label={t("profileSettings.toggleLabel")}
-                        onClick={handleToggle}
-                        disabled={loading || saving || !profile}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                          isPublic
-                            ? "border-emerald-300/50 bg-emerald-400/70"
-                            : "border-white/20 bg-white/10"
-                        } ${
-                          loading || saving || !profile
-                            ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        }`}
-                      >
-                        <span
-                          className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                            isPublic ? "translate-x-5" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
+                      <HelperText>{t("profileSettings.publicDescription")}</HelperText>
                     </div>
-                  }
-                >
-                  {loading && (
-                    <p className="mt-3 text-xs text-slate-400">{t("profileSettings.loading")}</p>
-                  )}
-                </SettingRow>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/30 px-3 py-2">
+                        <span className="text-xs text-slate-300">
+                          {t("profileSettings.toggleLabel")}
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={publicProfileEnabled}
+                          aria-label={t("profileSettings.toggleLabel")}
+                          onClick={handlePublicProfileToggle}
+                          disabled={loading || saving || !profile}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                            publicProfileEnabled
+                              ? "border-emerald-300/50 bg-emerald-400/70"
+                              : "border-white/20 bg-white/10"
+                          } ${
+                            loading || saving || !profile
+                              ? "cursor-not-allowed opacity-60"
+                              : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                          }`}
+                        >
+                          <span
+                            className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                              publicProfileEnabled ? "translate-x-5" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-xs text-slate-300">
+                          {t("profileSettings.publicLinkLabel")}
+                        </div>
+                        {publicProfilePath ? (
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+                              {publicProfileUrl}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <a
+                                href={publicProfilePath}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                              >
+                                {t("profileSettings.viewPublicProfile")}
+                              </a>
+                              <button
+                                type="button"
+                                onClick={handleCopyLink}
+                                className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                              >
+                                {copied
+                                  ? t("profileSettings.copySuccess")
+                                  : t("profileSettings.copyLink")}
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
+                        {loading && (
+                          <HelperText className="text-slate-400">
+                            {t("profileSettings.loading")}
+                          </HelperText>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <HelperText>
+                          {!publicProfileEnabled && publicProfilePath
+                            ? t("profileSettings.publicLinkPrivate")
+                            : t("profileSettings.publicLinkDescription")}
+                        </HelperText>
+                        <button
+                          type="button"
+                          onClick={savePublicProfile}
+                          disabled={!publicProfileDirty || saving || loading || !profile}
+                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {t("profileSettings.save")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <div className="space-y-3">
@@ -605,9 +624,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.tagsLabel")}
                       </div>
-                      <p className="text-[11px] text-slate-500">
-                        {t("profileSettings.tagsDescription")}
-                      </p>
+                      <HelperText>{t("profileSettings.tagsDescription")}</HelperText>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {normalizedProfileTags.map((tag) => (
@@ -628,9 +645,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </span>
                       ))}
                       {normalizedProfileTags.length === 0 && (
-                        <span className="text-xs text-slate-500">
-                          {t("profileSettings.tagsEmpty")}
-                        </span>
+                        <HelperText>{t("profileSettings.tagsEmpty")}</HelperText>
                       )}
                     </div>
                     <div className="space-y-1">
@@ -656,12 +671,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[11px] text-slate-500">
+                        <HelperText>
                           {t("profileSettings.tagsHelper", {
                             count: normalizedProfileTags.length,
                             max: maxTags,
                           })}
-                        </span>
+                        </HelperText>
                         <button
                           type="button"
                           onClick={saveTags}
@@ -672,7 +687,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </button>
                       </div>
                       {tagsError && (
-                        <span className="text-[11px] text-red-200">{tagsError}</span>
+                        <HelperText className="text-red-200">{tagsError}</HelperText>
                       )}
                     </div>
                   </div>
