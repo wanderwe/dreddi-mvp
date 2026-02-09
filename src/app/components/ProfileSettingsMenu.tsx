@@ -641,61 +641,65 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-medium text-white">
                         {t("profileSettings.tagsLabel")}
                       </div>
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-                        <div className="min-w-0 space-y-3">
-                          <div className="flex flex-wrap gap-2">
-                            {normalizedProfileTags.map((tag) => (
-                              <span
-                                key={tag}
-                                tabIndex={0}
-                                className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200/90 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                      <HelperText className="text-sm text-slate-300">
+                        {t("profileSettings.tagsDescription")}
+                      </HelperText>
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                          {normalizedProfileTags.map((tag) => (
+                            <span
+                              key={tag}
+                              tabIndex={0}
+                              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200/90 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                            >
+                              {tag}
+                              <button
+                                type="button"
+                                onClick={() => removeTag(tag)}
+                                className="cursor-pointer rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                                aria-label={t("profileSettings.tagsRemove", { tag })}
                               >
-                                {tag}
-                                <button
-                                  type="button"
-                                  onClick={() => removeTag(tag)}
-                                  className="cursor-pointer rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-                                  aria-label={t("profileSettings.tagsRemove", { tag })}
-                                >
-                                  <X className="h-3 w-3" aria-hidden />
-                                </button>
-                              </span>
-                            ))}
-                            {normalizedProfileTags.length === 0 && (
-                              <HelperText>{t("profileSettings.tagsEmpty")}</HelperText>
-                            )}
-                          </div>
-                          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                            <input
-                              type="text"
-                              value={profileTagsInput}
-                              onChange={(event) => {
-                                setProfileTagsInput(event.target.value);
-                                if (tagsError) setTagsError(null);
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === ",") {
-                                  event.preventDefault();
-                                  addTagsFromInput(profileTagsInput);
-                                }
-                              }}
-                              onBlur={() => addTagsFromInput(profileTagsInput)}
-                              placeholder={t("profileSettings.tagsPlaceholder")}
-                              className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
-                            />
-                          </div>
+                                <X className="h-3 w-3" aria-hidden />
+                              </button>
+                            </span>
+                          ))}
+                          {normalizedProfileTags.length === 0 && (
+                            <HelperText>{t("profileSettings.tagsEmpty")}</HelperText>
+                          )}
                         </div>
-                        <button
-                          type="button"
-                          onClick={saveTags}
-                          disabled={tagsSaveDisabled}
-                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {t("profileSettings.save")}
-                        </button>
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                              <input
+                                type="text"
+                                value={profileTagsInput}
+                                onChange={(event) => {
+                                  setProfileTagsInput(event.target.value);
+                                  if (tagsError) setTagsError(null);
+                                }}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === ",") {
+                                    event.preventDefault();
+                                    addTagsFromInput(profileTagsInput);
+                                  }
+                                }}
+                                onBlur={() => addTagsFromInput(profileTagsInput)}
+                                placeholder={t("profileSettings.tagsPlaceholder")}
+                                className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={saveTags}
+                            disabled={tagsSaveDisabled}
+                            className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {t("profileSettings.save")}
+                          </button>
+                        </div>
                       </div>
                       <div className="space-y-1">
-                        <HelperText>{t("profileSettings.tagsDescription")}</HelperText>
                         <HelperText>
                           {t("profileSettings.tagsHelper", {
                             count: normalizedProfileTags.length,
