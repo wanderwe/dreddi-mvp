@@ -490,8 +490,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                         />
                       </div>
-                      <div className="space-y-2 text-xs text-slate-300">
-                        <label htmlFor="profile-handle">{t("profileSettings.handleLabel")}</label>
+                      <div className="space-y-1 text-xs text-slate-300">
+                        <label htmlFor="profile-handle" className="block">
+                          {t("profileSettings.handleLabel")}
+                        </label>
                         <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                           <span className="text-slate-400">@</span>
                           <input
