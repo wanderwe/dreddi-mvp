@@ -468,7 +468,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             >
               <div className="space-y-3 pt-3">
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="space-y-1">
                       <div className="text-sm font-semibold text-white">
                         {t("profileSettings.displayNameLabel")}
