@@ -551,7 +551,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           {t("profileSettings.toggleLabel")}
                         </div>
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                          <div className="min-w-0">
+                          <div className="min-w-0" />
+                          <div className="flex justify-end">
                             <button
                               type="button"
                               role="switch"
@@ -576,14 +577,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               />
                             </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={savePublicProfile}
-                            disabled={!publicProfileDirty || saving || loading || !profile}
-                            className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {t("profileSettings.save")}
-                          </button>
                         </div>
                         <HelperText>
                           {!publicProfileEnabled && publicProfilePath
@@ -756,7 +749,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     {t("profileSettings.pushLabel")}
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                    <div className="min-w-0">
+                    <div className="min-w-0" />
+                    <div className="flex justify-end">
                       <button
                         type="button"
                         role="switch"
@@ -771,7 +765,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           loading || saving || !profile
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        }`}
+                          }`}
                       >
                         <span
                           className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -789,7 +783,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     {t("profileSettings.deadlineLabel")}
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                    <div className="min-w-0">
+                    <div className="min-w-0" />
+                    <div className="flex justify-end">
                       <button
                         type="button"
                         role="switch"
@@ -804,7 +799,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           loading || saving || !profile
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                        }`}
+                          }`}
                       >
                         <span
                           className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
@@ -823,7 +818,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       {t("profileSettings.quietHoursLabel")}
                     </div>
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                      <div className="min-w-0">
+                      <div className="min-w-0" />
+                      <div className="flex justify-end">
                         <button
                           type="button"
                           role="switch"
@@ -838,7 +834,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             loading || saving || !profile
                               ? "cursor-not-allowed opacity-60"
                               : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                          }`}
+                            }`}
                         >
                           <span
                             className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
