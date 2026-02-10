@@ -547,16 +547,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <div className="text-sm font-medium text-white">
-                          {t("profileSettings.toggleLabel")}
-                        </div>
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                          <div className="min-w-0">
-                            <HelperText>
-                              {!publicProfileEnabled && publicProfilePath
-                                ? t("profileSettings.publicLinkPrivate")
-                                : t("profileSettings.publicLinkDescription")}
-                            </HelperText>
+                          <div className="text-sm font-medium text-white">
+                            {t("profileSettings.toggleLabel")}
                           </div>
                           <div className="flex justify-end">
                             <button
@@ -584,6 +577,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             </button>
                           </div>
                         </div>
+                        <HelperText>
+                          {!publicProfileEnabled && publicProfilePath
+                            ? t("profileSettings.publicLinkPrivate")
+                            : t("profileSettings.publicLinkDescription")}
+                        </HelperText>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm font-medium text-white">
@@ -746,12 +744,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             >
               <div className="space-y-4 pt-3">
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-white">
-                    {t("profileSettings.pushLabel")}
-                  </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                    <div className="min-w-0">
-                      <HelperText>{t("profileSettings.pushDescription")}</HelperText>
+                    <div className="text-sm font-medium text-white">
+                      {t("profileSettings.pushLabel")}
                     </div>
                     <div className="flex justify-end">
                       <button
@@ -778,15 +773,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </button>
                     </div>
                   </div>
+                  <HelperText>{t("profileSettings.pushDescription")}</HelperText>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-white">
-                    {t("profileSettings.deadlineLabel")}
-                  </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                    <div className="min-w-0">
-                      <HelperText>{t("profileSettings.deadlineDescription")}</HelperText>
+                    <div className="text-sm font-medium text-white">
+                      {t("profileSettings.deadlineLabel")}
                     </div>
                     <div className="flex justify-end">
                       <button
@@ -813,16 +806,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </button>
                     </div>
                   </div>
+                  <HelperText>{t("profileSettings.deadlineDescription")}</HelperText>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-white">
-                      {t("profileSettings.quietHoursLabel")}
-                    </div>
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                      <div className="min-w-0">
-                        <HelperText>{t("profileSettings.quietHoursDescription")}</HelperText>
+                      <div className="text-sm font-medium text-white">
+                        {t("profileSettings.quietHoursLabel")}
                       </div>
                       <div className="flex justify-end">
                         <button
@@ -849,6 +840,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </button>
                       </div>
                     </div>
+                    <HelperText>{t("profileSettings.quietHoursDescription")}</HelperText>
                   </div>
 
                   <div className="space-y-2">
