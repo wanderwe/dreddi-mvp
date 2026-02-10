@@ -65,6 +65,7 @@
     "tagsAdd": "Додати",
     "tagsEmpty": "Тегів ще немає",
     "tagsRemove": "Прибрати тег {tag}",
+    "tagsClear": "Очистити введення тегів",
     "tagsErrorLength": "Теги мають містити {min}–{max} символів",
     "tagsErrorCount": "Можна додати до {count} тегів",
     "displayNameError": "Показуване ім’я має містити 2–40 символів.",
