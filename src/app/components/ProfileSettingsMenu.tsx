@@ -994,7 +994,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       )}
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="max-md:my-2 max-md:mr-2 max-md:h-[calc(100dvh-1rem)] max-md:rounded-2xl flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
+        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] rounded-2xl flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
