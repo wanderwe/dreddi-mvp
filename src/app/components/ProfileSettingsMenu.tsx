@@ -537,7 +537,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </div>
                       <HelperText>{t("profileSettings.handleHelper")}</HelperText>
                       {(displayNameTooShort || displayNameTooLong || handleMissing) && (
-                        <HelperText className={handleMissing ? "text-red-200" : "text-slate-500"}>
+                        <HelperText className="text-red-200">
                           {displayNameTooShort || displayNameTooLong
                             ? t("profileSettings.displayNameError")
                             : t("profileSettings.handleError")}

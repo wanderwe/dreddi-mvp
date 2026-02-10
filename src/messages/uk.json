@@ -68,8 +68,8 @@
     "tagsClear": "Очистити введення тегів",
     "tagsErrorLength": "Теги мають містити {min}–{max} символів",
     "tagsErrorCount": "Можна додати до {count} тегів",
-    "displayNameError": "Показуване ім’я має містити 2–40 символів.",
-    "handleError": "Handle є обов’язковим.",
+    "displayNameError": "Показуване ім’я має містити 2–40 символів",
+    "handleError": "Handle є обов’язковим",
     "loading": "Завантаження профілю…",
     "errors": {
       "unavailable": "Автентифікація недоступна в цьому превʼю",
