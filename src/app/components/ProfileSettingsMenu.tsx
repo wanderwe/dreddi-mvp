@@ -480,15 +480,27 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </label>
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                         <div className="min-w-0">
-                          <input
-                            id="profile-display-name"
-                            type="text"
-                            value={displayNameInput}
-                            onChange={(event) => setDisplayNameInput(event.target.value)}
-                            placeholder={t("profileSettings.displayNamePlaceholder")}
-                            maxLength={40}
-                            className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-                          />
+                          <div className="relative">
+                            <input
+                              id="profile-display-name"
+                              type="text"
+                              value={displayNameInput}
+                              onChange={(event) => setDisplayNameInput(event.target.value)}
+                              placeholder={t("profileSettings.displayNamePlaceholder")}
+                              maxLength={40}
+                              className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 pr-10 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                            />
+                            {displayNameInput.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setDisplayNameInput("")}
+                                aria-label={t("profileSettings.displayNameClear")}
+                                className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-slate-300 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                              >
+                                <X className="h-3.5 w-3.5" aria-hidden />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>

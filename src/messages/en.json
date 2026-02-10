@@ -55,6 +55,7 @@
     "displayNameLabel": "Display name",
     "displayNamePlaceholder": "Enter a name or brand",
     "displayNameHelper": "This name is shown in public profiles and deals.\nIf left blank, @handle will be shown.",
+    "displayNameClear": "Clear display name",
     "handleLabel": "Public handle (profile link)",
     "handlePlaceholder": "your-handle",
     "handleHelper": "Unique identifier used in links and search.",
