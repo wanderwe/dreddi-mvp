@@ -480,7 +480,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </label>
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                         <div className="min-w-0">
-                          <div className="relative">
+                          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                             <input
                               id="profile-display-name"
                               type="text"
@@ -488,14 +488,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               onChange={(event) => setDisplayNameInput(event.target.value)}
                               placeholder={t("profileSettings.displayNamePlaceholder")}
                               maxLength={40}
-                              className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 pr-10 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                              className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                             />
                             {displayNameInput.length > 0 && (
                               <button
                                 type="button"
                                 onClick={() => setDisplayNameInput("")}
-                                aria-label={t("profileSettings.displayNameClear")}
-                                className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 text-slate-300 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                aria-label={t("profileSettings.close")}
+                                className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
                               >
                                 <X className="h-3.5 w-3.5" aria-hidden />
                               </button>
