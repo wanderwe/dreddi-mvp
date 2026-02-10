@@ -68,8 +68,8 @@
     "tagsClear": "Clear tag input",
     "tagsErrorLength": "Tags must be {min}–{max} characters",
     "tagsErrorCount": "You can add up to {count} tags",
-    "displayNameError": "Display name must be 2–40 characters.",
-    "handleError": "Handle is required.",
+    "displayNameError": "Display name must be 2–40 characters",
+    "handleError": "Handle is required",
     "loading": "Loading profile…",
     "errors": {
       "unavailable": "Authentication is unavailable in this preview",
