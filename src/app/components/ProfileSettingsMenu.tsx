@@ -577,11 +577,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             </button>
                           </div>
                         </div>
-                        <HelperText>
-                          {!publicProfileEnabled && publicProfilePath
-                            ? t("profileSettings.publicLinkPrivate")
-                            : t("profileSettings.publicLinkDescription")}
-                        </HelperText>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm font-medium text-white">
@@ -622,6 +617,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             </div>
                           ) : null}
                         </div>
+                        <HelperText>
+                          {!publicProfileEnabled && publicProfilePath
+                            ? t("profileSettings.publicLinkPrivate")
+                            : t("profileSettings.publicLinkDescription")}
+                        </HelperText>
                       </div>
                     </div>
                   </div>
@@ -743,7 +743,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-4 pt-3">
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="text-sm font-medium text-white">
                       {t("profileSettings.pushLabel")}
@@ -776,7 +776,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   <HelperText>{t("profileSettings.pushDescription")}</HelperText>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="text-sm font-medium text-white">
                       {t("profileSettings.deadlineLabel")}
@@ -810,7 +810,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 </div>
 
                 <div className="space-y-4">
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                       <div className="text-sm font-medium text-white">
                         {t("profileSettings.quietHoursLabel")}
