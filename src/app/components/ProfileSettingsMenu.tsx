@@ -568,7 +568,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           </button>
                         </div>
                       </div>
-                      <HelperText className="text-sm text-slate-300">
+                      <HelperText>
                         {t("profileSettings.publicDescription")}
                       </HelperText>
                     </div>
@@ -672,6 +672,16 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 placeholder={t("profileSettings.tagsPlaceholder")}
                                 className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
                               />
+                              {profileTagsInput.trim().length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setProfileTagsInput("")}
+                                  aria-label={t("profileSettings.tagsClear")}
+                                  className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                >
+                                  <X className="h-3.5 w-3.5" aria-hidden />
+                                </button>
+                              )}
                             </div>
                           </div>
                           <button
