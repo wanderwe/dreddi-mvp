@@ -553,10 +553,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         <div className="text-sm font-medium text-white">
                           {t("profileSettings.publicLinkLabel")}
                         </div>
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                        <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
                           <div className="min-w-0 space-y-2">
                             {publicProfilePath ? (
-                              <div className="break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200">
+                              <div className="break-words rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200 [overflow-wrap:anywhere]">
                                 {publicProfileUrl}
                               </div>
                             ) : null}
@@ -567,7 +567,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             )}
                           </div>
                           {publicProfilePath ? (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex w-full flex-wrap gap-2 md:w-auto md:justify-end">
                               <a
                                 href={publicProfilePath}
                                 target="_blank"
@@ -994,7 +994,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       )}
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] rounded-2xl flex flex-col md:w-[360px] lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
+        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
