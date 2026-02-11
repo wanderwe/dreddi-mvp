@@ -689,6 +689,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               {profileTagsInput.trim().length > 0 && (
                                 <button
                                   type="button"
+                                  onMouseDown={(event) => event.preventDefault()}
                                   onClick={() => setProfileTagsInput("")}
                                   aria-label={t("profileSettings.tagsClear")}
                                   className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
