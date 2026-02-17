@@ -162,6 +162,7 @@ export default function PromisePage() {
   const searchParams = useSearchParams();
   const id = params?.id;
   const backFrom = searchParams?.get("from");
+  const actionParam = searchParams?.get("action");
 
   const [p, setP] = useState<PromiseRow | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -190,7 +191,7 @@ export default function PromisePage() {
 
   const backLink = useMemo(() => {
     if (backFrom === "dashboard") {
-      return { href: "/", label: "← Back to dashboard" };
+      return { href: "/", label: t("promises.detail.backToDashboard") };
     }
     return {
       href: "/promises",
@@ -224,7 +225,10 @@ export default function PromisePage() {
       return;
     }
 
-    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    const actionQuery = actionParam === "confirm" || actionParam === "dispute"
+      ? `?action=${actionParam}`
+      : "";
+    const session = await requireSessionOrRedirect(`/promises/${id}${actionQuery}`, supabase);
     if (!session) return;
 
     const { data, error } = await supabase
@@ -252,7 +256,13 @@ export default function PromisePage() {
     if (!id) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, actionParam]);
+
+  useEffect(() => {
+    if (!id || !userId) return;
+    if (actionParam !== "confirm" && actionParam !== "dispute") return;
+    router.replace(`/promises/${id}/confirm?action=${actionParam}`);
+  }, [actionParam, id, router, userId]);
 
   useEffect(() => {
     let active = true;

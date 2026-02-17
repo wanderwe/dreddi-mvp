@@ -73,6 +73,11 @@ type PromiseSummary = PromiseRoleBase & {
   isReviewer: boolean;
 };
 
+type ReminderInfo = {
+  count: number;
+  lastSentAt: string | null;
+};
+
 const PAGE_SIZE = 12;
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
@@ -159,11 +164,23 @@ export default function PromisesClient() {
   const [error, setError] = useState<string | null>(null);
   const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
+  const [reminderInfoByDeal, setReminderInfoByDeal] = useState<Record<string, ReminderInfo>>({});
+  const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>("total");
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
+
+  const reminderErrorMessage = (errorCode?: string) => {
+    if (errorCode === "reminder_rate_limit") return t("promises.list.reminder.rateLimited");
+    if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
+    if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
+    if (errorCode === "reminder_acceptance_required") return t("promises.list.reminder.acceptedOnly");
+    if (errorCode === "reminder_active_only") return t("promises.list.reminder.activeOnly");
+    return t("promises.list.reminder.sendFailed");
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -280,6 +297,35 @@ export default function PromisesClient() {
     setPageByTab((prev) => ({ ...prev, [tabKey]: page }));
   };
 
+  const loadReminderInfo = async (ids: string[]) => {
+    if (!ids.length) return;
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch {
+      return;
+    }
+
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return;
+
+    const res = await fetch(`/api/promises/reminders/summary?ids=${encodeURIComponent(ids.join(","))}`, {
+      headers: {
+        Authorization: `Bearer ${data.session.access_token}`,
+      },
+    });
+
+    if (!res.ok) return;
+
+    const body = await res.json().catch(() => null) as
+      | { reminders?: Record<string, ReminderInfo> }
+      | null;
+    if (!body?.reminders) return;
+
+    setReminderInfoByDeal((prev) => ({ ...prev, ...body.reminders }));
+  };
+
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
@@ -299,6 +345,75 @@ export default function PromisesClient() {
       cancelled = true;
     };
   }, [tab, userId]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  useEffect(() => {
+    if (listLoading) return;
+    const sourceRows = listRowsByTab[tab] ?? [];
+    const filteredRows =
+      activeMetricFilter === "awaiting_my_action"
+        ? sourceRows.filter((row) => isAwaitingYourAction(row))
+        : activeMetricFilter === "awaiting_others"
+          ? sourceRows.filter((row) => isAwaitingOthers(row))
+          : sourceRows;
+
+    void loadReminderInfo(filteredRows.map((row) => row.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeMetricFilter, listLoading, listRowsByTab, tab]);
+
+  const handleSendReminder = async (promiseId: string) => {
+    setError(null);
+    setSendingReminderId(promiseId);
+    try {
+      const supabase = requireSupabase();
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        router.push(`/login?next=${encodeURIComponent("/promises")}`);
+        return;
+      }
+
+      const res = await fetch(`/api/promises/${promiseId}/reminder`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+      });
+
+      const body = await res.json().catch(() => ({})) as {
+        error?: string;
+        error_code?: string;
+        count?: number;
+        created_at?: string;
+      };
+      if (!res.ok) {
+        throw new Error(reminderErrorMessage(body.error_code));
+      }
+
+      setReminderInfoByDeal((prev) => ({
+        ...prev,
+        [promiseId]: {
+          count: body.count ?? (prev[promiseId]?.count ?? 0) + 1,
+          lastSentAt: body.created_at ?? new Date().toISOString(),
+        },
+      }));
+      setToast(t("promises.list.reminder.sent"));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("promises.list.reminder.sendFailed"));
+    } finally {
+      setSendingReminderId(null);
+    }
+  };
+
+  const isReminderCoolingDown = (lastSentAt: string | null) => {
+    if (!lastSentAt) return false;
+    const diff = Date.now() - new Date(lastSentAt).getTime();
+    return diff < 24 * 60 * 60 * 1000;
+  };
 
   const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
@@ -454,6 +569,12 @@ export default function PromisesClient() {
 
   return (
     <main className="relative py-10">
+      {toast && (
+        <div className="fixed right-4 top-4 z-50 rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-100 shadow-lg shadow-emerald-900/40">
+          {toast}
+        </div>
+      )}
+
       <div
         className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(74,222,128,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(74,144,226,0.08),transparent_28%)]"
         aria-hidden
@@ -576,8 +697,11 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
-                const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const acceptedBySecondSide = isPromiseAccepted(p);
+                const canSendReminder = canReview && p.status === "active" && acceptedBySecondSide;
+                const isDeclined = p.uiStatus === "declined" || p.status === "declined";
+                const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
+                const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
 
                 const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
 
@@ -609,7 +733,28 @@ export default function PromisesClient() {
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 text-right text-sm text-slate-200">
+                      <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
+                        {canSendReminder && (
+                          <div className="flex flex-col items-end gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleSendReminder(p.id)}
+                              disabled={sendingReminderId === p.id || reminderCooldown}
+                              className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-300/50 hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {sendingReminderId === p.id
+                                ? t("promises.list.reminder.sending")
+                                : t("promises.list.reminder.button")}
+                            </button>
+                            {reminderInfo.count > 0 && (
+                              <div className="text-[11px] text-slate-400">
+                                {t("promises.list.reminder.count", { count: reminderInfo.count })}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-end gap-2">
                         <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
                           {statusLabel}
                         </span>
@@ -636,6 +781,7 @@ export default function PromisesClient() {
                             />
                           </Tooltip>
                         )}
+                        </div>
                       </div>
                     </div>
                   </div>
