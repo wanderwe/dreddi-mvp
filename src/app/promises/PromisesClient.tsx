@@ -345,9 +345,17 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (listLoading) return;
-    void loadReminderInfo(rows.map((row) => row.id));
+    const sourceRows = listRowsByTab[tab] ?? [];
+    const filteredRows =
+      activeMetricFilter === "awaiting_my_action"
+        ? sourceRows.filter((row) => isAwaitingYourAction(row))
+        : activeMetricFilter === "awaiting_others"
+          ? sourceRows.filter((row) => isAwaitingOthers(row))
+          : sourceRows;
+
+    void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listLoading, tab, rows.length]);
+  }, [activeMetricFilter, listLoading, listRowsByTab, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
