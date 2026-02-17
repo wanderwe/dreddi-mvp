@@ -55,7 +55,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
-  const [openSection, setOpenSection] = useState<"identity" | "notifications">("identity");
+  const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
+    "identity"
+  );
   const lastHandleRef = useRef<string | null>(null);
   const maxTags = 7;
   const minTagLength = 2;
@@ -634,6 +636,41 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5">
+          <button
+            type="button"
+            onClick={() => setOpenSection("domains")}
+            aria-expanded={openSection === "domains"}
+            className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
+          >
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.domainsLabel")}
+              </div>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 text-slate-200 transition ${
+                openSection === "domains" ? "rotate-180" : ""
+              }`}
+              aria-hidden
+            />
+          </button>
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              openSection === "domains" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div
+              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+                openSection === "domains" ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="space-y-3 pt-3">
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
