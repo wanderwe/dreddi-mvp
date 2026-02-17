@@ -3,11 +3,13 @@ import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 type ReminderErrorCode =
   | "reminder_active_only"
+  | "reminder_acceptance_required"
   | "reminder_participants_invalid"
   | "reminder_forbidden"
   | "reminder_rate_limit"
@@ -135,6 +137,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     if (promise.status !== "active") {
       return errorResponse(400, "reminder_active_only", "Reminders are only available for active deals");
+    }
+
+    if (!isPromiseAccepted(promise)) {
+      return errorResponse(
+        400,
+        "reminder_acceptance_required",
+        "Reminders are available only after the deal is accepted"
+      );
     }
 
     const admin = getAdminClient();

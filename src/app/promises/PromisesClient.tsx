@@ -177,6 +177,7 @@ export default function PromisesClient() {
     if (errorCode === "reminder_rate_limit") return t("promises.list.reminder.rateLimited");
     if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
     if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
+    if (errorCode === "reminder_acceptance_required") return t("promises.list.reminder.acceptedOnly");
     if (errorCode === "reminder_active_only") return t("promises.list.reminder.activeOnly");
     return t("promises.list.reminder.sendFailed");
   };
@@ -696,9 +697,9 @@ export default function PromisesClient() {
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
-                const canSendReminder = canReview && p.status === "active";
-                const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const acceptedBySecondSide = isPromiseAccepted(p);
+                const canSendReminder = canReview && p.status === "active" && acceptedBySecondSide;
+                const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
 
