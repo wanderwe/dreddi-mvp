@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, BadgeCheck } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
 import { IconButton } from "@/app/components/ui/IconButton";
@@ -19,6 +19,7 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { ActionQueueState, getActionQueueState } from "@/lib/actionQueue";
 
 type PromiseRow = {
   id: string;
@@ -38,6 +39,7 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  invite_token: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -55,6 +57,9 @@ type PromiseRoleBase = Pick<
   | "accepted_at"
   | "declined_at"
   | "ignored_at"
+  | "due_at"
+  | "title"
+  | "invite_token"
   | "creator_id"
   | "promisor_id"
   | "promisee_id"
@@ -65,6 +70,10 @@ type PromiseWithRole = PromiseRow & {
   inviteStatus: InviteStatus;
   uiStatus: PromiseUiStatus;
   isReviewer: boolean;
+};
+
+type ActionQueueItem = PromiseSummary & {
+  queueState: ActionQueueState;
 };
 type PromiseSummary = PromiseRoleBase & {
   role: PromiseRole;
@@ -146,6 +155,27 @@ export default function PromisesClient() {
     return status;
   };
 
+  const actionQueueLabel = (state: ActionQueueState) => {
+    if (state === "awaiting_acceptance") return t("promises.actionQueue.labels.awaitingAcceptance");
+    if (state === "overdue") return t("promises.actionQueue.labels.overdue");
+    if (state === "active_no_deadline") return t("promises.actionQueue.labels.activeNoDeadline");
+    return t("promises.actionQueue.labels.needsConfirmation");
+  };
+
+  const actionQueueCtaLabel = (state: ActionQueueState) => {
+    if (state === "awaiting_acceptance") return t("promises.actionQueue.cta.accept");
+    if (state === "needs_confirmation") return t("promises.actionQueue.cta.confirmOrDispute");
+    return t("promises.actionQueue.cta.markCompleted");
+  };
+
+  const actionQueueHref = (row: PromiseSummary, state: ActionQueueState) => {
+    if (state === "awaiting_acceptance" && row.invite_token) {
+      return `/p/invite/${row.invite_token}`;
+    }
+    if (state === "needs_confirmation") return `/promises/${row.id}/confirm`;
+    return `/promises/${row.id}`;
+  };
+
   const [summaryRows, setSummaryRows] = useState<PromiseSummary[]>([]);
   const [listRowsByTab, setListRowsByTab] = useState<Record<TabKey, PromiseWithRole[]>>({
     "i-promised": [],
@@ -169,6 +199,7 @@ export default function PromisesClient() {
   const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>("total");
+  const actionQueueRef = useRef<HTMLDivElement | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -210,7 +241,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,status,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,invite_token,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -268,7 +299,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,invite_token,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -454,7 +485,21 @@ export default function PromisesClient() {
     [listRowsByTab, activeMetricFilter]
   );
 
-  const rows = filteredListRowsByTab[tab];
+  const actionQueueItems = useMemo<ActionQueueItem[]>(() => {
+    if (!userId) return [];
+    const now = new Date();
+    return summaryRows
+      .map((row) => {
+        const queueState = getActionQueueState(row, userId, now);
+        if (!queueState) return null;
+        return { ...row, queueState };
+      })
+      .filter((row): row is ActionQueueItem => Boolean(row));
+  }, [summaryRows, userId]);
+
+  const actionQueueIds = useMemo(() => new Set(actionQueueItems.map((item) => item.id)), [actionQueueItems]);
+
+  const rows = filteredListRowsByTab[tab].filter((row) => !actionQueueIds.has(row.id));
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
@@ -500,6 +545,19 @@ export default function PromisesClient() {
     roleCounts.uncategorized,
     filteredSummaryRows.length,
   ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const count = actionQueueItems.length;
+    window.localStorage.setItem("dreddi_action_queue_count", String(count));
+    window.dispatchEvent(new CustomEvent("dreddi:action-queue-updated", { detail: { count } }));
+  }, [actionQueueItems.length]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.location.hash.includes("action-queue")) return;
+    actionQueueRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [actionQueueItems.length]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -649,6 +707,42 @@ export default function PromisesClient() {
           </div>
         </div>
 
+        {actionQueueItems.length > 0 && (
+          <div
+            id="action-queue"
+            ref={actionQueueRef}
+            className="rounded-3xl border border-amber-300/30 bg-amber-500/10 p-4 shadow-xl shadow-black/30 backdrop-blur"
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-amber-50">{t("promises.actionQueue.title")}</h2>
+              <span className="rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-0.5 text-xs font-semibold text-amber-100">
+                {actionQueueItems.length}
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {actionQueueItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-amber-100/20 bg-black/30 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <div className="text-sm font-semibold text-white">{item.title}</div>
+                    <div className="text-xs text-amber-100/90">{actionQueueLabel(item.queueState)}</div>
+                  </div>
+
+                  <Link
+                    href={actionQueueHref(item, item.queueState)}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-amber-300 px-3 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-amber-200"
+                  >
+                    {actionQueueCtaLabel(item.queueState)}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -698,7 +792,7 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const canSendReminder = canReview && p.status === "active" && acceptedBySecondSide;
+                const canSendReminder = canReview && ((p.status === "active" && acceptedBySecondSide) || p.status === "completed_by_promisor");
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
@@ -746,9 +840,9 @@ export default function PromisesClient() {
                                 ? t("promises.list.reminder.sending")
                                 : t("promises.list.reminder.button")}
                             </button>
-                            {reminderInfo.count > 0 && (
+                            {reminderInfo.lastSentAt && (
                               <div className="text-[11px] text-slate-400">
-                                {t("promises.list.reminder.count", { count: reminderInfo.count })}
+                                {t("promises.list.reminder.last", { date: new Date(reminderInfo.lastSentAt).toLocaleString(locale) })}
                               </div>
                             )}
                           </div>

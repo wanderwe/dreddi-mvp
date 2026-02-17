@@ -9,7 +9,8 @@
     "notifications": "Notifications",
     "switchLanguage": "Switch language",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "actionQueueBadge": "Action required"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -179,7 +180,8 @@
         "forbidden": "Only the side waiting for action can send a reminder",
         "unavailable": "Reminder feature is temporarily unavailable. Please try again later",
         "invalidState": "Reminders are available only while someone is waiting for action",
-        "acceptedOnly": "Reminders are available only after a deal is accepted"
+        "acceptedOnly": "Reminders are available only after a deal is accepted",
+        "last": "Last reminder: {date}"
       },
       "errors": {
         "markComplete": "Could not mark complete",
@@ -361,6 +363,20 @@
       },
       "submit": "Create {entityLower}",
       "creating": "Creating {entityLower}…"
+    },
+    "actionQueue": {
+      "title": "Requires your action",
+      "labels": {
+        "awaitingAcceptance": "Pending acceptance",
+        "overdue": "Overdue",
+        "activeNoDeadline": "Active with no deadline",
+        "needsConfirmation": "Awaiting confirmation"
+      },
+      "cta": {
+        "accept": "Accept",
+        "markCompleted": "Mark as completed",
+        "confirmOrDispute": "Confirm / Dispute"
+      }
     }
   },
   "invite": {

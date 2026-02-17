@@ -14,6 +14,7 @@ import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
+import { getActionQueueState } from "@/lib/actionQueue";
 import {
   buildAuthState,
   getAuthState,
@@ -25,6 +26,7 @@ export function AppHeader() {
   const t = useT();
   const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
+  const [actionQueueCount, setActionQueueCount] = useState(0);
   const isAuthenticated = authState.isLoggedIn;
   const showBackLink = !isAuthenticated && pathname !== "/";
   const showSignIn = !isAuthenticated && pathname !== "/login";
@@ -63,6 +65,54 @@ export function AppHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    const client = supabase;
+    if (!authState.isLoggedIn || !authState.user || !client) {
+      setActionQueueCount(0);
+      return;
+    }
+
+    let active = true;
+
+    const syncCount = async () => {
+      const userId = authState.user.id;
+      const { data, error } = await client
+        .from("promises")
+        .select(
+          "id,status,due_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        )
+        .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`);
+
+      if (!active || error) return;
+      const now = new Date();
+      const count = (data ?? []).filter((row) => getActionQueueState(row, userId, now)).length;
+      setActionQueueCount(count);
+      window.localStorage.setItem("dreddi_action_queue_count", String(count));
+    };
+
+    const loadCachedCount = () => {
+      const cached = window.localStorage.getItem("dreddi_action_queue_count");
+      if (!cached) return;
+      const parsed = Number(cached);
+      if (!Number.isNaN(parsed)) setActionQueueCount(parsed);
+    };
+
+    const onQueueUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ count?: number }>;
+      const count = customEvent.detail?.count;
+      if (typeof count === "number") setActionQueueCount(count);
+    };
+
+    loadCachedCount();
+    void syncCount();
+    window.addEventListener("dreddi:action-queue-updated", onQueueUpdate as EventListener);
+
+    return () => {
+      active = false;
+      window.removeEventListener("dreddi:action-queue-updated", onQueueUpdate as EventListener);
+    };
+  }, [authState.isLoggedIn, authState.user]);
+
   return (
     <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
@@ -98,6 +148,15 @@ export function AppHeader() {
                   <Link className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </Link>
+                  {actionQueueCount > 0 && (
+                    <Link
+                      href="/promises#action-queue"
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100"
+                    >
+                      {t("nav.actionQueueBadge")}
+                      <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-slate-900">{actionQueueCount}</span>
+                    </Link>
+                  )}
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
@@ -119,7 +178,7 @@ export function AppHeader() {
               </nav>
               <div className="flex items-center gap-2 md:hidden">
                 <LocaleSwitcher />
-                <MobileMenu isAuthenticated={isAuthenticated} />
+                <MobileMenu isAuthenticated={isAuthenticated} actionQueueCount={actionQueueCount} />
               </div>
             </>
           ) : (
@@ -137,7 +196,7 @@ export function AppHeader() {
               </nav>
               <div className="flex items-center gap-2 md:hidden">
                 <LocaleSwitcher />
-                <MobileMenu isAuthenticated={isAuthenticated} />
+                <MobileMenu isAuthenticated={isAuthenticated} actionQueueCount={actionQueueCount} />
               </div>
             </>
           )}
