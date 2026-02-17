@@ -11,7 +11,8 @@ CREATE INDEX IF NOT EXISTS deal_reminders_deal_idx ON deal_reminders(deal_id, cr
 
 ALTER TABLE deal_reminders ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS deal_reminders_participant_select
+DROP POLICY IF EXISTS deal_reminders_participant_select ON deal_reminders;
+CREATE POLICY deal_reminders_participant_select
   ON deal_reminders
   FOR SELECT
   USING (
@@ -25,7 +26,8 @@ CREATE POLICY IF NOT EXISTS deal_reminders_participant_select
     )
   );
 
-CREATE POLICY IF NOT EXISTS deal_reminders_participant_insert
+DROP POLICY IF EXISTS deal_reminders_participant_insert ON deal_reminders;
+CREATE POLICY deal_reminders_participant_insert
   ON deal_reminders
   FOR INSERT
   WITH CHECK (
