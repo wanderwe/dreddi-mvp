@@ -52,6 +52,7 @@
     "copySuccess": "Copied",
     "identityLabel": "How others see you",
     "identityDescription": "Clarifies which name and handle appear in profiles and deals",
+    "domainsLabel": "Fields of activity",
     "displayNameLabel": "Display name",
     "displayNamePlaceholder": "Enter a name or brand",
     "displayNameHelper": "This name is shown in public profiles and deals.\nIf left blank, @handle will be shown.",

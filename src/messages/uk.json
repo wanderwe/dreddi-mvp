@@ -52,6 +52,7 @@
     "copySuccess": "Скопійовано",
     "identityLabel": "Як вас бачать інші",
     "identityDescription": "Пояснення, яке імʼя та нікнейм побачать люди у профілі й угодах",
+    "domainsLabel": "Сфери діяльності",
     "displayNameLabel": "Імʼя для показу",
     "displayNamePlaceholder": "Введіть імʼя або назву",
     "displayNameHelper": "Це імʼя бачать інші люди у публічних профілях та угодах.\nЯкщо поле порожнє — буде показано @handle.",
