@@ -449,9 +449,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="text-sm font-semibold text-white">
                 {t("profileSettings.identityLabel")}
               </div>
-              <HelperText className="text-sm text-slate-300">
-                {t("profileSettings.identityDescription")}
-              </HelperText>
             </div>
             <ChevronDown
               className={`h-4 w-4 text-slate-200 transition ${
@@ -677,9 +674,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-medium text-white">
                         {t("profileSettings.tagsLabel")}
                       </div>
-                      <HelperText className="text-sm text-slate-300">
-                        {t("profileSettings.tagsDescription")}
-                      </HelperText>
                       <div className="space-y-3">
                         <div className="flex flex-wrap gap-2">
                           {normalizedProfileTags.map((tag) => (
@@ -776,9 +770,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="text-sm font-semibold text-white">
                 {t("profileSettings.notificationsLabel")}
               </div>
-              <HelperText className="text-sm text-slate-300">
-                {t("profileSettings.notificationsDescription")}
-              </HelperText>
             </div>
             <ChevronDown
               className={`h-4 w-4 text-slate-200 transition ${
