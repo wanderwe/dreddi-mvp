@@ -6,6 +6,9 @@ type StreakDeal = {
   confirmed_at?: string | null;
 };
 
+const isClosedDeal = (deal: StreakDeal) =>
+  deal.status === "confirmed" || deal.status === "disputed" || Boolean(deal.disputed_at);
+
 const resolveClosedAt = (deal: StreakDeal) =>
   deal.closed_at ?? deal.confirmed_at ?? deal.disputed_at ?? deal.updated_at ?? null;
 
@@ -24,7 +27,8 @@ export const sortDealsByClosedDateDesc = <T extends StreakDeal>(deals: T[]) =>
 export const computeDealStreak = (deals: StreakDeal[]) => {
   let streak = 0;
 
-  for (const deal of sortDealsByClosedDateDesc(deals)) {
+  const closedDeals = sortDealsByClosedDateDesc(deals.filter(isClosedDeal));
+  for (const deal of closedDeals) {
     const hasDispute = Boolean(deal.disputed_at) || deal.status === "disputed";
     if (deal.status === "confirmed" && !hasDispute) {
       streak += 1;
@@ -35,4 +39,3 @@ export const computeDealStreak = (deals: StreakDeal[]) => {
 
   return streak;
 };
-

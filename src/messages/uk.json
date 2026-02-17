@@ -438,6 +438,8 @@
     "copyLink": "Скопіювати посилання",
     "reputationScore": "Репутаційний бал",
     "streakValue": "{count} в серії",
+    "streakEmpty": "серія ще не стартувала",
+    "streakHelp": "Серія — це останні підтверджені угоди підряд без спорів.",
     "reputationLabel": "Метрики",
     "stableReputation": "Стабільна репутація",
     "reputation": {

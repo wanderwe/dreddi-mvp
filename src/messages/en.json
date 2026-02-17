@@ -430,6 +430,8 @@
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
     "streakValue": "{count} in a row",
+    "streakEmpty": "streak not started yet",
+    "streakHelp": "Streak is the latest chain of confirmed deals in a row without disputes.",
     "reputationLabel": "Metrics",
     "stableReputation": "Stable reputation",
     "reputation": {

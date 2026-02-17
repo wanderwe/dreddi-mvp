@@ -432,9 +432,15 @@ export default function PublicProfilePage() {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-white/50">
                 <span>{lastActivityLabel}</span>
-                <span className="inline-flex items-center rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-100">
-                  🔥 {t("publicProfile.streakValue", { count: numberFormatter.format(streakCount) })}
+                <span
+                  className="inline-flex items-center rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-100"
+                  title={t("publicProfile.streakHelp")}
+                >
+                  🔥 {streakCount > 0
+                    ? t("publicProfile.streakValue", { count: numberFormatter.format(streakCount) })
+                    : t("publicProfile.streakEmpty")}
                 </span>
+                <span className="text-white/45">{t("publicProfile.streakHelp")}</span>
               </div>
             </section>
 
