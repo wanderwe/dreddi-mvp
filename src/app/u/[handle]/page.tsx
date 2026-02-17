@@ -508,19 +508,6 @@ export default function PublicProfilePage() {
                     </p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                        <h3 className="text-sm font-semibold text-white">
-                          {t("publicProfile.streakLabel")}
-                        </h3>
-                        <div className="mt-2 space-y-2">
-                          <div className="text-2xl font-semibold text-white">
-                            {t("publicProfile.streakDealsInRow", {
-                              count: numberFormatter.format(streakCount),
-                            })}
-                          </div>
-                          <p className="text-xs text-white/60">{t("publicProfile.streakSubtext")}</p>
-                        </div>
-                      </div>
                       {reputationEvidence.uniquePeople !== null && (
                         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                           <h3 className="text-sm font-semibold text-white">

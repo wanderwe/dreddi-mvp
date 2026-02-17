@@ -429,10 +429,7 @@
     "loading": "Loading profile…",
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
-    "streakLabel": "Execution streak",
     "streakValue": "{count} in a row",
-    "streakDealsInRow": "{count} deals in a row",
-    "streakSubtext": "without disputes",
     "reputationLabel": "Metrics",
     "stableReputation": "Stable reputation",
     "reputation": {
