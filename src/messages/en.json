@@ -178,6 +178,7 @@
       "loading": "Loading…",
       "cardTitle": "{entity}",
       "backToList": "← Back to {entityPlural}",
+      "backToDashboard": "← Back to dashboard",
       "acceptedBySecondSide": "Accepted by second side",
       "inviteStatusLabel": "Invite status",
       "yes": "Yes",
@@ -424,6 +425,7 @@
     }
   },
   "publicProfile": {
+    "backToDirectory": "← Back to public profiles",
     "confirmed": "Confirmed",
     "disputed": "Disputed",
     "loading": "Loading profile…",

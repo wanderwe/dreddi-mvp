@@ -190,7 +190,7 @@ export default function PromisePage() {
 
   const backLink = useMemo(() => {
     if (backFrom === "dashboard") {
-      return { href: "/", label: "← Back to dashboard" };
+      return { href: "/", label: t("promises.detail.backToDashboard") };
     }
     return {
       href: "/promises",

@@ -186,6 +186,7 @@
       "loading": "Завантаження…",
       "cardTitle": "Угода",
       "backToList": "← Назад до угод",
+      "backToDashboard": "← Назад до дашборду",
       "acceptedBySecondSide": "Прийнято другою стороною",
       "inviteStatusLabel": "Статус запрошення",
       "yes": "Так",
@@ -432,6 +433,7 @@
     }
   },
   "publicProfile": {
+    "backToDirectory": "← Назад до публічних профілів",
     "confirmed": "Підтверджено",
     "disputed": "Оскаржено",
     "loading": "Завантаження профілю…",

@@ -114,10 +114,10 @@ export default function PublicProfilePage() {
 
   const backLink = useMemo(() => {
     if (backFrom === "profiles") {
-      return { href: "/u", label: "← Back to public profiles" };
+      return { href: "/u", label: t("publicProfile.backToDirectory") };
     }
-    return { href: "/u", label: "← Back to public profiles" };
-  }, [backFrom]);
+    return { href: "/u", label: t("publicProfile.backToDirectory") };
+  }, [backFrom, t]);
 
   useEffect(() => {
     let active = true;
