@@ -168,6 +168,13 @@
       "loadMore": "Load more",
       "loadingMore": "Loading…",
       "reviewConfirm": "Review & confirm",
+      "reminder": {
+        "button": "🔔 Remind",
+        "sending": "Sending…",
+        "sent": "Reminder sent",
+        "count": "Reminded {count} time(s)",
+        "sendFailed": "Could not send reminder"
+      },
       "errors": {
         "markComplete": "Could not mark complete",
         "updateFailed": "Failed to update"
