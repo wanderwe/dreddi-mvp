@@ -50,7 +50,7 @@ export default function NewPromisePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState(false);
-  const [isPublicDeal, setIsPublicDeal] = useState(false);
+  const [isPublicDeal, setIsPublicDeal] = useState(true);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
