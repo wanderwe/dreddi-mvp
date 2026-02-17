@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -36,6 +36,7 @@ export default function ConfirmPromisePage() {
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [promise, setPromise] = useState<PromiseRow | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,8 @@ export default function ConfirmPromisePage() {
   );
   const [disputeReason, setDisputeReason] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement | null>(null);
+  const disputeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -83,8 +86,10 @@ export default function ConfirmPromisePage() {
       }
 
       const { data } = await supabase.auth.getSession();
+      const action = searchParams?.get("action");
+      const actionSuffix = action === "confirm" || action === "dispute" ? `?action=${action}` : "";
       if (!data.session) {
-        router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm`)}`);
+        router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm${actionSuffix}`)}`);
         return;
       }
       setUserId(data.session.user.id);
@@ -124,7 +129,7 @@ export default function ConfirmPromisePage() {
     return () => {
       mounted = false;
     };
-  }, [params?.id, router]);
+  }, [params?.id, router, searchParams]);
 
   function statusNote(status: PromiseStatus) {
     if (status === "confirmed") return t("promises.confirm.statusNote.confirmed");
@@ -145,6 +150,23 @@ export default function ConfirmPromisePage() {
       isCounterparty &&
       isPromiseAccepted(promise)
   );
+
+  useEffect(() => {
+    const action = searchParams?.get("action");
+    if (!canReview || (action !== "confirm" && action !== "dispute")) return;
+
+    if (action === "confirm") {
+      confirmButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      confirmButtonRef.current?.focus();
+      return;
+    }
+
+    setShowDispute(true);
+    setTimeout(() => {
+      disputeButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      disputeButtonRef.current?.focus();
+    }, 0);
+  }, [canReview, searchParams]);
 
   async function postAction(path: string, payload?: Record<string, unknown>) {
     if (!promise) return;
@@ -309,6 +331,7 @@ export default function ConfirmPromisePage() {
               {canReview ? (
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
+                    ref={confirmButtonRef}
                     type="button"
                     onClick={onConfirm}
                     disabled={actionBusy !== null}
@@ -318,6 +341,7 @@ export default function ConfirmPromisePage() {
                   </button>
 
                   <button
+                    ref={disputeButtonRef}
                     type="button"
                     onClick={() => setShowDispute(true)}
                     disabled={actionBusy !== null}

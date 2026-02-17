@@ -168,6 +168,17 @@
       "loadMore": "Load more",
       "loadingMore": "Loading…",
       "reviewConfirm": "Review & confirm",
+      "reminder": {
+        "button": "🔔 Remind",
+        "sending": "Sending…",
+        "sent": "Reminder sent",
+        "count": "Reminded {count} time(s)",
+        "sendFailed": "Could not send reminder",
+        "rateLimited": "A reminder was already sent in the last 24 hours",
+        "forbidden": "Only the counterparty can send a reminder",
+        "unavailable": "Reminder feature is temporarily unavailable. Please try again later",
+        "activeOnly": "Reminders are available only for active deals"
+      },
       "errors": {
         "markComplete": "Could not mark complete",
         "updateFailed": "Failed to update"
