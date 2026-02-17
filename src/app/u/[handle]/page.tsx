@@ -49,6 +49,13 @@ type PublicPromise = {
   disputed_at: string | null;
 };
 
+type ProfileMetricsResponse = {
+  reputationScore: number;
+  confirmedCount: number;
+  disputedCount: number;
+  streak: number;
+};
+
 const getPublicProfileStats = async (handle: string) => {
   if (!supabase) {
     return {
@@ -91,6 +98,7 @@ export default function PublicProfilePage() {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
+  const [profileMetrics, setProfileMetrics] = useState<ProfileMetricsResponse | null>(null);
 
   const formatRelativeTime = useMemo(() => {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
@@ -149,6 +157,17 @@ export default function PublicProfilePage() {
       }
 
       setProfile(profileRow as PublicProfileRow);
+
+      try {
+        const metricsRes = await fetch(`/api/profile/${encodeURIComponent(profileRow.handle)}`);
+        if (metricsRes.ok) {
+          const metrics = (await metricsRes.json()) as ProfileMetricsResponse;
+          if (active) setProfileMetrics(metrics);
+        }
+      } catch {
+        // no-op: keep fallback values from public profile stats
+      }
+
       if (process.env.NODE_ENV !== "production") {
         console.info("public profile on-time metrics", {
           handle: profileRow.handle,
@@ -225,9 +244,10 @@ export default function PublicProfilePage() {
   const primaryLabel = identity.title || profile?.handle || "";
   const avatarLabel = primaryLabel.replace(/^@/, "");
   const profileTags = profile?.profile_tags ?? [];
-  const confirmedCount = profile?.confirmed_count ?? 0;
-  const disputedCount = profile?.disputed_count ?? 0;
-  const reputationScore = profile?.reputation_score ?? 50;
+  const confirmedCount = profileMetrics?.confirmedCount ?? profile?.confirmed_count ?? 0;
+  const disputedCount = profileMetrics?.disputedCount ?? profile?.disputed_count ?? 0;
+  const reputationScore = profileMetrics?.reputationScore ?? profile?.reputation_score ?? 50;
+  const streakCount = profileMetrics?.streak ?? 0;
   const totalConfirmedDeals = profile?.total_confirmed_deals ?? confirmedCount;
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
@@ -410,7 +430,12 @@ export default function PublicProfilePage() {
                   {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
                 </button>
               </div>
-              <div className="text-xs text-white/50">{lastActivityLabel}</div>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-white/50">
+                <span>{lastActivityLabel}</span>
+                <span className="inline-flex items-center rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-100">
+                  🔥 {t("publicProfile.streakValue", { count: numberFormatter.format(streakCount) })}
+                </span>
+              </div>
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
@@ -483,6 +508,19 @@ export default function PublicProfilePage() {
                     </p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-white">
+                          {t("publicProfile.streakLabel")}
+                        </h3>
+                        <div className="mt-2 space-y-2">
+                          <div className="text-2xl font-semibold text-white">
+                            {t("publicProfile.streakDealsInRow", {
+                              count: numberFormatter.format(streakCount),
+                            })}
+                          </div>
+                          <p className="text-xs text-white/60">{t("publicProfile.streakSubtext")}</p>
+                        </div>
+                      </div>
                       {reputationEvidence.uniquePeople !== null && (
                         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                           <h3 className="text-sm font-semibold text-white">

@@ -437,6 +437,10 @@
     "loading": "Завантаження профілю…",
     "copyLink": "Скопіювати посилання",
     "reputationScore": "Репутаційний бал",
+    "streakLabel": "Серія виконань",
+    "streakValue": "{count} в серії",
+    "streakDealsInRow": "{count} угод підряд",
+    "streakSubtext": "без спорів",
     "reputationLabel": "Метрики",
     "stableReputation": "Стабільна репутація",
     "reputation": {
