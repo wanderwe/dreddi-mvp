@@ -336,7 +336,7 @@
       },
       "publicDeal": {
         "label": "{publicEntity}",
-        "helper": "Public {entityPlural} appear on your public profile once confirmed"
+        "helper": "Public {entityPlural} appear on your profile"
       },
       "errors": {
         "counterpartyRequired": "Please add the other side's contact",

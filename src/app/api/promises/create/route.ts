@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     const admin = getAdminClient();
-    const requestedVisibility = body?.visibility === "public" ? "public" : "private";
+    const requestedVisibility = body?.visibility === "private" ? "private" : "public";
 
     const { data: profileRow } = await admin
       .from("profiles")

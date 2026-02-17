@@ -49,8 +49,8 @@ export default function NewPromisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [isPublicProfile, setIsPublicProfile] = useState(false);
-  const [isPublicDeal, setIsPublicDeal] = useState(false);
+  const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
+  const [isPublicDeal, setIsPublicDeal] = useState(true);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -413,7 +413,7 @@ export default function NewPromisePage() {
   }, [router]);
 
   useEffect(() => {
-    if (!isPublicProfile) {
+    if (isPublicProfile === false) {
       setIsPublicDeal(false);
     }
   }, [isPublicProfile]);
