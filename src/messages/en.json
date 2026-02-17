@@ -177,7 +177,8 @@
         "rateLimited": "A reminder was already sent in the last 24 hours",
         "forbidden": "Only the counterparty can send a reminder",
         "unavailable": "Reminder feature is temporarily unavailable. Please try again later",
-        "activeOnly": "Reminders are available only for active deals"
+        "activeOnly": "Reminders are available only for active deals",
+        "acceptedOnly": "Reminders are available only after a deal is accepted"
       },
       "errors": {
         "markComplete": "Could not mark complete",
