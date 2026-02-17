@@ -503,7 +503,8 @@
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
-      "publicDeals": "Public deals"
+      "publicDeals": "Public deals",
+      "activeDeals": "🎯 Active deals"
     },
     "status": {
       "active": "Active",
@@ -526,6 +527,7 @@
     "emptyOverdue": "No overdue responsibilities",
     "emptyHistory": "No history yet",
     "emptyPublicDeals": "No public deals yet",
+    "noDeadline": "No deadline",
     "errors": {
       "supabase": "Supabase is not configured",
       "missing": "Profile handle is missing",

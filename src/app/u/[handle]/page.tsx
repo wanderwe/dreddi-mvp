@@ -12,6 +12,7 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 
 type PublicProfileRow = {
+  profile_id: string;
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -30,6 +31,25 @@ type PublicProfileRow = {
   reputation_age_days: number | null;
   avg_deals_per_month: number | null;
 };
+
+type ActivePublicDealRow = {
+  id: string;
+  title: string | null;
+  status: string | null;
+  due_at: string | null;
+  updated_at: string | null;
+  created_at: string | null;
+};
+
+type ActivePublicDeal = {
+  id: string;
+  title: string;
+  status: PromiseStatus;
+  due_at: string | null;
+  updated_at: string;
+};
+
+const activePromiseStatuses: PromiseStatus[] = ["active", "completed_by_promisor"];
 
 type PublicPromiseRow = {
   title: string | null;
@@ -86,6 +106,7 @@ export default function PublicProfilePage() {
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
   const [promises, setPromises] = useState<PublicPromise[]>([]);
+  const [activeDeals, setActiveDeals] = useState<ActivePublicDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
@@ -166,6 +187,17 @@ export default function PublicProfilePage() {
       );
       const promiseRows = (data ?? []) as PublicPromiseRow[];
 
+      const { data: activeDealsData, error: activeDealsErr } = await supabase
+        .from("promises")
+        .select("id,title,status,due_at,updated_at,created_at")
+        .eq("visibility", "public")
+        .eq("invite_status", "accepted")
+        .in("status", activePromiseStatuses)
+        .or(
+          `creator_id.eq.${profileRow.profile_id},promisor_id.eq.${profileRow.profile_id},counterparty_id.eq.${profileRow.profile_id}`
+        )
+        .limit(40);
+
       if (!active) return;
 
       if (promisesErr) {
@@ -196,6 +228,39 @@ export default function PublicProfilePage() {
             promiseCount: normalized.length,
           });
         }
+      }
+
+      if (activeDealsErr) {
+        setActiveDeals([]);
+      } else {
+        const normalizedActiveDeals = ((activeDealsData ?? []) as ActivePublicDealRow[])
+          .flatMap((deal) => {
+            const updatedAt = deal.updated_at ?? deal.created_at;
+            if (!deal.id || !deal.title || !updatedAt || !isPromiseStatus(deal.status)) {
+              return [];
+            }
+
+            return [
+              {
+                id: deal.id,
+                title: deal.title,
+                status: deal.status,
+                due_at: deal.due_at,
+                updated_at: updatedAt,
+              },
+            ];
+          })
+          .sort((a, b) => {
+            if (a.due_at && b.due_at) {
+              return new Date(a.due_at).getTime() - new Date(b.due_at).getTime();
+            }
+            if (a.due_at && !b.due_at) return -1;
+            if (!a.due_at && b.due_at) return 1;
+            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+          })
+          .slice(0, 5);
+
+        setActiveDeals(normalizedActiveDeals);
       }
 
       setLoading(false);
@@ -283,7 +348,12 @@ export default function PublicProfilePage() {
     declined: landingCopy.recentDeals.status.declined,
   };
 
-  const publicDealsEmpty = promises.length === 0;
+  const publicDeals = useMemo(
+    () => promises.filter((promise) => !activePromiseStatuses.includes(promise.status)),
+    [promises]
+  );
+  const publicDealsEmpty = publicDeals.length === 0;
+  const hasActiveDeals = activeDeals.length > 0;
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
@@ -610,6 +680,40 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              {hasActiveDeals && (
+                <div className="mb-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">{t("publicProfile.sections.activeDeals")}</h2>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {activeDeals.map((deal) => (
+                      <div
+                        key={deal.id}
+                        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-white">{deal.title}</p>
+                          {deal.due_at ? (
+                            <p className="text-xs text-white/60">
+                              ⏳ {formatRelativeTime(deal.due_at) ?? "—"}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-white/45">{t("publicProfile.noDeadline")}</p>
+                          )}
+                        </div>
+                        <span
+                          className={`w-fit rounded-full px-3 py-1 text-xs ${
+                            statusTones[deal.status] ?? "bg-white/5 text-white/70"
+                          }`}
+                        >
+                          {statusLabels[deal.status] ?? deal.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
@@ -617,7 +721,7 @@ export default function PublicProfilePage() {
                 <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
               ) : (
                 <div className="flex flex-col gap-4">
-                  {promises.map((promise) => (
+                  {publicDeals.map((promise) => (
                     <div
                       key={`${promise.title}-${promise.created_at}`}
                       className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
