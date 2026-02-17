@@ -348,7 +348,11 @@ export default function PublicProfilePage() {
     declined: landingCopy.recentDeals.status.declined,
   };
 
-  const publicDealsEmpty = promises.length === 0;
+  const publicDeals = useMemo(
+    () => promises.filter((promise) => !activePromiseStatuses.includes(promise.status)),
+    [promises]
+  );
+  const publicDealsEmpty = publicDeals.length === 0;
   const hasActiveDeals = activeDeals.length > 0;
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
@@ -717,7 +721,7 @@ export default function PublicProfilePage() {
                 <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
               ) : (
                 <div className="flex flex-col gap-4">
-                  {promises.map((promise) => (
+                  {publicDeals.map((promise) => (
                     <div
                       key={`${promise.title}-${promise.created_at}`}
                       className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
