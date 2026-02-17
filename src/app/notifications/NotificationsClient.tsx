@@ -149,15 +149,34 @@ export default function NotificationsClient() {
       void loadNotifications(0, true);
       subscribeToNotifications(supabase, session.user.id);
 
-      pollId = setInterval(() => {
+      const runPoll = () => {
+        if (document.visibilityState !== "visible") return;
         void loadNotifications(0, true);
-      }, 45000);
+      };
+
+      const onVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          void loadNotifications(0, true);
+        }
+      };
+
+      window.addEventListener("visibilitychange", onVisibilityChange);
+      pollId = setInterval(runPoll, 30000);
+
+      return () => {
+        window.removeEventListener("visibilitychange", onVisibilityChange);
+      };
     };
 
-    void init();
+    let disposeInit: (() => void) | undefined;
+
+    void (async () => {
+      disposeInit = await init();
+    })();
 
     return () => {
       active = false;
+      disposeInit?.();
       if (channel) {
         try {
           const supabase = requireSupabase();

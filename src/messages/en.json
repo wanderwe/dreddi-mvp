@@ -175,9 +175,9 @@
         "count": "Reminded {count} time(s)",
         "sendFailed": "Could not send reminder",
         "rateLimited": "A reminder was already sent in the last 24 hours",
-        "forbidden": "Only the counterparty can send a reminder",
+        "forbidden": "Only the side waiting for action can send a reminder",
         "unavailable": "Reminder feature is temporarily unavailable. Please try again later",
-        "activeOnly": "Reminders are available only for active deals",
+        "invalidState": "Reminders are available only while someone is waiting for action",
         "acceptedOnly": "Reminders are available only after a deal is accepted"
       },
       "errors": {

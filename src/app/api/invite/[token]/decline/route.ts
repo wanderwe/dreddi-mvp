@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -96,6 +97,16 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     if (updateError) {
       return NextResponse.json({ error: "Decline failed", detail: updateError.message }, { status: 500 });
     }
+
+    await createNotification(admin, {
+      userId: p.creator_id,
+      promiseId: p.id,
+      type: "invite_declined",
+      role: "creator",
+      dedupeKey: `invite_declined:${p.id}`,
+      ctaUrl: `/promises/${p.id}`,
+      priority: mapPriorityForType("invite_declined"),
+    });
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e: unknown) {

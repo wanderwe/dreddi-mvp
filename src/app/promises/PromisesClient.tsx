@@ -178,7 +178,7 @@ export default function PromisesClient() {
     if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
     if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
     if (errorCode === "reminder_acceptance_required") return t("promises.list.reminder.acceptedOnly");
-    if (errorCode === "reminder_active_only") return t("promises.list.reminder.activeOnly");
+    if (errorCode === "reminder_invalid_state") return t("promises.list.reminder.invalidState");
     return t("promises.list.reminder.sendFailed");
   };
 
