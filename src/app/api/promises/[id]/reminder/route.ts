@@ -6,6 +6,23 @@ import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipa
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+type ReminderErrorCode =
+  | "reminder_active_only"
+  | "reminder_participants_invalid"
+  | "reminder_forbidden"
+  | "reminder_rate_limit"
+  | "reminder_feature_unavailable"
+  | "reminder_create_failed"
+  | "reminder_unexpected";
+
+const errorResponse = (
+  status: number,
+  error_code: ReminderErrorCode,
+  error: string,
+  detail?: string
+) => NextResponse.json({ error_code, error, detail: detail ?? null }, { status });
+
+
 const getBaseUrl = (req: Request) => {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (configured) return configured.replace(/\/$/, "");
@@ -117,18 +134,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (promise instanceof NextResponse) return promise;
 
     if (promise.status !== "active") {
-      return NextResponse.json({ error: "Reminders are only available for active deals" }, { status: 400 });
+      return errorResponse(400, "reminder_active_only", "Reminders are only available for active deals");
     }
 
     const admin = getAdminClient();
     const executorId = resolveExecutorId(promise);
     const counterpartyId = resolveCounterpartyId(promise);
     if (!executorId || !counterpartyId || counterpartyId === executorId) {
-      return NextResponse.json({ error: "Deal participants are invalid" }, { status: 400 });
+      return errorResponse(400, "reminder_participants_invalid", "Deal participants are invalid");
     }
 
     if (user.id !== counterpartyId) {
-      return NextResponse.json({ error: "Only counterparty can send reminder" }, { status: 403 });
+      return errorResponse(403, "reminder_forbidden", "Only counterparty can send reminder");
     }
 
     const receiverId = executorId;
@@ -144,14 +161,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .maybeSingle();
 
     if (existingError) {
-      return NextResponse.json(
-        { error: "Could not validate reminder rate limit", detail: existingError.message },
-        { status: 500 }
-      );
+      if (existingError.code === "42P01") {
+        return errorResponse(503, "reminder_feature_unavailable", "Reminder feature is temporarily unavailable", existingError.message);
+      }
+      return errorResponse(500, "reminder_rate_limit", "Could not validate reminder rate limit", existingError.message);
     }
 
     if (existingReminder) {
-      return NextResponse.json({ error: "Reminder already sent in the last 24 hours" }, { status: 429 });
+      return errorResponse(429, "reminder_rate_limit", "Reminder already sent in the last 24 hours");
     }
 
     const { data: inserted, error: insertError } = await admin
@@ -165,10 +182,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .single();
 
     if (insertError) {
-      return NextResponse.json(
-        { error: "Could not create reminder", detail: insertError.message },
-        { status: 500 }
-      );
+      if (insertError.code === "42P01") {
+        return errorResponse(503, "reminder_feature_unavailable", "Reminder feature is temporarily unavailable", insertError.message);
+      }
+      return errorResponse(500, "reminder_create_failed", "Could not create reminder", insertError.message);
     }
 
     try {
@@ -199,6 +216,6 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: "Unexpected error", message }, { status: 500 });
+    return errorResponse(500, "reminder_unexpected", "Unexpected error", message);
   }
 }

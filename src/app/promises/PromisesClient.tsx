@@ -173,6 +173,14 @@ export default function PromisesClient() {
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
 
+  const reminderErrorMessage = (errorCode?: string) => {
+    if (errorCode === "reminder_rate_limit") return t("promises.list.reminder.rateLimited");
+    if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
+    if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
+    if (errorCode === "reminder_active_only") return t("promises.list.reminder.activeOnly");
+    return t("promises.list.reminder.sendFailed");
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -375,9 +383,14 @@ export default function PromisesClient() {
         },
       });
 
-      const body = await res.json().catch(() => ({}));
+      const body = await res.json().catch(() => ({})) as {
+        error?: string;
+        error_code?: string;
+        count?: number;
+        created_at?: string;
+      };
       if (!res.ok) {
-        throw new Error(body.error ?? t("promises.list.reminder.sendFailed"));
+        throw new Error(reminderErrorMessage(body.error_code));
       }
 
       setReminderInfoByDeal((prev) => ({
