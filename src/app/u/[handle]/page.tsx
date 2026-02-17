@@ -430,18 +430,7 @@ export default function PublicProfilePage() {
                   {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
                 </button>
               </div>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-white/50">
-                <span>{lastActivityLabel}</span>
-                <span
-                  className="inline-flex items-center rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-100"
-                  title={t("publicProfile.streakHelp")}
-                >
-                  🔥 {streakCount > 0
-                    ? t("publicProfile.streakValue", { count: numberFormatter.format(streakCount) })
-                    : t("publicProfile.streakEmpty")}
-                </span>
-                <span className="text-white/45">{t("publicProfile.streakHelp")}</span>
-              </div>
+              <div className="text-xs text-white/50">{lastActivityLabel}</div>
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
@@ -464,6 +453,17 @@ export default function PublicProfilePage() {
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
                 </div>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/60">
+                <span
+                  className="inline-flex items-center rounded-full border border-emerald-300/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-100"
+                  title={t("publicProfile.streakHelp")}
+                >
+                  🔥 {streakCount > 0
+                    ? t("publicProfile.streakValue", { count: numberFormatter.format(streakCount) })
+                    : t("publicProfile.streakEmpty")}
+                </span>
+                <span className="text-white/45">{t("publicProfile.streakHelp")}</span>
               </div>
             </section>
 
