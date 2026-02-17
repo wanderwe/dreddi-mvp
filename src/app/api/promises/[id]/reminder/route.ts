@@ -4,11 +4,12 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 type ReminderErrorCode =
-  | "reminder_active_only"
+  | "reminder_invalid_state"
   | "reminder_acceptance_required"
   | "reminder_participants_invalid"
   | "reminder_forbidden"
@@ -135,8 +136,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const promise = await loadPromiseForUser(id, user.id);
     if (promise instanceof NextResponse) return promise;
 
-    if (promise.status !== "active") {
-      return errorResponse(400, "reminder_active_only", "Reminders are only available for active deals");
+    if (promise.status !== "active" && promise.status !== "completed_by_promisor") {
+      return errorResponse(
+        400,
+        "reminder_invalid_state",
+        "Reminders are available only for deals awaiting action"
+      );
     }
 
     if (!isPromiseAccepted(promise)) {
@@ -154,11 +159,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return errorResponse(400, "reminder_participants_invalid", "Deal participants are invalid");
     }
 
-    if (user.id !== counterpartyId) {
-      return errorResponse(403, "reminder_forbidden", "Only counterparty can send reminder");
-    }
+    const isActive = promise.status === "active";
+    const senderShouldBe = isActive ? counterpartyId : executorId;
+    const receiverId = isActive ? executorId : counterpartyId;
 
-    const receiverId = executorId;
+    if (user.id !== senderShouldBe) {
+      return errorResponse(403, "reminder_forbidden", "Only the waiting side can send reminder");
+    }
 
     const sinceIso = new Date(Date.now() - DAY_MS).toISOString();
     const { data: existingReminder, error: existingError } = await admin
@@ -210,6 +217,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
           baseUrl: getBaseUrl(req),
         });
       }
+
+      await createNotification(admin, {
+        userId: receiverId,
+        promiseId: id,
+        type: isActive ? "reminder_overdue" : "marked_completed",
+        dedupeKey: `manual_reminder:${id}:${Math.floor(Date.now() / DAY_MS)}`,
+        ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
+        ctaLabel: "Open",
+        priority: mapPriorityForType(isActive ? "reminder_overdue" : "marked_completed"),
+        body: isActive
+          ? "The other side reminded you to complete this deal."
+          : "The other side reminded you to confirm or dispute this completed deal.",
+      });
     } catch (emailError) {
       console.warn("[reminders] email send failed", emailError);
     }
