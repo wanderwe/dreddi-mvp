@@ -76,9 +76,9 @@ function DealRow({
   metaText,
   statusLabels,
 }: DealRowProps) {
-  const baseClass = "group flex items-start justify-between gap-3 rounded-xl px-2 py-2.5 text-slate-200";
-  const interactiveClass = isClickable ? "transition hover:bg-white/[0.04] hover:text-white" : "cursor-default";
-  const titleClass = "truncate text-sm font-medium text-slate-100";
+  const baseClass = "flex items-start justify-between gap-3 py-2.5 text-slate-200";
+  const interactiveClass = isClickable ? "transition hover:text-white" : "cursor-default";
+  const titleClass = "truncate text-sm font-semibold text-slate-100";
   const metaClass = "mt-1 truncate text-xs text-slate-400";
   const statusPillToneMap: Record<PromiseStatus, StatusPillTone> = {
     active: "neutral",
@@ -494,25 +494,25 @@ export default function Home() {
         </div>
 
         <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border border-white/10 p-7 sm:p-8">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-slate-900/10 to-white/[0.03]" aria-hidden />
-            <div className="relative flex flex-col gap-5">
+          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-white/10 to-sky-400/5" aria-hidden />
+            <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <DreddiLogoMark className="h-10 w-10" />
+                  <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
                   <div>
-                    <p className="text-sm text-slate-300/90">{copy.score.label}</p>
+                    <p className="text-sm text-slate-300">{copy.score.label}</p>
                     <p className="text-4xl font-semibold leading-none text-white">
                       {reputationLoading ? copy.loading.short : score}
                     </p>
                   </div>
                 </div>
                 {email ? (
-                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
+                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
                     {copy.score.live}
                   </span>
                 ) : (
-                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
+                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
                     {copy.score.signIn}
                   </span>
                 )}
@@ -533,7 +533,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <p className="text-sm text-slate-400/90">
+              <p className="text-sm text-slate-300">
                 {copy.score.onTime.label}: {onTimeLineValue}
               </p>
 
@@ -544,7 +544,7 @@ export default function Home() {
               )}
 
               <div>
-                <div className="flex items-center justify-between text-sm text-slate-300/90">
+                <div className="flex items-center justify-between text-sm text-slate-300">
                   <span>{recentDealsTitle}</span>
                   <Link
                     href={recentDealsHref}
@@ -555,7 +555,7 @@ export default function Home() {
                 </div>
                 {!isAuthenticated ? (
                   <div className="mt-3">
-                    <div className="mt-2 divide-y divide-white/10 text-sm">
+                    <div className="mt-3 divide-y divide-white/10 text-sm">
                       {demoDeals.map((item) => (
                         <DealRow
                           key={item.id}
@@ -575,7 +575,7 @@ export default function Home() {
                       </div>
                     )}
 
-                    <div className="mt-2 text-sm">
+                    <div className="mt-3 text-sm">
                       {reputationLoading || recentLoading ? (
                         <div className="space-y-2">
                           {[1, 2, 3].map((i) => (
