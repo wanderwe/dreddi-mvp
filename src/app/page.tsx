@@ -93,14 +93,6 @@ function DealRow({
     declined: "danger",
   };
 
-  const statusPillIconMap: Record<PromiseStatus, "check" | "clock" | "warning"> = {
-    active: "clock",
-    completed_by_promisor: "warning",
-    confirmed: "check",
-    disputed: "warning",
-    declined: "warning",
-  };
-
   const content = (
     <>
       <div className="min-w-0 flex-1">
@@ -110,7 +102,6 @@ function DealRow({
       <StatusPill
         label={statusLabels[item.status] ?? item.status}
         tone={statusPillToneMap[item.status] ?? "neutral"}
-        icon={statusPillIconMap[item.status] ?? "clock"}
       />
     </>
   );

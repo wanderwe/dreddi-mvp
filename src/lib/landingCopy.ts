@@ -159,7 +159,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       placeholderMetaCreated: (date) => `Створено ${date}`,
       status: {
         active: "Активна",
-        completedByPromisor: "На підтвердженні",
+        completedByPromisor: "Очікує перегляду",
         confirmed: "Підтверджено",
         disputed: "Оскаржено",
         declined: "Відхилено",
@@ -250,7 +250,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       placeholderMetaCreated: (date) => `Created ${date}`,
       status: {
         active: "Active",
-        completedByPromisor: "Awaiting confirmation",
+        completedByPromisor: "Awaiting review",
         confirmed: "Confirmed",
         disputed: "Disputed",
         declined: "Declined",

@@ -8,6 +8,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
@@ -65,12 +66,12 @@ const getPublicProfileStats = async (handle: string) => {
     .maybeSingle();
 };
 
-const statusTones: Record<PromiseStatus, string> = {
-  active: "bg-white/5 text-emerald-200 border border-white/10",
-  completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
-  confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
-  disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
-  declined: "bg-red-500/10 text-red-100 border border-red-300/40",
+const statusTones: Record<PromiseStatus, StatusPillTone> = {
+  active: "neutral",
+  completed_by_promisor: "attention",
+  confirmed: "success",
+  disputed: "danger",
+  declined: "danger",
 };
 
 export default function PublicProfilePage() {
@@ -660,13 +661,10 @@ export default function PublicProfilePage() {
                           {formatDealMeta(promise, locale, dealMetaLabels)}
                         </p>
                       </div>
-                      <span
-                        className={`w-fit rounded-full px-3 py-1 text-xs ${
-                          statusTones[promise.status] ?? "bg-white/5 text-white/70"
-                        }`}
-                      >
-                        {statusLabels[promise.status] ?? promise.status}
-                      </span>
+                      <StatusPill
+                        label={statusLabels[promise.status] ?? promise.status}
+                        tone={statusTones[promise.status] ?? "neutral"}
+                      />
                     </div>
                   ))}
                 </div>

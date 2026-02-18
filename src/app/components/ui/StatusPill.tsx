@@ -7,34 +7,39 @@ type StatusPillProps = {
   label: string;
   tone?: StatusPillTone;
   icon?: "check" | "clock" | "warning";
+  marker?: "dot" | "icon" | "none";
   className?: string;
 };
 
 const toneClassMap: Record<StatusPillTone, string> = {
-  success: "bg-emerald-300/14 text-emerald-50 ring-1 ring-inset ring-emerald-200/15",
-  attention: "bg-amber-200/12 text-amber-50 ring-1 ring-inset ring-amber-200/15",
-  neutral: "bg-slate-200/12 text-slate-100 ring-1 ring-inset ring-white/10",
-  danger: "bg-rose-300/14 text-rose-50 ring-1 ring-inset ring-rose-200/15",
+  success: "bg-emerald-300/7 text-emerald-100",
+  attention: "bg-amber-200/7 text-amber-100",
+  neutral: "bg-slate-200/6 text-slate-200",
+  danger: "bg-rose-300/7 text-rose-100",
 };
 
-const iconClassName = "h-3.5 w-3.5 text-current opacity-65";
+const iconClassName = "h-[14px] w-[14px] text-current opacity-70";
 
 function Icon({ icon }: { icon: NonNullable<StatusPillProps["icon"]> }) {
-  if (icon === "check") return <Check className={iconClassName} aria-hidden="true" />;
-  if (icon === "warning") return <AlertTriangle className={iconClassName} aria-hidden="true" />;
-  return <Clock3 className={iconClassName} aria-hidden="true" />;
+  if (icon === "check") return <Check className={iconClassName} aria-hidden="true" strokeWidth={1.5} />;
+  if (icon === "warning") return <AlertTriangle className={iconClassName} aria-hidden="true" strokeWidth={1.5} />;
+  return <Clock3 className={iconClassName} aria-hidden="true" strokeWidth={1.5} />;
 }
 
-export function StatusPill({ label, tone = "neutral", icon, className }: StatusPillProps) {
+export function StatusPill({ label, tone = "neutral", icon, marker = "dot", className }: StatusPillProps) {
   return (
     <span
       className={cn(
-        "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium leading-none",
+        "inline-flex items-center gap-1.5 rounded-[999px] px-2.5 py-1.5 text-[13px] font-medium leading-none",
         toneClassMap[tone],
         className
       )}
     >
-      {icon ? <Icon icon={icon} /> : null}
+      {marker === "none" ? null : marker === "icon" && icon ? (
+        <Icon icon={icon} />
+      ) : (
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current opacity-85" />
+      )}
       <span>{label}</span>
     </span>
   );
