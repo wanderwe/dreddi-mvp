@@ -76,15 +76,10 @@ function DealRow({
   metaText,
   statusLabels,
 }: DealRowProps) {
-  const isDemo = !isClickable;
-  const baseClass = isDemo
-    ? "flex items-start justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-slate-300"
-    : "flex items-center justify-between rounded-xl border border-white/5 bg-black/30 px-3 py-2 text-slate-200";
-  const interactiveClass = isClickable
-    ? "transition hover:border-emerald-300/40 hover:bg-emerald-500/10"
-    : "cursor-default";
-  const titleClass = isDemo ? "text-sm font-medium text-slate-100" : "font-semibold text-white";
-  const metaClass = isDemo ? "mt-1 text-[11px] text-slate-400" : "text-xs text-slate-400";
+  const baseClass = "group flex items-start justify-between gap-3 rounded-xl px-2 py-2.5 text-slate-200";
+  const interactiveClass = isClickable ? "transition hover:bg-white/[0.04] hover:text-white" : "cursor-default";
+  const titleClass = "truncate text-sm font-medium text-slate-100";
+  const metaClass = "mt-1 truncate text-xs text-slate-400";
   const statusPillToneMap: Record<PromiseStatus, StatusPillTone> = {
     active: "neutral",
     completed_by_promisor: "attention",
@@ -102,6 +97,8 @@ function DealRow({
       <StatusPill
         label={statusLabels[item.status] ?? item.status}
         tone={statusPillToneMap[item.status] ?? "neutral"}
+        marker="none"
+        className="shrink-0 px-2 py-1 text-[11px]"
       />
     </>
   );
@@ -403,11 +400,15 @@ export default function Home() {
       ? Math.round((onTimeCount / confirmedWithDeadlineCount) * 100)
       : null;
   const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
-  const onTimeHelper =
-    confirmedWithDeadlineCount === 0 ? copy.score.onTime.empty : copy.score.onTime.helper;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
+  const onTimeLineValue = hasDueDateDeals
+    ? reputationLoading
+      ? copy.loading.placeholder
+      : onTimeSummary
+    : "—";
+  const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
-  const recentDealsTitle = isAuthenticated ? copy.recentDeals.title : copy.recentDeals.demoTitle;
+  const recentDealsTitle = copy.recentDeals.title;
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index, lines) => (
@@ -493,81 +494,70 @@ export default function Home() {
         </div>
 
         <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-white/10 to-sky-400/5" aria-hidden />
-            <div className="relative flex flex-col gap-4">
+          <div className="glass-panel relative overflow-hidden rounded-3xl border border-white/10 p-7 sm:p-8">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-slate-900/10 to-white/[0.03]" aria-hidden />
+            <div className="relative flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_10px_30px_rgba(16,185,129,0.35)]" />
+                  <DreddiLogoMark className="h-10 w-10" />
                   <div>
-                    <p className="text-sm text-slate-300">{copy.score.label}</p>
-                    <p className="text-2xl font-semibold text-white">
+                    <p className="text-sm text-slate-300/90">{copy.score.label}</p>
+                    <p className="text-4xl font-semibold leading-none text-white">
                       {reputationLoading ? copy.loading.short : score}
                     </p>
                   </div>
                 </div>
                 {email ? (
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-emerald-200 ring-1 ring-white/10">
+                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
                     {copy.score.live}
                   </span>
                 ) : (
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 ring-1 ring-white/10">
+                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
                     {copy.score.signIn}
                   </span>
                 )}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs text-emerald-200">{copy.score.cards.confirmed}</div>
-                  <div className="text-lg font-semibold">
-                    {reputationLoading ? copy.loading.placeholder : confirmedCount}
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="grid grid-cols-2 divide-x divide-white/10">
+                  <div className="pr-4">
+                    <div className="text-xs text-slate-400">{copy.score.cards.confirmed}</div>
+                    <div className="mt-1 text-3xl font-semibold text-white">
+                      {reputationLoading ? copy.loading.placeholder : confirmedCount}
+                    </div>
                   </div>
-                </div>
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs text-amber-200">{copy.score.cards.disputed}</div>
-                  <div className="text-lg font-semibold">
-                    {reputationLoading ? copy.loading.placeholder : disputedCount}
+                  <div className="pl-4">
+                    <div className="text-xs text-slate-400">{copy.score.cards.disputed}</div>
+                    <div className="mt-1 text-3xl font-semibold text-white">
+                      {reputationLoading ? copy.loading.placeholder : disputedCount}
+                    </div>
                   </div>
                 </div>
               </div>
 
-                {reputationError && isAuthenticated && (
+              <p className="text-sm text-slate-400/90">
+                {copy.score.onTime.label}: {onTimeLineValue}
+              </p>
+
+              {reputationError && isAuthenticated && (
                   <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
                     {reputationError}
                   </div>
                 )}
 
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-3 shadow-inner shadow-black/50">
-                <div className="flex items-center gap-3 text-sm text-emerald-200">
-                  <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  <span>{copy.score.onTime.label}</span>
-                  {hasDueDateDeals ? (
-                    <span className="ml-auto text-lg font-semibold text-white">
-                      {reputationLoading ? copy.loading.placeholder : onTimeSummary}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-2 text-xs text-emerald-100/80">
-                  {onTimeHelper}
-                </p>
-              </div>
-
-                <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-                  <div className="flex items-center justify-between text-sm text-slate-300">
+              <div>
+                  <div className="flex items-center justify-between text-sm text-slate-300/90">
                     <span>{recentDealsTitle}</span>
-                    {isAuthenticated ? (
-                      <Link
-                        href="/promises"
-                        className="text-xs font-medium text-emerald-200 hover:text-emerald-100"
-                      >
-                        {copy.recentDeals.seeAll}
-                      </Link>
-                    ) : null}
+                    <Link
+                      href={recentDealsHref}
+                      className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
+                    >
+                      {copy.recentDeals.seeAll}
+                    </Link>
                   </div>
                   {!isAuthenticated ? (
                     <div className="mt-3">
-                      <div className="mt-3 space-y-2 text-sm">
+                      <div className="mt-2 divide-y divide-white/10 text-sm">
                         {demoDeals.map((item) => (
                           <DealRow
                             key={item.id}
@@ -587,32 +577,34 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className="mt-3 space-y-2 text-sm">
+                      <div className="mt-2 text-sm">
                         {reputationLoading || recentLoading ? (
                           <div className="space-y-2">
                             {[1, 2, 3].map((i) => (
-                              <div key={i} className="h-[64px] animate-pulse rounded-xl bg-white/5" />
+                              <div key={i} className="h-[52px] animate-pulse rounded-xl bg-white/5" />
                             ))}
                           </div>
                         ) : recentDeals.length === 0 ? (
-                          <div className="rounded-xl border border-white/5 bg-black/30 px-3 py-3 text-xs text-slate-400">
+                          <div className="rounded-xl bg-white/[0.03] px-3 py-3 text-xs text-slate-400">
                             {copy.recentDeals.empty}
                           </div>
                         ) : (
-                          recentDealsLimited.map((item) => (
-                            <DealRow
-                              key={item.id}
-                              item={item}
-                              href={`/promises/${item.id}?from=dashboard`}
-                              metaText={getMetaText(item)}
-                              statusLabels={statusLabels}
-                            />
-                          ))
+                          <div className="divide-y divide-white/10">
+                            {recentDealsLimited.map((item) => (
+                              <DealRow
+                                key={item.id}
+                                item={item}
+                                href={`/promises/${item.id}?from=dashboard`}
+                                metaText={getMetaText(item)}
+                                statusLabels={statusLabels}
+                              />
+                            ))}
+                          </div>
                         )}
                       </div>
                     </>
                   )}
-                </div>
+              </div>
             </div>
           </div>
         </div>

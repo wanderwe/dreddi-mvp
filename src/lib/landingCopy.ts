@@ -146,8 +146,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
     },
     recentDeals: {
-      title: "Ваші останні угоди",
-      demoTitle: "Приклади угод у профілі",
+      title: "Останні угоди",
+      demoTitle: "Останні угоди",
       seeAll: "Переглянути всі",
       empty: "У вас поки що немає жодної угоди",
       sentiment: {
@@ -237,8 +237,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
     },
     recentDeals: {
-      title: "Your recent deals",
-      demoTitle: "Example deals in a profile",
+      title: "Recent deals",
+      demoTitle: "Recent deals",
       seeAll: "View all",
       empty: "You don't have any deals yet",
       sentiment: {
