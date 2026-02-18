@@ -69,7 +69,9 @@ export function AppHeader() {
 
   useEffect(() => {
     const client = supabase;
-    if (!authState.isLoggedIn || !authState.user || !client) {
+    const userId = authState.user?.id;
+
+    if (!authState.isLoggedIn || !userId || !client) {
       setActionQueueCount(0);
       return;
     }
@@ -84,7 +86,6 @@ export function AppHeader() {
     };
 
     const syncCount = async () => {
-      const userId = authState.user.id;
       const { data, error } = await client
         .from("promises")
         .select(
