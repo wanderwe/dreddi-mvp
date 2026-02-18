@@ -7,7 +7,7 @@ type StatusPillProps = {
   label: string;
   tone?: StatusPillTone;
   icon?: "check" | "clock" | "warning";
-  marker?: "dot" | "icon" | "none";
+  marker?: "icon" | "none";
   className?: string;
 };
 
@@ -26,7 +26,7 @@ function Icon({ icon }: { icon: NonNullable<StatusPillProps["icon"]> }) {
   return <Clock3 className={iconClassName} aria-hidden="true" strokeWidth={1.5} />;
 }
 
-export function StatusPill({ label, tone = "neutral", icon, marker = "dot", className }: StatusPillProps) {
+export function StatusPill({ label, tone = "neutral", icon, marker = "none", className }: StatusPillProps) {
   return (
     <span
       className={cn(
@@ -35,11 +35,9 @@ export function StatusPill({ label, tone = "neutral", icon, marker = "dot", clas
         className
       )}
     >
-      {marker === "none" ? null : marker === "icon" && icon ? (
+      {marker === "icon" && icon ? (
         <Icon icon={icon} />
-      ) : (
-        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current opacity-85" />
-      )}
+      ) : null}
       <span>{label}</span>
     </span>
   );
