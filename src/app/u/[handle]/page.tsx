@@ -10,6 +10,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
+import { formatStreakLine } from "@/lib/formatStreakLine";
 
 type PublicProfileRow = {
   handle: string;
@@ -463,13 +464,7 @@ export default function PublicProfilePage() {
                     {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
                   </p>
                 </div>
-                <p className="mt-1 text-xs text-white/60">
-                  {streakCount === 0
-                    ? t("publicProfile.streak.zero")
-                    : t("publicProfile.streak.nonZero", {
-                        count: numberFormatter.format(streakCount),
-                      })}
-                </p>
+                <p className="mt-1 text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
               </div>
             </section>
 
