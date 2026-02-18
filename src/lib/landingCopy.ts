@@ -138,7 +138,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     score: {
       label: "Репутаційний бал",
       shortLabel: "Бал",
-      overviewLabel: "Огляд балу",
+      overviewLabel: "Огляд домовленостей",
       live: "Оновлюється",
       signIn: "Увійдіть, щоб бачити оновлення",
       cards: {
@@ -232,7 +232,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     score: {
       label: "Reputation score",
       shortLabel: "Score",
-      overviewLabel: "Score overview",
+      overviewLabel: "Agreement Snapshot",
       live: "Updating",
       signIn: "Sign in to see updates",
       cards: {
