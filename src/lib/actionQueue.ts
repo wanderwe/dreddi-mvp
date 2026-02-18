@@ -34,6 +34,12 @@ export function getActionQueueState(
   }
 
   const inviteStatus = getPromiseInviteStatus(row);
+  const isInviteAccepted = inviteStatus === "accepted";
+
+  if (inviteStatus === "declined" || inviteStatus === "ignored") {
+    return null;
+  }
+
   const executorId = resolveExecutorId(row);
   const isExecutor = executorId === userId;
   const isInvitee = row.counterparty_id === userId || row.promisee_id === userId;
@@ -42,12 +48,12 @@ export function getActionQueueState(
     return "awaiting_acceptance";
   }
 
-  if (row.status === "active" && isExecutor) {
+  if (row.status === "active" && isExecutor && isInviteAccepted) {
     if (!row.due_at) return "active_no_deadline";
     if (new Date(row.due_at).getTime() <= now.getTime()) return "overdue";
   }
 
-  if (row.status === "completed_by_promisor" && !isExecutor) {
+  if (row.status === "completed_by_promisor" && !isExecutor && isInviteAccepted) {
     return "needs_confirmation";
   }
 
