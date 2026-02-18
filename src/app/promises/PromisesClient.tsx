@@ -494,6 +494,16 @@ export default function PromisesClient() {
   }, [summaryRows]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("dreddi_awaiting_action_count", String(overview.awaitingYou));
+    window.dispatchEvent(
+      new CustomEvent("dreddi:awaiting-actions-updated", {
+        detail: { count: overview.awaitingYou },
+      })
+    );
+  }, [overview.awaitingYou]);
+
+  useEffect(() => {
     const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
     if (
       process.env.NODE_ENV !== "production" &&
@@ -512,6 +522,20 @@ export default function PromisesClient() {
     roleCounts.uncategorized,
     filteredSummaryRows.length,
   ]);
+
+  useEffect(() => {
+    if (listLoading) return;
+    if (activeMetricFilter !== "awaiting_my_action") return;
+
+    const currentCount = filteredListRowsByTab[tab]?.length ?? 0;
+    if (currentCount > 0) return;
+
+    const fallbackTab: TabKey = tab === "i-promised" ? "promised-to-me" : "i-promised";
+    const fallbackCount = filteredListRowsByTab[fallbackTab]?.length ?? 0;
+    if (fallbackCount > 0) {
+      setTab(fallbackTab);
+    }
+  }, [activeMetricFilter, filteredListRowsByTab, listLoading, tab]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));

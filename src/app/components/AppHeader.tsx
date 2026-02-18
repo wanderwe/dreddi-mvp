@@ -76,6 +76,13 @@ export function AppHeader() {
 
     let active = true;
 
+    const loadCachedCount = () => {
+      const cached = window.localStorage.getItem("dreddi_awaiting_action_count");
+      if (!cached) return;
+      const parsed = Number(cached);
+      if (!Number.isNaN(parsed)) setActionQueueCount(parsed);
+    };
+
     const syncCount = async () => {
       const userId = authState.user.id;
       const { data, error } = await client
@@ -102,12 +109,28 @@ export function AppHeader() {
       }).length;
 
       setActionQueueCount(count);
+      window.localStorage.setItem("dreddi_awaiting_action_count", String(count));
     };
 
+    const onAwaitingActionsUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ count?: number }>;
+      const count = customEvent.detail?.count;
+      if (typeof count === "number") setActionQueueCount(count);
+    };
+
+    loadCachedCount();
     void syncCount();
+    window.addEventListener(
+      "dreddi:awaiting-actions-updated",
+      onAwaitingActionsUpdated as EventListener
+    );
 
     return () => {
       active = false;
+      window.removeEventListener(
+        "dreddi:awaiting-actions-updated",
+        onAwaitingActionsUpdated as EventListener
+      );
     };
   }, [authState.isLoggedIn, authState.user]);
 
