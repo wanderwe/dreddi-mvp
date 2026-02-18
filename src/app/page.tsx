@@ -525,18 +525,11 @@ export default function Home() {
                   {copy.score.overviewLabel}
                 </p>
                 <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
-                  <div className="pointer-events-none absolute -left-16 top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-emerald-300/8 blur-3xl" aria-hidden />
                   <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
-                      <div className="relative mt-1 text-[2.1rem] font-semibold leading-none text-white sm:text-[2.35rem]">
-                        <span
-                          className="pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/15 blur-2xl"
-                          aria-hidden
-                        />
-                        <span className="relative bg-gradient-to-b from-white to-slate-200/85 bg-clip-text text-transparent">
-                          {reputationLoading ? copy.loading.short : score}
-                        </span>
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
+                        {reputationLoading ? copy.loading.short : score}
                       </div>
                     </div>
 
@@ -544,7 +537,7 @@ export default function Home() {
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
                         {copy.score.cards.confirmed}
                       </div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
                         {reputationLoading ? copy.loading.placeholder : confirmedCount}
                       </div>
                     </div>
@@ -553,7 +546,7 @@ export default function Home() {
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
                         {copy.score.cards.disputed}
                       </div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
                         {reputationLoading ? copy.loading.placeholder : disputedCount}
                       </div>
                     </div>
