@@ -500,12 +500,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <DreddiLogoMark className="h-10 w-10" />
-                  <div>
-                    <p className="text-sm text-slate-300">{copy.score.label}</p>
-                    <p className="text-4xl font-semibold leading-none text-white">
-                      {reputationLoading ? copy.loading.short : score}
-                    </p>
-                  </div>
+                  <p className="text-sm text-slate-300">{copy.score.label}</p>
                 </div>
                 {email ? (
                   <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
@@ -518,17 +513,31 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-xs text-slate-400">{copy.score.cards.confirmed}</div>
-                  <div className="text-3xl font-semibold text-white">
-                    {reputationLoading ? copy.loading.placeholder : confirmedCount}
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 sm:px-5 sm:py-4 md:px-4 md:py-3">
+                <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                  <div className="py-2 sm:px-4 sm:py-1">
+                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.label}</div>
+                    <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
+                      {reputationLoading ? copy.loading.short : score}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">{copy.score.cards.disputed}</div>
-                  <div className="text-3xl font-semibold text-white">
-                    {reputationLoading ? copy.loading.placeholder : disputedCount}
+
+                  <div className="py-2 sm:px-4 sm:py-1">
+                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                      {copy.score.cards.confirmed}
+                    </div>
+                    <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                      {reputationLoading ? copy.loading.placeholder : confirmedCount}
+                    </div>
+                  </div>
+
+                  <div className="py-2 sm:px-4 sm:py-1">
+                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                      {copy.score.cards.disputed}
+                    </div>
+                    <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                      {reputationLoading ? copy.loading.placeholder : disputedCount}
+                    </div>
                   </div>
                 </div>
               </div>
