@@ -79,7 +79,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
       eyebrow: "Легкий трекер домовленостей",
-      headline: "Dreddi knows, про що ви домовились",
+      headline: "про що ви домовились.",
       subline: "Домовляйтесь. Фіксуйте. Рухайтесь далі.",
       description:
         "Фіксуйте угоди з друзями, партнерами чи клієнтами.\nПросто, публічно або приватно — без контрактів і зайвого шуму.",
@@ -171,7 +171,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   en: {
     hero: {
       eyebrow: "A lightweight deal tracker",
-      headline: "Dreddi knows what was agreed",
+      headline: "what was agreed.",
       subline: "Agree. Track. Move on.",
       description:
         "Track deals with friends, partners or clients.\nSimple, public or private — no contracts, no pressure.",
