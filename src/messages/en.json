@@ -135,8 +135,8 @@
     },
     "status": {
       "active": "Active",
-      "pendingConfirmation": "Awaiting confirmation",
-      "waitingConfirmation": "Awaiting confirmation",
+      "pendingConfirmation": "Awaiting review",
+      "waitingConfirmation": "Awaiting review",
       "confirmed": "Confirmed",
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
@@ -370,7 +370,7 @@
         "awaitingAcceptance": "Pending acceptance",
         "overdue": "Overdue",
         "activeNoDeadline": "Active with no deadline",
-        "needsConfirmation": "Awaiting confirmation"
+        "needsConfirmation": "Awaiting review"
       },
       "cta": {
         "accept": "Accept",

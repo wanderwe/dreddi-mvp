@@ -143,8 +143,8 @@
     },
     "status": {
       "active": "Активна",
-      "pendingConfirmation": "На підтвердженні",
-      "waitingConfirmation": "На підтвердженні",
+      "pendingConfirmation": "Очікує перегляду",
+      "waitingConfirmation": "Очікує перегляду",
       "confirmed": "Підтверджено",
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
@@ -378,7 +378,7 @@
         "awaitingAcceptance": "Очікує прийняття",
         "overdue": "Прострочено",
         "activeNoDeadline": "Активна без дедлайну",
-        "needsConfirmation": "Очікує підтвердження"
+        "needsConfirmation": "Очікує перегляду"
       },
       "cta": {
         "accept": "Прийняти",
