@@ -807,7 +807,7 @@ export default function PromisesClient() {
                               ariaLabel={t("promises.list.markCompleted")}
                               onClick={() => setConfirmingId(p.id)}
                               disabled={busy}
-                              className="h-9 w-9"
+                              className="h-8 w-8 border-emerald-300/45 bg-emerald-400/12 text-emerald-100 shadow-[0_0_10px_rgba(16,185,129,0.22)] hover:border-emerald-200/70 hover:bg-emerald-400/24"
                             />
                           </Tooltip>
                         )}
@@ -818,7 +818,7 @@ export default function PromisesClient() {
                               href={`/promises/${p.id}/confirm`}
                               icon={<BadgeCheck className="h-4 w-4" />}
                               ariaLabel={t("promises.list.reviewConfirm")}
-                              className="h-9 w-9"
+                              className="h-8 w-8 border-emerald-300/45 bg-emerald-400/12 text-emerald-100 shadow-[0_0_10px_rgba(16,185,129,0.22)] hover:border-emerald-200/70 hover:bg-emerald-400/24"
                             />
                           </Tooltip>
                         )}
