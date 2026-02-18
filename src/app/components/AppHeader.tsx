@@ -169,20 +169,15 @@ export function AppHeader() {
                   <Link className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </Link>
-                  <Link
-                    href="/promises?filter=awaiting_my_action"
-                    className={[
-                      "inline-flex cursor-pointer items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold transition",
-                      actionQueueCount > 0
-                        ? "border-amber-200/40 bg-amber-300/20 text-amber-100"
-                        : "border-white/15 bg-white/5 text-slate-200 hover:border-white/30 hover:bg-white/10",
-                    ].join(" ")}
-                  >
-                    {t("nav.actionQueueBadge")}
-                    {actionQueueCount > 0 && (
+                  {actionQueueCount > 0 && (
+                    <Link
+                      href="/promises?filter=awaiting_my_action"
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100 transition"
+                    >
+                      {t("nav.actionQueueBadge")}
                       <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-slate-900">{actionQueueCount}</span>
-                    )}
-                  </Link>
+                    </Link>
+                  )}
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
