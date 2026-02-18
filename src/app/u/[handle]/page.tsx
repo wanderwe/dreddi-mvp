@@ -284,6 +284,28 @@ export default function PublicProfilePage() {
   };
 
   const publicDealsEmpty = promises.length === 0;
+  const streakCount = useMemo(() => {
+    const finalizedDeals = promises
+      .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
+      .map((promise) => ({
+        status: promise.status,
+        finalizedAt: promise.confirmed_at ?? promise.disputed_at,
+      }))
+      .filter((promise) => Boolean(promise.finalizedAt))
+      .sort((a, b) => {
+        const aTime = a.finalizedAt ? new Date(a.finalizedAt).getTime() : 0;
+        const bTime = b.finalizedAt ? new Date(b.finalizedAt).getTime() : 0;
+        return bTime - aTime;
+      });
+
+    let currentStreak = 0;
+    for (const deal of finalizedDeals) {
+      if (deal.status !== "confirmed") break;
+      currentStreak += 1;
+    }
+
+    return currentStreak;
+  }, [promises]);
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
@@ -433,6 +455,21 @@ export default function PublicProfilePage() {
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
                 </div>
+              </div>
+              <div className="mt-4">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-semibold text-white">🔥</span>
+                  <p className="text-2xl font-semibold text-white">
+                    {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-white/60">
+                  {streakCount === 0
+                    ? t("publicProfile.streak.zero")
+                    : t("publicProfile.streak.nonZero", {
+                        count: numberFormatter.format(streakCount),
+                      })}
+                </p>
               </div>
             </section>
 

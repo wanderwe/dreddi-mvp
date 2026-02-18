@@ -529,6 +529,11 @@
       "missing": "Profile handle is missing",
       "private": "This profile is private",
       "notFound": "Profile not found"
+    },
+    "streak": {
+      "title": "Streak: {count}",
+      "zero": "Start confirming deals in a row to launch your streak",
+      "nonZero": "{count} deals in a row confirmed without disputes"
     }
   },
   "deal": {
