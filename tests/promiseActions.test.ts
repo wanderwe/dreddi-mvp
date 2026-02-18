@@ -9,10 +9,11 @@ type FixtureRow = {
   role: PromiseRole;
   status: PromiseStatus;
   inviteStatus: InviteStatus;
+  isReviewer: boolean;
 };
 
 test("promisor with an active accepted promise should be awaiting your action", () => {
-  const row: FixtureRow = { role: "promisor", status: "active", inviteStatus: "accepted" };
+  const row: FixtureRow = { role: "promisor", status: "active", inviteStatus: "accepted", isReviewer: false };
 
   assert.equal(isAwaitingYourAction(row), true);
   assert.equal(isAwaitingOthers(row), false);
@@ -23,6 +24,7 @@ test("promisor with an awaiting invite is not awaiting your action", () => {
     role: "promisor",
     status: "active",
     inviteStatus: "awaiting_acceptance",
+    isReviewer: false,
   };
 
   assert.equal(isAwaitingYourAction(row), false);
@@ -34,6 +36,7 @@ test("counterparty should be awaiting action after promisor marks complete", () 
     role: "counterparty",
     status: "completed_by_promisor",
     inviteStatus: "accepted",
+    isReviewer: true,
   };
 
   assert.equal(isAwaitingYourAction(row), true);
@@ -45,6 +48,7 @@ test("awaiting others mirrors CTA responsibility", () => {
     role: "promisor",
     status: "completed_by_promisor",
     inviteStatus: "accepted",
+    isReviewer: false,
   };
 
   assert.equal(isAwaitingYourAction(row), false);
@@ -52,15 +56,27 @@ test("awaiting others mirrors CTA responsibility", () => {
 });
 
 test("counterparty with an active accepted promise is awaiting the promisor", () => {
-  const row: FixtureRow = { role: "counterparty", status: "active", inviteStatus: "accepted" };
+  const row: FixtureRow = { role: "counterparty", status: "active", inviteStatus: "accepted", isReviewer: true };
 
   assert.equal(isAwaitingYourAction(row), false);
   assert.equal(isAwaitingOthers(row), true);
 });
 
 test("counterparty with a declined invite is not awaiting the promisor", () => {
-  const row: FixtureRow = { role: "counterparty", status: "active", inviteStatus: "declined" };
+  const row: FixtureRow = { role: "counterparty", status: "active", inviteStatus: "declined", isReviewer: true };
 
   assert.equal(isAwaitingYourAction(row), false);
   assert.equal(isAwaitingOthers(row), false);
+});
+
+
+test("counterparty reviewer with pending acceptance is not awaiting your action", () => {
+  const row: FixtureRow = {
+    role: "counterparty",
+    status: "active",
+    inviteStatus: "awaiting_acceptance",
+    isReviewer: true,
+  };
+
+  assert.equal(isAwaitingYourAction(row), false);
 });

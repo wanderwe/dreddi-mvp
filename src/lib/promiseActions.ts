@@ -15,7 +15,6 @@ const isInviteAccepted = (inviteStatus: InviteStatus) =>
 
 /**
  * Awaiting your action = promises where the signed-in user has a primary CTA available.
- * - Counterparty + awaiting_acceptance → can accept/decline invite.
  * - Promisor + active + accepted invite → can mark as completed.
  * - Counterparty reviewer + completed_by_promisor + accepted invite → can confirm or dispute.
  *
@@ -23,9 +22,6 @@ const isInviteAccepted = (inviteStatus: InviteStatus) =>
  * so all surfaces use the same actionable semantics.
  */
 export function isAwaitingYourAction(row: PromiseListItem): boolean {
-  if (row.isReviewer && row.inviteStatus === "awaiting_acceptance") {
-    return true;
-  }
   if (row.role === "promisor" && row.status === "active" && isInviteAccepted(row.inviteStatus)) {
     return true;
   }
