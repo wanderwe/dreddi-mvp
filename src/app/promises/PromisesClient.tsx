@@ -12,6 +12,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import {
   getPromiseInviteStatus,
@@ -738,7 +739,7 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const canSendReminder = canReview && ((p.status === "active" && acceptedBySecondSide) || p.status === "completed_by_promisor");
+                const canSendReminder = getNextActionOwner(p, userId) === "other";
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
