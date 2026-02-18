@@ -458,8 +458,8 @@ export default function PublicProfilePage() {
               </div>
               <div className="mt-4">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-semibold text-white">🔥</span>
-                  <p className="text-2xl font-semibold text-white">
+                  <span className="text-xl font-semibold text-white">🔥</span>
+                  <p className="text-xl font-semibold text-white">
                     {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
                   </p>
                 </div>
