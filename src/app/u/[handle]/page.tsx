@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -93,6 +93,7 @@ export default function PublicProfilePage() {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
+  const streakFireGradientId = useId();
 
   const formatRelativeTime = useMemo(() => {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
@@ -458,15 +459,34 @@ export default function PublicProfilePage() {
                   <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
                 </div>
               </div>
-              <div className="mt-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-semibold text-white">🔥</span>
-                  <p className="text-xl font-semibold text-white">
-                    {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
-                  </p>
+              {streakCount > 0 ? (
+                <div className="mt-4">
+                  <div className="flex items-baseline gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="h-4 w-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <linearGradient id={streakFireGradientId} x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="rgb(110 231 183 / 0.8)" />
+                          <stop offset="55%" stopColor="rgb(45 212 191 / 0.75)" />
+                          <stop offset="100%" stopColor="rgb(125 211 252 / 0.7)" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        fill={`url(#${streakFireGradientId})`}
+                        d="M12.18 2.25c.59 2.42-.17 3.91-1.07 5.36-.96 1.54-2.04 3.17-2.04 5.48 0 2.25 1.56 4.42 3.93 5.16-1.04-.86-1.66-2.06-1.66-3.39 0-1.58.88-2.66 1.73-3.71.83-1.02 1.63-2.02 1.63-3.5 1.85 1.18 3.06 3.28 3.06 5.58 0 3.52-2.84 6.37-6.35 6.37S5.06 16.75 5.06 13.23c0-3.03 1.68-5.2 3.11-7.13 1.33-1.79 2.46-3.37 4.01-3.85Z"
+                      />
+                    </svg>
+                    <p className="text-xl font-semibold text-white">
+                      {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
                 </div>
-                <p className="mt-1 text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
-              </div>
+              ) : null}
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
