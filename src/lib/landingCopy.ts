@@ -3,6 +3,7 @@ export type LandingCopy = {
   hero: {
     eyebrow: string;
     headline: string;
+    subline: string;
     description: string;
   };
   useDreddi: {
@@ -77,10 +78,11 @@ export type LandingCopy = {
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
-      eyebrow: "Аналітика репутації для угод та обіцянок",
-      headline: "Домовленість починається з підтвердження",
+      eyebrow: "Легкий трекер домовленостей",
+      headline: "Dreddi knows, про що ви домовились",
+      subline: "Домовляйтесь. Фіксуйте. Рухайтесь далі.",
       description:
-        "Dreddi — сервіс між словами і контрактом.\nВи фіксуєте домовленості, берете відповідальність\nі будуєте репутацію без юридичного тиску —\nале з реальними наслідками для довіри.",
+        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\nПросто, публічно або приватно — без контрактів і зайвого шуму.",
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -133,8 +135,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     score: {
       label: "Репутаційний бал",
-      live: "Наживо",
-      signIn: "Увійдіть, щоб бачити оновлення наживо",
+      live: "Оновлюється",
+      signIn: "Увійдіть, щоб бачити оновлення",
       cards: {
         confirmed: "Підтверджено",
         disputed: "Оскаржено",
@@ -168,10 +170,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
   en: {
     hero: {
-      eyebrow: "Reputation analytics for deals and promises",
-      headline: "An agreement starts with confirmation",
+      eyebrow: "A lightweight deal tracker",
+      headline: "Dreddi knows what was agreed",
+      subline: "Agree. Track. Move on.",
       description:
-        "Dreddi is the service layer between talk and contracts.\nYou capture agreements, take responsibility,\nand build reputation without legal pressure —\nbut with real consequences for trust.",
+        "Track deals with friends, partners or clients.\nSimple, public or private — no contracts, no pressure.",
     },
     useDreddi: {
       label: "Use cases",
@@ -224,8 +227,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     score: {
       label: "Reputation score",
-      live: "Live",
-      signIn: "Sign in to see live updates",
+      live: "Updating",
+      signIn: "Sign in to see updates",
       cards: {
         confirmed: "Confirmed",
         disputed: "Disputed",

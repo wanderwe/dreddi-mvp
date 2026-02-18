@@ -449,6 +449,9 @@ export default function Home() {
             <p className="max-w-xl text-xl font-semibold text-white">
               {copy.hero.headline}
             </p>
+            <p className="max-w-xl text-sm font-medium uppercase tracking-[0.16em] text-emerald-200/80">
+              {copy.hero.subline}
+            </p>
             <p className="max-w-xl text-lg text-slate-300">
               {renderMultiline(copy.hero.description)}
             </p>
@@ -468,10 +471,10 @@ export default function Home() {
                 {copy.cta.getStarted}
               </Link>
               <Link
-                href="/u"
+                href="/promises"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                {copy.cta.publicProfiles}
+                {copy.cta.reviewDeals}
               </Link>
             </div>
           ) : (
