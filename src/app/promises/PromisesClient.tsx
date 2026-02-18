@@ -785,13 +785,13 @@ export default function PromisesClient() {
                           </span>
 
                           {canSendReminder && (
-                            <Tooltip label={reminderTooltip} placement="top-right">
+                            <Tooltip label={reminderTooltip} placement="top">
                               <IconButton
                                 icon={<BellRing className="h-4 w-4" />}
                                 ariaLabel={t("promises.list.reminder.aria")}
                                 onClick={() => handleSendReminder(p.id)}
                                 disabled={sendingReminderId === p.id || reminderCooldown}
-                                className="h-9 w-9 border-amber-300/30 text-amber-100 hover:border-amber-300/50 hover:bg-amber-400/20"
+                                className="h-9 w-9"
                               />
                             </Tooltip>
                           )}
