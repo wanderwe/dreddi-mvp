@@ -114,6 +114,29 @@ function DealRow({
   );
 }
 
+function MetricValue({
+  isLoading,
+  value,
+  className,
+}: {
+  isLoading: boolean;
+  value: string | number;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      {isLoading ? (
+        <span
+          className="block h-8 w-20 animate-pulse rounded-lg bg-white/15"
+          aria-hidden="true"
+        />
+      ) : (
+        value
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const locale = useLocale();
   const t = useT();
@@ -521,27 +544,33 @@ export default function Home() {
                   <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
-                        {reputationLoading ? copy.loading.short : score}
-                      </div>
+                      <MetricValue
+                        isLoading={reputationLoading}
+                        value={score}
+                        className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]"
+                      />
                     </div>
 
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
                         {copy.score.cards.confirmed}
                       </div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
-                        {reputationLoading ? copy.loading.placeholder : confirmedCount}
-                      </div>
+                      <MetricValue
+                        isLoading={reputationLoading}
+                        value={confirmedCount}
+                        className="mt-1 text-3xl font-semibold leading-none text-white"
+                      />
                     </div>
 
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
                         {copy.score.cards.disputed}
                       </div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
-                        {reputationLoading ? copy.loading.placeholder : disputedCount}
-                      </div>
+                      <MetricValue
+                        isLoading={reputationLoading}
+                        value={disputedCount}
+                        className="mt-1 text-3xl font-semibold leading-none text-white"
+                      />
                     </div>
                   </div>
                 </div>
