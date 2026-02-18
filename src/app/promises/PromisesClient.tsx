@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, BadgeCheck } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -743,6 +743,11 @@ export default function PromisesClient() {
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
+                const reminderTooltip = reminderInfo.lastSentAt
+                  ? t("promises.list.reminder.tooltipWithLast", {
+                      date: new Date(reminderInfo.lastSentAt).toLocaleString(locale),
+                    })
+                  : t("promises.list.reminder.tooltip");
 
                 const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
 
@@ -775,53 +780,45 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        {canSendReminder && (
-                          <div className="flex flex-col items-end gap-1">
-                            <button
-                              type="button"
-                              onClick={() => handleSendReminder(p.id)}
-                              disabled={sendingReminderId === p.id || reminderCooldown}
-                              className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-300/50 hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {sendingReminderId === p.id
-                                ? t("promises.list.reminder.sending")
-                                : t("promises.list.reminder.button")}
-                            </button>
-                            {reminderInfo.lastSentAt && (
-                              <div className="text-[11px] text-slate-400">
-                                {t("promises.list.reminder.last", { date: new Date(reminderInfo.lastSentAt).toLocaleString(locale) })}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
                         <div className="flex items-center justify-end gap-2">
-                        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                          {statusLabel}
-                        </span>
+                          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
+                            {statusLabel}
+                          </span>
 
-                        {isPromisor && p.status === "active" && acceptedBySecondSide && (
-                          <Tooltip label={t("promises.list.markCompleted")} placement="top">
-                            <IconButton
-                              icon={<CheckCircle2 className="h-4 w-4" />}
-                              ariaLabel={t("promises.list.markCompleted")}
-                              onClick={() => setConfirmingId(p.id)}
-                              disabled={busy}
-                              className="h-8 w-8 border-emerald-300/45 bg-emerald-400/12 text-emerald-100 shadow-[0_0_10px_rgba(16,185,129,0.22)] hover:border-emerald-200/70 hover:bg-emerald-400/24"
-                            />
-                          </Tooltip>
-                        )}
+                          {canSendReminder && (
+                            <Tooltip label={reminderTooltip} placement="top">
+                              <IconButton
+                                icon={<BellRing className="h-4 w-4" />}
+                                ariaLabel={t("promises.list.reminder.aria")}
+                                onClick={() => handleSendReminder(p.id)}
+                                disabled={sendingReminderId === p.id || reminderCooldown}
+                                className="h-9 w-9"
+                              />
+                            </Tooltip>
+                          )}
 
-                        {canReview && p.status === "completed_by_promisor" && (
-                          <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
-                            <IconButton
-                              href={`/promises/${p.id}/confirm`}
-                              icon={<BadgeCheck className="h-4 w-4" />}
-                              ariaLabel={t("promises.list.reviewConfirm")}
-                              className="h-8 w-8 border-emerald-300/45 bg-emerald-400/12 text-emerald-100 shadow-[0_0_10px_rgba(16,185,129,0.22)] hover:border-emerald-200/70 hover:bg-emerald-400/24"
-                            />
-                          </Tooltip>
-                        )}
+                          {isPromisor && p.status === "active" && acceptedBySecondSide && (
+                            <Tooltip label={t("promises.list.markCompleted")} placement="top">
+                              <IconButton
+                                icon={<CheckCircle2 className="h-4 w-4" />}
+                                ariaLabel={t("promises.list.markCompleted")}
+                                onClick={() => setConfirmingId(p.id)}
+                                disabled={busy}
+                                className="h-9 w-9"
+                              />
+                            </Tooltip>
+                          )}
+
+                          {canReview && p.status === "completed_by_promisor" && (
+                            <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
+                              <IconButton
+                                href={`/promises/${p.id}/confirm`}
+                                icon={<BadgeCheck className="h-4 w-4" />}
+                                ariaLabel={t("promises.list.reviewConfirm")}
+                                className="h-9 w-9"
+                              />
+                            </Tooltip>
+                          )}
                         </div>
                       </div>
                     </div>
