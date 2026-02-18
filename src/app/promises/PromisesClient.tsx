@@ -794,7 +794,7 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        <div className="flex items-center justify-end gap-2.5">
+                        <div className="flex items-center justify-end gap-2">
                           <StatusPill
                             label={statusLabel}
                             tone={statusPill.tone}
@@ -805,11 +805,11 @@ export default function PromisesClient() {
                           {canSendReminder && (
                             <Tooltip label={reminderTooltip} placement="top">
                               <IconButton
-                                icon={<BellRing className="h-4 w-4" />}
+                                icon={<BellRing className="h-[18px] w-[18px]" />}
                                 ariaLabel={t("promises.list.reminder.aria")}
                                 onClick={() => handleSendReminder(p.id)}
                                 disabled={sendingReminderId === p.id || reminderCooldown}
-                                className="h-9 w-9"
+                                className="h-[34px] w-[34px]"
                               />
                             </Tooltip>
                           )}
@@ -817,11 +817,11 @@ export default function PromisesClient() {
                           {isPromisor && p.status === "active" && acceptedBySecondSide && (
                             <Tooltip label={t("promises.list.markCompleted")} placement="top">
                               <IconButton
-                                icon={<CheckCircle2 className="h-4 w-4" />}
+                                icon={<CheckCircle2 className="h-[18px] w-[18px]" />}
                                 ariaLabel={t("promises.list.markCompleted")}
                                 onClick={() => setConfirmingId(p.id)}
                                 disabled={busy}
-                                className="h-9 w-9"
+                                className="h-[34px] w-[34px]"
                               />
                             </Tooltip>
                           )}
@@ -830,9 +830,9 @@ export default function PromisesClient() {
                             <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
                               <IconButton
                                 href={`/promises/${p.id}/confirm`}
-                                icon={<BadgeCheck className="h-4 w-4" />}
+                                icon={<BadgeCheck className="h-[18px] w-[18px]" />}
                                 ariaLabel={t("promises.list.reviewConfirm")}
-                                className="h-9 w-9"
+                                className="h-[34px] w-[34px]"
                               />
                             </Tooltip>
                           )}
