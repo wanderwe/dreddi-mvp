@@ -16,9 +16,14 @@ import { useT } from "@/lib/i18n/I18nProvider";
 type MobileMenuProps = {
   isAuthenticated?: boolean;
   actionQueueCount?: number;
+  actionQueueHref?: string;
 };
 
-export function MobileMenu({ isAuthenticated = false, actionQueueCount = 0 }: MobileMenuProps) {
+export function MobileMenu({
+  isAuthenticated = false,
+  actionQueueCount = 0,
+  actionQueueHref = "/promises?filter=awaiting_my_action",
+}: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const baseLinkClasses =
@@ -56,7 +61,7 @@ export function MobileMenu({ isAuthenticated = false, actionQueueCount = 0 }: Mo
                 </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
-                    <Link className={baseLinkClasses} href="/promises?filter=awaiting_my_action">
+                    <Link className={baseLinkClasses} href={actionQueueHref}>
                       {t("nav.actionQueueBadge")} ({actionQueueCount})
                     </Link>
                   </SheetClose>

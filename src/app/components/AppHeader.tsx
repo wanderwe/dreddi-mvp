@@ -29,6 +29,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
+  const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
   const isAuthenticated = authState.isLoggedIn;
   const showBackLink = !isAuthenticated && pathname !== "/";
   const showSignIn = !isAuthenticated && pathname !== "/login";
@@ -73,6 +74,7 @@ export function AppHeader() {
 
     if (!authState.isLoggedIn || !userId || !client) {
       setActionQueueCount(0);
+      setActionQueueHref("/promises?filter=awaiting_my_action");
       return;
     }
 
@@ -95,21 +97,39 @@ export function AppHeader() {
 
       if (!active || error) return;
 
+      let awaitingAsExecutor = 0;
+      let awaitingAsCounterparty = 0;
+
       const count = (data ?? []).filter((row) => {
         const executorId = resolveExecutorId(row);
         const role = executorId && executorId === userId ? "promisor" : "counterparty";
         const isReviewer = executorId !== userId;
         const inviteStatus = getPromiseInviteStatus(row);
 
-        return isAwaitingYourAction({
+        const awaitingMyAction = isAwaitingYourAction({
           status: row.status,
           role,
           inviteStatus,
           isReviewer,
         });
+
+        if (!awaitingMyAction) return false;
+
+        if (role === "promisor") awaitingAsExecutor += 1;
+        else awaitingAsCounterparty += 1;
+
+        return true;
       }).length;
 
+      const nextActionQueueHref =
+        awaitingAsExecutor > 0 && awaitingAsCounterparty === 0
+          ? "/promises?tab=i-am-executor&filter=awaiting_my_action"
+          : awaitingAsCounterparty > 0 && awaitingAsExecutor === 0
+            ? "/promises?tab=promised-to-me&filter=awaiting_my_action"
+            : "/promises?filter=awaiting_my_action";
+
       setActionQueueCount(count);
+      setActionQueueHref(nextActionQueueHref);
       window.localStorage.setItem("dreddi_awaiting_action_count", String(count));
     };
 
@@ -172,7 +192,7 @@ export function AppHeader() {
                   </Link>
                   {actionQueueCount > 0 && (
                     <Link
-                      href="/promises?filter=awaiting_my_action"
+                      href={actionQueueHref}
                       className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100 transition"
                     >
                       {t("nav.actionQueueBadge")}
@@ -200,7 +220,11 @@ export function AppHeader() {
               </nav>
               <div className="flex items-center gap-2 md:hidden">
                 <LocaleSwitcher />
-                <MobileMenu isAuthenticated={isAuthenticated} actionQueueCount={actionQueueCount} />
+                <MobileMenu
+                  isAuthenticated={isAuthenticated}
+                  actionQueueCount={actionQueueCount}
+                  actionQueueHref={actionQueueHref}
+                />
               </div>
             </>
           ) : (
@@ -218,7 +242,11 @@ export function AppHeader() {
               </nav>
               <div className="flex items-center gap-2 md:hidden">
                 <LocaleSwitcher />
-                <MobileMenu isAuthenticated={isAuthenticated} actionQueueCount={actionQueueCount} />
+                <MobileMenu
+                  isAuthenticated={isAuthenticated}
+                  actionQueueCount={actionQueueCount}
+                  actionQueueHref={actionQueueHref}
+                />
               </div>
             </>
           )}
