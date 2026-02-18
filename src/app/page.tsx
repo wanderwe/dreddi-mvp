@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { ReputationSection } from "@/app/components/landing/ReputationSection";
 import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
@@ -64,7 +65,6 @@ type DealRowProps = {
   isClickable?: boolean;
   metaText: string;
   statusLabels: Record<PromiseStatus, string>;
-  statusTones: Record<PromiseStatus, string>;
 };
 
 const LEGACY_BETA_BANNER_DISMISSED_KEYS = ["betaBannerDismissed", "beta-banner-dismissed"];
@@ -75,7 +75,6 @@ function DealRow({
   isClickable = true,
   metaText,
   statusLabels,
-  statusTones,
 }: DealRowProps) {
   const isDemo = !isClickable;
   const baseClass = isDemo
@@ -86,7 +85,21 @@ function DealRow({
     : "cursor-default";
   const titleClass = isDemo ? "text-sm font-medium text-slate-100" : "font-semibold text-white";
   const metaClass = isDemo ? "mt-1 text-[11px] text-slate-400" : "text-xs text-slate-400";
-  const statusClass = `rounded-full px-3 py-1 text-xs ${statusTones[item.status] ?? "bg-white/5 text-white"}`;
+  const statusPillToneMap: Record<PromiseStatus, StatusPillTone> = {
+    active: "neutral",
+    completed_by_promisor: "attention",
+    confirmed: "success",
+    disputed: "danger",
+    declined: "danger",
+  };
+
+  const statusPillIconMap: Record<PromiseStatus, "check" | "clock" | "warning"> = {
+    active: "clock",
+    completed_by_promisor: "warning",
+    confirmed: "check",
+    disputed: "warning",
+    declined: "warning",
+  };
 
   const content = (
     <>
@@ -94,7 +107,11 @@ function DealRow({
         <div className={titleClass}>{item.title}</div>
         {metaText ? <div className={metaClass}>{metaText}</div> : null}
       </div>
-      <span className={statusClass}>{statusLabels[item.status] ?? item.status}</span>
+      <StatusPill
+        label={statusLabels[item.status] ?? item.status}
+        tone={statusPillToneMap[item.status] ?? "neutral"}
+        icon={statusPillIconMap[item.status] ?? "clock"}
+      />
     </>
   );
 
@@ -173,13 +190,6 @@ export default function Home() {
     declined: copy.recentDeals.status.declined,
   };
 
-  const statusTones: Record<PromiseStatus, string> = {
-    active: "bg-white/5 text-emerald-200 border border-white/10",
-    completed_by_promisor: "bg-amber-500/10 text-amber-100 border border-amber-300/40",
-    confirmed: "bg-emerald-500/10 text-emerald-100 border border-emerald-300/40",
-    disputed: "bg-red-500/10 text-red-100 border border-red-300/40",
-    declined: "bg-red-500/10 text-red-100 border border-red-300/40",
-  };
 
   const getMetaText = (item: DealRow) => {
     if (item.meta) {
@@ -574,7 +584,6 @@ export default function Home() {
                             isClickable={false}
                             metaText={getMetaText(item)}
                             statusLabels={statusLabels}
-                            statusTones={statusTones}
                           />
                         ))}
                       </div>
@@ -606,7 +615,6 @@ export default function Home() {
                               href={`/promises/${item.id}?from=dashboard`}
                               metaText={getMetaText(item)}
                               statusLabels={statusLabels}
-                              statusTones={statusTones}
                             />
                           ))
                         )}

@@ -9,6 +9,7 @@ import { formatDueDate } from "@/lib/formatDueDate";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted, InviteStatus } from "@/lib/promiseAcceptance";
 import { getPromiseLabels } from "@/lib/promiseLabels";
+import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 
 type PromiseRow = {
   id: string;
@@ -245,6 +246,20 @@ export default function ConfirmPromisePage() {
     disputed: t("promises.status.disputed"),
     declined: t("promises.inviteStatus.declined"),
   };
+  const statusToneMap: Record<PromiseStatus, StatusPillTone> = {
+    active: "neutral",
+    completed_by_promisor: "attention",
+    confirmed: "success",
+    disputed: "danger",
+    declined: "danger",
+  };
+  const statusIconMap: Record<PromiseStatus, "check" | "clock" | "warning"> = {
+    active: "clock",
+    completed_by_promisor: "warning",
+    confirmed: "check",
+    disputed: "warning",
+    declined: "warning",
+  };
   const actionNote = promise ? statusNote(promise.status) : null;
 
   return (
@@ -294,9 +309,11 @@ export default function ConfirmPromisePage() {
                 </div>
 
                 <div className="flex flex-col items-end gap-2 text-sm text-slate-200">
-                  <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                    {t("promises.confirm.statusLabel")}: {statusLabelMap[promise.status]}
-                  </span>
+                  <StatusPill
+                    label={`${t("promises.confirm.statusLabel")}: ${statusLabelMap[promise.status]}`}
+                    tone={statusToneMap[promise.status] ?? "neutral"}
+                    icon={statusIconMap[promise.status] ?? "clock"}
+                  />
                 </div>
               </div>
 
