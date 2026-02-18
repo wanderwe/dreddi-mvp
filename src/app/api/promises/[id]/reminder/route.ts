@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getAdminClient, loadPromiseForUser } from "../common";
-import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import { getNextActionOwner, resolveNextActionOwnerId } from "@/lib/promiseNextAction";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -144,6 +144,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
+    const admin = getAdminClient();
     if (!isPromiseAccepted(promise)) {
       return errorResponse(
         400,
@@ -152,20 +153,26 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    const admin = getAdminClient();
-    const executorId = resolveExecutorId(promise);
-    const counterpartyId = resolveCounterpartyId(promise);
-    if (!executorId || !counterpartyId || counterpartyId === executorId) {
+    const nextActionOwnerId = resolveNextActionOwnerId(promise);
+    if (!nextActionOwnerId) {
       return errorResponse(400, "reminder_participants_invalid", "Deal participants are invalid");
     }
 
     const isActive = promise.status === "active";
-    const senderShouldBe = isActive ? counterpartyId : executorId;
-    const receiverId = isActive ? executorId : counterpartyId;
-
-    if (user.id !== senderShouldBe) {
-      return errorResponse(403, "reminder_forbidden", "Only the waiting side can send reminder");
+    const nextActionOwner = getNextActionOwner(promise, user.id);
+    if (nextActionOwner === "none") {
+      return errorResponse(400, "reminder_participants_invalid", "Deal participants are invalid");
     }
+
+    if (nextActionOwner === "me") {
+      return errorResponse(
+        403,
+        "reminder_forbidden",
+        "Нагадування можна надсилати лише коли дія очікується від іншої сторони."
+      );
+    }
+
+    const receiverId = nextActionOwnerId;
 
     const sinceIso = new Date(Date.now() - DAY_MS).toISOString();
     const { data: existingReminder, error: existingError } = await admin
