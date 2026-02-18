@@ -518,19 +518,17 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <div className="grid grid-cols-2 divide-x divide-white/10">
-                  <div className="pr-4">
-                    <div className="text-xs text-slate-400">{copy.score.cards.confirmed}</div>
-                    <div className="mt-1 text-3xl font-semibold text-white">
-                      {reputationLoading ? copy.loading.placeholder : confirmedCount}
-                    </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs text-slate-400">{copy.score.cards.confirmed}</div>
+                  <div className="mt-1 text-3xl font-semibold text-white">
+                    {reputationLoading ? copy.loading.placeholder : confirmedCount}
                   </div>
-                  <div className="pl-4">
-                    <div className="text-xs text-slate-400">{copy.score.cards.disputed}</div>
-                    <div className="mt-1 text-3xl font-semibold text-white">
-                      {reputationLoading ? copy.loading.placeholder : disputedCount}
-                    </div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-400">{copy.score.cards.disputed}</div>
+                  <div className="mt-1 text-3xl font-semibold text-white">
+                    {reputationLoading ? copy.loading.placeholder : disputedCount}
                   </div>
                 </div>
               </div>
@@ -540,70 +538,70 @@ export default function Home() {
               </p>
 
               {reputationError && isAuthenticated && (
-                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
-                    {reputationError}
-                  </div>
-                )}
+                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                  {reputationError}
+                </div>
+              )}
 
               <div>
-                  <div className="flex items-center justify-between text-sm text-slate-300/90">
-                    <span>{recentDealsTitle}</span>
-                    <Link
-                      href={recentDealsHref}
-                      className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
-                    >
-                      {copy.recentDeals.seeAll}
-                    </Link>
-                  </div>
-                  {!isAuthenticated ? (
-                    <div className="mt-3">
-                      <div className="mt-2 divide-y divide-white/10 text-sm">
-                        {demoDeals.map((item) => (
-                          <DealRow
-                            key={item.id}
-                            item={item}
-                            isClickable={false}
-                            metaText={getMetaText(item)}
-                            statusLabels={statusLabels}
-                          />
-                        ))}
-                      </div>
+                <div className="flex items-center justify-between text-sm text-slate-300/90">
+                  <span>{recentDealsTitle}</span>
+                  <Link
+                    href={recentDealsHref}
+                    className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
+                  >
+                    {copy.recentDeals.seeAll}
+                  </Link>
+                </div>
+                {!isAuthenticated ? (
+                  <div className="mt-3">
+                    <div className="mt-2 divide-y divide-white/10 text-sm">
+                      {demoDeals.map((item) => (
+                        <DealRow
+                          key={item.id}
+                          item={item}
+                          isClickable={false}
+                          metaText={getMetaText(item)}
+                          statusLabels={statusLabels}
+                        />
+                      ))}
                     </div>
-                  ) : (
-                    <>
-                      {recentError && (
-                        <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                          {recentError}
+                  </div>
+                ) : (
+                  <>
+                    {recentError && (
+                      <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                        {recentError}
+                      </div>
+                    )}
+
+                    <div className="mt-2 text-sm">
+                      {reputationLoading || recentLoading ? (
+                        <div className="space-y-2">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-[52px] animate-pulse rounded-xl bg-white/5" />
+                          ))}
+                        </div>
+                      ) : recentDeals.length === 0 ? (
+                        <div className="rounded-xl bg-white/[0.03] px-3 py-3 text-xs text-slate-400">
+                          {copy.recentDeals.empty}
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-white/10">
+                          {recentDealsLimited.map((item) => (
+                            <DealRow
+                              key={item.id}
+                              item={item}
+                              href={`/promises/${item.id}?from=dashboard`}
+                              metaText={getMetaText(item)}
+                              statusLabels={statusLabels}
+                            />
+                          ))}
                         </div>
                       )}
-
-                      <div className="mt-2 text-sm">
-                        {reputationLoading || recentLoading ? (
-                          <div className="space-y-2">
-                            {[1, 2, 3].map((i) => (
-                              <div key={i} className="h-[52px] animate-pulse rounded-xl bg-white/5" />
-                            ))}
-                          </div>
-                        ) : recentDeals.length === 0 ? (
-                          <div className="rounded-xl bg-white/[0.03] px-3 py-3 text-xs text-slate-400">
-                            {copy.recentDeals.empty}
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-white/10">
-                            {recentDealsLimited.map((item) => (
-                              <DealRow
-                                key={item.id}
-                                item={item}
-                                href={`/promises/${item.id}?from=dashboard`}
-                                metaText={getMetaText(item)}
-                                statusLabels={statusLabels}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
