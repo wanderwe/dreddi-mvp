@@ -41,6 +41,8 @@ export type LandingCopy = {
   };
   score: {
     label: string;
+    shortLabel: string;
+    overviewLabel: string;
     live: string;
     signIn: string;
     cards: {
