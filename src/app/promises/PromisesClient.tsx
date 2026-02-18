@@ -46,6 +46,15 @@ type PromiseRow = {
 };
 
 type TabKey = "i-promised" | "promised-to-me";
+const isTabKey = (value: string | null): value is TabKey =>
+  value === "i-promised" || value === "promised-to-me";
+
+const normalizeTabParam = (value: string | null): TabKey => {
+  if (value === "i-am-executor") return "i-promised";
+  if (isTabKey(value)) return value;
+  return "i-promised";
+};
+
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
 type PromiseRoleBase = Pick<
   PromiseRow,
@@ -116,7 +125,7 @@ export default function PromisesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const tab = normalizeTabParam(searchParams.get("tab"));
   const filterParam = searchParams.get("filter");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
