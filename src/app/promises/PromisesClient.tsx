@@ -739,8 +739,7 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const canShowReminder =
-                  canSendReminder(p, userId) && !isAwaitingYourAction(p);
+                const canShowReminder = canSendReminder(p, userId);
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
