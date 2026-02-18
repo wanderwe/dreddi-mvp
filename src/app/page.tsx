@@ -496,30 +496,47 @@ export default function Home() {
         <div className="flex-1">
           <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
+            <div
+              className="pointer-events-none absolute inset-0 rounded-3xl"
+              style={{
+                background:
+                  "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 35%, rgba(255,255,255,0) 60%)",
+              }}
+              aria-hidden
+            />
             <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 {email ? (
-                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                    <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
                     {copy.score.live}
                   </span>
                 ) : (
-                  <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
                     {copy.score.signIn}
                   </span>
                 )}
               </div>
 
               <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.1em] text-slate-400/90">
+                <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-slate-400/90">
                   {copy.score.overviewLabel}
                 </p>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 sm:px-5 sm:py-3 md:px-4 md:py-3">
+                <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
+                  <div className="pointer-events-none absolute -left-16 top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-emerald-300/8 blur-3xl" aria-hidden />
                   <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
-                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
-                        {reputationLoading ? copy.loading.short : score}
+                      <div className="relative mt-1 text-[2.1rem] font-semibold leading-none text-white sm:text-[2.35rem]">
+                        <span
+                          className="pointer-events-none absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/15 blur-2xl"
+                          aria-hidden
+                        />
+                        <span className="relative bg-gradient-to-b from-white to-slate-200/85 bg-clip-text text-transparent">
+                          {reputationLoading ? copy.loading.short : score}
+                        </span>
                       </div>
                     </div>
 

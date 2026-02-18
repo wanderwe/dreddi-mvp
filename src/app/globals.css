@@ -83,8 +83,29 @@ textarea:autofill:focus {
       rgba(255, 255, 255, 0.02)
     ),
     rgba(7, 10, 16, 0.7);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 26px 52px rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(15px);
+}
+
+.score-metrics-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.status-pulse-dot {
+  animation: status-dot-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes status-dot-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 rgba(110, 231, 183, 0.25);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 6px rgba(110, 231, 183, 0);
+  }
 }
 
 .hero-grid {
