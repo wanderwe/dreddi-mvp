@@ -14,7 +14,9 @@ import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
-import { getActionQueueState } from "@/lib/actionQueue";
+import { isAwaitingYourAction } from "@/lib/promiseActions";
+import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   buildAuthState,
   getAuthState,
@@ -79,37 +81,33 @@ export function AppHeader() {
       const { data, error } = await client
         .from("promises")
         .select(
-          "id,status,due_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+          "status,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
         )
         .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`);
 
       if (!active || error) return;
-      const now = new Date();
-      const count = (data ?? []).filter((row) => getActionQueueState(row, userId, now)).length;
+
+      const count = (data ?? []).filter((row) => {
+        const executorId = resolveExecutorId(row);
+        const role = executorId && executorId === userId ? "promisor" : "counterparty";
+        const isReviewer = executorId !== userId;
+        const inviteStatus = getPromiseInviteStatus(row);
+
+        return isAwaitingYourAction({
+          status: row.status,
+          role,
+          inviteStatus,
+          isReviewer,
+        });
+      }).length;
+
       setActionQueueCount(count);
-      window.localStorage.setItem("dreddi_action_queue_count", String(count));
     };
 
-    const loadCachedCount = () => {
-      const cached = window.localStorage.getItem("dreddi_action_queue_count");
-      if (!cached) return;
-      const parsed = Number(cached);
-      if (!Number.isNaN(parsed)) setActionQueueCount(parsed);
-    };
-
-    const onQueueUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent<{ count?: number }>;
-      const count = customEvent.detail?.count;
-      if (typeof count === "number") setActionQueueCount(count);
-    };
-
-    loadCachedCount();
     void syncCount();
-    window.addEventListener("dreddi:action-queue-updated", onQueueUpdate as EventListener);
 
     return () => {
       active = false;
-      window.removeEventListener("dreddi:action-queue-updated", onQueueUpdate as EventListener);
     };
   }, [authState.isLoggedIn, authState.user]);
 
@@ -150,7 +148,7 @@ export function AppHeader() {
                   </Link>
                   {actionQueueCount > 0 && (
                     <Link
-                      href="/promises#action-queue"
+                      href="/promises?filter=awaiting_my_action"
                       className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100"
                     >
                       {t("nav.actionQueueBadge")}

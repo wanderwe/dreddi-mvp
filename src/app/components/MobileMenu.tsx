@@ -56,7 +56,7 @@ export function MobileMenu({ isAuthenticated = false, actionQueueCount = 0 }: Mo
                 </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
-                    <Link className={baseLinkClasses} href="/promises#action-queue">
+                    <Link className={baseLinkClasses} href="/promises?filter=awaiting_my_action">
                       {t("nav.actionQueueBadge")} ({actionQueueCount})
                     </Link>
                   </SheetClose>
