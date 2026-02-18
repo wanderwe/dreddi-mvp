@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -153,6 +154,18 @@ export default function PromisesClient() {
     if (status === "disputed") return t("promises.status.disputed");
 
     return status;
+  };
+
+  const statusPillFor = (
+    status: PromiseStatus,
+    uiStatus: PromiseUiStatus
+  ): { tone: StatusPillTone; icon: "check" | "clock" | "warning" } => {
+    if (status === "confirmed") return { tone: "success", icon: "check" };
+    if (status === "disputed" || uiStatus === "declined") return { tone: "danger", icon: "warning" };
+    if (status === "completed_by_promisor" || uiStatus === "ignored") {
+      return { tone: "attention", icon: "warning" };
+    }
+    return { tone: "neutral", icon: "clock" };
   };
 
   const [summaryRows, setSummaryRows] = useState<PromiseSummary[]>([]);
@@ -750,6 +763,7 @@ export default function PromisesClient() {
                   : t("promises.list.reminder.tooltip");
 
                 const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
+                const statusPill = statusPillFor(p.status, p.uiStatus);
 
                 const busy = busyMap[p.id];
                 const dealMeta = isDeclined
@@ -780,10 +794,13 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        <div className="flex items-center justify-end gap-2">
-                          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                            {statusLabel}
-                          </span>
+                        <div className="flex items-center justify-end gap-2.5">
+                          <StatusPill
+                            label={statusLabel}
+                            tone={statusPill.tone}
+                            icon={statusPill.icon}
+                            className="shrink-0"
+                          />
 
                           {canSendReminder && (
                             <Tooltip label={reminderTooltip} placement="top">

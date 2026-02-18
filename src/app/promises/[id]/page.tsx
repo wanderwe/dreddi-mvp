@@ -16,6 +16,7 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 
 type PromiseRow = {
   id: string;
@@ -63,36 +64,28 @@ function Card({
   );
 }
 
-function StatusPill({ status }: { status: PromiseUiStatus }) {
-  const t = useT();
-  const labelMap: Record<PromiseUiStatus, string> = {
-    active: t("promises.status.active"),
-    completed_by_promisor: t("promises.status.pendingConfirmation"),
-    confirmed: t("promises.status.confirmed"),
-    disputed: t("promises.status.disputed"),
-    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
-    declined: t("promises.inviteStatus.declined"),
-    ignored: t("promises.inviteStatus.ignored"),
-  };
 
-  const colorMap: Record<PromiseUiStatus, string> = {
-    active: "border-neutral-700 text-neutral-200 bg-white/0",
-    confirmed: "border-emerald-700/60 text-emerald-200 bg-emerald-500/10",
-    disputed: "border-red-700/60 text-red-200 bg-red-500/10",
-    completed_by_promisor: "border-amber-500/40 text-amber-100 bg-amber-500/10",
-    awaiting_acceptance: "border-slate-700/60 text-slate-200 bg-slate-500/10",
-    declined: "border-red-700/60 text-red-200 bg-red-500/10",
-    ignored: "border-amber-500/40 text-amber-100 bg-amber-500/10",
-  };
 
-  return (
-    <span
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${colorMap[status] ?? "border-neutral-700 bg-white/0 text-white"}`}
-    >
-      {labelMap[status] ?? status}
-    </span>
-  );
-}
+
+const promiseStatusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
+  active: "neutral",
+  completed_by_promisor: "attention",
+  confirmed: "success",
+  disputed: "danger",
+  awaiting_acceptance: "neutral",
+  declined: "danger",
+  ignored: "attention",
+};
+
+const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning"> = {
+  active: "clock",
+  completed_by_promisor: "warning",
+  confirmed: "check",
+  disputed: "warning",
+  awaiting_acceptance: "clock",
+  declined: "warning",
+  ignored: "warning",
+};
 
 function ActionButton({
   label,
@@ -495,6 +488,16 @@ export default function PromisePage() {
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
   const uiStatus = p ? getPromiseUiStatus(p) : null;
+  const statusLabelMap: Record<PromiseUiStatus, string> = {
+    active: t("promises.status.active"),
+    completed_by_promisor: t("promises.status.pendingConfirmation"),
+    confirmed: t("promises.status.confirmed"),
+    disputed: t("promises.status.disputed"),
+    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    declined: t("promises.inviteStatus.declined"),
+    ignored: t("promises.inviteStatus.ignored"),
+  };
+  const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
@@ -524,7 +527,7 @@ export default function PromisePage() {
         >
           {backLink.label}
         </Link>
-        <div className="flex items-center gap-3">{uiStatus && <StatusPill status={uiStatus} />}</div>
+        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} />}</div>
       </div>
 
       {error && (
