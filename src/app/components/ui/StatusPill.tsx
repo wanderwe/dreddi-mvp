@@ -11,13 +11,13 @@ type StatusPillProps = {
 };
 
 const toneClassMap: Record<StatusPillTone, string> = {
-  success: "bg-emerald-400/12 text-emerald-100 ring-1 ring-inset ring-emerald-300/20",
-  attention: "bg-amber-400/14 text-amber-100 ring-1 ring-inset ring-amber-300/25",
-  neutral: "bg-slate-200/10 text-slate-200 ring-1 ring-inset ring-white/10",
-  danger: "bg-red-400/12 text-red-100 ring-1 ring-inset ring-red-300/20",
+  success: "bg-emerald-300/14 text-emerald-50 ring-1 ring-inset ring-emerald-200/15",
+  attention: "bg-amber-200/12 text-amber-50 ring-1 ring-inset ring-amber-200/15",
+  neutral: "bg-slate-200/12 text-slate-100 ring-1 ring-inset ring-white/10",
+  danger: "bg-rose-300/14 text-rose-50 ring-1 ring-inset ring-rose-200/15",
 };
 
-const iconClassName = "h-3.5 w-3.5 text-current opacity-70";
+const iconClassName = "h-3.5 w-3.5 text-current opacity-65";
 
 function Icon({ icon }: { icon: NonNullable<StatusPillProps["icon"]> }) {
   if (icon === "check") return <Check className={iconClassName} aria-hidden="true" />;
@@ -29,7 +29,7 @@ export function StatusPill({ label, tone = "neutral", icon, className }: StatusP
   return (
     <span
       className={cn(
-        "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-semibold leading-none",
+        "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium leading-none",
         toneClassMap[tone],
         className
       )}

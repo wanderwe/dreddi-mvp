@@ -13,7 +13,7 @@ export type IconButtonProps = {
 };
 
 const baseClasses =
-  "relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-200 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+  "relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-200/80 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
 export function IconButton({
   icon,
