@@ -494,9 +494,9 @@ export default function Home() {
         </div>
 
         <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 p-7 sm:p-8">
+          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
-            <div className="relative flex flex-col gap-6">
+            <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 {email ? (
@@ -510,30 +510,35 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 sm:px-5 sm:py-4 md:px-4 md:py-3">
-                <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
-                  <div className="py-2 sm:px-4 sm:py-1">
-                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
-                    <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
-                      {reputationLoading ? copy.loading.short : score}
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.1em] text-slate-400/90">
+                  {copy.score.overviewLabel}
+                </p>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 sm:px-5 sm:py-3 md:px-4 md:py-3">
+                  <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                    <div className="py-2 sm:px-4 sm:py-1">
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
+                        {reputationLoading ? copy.loading.short : score}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="py-2 sm:px-4 sm:py-1">
-                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
-                      {copy.score.cards.confirmed}
+                    <div className="py-2 sm:px-4 sm:py-1">
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                        {copy.score.cards.confirmed}
+                      </div>
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                        {reputationLoading ? copy.loading.placeholder : confirmedCount}
+                      </div>
                     </div>
-                    <div className="mt-1 text-3xl font-semibold leading-none text-white">
-                      {reputationLoading ? copy.loading.placeholder : confirmedCount}
-                    </div>
-                  </div>
 
-                  <div className="py-2 sm:px-4 sm:py-1">
-                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
-                      {copy.score.cards.disputed}
-                    </div>
-                    <div className="mt-1 text-3xl font-semibold leading-none text-white">
-                      {reputationLoading ? copy.loading.placeholder : disputedCount}
+                    <div className="py-2 sm:px-4 sm:py-1">
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                        {copy.score.cards.disputed}
+                      </div>
+                      <div className="mt-1 text-3xl font-semibold leading-none text-white">
+                        {reputationLoading ? copy.loading.placeholder : disputedCount}
+                      </div>
                     </div>
                   </div>
                 </div>
