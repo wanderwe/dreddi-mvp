@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
-import { getNextActionOwner, resolveNextActionOwnerId } from "@/lib/promiseNextAction";
+import { canSendReminder, resolveNextActionOwnerId } from "@/lib/promiseNextAction";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -159,12 +159,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
 
     const isActive = promise.status === "active";
-    const nextActionOwner = getNextActionOwner(promise, user.id);
-    if (nextActionOwner === "none") {
-      return errorResponse(400, "reminder_participants_invalid", "Deal participants are invalid");
-    }
-
-    if (nextActionOwner === "me") {
+    if (!canSendReminder(promise, user.id)) {
       return errorResponse(
         403,
         "reminder_forbidden",

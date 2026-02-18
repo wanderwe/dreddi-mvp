@@ -31,3 +31,9 @@ export function getNextActionOwner(
   return nextActionOwnerId === currentUserId ? "me" : "other";
 }
 
+export function canSendReminder(
+  promise: PromiseForNextAction,
+  currentUserId: string | null | undefined
+): boolean {
+  return getNextActionOwner(promise, currentUserId) === "other";
+}

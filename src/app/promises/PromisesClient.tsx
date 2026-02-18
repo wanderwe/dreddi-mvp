@@ -12,7 +12,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
-import { getNextActionOwner } from "@/lib/promiseNextAction";
+import { canSendReminder } from "@/lib/promiseNextAction";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import {
   getPromiseInviteStatus,
@@ -739,7 +739,8 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const canSendReminder = getNextActionOwner(p, userId) === "other";
+                const canShowReminder =
+                  canSendReminder(p, userId) && !isAwaitingYourAction(p);
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
@@ -775,7 +776,7 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        {canSendReminder && (
+                        {canShowReminder && (
                           <div className="flex flex-col items-end gap-1">
                             <button
                               type="button"
