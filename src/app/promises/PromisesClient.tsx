@@ -55,6 +55,8 @@ type PromiseRoleBase = Pick<
   | "accepted_at"
   | "declined_at"
   | "ignored_at"
+  | "due_at"
+  | "title"
   | "creator_id"
   | "promisor_id"
   | "promisee_id"
@@ -66,6 +68,7 @@ type PromiseWithRole = PromiseRow & {
   uiStatus: PromiseUiStatus;
   isReviewer: boolean;
 };
+
 type PromiseSummary = PromiseRoleBase & {
   role: PromiseRole;
   inviteStatus: InviteStatus;
@@ -112,6 +115,11 @@ export default function PromisesClient() {
   const searchParams = useSearchParams();
 
   const tab: TabKey = (searchParams.get("tab") as TabKey) ?? "i-promised";
+  const filterParam = searchParams.get("filter");
+  const metricFromSearch: MetricFilter =
+    filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
+      ? filterParam
+      : "total";
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -168,7 +176,7 @@ export default function PromisesClient() {
   const [reminderInfoByDeal, setReminderInfoByDeal] = useState<Record<string, ReminderInfo>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>("total");
+  const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -210,7 +218,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,status,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -353,6 +361,10 @@ export default function PromisesClient() {
   }, [toast]);
 
   useEffect(() => {
+    setActiveMetricFilter(metricFromSearch);
+  }, [metricFromSearch]);
+
+  useEffect(() => {
     if (listLoading) return;
     const sourceRows = listRowsByTab[tab] ?? [];
     const filteredRows =
@@ -482,6 +494,16 @@ export default function PromisesClient() {
   }, [summaryRows]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("dreddi_awaiting_action_count", String(overview.awaitingYou));
+    window.dispatchEvent(
+      new CustomEvent("dreddi:awaiting-actions-updated", {
+        detail: { count: overview.awaitingYou },
+      })
+    );
+  }, [overview.awaitingYou]);
+
+  useEffect(() => {
     const categorizedTotal = roleCounts.promisor + roleCounts.counterparty;
     if (
       process.env.NODE_ENV !== "production" &&
@@ -500,6 +522,20 @@ export default function PromisesClient() {
     roleCounts.uncategorized,
     filteredSummaryRows.length,
   ]);
+
+  useEffect(() => {
+    if (listLoading) return;
+    if (activeMetricFilter !== "awaiting_my_action") return;
+
+    const currentCount = filteredListRowsByTab[tab]?.length ?? 0;
+    if (currentCount > 0) return;
+
+    const fallbackTab: TabKey = tab === "i-promised" ? "promised-to-me" : "i-promised";
+    const fallbackCount = filteredListRowsByTab[fallbackTab]?.length ?? 0;
+    if (fallbackCount > 0) {
+      setTab(fallbackTab);
+    }
+  }, [activeMetricFilter, filteredListRowsByTab, listLoading, tab]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
@@ -562,9 +598,13 @@ export default function PromisesClient() {
     "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
   const handleMetricClick = (next: MetricFilter) => {
-    setActiveMetricFilter((current) =>
-      current === next && next !== "total" ? "total" : next
-    );
+    const resolved = activeMetricFilter === next && next !== "total" ? "total" : next;
+    setActiveMetricFilter(resolved);
+
+    const sp = new URLSearchParams(searchParams.toString());
+    if (resolved === "total") sp.delete("filter");
+    else sp.set("filter", resolved);
+    router.push(`/promises?${sp.toString()}`);
   };
 
   return (
@@ -698,7 +738,7 @@ export default function PromisesClient() {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
-                const canSendReminder = canReview && p.status === "active" && acceptedBySecondSide;
+                const canSendReminder = canReview && ((p.status === "active" && acceptedBySecondSide) || p.status === "completed_by_promisor");
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
@@ -746,9 +786,9 @@ export default function PromisesClient() {
                                 ? t("promises.list.reminder.sending")
                                 : t("promises.list.reminder.button")}
                             </button>
-                            {reminderInfo.count > 0 && (
+                            {reminderInfo.lastSentAt && (
                               <div className="text-[11px] text-slate-400">
-                                {t("promises.list.reminder.count", { count: reminderInfo.count })}
+                                {t("promises.list.reminder.last", { date: new Date(reminderInfo.lastSentAt).toLocaleString(locale) })}
                               </div>
                             )}
                           </div>
