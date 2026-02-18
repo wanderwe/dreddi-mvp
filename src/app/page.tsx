@@ -498,10 +498,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div className="relative flex flex-col gap-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <DreddiLogoMark className="h-10 w-10" />
-                  <p className="text-sm text-slate-300">{copy.score.label}</p>
-                </div>
+                <DreddiLogoMark className="h-10 w-10" />
                 {email ? (
                   <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
                     {copy.score.live}
@@ -516,7 +513,7 @@ export default function Home() {
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 sm:px-5 sm:py-4 md:px-4 md:py-3">
                 <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                   <div className="py-2 sm:px-4 sm:py-1">
-                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.label}</div>
+                    <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
                     <div className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]">
                       {reputationLoading ? copy.loading.short : score}
                     </div>

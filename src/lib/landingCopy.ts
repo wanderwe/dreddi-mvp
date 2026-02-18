@@ -40,6 +40,7 @@ export type LandingCopy = {
   };
   score: {
     label: string;
+    shortLabel: string;
     live: string;
     signIn: string;
     cards: {
@@ -133,6 +134,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     score: {
       label: "Репутаційний бал",
+      shortLabel: "Бал",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення наживо",
       cards: {
@@ -224,6 +226,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     score: {
       label: "Reputation score",
+      shortLabel: "Score",
       live: "Live",
       signIn: "Sign in to see live updates",
       cards: {
