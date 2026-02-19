@@ -449,11 +449,14 @@ export default function Home() {
       : null;
   const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
-  const onTimeLineValue = hasDueDateDeals
-    ? reputationLoading
-      ? copy.loading.placeholder
-      : onTimeSummary
-    : "—";
+  const demoOnTimePercentage = 100;
+  const onTimeLineValue = !isAuthenticated
+    ? `${demoOnTimePercentage}%`
+    : hasDueDateDeals
+      ? reputationLoading
+        ? copy.loading.placeholder
+        : onTimeSummary
+      : "—";
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
@@ -463,7 +466,7 @@ export default function Home() {
     text.split("\n").map((line, index, lines) => (
       <span
         key={`${line}-${index}`}
-        className={index === 0 ? "block" : "mt-1 block"}
+        className={index === 0 ? "block" : "mt-0.5 block"}
       >
         {line}
       </span>
@@ -497,26 +500,31 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
-            <div className="flex items-center gap-4 sm:gap-5">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
-                  Dreddi
-                </span>
-                <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
-                  {t("landing.hero.brandSuffix")}
-                </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
-                />
+          <div className="order-1 rounded-3xl border border-white/10 bg-white/[0.02] p-5 shadow-[0_16px_40px_rgba(7,20,36,0.35)] backdrop-blur-sm sm:p-6 md:max-w-[40rem]">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-emerald-200/80">
+              {copy.hero.eyebrow}
+            </p>
+            <div className="mt-3 flex items-start gap-4 sm:gap-5">
+              <DreddiLogoMark className="h-12 w-12 shrink-0 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
+              <div className="space-y-2">
+                <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
+                  <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
+                    Dreddi
+                  </span>
+                  <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
+                    {t("landing.hero.brandSuffix")}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
+                  />
+                </div>
+                <p className="max-w-xl text-sm font-medium text-slate-300 sm:text-base">
+                  {copy.hero.headline}
+                </p>
               </div>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
-              {copy.hero.headline}
-            </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
