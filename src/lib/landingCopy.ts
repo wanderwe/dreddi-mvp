@@ -6,21 +6,21 @@ export type LandingCopy = {
     description: string;
   };
   useDreddi: {
-    label: string;
+    eyebrow: string;
     title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
-  };
-  reputation: {
-    label: string;
-    title: string;
-    steps: string[];
-    outcomeTitle: string;
-    outcomeDescription: string;
-    cta: string;
+    subtitle: string;
+    steps: {
+      title: string;
+      description: string;
+    }[];
+    demoStatus: string;
+    demoDealLabel: string;
+    demoReminder: string;
+    demoConfirmed: string;
+    demoDelta: string;
+    demoProfileAdded: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
   };
   cta: {
     getStarted: string;
@@ -85,37 +85,31 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.",
     },
     useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
-      ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
-      ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
-    },
-    reputation: {
-      label: "Результат",
-      title: "Репутація будується виконанням",
+      eyebrow: "Як це працює",
+      title: "Домовленість — не просто слова",
+      subtitle: "Зафіксували → нагадали → підтвердили → результат видно",
       steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+        {
+          title: "Домовились",
+          description: "Дедлайн “на словах” швидко плутається",
+        },
+        {
+          title: "Зафіксували в Dreddi",
+          description: "Дата + нагадування обом",
+        },
+        {
+          title: "Підтвердили результат",
+          description: "Обидві сторони підтверджують — і це видно в профілі",
+        },
       ],
-      outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
-      cta: "Переглянути приклад профілю",
+      demoStatus: "Очікує підтвердження",
+      demoDealLabel: "Домовленість",
+      demoReminder: "Нагадування завтра",
+      demoConfirmed: "Підтверджено",
+      demoDelta: "+1 підтверджено",
+      demoProfileAdded: "Додано в профіль",
+      ctaPrimary: "Створити домовленість",
+      ctaSecondary: "Подивитись приклад профілю",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -178,37 +172,31 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.",
     },
     useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
-      ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
-      ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
-    },
-    reputation: {
-      label: "Outcome",
-      title: "Reputation is built by execution",
+      eyebrow: "How it works",
+      title: "An agreement is more than words",
+      subtitle: "Record → remind → confirm → visible result",
       steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
+        {
+          title: "You agreed",
+          description: "A deadline “on words” quickly gets blurry",
+        },
+        {
+          title: "Recorded in Dreddi",
+          description: "Date + reminders for both",
+        },
+        {
+          title: "Confirmed the outcome",
+          description: "Both sides confirm — and it appears on profile",
+        },
       ],
-      outcomeTitle: "Public profile",
-      outcomeDescription: "Shows confirmed and disputed deals",
-      cta: "View example profile",
+      demoStatus: "Awaiting confirmation",
+      demoDealLabel: "Agreement",
+      demoReminder: "Reminder tomorrow",
+      demoConfirmed: "Confirmed",
+      demoDelta: "+1 confirmed",
+      demoProfileAdded: "Added to profile",
+      ctaPrimary: "Create an agreement",
+      ctaSecondary: "View example profile",
     },
     cta: {
       getStarted: "Create a deal",
