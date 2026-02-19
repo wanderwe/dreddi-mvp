@@ -442,6 +442,11 @@ export default function Home() {
   const confirmedCount = rep?.confirmed_count ?? 0;
   const confirmedWithDeadlineCount = rep?.confirmed_with_deadline_count ?? 0;
   const disputedCount = rep?.disputed_count ?? 0;
+  const demoMetrics = {
+    score: 78,
+    confirmed: 24,
+    disputed: 1,
+  };
   const onTimeCount = rep?.on_time_count ?? 0;
   const onTimePercentage =
     confirmedWithDeadlineCount > 0
@@ -456,6 +461,9 @@ export default function Home() {
       : hasDueDateDeals
         ? onTimeSummary
         : copy.score.onTime.empty;
+  const scoreValue = !isAuthenticated ? demoMetrics.score : score;
+  const confirmedValue = !isAuthenticated ? demoMetrics.confirmed : confirmedCount;
+  const disputedValue = !isAuthenticated ? demoMetrics.disputed : disputedCount;
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
@@ -577,11 +585,6 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 <div className="flex items-center gap-2">
-                  {!isAuthenticated ? (
-                    <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
-                      {copy.score.demoBadge}
-                    </span>
-                  ) : null}
                   {email ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
                       <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
@@ -597,7 +600,7 @@ export default function Home() {
               </div>
 
               <div>
-                <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-slate-400/90">
+                <p className="mb-1.5 text-sm font-medium text-slate-300/95">
                   {copy.score.overviewLabel}
                 </p>
                 <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
@@ -606,7 +609,7 @@ export default function Home() {
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={score}
+                        value={scoreValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]"
                       />
                     </div>
@@ -617,7 +620,7 @@ export default function Home() {
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={confirmedCount}
+                        value={confirmedValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white"
                       />
                     </div>
@@ -628,7 +631,7 @@ export default function Home() {
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={disputedCount}
+                        value={disputedValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white"
                       />
                     </div>
