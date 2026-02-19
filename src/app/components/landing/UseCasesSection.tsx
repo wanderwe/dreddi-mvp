@@ -44,13 +44,9 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
       <div className="relative space-y-10 sm:space-y-14">
         <div className="space-y-3 text-center">
-          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-300 sm:text-sm">
-            {copy.label}
-          </span>
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">
             {copy.title}
           </h2>
-          <p className="text-base text-slate-300 sm:text-lg">{copy.subtitle}</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">

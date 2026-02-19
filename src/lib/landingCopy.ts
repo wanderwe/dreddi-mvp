@@ -6,9 +6,7 @@ export type LandingCopy = {
     description: string;
   };
   useDreddi: {
-    label: string;
     title: string;
-    subtitle: string;
     beforeTitle: string;
     beforeBullets: string[];
     afterTitle: string;
@@ -91,15 +89,13 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.",
     },
     useDreddi: {
-      label: "Ситуація",
-      title: "Коли домовленість лише на словах",
-      subtitle: "Знайомо?",
+      title: "Коли домовленість — це просто слова",
       beforeTitle: "Без фіксації",
       beforeBullets: [
         "Дедлайн “на словах”",
-        "Ніхто нічого не памʼятає",
+        "Ніхто нічого не пам’ятає",
         "Починається “я думав ти…”",
-        "Неприємне відчуття, що все розплилось",
+        "Це тихо переростає в конфлікт",
       ],
       afterTitle: "Коли домовленість зафіксована в Dreddi",
       afterBullets: [
@@ -188,15 +184,13 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.",
     },
     useDreddi: {
-      label: "Situation",
       title: "When an agreement is just words",
-      subtitle: "Recognize this?",
       beforeTitle: "Without recording",
       beforeBullets: [
         "Deadline “on words”",
         "No one remembers clearly",
         "It turns into “I thought you…”",
-        "Awkward tension",
+        "It quietly turns into conflict",
       ],
       afterTitle: "When it’s recorded in Dreddi",
       afterBullets: [
