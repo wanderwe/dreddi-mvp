@@ -115,7 +115,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Підтвердження формують репутаційний бал",
       ],
       outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
+      outcomeDescription: "Відображає дотримані та оскаржені угоди",
       cta: "Переглянути приклад профілю",
     },
     cta: {
@@ -142,12 +142,12 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Увійдіть, щоб бачити оновлення",
       demoBadge: "Приклад профілю",
       cards: {
-        confirmed: "Підтверджено",
+        confirmed: "Дотримано",
         disputed: "Оскаржено",
       },
       onTime: {
         label: "Вчасні виконання",
-        helper: "Тут враховуються лише підтверджені угоди зі строком",
+        helper: "Тут враховуються лише дотримані угоди зі строком",
         empty: "Ще немає даних",
       },
     },
@@ -166,7 +166,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Активна",
         completedByPromisor: "Очікує перегляду",
-        confirmed: "Підтверджено",
+        confirmed: "Дотримано",
         disputed: "Оскаржено",
         declined: "Відхилено",
       },
@@ -209,7 +209,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Confirmations build the reputation score",
       ],
       outcomeTitle: "Public profile",
-      outcomeDescription: "Shows confirmed and disputed deals",
+      outcomeDescription: "Shows fulfilled and disputed deals",
       cta: "View example profile",
     },
     cta: {
@@ -236,12 +236,12 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Sign in to see updates",
       demoBadge: "Demo profile",
       cards: {
-        confirmed: "Confirmed",
+        confirmed: "Fulfilled",
         disputed: "Disputed",
       },
       onTime: {
         label: "On-time outcomes",
-        helper: "Only confirmed deals with a due date count here",
+        helper: "Only fulfilled deals with a due date count here",
         empty: "No data yet",
       },
     },
@@ -260,7 +260,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Active",
         completedByPromisor: "Awaiting review",
-        confirmed: "Confirmed",
+        confirmed: "Fulfilled",
         disputed: "Disputed",
         declined: "Declined",
       },
