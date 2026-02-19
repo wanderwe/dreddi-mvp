@@ -22,16 +22,6 @@ export type LandingCopy = {
     ctaPrimary: string;
     ctaSecondary: string;
   };
-  reputation: {
-    label: string;
-    title: string;
-    subtitle: string;
-    bullets: string[];
-    cardMicrocopy: string;
-    cardLabel: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
-  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -121,20 +111,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       ctaPrimary: "Створити домовленість",
       ctaSecondary: "Подивитись приклад профілю",
     },
-    reputation: {
-      label: "Перевірка",
-      title: "Працюйте з тими, хто виконує",
-      subtitle: "Профіль показує реальну історію підтверджених та оскаржених домовленостей",
-      bullets: [
-        "Історія виконання — не обіцянки",
-        "Підтверджені та оскаржені результати",
-        "Швидше рішення: довіряти чи ні",
-      ],
-      cardMicrocopy: "Історія виконання — в одному місці",
-      cardLabel: "Публічний профіль",
-      ctaPrimary: "Переглянути приклад профілю",
-      ctaSecondary: "Переглянути угоди",
-    },
     cta: {
       getStarted: "Створити угоду",
       publicProfiles: "Переглянути публічні профілі",
@@ -221,20 +197,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       demoProfileAdded: "Added to profile",
       ctaPrimary: "Create an agreement",
       ctaSecondary: "View example profile",
-    },
-    reputation: {
-      label: "Verification",
-      title: "Work with people who follow through",
-      subtitle: "A profile shows a real history of confirmed and disputed agreements",
-      bullets: [
-        "Delivery history — not promises",
-        "Confirmed and disputed outcomes",
-        "Decide faster: trust or not",
-      ],
-      cardMicrocopy: "Delivery history in one place",
-      cardLabel: "Public profile",
-      ctaPrimary: "View example profile",
-      ctaSecondary: "View deals",
     },
     cta: {
       getStarted: "Create a deal",

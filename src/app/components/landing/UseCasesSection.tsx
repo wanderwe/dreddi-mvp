@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Bell } from "lucide-react";
+import { StatusPill } from "@/app/components/ui/StatusPill";
 
 import type { LandingCopy } from "@/lib/landingCopy";
 
@@ -10,13 +11,13 @@ type UseCasesSectionProps = {
 
 export function UseCasesSection({ copy, scoreCopy }: UseCasesSectionProps) {
   return (
-    <section className="relative mx-auto -mt-8 w-full max-w-6xl px-4 pb-16 sm:-mt-12 sm:px-6 sm:pb-20">
+    <section className="relative mx-auto -mt-8 w-full max-w-6xl px-4 pb-20 sm:-mt-12 sm:px-6 sm:pb-24">
       <div
         className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-emerald-500/20 via-emerald-500/5 to-transparent blur-3xl"
         aria-hidden
       />
 
-      <div className="relative space-y-8 sm:space-y-10">
+      <div className="relative space-y-10 sm:space-y-12">
         <div className="space-y-3 text-center sm:text-left">
           <span className="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
             {copy.eyebrow}
@@ -46,7 +47,12 @@ export function UseCasesSection({ copy, scoreCopy }: UseCasesSectionProps) {
             <div className="rounded-2xl border border-white/10 bg-slate-900/75 p-3.5">
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>Dreddi</span>
-                <span className="text-amber-100">{copy.demoStatus}</span>
+                <StatusPill
+                  label={copy.demoStatus}
+                  tone="attention"
+                  marker="none"
+                  className="px-2 py-0.5 text-[11px]"
+                />
               </div>
               <div className="mt-2.5 flex items-center justify-between text-sm text-slate-100">
                 <span className="font-medium">25.04 · 19:00</span>
@@ -60,10 +66,12 @@ export function UseCasesSection({ copy, scoreCopy }: UseCasesSectionProps) {
             </div>
 
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-slate-200">
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-200" />
-                {copy.demoConfirmed}
-              </span>
+              <StatusPill
+                label={copy.demoConfirmed}
+                tone="success"
+                marker="none"
+                className="px-2 py-0.5 text-[11px]"
+              />
               <span className="text-emerald-200">{copy.demoDelta}</span>
             </div>
 
