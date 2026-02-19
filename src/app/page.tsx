@@ -570,7 +570,7 @@ export default function Home() {
 
         </div>
 
-        <div className="flex-1">
+        <div className="relative flex-1 pb-6">
           <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
@@ -651,14 +651,7 @@ export default function Home() {
 
                 <div>
                   <div className="flex items-center justify-between text-sm text-slate-300">
-                    <div className="flex items-center gap-2">
-                      <span>{recentDealsTitle}</span>
-                      {!isAuthenticated ? (
-                        <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-400 ring-1 ring-white/10">
-                          {copy.score.demoBadge}
-                        </span>
-                      ) : null}
-                    </div>
+                    <span>{recentDealsTitle}</span>
                     <Link
                       href={recentDealsHref}
                       className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
@@ -718,6 +711,11 @@ export default function Home() {
                 </div>
             </div>
           </div>
+          {!isAuthenticated ? (
+            <span className="pointer-events-none absolute bottom-0 right-4 inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-400 ring-1 ring-white/10">
+              {copy.score.demoBadge}
+            </span>
+          ) : null}
         </div>
       </div>
 
