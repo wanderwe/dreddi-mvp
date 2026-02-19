@@ -5,22 +5,40 @@ export type LandingCopy = {
     headline: string;
     description: string;
   };
-  useDreddi: {
-    label: string;
-    title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
-  };
-  reputation: {
-    label: string;
-    title: string;
-    steps: string[];
-    outcomeTitle: string;
-    outcomeDescription: string;
-    cta: string;
+  sections: {
+    situation: {
+      label: string;
+      title: string;
+      triggers: string[];
+      clearTitle: string;
+      clearBullets: string[];
+    };
+    howItWorks: {
+      label: string;
+      title: string;
+      steps: string[];
+      exampleProfileCta: string;
+      previewDealTitle: string;
+      previewDealStatus: string;
+      previewDealMeta: string;
+      previewReminderTitle: string;
+      previewReminderTag: string;
+      previewReminderMeta: string;
+      previewOutcomeTitle: string;
+      previewOutcomeStatus: string;
+      previewOutcomeMeta: string;
+    };
+    trustCheck: {
+      label: string;
+      title: string;
+      lead: string;
+      bullets: string[];
+      profilePreviewLabel: string;
+      profilePreviewScore: string;
+      profilePreviewConfirmed: string;
+      profilePreviewDisputed: string;
+      exampleProfileCta: string;
+    };
   };
   cta: {
     getStarted: string;
@@ -84,38 +102,58 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
     },
-    useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
-      ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
-      ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
-    },
-    reputation: {
-      label: "Результат",
-      title: "Репутація будується виконанням",
-      steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
-      ],
-      outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
-      cta: "Переглянути приклад профілю",
+    sections: {
+      situation: {
+        label: "Ситуація",
+        title: "Знайомо?",
+        triggers: [
+          "Дедлайн “на словах”",
+          "Ніхто нічого не памʼятає",
+          "Починається “я думав ти…”",
+          "Це тихо переростає в конфлікт",
+        ],
+        clearTitle: "Коли це зафіксовано в Dreddi",
+        clearBullets: [
+          "Є дата",
+          "Нагадування обом",
+          "Обидві сторони підтверджують",
+          "Результат видно",
+        ],
+      },
+      howItWorks: {
+        label: "Як це працює",
+        title: "Домовились — і це не губиться",
+        steps: [
+          "Записали домовленість",
+          "Нагадування обом",
+          "Підтвердили результат",
+        ],
+        exampleProfileCta: "Переглянути приклад профілю",
+        previewDealTitle: "Оновити брендбук",
+        previewDealStatus: "Активна",
+        previewDealMeta: "Строк 12 березня",
+        previewReminderTitle: "Нагадування обом сторонам",
+        previewReminderTag: "Авто",
+        previewReminderMeta: "Надіслано за 24 години до дедлайну",
+        previewOutcomeTitle: "Результат підтверджено",
+        previewOutcomeStatus: "Підтверджено",
+        previewOutcomeMeta: "Відображається в публічному профілі",
+      },
+      trustCheck: {
+        label: "Перевірка",
+        title: "Ви бачите, хто тримає слово",
+        lead: "Профіль показує історію підтверджених і оскаржених домовленостей",
+        bullets: [
+          "Історія виконання, а не “обіцянки”",
+          "Стиль: вчасно / із переносами / з конфліктами",
+          "Рішення швидше: довіряти чи ні",
+        ],
+        profilePreviewLabel: "Приклад профілю",
+        profilePreviewScore: "Репутація 78",
+        profilePreviewConfirmed: "14 підтверджено",
+        profilePreviewDisputed: "2 оскаржено",
+        exampleProfileCta: "Переглянути приклад профілю",
+      },
     },
     cta: {
       getStarted: "Створити угоду",
@@ -177,38 +215,54 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
     },
-    useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
-      ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
-      ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
-    },
-    reputation: {
-      label: "Outcome",
-      title: "Reputation is built by execution",
-      steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
-      ],
-      outcomeTitle: "Public profile",
-      outcomeDescription: "Shows confirmed and disputed deals",
-      cta: "View example profile",
+    sections: {
+      situation: {
+        label: "Situation",
+        title: "Recognize this?",
+        triggers: [
+          "A deadline “on words”",
+          "No one remembers clearly",
+          "It turns into “I thought you…”",
+          "It quietly turns into conflict",
+        ],
+        clearTitle: "When it’s recorded in Dreddi",
+        clearBullets: [
+          "Clear date",
+          "Reminders for both",
+          "Both confirm",
+          "Outcome is visible",
+        ],
+      },
+      howItWorks: {
+        label: "How it works",
+        title: "Agreed — and it doesn’t get lost",
+        steps: ["Record the agreement", "Reminders for both", "Confirm outcome"],
+        exampleProfileCta: "View example profile",
+        previewDealTitle: "Update brand guideline",
+        previewDealStatus: "Active",
+        previewDealMeta: "Due March 12",
+        previewReminderTitle: "Reminder sent to both sides",
+        previewReminderTag: "Auto",
+        previewReminderMeta: "Sent 24h before the due date",
+        previewOutcomeTitle: "Outcome confirmed",
+        previewOutcomeStatus: "Confirmed",
+        previewOutcomeMeta: "Visible on public profile",
+      },
+      trustCheck: {
+        label: "Trust check",
+        title: "See who keeps their word",
+        lead: "A profile shows confirmed and disputed outcomes",
+        bullets: [
+          "Outcomes, not promises",
+          "Pattern: on time / delayed / disputed",
+          "Decide faster: trust or not",
+        ],
+        profilePreviewLabel: "Profile preview",
+        profilePreviewScore: "Reputation 78",
+        profilePreviewConfirmed: "14 confirmed",
+        profilePreviewDisputed: "2 disputed",
+        exampleProfileCta: "View example profile",
+      },
     },
     cta: {
       getStarted: "Create a deal",
