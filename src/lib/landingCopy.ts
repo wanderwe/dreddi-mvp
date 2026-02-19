@@ -10,6 +10,8 @@ export type LandingCopy = {
       label: string;
       title: string;
       triggers: string[];
+      cardMetaLabel: string;
+      cardMetaCount: string;
       clearTitle: string;
       clearBullets: string[];
     };
@@ -17,12 +19,11 @@ export type LandingCopy = {
       label: string;
       title: string;
       steps: string[];
-      exampleProfileCta: string;
+      stepMicrocopy: string[];
       previewDealTitle: string;
       previewDealStatus: string;
       previewDealMeta: string;
       previewReminderTitle: string;
-      previewReminderTag: string;
       previewReminderMeta: string;
       previewOutcomeTitle: string;
       previewOutcomeStatus: string;
@@ -112,6 +113,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
           "Починається “я думав ти…”",
           "Це тихо переростає в конфлікт",
         ],
+        cardMetaLabel: "В Dreddi",
+        cardMetaCount: "4 речі",
         clearTitle: "Коли це зафіксовано в Dreddi",
         clearBullets: [
           "Є дата",
@@ -128,31 +131,30 @@ export const landingCopy: Record<Locale, LandingCopy> = {
           "Нагадування обом",
           "Підтвердили результат",
         ],
-        exampleProfileCta: "Переглянути приклад профілю",
+        stepMicrocopy: ["Дата і умови зафіксовані", "Перед дедлайном обидва отримують пінг", "Сторони позначають факт виконання"],
         previewDealTitle: "Оновити брендбук",
         previewDealStatus: "Активна",
         previewDealMeta: "Строк 12 березня",
-        previewReminderTitle: "Нагадування обом сторонам",
-        previewReminderTag: "Авто",
+        previewReminderTitle: "Нагадування",
         previewReminderMeta: "Надіслано за 24 години до дедлайну",
         previewOutcomeTitle: "Результат підтверджено",
         previewOutcomeStatus: "Підтверджено",
-        previewOutcomeMeta: "Відображається в публічному профілі",
+        previewOutcomeMeta: "Подію видно в історії домовленості",
       },
       trustCheck: {
         label: "Перевірка",
         title: "Ви бачите, хто тримає слово",
-        lead: "Профіль показує історію підтверджених і оскаржених домовленостей",
+        lead: "Профіль — це короткий зріз: підтвердження, оскарження, ритм виконання",
         bullets: [
-          "Історія виконання, а не “обіцянки”",
-          "Стиль: вчасно / із переносами / з конфліктами",
-          "Рішення швидше: довіряти чи ні",
+          "Не обіцянки — фактичні результати",
+          "Патерн: вчасно / переносить / спірні",
+          "Простіше вирішити: довіряти чи ні",
         ],
         profilePreviewLabel: "Приклад профілю",
         profilePreviewScore: "Репутація 78",
         profilePreviewConfirmed: "14 підтверджено",
         profilePreviewDisputed: "2 оскаржено",
-        exampleProfileCta: "Переглянути приклад профілю",
+        exampleProfileCta: "Подивитись приклад профілю",
       },
     },
     cta: {
@@ -225,6 +227,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
           "It turns into “I thought you…”",
           "It quietly turns into conflict",
         ],
+        cardMetaLabel: "In Dreddi",
+        cardMetaCount: "4 points",
         clearTitle: "When it’s recorded in Dreddi",
         clearBullets: [
           "Clear date",
@@ -237,16 +241,19 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         label: "How it works",
         title: "Agreed — and it doesn’t get lost",
         steps: ["Record the agreement", "Reminders for both", "Confirm outcome"],
-        exampleProfileCta: "View example profile",
+        stepMicrocopy: [
+          "Date and terms are locked in",
+          "Both sides get a pre-deadline reminder",
+          "Both mark the final outcome",
+        ],
         previewDealTitle: "Update brand guideline",
         previewDealStatus: "Active",
         previewDealMeta: "Due March 12",
-        previewReminderTitle: "Reminder sent to both sides",
-        previewReminderTag: "Auto",
+        previewReminderTitle: "Reminder",
         previewReminderMeta: "Sent 24h before the due date",
         previewOutcomeTitle: "Outcome confirmed",
         previewOutcomeStatus: "Confirmed",
-        previewOutcomeMeta: "Visible on public profile",
+        previewOutcomeMeta: "Recorded in the deal history",
       },
       trustCheck: {
         label: "Trust check",
