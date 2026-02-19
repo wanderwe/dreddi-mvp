@@ -34,10 +34,12 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
       <div className="relative space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center sm:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
-            <CheckCircle2 className="h-4 w-4" />
-            {copy.label}
-          </span>
+          {copy.label ? (
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-200 sm:text-sm">
+              <CheckCircle2 className="h-4 w-4" />
+              {copy.label}
+            </span>
+          ) : null}
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">
             {copy.title}
           </h2>
@@ -45,6 +47,9 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
 
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
           <div className="space-y-8">
+            <h3 className="mx-auto max-w-xl text-lg font-semibold text-white sm:text-xl">
+              {copy.comparisonTitle}
+            </h3>
             <ul className="mx-auto max-w-xl space-y-6 text-base text-slate-100/90 sm:space-y-8 sm:text-lg">
               {copy.bullets.map((item, index) => {
                 const Icon = triggerIcons[index] ?? CheckCircle2;
