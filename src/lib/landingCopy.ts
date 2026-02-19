@@ -44,7 +44,6 @@ export type LandingCopy = {
     overviewLabel: string;
     live: string;
     signIn: string;
-    demoBadge: string;
     cards: {
       confirmed: string;
       disputed: string;
@@ -140,7 +139,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Огляд домовленостей",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення",
-      demoBadge: "Приклад профілю",
       cards: {
         confirmed: "Підтверджено",
         disputed: "Оскаржено",
@@ -234,7 +232,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Agreement Snapshot",
       live: "Live",
       signIn: "Sign in to see updates",
-      demoBadge: "Demo profile",
       cards: {
         confirmed: "Confirmed",
         disputed: "Disputed",

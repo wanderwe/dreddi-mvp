@@ -467,6 +467,9 @@ export default function Home() {
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
+  const overviewLabel = !isAuthenticated
+    ? `${copy.score.overviewLabel} (${locale === "uk" ? "демо" : "demo"})`
+    : copy.score.overviewLabel;
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
   const renderMultiline = (text: string) =>
@@ -570,7 +573,7 @@ export default function Home() {
 
         </div>
 
-        <div className="relative flex-1 pb-6">
+        <div className="flex-1">
           <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
@@ -601,7 +604,7 @@ export default function Home() {
 
               <div>
                 <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-slate-400/90">
-                  {copy.score.overviewLabel}
+                  {overviewLabel}
                 </p>
                 <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
                   <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
@@ -711,11 +714,6 @@ export default function Home() {
                 </div>
             </div>
           </div>
-          {!isAuthenticated ? (
-            <span className="pointer-events-none absolute bottom-0 right-4 inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-400 ring-1 ring-white/10">
-              {copy.score.demoBadge}
-            </span>
-          ) : null}
         </div>
       </div>
 
