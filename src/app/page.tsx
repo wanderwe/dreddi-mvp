@@ -467,9 +467,7 @@ export default function Home() {
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
-  const overviewLabel = !isAuthenticated
-    ? `${copy.score.overviewLabel} (${locale === "uk" ? "демо" : "demo"})`
-    : copy.score.overviewLabel;
+  const demoProfileLabel = locale === "uk" ? "Приклад профілю" : "Demo profile";
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
   const renderMultiline = (text: string) =>
@@ -603,9 +601,16 @@ export default function Home() {
               </div>
 
               <div>
-                <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-slate-400/90">
-                  {overviewLabel}
-                </p>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <p className="text-sm font-medium text-slate-300/95">
+                    {copy.score.overviewLabel}
+                  </p>
+                  {!isAuthenticated ? (
+                    <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-slate-300 ring-1 ring-white/10">
+                      {demoProfileLabel}
+                    </span>
+                  ) : null}
+                </div>
                 <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
                   <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
