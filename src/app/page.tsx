@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { AfterConfirmationSection } from "@/app/components/landing/AfterConfirmationSection";
 import { ReputationSection } from "@/app/components/landing/ReputationSection";
 import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
@@ -714,6 +715,7 @@ export default function Home() {
         </div>
       </div>
 
+      <AfterConfirmationSection copy={copy.afterConfirmation} />
       <UseCasesSection copy={copy.useDreddi} />
       <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
     </main>
