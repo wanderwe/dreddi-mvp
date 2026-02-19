@@ -50,28 +50,24 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <article className="rounded-3xl border border-white/10 bg-slate-950/40 p-6 sm:p-8">
-            <h3 className="text-xl font-semibold text-slate-200">{copy.beforeTitle}</h3>
-            <ul className="mt-6 space-y-4 text-slate-400">
+          <article className="rounded-3xl border border-white/10 bg-slate-950/30 p-5 sm:p-6">
+            <h3 className="text-xl font-semibold text-slate-300">{copy.beforeTitle}</h3>
+            <ul className="mt-5 space-y-3.5 pl-1 text-base leading-7 text-slate-400/90">
               {copy.beforeBullets.map((item) => (
-                <li key={item} className="flex items-start gap-3 leading-relaxed">
-                  <span aria-hidden className="pt-0.5 text-slate-500">
-                    –
-                  </span>
+                <li key={item} className="flex items-start gap-3">
+                  <span aria-hidden className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-slate-500/70" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
           </article>
 
-          <article className="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.07] p-6 shadow-lg shadow-emerald-900/10 sm:p-8">
+          <article className="rounded-3xl border border-emerald-300/20 bg-emerald-500/[0.09] p-5 shadow-lg shadow-emerald-900/10 sm:p-6">
             <h3 className="text-xl font-semibold text-white">{copy.afterTitle}</h3>
-            <ul className="mt-6 space-y-4 text-slate-100">
+            <ul className="mt-5 space-y-3.5 pl-1 text-base leading-7 text-slate-100">
               {copy.afterBullets.map((item) => (
-                <li key={item} className="flex items-start gap-3 leading-relaxed">
-                  <span aria-hidden className="pt-0.5 text-emerald-300/90">
-                    –
-                  </span>
+                <li key={item} className="flex items-start gap-3">
+                  <span aria-hidden className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
                   <span>{highlightText(item, copy.highlightWords)}</span>
                 </li>
               ))}
