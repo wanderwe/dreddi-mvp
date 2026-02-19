@@ -5,22 +5,22 @@ export type LandingCopy = {
     headline: string;
     description: string;
   };
-  useDreddi: {
-    label: string;
-    title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
-  };
-  reputation: {
-    label: string;
-    title: string;
-    steps: string[];
-    outcomeTitle: string;
-    outcomeDescription: string;
-    cta: string;
+  narrative: {
+    reality: {
+      title: string;
+      bullets: string[];
+      statement: string;
+    };
+    pivot: string;
+    trust: {
+      title: string;
+      cardLabel: string;
+      bullets: string[];
+      cta: string;
+    };
+    socialEffect: string[];
+    audienceTitle: string;
+    audience: string[];
   };
   cta: {
     getStarted: string;
@@ -85,38 +85,35 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
     },
-    useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+    narrative: {
+      reality: {
+        title: "Ми всі це проходили",
+        bullets: [
+          "Дедлайн “на словах”",
+          "Ніхто нічого не памʼятає",
+          "Починається “я думав ти…”",
+          "Це тихо переростає в конфлікт",
+        ],
+        statement: "Слова зникають. Записані домовленості — ні.",
+      },
+      pivot: "Dreddi не керує задачами. Він робить відповідальність видимою.",
+      trust: {
+        title: "Ви бачите, хто тримає слово",
+        cardLabel: "Приклад публічного профілю",
+        bullets: [
+          "Не обіцянки — а результати",
+          "Не відгуки — а підтвердження",
+          "Не слова — а історія виконання",
+        ],
+        cta: "Подивитись приклад профілю",
+      },
+      socialEffect: [
+        "Люди рідше “забувають”",
+        "Менше “я думав ти…”",
+        "Більше спокою у домовленостях",
       ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
-      ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
-    },
-    reputation: {
-      label: "Результат",
-      title: "Репутація будується виконанням",
-      steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
-      ],
-      outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
-      cta: "Переглянути приклад профілю",
+      audienceTitle: "Для кого це",
+      audience: ["Друзі", "Партнери", "Фрилансери", "Рання співпраця"],
     },
     cta: {
       getStarted: "Створити угоду",
@@ -179,38 +176,35 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
     },
-    useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+    narrative: {
+      reality: {
+        title: "We’ve all been there",
+        bullets: [
+          "A deadline “on words”",
+          "No one remembers clearly",
+          "It turns into “I thought you…”",
+          "It quietly turns into conflict",
+        ],
+        statement: "Words fade. Recorded agreements don’t.",
+      },
+      pivot: "Dreddi doesn’t manage tasks. It makes responsibility visible.",
+      trust: {
+        title: "You can see who follows through",
+        cardLabel: "Example public profile",
+        bullets: [
+          "Not promises — outcomes",
+          "Not reviews — confirmations",
+          "Not words — execution history",
+        ],
+        cta: "View example profile",
+      },
+      socialEffect: [
+        "People “forget” less",
+        "Less “I thought you…”",
+        "More calm in agreements",
       ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
-      ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
-    },
-    reputation: {
-      label: "Outcome",
-      title: "Reputation is built by execution",
-      steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
-      ],
-      outcomeTitle: "Public profile",
-      outcomeDescription: "Shows confirmed and disputed deals",
-      cta: "View example profile",
+      audienceTitle: "Who it’s for",
+      audience: ["Friends", "Partners", "Freelancers", "Early-stage cooperation"],
     },
     cta: {
       getStarted: "Create a deal",
