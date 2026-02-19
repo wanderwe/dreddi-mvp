@@ -5,8 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
-import { ReputationSection } from "@/app/components/landing/ReputationSection";
-import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
+import { LandingNarrativeSections } from "@/app/components/landing/LandingNarrativeSections";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
@@ -536,12 +535,6 @@ export default function Home() {
               >
                 {copy.cta.getStarted}
               </Link>
-              <Link
-                href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta.reviewDeals}
-              </Link>
             </div>
           ) : (
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
@@ -550,12 +543,6 @@ export default function Home() {
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
                 {copy.cta.createPromise}
-              </Link>
-              <Link
-                href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta.reviewDeals}
               </Link>
             </div>
           )}
@@ -711,8 +698,7 @@ export default function Home() {
         </div>
       </div>
 
-      <UseCasesSection copy={copy.useDreddi} />
-      <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
+      <LandingNarrativeSections copy={copy.narrative} scoreCopy={copy.score} />
     </main>
   );
 }
