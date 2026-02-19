@@ -485,9 +485,12 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex flex-1 flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-3">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-20 sm:px-8 md:gap-14 md:flex-row md:items-center md:py-14">
+        <div className="flex flex-1 flex-col gap-4 md:gap-6">
+          <div className="order-1 space-y-2.5">
+            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] tracking-[0.05em] text-slate-300/80">
+              {copy.hero.eyebrow}
+            </span>
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
@@ -497,19 +500,15 @@ export default function Home() {
                 <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
                   {t("landing.hero.brandSuffix")}
                 </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
-                />
               </div>
             </div>
             <h1 className="max-w-xl text-xl font-semibold leading-tight text-white sm:text-2xl">
               {copy.hero.headline}
             </h1>
-            <p className="max-w-xl whitespace-pre-line text-base leading-snug text-slate-200/78 sm:text-lg">
+            <p className="max-w-xl whitespace-pre-line text-base leading-snug text-slate-200/76 sm:text-lg">
               {copy.hero.description}
             </p>
-            <p className="max-w-xl text-base font-normal leading-tight tracking-[-0.01em] text-emerald-200/72 sm:text-[1.05rem]">
+            <p className="max-w-xl text-base font-normal leading-tight tracking-[-0.015em] text-emerald-200/72 sm:text-[1.05rem]">
               {copy.hero.punchline}
             </p>
           </div>
@@ -554,17 +553,7 @@ export default function Home() {
         </div>
 
         <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
-            <div
-              className="pointer-events-none absolute inset-0 rounded-3xl"
-              style={{
-                background:
-                  "linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 35%, rgba(255,255,255,0) 60%)",
-              }}
-              aria-hidden
-            />
-            <div className="relative flex flex-col gap-4">
+          <div className="flex flex-col gap-4 px-1 sm:px-2">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 {email ? (
@@ -690,7 +679,6 @@ export default function Home() {
                     </>
                   )}
                 </div>
-            </div>
           </div>
         </div>
       </div>
