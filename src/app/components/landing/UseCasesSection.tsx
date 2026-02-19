@@ -1,20 +1,7 @@
-import {
-  Briefcase,
-  CheckCircle2,
-  Clock,
-  Coins,
-  Handshake,
-  Home,
-  MessageSquare,
-  Rocket,
-  Scale,
-  Wrench,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
 
 import type { LandingCopy } from "@/lib/landingCopy";
-
-const triggerIcons = [Clock, Coins, MessageSquare, Scale];
-const scenarioIcons = [Briefcase, Handshake, Home, Wrench, Rocket];
 
 type UseCasesSectionProps = {
   copy: LandingCopy["useDreddi"];
@@ -38,60 +25,84 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
             <CheckCircle2 className="h-4 w-4" />
             {copy.label}
           </span>
-          <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-            {copy.title}
-          </h2>
+          <h2 className="text-3xl font-semibold text-white sm:text-4xl">{copy.title}</h2>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-          <div className="space-y-8">
-            <ul className="mx-auto max-w-xl space-y-6 text-base text-slate-100/90 sm:space-y-8 sm:text-lg">
-              {copy.bullets.map((item, index) => {
-                const Icon = triggerIcons[index] ?? CheckCircle2;
+        <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
+          <div className="relative px-1 py-2">
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent blur-2xl"
+              aria-hidden
+            />
+            <ul className="relative space-y-6 text-base text-slate-200/85 sm:space-y-7 sm:text-lg">
+              {copy.chaosBullets.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-300/50" aria-hidden />
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-                return (
-                  <li key={item} className="flex items-center gap-4">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/20">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <span className="leading-relaxed">{item}</span>
-                  </li>
-                );
-              })}
+          <div className="rounded-2xl bg-gradient-to-br from-white/10 via-white/[0.06] to-slate-900/50 p-6 shadow-[0_20px_65px_rgba(15,23,42,0.58)] ring-1 ring-emerald-500/20">
+            <p className="text-sm font-semibold text-white">{copy.clarityTitle}</p>
+
+            <ul className="mt-4 space-y-3 text-sm text-slate-100/90 sm:text-base">
+              {copy.clarityBullets.map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
 
-            <div className="rounded-3xl bg-white/5 p-5 text-sm text-slate-300/90 shadow-inner shadow-black/30">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-                {copy.noteTitle}
-              </p>
-              <p className="mt-3 text-sm text-slate-200/80">{copy.framing}</p>
-            </div>
-          </div>
-
-          <div className="lg:mt-10">
-            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-              {copy.scenariosTitle}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2.5">
-              {copy.scenarios.map((item, index) => {
-                const Icon = scenarioIcons[index] ?? Briefcase;
-
-                return (
-                  <div
-                    key={item}
-                    className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-300"
+            <div className="mt-6 rounded-xl bg-slate-950/45 p-4 ring-1 ring-white/10">
+              <div className="space-y-2 text-xs text-slate-300 sm:text-sm">
+                <div>{copy.previewRows.date}</div>
+                <div>{copy.previewRows.reminder}</div>
+                <div>{copy.previewRows.confirmed}</div>
+              </div>
+              <div className="mt-3 inline-flex rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-200">
+                {copy.previewRows.plusOne}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {copy.statusTags.map((tag, index) => (
+                  <span
+                    key={tag}
+                    className={`rounded-full px-2.5 py-1 text-[11px] ${
+                      index === 0
+                        ? "bg-emerald-500/15 text-emerald-100"
+                        : index === 1
+                          ? "bg-amber-500/15 text-amber-100"
+                          : "bg-white/10 text-slate-200"
+                    }`}
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-emerald-200">
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span>{item}</span>
-                  </div>
-                );
-              })}
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
+        <div className="space-y-5 border-t border-white/10 pt-8 text-center">
+          <p className="text-base text-slate-100/90 sm:text-lg">{copy.transitionLine}</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/new"
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+            >
+              {copy.primaryCta}
+            </Link>
+            <Link
+              href="/u"
+              className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/10"
+            >
+              <AlertCircle className="mr-2 h-4 w-4 text-slate-300" />
+              {copy.secondaryCta}
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -8,18 +8,28 @@ export type LandingCopy = {
   useDreddi: {
     label: string;
     title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
+    chaosBullets: string[];
+    clarityTitle: string;
+    clarityBullets: string[];
+    previewRows: {
+      date: string;
+      reminder: string;
+      confirmed: string;
+      plusOne: string;
+    };
+    statusTags: string[];
+    transitionLine: string;
+    primaryCta: string;
+    secondaryCta: string;
   };
   reputation: {
     label: string;
     title: string;
-    steps: string[];
-    outcomeTitle: string;
-    outcomeDescription: string;
+    description: string;
+    bullets: string[];
+    profilePreviewTitle: string;
+    profilePreviewItems: string[];
+    profilePreviewStats: string[];
     cta: string;
   };
   cta: {
@@ -85,36 +95,49 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
     },
     useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+      label: "Як це працює",
+      title: "Коли домовленість залишається словами",
+      chaosBullets: [
+        "Дедлайн “на словах”",
+        "Ніхто нічого не пам’ятає",
+        "Починається “я думав ти...”",
+        "Це тихо переростає в конфлікт",
       ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
+      clarityTitle: "Зафіксовано в Dreddi",
+      clarityBullets: [
+        "Є конкретна дата",
+        "Нагадування приходить обом",
+        "Виконання підтверджують обидві сторони",
+        "Результат видно в профілі",
       ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+      previewRows: {
+        date: "Дата: 24 квітня, 18:00",
+        reminder: "Нагадування: за 24 години",
+        confirmed: "Підтвердження: обидві сторони",
+        plusOne: "+1 підтверджено",
+      },
+      statusTags: ["Підтверджено", "Оскаржено", "Репутація"],
+      transitionLine: "Фіксуйте домовленості до того, як стане незручно",
+      primaryCta: "Створити домовленість",
+      secondaryCta: "Подивитися приклад профілю",
     },
     reputation: {
-      label: "Результат",
-      title: "Репутація будується виконанням",
-      steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+      label: "Публічний профіль",
+      title: "Ви бачите, хто тримає слово",
+      description:
+        "Історія підтверджених і оскаржених домовленостей — в одному місці",
+      bullets: [
+        "Історія виконання — не обіцянки",
+        "Видно підтверджені та оскаржені результати",
+        "Простіше вирішити — довіряти чи ні",
       ],
-      outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає підтверджені та оскаржені угоди",
+      profilePreviewTitle: "Профіль довіри",
+      profilePreviewItems: [
+        "12 підтверджено",
+        "2 оскаржено",
+        "89% виконано вчасно",
+      ],
+      profilePreviewStats: ["Підтверджено", "Оскаржено", "Репутація"],
       cta: "Переглянути приклад профілю",
     },
     cta: {
@@ -178,36 +201,44 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
     },
     useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+      label: "How it works",
+      title: "When an agreement stays just words",
+      chaosBullets: [
+        "Deadlines are only verbal",
+        "No one remembers the details",
+        "It turns into “I thought you…”",
+        "That quietly becomes conflict",
       ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
+      clarityTitle: "Captured in Dreddi",
+      clarityBullets: [
+        "A clear date is set",
+        "Both sides get reminders",
+        "Both parties confirm completion",
+        "Result appears on profile",
       ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
+      previewRows: {
+        date: "Date: Apr 24, 18:00",
+        reminder: "Reminder: 24 hours before",
+        confirmed: "Confirmation: both parties",
+        plusOne: "+1 confirmed",
+      },
+      statusTags: ["Confirmed", "Disputed", "Reputation"],
+      transitionLine: "Record agreements before things get awkward",
+      primaryCta: "Create agreement",
+      secondaryCta: "View profile example",
     },
     reputation: {
-      label: "Outcome",
-      title: "Reputation is built by execution",
-      steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
+      label: "Public profile",
+      title: "You can see who keeps their word",
+      description: "History of confirmed and disputed agreements in one place",
+      bullets: [
+        "Execution history, not promises",
+        "See confirmed and disputed outcomes",
+        "Decide faster who to trust",
       ],
-      outcomeTitle: "Public profile",
-      outcomeDescription: "Shows confirmed and disputed deals",
+      profilePreviewTitle: "Trust profile",
+      profilePreviewItems: ["12 confirmed", "2 disputed", "89% on-time"],
+      profilePreviewStats: ["Confirmed", "Disputed", "Reputation"],
       cta: "View example profile",
     },
     cta: {
