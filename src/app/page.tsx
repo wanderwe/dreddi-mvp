@@ -460,10 +460,10 @@ export default function Home() {
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
   const renderMultiline = (text: string) =>
-    text.split("\n").map((line, index, lines) => (
+    text.split("\n").map((line, index) => (
       <span
         key={`${line}-${index}`}
-        className={index === 0 ? "block" : "mt-1 block"}
+        className={index === 0 ? "block" : "mt-0.5 block"}
       >
         {line}
       </span>
@@ -498,6 +498,9 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex-1 flex flex-col gap-5 md:gap-7">
           <div className="order-1 space-y-4">
+            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
+              {copy.hero.headline}
+            </p>
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
@@ -513,10 +516,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
-              {copy.hero.headline}
-            </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-xl text-base leading-tight text-slate-300 sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
