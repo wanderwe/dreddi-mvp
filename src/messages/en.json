@@ -23,7 +23,8 @@
       "brandSuffix": "knows"
     },
     "betaBanner": {
-      "body": "Deals and data created during beta testing will likely not be carried over to the final version"
+      "body": "Deals and data created during beta testing will likely not be carried over to the final version",
+      "dismiss": "Dismiss banner"
     },
     "demoDeals": {
       "deal1": {
