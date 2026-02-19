@@ -1,4 +1,7 @@
 {
+  "status": {
+    "fulfilled": "Fulfilled"
+  },
   "nav": {
     "myPromises": "My deals",
     "publicProfiles": "Public profiles",
@@ -138,7 +141,7 @@
       "active": "Active",
       "pendingConfirmation": "Awaiting review",
       "waitingConfirmation": "Awaiting review",
-      "confirmed": "Confirmed",
+      "confirmed": "Fulfilled",
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
       "needsReview": "Needs your review",
@@ -214,7 +217,7 @@
       "reviewConfirm": "Review & confirm",
       "awaitingExecutor": "Waiting for the {executorRole} to mark this complete",
       "waitingReview": "Waiting for the other side to review",
-      "confirmed": "{entity} confirmed ✅",
+      "confirmed": "{entity} fulfilled ✅",
       "disputed": "{entity} disputed",
       "awaitingAcceptanceHint": "The {entityLower} hasn’t been accepted by the other side yet",
       "rewardLabel": "Reward",
@@ -242,11 +245,11 @@
         "privateAfterProposal": "Private (public was proposed)"
       },
       "publicVisibility": {
-        "title": "Public visibility (confirmed only)",
+        "title": "Public visibility (fulfilled only)",
         "helper": "This {entityLower} will appear on your public profile only if both sides agree",
-        "creatorConsent": "I agree to show this confirmed {entityLower} publicly",
-        "counterpartyConsent": "I agree to show this confirmed {entityLower} publicly",
-        "confirmedOnly": "Only confirmed responsibilities can be shown publicly",
+        "creatorConsent": "I agree to show this fulfilled {entityLower} publicly",
+        "counterpartyConsent": "I agree to show this fulfilled {entityLower} publicly",
+        "confirmedOnly": "Only fulfilled responsibilities can be shown publicly",
         "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public"
       },
       "errors": {
@@ -286,12 +289,12 @@
       "cancel": "Cancel",
       "noDeadline": "No deadline",
       "statusNote": {
-        "confirmed": "Already confirmed ✅",
+        "confirmed": "Already fulfilled ✅",
         "disputed": "Already disputed",
         "active": "Not marked as completed yet"
       },
       "success": {
-        "confirmed": "{entity} confirmed. Redirecting…",
+        "confirmed": "{entity} fulfilled. Redirecting…",
         "disputed": "Dispute submitted. Redirecting…"
       },
       "errors": {
@@ -456,7 +459,7 @@
   },
   "publicProfile": {
     "backToDirectory": "← Back to public profiles",
-    "confirmed": "Confirmed",
+    "confirmed": "Fulfilled",
     "disputed": "Disputed",
     "loading": "Loading profile…",
     "copyLink": "Copy link",
@@ -467,7 +470,7 @@
       "title": "Metrics"
     },
     "summary": {
-      "metrics": "{confirmed} confirmed · {disputed} disputed",
+      "metrics": "{fulfilled} fulfilled · {disputed} disputed",
       "lastActivity": "Last activity — {time}",
       "lastActivityEmpty": "No activity yet"
     },
@@ -553,7 +556,7 @@
     "streak": {
       "title": "Streak: {count}",
       "zero": "Start confirming deals in a row to launch your streak",
-      "nonZero": "{count} deals in a row confirmed without disputes"
+      "nonZero": "{count} deals in a row fulfilled without disputes"
     }
   },
   "deal": {
@@ -613,8 +616,8 @@
         "cta": "Review"
       },
       "confirmed": {
-        "title": "Outcome confirmed",
-        "description": "Why now: the other party confirmed completion. Review the outcome details.",
+        "title": "Outcome fulfilled",
+        "description": "Why now: the other party marked the deal as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "disputed": {
@@ -648,8 +651,8 @@
         "cta": "Review"
       },
       "completion_followup": {
-        "title": "Outcome confirmed",
-        "description": "Why now: the other party confirmed completion. Review the outcome details.",
+        "title": "Outcome fulfilled",
+        "description": "Why now: the other party marked the deal as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "dispute": {
