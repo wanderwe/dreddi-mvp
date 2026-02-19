@@ -484,7 +484,7 @@ export default function Home() {
                 type="button"
                 onClick={dismissBetaBanner}
                 aria-label={t("landing.betaBanner.dismiss")}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-slate-200/80 transition-colors duration-150 hover:bg-white/5 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 text-slate-200/80 transition-colors duration-150 hover:bg-white/5 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
                 <X className="h-4 w-4" aria-hidden />
               </button>
