@@ -461,9 +461,11 @@ export default function Home() {
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index, lines) => (
-      <span key={`${line}-${index}`}>
+      <span
+        key={`${line}-${index}`}
+        className={index === 0 ? "block" : "mt-1 block"}
+      >
         {line}
-        {index < lines.length - 1 ? <br /> : null}
       </span>
     ));
 
