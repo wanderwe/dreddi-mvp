@@ -667,6 +667,11 @@ export default function Home() {
       </div>
 
       <UseCasesSection copy={copy.useDreddi} />
+      <div className="mx-auto w-full max-w-6xl px-4 pb-8 text-center sm:px-6 sm:pb-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400/85">
+          {copy.useDreddi.transitionTitle}
+        </p>
+      </div>
       <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
     </main>
   );
