@@ -485,10 +485,10 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-20 sm:px-8 md:gap-14 md:flex-row md:items-center md:py-14">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-10 px-6 pb-12 pt-20 sm:px-8 md:gap-12 md:py-14">
         <div className="flex flex-1 flex-col gap-4 md:gap-6">
           <div className="order-1 space-y-2.5">
-            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] tracking-[0.05em] text-slate-300/80">
+            <span className="inline-flex items-center text-[11px] uppercase tracking-[0.08em] text-slate-400/85">
               {copy.hero.eyebrow}
             </span>
             <div className="flex items-center gap-4 sm:gap-5">
@@ -552,135 +552,6 @@ export default function Home() {
 
         </div>
 
-        <div className="flex-1">
-          <div className="flex flex-col gap-4 px-1 sm:px-2">
-              <div className="flex items-center justify-between">
-                <DreddiLogoMark className="h-10 w-10" />
-                {email ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
-                    {copy.score.live}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
-                    {copy.score.signIn}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-slate-400/90">
-                  {copy.score.overviewLabel}
-                </p>
-                <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
-                  <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
-                    <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
-                      <MetricValue
-                        isLoading={reputationLoading}
-                        value={score}
-                        className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]"
-                      />
-                    </div>
-
-                    <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
-                        {copy.score.cards.confirmed}
-                      </div>
-                      <MetricValue
-                        isLoading={reputationLoading}
-                        value={confirmedCount}
-                        className="mt-1 text-3xl font-semibold leading-none text-white"
-                      />
-                    </div>
-
-                    <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
-                        {copy.score.cards.disputed}
-                      </div>
-                      <MetricValue
-                        isLoading={reputationLoading}
-                        value={disputedCount}
-                        className="mt-1 text-3xl font-semibold leading-none text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-sm text-slate-400">
-                {copy.score.onTime.label}: {onTimeLineValue}
-              </p>
-
-                {reputationError && isAuthenticated && (
-                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
-                    {reputationError}
-                  </div>
-                )}
-
-                <div>
-                  <div className="flex items-center justify-between text-sm text-slate-300">
-                    <span>{recentDealsTitle}</span>
-                    <Link
-                      href={recentDealsHref}
-                      className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
-                    >
-                      {copy.recentDeals.seeAll}
-                    </Link>
-                  </div>
-                  {!isAuthenticated ? (
-                    <div className="mt-3">
-                      <div className="mt-1 divide-y divide-white/10 text-sm">
-                        {demoDeals.map((item) => (
-                          <DealRow
-                            key={item.id}
-                            item={item}
-                            isClickable={false}
-                            metaText={getMetaText(item)}
-                            statusLabels={statusLabels}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {recentError && (
-                        <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                          {recentError}
-                        </div>
-                      )}
-
-                      <div className="mt-1 text-sm">
-                        {reputationLoading || recentLoading ? (
-                          <div className="space-y-2">
-                            {[1, 2, 3].map((i) => (
-                              <div key={i} className="h-[52px] animate-pulse rounded-xl bg-white/5" />
-                            ))}
-                          </div>
-                        ) : recentDeals.length === 0 ? (
-                          <div className="rounded-xl bg-white/[0.03] px-3 py-3 text-xs text-slate-400">
-                            {copy.recentDeals.empty}
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-white/10">
-                            {recentDealsLimited.map((item) => (
-                              <DealRow
-                                key={item.id}
-                                item={item}
-                                href={`/promises/${item.id}?from=dashboard`}
-                                metaText={getMetaText(item)}
-                                statusLabels={statusLabels}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-          </div>
-        </div>
       </div>
 
       <UseCasesSection copy={copy.useDreddi} />
