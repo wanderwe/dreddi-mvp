@@ -25,7 +25,7 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <ul className="space-y-3.5 rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-base leading-7 text-slate-200 sm:p-6">
+          <ul className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-[15px] leading-7 text-slate-200 sm:p-6">
             {copy.bullets.map((item) => (
               <li key={item} className="flex items-start gap-3">
                 <span aria-hidden className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-sky-300/80" />
@@ -34,13 +34,12 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
             ))}
           </ul>
 
-          <div className="rounded-3xl bg-gradient-to-br from-white/10 via-white/5 to-slate-900/40 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.6)] ring-1 ring-emerald-500/20">
+          <div className="rounded-3xl bg-gradient-to-br from-white/12 via-white/6 to-slate-900/45 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.6)] ring-1 ring-emerald-500/20">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
-              {copy.label}
+              {copy.cardLabel}
             </p>
-            <h3 className="mt-3 text-2xl font-semibold text-white">{copy.title}</h3>
 
-            <div className="mt-6 flex flex-wrap gap-2 text-xs text-slate-200/80">
+            <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-200/80">
               <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-100">
                 {scoreCopy.cards.confirmed}
               </span>

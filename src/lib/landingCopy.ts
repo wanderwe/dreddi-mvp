@@ -6,6 +6,7 @@ export type LandingCopy = {
     description: string;
   };
   useDreddi: {
+    eyebrow: string;
     title: string;
     beforeTitle: string;
     beforeBullets: string[];
@@ -17,6 +18,9 @@ export type LandingCopy = {
     ctaSecondary: string;
     previewDelta: string;
     previewNote: string;
+    demoStatus: string;
+    demoReminder: string;
+    demoProfileAdded: string;
   };
   reputation: {
     label: string;
@@ -24,6 +28,7 @@ export type LandingCopy = {
     subtitle: string;
     bullets: string[];
     cardMicrocopy: string;
+    cardLabel: string;
     ctaPrimary: string;
     ctaSecondary: string;
   };
@@ -90,7 +95,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.",
     },
     useDreddi: {
-      title: "Домовились. І що далі?",
+      eyebrow: "Ситуація",
+      title: "Коли домовленість залишається словами",
       beforeTitle: "Без фіксації",
       beforeBullets: [
         "Дедлайн “на словах”",
@@ -98,30 +104,33 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Починається “я думав ти…”",
         "Це тихо переростає в конфлікт",
       ],
-      afterTitle: "Коли це зафіксовано в Dreddi",
+      afterTitle: "Зафіксовано в Dreddi",
       afterBullets: [
-        "Є конкретна дата",
-        "Обом приходить нагадування",
-        "Виконання підтверджують обидві сторони",
+        "Є дата і нагадування обом",
+        "Після виконання — підтвердження двох сторін",
         "Результат видно в профілі",
       ],
-      highlightWords: ["дата", "нагадування", "підтверджують", "профілі"],
-      ctaLine: "Фіксуйте домовленості до того, як стане незручно.",
+      highlightWords: ["дата", "нагадування", "підтвердження", "профілі"],
+      ctaLine: "Фіксуйте домовленості до того, як стане незручно",
       ctaPrimary: "Створити домовленість",
       ctaSecondary: "Подивитись приклад профілю",
       previewDelta: "+1 підтверджено",
       previewNote: "Обидві сторони підтвердили виконання",
+      demoStatus: "Очікує підтвердження",
+      demoReminder: "Нагадування завтра",
+      demoProfileAdded: "Додано в профіль",
     },
     reputation: {
       label: "Перевірка",
-      title: "Ви бачите, хто тримає слово",
-      subtitle: "Профіль показує історію підтверджених та оскаржених домовленостей.",
+      title: "Працюйте з тими, хто виконує",
+      subtitle: "Профіль показує реальну історію підтверджених та оскаржених домовленостей",
       bullets: [
-        "Дивіться історію домовленостей, а не обіцянки",
-        "Розумійте стиль виконання: вчасно / з переносами / з конфліктами",
-        "Приймайте рішення швидше — без зайвих пояснень",
+        "Історія виконання — не обіцянки",
+        "Підтверджені та оскаржені результати",
+        "Швидше рішення: довіряти чи ні",
       ],
       cardMicrocopy: "Історія виконання — в одному місці",
+      cardLabel: "Публічний профіль",
       ctaPrimary: "Переглянути приклад профілю",
       ctaSecondary: "Переглянути угоди",
     },
@@ -186,7 +195,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.",
     },
     useDreddi: {
-      title: "You agreed. Now what?",
+      eyebrow: "Situation",
+      title: "When an agreement stays verbal",
       beforeTitle: "Without recording",
       beforeBullets: [
         "Deadline “on words”",
@@ -194,30 +204,33 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "It turns into “I thought you…”",
         "It quietly turns into conflict",
       ],
-      afterTitle: "When it’s recorded in Dreddi",
+      afterTitle: "Recorded in Dreddi",
       afterBullets: [
-        "Clear date",
-        "Reminders for both",
-        "Both confirm completion",
-        "Result visible on profile",
+        "Clear date and reminders for both",
+        "After completion — both sides confirm",
+        "Result is visible on profile",
       ],
       highlightWords: ["date", "Reminders", "confirm", "profile"],
-      ctaLine: "Fix agreements before they turn awkward.",
+      ctaLine: "Fix agreements before they turn awkward",
       ctaPrimary: "Create an agreement",
       ctaSecondary: "View example profile",
       previewDelta: "+1 confirmed",
       previewNote: "Both sides confirmed completion",
+      demoStatus: "Awaiting confirmation",
+      demoReminder: "Reminder tomorrow",
+      demoProfileAdded: "Added to profile",
     },
     reputation: {
       label: "Verification",
-      title: "See who follows through",
-      subtitle: "A profile shows a history of confirmed and disputed agreements.",
+      title: "Work with people who follow through",
+      subtitle: "A profile shows a real history of confirmed and disputed agreements",
       bullets: [
-        "See history, not promises",
-        "Understand the pattern: on time / delayed / disputed",
-        "Decide faster — without awkward back-and-forth",
+        "Delivery history — not promises",
+        "Confirmed and disputed outcomes",
+        "Decide faster: trust or not",
       ],
       cardMicrocopy: "Delivery history in one place",
+      cardLabel: "Public profile",
       ctaPrimary: "View example profile",
       ctaSecondary: "View deals",
     },
