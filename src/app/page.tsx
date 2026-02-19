@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { ReputationSection } from "@/app/components/landing/ReputationSection";
@@ -67,7 +68,7 @@ type DealRowProps = {
   statusLabels: Record<PromiseStatus, string>;
 };
 
-const LEGACY_BETA_BANNER_DISMISSED_KEYS = ["betaBannerDismissed", "beta-banner-dismissed"];
+const BETA_BANNER_DISMISSED_KEY = "dreddi_banner_beta_v1_dismissed";
 
 function DealRow({
   item,
@@ -143,6 +144,8 @@ export default function Home() {
   const copy = useMemo(() => getLandingCopy(locale), [locale]);
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+  const [isBannerStateReady, setIsBannerStateReady] = useState(false);
   const [recentDeals, setRecentDeals] = useState<DealRow[]>([]);
   const [recentLoading, setRecentLoading] = useState(false);
   const [recentError, setRecentError] = useState<string | null>(null);
@@ -214,15 +217,37 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!isBeta || typeof window === "undefined") return;
+    if (!isBeta) {
+      setIsBannerDismissed(true);
+      setIsBannerStateReady(true);
+      return;
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
     try {
-      LEGACY_BETA_BANNER_DISMISSED_KEYS.forEach((key) =>
-        window.localStorage.removeItem(key)
-      );
+      setIsBannerDismissed(window.localStorage.getItem(BETA_BANNER_DISMISSED_KEY) === "1");
     } catch {
-      // Ignore storage cleanup errors (private mode, blocked storage, etc.).
+      setIsBannerDismissed(false);
+    } finally {
+      setIsBannerStateReady(true);
     }
   }, [isBeta]);
+
+  const dismissBetaBanner = () => {
+    setIsBannerDismissed(true);
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(BETA_BANNER_DISMISSED_KEY, "1");
+    } catch {
+      // Ignore storage write errors (private mode, blocked storage, etc.).
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -432,6 +457,7 @@ export default function Home() {
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
+  const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index, lines) => (
@@ -446,14 +472,22 @@ export default function Home() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      {isBeta ? (
+      {showBetaBanner ? (
         <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
           <div className="rounded-2xl border border-amber-300/25 bg-gradient-to-r from-amber-500/15 via-slate-900/20 to-rose-500/10 px-4 py-2 text-sm text-slate-50 shadow-[0_8px_24px_rgba(5,15,20,0.35)] backdrop-blur">
             <div className="flex items-center gap-3">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.5)]" aria-hidden />
-              <p className="text-sm text-slate-100/80">
+              <p className="flex-1 text-sm text-slate-100/80">
                 {t("landing.betaBanner.body")}
               </p>
+              <button
+                type="button"
+                onClick={dismissBetaBanner}
+                aria-label={t("landing.betaBanner.dismiss")}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-slate-200/80 transition-colors duration-150 hover:bg-white/5 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
             </div>
           </div>
         </div>
