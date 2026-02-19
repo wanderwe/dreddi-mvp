@@ -4,6 +4,7 @@ export type LandingCopy = {
     eyebrow: string;
     headline: string;
     description: string;
+    punchline: string;
   };
   useDreddi: {
     label: string;
@@ -82,7 +83,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Легкий трекер домовленостей",
       headline: "Домовленість починається з підтвердження",
       description:
-        "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
+        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\nПублічно або приватно — без контрактів, без тиску",
+      punchline: "З видимими наслідками для репутації",
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -175,7 +177,8 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
-        "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+        "Track agreements with friends, partners or clients.\nPublic or private — no contracts, no pressure",
+      punchline: "With visible consequences for reputation",
     },
     useDreddi: {
       label: "Use cases",

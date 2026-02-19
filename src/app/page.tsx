@@ -459,16 +459,6 @@ export default function Home() {
   const recentDealsTitle = copy.recentDeals.title;
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
-  const renderMultiline = (text: string) =>
-    text.split("\n").map((line, index, lines) => (
-      <span
-        key={`${line}-${index}`}
-        className={index === 0 ? "block" : "mt-1 block"}
-      >
-        {line}
-      </span>
-    ));
-
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
@@ -496,8 +486,8 @@ export default function Home() {
       ) : null}
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
+        <div className="flex flex-1 flex-col gap-5 md:gap-7">
+          <div className="order-1 space-y-3">
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
@@ -513,11 +503,14 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-xl font-semibold text-white">
+            <h1 className="max-w-xl text-xl font-semibold leading-tight text-white sm:text-2xl">
               {copy.hero.headline}
+            </h1>
+            <p className="max-w-xl whitespace-pre-line text-base leading-snug text-slate-200/78 sm:text-lg">
+              {copy.hero.description}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
-              {renderMultiline(copy.hero.description)}
+            <p className="max-w-xl text-base font-normal leading-tight tracking-[-0.01em] text-emerald-200/72 sm:text-[1.05rem]">
+              {copy.hero.punchline}
             </p>
           </div>
 
