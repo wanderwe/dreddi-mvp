@@ -161,19 +161,19 @@ export default function Home() {
         id: "demo-1",
         titleKey: "landing.demoDeals.deal1.title",
         status: "confirmed" as const,
-        confirmed_at: "2024-01-23T19:54:00",
+        confirmed_at: "2026-02-14T19:10:00",
       },
       {
         id: "demo-2",
         titleKey: "landing.demoDeals.deal2.title",
         status: "confirmed" as const,
-        confirmed_at: "2024-01-19T11:20:00",
+        confirmed_at: "2026-02-10T11:35:00",
       },
       {
         id: "demo-3",
         titleKey: "landing.demoDeals.deal3.title",
         status: "active" as const,
-        due_at: "2024-02-02T18:00:00",
+        due_at: "2026-03-01T18:00:00",
       },
     ],
     []
@@ -442,6 +442,11 @@ export default function Home() {
   const confirmedCount = rep?.confirmed_count ?? 0;
   const confirmedWithDeadlineCount = rep?.confirmed_with_deadline_count ?? 0;
   const disputedCount = rep?.disputed_count ?? 0;
+  const demoMetrics = {
+    score: 78,
+    confirmed: 24,
+    disputed: 1,
+  };
   const onTimeCount = rep?.on_time_count ?? 0;
   const onTimePercentage =
     confirmedWithDeadlineCount > 0
@@ -449,11 +454,16 @@ export default function Home() {
       : null;
   const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
-  const onTimeLineValue = hasDueDateDeals
-    ? reputationLoading
+  const onTimeLineValue = !isAuthenticated
+    ? "92%"
+    : reputationLoading
       ? copy.loading.placeholder
-      : onTimeSummary
-    : "—";
+      : hasDueDateDeals
+        ? onTimeSummary
+        : copy.score.onTime.empty;
+  const scoreValue = !isAuthenticated ? demoMetrics.score : score;
+  const confirmedValue = !isAuthenticated ? demoMetrics.confirmed : confirmedCount;
+  const disputedValue = !isAuthenticated ? demoMetrics.disputed : disputedCount;
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
@@ -574,17 +584,19 @@ export default function Home() {
             <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
-                {email ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
-                    {copy.score.live}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
-                    {copy.score.signIn}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {email ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                      <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
+                      {copy.score.live}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
+                      {copy.score.signIn}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -597,7 +609,7 @@ export default function Home() {
                       <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={score}
+                        value={scoreValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]"
                       />
                     </div>
@@ -608,7 +620,7 @@ export default function Home() {
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={confirmedCount}
+                        value={confirmedValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white"
                       />
                     </div>
@@ -619,7 +631,7 @@ export default function Home() {
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
-                        value={disputedCount}
+                        value={disputedValue}
                         className="mt-1 text-3xl font-semibold leading-none text-white"
                       />
                     </div>
@@ -639,7 +651,14 @@ export default function Home() {
 
                 <div>
                   <div className="flex items-center justify-between text-sm text-slate-300">
-                    <span>{recentDealsTitle}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{recentDealsTitle}</span>
+                      {!isAuthenticated ? (
+                        <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-400 ring-1 ring-white/10">
+                          {copy.score.demoBadge}
+                        </span>
+                      ) : null}
+                    </div>
                     <Link
                       href={recentDealsHref}
                       className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
