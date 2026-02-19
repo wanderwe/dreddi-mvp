@@ -463,7 +463,7 @@ export default function Home() {
     text.split("\n").map((line, index, lines) => (
       <span
         key={`${line}-${index}`}
-        className={index === 0 ? "block" : "mt-1 block"}
+        className={index === 0 ? "block" : "mt-0.5 block"}
       >
         {line}
       </span>
@@ -516,7 +516,7 @@ export default function Home() {
             <p className="max-w-xl text-xl font-semibold text-white">
               {copy.hero.headline}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
