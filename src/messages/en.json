@@ -28,13 +28,13 @@
     },
     "demoDeals": {
       "deal1": {
-        "title": "Sell the car after receiving a deposit"
+        "title": "Help with moving on Saturday"
       },
       "deal2": {
-        "title": "Help with the move over the weekend"
+        "title": "Prepare an investor pitch"
       },
       "deal3": {
-        "title": "Prepare a renovation estimate by Friday"
+        "title": "Return $200 by March 1"
       }
     }
   },
