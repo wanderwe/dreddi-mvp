@@ -12,49 +12,42 @@ type ReputationSectionProps = {
 
 export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-16">
-      <div
-        className="pointer-events-none absolute inset-x-0 -top-16 h-28 bg-gradient-to-b from-sky-400/25 via-sky-400/10 to-transparent blur-3xl"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-x-8 -top-2 h-px bg-gradient-to-r from-transparent via-sky-300/40 to-transparent"
-        aria-hidden
-      />
-
-      <div className="relative space-y-8 sm:space-y-10">
+    <section className="relative mx-auto w-full max-w-5xl px-4 pb-20 sm:px-6 sm:pb-24">
+      <div className="relative space-y-9 sm:space-y-11">
         <div className="space-y-3 text-center sm:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-[11px] font-medium text-sky-200 sm:text-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-medium text-slate-300 sm:text-xs">
             <Sparkles className="h-4 w-4" />
             {copy.label}
           </span>
-          <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+          <h2 className="text-2xl font-semibold text-white sm:text-3xl">
             {copy.title}
           </h2>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <ol className="relative space-y-6 pl-6 text-base text-slate-200/90 sm:space-y-8 sm:text-lg">
-            {copy.steps.map((item, index) => {
-              const Icon = stepIcons[index] ?? CheckCircle2;
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+          <div className="glass-panel rounded-3xl px-5 py-6 sm:px-6 sm:py-7">
+            <ol className="space-y-4 text-sm text-slate-200/90 sm:text-base">
+              {copy.steps.map((item, index) => {
+                const Icon = stepIcons[index] ?? CheckCircle2;
 
-              return (
-                <li key={item} className="relative flex items-center gap-4">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/15 text-sky-100 ring-1 ring-sky-400/30">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="leading-relaxed">{item}</span>
-                </li>
-              );
-            })}
-          </ol>
+                return (
+                  <li key={item} className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500/15 text-sky-100 ring-1 ring-sky-400/30">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
 
-          <div className="rounded-3xl bg-gradient-to-br from-white/10 via-white/5 to-slate-900/40 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.6)] ring-1 ring-emerald-500/20">
+          <div className="glass-panel rounded-3xl px-5 py-6 sm:px-6 sm:py-7">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-400">
                 {copy.outcomeTitle}
               </p>
-              <h3 className="text-2xl font-semibold text-white">
+              <h3 className="text-xl font-semibold text-white sm:text-2xl">
                 {copy.outcomeDescription}
               </h3>
             </div>
@@ -73,7 +66,7 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
 
             <Link
               href="/u"
-              className="mt-8 inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+              className="mt-7 inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
             >
               {copy.cta}
             </Link>

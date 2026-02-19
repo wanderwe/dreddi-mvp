@@ -495,7 +495,7 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-12 px-4 pb-14 pt-20 sm:px-6 md:gap-20 md:flex-row md:items-center md:py-16">
         <div className="flex-1 flex flex-col gap-5 md:gap-7">
           <div className="order-1 space-y-4">
             <div className="flex items-center gap-4 sm:gap-5">
@@ -516,7 +516,7 @@ export default function Home() {
             <p className="max-w-xl text-xl font-semibold text-white">
               {copy.hero.headline}
             </p>
-            <p className="max-w-xl text-lg text-slate-300">
+            <p className="max-w-2xl text-lg text-slate-300">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
@@ -534,12 +534,6 @@ export default function Home() {
               >
                 {copy.cta.getStarted}
               </Link>
-              <Link
-                href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta.reviewDeals}
-              </Link>
             </div>
           ) : (
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
@@ -548,12 +542,6 @@ export default function Home() {
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
               >
                 {copy.cta.createPromise}
-              </Link>
-              <Link
-                href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta.reviewDeals}
               </Link>
             </div>
           )}
