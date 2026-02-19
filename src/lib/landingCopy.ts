@@ -44,6 +44,7 @@ export type LandingCopy = {
     overviewLabel: string;
     live: string;
     signIn: string;
+    demoBadge: string;
     cards: {
       confirmed: string;
       disputed: string;
@@ -139,6 +140,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Огляд домовленостей",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення",
+      demoBadge: "Приклад профілю",
       cards: {
         confirmed: "Підтверджено",
         disputed: "Оскаржено",
@@ -146,7 +148,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       onTime: {
         label: "Вчасні виконання",
         helper: "Тут враховуються лише підтверджені угоди зі строком",
-        empty: "Поки що немає угод зі строком",
+        empty: "Ще немає даних",
       },
     },
     recentDeals: {
@@ -232,6 +234,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Agreement Snapshot",
       live: "Live",
       signIn: "Sign in to see updates",
+      demoBadge: "Demo profile",
       cards: {
         confirmed: "Confirmed",
         disputed: "Disputed",
@@ -239,7 +242,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       onTime: {
         label: "On-time outcomes",
         helper: "Only confirmed deals with a due date count here",
-        empty: "No deals with a due date yet",
+        empty: "No data yet",
       },
     },
     recentDeals: {

@@ -161,19 +161,19 @@ export default function Home() {
         id: "demo-1",
         titleKey: "landing.demoDeals.deal1.title",
         status: "confirmed" as const,
-        confirmed_at: "2024-01-23T19:54:00",
+        confirmed_at: "2026-02-14T19:10:00",
       },
       {
         id: "demo-2",
         titleKey: "landing.demoDeals.deal2.title",
         status: "confirmed" as const,
-        confirmed_at: "2024-01-19T11:20:00",
+        confirmed_at: "2026-02-10T11:35:00",
       },
       {
         id: "demo-3",
         titleKey: "landing.demoDeals.deal3.title",
         status: "active" as const,
-        due_at: "2024-02-02T18:00:00",
+        due_at: "2026-03-01T18:00:00",
       },
     ],
     []
@@ -449,11 +449,13 @@ export default function Home() {
       : null;
   const onTimeSummary = onTimePercentage === null ? null : `${onTimePercentage}%`;
   const hasDueDateDeals = confirmedWithDeadlineCount > 0;
-  const onTimeLineValue = hasDueDateDeals
-    ? reputationLoading
+  const onTimeLineValue = !isAuthenticated
+    ? "92%"
+    : reputationLoading
       ? copy.loading.placeholder
-      : onTimeSummary
-    : "—";
+      : hasDueDateDeals
+        ? onTimeSummary
+        : copy.score.onTime.empty;
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
@@ -574,17 +576,24 @@ export default function Home() {
             <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
-                {email ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
-                    {copy.score.live}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
-                    {copy.score.signIn}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {!isAuthenticated ? (
+                    <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-400 ring-1 ring-white/10">
+                      {copy.score.demoBadge}
+                    </span>
+                  ) : null}
+                  {email ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                      <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
+                      {copy.score.live}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
+                      {copy.score.signIn}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div>
