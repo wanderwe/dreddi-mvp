@@ -8,11 +8,17 @@ export type LandingCopy = {
   useDreddi: {
     label: string;
     title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
+    subtitle: string;
+    beforeTitle: string;
+    beforeBullets: string[];
+    afterTitle: string;
+    afterBullets: string[];
+    highlightWords: string[];
+    ctaLine: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+    previewDelta: string;
+    previewNote: string;
   };
   reputation: {
     label: string;
@@ -85,25 +91,29 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.",
     },
     useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+      label: "Ситуація",
+      title: "Коли домовленість лише на словах",
+      subtitle: "Знайомо?",
+      beforeTitle: "Без фіксації",
+      beforeBullets: [
+        "Дедлайн “на словах”",
+        "Ніхто нічого не памʼятає",
+        "Починається “я думав ти…”",
+        "Неприємне відчуття, що все розплилось",
       ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
+      afterTitle: "Коли домовленість зафіксована в Dreddi",
+      afterBullets: [
+        "Є конкретна дата",
+        "Обом приходить нагадування",
+        "Виконання підтверджують обидві сторони",
+        "Результат видно в профілі",
       ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+      highlightWords: ["дата", "нагадування", "підтверджують", "профілі"],
+      ctaLine: "Фіксуйте домовленості до того, як стане незручно.",
+      ctaPrimary: "Створити домовленість",
+      ctaSecondary: "Подивитись приклад профілю",
+      previewDelta: "+1 підтверджено",
+      previewNote: "Обидві сторони підтвердили виконання",
     },
     reputation: {
       label: "Результат",
@@ -178,25 +188,29 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.",
     },
     useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+      label: "Situation",
+      title: "When an agreement is just words",
+      subtitle: "Recognize this?",
+      beforeTitle: "Without recording",
+      beforeBullets: [
+        "Deadline “on words”",
+        "No one remembers clearly",
+        "It turns into “I thought you…”",
+        "Awkward tension",
       ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
+      afterTitle: "When it’s recorded in Dreddi",
+      afterBullets: [
+        "Clear date",
+        "Reminders for both",
+        "Both confirm completion",
+        "Result visible on profile",
       ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
+      highlightWords: ["date", "Reminders", "confirm", "profile"],
+      ctaLine: "Fix agreements before they turn awkward.",
+      ctaPrimary: "Create an agreement",
+      ctaSecondary: "View example profile",
+      previewDelta: "+1 confirmed",
+      previewNote: "Both sides confirmed completion",
     },
     reputation: {
       label: "Outcome",
