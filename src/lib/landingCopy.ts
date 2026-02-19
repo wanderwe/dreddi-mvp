@@ -14,6 +14,20 @@ export type LandingCopy = {
     noteTitle: string;
     framing: string;
   };
+  afterConfirmation: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    bullets: string[];
+    emphasis: string;
+    ctaPrimary: string;
+    ctaSecondary?: string;
+    highlight: {
+      confirmedPill: string;
+      title: string;
+      hint: string;
+    };
+  };
   reputation: {
     label: string;
     title: string;
@@ -105,6 +119,25 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Не для всього",
       framing:
         "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+    },
+    afterConfirmation: {
+      eyebrow: "Після підтвердження",
+      title: "Коли ви підтвердили домовленість",
+      subtitle: "Динаміка змінюється: це вже не “можливо”, це обіцянка",
+      bullets: [
+        "Ви вже не просто “плануєте” — ви пообіцяли",
+        "Інша сторона це бачить",
+        "Результат буде зафіксований",
+        "Це стає частиною історії у профілі",
+      ],
+      emphasis: "Легка видимість → більше відповідальності",
+      ctaPrimary: "Створити угоду",
+      ctaSecondary: "Подивитись приклад профілю",
+      highlight: {
+        confirmedPill: "Підтверджено",
+        title: "Видимо у профілі",
+        hint: "Після підтвердження домовленість стає соціальним сигналом довіри.",
+      },
     },
     reputation: {
       label: "Результат",
@@ -199,6 +232,25 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       noteTitle: "Not for everything",
       framing:
         "For agreements where it’s too early for contracts but already risky to rely on words",
+    },
+    afterConfirmation: {
+      eyebrow: "After confirmation",
+      title: "When you confirm an agreement",
+      subtitle: "The dynamic changes: it’s no longer “maybe” — it’s a promise",
+      bullets: [
+        "You’re not just “planning” anymore — you committed",
+        "The other side can see it",
+        "The outcome will be recorded",
+        "It becomes part of your profile history",
+      ],
+      emphasis: "A little visibility → more follow-through",
+      ctaPrimary: "Create a deal",
+      ctaSecondary: "View example profile",
+      highlight: {
+        confirmedPill: "Confirmed",
+        title: "Visible on profile",
+        hint: "Once confirmed, the agreement becomes a social trust signal.",
+      },
     },
     reputation: {
       label: "Outcome",
