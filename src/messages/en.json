@@ -180,8 +180,8 @@
         "invalidState": "Reminders are available only while someone is waiting for action",
         "acceptedOnly": "Reminders are available only after a deal is accepted",
         "last": "Last reminder: {date}",
-        "tooltip": "Click to send a reminder to the other side",
-        "tooltipWithLast": "Click to send a reminder to the other side.\nLast reminder: {date}"
+        "tooltip": "Send a reminder to the other side",
+        "tooltipWithLast": "Send a reminder to the other side\nLast reminder: {date}"
       },
       "errors": {
         "markComplete": "Could not mark complete",
