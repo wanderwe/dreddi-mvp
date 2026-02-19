@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { ReputationSection } from "@/app/components/landing/ReputationSection";
-import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
+import { HowItWorksSection } from "@/app/components/landing/HowItWorksSection";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
@@ -666,7 +666,7 @@ export default function Home() {
         </div>
       </div>
 
-      <UseCasesSection copy={copy.useDreddi} />
+      <HowItWorksSection copy={copy.howItWorks} />
       <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
     </main>
   );

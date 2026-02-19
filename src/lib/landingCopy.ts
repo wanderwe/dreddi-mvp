@@ -5,14 +5,28 @@ export type LandingCopy = {
     headline: string;
     description: string;
   };
-  useDreddi: {
+  howItWorks: {
     label: string;
     title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
+    subtitle: string;
+    timeline: string[];
+    cards: {
+      agreement: {
+        title: string;
+        meta: string;
+        status: string;
+        cta: string;
+      };
+      reminder: {
+        label: string;
+        text: string;
+      };
+      result: {
+        status: string;
+        profileHint: string;
+        counter: string;
+      };
+    };
   };
   reputation: {
     label: string;
@@ -84,34 +98,42 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.",
     },
-    useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+    howItWorks: {
+      label: "Як це працює",
+      title: "Один сценарій — і ви зрозумієте Dreddi",
+      subtitle:
+        "Без контрактів. Просто зафіксували — і обидві сторони бачать результат.",
+      timeline: [
+        "Домовились про допомогу з переїздом у суботу",
+        "Зафіксували домовленість у Dreddi",
+        "Нагадування приходить обом",
+        "Після виконання — обидві сторони підтверджують",
       ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
-      ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+      cards: {
+        agreement: {
+          title: "Допомога з переїздом",
+          meta: "Субота, 12:00",
+          status: "Очікує підтвердження",
+          cta: "Підтвердити",
+        },
+        reminder: {
+          label: "Нагадування",
+          text: 'Завтра дедлайн: "Допомога з переїздом"',
+        },
+        result: {
+          status: "Підтверджено",
+          profileHint: "Додано до профілю",
+          counter: "Підтверджено: +1",
+        },
+      },
     },
     reputation: {
       label: "Результат",
-      title: "Репутація будується виконанням",
+      title: "Результат видно обом сторонам",
       steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+        "Домовленість зберігається в Dreddi",
+        "Після виконання обидві сторони підтверджують результат",
+        "Підтверджені результати видно у профілі",
       ],
       outcomeTitle: "Публічний профіль",
       outcomeDescription: "Відображає підтверджені та оскаржені угоди",
@@ -177,34 +199,42 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.",
     },
-    useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+    howItWorks: {
+      label: "How it works",
+      title: "One example, and you’ll get Dreddi",
+      subtitle:
+        "No contracts. Just capture it — and both sides can confirm the outcome.",
+      timeline: [
+        "Agreed to help with the move on Saturday",
+        "Captured the agreement in Dreddi",
+        "Both get a reminder",
+        "After it’s done — both confirm",
       ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
-      ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
+      cards: {
+        agreement: {
+          title: "Help with moving",
+          meta: "Saturday, 12:00",
+          status: "Pending confirmation",
+          cta: "Confirm",
+        },
+        reminder: {
+          label: "Reminder",
+          text: 'Deadline tomorrow: "Help with moving"',
+        },
+        result: {
+          status: "Confirmed",
+          profileHint: "Added to profile",
+          counter: "Confirmed: +1",
+        },
+      },
     },
     reputation: {
       label: "Outcome",
-      title: "Reputation is built by execution",
+      title: "Both sides see the outcome",
       steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
+        "The agreement is captured in Dreddi",
+        "After it’s done, both sides confirm what happened",
+        "Confirmed outcomes appear on the profile",
       ],
       outcomeTitle: "Public profile",
       outcomeDescription: "Shows confirmed and disputed deals",
