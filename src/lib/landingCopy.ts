@@ -82,7 +82,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Легкий трекер домовленостей",
       headline: "Домовленість починається з підтвердження",
       description:
-        "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
+        "Фіксуйте угоди з друзями, партнерами та клієнтами\nПросто, публічно або приватно — без контрактів, без тиску\nАле з видимими наслідками для репутації",
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -118,9 +118,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "Переглянути приклад профілю",
     },
     cta: {
-      getStarted: "Створити угоду",
+      getStarted: "Створити домовленість",
       publicProfiles: "Переглянути публічні профілі",
-      createPromise: "Створити угоду",
+      createPromise: "Створити домовленість",
       reviewDeals: "Переглянути угоди",
     },
     loading: {
@@ -175,7 +175,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
-        "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+        "Track deals with friends, partners and clients\nSimple, public or private — no contracts, no pressure\nBut with visible consequences for reputation",
     },
     useDreddi: {
       label: "Use cases",
@@ -211,9 +211,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "View example profile",
     },
     cta: {
-      getStarted: "Create a deal",
+      getStarted: "Create an agreement",
       publicProfiles: "View public profiles",
-      createPromise: "Create a deal",
+      createPromise: "Create an agreement",
       reviewDeals: "View deals",
     },
     loading: {
