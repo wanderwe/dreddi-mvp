@@ -11,6 +11,7 @@ export type LandingCopy = {
     bullets: string[];
     scenariosTitle: string;
     scenarios: string[];
+    transitionTitle: string;
     noteTitle: string;
     framing: string;
   };
@@ -90,7 +91,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "Коли варто використовувати Dreddi",
       bullets: [
         "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
         "Ви чуєте «давайте поки просто домовимось»",
         "Ви ще не хочете юристів — але й хаосу теж",
       ],
@@ -98,21 +98,21 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       scenarios: [
         "Фріланс і послуги до контрактів",
         "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
         "Підрядники та довгі проєкти",
         "Пілотні проєкти / тестова співпраця",
       ],
+      transitionTitle: "Як це працює",
       noteTitle: "Не для всього",
       framing:
         "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
     },
     reputation: {
       label: "Результат",
-      title: "Репутація будується виконанням",
+      title: "Репутація — це підтверджене виконання",
       steps: [
         "Домовленість фіксується в Dreddi",
         "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+        "Підтвердження формують репутацію",
       ],
       outcomeTitle: "Публічний профіль",
       outcomeDescription: "Відображає дотримані та оскаржені угоди",
@@ -184,7 +184,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "Use Dreddi when",
       bullets: [
         "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
         "You hear “let’s just agree for now”",
         "You don’t want lawyers yet — but don’t want chaos either",
       ],
@@ -192,10 +191,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       scenarios: [
         "Freelance & services before contracts",
         "Early-stage partnerships",
-        "Real estate negotiations",
         "Contractors & long-term jobs",
         "Pilot projects / test collaborations",
       ],
+      transitionTitle: "How it works",
       noteTitle: "Not for everything",
       framing:
         "For agreements where it’s too early for contracts but already risky to rely on words",
