@@ -707,6 +707,55 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <section className="relative mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6">
+        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.015] px-5 py-6 sm:px-7 sm:py-7">
+          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.08em] text-slate-300/80">
+            {copy.socialMechanism.eyebrow}
+          </span>
+
+          <h2 className="mt-3 text-xl font-medium tracking-[-0.01em] text-white sm:text-[1.72rem]">
+            {copy.socialMechanism.title}
+          </h2>
+
+          <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-10">
+            <div className="text-slate-300/85">
+              <p className="text-xs uppercase tracking-[0.08em] text-slate-400/85">
+                {copy.socialMechanism.beforeTitle}
+              </p>
+              <ul className="mt-3 space-y-1.5 text-sm leading-tight">
+                {copy.socialMechanism.beforePoints.map((point) => (
+                  <li key={point} className="text-slate-300/85">
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+              <p className="text-sm leading-snug text-slate-200">{copy.socialMechanism.afterTitle}</p>
+              <div className="mt-3 space-y-1.5 text-sm leading-tight text-slate-300/90">
+                {copy.socialMechanism.afterPoints.map((point) => (
+                  <p key={point}>{point}</p>
+                ))}
+              </div>
+
+              <div className="mt-4 space-y-1 text-[0.95rem] leading-snug text-emerald-100/80">
+                {copy.socialMechanism.punchline.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+
+              <Link
+                href="/u"
+                className="mt-4 inline-flex text-sm text-slate-300 transition hover:text-emerald-200"
+              >
+                {copy.socialMechanism.cta}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
