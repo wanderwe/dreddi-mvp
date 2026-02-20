@@ -75,6 +75,26 @@ export type LandingCopy = {
       declined: string;
     };
   };
+  howItWorks: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    steps: {
+      title: string;
+      line: string;
+    }[];
+    demo: {
+      dealTitle: string;
+      dealMeta: string;
+      dealStatus: string;
+      reminder: string;
+      confirmed: string;
+      confirmedPlus: string;
+      addedToProfile: string;
+    };
+    primaryCta: string;
+    secondaryCta: string;
+  };
 };
 
 export const landingCopy: Record<Locale, LandingCopy> = {
@@ -171,6 +191,36 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Відхилено",
       },
     },
+    howItWorks: {
+      eyebrow: "Як це працює",
+      title: "Домовленість — не просто слова",
+      subtitle: "Зафіксували → нагадали → підтвердили → результат видно",
+      steps: [
+        {
+          title: "Домовились",
+          line: "Дедлайн “на словах” швидко плутається",
+        },
+        {
+          title: "Зафіксували в Dreddi",
+          line: "Дата + нагадування обом",
+        },
+        {
+          title: "Підтвердили результат",
+          line: "Обидві сторони підтверджують — і це видно в профілі",
+        },
+      ],
+      demo: {
+        dealTitle: "Лендінг для клієнта",
+        dealMeta: "24 бер, 18:30",
+        dealStatus: "Очікує підтвердження",
+        reminder: "Нагадування завтра",
+        confirmed: "Підтверджено",
+        confirmedPlus: "+1 підтверджено",
+        addedToProfile: "Додано в профіль",
+      },
+      primaryCta: "Створити домовленість",
+      secondaryCta: "Подивитись приклад профілю",
+    },
   },
   en: {
     hero: {
@@ -264,6 +314,36 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         disputed: "Disputed",
         declined: "Declined",
       },
+    },
+    howItWorks: {
+      eyebrow: "How it works",
+      title: "An agreement is more than words",
+      subtitle: "Record → remind → confirm → visible result",
+      steps: [
+        {
+          title: "Agreed",
+          line: "A deadline “on words” gets blurry fast",
+        },
+        {
+          title: "Recorded in Dreddi",
+          line: "Date + reminders for both sides",
+        },
+        {
+          title: "Result confirmed",
+          line: "Both sides confirm — and it becomes visible in profile",
+        },
+      ],
+      demo: {
+        dealTitle: "Client landing page",
+        dealMeta: "Mar 24, 6:30 PM",
+        dealStatus: "Awaiting confirmation",
+        reminder: "Reminder tomorrow",
+        confirmed: "Confirmed",
+        confirmedPlus: "+1 confirmed",
+        addedToProfile: "Added to profile",
+      },
+      primaryCta: "Create an agreement",
+      secondaryCta: "View example profile",
     },
   },
 };
