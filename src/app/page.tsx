@@ -152,6 +152,7 @@ export default function Home() {
   const [reputationError, setReputationError] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
+  const showAuthenticatedCta = ready && isAuthenticated;
   const isBeta = process.env.NEXT_PUBLIC_BETA !== "false";
   const demoDealsSource: DemoDealSource[] = useMemo(
     () => [
@@ -529,12 +530,7 @@ export default function Home() {
             </p>
           </div>
 
-          {!ready ? (
-            <div className="order-3 flex items-center gap-3 text-slate-400 md:order-4">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-              {copy.loading.session}
-            </div>
-          ) : !isAuthenticated ? (
+          {!showAuthenticatedCta ? (
             <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
               <Link
                 href="/login"
@@ -543,10 +539,10 @@ export default function Home() {
                 {copy.cta.getStarted}
               </Link>
               <Link
-                href="/promises"
+                href="/u"
                 className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
               >
-                {copy.cta.reviewDeals}
+                {copy.cta.publicProfiles}
               </Link>
             </div>
           ) : (

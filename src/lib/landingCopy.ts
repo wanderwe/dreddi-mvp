@@ -120,7 +120,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     cta: {
       getStarted: "Створити угоду",
-      publicProfiles: "Переглянути публічні профілі",
+      publicProfiles: "Переглянути профілі",
       createPromise: "Створити угоду",
       reviewDeals: "Переглянути угоди",
     },
@@ -214,7 +214,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     cta: {
       getStarted: "Create a deal",
-      publicProfiles: "View public profiles",
+      publicProfiles: "Browse profiles",
       createPromise: "Create a deal",
       reviewDeals: "View deals",
     },
