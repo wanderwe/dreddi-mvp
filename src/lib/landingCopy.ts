@@ -75,12 +75,37 @@ export type LandingCopy = {
       declined: string;
     };
   };
-  socialMechanism: {
-    leftTitle: string;
-    leftLines: string[];
-    rightTitle: string;
-    rightLines: string[];
-    closingLine: string;
+  comparison: {
+    eyebrow: string;
+    title: string;
+    withoutTitle: string;
+    withoutPoints: string[];
+    recordedTitle: string;
+    recordedPoints: string[];
+    demo: {
+      dealTitle: string;
+      dealMeta: string;
+      dealStatus: string;
+      reminder: string;
+      confirmed: string;
+      addedToProfile: string;
+    };
+    ctaLine: string;
+  };
+  verification: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    points: string[];
+    cardLabel: string;
+    cardHint: string;
+    chips: {
+      confirmed: string;
+      disputed: string;
+      reputation: string;
+    };
+    primaryCta: string;
+    secondaryCta: string;
   };
 };
 
@@ -178,21 +203,50 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Відхилено",
       },
     },
-    socialMechanism: {
-      leftTitle: "Домовленості іноді ламаються не через наміри",
-      leftLines: [
-        "Дедлайн “на словах”.",
-        "Ніхто нічого не памʼятає.",
-        "Починається “я думав ти…”.",
-        "Зʼявляється напруга.",
+    comparison: {
+      eyebrow: "Ситуація",
+      title: "Коли домовленість залишається словами",
+      withoutTitle: "Без фіксації",
+      withoutPoints: [
+        "Дедлайн “на словах”",
+        "Ніхто нічого не пам’ятає",
+        "Починається “я думав ти…”",
+        "Це тихо переростає в конфлікт",
       ],
-      rightTitle: "Коли домовленість підтверджено — вона стає видимою.",
-      rightLines: [
-        "Інша сторона це бачить.",
-        "Результат буде зафіксований.",
-        "Це відображається у профілі.",
+      recordedTitle: "Зафіксовано в Dreddi",
+      recordedPoints: [
+        "Є дата і нагадування обом",
+        "Після виконання — підтвердження двох сторін",
+        "Результат видно в профілі",
       ],
-      closingLine: "Видимість додає відповідальності.",
+      demo: {
+        dealTitle: "Лендінг для клієнта",
+        dealMeta: "24 бер, 18:30",
+        dealStatus: "Очікує підтвердження",
+        reminder: "Нагадування завтра",
+        confirmed: "Підтверджено +1",
+        addedToProfile: "Додано в профіль",
+      },
+      ctaLine: "Фіксуйте домовленості до того, як стане незручно",
+    },
+    verification: {
+      eyebrow: "Перевірка",
+      title: "Працюйте з тими, хто виконує",
+      subtitle: "Профіль показує реальну історію підтверджених та оскаржених домовленостей",
+      points: [
+        "Історія виконання — не обіцянки",
+        "Підтверджені та оскаржені результати",
+        "Швидше рішення: довіряти чи ні",
+      ],
+      cardLabel: "Публічний профіль",
+      cardHint: "Історія виконання — в одному місці",
+      chips: {
+        confirmed: "Дотримано",
+        disputed: "Оскаржено",
+        reputation: "Репутація",
+      },
+      primaryCta: "Переглянути приклад профілю",
+      secondaryCta: "Переглянути угоди",
     },
   },
   en: {
@@ -288,21 +342,50 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         declined: "Declined",
       },
     },
-    socialMechanism: {
-      leftTitle: "Agreements don’t fail because of bad intentions.",
-      leftLines: [
-        "A deadline “on words”.",
-        "No one remembers clearly.",
-        "It turns into “I thought you…”.",
-        "Tension builds.",
+    comparison: {
+      eyebrow: "Situation",
+      title: "When an agreement stays verbal",
+      withoutTitle: "Without recording",
+      withoutPoints: [
+        "Deadline “on words”",
+        "No one remembers clearly",
+        "It turns into “I thought you…”",
+        "It quietly turns into conflict",
       ],
-      rightTitle: "Once confirmed, an agreement becomes visible.",
-      rightLines: [
-        "The other side can see it.",
-        "The outcome gets recorded.",
-        "It appears in your profile.",
+      recordedTitle: "Recorded in Dreddi",
+      recordedPoints: [
+        "There’s a date with reminders for both",
+        "After delivery, both sides confirm",
+        "The result appears in the profile",
       ],
-      closingLine: "Visibility adds accountability.",
+      demo: {
+        dealTitle: "Client landing page",
+        dealMeta: "Mar 24, 6:30 PM",
+        dealStatus: "Awaiting confirmation",
+        reminder: "Reminder tomorrow",
+        confirmed: "Confirmed +1",
+        addedToProfile: "Added to profile",
+      },
+      ctaLine: "Fix agreements before they turn awkward",
+    },
+    verification: {
+      eyebrow: "Verification",
+      title: "Work with people who follow through",
+      subtitle: "A profile shows the real history of confirmed and disputed agreements",
+      points: [
+        "Execution history — not promises",
+        "Confirmed and disputed outcomes",
+        "Faster call: trust or pass",
+      ],
+      cardLabel: "Public profile",
+      cardHint: "Execution history in one place",
+      chips: {
+        confirmed: "Fulfilled",
+        disputed: "Disputed",
+        reputation: "Reputation",
+      },
+      primaryCta: "View example profile",
+      secondaryCta: "View deals",
     },
   },
 };
