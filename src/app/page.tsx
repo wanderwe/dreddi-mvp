@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Bell, CalendarClock, CheckCircle2, X } from "lucide-react";
+import { Bell, CheckCircle2, X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
@@ -712,128 +712,76 @@ export default function Home() {
         <div className="h-px w-full bg-white/10" aria-hidden />
         <div className="py-9">
           <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.08em] text-slate-300/80">
-            {copy.comparison.eyebrow}
+            {copy.howItWorks.eyebrow}
           </span>
-          <h2 className="mt-3 max-w-xl text-xl font-medium tracking-[-0.01em] text-white sm:text-[1.72rem]">
-            {copy.comparison.title}
+          <h2 className="mt-3 text-[1.45rem] font-medium tracking-[-0.01em] text-white sm:text-[1.65rem]">
+            {copy.howItWorks.title}
           </h2>
+          <p className="mt-2 text-sm text-slate-300/85">{copy.howItWorks.subtitle}</p>
 
-          <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_56px_minmax(0,1.1fr)] md:items-start">
-            <div>
-              <p className="text-xs uppercase tracking-[0.08em] text-slate-500">{copy.comparison.withoutTitle}</p>
-              <ul className="mt-3 space-y-2 text-sm leading-tight text-slate-400/90">
-                {copy.comparison.withoutPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-2">
-                    <span className="mt-[7px] h-1 w-1 rounded-full bg-slate-500" aria-hidden />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex h-full items-center justify-center py-1">
-              <div className="hidden h-full min-h-28 w-px bg-gradient-to-b from-transparent via-emerald-300/35 to-transparent md:block" />
-              <ArrowRight className="h-4 w-4 text-emerald-200/50 md:hidden" aria-hidden />
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-[0.08em] text-slate-300/85">{copy.comparison.recordedTitle}</p>
-              <ul className="mt-3 space-y-2 text-sm leading-tight text-slate-200/90">
-                {copy.comparison.recordedPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-2">
-                    <span className="mt-[7px] h-1 w-1 rounded-full bg-emerald-300/80" aria-hidden />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-4 space-y-2">
-                <div className="glass-panel rounded-xl border border-white/10 px-3 py-2">
-                  <div className="flex items-center justify-between gap-3 text-xs text-slate-300/85">
-                    <span className="truncate">{copy.comparison.demo.dealTitle}</span>
-                    <span className="shrink-0">{copy.comparison.demo.dealMeta}</span>
-                  </div>
-                  <div className="mt-1 text-xs text-emerald-200/90">{copy.comparison.demo.dealStatus}</div>
-                </div>
-
-                <div className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300/90">
-                  <Bell className="h-3.5 w-3.5 text-emerald-200/80" aria-hidden />
-                  {copy.comparison.demo.reminder}
-                </div>
-
-                <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-200/90">
-                  <span className="inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300/85" aria-hidden />
-                    {copy.comparison.demo.confirmed}
+          <div className="mt-6 grid gap-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-10">
+            <div className="space-y-3">
+              {copy.howItWorks.steps.map((step, idx) => (
+                <div key={step.title} className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-3.5 py-3">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-[11px] font-medium text-slate-200">
+                    {idx + 1}
                   </span>
-                  <span className="text-slate-400">{copy.comparison.demo.addedToProfile}</span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-100">{step.title}</p>
+                    <p className="mt-1 text-xs leading-snug text-slate-300/80">{step.line}</p>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="glass-panel rounded-xl border border-white/10 px-3 py-2 transition duration-200 hover:-translate-y-[1px] hover:border-white/20">
+                <div className="flex items-center justify-between gap-3 text-xs text-slate-300/85">
+                  <span className="truncate">{copy.howItWorks.demo.dealTitle}</span>
+                  <span className="shrink-0">{copy.howItWorks.demo.dealMeta}</span>
+                </div>
+                <div className="mt-1 inline-flex rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2 py-0.5 text-[11px] text-emerald-200/95">
+                  {copy.howItWorks.demo.dealStatus}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-300/90 transition duration-200 hover:border-white/20">
+                <Bell className="h-3.5 w-3.5 text-emerald-200/80" aria-hidden />
+                {copy.howItWorks.demo.reminder}
+              </div>
+
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-200/90 transition duration-200 hover:border-white/20">
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300/85" aria-hidden />
+                  {copy.howItWorks.demo.confirmed}
+                </span>
+                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-0.5 text-[11px] text-emerald-200/90">
+                  {copy.howItWorks.demo.confirmedPlus}
+                </span>
+              </div>
+
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-300/90 transition duration-200 hover:border-white/20">
+                {copy.howItWorks.demo.addedToProfile}
               </div>
             </div>
           </div>
 
-          <p className="mt-6 text-sm text-slate-300/90">{copy.comparison.ctaLine}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/promises/new"
+              className="rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+            >
+              {copy.howItWorks.primaryCta}
+            </Link>
+            <Link
+              href="/u"
+              className="rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/40 hover:text-emerald-200"
+            >
+              {copy.howItWorks.secondaryCta}
+            </Link>
+          </div>
         </div>
         <div className="h-px w-full bg-white/10" aria-hidden />
-      </section>
-
-      <section className="relative mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6">
-        <div className="grid gap-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-10">
-          <div>
-            <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.08em] text-slate-300/80">
-              {copy.verification.eyebrow}
-            </span>
-            <h2 className="mt-3 max-w-xl text-xl font-medium tracking-[-0.01em] text-white sm:text-[1.72rem]">
-              {copy.verification.title}
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-snug text-slate-300/90">{copy.verification.subtitle}</p>
-            <ul className="mt-4 space-y-2 text-sm leading-tight text-slate-200/90">
-              {copy.verification.points.map((point) => (
-                <li key={point} className="flex items-start gap-2">
-                  <span className="mt-[7px] h-1 w-1 rounded-full bg-emerald-300/80" aria-hidden />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="glass-panel rounded-2xl border border-white/10 px-5 py-4 sm:px-6">
-            <p className="text-xs uppercase tracking-[0.08em] text-slate-400/90">{copy.verification.cardLabel}</p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
-                <p className="text-[11px] text-slate-400">{copy.verification.chips.confirmed}</p>
-                <p className="mt-1 text-sm font-medium text-white">24</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
-                <p className="text-[11px] text-slate-400">{copy.verification.chips.disputed}</p>
-                <p className="mt-1 text-sm font-medium text-white">1</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-center">
-                <p className="text-[11px] text-slate-400">{copy.verification.chips.reputation}</p>
-                <p className="mt-1 text-sm font-medium text-white">78</p>
-              </div>
-            </div>
-            <p className="mt-3 inline-flex items-center gap-2 text-xs text-slate-300/85">
-              <CalendarClock className="h-3.5 w-3.5 text-emerald-200/75" aria-hidden />
-              {copy.verification.cardHint}
-            </p>
-
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Link
-                href="/u"
-                className="rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
-              >
-                {copy.verification.primaryCta}
-              </Link>
-              <Link
-                href={recentDealsHref}
-                className="rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/40 hover:text-emerald-200"
-              >
-                {copy.verification.secondaryCta}
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
     </main>
   );
