@@ -76,14 +76,11 @@ export type LandingCopy = {
     };
   };
   socialMechanism: {
-    eyebrow: string;
-    title: string;
-    beforeTitle: string;
-    beforePoints: string[];
-    afterTitle: string;
-    afterPoints: string[];
-    punchline: string[];
-    cta: string;
+    leftTitle: string;
+    leftLines: string[];
+    rightTitle: string;
+    rightLines: string[];
+    closingLine: string;
   };
 };
 
@@ -182,26 +179,20 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
     },
     socialMechanism: {
-      eyebrow: "Соціальний механізм",
-      title: "Домовленості мають наслідки",
-      beforeTitle: "Знайомо?",
-      beforePoints: [
-        "Дедлайн “на словах”",
-        "Ніхто нічого не памʼятає",
-        "Починається “я думав ти…”",
-        "І зʼявляється напруга",
+      leftTitle: "Домовленості іноді ламаються не через наміри",
+      leftLines: [
+        "Дедлайн “на словах”.",
+        "Ніхто нічого не памʼятає.",
+        "Починається “я думав ти…”.",
+        "Зʼявляється напруга.",
       ],
-      afterTitle: "Коли домовленість підтверджено — це вже видно",
-      afterPoints: [
-        "Інша сторона це бачить",
-        "Результат буде зафіксований",
-        "Це стане частиною вашого профілю",
+      rightTitle: "Коли домовленість підтверджено — вона стає видимою.",
+      rightLines: [
+        "Інша сторона це бачить.",
+        "Результат буде зафіксований.",
+        "Це відображається у профілі.",
       ],
-      punchline: [
-        "Видимість створює відповідальність.",
-        "Не через страх — через репутацію.",
-      ],
-      cta: "Подивитись приклад профілю →",
+      closingLine: "Видимість додає відповідальності.",
     },
   },
   en: {
@@ -298,26 +289,20 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       },
     },
     socialMechanism: {
-      eyebrow: "Social mechanism",
-      title: "Agreements have consequences",
-      beforeTitle: "Recognize this?",
-      beforePoints: [
-        "A deadline “on words”",
-        "No one remembers clearly",
-        "It turns into “I thought you…”",
-        "And tension builds",
+      leftTitle: "Agreements don’t fail because of bad intentions.",
+      leftLines: [
+        "A deadline “on words”.",
+        "No one remembers clearly.",
+        "It turns into “I thought you…”.",
+        "Tension builds.",
       ],
-      afterTitle: "Once it’s confirmed — it becomes visible",
-      afterPoints: [
-        "The other side can see it",
-        "The outcome gets recorded",
-        "It becomes part of your profile",
+      rightTitle: "Once confirmed, an agreement becomes visible.",
+      rightLines: [
+        "The other side can see it.",
+        "The outcome gets recorded.",
+        "It appears in your profile.",
       ],
-      punchline: [
-        "Visibility creates accountability.",
-        "Not through fear — through reputation.",
-      ],
-      cta: "View example profile →",
+      closingLine: "Visibility adds accountability.",
     },
   },
 };
