@@ -8,6 +8,7 @@ export type LandingCopy = {
   useDreddi: {
     label: string;
     title: string;
+    comparisonTitle: string;
     bullets: string[];
     scenariosTitle: string;
     scenarios: string[];
@@ -86,13 +87,14 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
     },
     useDreddi: {
-      label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
+      label: "",
+      title: "Коли домовленість — це просто слова",
+      comparisonTitle: "Без фіксації",
       bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+        "Дедлайн “на словах”",
+        "Ніхто нічого не пам’ятає",
+        "Починається “я думав ти...”",
+        "Це тихо переростає в конфлікт",
       ],
       scenariosTitle: "Типові сценарії",
       scenarios: [
@@ -180,13 +182,14 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
     },
     useDreddi: {
-      label: "Use cases",
-      title: "Use Dreddi when",
+      label: "",
+      title: "When an agreement is just words",
+      comparisonTitle: "Without recording",
       bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+        "Deadline “on words”",
+        "No one remembers clearly",
+        "It turns into “I thought you...”",
+        "It quietly turns into conflict",
       ],
       scenariosTitle: "Typical scenarios",
       scenarios: [
