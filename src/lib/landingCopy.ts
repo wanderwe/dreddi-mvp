@@ -106,7 +106,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "Ви бачите, хто тримає слово",
       description: "Публічний профіль показує не слова — а історію виконання.",
       bullets: [
-        "Підтверджені домовленості",
+        "Виконані домовленості",
         "Оскаржені випадки",
         "Ритм виконання",
       ],
@@ -136,7 +136,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Увійдіть, щоб бачити оновлення",
       demoBadge: "Приклад профілю",
       cards: {
-        confirmed: "Дотримано",
+        confirmed: "Виконано",
         disputed: "Оскаржено",
       },
       onTime: {
@@ -160,7 +160,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Активна",
         completedByPromisor: "Очікує перегляду",
-        confirmed: "Дотримано",
+        confirmed: "Виконано",
         disputed: "Оскаржено",
         declined: "Відхилено",
       },
@@ -196,7 +196,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       title: "You can see who keeps their word",
       description: "A public profile shows not claims — but execution history.",
       bullets: [
-        "Confirmed agreements",
+        "Completed agreements",
         "Disputed cases",
         "Execution rhythm",
       ],
@@ -226,7 +226,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Sign in to see updates",
       demoBadge: "Demo profile",
       cards: {
-        confirmed: "Fulfilled",
+        confirmed: "Completed",
         disputed: "Disputed",
       },
       onTime: {
@@ -250,7 +250,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Active",
         completedByPromisor: "Awaiting review",
-        confirmed: "Fulfilled",
+        confirmed: "Completed",
         disputed: "Disputed",
         declined: "Declined",
       },

@@ -1,4 +1,4 @@
-import { CircleDot, Dot, Sparkles } from "lucide-react";
+import { CircleDot, Dot } from "lucide-react";
 
 import type { LandingCopy } from "@/lib/landingCopy";
 
@@ -8,8 +8,8 @@ type UseCasesSectionProps = {
 
 export function UseCasesSection({ copy }: UseCasesSectionProps) {
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 sm:pb-14">
-      <div className="space-y-6 rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+    <section className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6 sm:pb-10">
+      <div className="space-y-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] px-6 py-5 sm:px-8 sm:py-7">
         <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
           <CircleDot className="h-3.5 w-3.5 text-emerald-200" />
           {copy.label}
@@ -38,10 +38,7 @@ export function UseCasesSection({ copy }: UseCasesSectionProps) {
                 </li>
               ))}
             </ul>
-            <p className="mt-5 inline-flex items-center gap-2 text-sm text-emerald-100 sm:text-base">
-              <Sparkles className="h-4 w-4 text-emerald-200/80" />
-              {copy.effectLine}
-            </p>
+            <p className="mt-5 text-sm text-emerald-100 sm:text-base">{copy.effectLine}</p>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ type ReputationSectionProps = {
 
 export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-16">
+    <section className="mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6 sm:pb-14">
       <div className="grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:items-start">
         <div className="space-y-4">
           <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
@@ -50,11 +50,7 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
               <p className="mt-1 text-2xl font-semibold text-white">1</p>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-200/85">
-            <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-100">{copy.bullets[0]}</span>
-            <span className="rounded-full bg-amber-500/15 px-3 py-1 text-amber-100">{copy.bullets[1]}</span>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-slate-200">{copy.bullets[2]}</span>
-          </div>
+          <p className="mt-4 text-xs text-slate-400">{copy.bullets[2]}</p>
         </div>
       </div>
     </section>
