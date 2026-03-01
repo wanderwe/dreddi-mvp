@@ -11,6 +11,8 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
+import { ReputationSection } from "@/app/components/landing/ReputationSection";
 
 type DealRow = {
   id: string;
@@ -707,6 +709,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <UseCasesSection copy={copy.useDreddi} />
+      <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
     </main>
   );
 }
