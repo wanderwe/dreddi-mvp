@@ -31,7 +31,24 @@ export default function NewPromisePage() {
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
   const [showCondition, setShowCondition] = useState(false);
-  const [counterparty, setCounterparty] = useState("");
+  const [counterpartyQuery, setCounterpartyQuery] = useState("");
+  const [selectedCounterparty, setSelectedCounterparty] = useState<{
+    id: string;
+    handle: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+    reputationScore: number | null;
+  } | null>(null);
+  const [counterpartyResults, setCounterpartyResults] = useState<
+    Array<{
+      id: string;
+      handle: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      reputation_score: number | null;
+    }>
+  >([]);
+  const [isCounterpartySearching, setIsCounterpartySearching] = useState(false);
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -51,6 +68,7 @@ export default function NewPromisePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
   const [isPublicDeal, setIsPublicDeal] = useState(true);
+  const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -418,6 +436,48 @@ export default function NewPromisePage() {
     }
   }, [isPublicProfile]);
 
+  useEffect(() => {
+    if (selectedCounterparty || counterpartyQuery.trim().length < 2) {
+      setCounterpartyResults([]);
+      setIsCounterpartySearching(false);
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        setIsCounterpartySearching(true);
+        const res = await fetch(
+          `/api/users/search?q=${encodeURIComponent(counterpartyQuery.trim())}`,
+          { signal: controller.signal }
+        );
+        const payload = (await res.json().catch(() => null)) as {
+          users?: Array<{
+            id: string;
+            handle: string;
+            display_name: string | null;
+            avatar_url: string | null;
+            reputation_score: number | null;
+          }>;
+        } | null;
+        if (!active) return;
+        setCounterpartyResults(payload?.users ?? []);
+      } catch {
+        if (!active) return;
+        setCounterpartyResults([]);
+      } finally {
+        if (active) setIsCounterpartySearching(false);
+      }
+    }, 180);
+
+    return () => {
+      active = false;
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [counterpartyQuery, selectedCounterparty]);
+
   async function createPromise() {
     setBusy(true);
     setError(null);
@@ -442,9 +502,9 @@ export default function NewPromisePage() {
       return;
     }
 
-    const counterpartyContact = counterparty.trim();
+    const secondPartyUserId = selectedCounterparty?.id ?? null;
 
-    if (!counterpartyContact) {
+    if (!secondPartyUserId) {
       setBusy(false);
       setError(t("promises.new.errors.counterpartyRequired"));
       return;
@@ -455,7 +515,7 @@ export default function NewPromisePage() {
       title: title.trim(),
       details: details.trim() || null,
       conditionText: conditionText.trim() || null,
-      counterpartyContact,
+      secondPartyUserId,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
@@ -625,18 +685,103 @@ export default function NewPromisePage() {
                       <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                         {t("promises.new.fields.counterparty")}
                       </span>
-                      <input
-                        id="counterparty"
-                        aria-describedby="counterparty-helper"
-                        className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
-                        placeholder={
-                          executor === "me"
-                            ? t("promises.new.placeholders.counterpartyMe")
-                            : t("promises.new.placeholders.counterpartyOther")
-                        }
-                        value={counterparty}
-                        onChange={(e) => setCounterparty(e.target.value)}
-                      />
+                      {selectedCounterparty ? (
+                        <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
+                          <span className="truncate">@{selectedCounterparty.handle}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedCounterparty(null);
+                              setCounterpartyQuery("");
+                              setCounterpartyResults([]);
+                              setShowCounterpartyDropdown(false);
+                            }}
+                            aria-label={t("promises.new.actions.removeCounterparty")}
+                            className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
+                          >
+                            <X className="h-3 w-3" aria-hidden />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <input
+                            id="counterparty"
+                            autoComplete="off"
+                            className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                            placeholder={
+                              executor === "me"
+                                ? t("promises.new.placeholders.counterpartyMe")
+                                : t("promises.new.placeholders.counterpartyOther")
+                            }
+                            value={counterpartyQuery}
+                            onFocus={() => setShowCounterpartyDropdown(true)}
+                            onBlur={() => {
+                              window.setTimeout(() => setShowCounterpartyDropdown(false), 120);
+                            }}
+                            onChange={(e) => {
+                              setCounterpartyQuery(e.target.value);
+                              setShowCounterpartyDropdown(true);
+                            }}
+                          />
+                          {showCounterpartyDropdown && counterpartyQuery.trim().length >= 2 && (
+                            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-xl shadow-black/40">
+                              {isCounterpartySearching && (
+                                <p className="px-3 py-2 text-xs text-slate-400">
+                                  {t("promises.new.search.searching")}
+                                </p>
+                              )}
+                              {!isCounterpartySearching && counterpartyResults.length === 0 && (
+                                <p className="px-3 py-2 text-xs text-slate-400">
+                                  {t("promises.new.search.noResults")}
+                                </p>
+                              )}
+                              {!isCounterpartySearching &&
+                                counterpartyResults.map((user) => (
+                                  <button
+                                    key={user.id}
+                                    type="button"
+                                    onMouseDown={(event) => {
+                                      event.preventDefault();
+                                      setSelectedCounterparty({
+                                        id: user.id,
+                                        handle: user.handle,
+                                        displayName: user.display_name,
+                                        avatarUrl: user.avatar_url,
+                                        reputationScore: user.reputation_score,
+                                      });
+                                      setCounterpartyQuery("");
+                                      setCounterpartyResults([]);
+                                      setShowCounterpartyDropdown(false);
+                                    }}
+                                    className="flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5"
+                                  >
+                                    <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
+                                      {user.avatar_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
+                                      ) : (
+                                        <div className="flex h-full w-full items-center justify-center text-xs text-slate-300">
+                                          @{user.handle.slice(0, 1).toUpperCase()}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="truncate text-sm text-white">@{user.handle}</p>
+                                      {user.display_name && (
+                                        <p className="truncate text-xs text-slate-400">{user.display_name}</p>
+                                      )}
+                                    </div>
+                                    {typeof user.reputation_score === "number" && (
+                                      <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
+                                        {user.reputation_score.toFixed(1)}
+                                      </span>
+                                    )}
+                                  </button>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </label>
                   </div>
                 )}
@@ -737,7 +882,7 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim() || !counterparty.trim()}
+              disabled={busy || !title.trim() || !selectedCounterparty}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy

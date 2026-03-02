@@ -347,8 +347,8 @@
         "title": "Короткий опис угоди",
         "details": "Деталі (опціонально)",
         "condition": "Виконання можливе після… (опціонально)",
-        "counterpartyMe": "Email або телефон іншої людини",
-        "counterpartyOther": "Email або телефон іншої людини",
+        "counterpartyMe": "Пошук за @username або публічним іменем",
+        "counterpartyOther": "Пошук за @username або публічним іменем",
         "dueDate": "Оберіть дату (опціонально)",
         "rewardAmount": "Сума винагороди",
         "rewardText": "Опишіть винагороду, результат або обсяг",
@@ -356,6 +356,7 @@
       },
       "actions": {
         "addCondition": "+ Додати контрумову",
+        "removeCounterparty": "Прибрати вибраного користувача",
         "removeCondition": "Прибрати контрумову",
         "clearDate": "Очистити дату",
         "changeTime": "Змінити час",
@@ -366,8 +367,12 @@
         "label": "Публічна угода",
         "helper": "Публічні угоди відображаються у вашому профілі"
       },
+      "search": {
+        "searching": "Шукаємо користувачів…",
+        "noResults": "Користувачів не знайдено"
+      },
       "errors": {
-        "counterpartyRequired": "Додайте контакт іншої сторони",
+        "counterpartyRequired": "Оберіть другу сторону",
         "rewardAmountInvalid": "Сума винагороди має бути числом",
         "rewardCurrencyRequired": "Додайте валюту, якщо вказана сума",
         "createFailed": "Не вдалося створити угоду",

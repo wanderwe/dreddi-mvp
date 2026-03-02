@@ -339,8 +339,8 @@
         "title": "Short summary of the {entityLower}",
         "details": "Details (optional)",
         "condition": "Execution becomes possible after… (optional)",
-        "counterpartyMe": "Other person’s email or phone",
-        "counterpartyOther": "Other person’s email or phone",
+        "counterpartyMe": "Search by @username or public name",
+        "counterpartyOther": "Search by @username or public name",
         "dueDate": "Select date (optional)",
         "rewardAmount": "Reward amount",
         "rewardText": "Describe the reward, deliverable, or scope",
@@ -348,6 +348,7 @@
       },
       "actions": {
         "addCondition": "+ Add counter-condition",
+        "removeCounterparty": "Remove selected user",
         "removeCondition": "Remove counter-condition",
         "clearDate": "Clear date",
         "changeTime": "Change time",
@@ -358,8 +359,12 @@
         "label": "{publicEntity}",
         "helper": "Public {entityPlural} appear on your profile"
       },
+      "search": {
+        "searching": "Searching users…",
+        "noResults": "No users found"
+      },
       "errors": {
-        "counterpartyRequired": "Please add the other side's contact",
+        "counterpartyRequired": "Please select the other side",
         "rewardAmountInvalid": "Reward amount must be a number",
         "rewardCurrencyRequired": "Add a currency when a reward amount is set",
         "createFailed": "Failed to create {entityLower}",
