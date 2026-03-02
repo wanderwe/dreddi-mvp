@@ -324,7 +324,7 @@
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
         "counterparty": "Counterparty",
-        "counterpartyHelper": "Start typing @handle or name. If not on Dreddi — invite by link.",
+        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
         "dueDate": "Due date",
         "dueTime": "Due time",
         "reward": "Reward (optional)",
