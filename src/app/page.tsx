@@ -509,28 +509,27 @@ export default function Home() {
           <div className="flex flex-col gap-5 md:gap-6">
             <div className="space-y-3.5">
               <div className="flex items-center gap-4 sm:gap-5">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
-                  Dreddi
-                </span>
-                <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
-                  {t("landing.hero.brandSuffix")}
-                </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
-                />
+                <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
+                <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
+                  <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
+                    Dreddi
+                  </span>
+                  <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
+                    {t("landing.hero.brandSuffix")}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
+                  />
+                </div>
               </div>
+              <h1 className="text-[1.85rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[2.15rem] md:text-[2.45rem]">
+                {copy.hero.headline}
+              </h1>
+              <p className="max-w-[34ch] text-[0.98rem] leading-snug text-slate-300 md:max-w-[52ch] md:text-[1.03rem]">
+                {renderMultiline(copy.hero.description)}
+              </p>
             </div>
-            <p className="text-sm font-medium tracking-[0.01em] text-slate-400/90">{copy.hero.headline}</p>
-            <p className="text-[1.85rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[2.15rem] md:text-[2.45rem]">
-              {copy.hero.eyebrow}
-            </p>
-            <p className="max-w-[34ch] text-[0.98rem] leading-snug text-slate-300 md:max-w-[52ch] md:text-[1.03rem]">
-              {renderMultiline(copy.hero.description)}
-            </p>
-          </div>
 
             <div className="flex flex-col gap-3.5 md:flex-row md:items-center">
               <Link
