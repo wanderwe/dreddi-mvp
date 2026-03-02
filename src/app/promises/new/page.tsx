@@ -18,7 +18,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, CircleHelp, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
@@ -69,6 +69,7 @@ export default function NewPromisePage() {
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const [inviteByLink, setInviteByLink] = useState(false);
+  const [isCounterpartyTooltipOpen, setIsCounterpartyTooltipOpen] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -707,12 +708,33 @@ export default function NewPromisePage() {
                 {executor && (
                   <div className="text-sm text-slate-200">
                     <label className="space-y-2 text-sm text-slate-200">
-                      <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                        {t("promises.new.fields.counterparty")}
-                      </span>
-                      <span className="block text-xs text-slate-400">
-                        {t("promises.new.fields.counterpartyHelper")}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                          {t("promises.new.fields.counterparty")}
+                        </span>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            aria-label={t("promises.new.fields.counterpartyHelper")}
+                            onMouseEnter={() => setIsCounterpartyTooltipOpen(true)}
+                            onMouseLeave={() => setIsCounterpartyTooltipOpen(false)}
+                            onFocus={() => setIsCounterpartyTooltipOpen(true)}
+                            onBlur={() => setIsCounterpartyTooltipOpen(false)}
+                            onClick={() => setIsCounterpartyTooltipOpen((prev) => !prev)}
+                            className="inline-flex cursor-pointer items-center rounded-full border border-white/20 p-1 text-slate-400 transition hover:border-emerald-300/50 hover:text-emerald-100"
+                          >
+                            <CircleHelp className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                          {isCounterpartyTooltipOpen && (
+                            <div
+                              role="tooltip"
+                              className="absolute left-0 top-7 z-30 w-64 rounded-lg border border-white/10 bg-slate-950/95 px-3 py-2 text-xs normal-case tracking-normal text-slate-300 shadow-xl shadow-black/40"
+                            >
+                              {t("promises.new.fields.counterpartyHelper")}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                       {selectedCounterparty ? (
                         <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
                           <div className="flex min-w-0 items-center gap-2">
