@@ -21,7 +21,7 @@ export type NotificationPriority = "low" | "normal" | "high" | "critical";
 
 export type NotificationLocale = "en" | "uk";
 
-export type NotificationRole = "creator" | "executor";
+export type NotificationRole = "creator" | "executor" | "counterparty";
 
 export type NotificationSettings = {
   locale: NotificationLocale;
