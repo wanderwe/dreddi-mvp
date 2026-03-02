@@ -582,7 +582,7 @@ export default function NewPromisePage() {
                 onChange={(e) => setDetails(e.target.value)}
               />
               {!shouldShowCondition && (
-                <div className="flex pt-1">
+                <div className="flex -mt-1">
                   <button
                     type="button"
                     onClick={() => setShowCondition(true)}
