@@ -795,18 +795,8 @@ export default function NewPromisePage() {
                                 </p>
                               )}
                               {!isCounterpartySearching && counterpartyResults.length === 0 && (
-                                <div className="space-y-2 px-3 py-3">
+                                <div className="px-3 py-3">
                                   <p className="text-xs text-slate-400">{t("promises.new.search.noResults")}</p>
-                                  <button
-                                    type="button"
-                                    onMouseDown={(event) => {
-                                      event.preventDefault();
-                                      setShowCounterpartyDropdown(false);
-                                    }}
-                                    className="rounded-lg border border-emerald-300/40 px-2 py-1 text-xs font-semibold text-emerald-100 transition hover:bg-white/10"
-                                  >
-                                    {t("promises.new.search.inviteByLink")}
-                                  </button>
                                 </div>
                               )}
                               {!isCounterpartySearching &&

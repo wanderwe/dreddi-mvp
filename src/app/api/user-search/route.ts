@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 
 type SearchUserRow = {
-  id: string;
+  profile_id: string;
   handle: string | null;
   display_name: string | null;
   avatar_url: string | null;
@@ -23,14 +23,18 @@ export async function GET(req: Request) {
   }
 
   const admin = getAdminClient();
-  const escaped = query.replace(/[,%]/g, "");
+  const normalizedQuery = query.startsWith("@") ? query.slice(1) : query;
+  const escaped = normalizedQuery.replace(/[,%]/g, "");
+  if (escaped.length < 2) {
+    return NextResponse.json({ users: [] }, { status: 200 });
+  }
   const handlePrefix = `${escaped}%`;
   const nameContains = `%${escaped}%`;
 
   const { data, error } = await admin
-    .from("profiles")
-    .select("id,handle,display_name,avatar_url")
-    .neq("id", user.id)
+    .from("public_profile_stats")
+    .select("profile_id,handle,display_name,avatar_url")
+    .neq("profile_id", user.id)
     .or(`handle.ilike.${handlePrefix},display_name.ilike.${nameContains}`)
     .limit(10)
     .returns<SearchUserRow[]>();
@@ -43,7 +47,7 @@ export async function GET(req: Request) {
   const users = (data ?? [])
     .filter((row): row is SearchUserRow & { handle: string } => Boolean(row.handle?.trim()))
     .map((row) => ({
-      id: row.id,
+      id: row.profile_id,
       handle: row.handle.trim(),
       display_name: row.display_name,
       avatar_url: row.avatar_url,
