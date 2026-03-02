@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getAdminClient } from "@/app/api/promises/[id]/common";
 
 type PublicStatsSearchRow = {
   profile_id: string;
@@ -29,7 +29,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ users: [] }, { status: 200 });
   }
 
-  const admin = getAdminClient();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    return NextResponse.json({ error: "Search failed", detail: "Supabase env is not configured" }, { status: 500 });
+  }
+
+  const supabase = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
   const normalizedQuery = query.startsWith("@") ? query.slice(1) : query;
   const escaped = normalizedQuery.replace(/[,%]/g, "");
   if (escaped.length < 2) {
@@ -40,7 +48,7 @@ export async function GET(req: Request) {
   const nameContains = `%${escaped}%`;
   const searchFilter = `handle.ilike.${handlePrefix},display_name.ilike.${nameContains}`;
 
-  const statsSearch = await admin
+  const statsSearch = await supabase
     .from("public_profile_stats")
     .select("profile_id,handle,display_name,avatar_url")
     .neq("profile_id", user.id)
@@ -51,7 +59,7 @@ export async function GET(req: Request) {
   let records: PublicStatsSearchRow[] = statsSearch.data ?? [];
 
   if (statsSearch.error) {
-    const profilesSearch = await admin
+    const profilesSearch = await supabase
       .from("profiles")
       .select("id,handle,display_name,avatar_url")
       .eq("is_public_profile", true)
