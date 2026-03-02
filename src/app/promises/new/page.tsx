@@ -37,7 +37,6 @@ export default function NewPromisePage() {
     handle: string;
     displayName: string | null;
     avatarUrl: string | null;
-    reputationScore: number | null;
   } | null>(null);
   const [counterpartyResults, setCounterpartyResults] = useState<
     Array<{
@@ -45,7 +44,6 @@ export default function NewPromisePage() {
       handle: string;
       display_name: string | null;
       avatar_url: string | null;
-      reputation_score: number | null;
     }>
   >([]);
   const [isCounterpartySearching, setIsCounterpartySearching] = useState(false);
@@ -69,6 +67,8 @@ export default function NewPromisePage() {
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
   const [isPublicDeal, setIsPublicDeal] = useState(true);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
+  const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
+  const [inviteByLink, setInviteByLink] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -449,7 +449,7 @@ export default function NewPromisePage() {
       try {
         setIsCounterpartySearching(true);
         const res = await fetch(
-          `/api/users/search?q=${encodeURIComponent(counterpartyQuery.trim())}`,
+          `/api/user-search?q=${encodeURIComponent(counterpartyQuery.trim())}`,
           { signal: controller.signal }
         );
         const payload = (await res.json().catch(() => null)) as {
@@ -458,18 +458,19 @@ export default function NewPromisePage() {
             handle: string;
             display_name: string | null;
             avatar_url: string | null;
-            reputation_score: number | null;
           }>;
         } | null;
         if (!active) return;
-        setCounterpartyResults(payload?.users ?? []);
+        const users = payload?.users ?? [];
+        setCounterpartyResults(users);
+        setCounterpartyActiveIndex(0);
       } catch {
         if (!active) return;
         setCounterpartyResults([]);
       } finally {
         if (active) setIsCounterpartySearching(false);
       }
-    }, 180);
+    }, 250);
 
     return () => {
       active = false;
@@ -477,6 +478,29 @@ export default function NewPromisePage() {
       window.clearTimeout(timeoutId);
     };
   }, [counterpartyQuery, selectedCounterparty]);
+
+  useEffect(() => {
+    if (!showCounterpartyDropdown) return;
+    setCounterpartyActiveIndex(0);
+  }, [counterpartyResults, showCounterpartyDropdown]);
+
+  const selectCounterparty = (user: {
+    id: string;
+    handle: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  }) => {
+    setSelectedCounterparty({
+      id: user.id,
+      handle: user.handle,
+      displayName: user.display_name,
+      avatarUrl: user.avatar_url,
+    });
+    setInviteByLink(false);
+    setCounterpartyQuery("");
+    setCounterpartyResults([]);
+    setShowCounterpartyDropdown(false);
+  };
 
   async function createPromise() {
     setBusy(true);
@@ -504,7 +528,7 @@ export default function NewPromisePage() {
 
     const secondPartyUserId = selectedCounterparty?.id ?? null;
 
-    if (!secondPartyUserId) {
+    if (!secondPartyUserId && !inviteByLink) {
       setBusy(false);
       setError(t("promises.new.errors.counterpartyRequired"));
       return;
@@ -516,6 +540,7 @@ export default function NewPromisePage() {
       details: details.trim() || null,
       conditionText: conditionText.trim() || null,
       secondPartyUserId,
+      inviteByLink,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
@@ -685,9 +710,26 @@ export default function NewPromisePage() {
                       <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                         {t("promises.new.fields.counterparty")}
                       </span>
+                      <span className="block text-xs text-slate-400">
+                        {t("promises.new.fields.counterpartyHelper")}
+                      </span>
                       {selectedCounterparty ? (
                         <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
-                          <span className="truncate">@{selectedCounterparty.handle}</span>
+                          <div className="flex min-w-0 items-center gap-2">
+                            <div className="h-7 w-7 overflow-hidden rounded-full bg-white/10">
+                              {selectedCounterparty.avatarUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={selectedCounterparty.avatarUrl} alt="" className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-xs text-slate-200">
+                                  @{selectedCounterparty.handle.slice(0, 1).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <span className="truncate">
+                              {selectedCounterparty.displayName ?? `@${selectedCounterparty.handle}`} · @{selectedCounterparty.handle}
+                            </span>
+                          </div>
                           <button
                             type="button"
                             onClick={() => {
@@ -695,6 +737,7 @@ export default function NewPromisePage() {
                               setCounterpartyQuery("");
                               setCounterpartyResults([]);
                               setShowCounterpartyDropdown(false);
+                              setInviteByLink(false);
                             }}
                             aria-label={t("promises.new.actions.removeCounterparty")}
                             className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
@@ -721,6 +764,30 @@ export default function NewPromisePage() {
                             onChange={(e) => {
                               setCounterpartyQuery(e.target.value);
                               setShowCounterpartyDropdown(true);
+                              setInviteByLink(false);
+                            }}
+                            onKeyDown={(e) => {
+                              if (!showCounterpartyDropdown || counterpartyQuery.trim().length < 2) return;
+                              if (e.key === "ArrowDown") {
+                                e.preventDefault();
+                                setCounterpartyActiveIndex((prev) =>
+                                  Math.min(prev + 1, Math.max(counterpartyResults.length - 1, 0))
+                                );
+                              }
+                              if (e.key === "ArrowUp") {
+                                e.preventDefault();
+                                setCounterpartyActiveIndex((prev) => Math.max(prev - 1, 0));
+                              }
+                              if (e.key === "Escape") {
+                                e.preventDefault();
+                                setShowCounterpartyDropdown(false);
+                              }
+                              if (e.key === "Enter") {
+                                if (counterpartyResults[counterpartyActiveIndex]) {
+                                  e.preventDefault();
+                                  selectCounterparty(counterpartyResults[counterpartyActiveIndex]);
+                                }
+                              }
                             }}
                           />
                           {showCounterpartyDropdown && counterpartyQuery.trim().length >= 2 && (
@@ -731,29 +798,34 @@ export default function NewPromisePage() {
                                 </p>
                               )}
                               {!isCounterpartySearching && counterpartyResults.length === 0 && (
-                                <p className="px-3 py-2 text-xs text-slate-400">
-                                  {t("promises.new.search.noResults")}
-                                </p>
+                                <div className="space-y-2 px-3 py-3">
+                                  <p className="text-xs text-slate-400">{t("promises.new.search.noResults")}</p>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => {
+                                      event.preventDefault();
+                                      setInviteByLink(true);
+                                      setShowCounterpartyDropdown(false);
+                                    }}
+                                    className="rounded-lg border border-emerald-300/40 px-2 py-1 text-xs font-semibold text-emerald-100 transition hover:bg-white/10"
+                                  >
+                                    {t("promises.new.search.inviteByLink")}
+                                  </button>
+                                </div>
                               )}
                               {!isCounterpartySearching &&
-                                counterpartyResults.map((user) => (
+                                counterpartyResults.map((user, index) => (
                                   <button
                                     key={user.id}
                                     type="button"
                                     onMouseDown={(event) => {
                                       event.preventDefault();
-                                      setSelectedCounterparty({
-                                        id: user.id,
-                                        handle: user.handle,
-                                        displayName: user.display_name,
-                                        avatarUrl: user.avatar_url,
-                                        reputationScore: user.reputation_score,
-                                      });
-                                      setCounterpartyQuery("");
-                                      setCounterpartyResults([]);
-                                      setShowCounterpartyDropdown(false);
+                                      selectCounterparty(user);
                                     }}
-                                    className="flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5"
+                                    className={clsx(
+                                      "flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5",
+                                      index === counterpartyActiveIndex && "bg-white/10"
+                                    )}
                                   >
                                     <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
                                       {user.avatar_url ? (
@@ -766,18 +838,21 @@ export default function NewPromisePage() {
                                       )}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm text-white">@{user.handle}</p>
-                                      {user.display_name && (
-                                        <p className="truncate text-xs text-slate-400">{user.display_name}</p>
-                                      )}
+                                      <p className="truncate text-sm font-semibold text-white">
+                                        {user.display_name ?? `@${user.handle}`}
+                                      </p>
+                                      <p className="truncate text-xs text-slate-400">@{user.handle}</p>
                                     </div>
-                                    {typeof user.reputation_score === "number" && (
-                                      <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
-                                        {user.reputation_score.toFixed(1)}
-                                      </span>
-                                    )}
+                                    <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
+                                      {t("promises.new.search.inDreddi")}
+                                    </span>
                                   </button>
                                 ))}
+                            </div>
+                          )}
+                          {inviteByLink && (
+                            <div className="mt-2 rounded-lg border border-emerald-300/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-100">
+                              {t("promises.new.search.inviteByLinkSelected")}
                             </div>
                           )}
                         </div>
@@ -882,7 +957,7 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim() || !selectedCounterparty}
+              disabled={busy || !title.trim() || (!selectedCounterparty && !inviteByLink)}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy
