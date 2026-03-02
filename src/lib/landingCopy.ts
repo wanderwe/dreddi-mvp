@@ -4,6 +4,7 @@ export type LandingCopy = {
     eyebrow: string;
     headline: string;
     description: string;
+    mobileReputationLine: string;
   };
   useDreddi: {
     label: string;
@@ -25,6 +26,7 @@ export type LandingCopy = {
   cta: {
     getStarted: string;
     publicProfiles: string;
+    viewExampleProfiles: string;
     createPromise: string;
     reviewDeals: string;
   };
@@ -84,6 +86,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "Домовленість починається з підтвердження",
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
+      mobileReputationLine: "Але з видимими наслідками для репутації.",
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -121,6 +124,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     cta: {
       getStarted: "Створити угоду",
       publicProfiles: "Переглянути профілі",
+      viewExampleProfiles: "Переглянути приклади профілів",
       createPromise: "Створити угоду",
       reviewDeals: "Переглянути угоди",
     },
@@ -178,6 +182,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "An agreement starts with confirmation",
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+      mobileReputationLine: "But with visible consequences for reputation.",
     },
     useDreddi: {
       label: "Use cases",
@@ -215,6 +220,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     cta: {
       getStarted: "Create a deal",
       publicProfiles: "Browse profiles",
+      viewExampleProfiles: "View example profiles",
       createPromise: "Create a deal",
       reviewDeals: "View deals",
     },

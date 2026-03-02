@@ -467,6 +467,9 @@ export default function Home() {
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
+  const mobileDescriptionLines = copy.hero.description.split("\n").slice(0, 2);
+  const mobilePreviewItem = isAuthenticated ? recentDeals[0] : demoDeals[0];
+  const mobilePreviewMetaText = mobilePreviewItem ? getMetaText(mobilePreviewItem) : "";
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index) => (
@@ -505,14 +508,17 @@ export default function Home() {
       ) : null}
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
-            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
+        <div className="flex flex-1 flex-col gap-5 md:gap-7">
+          <div className="space-y-3 md:order-1 md:space-y-4">
+            <p className="text-xs font-medium tracking-[0.05em] text-slate-500 md:hidden">
+              {copy.hero.eyebrow}
+            </p>
+            <p className="hidden max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90 md:block">
               {copy.hero.headline}
             </p>
-            <div className="flex items-center gap-4 sm:gap-5">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
+            <div className="flex items-center gap-3.5 sm:gap-5">
+              <DreddiLogoMark className="h-10 w-10 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
+              <div className="relative inline-flex items-baseline gap-2 pr-1 text-[1.7rem] md:gap-2.5 leading-none tracking-[-0.02em] sm:text-5xl">
                 <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
                   Dreddi
                 </span>
@@ -525,13 +531,39 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-base leading-tight text-slate-300 sm:text-[1.03rem]">
-              {renderMultiline(copy.hero.description)}
+            <p className="max-w-xl text-[1.65rem] font-medium leading-[1.1] text-white sm:text-[1.9rem] md:hidden">
+              {copy.hero.headline}
             </p>
+            <div className="space-y-2 text-sm leading-snug text-slate-300 md:max-w-xl md:text-base md:leading-tight md:space-y-0 sm:text-[1.03rem]">
+              <p className="md:hidden">
+                {mobileDescriptionLines.map((line, index) => (
+                  <span key={`${line}-${index}`} className={index === 0 ? "block" : "mt-0.5 block"}>
+                    {line}
+                  </span>
+                ))}
+              </p>
+              <p className="md:hidden text-slate-200">{copy.hero.mobileReputationLine}</p>
+              <p className="hidden md:block">{renderMultiline(copy.hero.description)}</p>
+            </div>
+          </div>
+
+          <div className="space-y-2.5 md:hidden">
+            <Link
+              href={showAuthenticatedCta ? "/promises/new" : "/login"}
+              className="block w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30"
+            >
+              {copy.cta.createPromise}
+            </Link>
+            <Link
+              href={showAuthenticatedCta ? "/promises" : "/u"}
+              className="block w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+            >
+              {showAuthenticatedCta ? copy.cta.reviewDeals : copy.cta.viewExampleProfiles}
+            </Link>
           </div>
 
           {!showAuthenticatedCta ? (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 hidden flex-wrap items-center gap-3 md:order-4 md:flex">
               <Link
                 href="/login"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -546,7 +578,7 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 hidden flex-wrap items-center gap-3 md:order-4 md:flex">
               <Link
                 href="/promises/new"
                 className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
@@ -562,9 +594,27 @@ export default function Home() {
             </div>
           )}
 
+          <div className="glass-panel relative overflow-hidden rounded-2xl border border-white/10 px-4 py-3 md:hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
+            <div className="relative space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
+                  {copy.score.shortLabel}: {scoreValue}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                  {copy.score.cards.confirmed}: {confirmedValue}
+                </span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs">
+                <p className="truncate font-medium text-slate-100">{mobilePreviewItem?.title ?? copy.recentDeals.eventFallbackTitle}</p>
+                <p className="mt-1 truncate text-slate-400">{mobilePreviewMetaText}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1">
+        <div className="hidden flex-1 md:block">
           <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
