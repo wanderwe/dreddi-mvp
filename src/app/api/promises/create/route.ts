@@ -9,7 +9,6 @@ type CreatePromisePayload = {
   details?: string | null;
   conditionText?: string | null;
   secondPartyUserId?: string | null;
-  inviteByLink?: boolean;
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
@@ -26,14 +25,9 @@ export async function POST(req: Request) {
     const title = body?.title?.trim();
     const secondPartyUserId = body?.secondPartyUserId?.trim();
     const executor = body?.executor === "other" ? "other" : "me";
-    const inviteByLink = body?.inviteByLink === true;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
-    }
-
-    if (!secondPartyUserId && !inviteByLink) {
-      return NextResponse.json({ error: "Counterparty is required" }, { status: 400 });
     }
 
     if (secondPartyUserId === user.id) {

@@ -18,7 +18,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
@@ -69,7 +69,6 @@ export default function NewPromisePage() {
   const [isPublicDeal, setIsPublicDeal] = useState(true);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
-  const [inviteByLink, setInviteByLink] = useState(false);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -497,7 +496,6 @@ export default function NewPromisePage() {
       displayName: user.display_name,
       avatarUrl: user.avatar_url,
     });
-    setInviteByLink(false);
     setCounterpartyQuery("");
     setCounterpartyResults([]);
     setShowCounterpartyDropdown(false);
@@ -529,19 +527,12 @@ export default function NewPromisePage() {
 
     const secondPartyUserId = selectedCounterparty?.id ?? null;
 
-    if (!secondPartyUserId && !inviteByLink) {
-      setBusy(false);
-      setError(t("promises.new.errors.counterpartyRequired"));
-      return;
-    }
-
     const shouldMakePublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
       details: details.trim() || null,
       conditionText: conditionText.trim() || null,
       secondPartyUserId,
-      inviteByLink,
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
@@ -715,9 +706,9 @@ export default function NewPromisePage() {
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
                           <span
                             aria-label={t("promises.new.fields.counterpartyHelper")}
-                            className="inline-flex h-4 min-w-4 items-center justify-center text-[11px] font-semibold text-slate-400 transition hover:text-emerald-100"
+                            className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
                           >
-                            i
+                            <Info className="h-3.5 w-3.5" aria-hidden />
                           </span>
                         </Tooltip>
                       </div>
@@ -772,7 +763,6 @@ export default function NewPromisePage() {
                             onChange={(e) => {
                               setCounterpartyQuery(e.target.value);
                               setShowCounterpartyDropdown(true);
-                              setInviteByLink(false);
                             }}
                             onKeyDown={(e) => {
                               if (!showCounterpartyDropdown || counterpartyQuery.trim().length < 2) return;
@@ -812,7 +802,6 @@ export default function NewPromisePage() {
                                     type="button"
                                     onMouseDown={(event) => {
                                       event.preventDefault();
-                                      setInviteByLink(true);
                                       setShowCounterpartyDropdown(false);
                                     }}
                                     className="rounded-lg border border-emerald-300/40 px-2 py-1 text-xs font-semibold text-emerald-100 transition hover:bg-white/10"
@@ -856,27 +845,6 @@ export default function NewPromisePage() {
                                     </span>
                                   </button>
                                 ))}
-                            </div>
-                          )}
-                          {inviteByLink && (
-                            <div className="mt-2 rounded-lg border border-emerald-300/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-100">
-                              {t("promises.new.search.inviteByLinkSelected")}
-                            </div>
-                          )}
-                          {!inviteByLink && (
-                            <div className="mt-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setInviteByLink(true);
-                                  setSelectedCounterparty(null);
-                                  setCounterpartyResults([]);
-                                  setShowCounterpartyDropdown(false);
-                                }}
-                                className="text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
-                              >
-                                {t("promises.new.search.inviteByLink")}
-                              </button>
                             </div>
                           )}
                         </div>
@@ -981,7 +949,7 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim() || (!selectedCounterparty && !inviteByLink)}
+              disabled={busy || !title.trim()}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy
