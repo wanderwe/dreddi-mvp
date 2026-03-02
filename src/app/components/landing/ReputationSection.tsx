@@ -10,7 +10,7 @@ type ReputationSectionProps = {
 
 export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6 sm:pb-14">
+    <section>
       <div className="grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:items-start">
         <div className="space-y-4">
           <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
