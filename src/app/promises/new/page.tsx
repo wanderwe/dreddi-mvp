@@ -586,7 +586,7 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     onClick={() => setShowCondition(true)}
-                    className="inline-flex cursor-pointer items-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                    className="cursor-pointer text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
                   >
                     {t("promises.new.actions.addCondition")}
                   </button>
