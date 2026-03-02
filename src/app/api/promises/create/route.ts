@@ -133,7 +133,10 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ id: insertData.id }, { status: 200 });
+    return NextResponse.json(
+      { id: insertData.id, inviteToken: insertData.invite_token },
+      { status: 200 }
+    );
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: "Unexpected error", message }, { status: 500 });

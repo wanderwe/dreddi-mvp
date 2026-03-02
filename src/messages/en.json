@@ -324,7 +324,7 @@
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
         "counterparty": "Counterparty",
-        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
+        "counterpartyHelper": "After creation you’ll get a shareable link. If the user is on Dreddi, they’ll also see an in-app invite.",
         "dueDate": "Due date",
         "dueTime": "Due time",
         "reward": "Reward (optional)",
@@ -362,20 +362,27 @@
       },
       "search": {
         "searching": "Searching users…",
-        "noResults": "User not found",
-        "inviteByLink": "Invite by link",
-        "inviteByLinkSelected": "This deal will be created with an invite link.",
-        "inDreddi": "On Dreddi"
+        "noResults": "User not found. Create the deal and share the invite link.",
+        "inDreddi": "On Dreddi",
+        "selectedHint": "Invite is created after you click “Create deal”"
       },
       "errors": {
-        "counterpartyRequired": "Select a user or choose invite by link",
+        "counterpartyRequired": "Select a user",
         "rewardAmountInvalid": "Reward amount must be a number",
         "rewardCurrencyRequired": "Add a currency when a reward amount is set",
         "createFailed": "Failed to create {entityLower}",
         "network": "Unable to reach the server. Please try again."
       },
       "submit": "Create {entityLower}",
-      "creating": "Creating {entityLower}…"
+      "creating": "Creating {entityLower}…",
+      "inviteModal": {
+        "title": "Share the invite",
+        "description": "After deal creation you always get an invite link. Copy it and send it to the other side.",
+        "copy": "Copy link",
+        "copySuccess": "Copied",
+        "copyFailed": "Copy failed",
+        "openDeal": "Open deal"
+      }
     },
     "actionQueue": {
       "title": "Requires your action",
