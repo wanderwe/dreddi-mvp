@@ -25,6 +25,7 @@ export type LandingCopy = {
   cta: {
     getStarted: string;
     publicProfiles: string;
+    exploreProfiles: string;
     createPromise: string;
     reviewDeals: string;
   };
@@ -121,6 +122,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     cta: {
       getStarted: "Створити угоду",
       publicProfiles: "Переглянути профілі",
+      exploreProfiles: "Подивитись приклади профілів",
       createPromise: "Створити угоду",
       reviewDeals: "Переглянути угоди",
     },
@@ -140,7 +142,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Огляд домовленостей",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення",
-      demoBadge: "Приклад профілю",
+      demoBadge: "Демо",
       cards: {
         confirmed: "Дотримано",
         disputed: "Оскаржено",
@@ -215,6 +217,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     cta: {
       getStarted: "Create a deal",
       publicProfiles: "Browse profiles",
+      exploreProfiles: "Explore example profiles",
       createPromise: "Create a deal",
       reviewDeals: "View deals",
     },
@@ -234,7 +237,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       overviewLabel: "Agreement Snapshot",
       live: "Live",
       signIn: "Sign in to see updates",
-      demoBadge: "Demo profile",
+      demoBadge: "Demo",
       cards: {
         confirmed: "Fulfilled",
         disputed: "Disputed",

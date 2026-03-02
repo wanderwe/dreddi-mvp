@@ -463,7 +463,7 @@ export default function Home() {
   const scoreValue = !isAuthenticated ? demoMetrics.score : score;
   const confirmedValue = !isAuthenticated ? demoMetrics.confirmed : confirmedCount;
   const disputedValue = !isAuthenticated ? demoMetrics.disputed : disputedCount;
-  const recentDealsHref = isAuthenticated ? "/promises" : "/login";
+  const recentDealsHref = isAuthenticated ? "/promises" : "/u";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
   const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
@@ -504,13 +504,11 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
-            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
-              {copy.hero.headline}
-            </p>
-            <div className="flex items-center gap-4 sm:gap-5">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 md:py-16 lg:py-20">
+        <div className="grid items-start gap-6 md:grid-cols-2 md:gap-10 lg:gap-12">
+          <div className="flex flex-col gap-5 md:gap-6">
+            <div className="space-y-3.5">
+              <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
                 <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
@@ -525,47 +523,32 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-base leading-tight text-slate-300 sm:text-[1.03rem]">
+            <p className="text-sm font-medium tracking-[0.01em] text-slate-400/90">{copy.hero.headline}</p>
+            <p className="text-[1.85rem] font-semibold leading-[1.07] tracking-[-0.02em] text-slate-50 sm:text-[2.15rem] md:text-[2.45rem]">
+              {copy.hero.eyebrow}
+            </p>
+            <p className="max-w-[34ch] text-[0.98rem] leading-snug text-slate-300 md:max-w-[52ch] md:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
 
-          {!showAuthenticatedCta ? (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
-              <Link
-                href="/login"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
-              >
-                {copy.cta.getStarted}
-              </Link>
-              <Link
-                href="/u"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
-              >
-                {copy.cta.publicProfiles}
-              </Link>
-            </div>
-          ) : (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="flex flex-col gap-3.5 md:flex-row md:items-center">
               <Link
                 href="/promises/new"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:w-auto"
               >
                 {copy.cta.createPromise}
               </Link>
               <Link
-                href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                href={showAuthenticatedCta ? "/promises" : "/u"}
+                className="w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:w-auto"
               >
-                {copy.cta.reviewDeals}
+                {showAuthenticatedCta ? copy.cta.reviewDeals : copy.cta.exploreProfiles}
               </Link>
             </div>
-          )}
+          </div>
 
-        </div>
-
-        <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
+          <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5 md:px-7 md:pb-7 md:pt-5">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
               className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -575,7 +558,7 @@ export default function Home() {
               }}
               aria-hidden
             />
-            <div className="relative flex flex-col gap-4">
+            <div className="relative flex flex-col gap-3.5 md:gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 <div className="flex items-center gap-2">
@@ -587,11 +570,15 @@ export default function Home() {
                   ) : (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
                       <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
-                      {copy.score.signIn}
+                      {copy.score.demoBadge}
                     </span>
                   )}
                 </div>
               </div>
+
+              {!isAuthenticated ? (
+                <p className="text-xs text-slate-400/75">{copy.score.signIn}</p>
+              ) : null}
 
               <div>
                 <p className="mb-1.5 text-sm font-medium text-slate-300/95">
@@ -633,7 +620,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-400/90">
                 {copy.score.onTime.label}: {onTimeLineValue}
               </p>
 
