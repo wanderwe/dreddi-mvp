@@ -736,7 +736,6 @@ export default function NewPromisePage() {
                               setCounterpartyQuery("");
                               setCounterpartyResults([]);
                               setShowCounterpartyDropdown(false);
-                              setInviteByLink(false);
                             }}
                             aria-label={t("promises.new.actions.removeCounterparty")}
                             className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
