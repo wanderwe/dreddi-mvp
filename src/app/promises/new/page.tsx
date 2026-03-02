@@ -656,7 +656,7 @@ export default function NewPromisePage() {
                     >
                       <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
                       <span
-                        className={clsx("flex-1", dueAt ? "text-slate-100" : "text-slate-500")}
+                        className={clsx("flex-1", dueAt ? "text-slate-100" : "text-white/50")}
                       >
                         {formattedDueAt}
                       </span>
