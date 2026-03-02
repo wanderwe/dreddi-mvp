@@ -1,7 +1,6 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
 export type LandingCopy = {
   hero: {
-    eyebrow: string;
     headline: string;
     description: string;
   };
@@ -81,7 +80,6 @@ export type LandingCopy = {
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
-      eyebrow: "Легкий трекер домовленостей",
       headline: "Домовленість починається з підтвердження",
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
@@ -176,7 +174,6 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
   en: {
     hero: {
-      eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
