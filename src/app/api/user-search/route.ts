@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getAdminClient } from "@/app/api/promises/[id]/common";
 
-type SearchUserRow = {
+type PublicStatsSearchRow = {
+  profile_id: string;
+  handle: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
+type ProfilesSearchRow = {
   id: string;
   handle: string | null;
   display_name: string | null;
@@ -22,28 +29,70 @@ export async function GET(req: Request) {
     return NextResponse.json({ users: [] }, { status: 200 });
   }
 
-  const admin = getAdminClient();
-  const escaped = query.replace(/[,%]/g, "");
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    return NextResponse.json({ error: "Search failed", detail: "Supabase env is not configured" }, { status: 500 });
+  }
+
+  const supabase = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const normalizedQuery = query.startsWith("@") ? query.slice(1) : query;
+  const escaped = normalizedQuery.replace(/[,%]/g, "");
+  if (escaped.length < 2) {
+    return NextResponse.json({ users: [] }, { status: 200 });
+  }
+
   const handlePrefix = `${escaped}%`;
   const nameContains = `%${escaped}%`;
+  const searchFilter = `handle.ilike.${handlePrefix},display_name.ilike.${nameContains}`;
 
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id,handle,display_name,avatar_url")
-    .neq("id", user.id)
-    .or(`handle.ilike.${handlePrefix},display_name.ilike.${nameContains}`)
+  const statsSearch = await supabase
+    .from("public_profile_stats")
+    .select("profile_id,handle,display_name,avatar_url")
+    .neq("profile_id", user.id)
+    .or(searchFilter)
     .limit(10)
-    .returns<SearchUserRow[]>();
+    .returns<PublicStatsSearchRow[]>();
 
-  if (error) {
-    return NextResponse.json({ error: "Search failed", detail: error.message }, { status: 500 });
+  let records: PublicStatsSearchRow[] = statsSearch.data ?? [];
+
+  if (statsSearch.error) {
+    const profilesSearch = await supabase
+      .from("profiles")
+      .select("id,handle,display_name,avatar_url")
+      .eq("is_public_profile", true)
+      .not("handle", "is", null)
+      .neq("id", user.id)
+      .or(searchFilter)
+      .limit(10)
+      .returns<ProfilesSearchRow[]>();
+
+    if (profilesSearch.error) {
+      return NextResponse.json(
+        {
+          error: "Search failed",
+          detail: profilesSearch.error.message,
+          fallbackDetail: statsSearch.error.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    records = (profilesSearch.data ?? []).map((row) => ({
+      profile_id: row.id,
+      handle: row.handle,
+      display_name: row.display_name,
+      avatar_url: row.avatar_url,
+    }));
   }
 
   const qLower = escaped.toLowerCase();
-  const users = (data ?? [])
-    .filter((row): row is SearchUserRow & { handle: string } => Boolean(row.handle?.trim()))
+  const users = records
+    .filter((row): row is PublicStatsSearchRow & { handle: string } => Boolean(row.handle?.trim()))
     .map((row) => ({
-      id: row.id,
+      id: row.profile_id,
       handle: row.handle.trim(),
       display_name: row.display_name,
       avatar_url: row.avatar_url,

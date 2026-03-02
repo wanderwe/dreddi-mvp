@@ -362,7 +362,7 @@
       },
       "search": {
         "searching": "Searching users…",
-        "noResults": "User not found.",
+        "noResults": "User not found",
         "inviteByLink": "Invite by link",
         "inviteByLinkSelected": "This deal will be created with an invite link.",
         "inDreddi": "On Dreddi"
