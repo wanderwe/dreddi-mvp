@@ -448,9 +448,24 @@ export default function NewPromisePage() {
     const timeoutId = window.setTimeout(async () => {
       try {
         setIsCounterpartySearching(true);
+        const supabase = requireSupabase();
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        if (!token) {
+          if (!active) return;
+          setCounterpartyResults([]);
+          setCounterpartyActiveIndex(0);
+          return;
+        }
+
         const res = await fetch(
           `/api/user-search?q=${encodeURIComponent(counterpartyQuery.trim())}`,
-          { signal: controller.signal }
+          {
+            signal: controller.signal,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const payload = (await res.json().catch(() => null)) as {
           users?: Array<{
