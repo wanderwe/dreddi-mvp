@@ -36,7 +36,7 @@ export function getActionQueueState(
   const inviteStatus = getPromiseInviteStatus(row);
   const isInviteAccepted = inviteStatus === "accepted";
 
-  if (inviteStatus === "declined" || inviteStatus === "ignored") {
+  if (inviteStatus === "declined" || inviteStatus === "expired" || inviteStatus === "cancelled_by_creator") {
     return null;
   }
 

@@ -38,6 +38,8 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -74,7 +76,8 @@ const promiseStatusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
   disputed: "danger",
   awaiting_acceptance: "neutral",
   declined: "danger",
-  ignored: "attention",
+  expired: "attention",
+  cancelled_by_creator: "danger",
 };
 
 const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning"> = {
@@ -84,7 +87,8 @@ const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning
   disputed: "warning",
   awaiting_acceptance: "clock",
   declined: "warning",
-  ignored: "warning",
+  expired: "warning",
+  cancelled_by_creator: "warning",
 };
 
 function ActionButton({
@@ -103,7 +107,7 @@ function ActionButton({
   onClick: () => void;
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
+    "inline-flex min-h-12 w-full sm:w-auto items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
     "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
@@ -165,7 +169,7 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [conditionBusy, setConditionBusy] = useState(false);
-  const [inviteBusy, setInviteBusy] = useState<"generate" | null>(null);
+  const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -227,7 +231,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -376,6 +380,45 @@ export default function PromisePage() {
     else load();
   }
 
+  async function cancelInvite() {
+    if (!p || !isCreator || inviteStatus !== "awaiting_acceptance") return;
+
+    setError(null);
+    setInviteBusy("cancel");
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setInviteBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setInviteBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/invites/${p.id}/cancel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setInviteBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    await load();
+  }
+
   async function markConditionMet() {
     if (!p) return;
     setError(null);
@@ -495,12 +538,13 @@ export default function PromisePage() {
     disputed: t("promises.status.disputed"),
     awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
     declined: t("promises.inviteStatus.declined"),
-    ignored: t("promises.inviteStatus.ignored"),
+    expired: t("promises.inviteStatus.expired"),
+    cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
+  const shouldShowInviteBlock = !isFinal && canManageInvite;
   const hasStatusActions = Boolean(
     (isExecutor && p?.status === "active" && isInviteAccepted) ||
       (canReview && p?.status === "completed_by_promisor")
@@ -519,15 +563,15 @@ export default function PromisePage() {
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href={backLink.href}
           className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {backLink.label}
         </Link>
-        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} />}</div>
+        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}</div>
       </div>
 
       {error && (
@@ -636,7 +680,7 @@ export default function PromisePage() {
                 {canReview && p.status === "completed_by_promisor" && (
                   <Link
                     href={`/promises/${p.id}/confirm`}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                   >
                     {t("promises.detail.reviewConfirm")}
                   </Link>
@@ -659,7 +703,7 @@ export default function PromisePage() {
                   </div>
                 </div>
               ) : !p.invite_token ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-neutral-400">
                     {t("promises.detail.noInviteToken")}
                   </div>
@@ -695,7 +739,7 @@ export default function PromisePage() {
                     {inviteLink ?? t("promises.detail.inviteFallback")}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <ActionButton
                       label={t("promises.detail.copyLink")}
                       variant="primary"
@@ -706,10 +750,20 @@ export default function PromisePage() {
                     {inviteLink && (
                       <Link
                         href={`/p/invite/${p.invite_token}`}
-                        className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                       >
                         {t("promises.detail.openInvite")}
                       </Link>
+                    )}
+
+                    {isCreator && inviteStatus === "awaiting_acceptance" && (
+                      <ActionButton
+                        label={t("promises.detail.withdrawInvite")}
+                        variant="danger"
+                        loading={inviteBusy === "cancel"}
+                        disabled={inviteBusy !== null}
+                        onClick={cancelInvite}
+                      />
                     )}
 
                   </div>

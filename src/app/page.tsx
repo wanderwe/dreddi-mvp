@@ -11,11 +11,13 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 
 type DealRow = {
   id: string;
   title: string;
   status: PromiseStatus;
+  uiStatus: PromiseUiStatus;
   meta?: string;
   due_at?: string | null;
   created_at?: string | null;
@@ -23,6 +25,12 @@ type DealRow = {
   confirmed_at?: string | null;
   disputed_at?: string | null;
   declined_at?: string | null;
+  invite_status?: string | null;
+  accepted_at?: string | null;
+  counterparty_accepted_at?: string | null;
+  ignored_at?: string | null;
+  expires_at?: string | null;
+  cancelled_at?: string | null;
 };
 
 type DemoDealSource = {
@@ -63,7 +71,7 @@ type DealRowProps = {
   href?: string;
   isClickable?: boolean;
   metaText: string;
-  statusLabels: Record<PromiseStatus, string>;
+  statusLabels: Record<PromiseUiStatus, string>;
 };
 
 const BETA_BANNER_DISMISSED_KEY = "dreddi_banner_beta_v1_dismissed";
@@ -79,12 +87,15 @@ function DealRow({
   const interactiveClass = isClickable ? "transition hover:text-white" : "cursor-default";
   const titleClass = "truncate text-sm font-medium text-slate-100";
   const metaClass = "mt-1 truncate text-xs text-slate-400";
-  const statusPillToneMap: Record<PromiseStatus, StatusPillTone> = {
+  const statusPillToneMap: Record<PromiseUiStatus, StatusPillTone> = {
     active: "neutral",
     completed_by_promisor: "attention",
     confirmed: "success",
     disputed: "danger",
     declined: "danger",
+    awaiting_acceptance: "neutral",
+    expired: "attention",
+    cancelled_by_creator: "danger",
   };
 
   const content = (
@@ -94,8 +105,8 @@ function DealRow({
         {metaText ? <div className={metaClass}>{metaText}</div> : null}
       </div>
       <StatusPill
-        label={statusLabels[item.status] ?? item.status}
-        tone={statusPillToneMap[item.status] ?? "neutral"}
+        label={statusLabels[item.uiStatus] ?? item.uiStatus}
+        tone={statusPillToneMap[item.uiStatus] ?? "neutral"}
         marker="none"
         className="shrink-0 px-2 py-1 text-xs"
       />
@@ -184,6 +195,7 @@ export default function Home() {
           id: deal.id,
           title: t(deal.titleKey),
           status: deal.status,
+          uiStatus: deal.status,
           due_at: deal.due_at ?? null,
           created_at: deal.created_at ?? null,
           completed_at: deal.completed_at ?? null,
@@ -195,12 +207,15 @@ export default function Home() {
     [demoDealsSource, t]
   );
 
-  const statusLabels: Record<PromiseStatus, string> = {
+  const statusLabels: Record<PromiseUiStatus, string> = {
     active: copy.recentDeals.status.active,
     completed_by_promisor: copy.recentDeals.status.completedByPromisor,
     confirmed: copy.recentDeals.status.confirmed,
     disputed: copy.recentDeals.status.disputed,
     declined: copy.recentDeals.status.declined,
+    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    expired: t("promises.inviteStatus.expired"),
+    cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
 
 
@@ -321,7 +336,7 @@ export default function Home() {
 
       const { data, error } = await client
         .from("promises")
-        .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at")
+        .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at,invite_status,accepted_at,counterparty_accepted_at,ignored_at,expires_at,cancelled_at")
         .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -338,12 +353,28 @@ export default function Home() {
               id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
+              uiStatus: getPromiseUiStatus({
+                status: row.status as PromiseStatus,
+                invite_status: row.invite_status,
+                accepted_at: row.accepted_at,
+                counterparty_accepted_at: row.counterparty_accepted_at,
+                declined_at: row.declined_at,
+                ignored_at: row.ignored_at,
+                expires_at: row.expires_at,
+                cancelled_at: row.cancelled_at,
+              }),
               due_at: row.due_at,
               created_at: row.created_at,
               completed_at: row.completed_at,
               confirmed_at: row.confirmed_at,
               disputed_at: row.disputed_at,
               declined_at: row.declined_at,
+              invite_status: row.invite_status,
+              accepted_at: row.accepted_at,
+              counterparty_accepted_at: row.counterparty_accepted_at,
+              ignored_at: row.ignored_at,
+              expires_at: row.expires_at,
+              cancelled_at: row.cancelled_at,
             },
           ];
         });
@@ -504,9 +535,9 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-12 pt-16 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
+        <div className="flex flex-1 flex-col gap-4 md:gap-7">
+          <div className="order-1 space-y-3 sm:space-y-4">
             <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
               {copy.hero.headline}
             </p>
@@ -525,37 +556,37 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-base leading-tight text-slate-300 sm:text-[1.03rem]">
+            <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
 
           {!showAuthenticatedCta ? (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <Link
                 href="/login"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.getStarted}
               </Link>
               <Link
                 href="/u"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.publicProfiles}
               </Link>
             </div>
           ) : (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <Link
                 href="/promises/new"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.createPromise}
               </Link>
               <Link
                 href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.reviewDeals}
               </Link>
@@ -564,8 +595,8 @@ export default function Home() {
 
         </div>
 
-        <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
+        <div className="w-full flex-1">
+          <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
               className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -575,7 +606,7 @@ export default function Home() {
               }}
               aria-hidden
             />
-            <div className="relative flex flex-col gap-4">
+            <div className="relative flex flex-col gap-3 sm:gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 <div className="flex items-center gap-2">

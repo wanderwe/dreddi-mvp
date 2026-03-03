@@ -47,7 +47,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     const { data: p, error: pErr } = await admin
       .from("promises")
       .select(
-        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id, invite_status"
+        "id, creator_id, counterparty_id, counterparty_accepted_at, invite_token, promisor_id, promisee_id, invite_status, expires_at"
       )
       .eq("invite_token", token)
       .maybeSingle();
@@ -73,7 +73,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
 
     // якщо вже прийнято
     const alreadyAccepted = p.invite_status === "accepted" || Boolean(p.counterparty_accepted_at);
-    if (p.invite_status === "declined" || p.invite_status === "ignored") {
+    if (p.invite_status === "declined" || p.invite_status === "expired" || p.invite_status === "cancelled_by_creator") {
       return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
     }
     const alreadyParticipant =
@@ -87,6 +87,19 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     }
 
     const nowIso = new Date().toISOString();
+    if (p.expires_at && new Date(p.expires_at).getTime() <= Date.now()) {
+      await admin
+        .from("promises")
+        .update({ invite_status: "expired", ignored_at: nowIso })
+        .eq("id", p.id)
+        .eq("invite_status", "awaiting_acceptance");
+      await admin
+        .from("deal_invites")
+        .update({ status: "expired" })
+        .eq("deal_id", p.id)
+        .eq("status", "created");
+      return NextResponse.json({ error: "Invite is no longer available" }, { status: 409 });
+    }
     const updateData: {
       counterparty_id: string;
       counterparty_accepted_at: string;
@@ -116,6 +129,12 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     if (upErr) {
       return NextResponse.json({ error: "Accept failed", detail: upErr.message }, { status: 500 });
     }
+
+    await admin
+      .from("deal_invites")
+      .update({ status: "accepted" })
+      .eq("deal_id", p.id)
+      .eq("status", "created");
 
     // 6) підвантажуємо учасників після апдейту і генеруємо нотифікації
     const { data: updatedPromise, error: updErr } = await admin
