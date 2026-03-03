@@ -390,9 +390,9 @@ export default function PublicProfilePage() {
     const paceWindowDays = 30;
     const paceWindowStart = Date.now() - paceWindowDays * 24 * 60 * 60 * 1000;
     const dealsLast30d = promises.filter((promise) => {
-      const finalizedAt = promise.confirmed_at ?? promise.disputed_at;
-      if (!finalizedAt) return false;
-      return new Date(finalizedAt).getTime() >= paceWindowStart;
+      const activityAt = promise.confirmed_at ?? promise.disputed_at ?? promise.created_at;
+      if (!activityAt) return false;
+      return new Date(activityAt).getTime() >= paceWindowStart;
     }).length;
     const avgDealsPerMonth = dealsLast30d;
 
@@ -695,19 +695,26 @@ export default function PublicProfilePage() {
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.trackRecord.noData")}
                               </p>
-                            ) : (
-                              <>
-                              <p className="text-xs text-white/60">
-                                {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
-                                  count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
-                                })}
-                              </p>
+                            ) : reputationEvidence.dealsLast30d === 1 ? (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.trackRecord.summary", {
                                   deals: numberFormatter.format(reputationEvidence.dealsLast30d),
                                   days: numberFormatter.format(reputationEvidence.paceWindowDays),
                                 })}
                               </p>
+                            ) : (
+                              <>
+                                <p className="text-xs text-white/60">
+                                  {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
+                                    count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
+                                  })}
+                                </p>
+                                <p className="text-xs text-white/60">
+                                  {t("publicProfile.reputationDetails.trackRecord.summary", {
+                                    deals: numberFormatter.format(reputationEvidence.dealsLast30d),
+                                    days: numberFormatter.format(reputationEvidence.paceWindowDays),
+                                  })}
+                                </p>
                               </>
                             )}
                           </div>
