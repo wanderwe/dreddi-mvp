@@ -31,6 +31,8 @@ type InviteInfo = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
 };
@@ -397,8 +399,10 @@ export default function InvitePage() {
                   </div>
                 ) : inviteStatus === "declined" ? (
                   <div className="mt-2 text-sm text-slate-300">{t("invite.declinedMessage")}</div>
-                ) : inviteStatus === "ignored" ? (
+                ) : inviteStatus === "expired" ? (
                   <div className="mt-2 text-sm text-slate-300">{t("invite.ignoredMessage")}</div>
+                ) : inviteStatus === "cancelled_by_creator" ? (
+                  <div className="mt-2 text-sm text-slate-300">{t("invite.withdrawnMessage")}</div>
                 ) : (
                   <>
                     <p className="mt-2 text-xs text-slate-400">

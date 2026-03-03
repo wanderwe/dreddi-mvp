@@ -24,4 +24,6 @@ export type PromiseRowMin = {
   counterparty_accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
 };
