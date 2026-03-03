@@ -505,7 +505,7 @@
       },
       "trackRecord": {
         "perMonthValue": "{count} / month",
-        "activeDays": "active {count} {label}"
+        "activeDays": "over {count} active {label}"
       },
       "labels": {
         "people": {
