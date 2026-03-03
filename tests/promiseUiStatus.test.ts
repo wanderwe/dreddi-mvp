@@ -16,17 +16,17 @@ test("getPromiseUiStatus overrides active status when invite is declined", () =>
   assert.equal(uiStatus, "declined");
 });
 
-test("getPromiseUiStatus overrides active status when invite is ignored", () => {
+test("getPromiseUiStatus overrides active status when invite is expired", () => {
   const uiStatus = getPromiseUiStatus({
     status: "active",
-    invite_status: "ignored",
+    invite_status: "expired",
     accepted_at: null,
     counterparty_accepted_at: null,
     declined_at: null,
     ignored_at: "2024-01-02T00:00:00Z",
   });
 
-  assert.equal(uiStatus, "ignored");
+  assert.equal(uiStatus, "expired");
 });
 
 test("getPromiseUiStatus reports pending acceptance when awaiting", () => {

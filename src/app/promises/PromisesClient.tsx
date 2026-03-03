@@ -40,6 +40,8 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -148,7 +150,8 @@ export default function PromisesClient() {
   ) => {
     if (uiStatus === "awaiting_acceptance") return t("promises.status.awaitingInviteAcceptance");
     if (uiStatus === "declined") return t("promises.inviteStatus.declined");
-    if (uiStatus === "ignored") return t("promises.inviteStatus.ignored");
+    if (uiStatus === "expired") return t("promises.inviteStatus.expired");
+    if (uiStatus === "cancelled_by_creator") return t("promises.inviteStatus.cancelled_by_creator");
 
     if (role === "promisor") {
       if (status === "active") return t("promises.status.active");
@@ -170,8 +173,8 @@ export default function PromisesClient() {
     uiStatus: PromiseUiStatus
   ): { tone: StatusPillTone; icon: "check" | "clock" | "warning" } => {
     if (status === "confirmed") return { tone: "success", icon: "check" };
-    if (status === "disputed" || uiStatus === "declined") return { tone: "danger", icon: "warning" };
-    if (status === "completed_by_promisor" || uiStatus === "ignored") {
+    if (status === "disputed" || uiStatus === "declined" || uiStatus === "cancelled_by_creator") return { tone: "danger", icon: "warning" };
+    if (status === "completed_by_promisor" || uiStatus === "expired") {
       return { tone: "attention", icon: "warning" };
     }
     return { tone: "neutral", icon: "clock" };
@@ -241,7 +244,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -299,7 +302,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
