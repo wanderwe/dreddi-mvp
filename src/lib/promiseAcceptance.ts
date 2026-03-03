@@ -2,7 +2,8 @@ export const INVITE_STATUSES = [
   "awaiting_acceptance",
   "accepted",
   "declined",
-  "ignored",
+  "expired",
+  "cancelled_by_creator",
 ] as const;
 
 export type InviteStatus = (typeof INVITE_STATUSES)[number];
@@ -13,6 +14,8 @@ export type PromiseAcceptance = {
   accepted_at?: string | null;
   declined_at?: string | null;
   ignored_at?: string | null;
+  expires_at?: string | null;
+  cancelled_at?: string | null;
   counterparty_accepted_at?: string | null;
 };
 
@@ -27,7 +30,9 @@ export const getPromiseInviteStatus = (
   if (isInviteStatus(row.invite_status)) return row.invite_status;
   if (row.accepted_at || row.counterparty_accepted_at) return "accepted";
   if (row.declined_at) return "declined";
-  if (row.ignored_at) return "ignored";
+  if (row.cancelled_at) return "cancelled_by_creator";
+  if (row.expires_at && new Date(row.expires_at).getTime() <= Date.now()) return "expired";
+  if (row.ignored_at) return "expired";
 
   return "awaiting_acceptance";
 };

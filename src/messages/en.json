@@ -234,6 +234,7 @@
       "copySuccess": "Copied",
       "copyFailed": "Copy failed",
       "openInvite": "Open invite page",
+      "withdrawInvite": "Withdraw invite",
       "inviteFallback": "…",
       "noDeadline": "No deadline",
       "saving": "Saving…",
@@ -262,7 +263,8 @@
       "awaiting_acceptance": "Awaiting acceptance",
       "accepted": "Accepted",
       "declined": "Declined",
-      "ignored": "Ignored"
+      "expired": "Expired",
+      "cancelled_by_creator": "Withdrawn"
     },
     "confirm": {
       "back": "Back to deals",
@@ -419,7 +421,8 @@
       "awaiting_acceptance": "Awaiting acceptance",
       "accepted": "Accepted",
       "declined": "Declined",
-      "ignored": "Ignored"
+      "expired": "Expired",
+      "cancelled_by_creator": "Withdrawn"
     },
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this {entityLower}",
@@ -428,6 +431,7 @@
     "decline": "Decline",
     "declinedMessage": "You declined this invite.",
     "ignoredMessage": "This invite expired without a response.",
+    "withdrawnMessage": "This agreement was withdrawn by the creator",
     "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {
       "title": "This {entityLower} is PUBLIC",
@@ -495,7 +499,7 @@
         "trackRecord": "Deal pace"
       },
       "workedWith": {
-        "secondary": "out of {count} {label}"
+        "secondary": "with {count} {label}"
       },
       "commitments": {
         "onTime": "{count} on time"

@@ -42,7 +42,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
 
     const { data: p, error: pErr } = await admin
       .from("promises")
-      .select("id, title, creator_id, counterparty_id, counterparty_accepted_at, invite_status")
+      .select("id, title, creator_id, counterparty_id, counterparty_accepted_at, invite_status, expires_at")
       .eq("invite_token", token)
       .maybeSingle();
 
@@ -68,11 +68,25 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       return NextResponse.json({ error: "Invite already accepted" }, { status: 409 });
     }
 
-    if (inviteStatus === "declined" || inviteStatus === "ignored") {
+    if (inviteStatus === "declined" || inviteStatus === "expired" || inviteStatus === "cancelled_by_creator") {
       return NextResponse.json({ ok: true }, { status: 200 });
     }
 
     const nowIso = new Date().toISOString();
+
+    if (p.expires_at && new Date(p.expires_at).getTime() <= Date.now()) {
+      await admin
+        .from("promises")
+        .update({ invite_status: "expired", ignored_at: nowIso })
+        .eq("id", p.id)
+        .eq("invite_status", "awaiting_acceptance");
+      await admin
+        .from("deal_invites")
+        .update({ status: "expired" })
+        .eq("deal_id", p.id)
+        .eq("status", "created");
+      return NextResponse.json({ ok: true }, { status: 200 });
+    }
 
     const updatePayload: {
       invite_status: "declined";
@@ -97,6 +111,12 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
     if (updateError) {
       return NextResponse.json({ error: "Decline failed", detail: updateError.message }, { status: 500 });
     }
+
+    await admin
+      .from("deal_invites")
+      .update({ status: "declined" })
+      .eq("deal_id", p.id)
+      .eq("status", "created");
 
     await createNotification(admin, {
       userId: p.creator_id,
