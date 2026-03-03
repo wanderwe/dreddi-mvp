@@ -10,7 +10,6 @@ WITH raw_public_promises AS (
     p.disputed_at,
     p.due_at,
     p.creator_id,
-    p.counterparty_id,
     p.promisor_id,
     p.promisee_id,
     CASE
