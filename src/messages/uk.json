@@ -242,6 +242,7 @@
       "copySuccess": "Скопійовано",
       "copyFailed": "Не вдалося скопіювати",
       "openInvite": "Відкрити сторінку запрошення",
+      "withdrawInvite": "Відкликати запрошення",
       "inviteFallback": "…",
       "noDeadline": "Без строку",
       "saving": "Збереження…",
@@ -270,7 +271,8 @@
       "awaiting_acceptance": "Очікує прийняття",
       "accepted": "Прийнято",
       "declined": "Відхилено",
-      "ignored": "Проігноровано"
+      "expired": "Термін дії минув",
+      "cancelled_by_creator": "Відкликано"
     },
     "confirm": {
       "back": "Назад до угод",
@@ -427,7 +429,8 @@
       "awaiting_acceptance": "Очікує прийняття",
       "accepted": "Прийнято",
       "declined": "Відхилено",
-      "ignored": "Проігноровано"
+      "expired": "Термін дії минув",
+      "cancelled_by_creator": "Відкликано"
     },
     "nextStep": "Наступний крок",
     "nextStepHint": "Приймаючи, ви підтверджуєте, що розумієте цю угоду",
@@ -436,6 +439,7 @@
     "decline": "Відхилити",
     "declinedMessage": "Ви відхилили це запрошення.",
     "ignoredMessage": "Це запрошення завершилося без відповіді.",
+    "withdrawnMessage": "Цю угоду відкликав ініціатор",
     "awaitingCounterparty": "Очікуємо відповіді другої сторони",
     "publicProposal": {
       "title": "Ця угода є ПУБЛІЧНОЮ",

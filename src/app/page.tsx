@@ -11,11 +11,13 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 
 type DealRow = {
   id: string;
   title: string;
   status: PromiseStatus;
+  uiStatus: PromiseUiStatus;
   meta?: string;
   due_at?: string | null;
   created_at?: string | null;
@@ -23,6 +25,12 @@ type DealRow = {
   confirmed_at?: string | null;
   disputed_at?: string | null;
   declined_at?: string | null;
+  invite_status?: string | null;
+  accepted_at?: string | null;
+  counterparty_accepted_at?: string | null;
+  ignored_at?: string | null;
+  expires_at?: string | null;
+  cancelled_at?: string | null;
 };
 
 type DemoDealSource = {
@@ -63,7 +71,7 @@ type DealRowProps = {
   href?: string;
   isClickable?: boolean;
   metaText: string;
-  statusLabels: Record<PromiseStatus, string>;
+  statusLabels: Record<PromiseUiStatus, string>;
 };
 
 const BETA_BANNER_DISMISSED_KEY = "dreddi_banner_beta_v1_dismissed";
@@ -79,12 +87,15 @@ function DealRow({
   const interactiveClass = isClickable ? "transition hover:text-white" : "cursor-default";
   const titleClass = "truncate text-sm font-medium text-slate-100";
   const metaClass = "mt-1 truncate text-xs text-slate-400";
-  const statusPillToneMap: Record<PromiseStatus, StatusPillTone> = {
+  const statusPillToneMap: Record<PromiseUiStatus, StatusPillTone> = {
     active: "neutral",
     completed_by_promisor: "attention",
     confirmed: "success",
     disputed: "danger",
     declined: "danger",
+    awaiting_acceptance: "neutral",
+    expired: "attention",
+    cancelled_by_creator: "danger",
   };
 
   const content = (
@@ -94,8 +105,8 @@ function DealRow({
         {metaText ? <div className={metaClass}>{metaText}</div> : null}
       </div>
       <StatusPill
-        label={statusLabels[item.status] ?? item.status}
-        tone={statusPillToneMap[item.status] ?? "neutral"}
+        label={statusLabels[item.uiStatus] ?? item.uiStatus}
+        tone={statusPillToneMap[item.uiStatus] ?? "neutral"}
         marker="none"
         className="shrink-0 px-2 py-1 text-xs"
       />
@@ -184,6 +195,7 @@ export default function Home() {
           id: deal.id,
           title: t(deal.titleKey),
           status: deal.status,
+          uiStatus: deal.status,
           due_at: deal.due_at ?? null,
           created_at: deal.created_at ?? null,
           completed_at: deal.completed_at ?? null,
@@ -195,12 +207,15 @@ export default function Home() {
     [demoDealsSource, t]
   );
 
-  const statusLabels: Record<PromiseStatus, string> = {
+  const statusLabels: Record<PromiseUiStatus, string> = {
     active: copy.recentDeals.status.active,
     completed_by_promisor: copy.recentDeals.status.completedByPromisor,
     confirmed: copy.recentDeals.status.confirmed,
     disputed: copy.recentDeals.status.disputed,
     declined: copy.recentDeals.status.declined,
+    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    expired: t("promises.inviteStatus.expired"),
+    cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
 
 
@@ -321,7 +336,7 @@ export default function Home() {
 
       const { data, error } = await client
         .from("promises")
-        .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at")
+        .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at,invite_status,accepted_at,counterparty_accepted_at,ignored_at,expires_at,cancelled_at")
         .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(3);
@@ -338,12 +353,28 @@ export default function Home() {
               id: row.id,
               title: row.title,
               status: row.status as PromiseStatus,
+              uiStatus: getPromiseUiStatus({
+                status: row.status as PromiseStatus,
+                invite_status: row.invite_status,
+                accepted_at: row.accepted_at,
+                counterparty_accepted_at: row.counterparty_accepted_at,
+                declined_at: row.declined_at,
+                ignored_at: row.ignored_at,
+                expires_at: row.expires_at,
+                cancelled_at: row.cancelled_at,
+              }),
               due_at: row.due_at,
               created_at: row.created_at,
               completed_at: row.completed_at,
               confirmed_at: row.confirmed_at,
               disputed_at: row.disputed_at,
               declined_at: row.declined_at,
+              invite_status: row.invite_status,
+              accepted_at: row.accepted_at,
+              counterparty_accepted_at: row.counterparty_accepted_at,
+              ignored_at: row.ignored_at,
+              expires_at: row.expires_at,
+              cancelled_at: row.cancelled_at,
             },
           ];
         });

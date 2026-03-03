@@ -31,9 +31,11 @@ test("shows awaiting_acceptance only for invitee", () => {
 
 test("does not include declined/ignored invite states", () => {
   const declined = { ...base, invite_status: "declined" };
-  const ignored = { ...base, invite_status: "ignored" };
+  const expired = { ...base, invite_status: "expired" };
+  const cancelled = { ...base, invite_status: "cancelled_by_creator" };
   assert.equal(getActionQueueState(declined, "u1"), null);
-  assert.equal(getActionQueueState(ignored, "u1"), null);
+  assert.equal(getActionQueueState(expired, "u1"), null);
+  assert.equal(getActionQueueState(cancelled, "u1"), null);
 });
 
 test("includes active executor only after acceptance", () => {

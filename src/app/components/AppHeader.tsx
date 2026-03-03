@@ -91,7 +91,7 @@ export function AppHeader() {
       const { data, error } = await client
         .from("promises")
         .select(
-          "status,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+          "status,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
         )
         .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`);
 
