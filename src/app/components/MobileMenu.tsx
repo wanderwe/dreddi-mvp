@@ -27,9 +27,9 @@ export function MobileMenu({
   const t = useT();
   const [open, setOpen] = useState(false);
   const baseLinkClasses =
-    "rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100";
+    "rounded-lg border border-white/5 px-3 py-2.5 text-left text-white transition hover:border-emerald-300/40 hover:bg-white/[0.03] hover:text-emerald-100";
   const primaryLinkClasses =
-    "rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45";
+    "rounded-xl bg-emerald-400 px-3 py-3 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -51,41 +51,50 @@ export function MobileMenu({
       <SheetPortal>
         <SheetOverlay />
         <SheetContent id="mobile-menu" className="md:hidden">
-          <nav className="flex flex-col gap-4 text-sm font-medium text-slate-200">
+          <nav className="flex flex-col gap-5 text-sm font-medium text-slate-200">
             {isAuthenticated ? (
               <>
-                <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/promises">
-                    {t("nav.myPromises")}
-                  </Link>
-                </SheetClose>
-                {actionQueueCount > 0 && (
+                <div className="space-y-1">
                   <SheetClose asChild>
-                    <Link className={baseLinkClasses} href={actionQueueHref}>
-                      {t("nav.actionQueueBadge")} ({actionQueueCount})
+                    <Link className={baseLinkClasses} href="/promises">
+                      {t("nav.myPromises")}
                     </Link>
                   </SheetClose>
-                )}
-                <SheetClose asChild>
-                  <Link className={primaryLinkClasses} href="/promises/new">
-                    {t("nav.newPromise")}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/u">
-                    {t("nav.publicProfiles")}
-                  </Link>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/notifications">
-                    {t("nav.notifications")}
-                  </Link>
-                </SheetClose>
-                <div className="mt-2 border-t border-white/10 pt-4">
+                  <SheetClose asChild>
+                    <Link className={baseLinkClasses} href="/u">
+                      {t("nav.publicProfiles")}
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link className={baseLinkClasses} href="/notifications">
+                      {t("nav.notifications")}
+                    </Link>
+                  </SheetClose>
+                  {actionQueueCount > 0 && (
+                    <SheetClose asChild>
+                      <Link className={baseLinkClasses} href={actionQueueHref}>
+                        {t("nav.actionQueueBadge")} ({actionQueueCount})
+                      </Link>
+                    </SheetClose>
+                  )}
+                </div>
+
+                <div className="my-1 border-y border-white/10 py-4">
+                  <SheetClose asChild>
+                    <Link className={`${primaryLinkClasses} text-base`} href="/promises/new">
+                      {t("nav.newPromise")}
+                    </Link>
+                  </SheetClose>
+                </div>
+
+                <div className="mt-3 border-t border-white/10 pt-5">
                   <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
                     {t("profileSettings.sectionLabel")}
                   </div>
-                  <ProfileSettingsPanel showTitle={false} className="mt-3" />
+                  <ProfileSettingsPanel
+                    showTitle={false}
+                    className="mt-3 [&_.rounded-2xl]:rounded-xl [&_.rounded-xl]:rounded-lg [&_.border-white\/10]:border-white\/5"
+                  />
                 </div>
               </>
             ) : (
