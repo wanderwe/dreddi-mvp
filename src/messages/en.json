@@ -492,10 +492,10 @@
         "workedWith": "Worked with",
         "commitments": "Commitments",
         "disputes": "Disputes",
-        "trackRecord": "Track record"
+        "trackRecord": "Deal pace"
       },
       "workedWith": {
-        "secondary": "out of {count} {label}"
+        "secondary": "out of {count} {label} total"
       },
       "commitments": {
         "onTime": "{count} on time"
@@ -504,15 +504,28 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonth": "/ month",
-        "activeDays": "active {count} {label}"
+        "perMonthValue": "{count} / month",
+        "activeDays": "over {count} active {label}",
+        "summary": "{deals} over {days}"
       },
       "labels": {
         "people": {
           "one": "person",
           "other": "people"
         },
+        "workedWithPeople": {
+          "one": "person",
+          "other": "people"
+        },
         "deals": {
+          "one": "deal",
+          "other": "deals"
+        },
+        "workedWithDeals": {
+          "one": "deal",
+          "other": "deals"
+        },
+        "dealsPace": {
           "one": "deal",
           "other": "deals"
         },
