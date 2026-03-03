@@ -521,9 +521,8 @@
         "rate": "{rate}% угод"
       },
       "trackRecord": {
-        "perMonthSuffix": "/ місяць",
-        "activeDays": "за {count} {label} активності",
-        "summary": "{dealsCount} {dealsLabel} за {daysCount} {daysLabel}"
+        "perMonthValue": "{count} / місяць",
+        "activeDays": "за {count} {label} активності"
       },
       "labels": {
         "people": {
@@ -541,6 +540,12 @@
         "dealsTotal": {
           "one": "угоди",
           "few": "угод",
+          "many": "угод",
+          "other": "угоди"
+        },
+        "dealsPace": {
+          "one": "угода",
+          "few": "угоди",
           "many": "угод",
           "other": "угоди"
         },

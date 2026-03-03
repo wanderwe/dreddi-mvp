@@ -508,9 +508,8 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonthSuffix": "/ month",
-        "activeDays": "over {count} active {label}",
-        "summary": "{dealsCount} {dealsLabel} over {daysCount} active {daysLabel}"
+        "perMonthValue": "{count} / month",
+        "activeDays": "over {count} active {label}"
       },
       "labels": {
         "people": {
@@ -521,7 +520,7 @@
           "one": "deal",
           "other": "deals"
         },
-        "dealsTotal": {
+        "dealsPace": {
           "one": "deal",
           "other": "deals"
         },

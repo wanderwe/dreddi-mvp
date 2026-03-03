@@ -678,15 +678,20 @@ export default function PublicProfilePage() {
                             {t("publicProfile.reputationDetails.sections.trackRecord")}
                           </h3>
                           <div className="mt-2 space-y-2">
+                            <div className="flex items-baseline gap-2 text-white">
+                              <span className="text-2xl font-semibold">
+                                {numberFormatter.format(reputationEvidence.totalDeals)}
+                              </span>
+                              <span className="text-sm text-white/70">
+                                {formatPlural(reputationEvidence.totalDeals, "dealsPace")}
+                              </span>
+                            </div>
                             {reputationEvidence.avgDealsPerMonth !== null && (
-                              <div className="flex items-baseline gap-2 text-white">
-                                <span className="text-2xl font-semibold">
-                                  {decimalFormatter.format(reputationEvidence.avgDealsPerMonth)}
-                                </span>
-                                <span className="text-sm text-white/70">
-                                  {t("publicProfile.reputationDetails.trackRecord.perMonthSuffix")}
-                                </span>
-                              </div>
+                              <p className="text-xs text-white/60">
+                                {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
+                                  count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
+                                })}
+                              </p>
                             )}
                             {reputationEvidence.reputationAgeDays !== null && (
                               <p className="text-xs text-white/60">
