@@ -621,24 +621,28 @@ export default function PublicProfilePage() {
                           </div>
                         </div>
                       )}
-                      {(reputationEvidence.reputationAgeDays !== null ||
+                      {(reputationEvidence.totalDeals > 0 ||
+                        reputationEvidence.reputationAgeDays !== null ||
                         reputationEvidence.avgDealsPerMonth !== null) && (
                         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                           <h3 className="text-sm font-semibold text-white">
                             {t("publicProfile.reputationDetails.sections.trackRecord")}
                           </h3>
                           <div className="mt-2 space-y-2">
+                            <div className="flex items-baseline gap-2 text-white">
+                              <span className="text-2xl font-semibold">
+                                {numberFormatter.format(reputationEvidence.totalDeals)}
+                              </span>
+                              <span className="text-sm text-white/70">
+                                {formatPlural(reputationEvidence.totalDeals, "dealsPace")}
+                              </span>
+                            </div>
                             {reputationEvidence.avgDealsPerMonth !== null && (
-                              <div className="flex items-baseline gap-2 text-white">
-                                <span className="text-2xl font-semibold">
-                                  {decimalFormatter.format(
-                                    reputationEvidence.avgDealsPerMonth
-                                  )}
-                                </span>
-                                <span className="text-sm text-white/70">
-                                  {t("publicProfile.reputationDetails.trackRecord.perMonth")}
-                                </span>
-                              </div>
+                              <p className="text-xs text-white/60">
+                                {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
+                                  count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
+                                })}
+                              </p>
                             )}
                             {reputationEvidence.reputationAgeDays !== null && (
                               <p className="text-xs text-white/60">
