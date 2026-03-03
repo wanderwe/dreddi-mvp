@@ -293,8 +293,8 @@ export default function NotificationsClient() {
   const hasUnread = rows.some((row) => !row.read_at);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
             {t("notifications.header.eyebrow")}
@@ -311,7 +311,7 @@ export default function NotificationsClient() {
             type="button"
             onClick={() => void markAllAsRead()}
             disabled={markingAll}
-            className="cursor-pointer rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
           >
             {t("notifications.markAllRead")}
           </button>
@@ -330,7 +330,7 @@ export default function NotificationsClient() {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="space-y-3">
+          <div className="space-y-2 divide-y divide-white/10">
             {rows.map((row) => {
               const unread = !row.read_at;
               const ctaUrl = row.cta_url ?? "/promises";
@@ -347,13 +347,13 @@ export default function NotificationsClient() {
               return (
                 <div
                   key={row.id}
-                  className={`rounded-2xl border px-4 py-4 transition ${
+                  className={`rounded-2xl border px-4 py-4 transition min-h-14 ${
                     unread
                       ? "border-emerald-400/40 bg-emerald-500/10"
                       : "border-white/10 bg-white/5"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex items-start gap-3">
                       <span
                         className={`mt-1 h-2 w-2 rounded-full ${
@@ -373,12 +373,12 @@ export default function NotificationsClient() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col gap-3 sm:items-end">
                       {ctaLabel && (
                         <Link
                           href={ctaUrl}
                           onClick={() => unread && void markAsRead(row.id)}
-                          className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                          className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-3 py-1 text-center text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
                         >
                           {ctaLabel}
                         </Link>
@@ -387,7 +387,7 @@ export default function NotificationsClient() {
                         <button
                           type="button"
                           onClick={() => void markAsRead(row.id)}
-                          className="cursor-pointer text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                          className="min-h-12 w-full cursor-pointer rounded-xl border border-transparent px-3 py-1 text-center text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-none"
                         >
                           {t("notifications.markRead")}
                         </button>
@@ -404,7 +404,7 @@ export default function NotificationsClient() {
                 type="button"
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="cursor-pointer rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
               >
                 {loadingMore ? t("notifications.loading") : t("notifications.loadMore")}
               </button>
