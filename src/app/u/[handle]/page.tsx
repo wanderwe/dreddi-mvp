@@ -7,6 +7,7 @@ import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
+import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
@@ -36,19 +37,34 @@ type PublicProfileRow = {
 type PublicPromiseRow = {
   title: string | null;
   status: string | null;
+  invite_status: string | null;
   created_at: string | null;
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
+  declined_at: string | null;
+  accepted_at: string | null;
+  counterparty_accepted_at: string | null;
+  ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
 };
 
 type PublicPromise = {
   title: string;
   status: PromiseStatus;
+  uiStatus: PromiseUiStatus;
   created_at: string;
   due_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
+  declined_at: string | null;
+  invite_status: string | null;
+  accepted_at: string | null;
+  counterparty_accepted_at: string | null;
+  ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
 };
 
 const getPublicProfileStats = async (handle: string) => {
@@ -66,12 +82,15 @@ const getPublicProfileStats = async (handle: string) => {
     .maybeSingle();
 };
 
-const statusTones: Record<PromiseStatus, StatusPillTone> = {
+const statusTones: Record<PromiseUiStatus, StatusPillTone> = {
   active: "neutral",
   completed_by_promisor: "attention",
   confirmed: "success",
   disputed: "danger",
   declined: "danger",
+  awaiting_acceptance: "neutral",
+  expired: "attention",
+  cancelled_by_creator: "danger",
 };
 
 export default function PublicProfilePage() {
@@ -176,14 +195,41 @@ export default function PublicProfilePage() {
       } else {
         const normalized: PublicPromise[] = promiseRows.flatMap((row) => {
           if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
+          const uiStatus = getPromiseUiStatus({
+            status: row.status,
+            invite_status: row.invite_status,
+            accepted_at: row.accepted_at,
+            counterparty_accepted_at: row.counterparty_accepted_at,
+            declined_at: row.declined_at,
+            ignored_at: row.ignored_at,
+            expires_at: row.expires_at,
+            cancelled_at: row.cancelled_at,
+          });
+
+          if (
+            uiStatus === "awaiting_acceptance" ||
+            uiStatus === "cancelled_by_creator" ||
+            uiStatus === "expired"
+          ) {
+            return [];
+          }
+
           return [
             {
               title: row.title,
               status: row.status,
+              uiStatus,
               created_at: row.created_at,
               due_at: row.due_at,
               confirmed_at: row.confirmed_at,
               disputed_at: row.disputed_at,
+              declined_at: row.declined_at,
+              invite_status: row.invite_status,
+              accepted_at: row.accepted_at,
+              counterparty_accepted_at: row.counterparty_accepted_at,
+              ignored_at: row.ignored_at,
+              expires_at: row.expires_at,
+              cancelled_at: row.cancelled_at,
             },
           ];
         });
@@ -278,12 +324,15 @@ export default function PublicProfilePage() {
     }
   };
 
-  const statusLabels: Partial<Record<PromiseStatus, string>> = {
+  const statusLabels: Partial<Record<PromiseUiStatus, string>> = {
     active: t("publicProfile.status.inProgress"),
     completed_by_promisor: t("publicProfile.status.awaitingOutcome"),
     confirmed: landingCopy.recentDeals.status.confirmed,
     disputed: landingCopy.recentDeals.status.disputed,
     declined: landingCopy.recentDeals.status.declined,
+    awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    expired: t("promises.inviteStatus.expired"),
+    cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
 
   const publicDealsEmpty = promises.length === 0;
@@ -544,20 +593,20 @@ export default function PublicProfilePage() {
                           <div className="mt-2 space-y-2">
                             <div className="flex items-baseline gap-2 text-white">
                               <span className="text-2xl font-semibold">
-                                {numberFormatter.format(reputationEvidence.uniquePeople)}
+                                {numberFormatter.format(reputationEvidence.totalDeals)}
                               </span>
                               <span className="text-sm text-white/70">
                                 {formatPlural(
-                                  reputationEvidence.uniquePeople,
-                                  "people"
+                                  reputationEvidence.totalDeals,
+                                  "deals"
                                 )}
                               </span>
                             </div>
                             {reputationEvidence.totalDeals > 0 && (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
-                                  count: numberFormatter.format(reputationEvidence.totalDeals),
-                                  label: formatPlural(reputationEvidence.totalDeals, "deals"),
+                                  count: numberFormatter.format(reputationEvidence.uniquePeople),
+                                  label: formatPlural(reputationEvidence.uniquePeople, "people"),
                                 })}
                               </p>
                             )}
@@ -646,11 +695,13 @@ export default function PublicProfilePage() {
                             )}
                             {reputationEvidence.reputationAgeDays !== null && (
                               <p className="text-xs text-white/60">
-                                {t("publicProfile.reputationDetails.trackRecord.activeDays", {
-                                  count: numberFormatter.format(
+                                {t("publicProfile.reputationDetails.trackRecord.summary", {
+                                  dealsCount: numberFormatter.format(reputationEvidence.totalDeals),
+                                  dealsLabel: formatPlural(reputationEvidence.totalDeals, "deals"),
+                                  daysCount: numberFormatter.format(
                                     reputationEvidence.reputationAgeDays
                                   ),
-                                  label: formatPlural(
+                                  daysLabel: formatPlural(
                                     reputationEvidence.reputationAgeDays,
                                     "days"
                                   ),
@@ -686,8 +737,8 @@ export default function PublicProfilePage() {
                         </p>
                       </div>
                       <StatusPill
-                        label={statusLabels[promise.status] ?? promise.status}
-                        tone={statusTones[promise.status] ?? "neutral"}
+                        label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
+                        tone={statusTones[promise.uiStatus] ?? "neutral"}
                       />
                     </div>
                   ))}
