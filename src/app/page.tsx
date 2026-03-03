@@ -11,6 +11,8 @@ import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { UseCasesSection } from "@/app/components/landing/UseCasesSection";
+import { ReputationSection } from "@/app/components/landing/ReputationSection";
 
 type DealRow = {
   id: string;
@@ -504,8 +506,10 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <div className="flex flex-col gap-16 py-16 md:gap-24 md:py-20">
+          <section className="flex min-h-[72vh] flex-col gap-10 md:flex-row md:items-center">
+            <div className="flex-1 flex flex-col gap-5 md:gap-7">
           <div className="order-1 space-y-4">
             <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
               {copy.hero.headline}
@@ -705,6 +709,11 @@ export default function Home() {
                 </div>
             </div>
           </div>
+            </div>
+          </section>
+
+          <UseCasesSection copy={copy.useDreddi} />
+          <ReputationSection copy={copy.reputation} scoreCopy={copy.score} />
         </div>
       </div>
     </main>

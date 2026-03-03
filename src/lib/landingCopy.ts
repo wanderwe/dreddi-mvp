@@ -7,19 +7,17 @@ export type LandingCopy = {
   };
   useDreddi: {
     label: string;
-    title: string;
-    bullets: string[];
-    scenariosTitle: string;
-    scenarios: string[];
-    noteTitle: string;
-    framing: string;
+    problemTitle: string;
+    problemBullets: string[];
+    effectTitle: string;
+    effectBullets: string[];
+    effectLine: string;
   };
   reputation: {
     label: string;
     title: string;
-    steps: string[];
-    outcomeTitle: string;
-    outcomeDescription: string;
+    description: string;
+    bullets: string[];
     cta: string;
   };
   cta: {
@@ -87,36 +85,32 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     useDreddi: {
       label: "Сценарії використання",
-      title: "Коли варто використовувати Dreddi",
-      bullets: [
-        "Ви погодили дедлайни, але нічого не підписано",
-        "На кону гроші, час або репутація",
-        "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+      problemTitle: "Знайомо?",
+      problemBullets: [
+        "Дедлайн “на словах”",
+        "Ніхто нічого не памʼятає",
+        "Починається “я думав ти…”",
+        "І зʼявляється напруга",
       ],
-      scenariosTitle: "Типові сценарії",
-      scenarios: [
-        "Фріланс і послуги до контрактів",
-        "Партнерства на ранніх етапах",
-        "Переговори з нерухомості",
-        "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
+      effectTitle: "Коли це зафіксовано в Dreddi",
+      effectBullets: [
+        "Є дата",
+        "Інша сторона підтвердила участь",
+        "Результат буде зафіксований",
+        "Це стане частиною профілю",
       ],
-      noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+      effectLine: "Видимість змінює поведінку.",
     },
     reputation: {
-      label: "Результат",
-      title: "Репутація будується виконанням",
-      steps: [
-        "Домовленість фіксується в Dreddi",
-        "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+      label: "Перевірка",
+      title: "Ви бачите, хто тримає слово",
+      description: "Публічний профіль показує не слова — а історію виконання.",
+      bullets: [
+        "Виконані домовленості",
+        "Оскаржені випадки",
+        "Ритм виконання",
       ],
-      outcomeTitle: "Публічний профіль",
-      outcomeDescription: "Відображає дотримані та оскаржені угоди",
-      cta: "Переглянути приклад профілю",
+      cta: "Подивитись приклад профілю",
     },
     cta: {
       getStarted: "Створити угоду",
@@ -142,7 +136,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Увійдіть, щоб бачити оновлення",
       demoBadge: "Приклад профілю",
       cards: {
-        confirmed: "Дотримано",
+        confirmed: "Виконано",
         disputed: "Оскаржено",
       },
       onTime: {
@@ -166,7 +160,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Активна",
         completedByPromisor: "Очікує перегляду",
-        confirmed: "Дотримано",
+        confirmed: "Виконано",
         disputed: "Оскаржено",
         declined: "Відхилено",
       },
@@ -181,36 +175,32 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     useDreddi: {
       label: "Use cases",
-      title: "Use Dreddi when",
-      bullets: [
-        "You agree on deadlines, but nothing is signed yet",
-        "Money, time, or reputation is at stake",
-        "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+      problemTitle: "Sound familiar?",
+      problemBullets: [
+        "Deadline is agreed only verbally",
+        "Nobody remembers exact terms",
+        "It turns into “I thought you…”",
+        "Tension starts to grow",
       ],
-      scenariosTitle: "Typical scenarios",
-      scenarios: [
-        "Freelance & services before contracts",
-        "Early-stage partnerships",
-        "Real estate negotiations",
-        "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
+      effectTitle: "When it is recorded in Dreddi",
+      effectBullets: [
+        "There is a clear date",
+        "The other side confirms participation",
+        "The result will be recorded",
+        "It becomes part of the profile",
       ],
-      noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
+      effectLine: "Visibility changes behavior.",
     },
     reputation: {
-      label: "Outcome",
-      title: "Reputation is built by execution",
-      steps: [
-        "The agreement is recorded in Dreddi",
-        "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
+      label: "Verification",
+      title: "You can see who keeps their word",
+      description: "A public profile shows not claims — but execution history.",
+      bullets: [
+        "Completed agreements",
+        "Disputed cases",
+        "Execution rhythm",
       ],
-      outcomeTitle: "Public profile",
-      outcomeDescription: "Shows fulfilled and disputed deals",
-      cta: "View example profile",
+      cta: "View profile example",
     },
     cta: {
       getStarted: "Create a deal",
@@ -236,7 +226,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       signIn: "Sign in to see updates",
       demoBadge: "Demo profile",
       cards: {
-        confirmed: "Fulfilled",
+        confirmed: "Completed",
         disputed: "Disputed",
       },
       onTime: {
@@ -260,7 +250,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       status: {
         active: "Active",
         completedByPromisor: "Awaiting review",
-        confirmed: "Fulfilled",
+        confirmed: "Completed",
         disputed: "Disputed",
         declined: "Declined",
       },
