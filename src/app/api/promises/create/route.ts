@@ -134,7 +134,7 @@ export async function POST(req: Request) {
         title: "New deal invitation",
         body: "You have been invited to a deal",
         dedupeKey: `invite:${insertData.id}:${counterpartyProfile.id}`,
-        ctaUrl: `/promises/${insertData.id}`,
+        ctaUrl: `/p/invite/${insertData.invite_token}`,
         priority: mapPriorityForType("invite"),
       });
     }
