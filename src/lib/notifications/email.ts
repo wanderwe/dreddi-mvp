@@ -5,6 +5,8 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "invite",
   "accepted",
   "invite_declined",
+  "marked_completed",
+  "completion_waiting",
   "reminder_due_24h",
   "reminder_overdue",
   "due_soon",
@@ -98,6 +100,17 @@ const resolveEmailCopy = (payload: EmailPayload) => {
         manageUrl,
       });
       return { subject: "Invite declined", ...content };
+    }
+    case "marked_completed":
+    case "completion_waiting": {
+      const content = renderTemplate({
+        heading: "Action needed: confirm or dispute",
+        message: payload.body || "The other side asked you to review completion.",
+        ctaLabel: "Review outcome",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "Completion review reminder", ...content };
     }
     case "reminder_due_24h":
     case "due_soon": {
