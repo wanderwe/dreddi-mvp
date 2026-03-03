@@ -516,6 +516,10 @@
           "one": "deal",
           "other": "deals"
         },
+        "dealsTotal": {
+          "one": "deal",
+          "other": "deals"
+        },
         "deadlines": {
           "one": "deadline",
           "other": "deadlines"

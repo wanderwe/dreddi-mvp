@@ -558,7 +558,7 @@ export default function PublicProfilePage() {
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
                                   count: numberFormatter.format(reputationEvidence.totalDeals),
-                                  label: formatPlural(reputationEvidence.totalDeals, "deals"),
+                                  label: formatPlural(reputationEvidence.totalDeals, "dealsTotal"),
                                 })}
                               </p>
                             )}
