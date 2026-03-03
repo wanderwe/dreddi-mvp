@@ -605,8 +605,9 @@ export default function PublicProfilePage() {
                             {reputationEvidence.totalDeals > 0 && (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
-                                  count: numberFormatter.format(reputationEvidence.uniquePeople),
-                                  label: formatPlural(reputationEvidence.uniquePeople, "people"),
+                                  count: numberFormatter.format(reputationEvidence.totalDeals),
+                                  // Keep legacy worked-with wording ("серед ... угод") separate from deal-pace noun forms.
+                                  label: formatPlural(reputationEvidence.totalDeals, "deals"),
                                 })}
                               </p>
                             )}
