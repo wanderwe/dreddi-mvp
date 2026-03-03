@@ -26,6 +26,7 @@ export type NotificationRole = "creator" | "executor" | "counterparty";
 export type NotificationSettings = {
   locale: NotificationLocale;
   pushEnabled: boolean;
+  emailEnabled: boolean;
   deadlineRemindersEnabled: boolean;
   quietHoursEnabled: boolean;
   quietHoursStart: string;

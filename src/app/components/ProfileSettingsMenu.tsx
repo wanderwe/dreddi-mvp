@@ -31,6 +31,7 @@ type ProfileState = {
   profileTags: string[];
   isPublic: boolean;
   pushEnabled: boolean;
+  emailEnabled: boolean;
   deadlineRemindersEnabled: boolean;
   quietHoursEnabled: boolean;
   quietHoursStart: string;
@@ -87,6 +88,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           profileTags: [],
           isPublic: true,
           pushEnabled: true,
+          emailEnabled: true,
           deadlineRemindersEnabled: true,
           quietHoursEnabled: true,
           quietHoursStart: "22:00",
@@ -121,7 +123,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const { data, error: profileError } = await supabase
         .from("profiles")
         .select(
-          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
         )
         .eq("id", session.user.id)
         .single();
@@ -140,6 +142,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         profile_tags?: string[] | null;
         is_public_profile?: boolean | null;
         push_notifications_enabled?: boolean | null;
+        email_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
         quiet_hours_enabled?: boolean | null;
         quiet_hours_start?: string | null;
@@ -150,6 +153,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const profileTagsRow = profileRow?.profile_tags ?? [];
       const isPublic = profileRow?.is_public_profile ?? true;
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
+      const emailEnabled = profileRow?.email_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
       const quietHoursEnabled = profileRow?.quiet_hours_enabled ?? true;
       const quietHoursStart = profileRow?.quiet_hours_start ?? "22:00";
@@ -163,6 +167,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         profileTags: profileTagsRow,
         isPublic,
         pushEnabled,
+        emailEnabled,
         deadlineRemindersEnabled,
         quietHoursEnabled,
         quietHoursStart,
@@ -299,6 +304,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     await updateProfileRow(
       { push_notifications_enabled: !profile.pushEnabled },
       { pushEnabled: !profile.pushEnabled }
+    );
+  };
+
+  const toggleEmailNotifications = async () => {
+    if (!profile) return;
+    await updateProfileRow(
+      { email_notifications_enabled: !profile.emailEnabled },
+      { emailEnabled: !profile.emailEnabled }
     );
   };
 
@@ -817,6 +830,41 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         <span
                           className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
                             profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-white">
+                        {t("profileSettings.emailLabel")}
+                      </div>
+                      <HelperText>{t("profileSettings.emailDescription")}</HelperText>
+                    </div>
+                    <div className="flex justify-end self-center">
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={profile?.emailEnabled ?? false}
+                        onClick={toggleEmailNotifications}
+                        disabled={loading || saving || !profile}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                          profile?.emailEnabled
+                            ? "border-emerald-300/50 bg-emerald-400/70"
+                            : "border-white/20 bg-white/10"
+                        } ${
+                          loading || saving || !profile
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                          }`}
+                      >
+                        <span
+                          className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                            profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
                           }`}
                         />
                       </button>

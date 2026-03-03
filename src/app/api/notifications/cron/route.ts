@@ -38,6 +38,7 @@ export async function POST(req: Request) {
   const now = new Date();
   const nowIso = now.toISOString();
   const dueSoonCutoff = new Date(now.getTime() + HOURS_24).toISOString();
+  const overdueCutoff = new Date(now.getTime() - HOURS_24).toISOString();
 
   const results = {
     dueSoon: 0,
@@ -96,7 +97,7 @@ export async function POST(req: Request) {
       "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(overdue_notified_at)"
     )
     .eq("status", "active")
-    .lt("due_at", nowIso);
+    .lte("due_at", overdueCutoff);
 
   for (const row of overdueRows ?? []) {
     if (!row.due_at) continue;

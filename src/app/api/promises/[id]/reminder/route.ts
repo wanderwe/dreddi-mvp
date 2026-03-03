@@ -26,106 +26,6 @@ const errorResponse = (
 ) => NextResponse.json({ error_code, error, detail: detail ?? null }, { status });
 
 
-const getBaseUrl = (req: Request) => {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (configured) return configured.replace(/\/$/, "");
-
-  const url = new URL(req.url);
-  return `${url.protocol}//${url.host}`;
-};
-
-const resolveProfileName = async (admin: ReturnType<typeof getAdminClient>, userId: string) => {
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("display_name,email")
-    .eq("id", userId)
-    .maybeSingle<{ display_name: string | null; email: string | null }>();
-
-  const displayName = profile?.display_name?.trim();
-  if (displayName) return displayName;
-
-  const email = profile?.email?.trim();
-  if (email) return email;
-
-  const { data: authUser } = await admin.auth.admin.getUserById(userId);
-  return authUser.user?.email?.trim() || "Користувач";
-};
-
-const resolveReceiverEmail = async (
-  admin: ReturnType<typeof getAdminClient>,
-  userId: string
-) => {
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("email")
-    .eq("id", userId)
-    .maybeSingle<{ email: string | null }>();
-
-  if (profile?.email?.trim()) return profile.email.trim();
-
-  const { data: authUser } = await admin.auth.admin.getUserById(userId);
-  return authUser.user?.email?.trim() ?? null;
-};
-
-async function sendReminderEmail({
-  to,
-  senderName,
-  dealTitle,
-  promiseId,
-  baseUrl,
-}: {
-  to: string;
-  senderName: string;
-  dealTitle: string;
-  promiseId: string;
-  baseUrl: string;
-}) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.REMINDER_FROM_EMAIL || process.env.RESEND_FROM_EMAIL;
-
-  if (!apiKey || !fromEmail) {
-    console.warn("[reminders] email provider is not configured");
-    return;
-  }
-
-  const confirmUrl = `${baseUrl}/promises/${promiseId}?action=confirm`;
-  const disputeUrl = `${baseUrl}/promises/${promiseId}?action=dispute`;
-
-  const text = `${senderName} нагадує вам про угоду:\n“${dealTitle}”\n\nЧи виконано її?\n\nПідтвердити: ${confirmUrl}\nОскаржити: ${disputeUrl}`;
-
-  const html = `
-    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a;">
-      <p>${senderName} нагадує вам про угоду:</p>
-      <p><strong>“${dealTitle}”</strong></p>
-      <p>Чи виконано її?</p>
-      <p>
-        <a href="${confirmUrl}" style="display:inline-block;padding:10px 14px;margin-right:8px;border-radius:8px;background:#22c55e;color:#020617;text-decoration:none;font-weight:700;">Підтвердити</a>
-        <a href="${disputeUrl}" style="display:inline-block;padding:10px 14px;border-radius:8px;background:#ef4444;color:#ffffff;text-decoration:none;font-weight:700;">Оскаржити</a>
-      </p>
-    </div>
-  `;
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to: [to],
-      subject: "Вам нагадують про угоду в Dreddi",
-      text,
-      html,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`Email sending failed: ${response.status} ${detail}`);
-  }
-}
-
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies();
@@ -212,34 +112,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return errorResponse(500, "reminder_create_failed", "Could not create reminder", insertError.message);
     }
 
-    try {
-      const senderName = await resolveProfileName(admin, user.id);
-      const receiverEmail = await resolveReceiverEmail(admin, receiverId);
-      if (receiverEmail) {
-        await sendReminderEmail({
-          to: receiverEmail,
-          senderName,
-          dealTitle: promise.title,
-          promiseId: id,
-          baseUrl: getBaseUrl(req),
-        });
-      }
-
-      await createNotification(admin, {
-        userId: receiverId,
-        promiseId: id,
-        type: isActive ? "reminder_overdue" : "marked_completed",
-        dedupeKey: `manual_reminder:${id}:${Math.floor(Date.now() / DAY_MS)}`,
-        ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
-        ctaLabel: "Open",
-        priority: mapPriorityForType(isActive ? "reminder_overdue" : "marked_completed"),
-        body: isActive
-          ? "The other side reminded you to complete this deal."
-          : "The other side reminded you to confirm or dispute this completed deal.",
-      });
-    } catch (emailError) {
-      console.warn("[reminders] email send failed", emailError);
-    }
+    await createNotification(admin, {
+      userId: receiverId,
+      promiseId: id,
+      type: isActive ? "reminder_overdue" : "marked_completed",
+      dedupeKey: `manual_reminder:${id}:${Math.floor(Date.now() / DAY_MS)}`,
+      ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
+      ctaLabel: "Open",
+      priority: mapPriorityForType(isActive ? "reminder_overdue" : "marked_completed"),
+      body: isActive
+        ? "The other side reminded you to complete this deal."
+        : "The other side reminded you to confirm or dispute this completed deal.",
+    });
 
     const { count } = await admin
       .from("deal_reminders")

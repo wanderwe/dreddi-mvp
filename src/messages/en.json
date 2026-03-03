@@ -86,6 +86,8 @@
     "notificationsLabel": "Notifications",
     "pushLabel": "In-app notifications",
     "pushDescription": "Notifications about important deal events shown inside the app",
+    "emailLabel": "Email notifications",
+    "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
     "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
     "quietHoursLabel": "Quiet hours",

@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeLocale } from "@/lib/i18n/locales";
 import { getNotificationCopy } from "@/lib/notifications/copy";
+import { maybeSendNotificationEmail } from "@/lib/notifications/email";
 import {
   CRITICAL_NOTIFICATION_TYPES,
   CAP_BYPASS_NOTIFICATION_TYPES,
@@ -36,11 +37,13 @@ export type NotificationRequest = {
 export type NotificationOutcome = {
   created: boolean;
   skippedReason?: string;
+  notificationId?: string;
 };
 
 const defaultSettings: NotificationSettings = {
   locale: "en",
   pushEnabled: true,
+  emailEnabled: true,
   deadlineRemindersEnabled: true,
   quietHoursEnabled: true,
   quietHoursStart: "22:00",
@@ -87,7 +90,7 @@ export async function getUserNotificationSettings(
   const { data } = await admin
     .from("profiles")
     .select(
-      "locale,push_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+      "locale,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
     )
     .eq("id", userId)
     .maybeSingle();
@@ -97,6 +100,7 @@ export async function getUserNotificationSettings(
   return {
     locale,
     pushEnabled: data?.push_notifications_enabled ?? defaultSettings.pushEnabled,
+    emailEnabled: data?.email_notifications_enabled ?? defaultSettings.emailEnabled,
     deadlineRemindersEnabled:
       data?.deadline_reminders_enabled ?? defaultSettings.deadlineRemindersEnabled,
     quietHoursEnabled: data?.quiet_hours_enabled ?? defaultSettings.quietHoursEnabled,
@@ -207,12 +211,15 @@ export async function createNotification(
     delta: request.delta,
   });
 
+  const title = request.title ?? copy.title ?? "";
+  const body = request.body ?? copy.body ?? "";
+
   const { error } = await admin.from("notifications").insert({
     user_id: request.userId,
     promise_id: request.promiseId,
     type: normalizedType,
-    title: request.title ?? copy.title ?? "",
-    body: request.body ?? copy.body ?? "",
+    title,
+    body,
     cta_label: request.ctaLabel ?? copy.ctaLabel ?? null,
     cta_url: request.ctaUrl,
     priority: request.priority,
@@ -224,6 +231,13 @@ export async function createNotification(
     return skip("db_error", { dbError: error.message });
   }
 
+  const { data: insertedNotification } = await admin
+    .from("notifications")
+    .select("id")
+    .eq("user_id", request.userId)
+    .eq("dedupe_key", request.dedupeKey)
+    .maybeSingle();
+
   if (shouldSendPush) {
     await sendPush({
       userId: request.userId,
@@ -232,7 +246,19 @@ export async function createNotification(
     });
   }
 
-  return { created: true };
+  if (settings.emailEnabled && insertedNotification?.id) {
+    await maybeSendNotificationEmail(admin, {
+      eventId: insertedNotification.id,
+      userId: request.userId,
+      type: normalizedType,
+      dedupeKey: request.dedupeKey,
+      ctaUrl: request.ctaUrl,
+      title,
+      body,
+    });
+  }
+
+  return { created: true, notificationId: insertedNotification?.id };
 }
 
 export async function sendPush(payload: {
