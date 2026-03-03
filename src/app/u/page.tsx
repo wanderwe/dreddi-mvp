@@ -217,11 +217,11 @@ export default function PublicProfilesDirectoryPage() {
                 {reputationScore}
               </div>
             </div>
-            <div className="flex flex-col gap-2 text-xs text-white/70 sm:flex-row sm:flex-wrap">
-              <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-1">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
+              <span className="inline-flex min-h-8 items-center rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2.5 py-1.5">
                 {t("publicProfile.confirmed")}: {confirmedCount}
               </span>
-              <span className="rounded-full border border-red-300/30 bg-red-500/10 px-2 py-1">
+              <span className="inline-flex min-h-8 items-center rounded-full border border-red-300/30 bg-red-500/10 px-2.5 py-1.5">
                 {t("publicProfile.disputed")}: {disputedCount}
               </span>
             </div>
