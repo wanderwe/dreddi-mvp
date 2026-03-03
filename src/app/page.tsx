@@ -504,9 +504,9 @@ export default function Home() {
         </div>
       ) : null}
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-12 pt-20 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
-        <div className="flex-1 flex flex-col gap-5 md:gap-7">
-          <div className="order-1 space-y-4">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-12 pt-16 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
+        <div className="flex flex-1 flex-col gap-4 md:gap-7">
+          <div className="order-1 space-y-3 sm:space-y-4">
             <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
               {copy.hero.headline}
             </p>
@@ -525,37 +525,37 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="max-w-xl text-base leading-tight text-slate-300 sm:text-[1.03rem]">
+            <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
           </div>
 
           {!showAuthenticatedCta ? (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <Link
                 href="/login"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.getStarted}
               </Link>
               <Link
                 href="/u"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.publicProfiles}
               </Link>
             </div>
           ) : (
-            <div className="order-3 flex flex-wrap items-center gap-3 md:order-4">
+            <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <Link
                 href="/promises/new"
-                className="rounded-xl bg-emerald-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.createPromise}
               </Link>
               <Link
                 href="/promises"
-                className="rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.reviewDeals}
               </Link>
@@ -564,8 +564,8 @@ export default function Home() {
 
         </div>
 
-        <div className="flex-1">
-          <div className="glass-panel relative overflow-hidden rounded-3xl border-white/10 px-7 pb-7 pt-5 sm:px-8 sm:pb-8 sm:pt-6">
+        <div className="w-full flex-1">
+          <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
               className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -575,7 +575,7 @@ export default function Home() {
               }}
               aria-hidden
             />
-            <div className="relative flex flex-col gap-4">
+            <div className="relative flex flex-col gap-3 sm:gap-4">
               <div className="flex items-center justify-between">
                 <DreddiLogoMark className="h-10 w-10" />
                 <div className="flex items-center gap-2">

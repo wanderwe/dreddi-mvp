@@ -103,7 +103,7 @@ function ActionButton({
   onClick: () => void;
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
+    "inline-flex min-h-12 w-full sm:w-auto items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
     "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
@@ -519,15 +519,15 @@ export default function PromisePage() {
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl py-10 space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href={backLink.href}
           className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {backLink.label}
         </Link>
-        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} />}</div>
+        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}</div>
       </div>
 
       {error && (
@@ -636,7 +636,7 @@ export default function PromisePage() {
                 {canReview && p.status === "completed_by_promisor" && (
                   <Link
                     href={`/promises/${p.id}/confirm`}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                   >
                     {t("promises.detail.reviewConfirm")}
                   </Link>
@@ -659,7 +659,7 @@ export default function PromisePage() {
                   </div>
                 </div>
               ) : !p.invite_token ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-neutral-400">
                     {t("promises.detail.noInviteToken")}
                   </div>
@@ -695,7 +695,7 @@ export default function PromisePage() {
                     {inviteLink ?? t("promises.detail.inviteFallback")}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <ActionButton
                       label={t("promises.detail.copyLink")}
                       variant="primary"
@@ -706,7 +706,7 @@ export default function PromisePage() {
                     {inviteLink && (
                       <Link
                         href={`/p/invite/${p.invite_token}`}
-                        className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                       >
                         {t("promises.detail.openInvite")}
                       </Link>
