@@ -523,7 +523,8 @@
       "trackRecord": {
         "perMonthValue": "{count} / місяць",
         "activeDays": "за {count} {label} активності",
-        "summary": "{deals} за {days}"
+        "summary": "{deals} за {days} днів",
+        "noData": "Немає даних за 30 днів"
       },
       "labels": {
         "people": {
