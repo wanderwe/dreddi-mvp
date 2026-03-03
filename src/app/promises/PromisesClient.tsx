@@ -792,63 +792,61 @@ export default function PromisesClient() {
                 return (
                   <div
                     key={p.id}
-                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
+                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4"
                   >
-                    <div className="flex flex-col gap-3">
-                      <div className="space-y-1">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+                      <div className="min-w-0 flex-1 space-y-1">
                         <Link
                           href={`/promises/${p.id}?from=deals`}
-                          className="text-lg font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                          className="block text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                         >
                           {p.title}
                         </Link>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 
-                      <div className="flex flex-col gap-3 text-left text-sm text-slate-200 sm:items-end sm:text-right">
-                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                          <StatusPill
-                            label={statusLabel}
-                            tone={statusPill.tone}
-                            icon={statusPill.icon}
-                            className="shrink-0"
-                          />
+                      <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-slate-200 sm:justify-end lg:self-start">
+                        <StatusPill
+                          label={statusLabel}
+                          tone={statusPill.tone}
+                          icon={statusPill.icon}
+                          className="shrink-0"
+                        />
 
-                          {canSendReminder && (
-                            <Tooltip label={reminderTooltip} placement="top">
-                              <IconButton
-                                icon={<BellRing className="h-[18px] w-[18px]" />}
-                                ariaLabel={t("promises.list.reminder.aria")}
-                                onClick={() => handleSendReminder(p.id)}
-                                disabled={sendingReminderId === p.id || reminderCooldown}
-                                className="h-12 w-12"
-                              />
-                            </Tooltip>
-                          )}
+                        {canSendReminder && (
+                          <Tooltip label={reminderTooltip} placement="top">
+                            <IconButton
+                              icon={<BellRing className="h-[18px] w-[18px]" />}
+                              ariaLabel={t("promises.list.reminder.aria")}
+                              onClick={() => handleSendReminder(p.id)}
+                              disabled={sendingReminderId === p.id || reminderCooldown}
+                              className="h-12 w-12"
+                            />
+                          </Tooltip>
+                        )}
 
-                          {isPromisor && p.status === "active" && acceptedBySecondSide && (
-                            <Tooltip label={t("promises.list.markCompleted")} placement="top">
-                              <IconButton
-                                icon={<CheckCircle2 className="h-[18px] w-[18px]" />}
-                                ariaLabel={t("promises.list.markCompleted")}
-                                onClick={() => setConfirmingId(p.id)}
-                                disabled={busy}
-                                className="h-12 w-12"
-                              />
-                            </Tooltip>
-                          )}
+                        {isPromisor && p.status === "active" && acceptedBySecondSide && (
+                          <Tooltip label={t("promises.list.markCompleted")} placement="top">
+                            <IconButton
+                              icon={<CheckCircle2 className="h-[18px] w-[18px]" />}
+                              ariaLabel={t("promises.list.markCompleted")}
+                              onClick={() => setConfirmingId(p.id)}
+                              disabled={busy}
+                              className="h-12 w-12"
+                            />
+                          </Tooltip>
+                        )}
 
-                          {canReview && p.status === "completed_by_promisor" && (
-                            <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
-                              <IconButton
-                                href={`/promises/${p.id}/confirm`}
-                                icon={<BadgeCheck className="h-[18px] w-[18px]" />}
-                                ariaLabel={t("promises.list.reviewConfirm")}
-                                className="h-12 w-12"
-                              />
-                            </Tooltip>
-                          )}
-                        </div>
+                        {canReview && p.status === "completed_by_promisor" && (
+                          <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
+                            <IconButton
+                              href={`/promises/${p.id}/confirm`}
+                              icon={<BadgeCheck className="h-[18px] w-[18px]" />}
+                              ariaLabel={t("promises.list.reviewConfirm")}
+                              className="h-12 w-12"
+                            />
+                          </Tooltip>
+                        )}
                       </div>
                     </div>
                   </div>
