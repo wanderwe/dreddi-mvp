@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getAdminClient } from "../[id]/common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
+import { getInviteExpiryIso } from "@/lib/inviteLifecycle";
 
 type CreatePromisePayload = {
   title?: string;
@@ -38,6 +39,8 @@ export async function POST(req: Request) {
     const dueAtIso = dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt.toISOString() : null;
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const nowIso = new Date().toISOString();
+    const expiresAtIso = getInviteExpiryIso(new Date(nowIso));
 
     const admin = getAdminClient();
     const requestedVisibility = body?.visibility === "private" ? "private" : "public";
@@ -77,10 +80,12 @@ export async function POST(req: Request) {
       invite_token: inviteToken,
       counterparty_id: counterpartyProfile?.id ?? null,
       invite_status: "awaiting_acceptance",
-      invited_at: new Date().toISOString(),
+      invited_at: nowIso,
       accepted_at: null,
       declined_at: null,
       ignored_at: null,
+      expires_at: expiresAtIso,
+      cancelled_at: null,
       visibility,
       promise_mode: "deal",
     };
@@ -107,13 +112,14 @@ export async function POST(req: Request) {
     }
 
     if (counterpartyProfile?.id) {
-      const nowIso = new Date().toISOString();
       const { error: inviteError } = await admin.from("deal_invites").insert({
         deal_id: insertData.id,
         inviter_id: user.id,
         invitee_id: counterpartyProfile.id,
-        status: "pending",
+        status: "created",
         created_at: nowIso,
+        expires_at: expiresAtIso,
+        cancelled_at: null,
       });
 
       if (inviteError) {
