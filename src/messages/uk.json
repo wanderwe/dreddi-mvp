@@ -522,7 +522,8 @@
       },
       "trackRecord": {
         "perMonthValue": "{count} / місяць",
-        "activeDays": "за {count} {label} активності"
+        "activeDays": "за {count} {label} активності",
+        "summary": "{deals} за {days}"
       },
       "labels": {
         "people": {
@@ -540,6 +541,12 @@
         "dealsTotal": {
           "one": "угоди",
           "few": "угод",
+          "many": "угод",
+          "other": "угоди"
+        },
+        "dealsPace": {
+          "one": "угода",
+          "few": "угоди",
           "many": "угод",
           "other": "угоди"
         },
