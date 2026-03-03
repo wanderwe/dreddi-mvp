@@ -492,7 +492,7 @@
         "workedWith": "Worked with",
         "commitments": "Commitments",
         "disputes": "Disputes",
-        "trackRecord": "Track record"
+        "trackRecord": "Deal pace"
       },
       "workedWith": {
         "secondary": "out of {count} {label}"
@@ -504,7 +504,7 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonth": "/ month",
+        "perMonthValue": "{count} / month",
         "activeDays": "active {count} {label}"
       },
       "labels": {
