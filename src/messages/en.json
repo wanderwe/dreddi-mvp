@@ -492,7 +492,7 @@
         "workedWith": "Worked with",
         "commitments": "Commitments",
         "disputes": "Disputes",
-        "trackRecord": "Track record"
+        "trackRecord": "Deal pace"
       },
       "workedWith": {
         "secondary": "out of {count} {label}"
