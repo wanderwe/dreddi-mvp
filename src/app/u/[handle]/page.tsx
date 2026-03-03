@@ -387,8 +387,14 @@ export default function PublicProfilePage() {
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
     const disputeRate = profile?.dispute_rate ?? null;
-    const reputationAgeDays = profile?.reputation_age_days ?? null;
-    const avgDealsPerMonth = profile?.avg_deals_per_month ?? null;
+    const paceWindowDays = 30;
+    const paceWindowStart = Date.now() - paceWindowDays * 24 * 60 * 60 * 1000;
+    const dealsLast30d = promises.filter((promise) => {
+      const activityAt = promise.confirmed_at ?? promise.disputed_at ?? promise.created_at;
+      if (!activityAt) return false;
+      return new Date(activityAt).getTime() >= paceWindowStart;
+    }).length;
+    const avgDealsPerMonth = dealsLast30d;
 
     return {
       totalDeals,
@@ -398,17 +404,17 @@ export default function PublicProfilePage() {
       onTimeCompletions,
       disputes,
       disputeRate,
-      reputationAgeDays,
+      paceWindowDays,
+      dealsLast30d,
       avgDealsPerMonth,
     };
   }, [
-    profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
     profile?.dispute_rate,
     profile?.disputed_count,
     profile?.on_time_completion_count,
-    profile?.reputation_age_days,
     profile?.unique_counterparties_count,
+    promises,
     totalConfirmedDeals,
   ]);
   const dealMetaLabels = useMemo(
@@ -671,7 +677,6 @@ export default function PublicProfilePage() {
                         </div>
                       )}
                       {(reputationEvidence.totalDeals > 0 ||
-                        reputationEvidence.reputationAgeDays !== null ||
                         reputationEvidence.avgDealsPerMonth !== null) && (
                         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                           <h3 className="text-sm font-semibold text-white">
@@ -686,27 +691,31 @@ export default function PublicProfilePage() {
                                 {formatPlural(reputationEvidence.totalDeals, "dealsPace")}
                               </span>
                             </div>
-                            {reputationEvidence.avgDealsPerMonth !== null && (
+                            {reputationEvidence.dealsLast30d < 1 ? (
                               <p className="text-xs text-white/60">
-                                {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
-                                  count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
-                                })}
+                                {t("publicProfile.reputationDetails.trackRecord.noData")}
                               </p>
-                            )}
-                            {reputationEvidence.reputationAgeDays !== null && (
+                            ) : reputationEvidence.dealsLast30d === 1 ? (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.trackRecord.summary", {
-                                  dealsCount: numberFormatter.format(reputationEvidence.totalDeals),
-                                  dealsLabel: formatPlural(reputationEvidence.totalDeals, "deals"),
-                                  daysCount: numberFormatter.format(
-                                    reputationEvidence.reputationAgeDays
-                                  ),
-                                  daysLabel: formatPlural(
-                                    reputationEvidence.reputationAgeDays,
-                                    "days"
-                                  ),
+                                  deals: numberFormatter.format(reputationEvidence.dealsLast30d),
+                                  days: numberFormatter.format(reputationEvidence.paceWindowDays),
                                 })}
                               </p>
+                            ) : (
+                              <>
+                                <p className="text-xs text-white/60">
+                                  {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
+                                    count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
+                                  })}
+                                </p>
+                                <p className="text-xs text-white/60">
+                                  {t("publicProfile.reputationDetails.trackRecord.summary", {
+                                    deals: numberFormatter.format(reputationEvidence.dealsLast30d),
+                                    days: numberFormatter.format(reputationEvidence.paceWindowDays),
+                                  })}
+                                </p>
+                              </>
                             )}
                           </div>
                         </div>
