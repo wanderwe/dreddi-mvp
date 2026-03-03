@@ -545,20 +545,20 @@ export default function PublicProfilePage() {
                           <div className="mt-2 space-y-2">
                             <div className="flex items-baseline gap-2 text-white">
                               <span className="text-2xl font-semibold">
-                                {numberFormatter.format(reputationEvidence.uniquePeople)}
+                                {numberFormatter.format(reputationEvidence.totalDeals)}
                               </span>
                               <span className="text-sm text-white/70">
                                 {formatPlural(
-                                  reputationEvidence.uniquePeople,
-                                  "people"
+                                  reputationEvidence.totalDeals,
+                                  "deals"
                                 )}
                               </span>
                             </div>
                             {reputationEvidence.totalDeals > 0 && (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
-                                  count: numberFormatter.format(reputationEvidence.totalDeals),
-                                  label: formatPlural(reputationEvidence.totalDeals, "dealsTotal"),
+                                  count: numberFormatter.format(reputationEvidence.uniquePeople),
+                                  label: formatPlural(reputationEvidence.uniquePeople, "people"),
                                 })}
                               </p>
                             )}
@@ -630,16 +630,8 @@ export default function PublicProfilePage() {
                             {t("publicProfile.reputationDetails.sections.trackRecord")}
                           </h3>
                           <div className="mt-2 space-y-2">
-                            <div className="flex items-baseline gap-2 text-white">
-                              <span className="text-2xl font-semibold">
-                                {numberFormatter.format(reputationEvidence.totalDeals)}
-                              </span>
-                              <span className="text-sm text-white/70">
-                                {formatPlural(reputationEvidence.totalDeals, "deals")}
-                              </span>
-                            </div>
                             {reputationEvidence.avgDealsPerMonth !== null && (
-                              <p className="text-xs text-white/60">
+                              <p className="text-2xl font-semibold text-white">
                                 {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
                                   count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
                                 })}
@@ -647,11 +639,13 @@ export default function PublicProfilePage() {
                             )}
                             {reputationEvidence.reputationAgeDays !== null && (
                               <p className="text-xs text-white/60">
-                                {t("publicProfile.reputationDetails.trackRecord.activeDays", {
-                                  count: numberFormatter.format(
+                                {t("publicProfile.reputationDetails.trackRecord.summary", {
+                                  dealsCount: numberFormatter.format(reputationEvidence.totalDeals),
+                                  dealsLabel: formatPlural(reputationEvidence.totalDeals, "deals"),
+                                  daysCount: numberFormatter.format(
                                     reputationEvidence.reputationAgeDays
                                   ),
-                                  label: formatPlural(
+                                  daysLabel: formatPlural(
                                     reputationEvidence.reputationAgeDays,
                                     "days"
                                   ),

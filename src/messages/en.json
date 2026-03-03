@@ -495,7 +495,7 @@
         "trackRecord": "Deal pace"
       },
       "workedWith": {
-        "secondary": "out of {count} {label}"
+        "secondary": "with {count} {label}"
       },
       "commitments": {
         "onTime": "{count} on time"
@@ -505,7 +505,8 @@
       },
       "trackRecord": {
         "perMonthValue": "{count} / month",
-        "activeDays": "over {count} active {label}"
+        "activeDays": "over {count} active {label}",
+        "summary": "{dealsCount} {dealsLabel} over {daysCount} active {daysLabel}"
       },
       "labels": {
         "people": {
