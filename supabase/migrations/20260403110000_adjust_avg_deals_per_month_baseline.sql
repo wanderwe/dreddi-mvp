@@ -184,7 +184,7 @@ SELECT
     ELSE ROUND(
       (
         deal_metrics.completed_deals_count::numeric * 30
-      ) / GREATEST(DATE_PART('day', NOW() - deal_metrics.first_deal_at), 30),
+      ) / GREATEST(DATE_PART('day', NOW() - deal_metrics.first_deal_at), 30)::numeric,
       2
     )
   END AS avg_deals_per_month
