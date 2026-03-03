@@ -517,7 +517,7 @@
         "rate": "{rate}% угод"
       },
       "trackRecord": {
-        "perMonthValue": "{count} / місяць",
+        "perMonthSuffix": "/ місяць",
         "activeDays": "за {count} {label} активності",
         "summary": "{dealsCount} {dealsLabel} за {daysCount} {daysLabel}"
       },

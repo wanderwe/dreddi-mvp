@@ -631,11 +631,14 @@ export default function PublicProfilePage() {
                           </h3>
                           <div className="mt-2 space-y-2">
                             {reputationEvidence.avgDealsPerMonth !== null && (
-                              <p className="text-2xl font-semibold text-white">
-                                {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
-                                  count: decimalFormatter.format(reputationEvidence.avgDealsPerMonth),
-                                })}
-                              </p>
+                              <div className="flex items-baseline gap-2 text-white">
+                                <span className="text-2xl font-semibold">
+                                  {decimalFormatter.format(reputationEvidence.avgDealsPerMonth)}
+                                </span>
+                                <span className="text-sm text-white/70">
+                                  {t("publicProfile.reputationDetails.trackRecord.perMonthSuffix")}
+                                </span>
+                              </div>
                             )}
                             {reputationEvidence.reputationAgeDays !== null && (
                               <p className="text-xs text-white/60">

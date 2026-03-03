@@ -504,7 +504,7 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonthValue": "{count} / month",
+        "perMonthSuffix": "/ month",
         "activeDays": "over {count} active {label}",
         "summary": "{dealsCount} {dealsLabel} over {daysCount} active {daysLabel}"
       },
