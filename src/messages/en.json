@@ -504,7 +504,7 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonth": "/ month",
+        "perMonthValue": "{count} / month",
         "activeDays": "active {count} {label}"
       },
       "labels": {

@@ -9,9 +9,9 @@ This document maps backend fields from `public_profile_stats` to the public prof
 | `on_time_completion_count` | Commitments | “{count} completed on time” | Shown only when value is available. |
 | `disputed_count` + `total_confirmed_deals` | Disputes | “{count} disputes out of {total} deals” | Uses `total_confirmed_deals`, falls back to confirmed count if needed. |
 | `reputation_age_days` | Deal pace | “active {count} days” | Shown as context for pace calculations. |
-| `avg_deals_per_month` | Deal pace | “{count} deals per month” | Uses localized decimal formatting (1 decimal) and a 30-day minimum baseline in SQL. |
+| `avg_deals_per_month` | Deal pace | “{count} deals per month” | Uses localized decimal formatting (1 decimal) without a minimum-day baseline in SQL. |
 
 Empty/low-data behavior:
 - If `total_confirmed_deals` resolves to 0, show “No completed deals yet” and hide all sections.
 - If a section’s values are `null`, that section is hidden.
-- Deal pace hides monthly rate when the user has fewer than 3 completed deals.
+- Deal pace always shows total completed deals; monthly pace is shown as supplementary context when available.
