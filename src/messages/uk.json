@@ -521,7 +521,7 @@
       },
       "trackRecord": {
         "perMonthValue": "{count} / місяць",
-        "activeDays": "активність {count} {label}"
+        "activeDays": "активність {count} днів"
       },
       "labels": {
         "people": {
