@@ -604,8 +604,8 @@ export default function NewPromisePage() {
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="w-full max-w-2xl space-y-6 rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+      <div className="relative flex min-h-screen items-center justify-center px-4 py-8 md:py-10">
+        <div className="w-full max-w-2xl space-y-5 rounded-3xl border border-white/10 bg-black/40 p-5 pb-28 shadow-2xl shadow-black/40 backdrop-blur sm:p-8 sm:pb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -620,7 +620,7 @@ export default function NewPromisePage() {
             </div>
           </div>
 
-          <div className="grid items-start gap-4 sm:grid-cols-2">
+          <div className="grid items-start gap-5 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
@@ -710,7 +710,7 @@ export default function NewPromisePage() {
             )}
 
             <div className="sm:col-span-2">
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+              <div className="grid items-start gap-5 sm:grid-cols-2">
                 {executor && (
                   <div className="text-sm text-slate-200">
                     <label className="space-y-2 text-sm text-slate-200">
@@ -763,7 +763,7 @@ export default function NewPromisePage() {
                           <input
                             id="counterparty"
                             autoComplete="off"
-                            className="h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                            className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                             placeholder={
                               executor === "me"
                                 ? t("promises.new.placeholders.counterpartyMe")
@@ -868,7 +868,7 @@ export default function NewPromisePage() {
                       onClick={() => setIsCalendarOpen((open) => !open)}
                       aria-expanded={isCalendarOpen}
                       aria-label={t("promises.new.fields.dueDate")}
-                      className="flex h-11 w-full cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                      className="flex h-12 w-full cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
                     >
                       <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
                       <span
@@ -954,7 +954,7 @@ export default function NewPromisePage() {
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+              className="hidden h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 sm:flex"
             >
               {busy
                 ? t("promises.new.creating", { entityLower: promiseLabels.entityLower })
@@ -974,6 +974,18 @@ export default function NewPromisePage() {
                 )}
               </div>
             )}
+          </div>
+
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur sm:hidden">
+            <button
+              onClick={createPromise}
+              disabled={busy || !title.trim()}
+              className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {busy
+                ? t("promises.new.creating", { entityLower: promiseLabels.entityLower })
+                : t("promises.new.submit", { entityLower: promiseLabels.entityLower })}
+            </button>
           </div>
         </div>
       </div>
