@@ -63,7 +63,7 @@ and track fulfillment or breach over time.
 - **dispute_rate**: Percentage of completed deals that ended in dispute.
 - **total_confirmed_deals**: Total confirmed deals (executor-only).
 - **reputation_age_days**: Days since the first confirmed/disputed deal.
-- **avg_deals_per_month**: Average completed deals per month since the first deal.
+- **avg_deals_per_month**: Average completed deals per month since the first deal, normalized since the first deal date (without a minimum 30-day floor).
 
 ## Tech stack
 - Next.js (App Router)
