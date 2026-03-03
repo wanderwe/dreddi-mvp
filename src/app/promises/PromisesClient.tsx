@@ -40,6 +40,8 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
@@ -148,7 +150,8 @@ export default function PromisesClient() {
   ) => {
     if (uiStatus === "awaiting_acceptance") return t("promises.status.awaitingInviteAcceptance");
     if (uiStatus === "declined") return t("promises.inviteStatus.declined");
-    if (uiStatus === "ignored") return t("promises.inviteStatus.ignored");
+    if (uiStatus === "expired") return t("promises.inviteStatus.expired");
+    if (uiStatus === "cancelled_by_creator") return t("promises.inviteStatus.cancelled_by_creator");
 
     if (role === "promisor") {
       if (status === "active") return t("promises.status.active");
@@ -170,8 +173,8 @@ export default function PromisesClient() {
     uiStatus: PromiseUiStatus
   ): { tone: StatusPillTone; icon: "check" | "clock" | "warning" } => {
     if (status === "confirmed") return { tone: "success", icon: "check" };
-    if (status === "disputed" || uiStatus === "declined") return { tone: "danger", icon: "warning" };
-    if (status === "completed_by_promisor" || uiStatus === "ignored") {
+    if (status === "disputed" || uiStatus === "declined" || uiStatus === "cancelled_by_creator") return { tone: "danger", icon: "warning" };
+    if (status === "completed_by_promisor" || uiStatus === "expired") {
       return { tone: "attention", icon: "warning" };
     }
     return { tone: "neutral", icon: "clock" };
@@ -241,7 +244,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -299,7 +302,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -643,8 +646,8 @@ export default function PromisesClient() {
         aria-hidden
       />
 
-      <div className="relative mx-auto w-full max-w-5xl px-6 space-y-6">
-        <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-6 shadow-2xl shadow-black/40 backdrop-blur">
+      <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
+        <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-4 shadow-2xl shadow-black/40 backdrop-blur sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
@@ -713,12 +716,12 @@ export default function PromisesClient() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <button
               type="button"
               onClick={() => setTab("i-promised")}
               className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
                 tab === "i-promised"
                   ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                   : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
@@ -731,7 +734,7 @@ export default function PromisesClient() {
               type="button"
               onClick={() => setTab("promised-to-me")}
               className={[
-                "rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
                 tab === "promised-to-me"
                   ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                   : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
@@ -789,9 +792,9 @@ export default function PromisesClient() {
                 return (
                   <div
                     key={p.id}
-                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
+                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-emerald-300/40 hover:bg-emerald-500/5"
                   >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex flex-col gap-3">
                       <div className="space-y-1">
                         <Link
                           href={`/promises/${p.id}?from=deals`}
@@ -802,8 +805,8 @@ export default function PromisesClient() {
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2 text-right text-sm text-slate-200">
-                        <div className="flex items-center justify-end gap-2">
+                      <div className="flex flex-col gap-3 text-left text-sm text-slate-200 sm:items-end sm:text-right">
+                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                           <StatusPill
                             label={statusLabel}
                             tone={statusPill.tone}
@@ -818,7 +821,7 @@ export default function PromisesClient() {
                                 ariaLabel={t("promises.list.reminder.aria")}
                                 onClick={() => handleSendReminder(p.id)}
                                 disabled={sendingReminderId === p.id || reminderCooldown}
-                                className="h-[34px] w-[34px]"
+                                className="h-12 w-12"
                               />
                             </Tooltip>
                           )}
@@ -830,7 +833,7 @@ export default function PromisesClient() {
                                 ariaLabel={t("promises.list.markCompleted")}
                                 onClick={() => setConfirmingId(p.id)}
                                 disabled={busy}
-                                className="h-[34px] w-[34px]"
+                                className="h-12 w-12"
                               />
                             </Tooltip>
                           )}
@@ -841,7 +844,7 @@ export default function PromisesClient() {
                                 href={`/promises/${p.id}/confirm`}
                                 icon={<BadgeCheck className="h-[18px] w-[18px]" />}
                                 ariaLabel={t("promises.list.reviewConfirm")}
-                                className="h-[34px] w-[34px]"
+                                className="h-12 w-12"
                               />
                             </Tooltip>
                           )}
@@ -860,7 +863,7 @@ export default function PromisesClient() {
                   <div className="mt-4">
                     <Link
                       href="/promises/new"
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
                     >
                       {t("promises.empty.cta")}
                     </Link>
@@ -871,7 +874,7 @@ export default function PromisesClient() {
                     <button
                       type="button"
                       onClick={() => setActiveMetricFilter("total")}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
                     >
                       {t("promises.empty.showAll")}
                     </button>
@@ -886,7 +889,7 @@ export default function PromisesClient() {
                   type="button"
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5"
+                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
                 >
                   {loadingMore ? (
                     <>
