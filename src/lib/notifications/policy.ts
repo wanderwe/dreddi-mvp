@@ -35,29 +35,6 @@ export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   "invite_ignored",
 ];
 
-const parseTimeToMinutes = (value: string) => {
-  const [h, m] = value.split(":").map((part) => Number(part));
-  if (Number.isNaN(h) || Number.isNaN(m)) return null;
-  return h * 60 + m;
-};
-
-export const isWithinQuietHours = (
-  now: Date,
-  { enabled, start, end }: { enabled: boolean; start: string; end: string }
-) => {
-  if (!enabled) return false;
-  const startMinutes = parseTimeToMinutes(start);
-  const endMinutes = parseTimeToMinutes(end);
-  if (startMinutes === null || endMinutes === null) return false;
-
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-  if (startMinutes === endMinutes) return false;
-  if (startMinutes < endMinutes) {
-    return nowMinutes >= startMinutes && nowMinutes < endMinutes;
-  }
-  return nowMinutes >= startMinutes || nowMinutes < endMinutes;
-};
 
 export const isDailyCapExceeded = (count: number, type: NotificationType) => {
   if (CAP_BYPASS_NOTIFICATION_TYPES.includes(normalizeNotificationType(type))) return false;

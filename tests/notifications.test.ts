@@ -4,7 +4,6 @@ import {
   getCompletionFollowupStage,
   isDailyCapExceeded,
   isPerDealCapExceeded,
-  isWithinQuietHours,
 } from "../src/lib/notifications/policy";
 import { buildDedupeKey } from "../src/lib/notifications/service";
 import { getInviteResponseCopy } from "../src/lib/notifications/inviteResponses";
@@ -12,43 +11,6 @@ import { getInviteResponseCopy } from "../src/lib/notifications/inviteResponses"
 const dateAt = (iso: string) => new Date(iso);
 
 describe("notification policy", () => {
-  it("detects quiet hours across midnight", () => {
-    assert.equal(
-      isWithinQuietHours(dateAt("2024-01-01T23:15:00Z"), {
-        enabled: true,
-        start: "22:00",
-        end: "09:00",
-      }),
-      true
-    );
-
-    assert.equal(
-      isWithinQuietHours(dateAt("2024-01-02T08:30:00Z"), {
-        enabled: true,
-        start: "22:00",
-        end: "09:00",
-      }),
-      true
-    );
-
-    assert.equal(
-      isWithinQuietHours(dateAt("2024-01-02T12:30:00Z"), {
-        enabled: true,
-        start: "22:00",
-        end: "09:00",
-      }),
-      false
-    );
-
-    assert.equal(
-      isWithinQuietHours(dateAt("2024-01-02T12:30:00Z"), {
-        enabled: false,
-        start: "22:00",
-        end: "09:00",
-      }),
-      false
-    );
-  });
 
   it("enforces daily cap only for capped types", () => {
     assert.equal(isDailyCapExceeded(3, "invite"), false);

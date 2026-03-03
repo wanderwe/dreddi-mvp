@@ -90,9 +90,6 @@
     "emailDescription": "Транзакційні листи про запрошення та нагадування щодо дедлайнів",
     "deadlineLabel": "Нагадування про дедлайн",
     "deadlineDescription": "Коли увімкнено, ви отримуєте нагадування перед завершенням угоди з дедлайном",
-    "quietHoursLabel": "Тихі години",
-    "quietHoursDescription": "Відкладати некритичні сповіщення у тихі години",
-    "quietHoursRangeLabel": "Діапазон тихих годин",
     "save": "Зберегти"
   },
   "promises": {
@@ -558,29 +555,11 @@
           "many": "угод",
           "other": "угоди"
         },
-        "dealsPace": {
-          "one": "угода",
-          "few": "угоди",
-          "many": "угод",
-          "other": "угоди"
-        },
-        "dealsPace": {
-          "one": "угода",
-          "few": "угоди",
-          "many": "угод",
-          "other": "угоди"
-        },
         "workedWithDeals": {
           "one": "угоди",
           "few": "угод",
           "many": "угод",
           "other": "угод"
-        },
-        "dealsPace": {
-          "one": "угода",
-          "few": "угоди",
-          "many": "угод",
-          "other": "угоди"
         },
         "deadlines": {
           "one": "з дедлайном",
