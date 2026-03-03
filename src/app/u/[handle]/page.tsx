@@ -195,20 +195,30 @@ export default function PublicProfilePage() {
       } else {
         const normalized: PublicPromise[] = promiseRows.flatMap((row) => {
           if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
+          const uiStatus = getPromiseUiStatus({
+            status: row.status,
+            invite_status: row.invite_status,
+            accepted_at: row.accepted_at,
+            counterparty_accepted_at: row.counterparty_accepted_at,
+            declined_at: row.declined_at,
+            ignored_at: row.ignored_at,
+            expires_at: row.expires_at,
+            cancelled_at: row.cancelled_at,
+          });
+
+          if (
+            uiStatus === "awaiting_acceptance" ||
+            uiStatus === "cancelled_by_creator" ||
+            uiStatus === "expired"
+          ) {
+            return [];
+          }
+
           return [
             {
               title: row.title,
               status: row.status,
-              uiStatus: getPromiseUiStatus({
-                status: row.status,
-                invite_status: row.invite_status,
-                accepted_at: row.accepted_at,
-                counterparty_accepted_at: row.counterparty_accepted_at,
-                declined_at: row.declined_at,
-                ignored_at: row.ignored_at,
-                expires_at: row.expires_at,
-                cancelled_at: row.cancelled_at,
-              }),
+              uiStatus,
               created_at: row.created_at,
               due_at: row.due_at,
               confirmed_at: row.confirmed_at,

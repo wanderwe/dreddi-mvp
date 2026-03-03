@@ -43,6 +43,7 @@ AS $$
   JOIN profiles ON profiles.id = promises.creator_id
   WHERE profiles.handle = public_get_profile_public_promises.p_handle
     AND promises.is_public = true
+    AND promises.invite_status = 'accepted'
   ORDER BY promises.created_at DESC
   LIMIT LEAST(GREATEST(public_get_profile_public_promises.p_limit, 1), 500);
 $$;
