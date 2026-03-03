@@ -3,12 +3,10 @@ import { normalizeLocale } from "@/lib/i18n/locales";
 import { getNotificationCopy } from "@/lib/notifications/copy";
 import { maybeSendNotificationEmail } from "@/lib/notifications/email";
 import {
-  CRITICAL_NOTIFICATION_TYPES,
   CAP_BYPASS_NOTIFICATION_TYPES,
   DAILY_NOTIFICATION_CAP,
   isDailyCapExceeded,
   isPerDealCapExceeded,
-  isWithinQuietHours,
 } from "./policy";
 import { normalizeNotificationType } from "./types";
 import type {
@@ -45,9 +43,6 @@ const defaultSettings: NotificationSettings = {
   pushEnabled: true,
   emailEnabled: true,
   deadlineRemindersEnabled: true,
-  quietHoursEnabled: true,
-  quietHoursStart: "22:00",
-  quietHoursEnd: "09:00",
 };
 
 const logNotificationSkip = (
@@ -63,25 +58,12 @@ const logNotificationSkip = (
     dedupeKey: request.dedupeKey,
     role: request.role ?? null,
     requiresDeadlineReminder: request.requiresDeadlineReminder ?? false,
-    quietHoursEnabled: settings?.quietHoursEnabled ?? null,
     deadlineRemindersEnabled: settings?.deadlineRemindersEnabled ?? null,
     skippedReason,
     dbError: extra?.dbError ?? null,
   });
 };
 
-const logQuietHoursDefer = (request: NotificationRequest, settings: NotificationSettings) => {
-  console.info("[notifications] quiet_hours_defer", {
-    userId: request.userId,
-    promiseId: request.promiseId,
-    type: normalizeNotificationType(request.type),
-    dedupeKey: request.dedupeKey,
-    role: request.role ?? null,
-    requiresDeadlineReminder: request.requiresDeadlineReminder ?? false,
-    quietHoursEnabled: settings.quietHoursEnabled,
-    deadlineRemindersEnabled: settings.deadlineRemindersEnabled,
-  });
-};
 
 export async function getUserNotificationSettings(
   admin: SupabaseClient,
@@ -89,8 +71,9 @@ export async function getUserNotificationSettings(
 ): Promise<NotificationSettings> {
   const { data } = await admin
     .from("profiles")
+    // Quiet hours columns remain in DB for backwards compatibility (deprecated in MVP).
     .select(
-      "locale,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+      "locale,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled"
     )
     .eq("id", userId)
     .maybeSingle();
@@ -103,9 +86,6 @@ export async function getUserNotificationSettings(
     emailEnabled: data?.email_notifications_enabled ?? defaultSettings.emailEnabled,
     deadlineRemindersEnabled:
       data?.deadline_reminders_enabled ?? defaultSettings.deadlineRemindersEnabled,
-    quietHoursEnabled: data?.quiet_hours_enabled ?? defaultSettings.quietHoursEnabled,
-    quietHoursStart: data?.quiet_hours_start ?? defaultSettings.quietHoursStart,
-    quietHoursEnd: data?.quiet_hours_end ?? defaultSettings.quietHoursEnd,
   };
 }
 
@@ -189,19 +169,7 @@ export async function createNotification(
     return skip("daily_cap");
   }
 
-  const quietHours = isWithinQuietHours(now, {
-    enabled: settings.quietHoursEnabled,
-    start: settings.quietHoursStart,
-    end: settings.quietHoursEnd,
-  });
-
-  const shouldSendPush =
-    settings.pushEnabled &&
-    (!quietHours || CRITICAL_NOTIFICATION_TYPES.includes(normalizedType));
-
-  if (settings.pushEnabled && quietHours && !CRITICAL_NOTIFICATION_TYPES.includes(normalizedType)) {
-    logQuietHoursDefer(request, settings);
-  }
+  const shouldSendPush = settings.pushEnabled;
 
   const copy = getNotificationCopy({
     locale: settings.locale,

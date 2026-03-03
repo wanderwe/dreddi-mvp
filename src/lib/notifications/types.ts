@@ -28,9 +28,6 @@ export type NotificationSettings = {
   pushEnabled: boolean;
   emailEnabled: boolean;
   deadlineRemindersEnabled: boolean;
-  quietHoursEnabled: boolean;
-  quietHoursStart: string;
-  quietHoursEnd: string;
 };
 
 export type NotificationCopy = {

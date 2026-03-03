@@ -7,7 +7,6 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
-import { TimePicker } from "@/app/components/ui/TimePicker";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import {
   Sheet,
@@ -33,9 +32,6 @@ type ProfileState = {
   pushEnabled: boolean;
   emailEnabled: boolean;
   deadlineRemindersEnabled: boolean;
-  quietHoursEnabled: boolean;
-  quietHoursStart: string;
-  quietHoursEnd: string;
 };
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
@@ -48,8 +44,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
-  const [quietHoursStartInput, setQuietHoursStartInput] = useState("22:00");
-  const [quietHoursEndInput, setQuietHoursEndInput] = useState("09:00");
   const [displayNameInput, setDisplayNameInput] = useState("");
   const [handleInput, setHandleInput] = useState("");
   const [profileTagsInput, setProfileTagsInput] = useState("");
@@ -90,9 +84,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           pushEnabled: true,
           emailEnabled: true,
           deadlineRemindersEnabled: true,
-          quietHoursEnabled: true,
-          quietHoursStart: "22:00",
-          quietHoursEnd: "09:00",
         });
         setLoading(false);
         return;
@@ -122,8 +113,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
       const { data, error: profileError } = await supabase
         .from("profiles")
+        // Quiet hours columns remain in DB for backwards compatibility (deprecated in MVP).
         .select(
-          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,quiet_hours_enabled,quiet_hours_start,quiet_hours_end"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled"
         )
         .eq("id", session.user.id)
         .single();
@@ -144,9 +136,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         push_notifications_enabled?: boolean | null;
         email_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
-        quiet_hours_enabled?: boolean | null;
-        quiet_hours_start?: string | null;
-        quiet_hours_end?: string | null;
       } | null;
       const handle = profileRow?.handle ?? null;
       const displayName = profileRow?.display_name ?? null;
@@ -155,9 +144,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const emailEnabled = profileRow?.email_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
-      const quietHoursEnabled = profileRow?.quiet_hours_enabled ?? true;
-      const quietHoursStart = profileRow?.quiet_hours_start ?? "22:00";
-      const quietHoursEnd = profileRow?.quiet_hours_end ?? "09:00";
       if (handle) lastHandleRef.current = handle;
       setProfile({
         userId: session.user.id,
@@ -169,9 +155,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         pushEnabled,
         emailEnabled,
         deadlineRemindersEnabled,
-        quietHoursEnabled,
-        quietHoursStart,
-        quietHoursEnd,
       });
       setLoading(false);
     };
@@ -204,12 +187,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (!profile) return;
     setPublicProfileInput(profile.isPublic);
   }, [profile?.isPublic, profile]);
-
-  useEffect(() => {
-    if (!profile) return;
-    setQuietHoursStartInput(profile.quietHoursStart);
-    setQuietHoursEndInput(profile.quietHoursEnd);
-  }, [profile?.quietHoursStart, profile?.quietHoursEnd, profile]);
 
   useEffect(() => {
     if (!profile) return;
@@ -323,27 +300,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     );
   };
 
-  const toggleQuietHours = async () => {
-    if (!profile) return;
-    await updateProfileRow(
-      { quiet_hours_enabled: !profile.quietHoursEnabled },
-      { quietHoursEnabled: !profile.quietHoursEnabled }
-    );
-  };
-
-  const saveQuietHoursRange = async () => {
-    if (!profile) return;
-    await updateProfileRow(
-      { quiet_hours_start: quietHoursStartInput, quiet_hours_end: quietHoursEndInput },
-      { quietHoursStart: quietHoursStartInput, quietHoursEnd: quietHoursEndInput }
-    );
-  };
-
-  const quietHoursRangeChanged =
-    !!profile &&
-    (quietHoursStartInput !== profile.quietHoursStart ||
-      quietHoursEndInput !== profile.quietHoursEnd);
-  const quietHoursRangeDisabled = !profile?.quietHoursEnabled;
   const normalizedDisplayName = displayNameInput.trim();
   const nextDisplayName =
     normalizedDisplayName.length > 0 ? normalizedDisplayName : null;
@@ -907,89 +863,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-white">
-                          {t("profileSettings.quietHoursLabel")}
-                        </div>
-                        <HelperText>{t("profileSettings.quietHoursDescription")}</HelperText>
-                      </div>
-                      <div className="flex justify-end self-center">
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={profile?.quietHoursEnabled ?? false}
-                          onClick={toggleQuietHours}
-                          disabled={loading || saving || !profile}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                            profile?.quietHoursEnabled
-                              ? "border-emerald-300/50 bg-emerald-400/70"
-                              : "border-white/20 bg-white/10"
-                          } ${
-                            loading || saving || !profile
-                              ? "cursor-not-allowed opacity-60"
-                              : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                            }`}
-                        >
-                          <span
-                            className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                              profile?.quietHoursEnabled ? "translate-x-5" : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-white">
-                      {t("profileSettings.quietHoursRangeLabel")}
-                    </div>
-                    <div
-                      className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 ${
-                        quietHoursRangeDisabled ? "pointer-events-none opacity-50" : ""
-                      }`}
-                    >
-                      <div className="flex min-w-0 flex-wrap items-center gap-3">
-                        <TimePicker
-                          value={quietHoursStartInput}
-                          onChange={setQuietHoursStartInput}
-                          disabled={!profile?.quietHoursEnabled || loading || saving}
-                          ariaLabel={t("profileSettings.quietHoursRangeLabel")}
-                          className="w-[150px]"
-                          buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
-                        />
-                        <span className="inline-flex h-9 items-center text-xs text-slate-400">
-                          →
-                        </span>
-                        <TimePicker
-                          value={quietHoursEndInput}
-                          onChange={setQuietHoursEndInput}
-                          disabled={!profile?.quietHoursEnabled || loading || saving}
-                          ariaLabel={t("profileSettings.quietHoursRangeLabel")}
-                          className="w-[150px]"
-                          buttonClassName="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={saveQuietHoursRange}
-                        disabled={
-                          loading ||
-                          saving ||
-                          !profile ||
-                          !profile?.quietHoursEnabled ||
-                          !quietHoursRangeChanged
-                        }
-                        className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {t("profileSettings.save")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

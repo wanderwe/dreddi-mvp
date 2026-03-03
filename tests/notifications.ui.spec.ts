@@ -66,7 +66,6 @@ test.describe("notifications UI", () => {
         locale: "en",
         push_notifications_enabled: true,
         deadline_reminders_enabled: true,
-        quiet_hours_enabled: false,
       },
       {
         id: executorId,
@@ -76,7 +75,6 @@ test.describe("notifications UI", () => {
         locale: "en",
         push_notifications_enabled: true,
         deadline_reminders_enabled: true,
-        quiet_hours_enabled: false,
       },
     ]);
 
