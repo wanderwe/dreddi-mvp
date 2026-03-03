@@ -38,6 +38,8 @@ type PromiseRow = {
   accepted_at: string | null;
   declined_at: string | null;
   ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -74,7 +76,8 @@ const promiseStatusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
   disputed: "danger",
   awaiting_acceptance: "neutral",
   declined: "danger",
-  ignored: "attention",
+  expired: "attention",
+  cancelled_by_creator: "danger",
 };
 
 const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning"> = {
@@ -84,7 +87,8 @@ const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning
   disputed: "warning",
   awaiting_acceptance: "clock",
   declined: "warning",
-  ignored: "warning",
+  expired: "warning",
+  cancelled_by_creator: "warning",
 };
 
 function ActionButton({
@@ -165,7 +169,7 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
   const [conditionBusy, setConditionBusy] = useState(false);
-  const [inviteBusy, setInviteBusy] = useState<"generate" | null>(null);
+  const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -227,7 +231,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -376,6 +380,45 @@ export default function PromisePage() {
     else load();
   }
 
+  async function cancelInvite() {
+    if (!p || !isCreator || inviteStatus !== "awaiting_acceptance") return;
+
+    setError(null);
+    setInviteBusy("cancel");
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setInviteBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setInviteBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/invites/${p.id}/cancel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setInviteBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    await load();
+  }
+
   async function markConditionMet() {
     if (!p) return;
     setError(null);
@@ -495,12 +538,13 @@ export default function PromisePage() {
     disputed: t("promises.status.disputed"),
     awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
     declined: t("promises.inviteStatus.declined"),
-    ignored: t("promises.inviteStatus.ignored"),
+    expired: t("promises.inviteStatus.expired"),
+    cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const shouldShowInviteBlock = !isFinal && canManageInvite && inviteStatus !== "declined";
+  const shouldShowInviteBlock = !isFinal && canManageInvite;
   const hasStatusActions = Boolean(
     (isExecutor && p?.status === "active" && isInviteAccepted) ||
       (canReview && p?.status === "completed_by_promisor")
@@ -710,6 +754,16 @@ export default function PromisePage() {
                       >
                         {t("promises.detail.openInvite")}
                       </Link>
+                    )}
+
+                    {isCreator && inviteStatus === "awaiting_acceptance" && (
+                      <ActionButton
+                        label={t("promises.detail.withdrawInvite")}
+                        variant="danger"
+                        loading={inviteBusy === "cancel"}
+                        disabled={inviteBusy !== null}
+                        onClick={cancelInvite}
+                      />
                     )}
 
                   </div>
