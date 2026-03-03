@@ -510,7 +510,8 @@
       "trackRecord": {
         "perMonthValue": "{count} / month",
         "activeDays": "over {count} active {label}",
-        "summary": "{deals} over {days}"
+        "summary": "{deals} over {days} days",
+        "compact": "{perMonth} / month"
       },
       "labels": {
         "people": {
