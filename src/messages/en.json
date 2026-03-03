@@ -508,9 +508,10 @@
         "rate": "{rate}% of deals"
       },
       "trackRecord": {
-        "perMonthValue": "{count} / month",
+        "perMonthValue": "≈{count}/mo",
         "activeDays": "over {count} active {label}",
-        "summary": "{deals} over {days}"
+        "summary": "{dealsCount} {dealsLabel} over {daysCount} {daysLabel}",
+        "insufficientData": "Not enough data"
       },
       "labels": {
         "people": {
