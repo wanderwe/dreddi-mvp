@@ -593,7 +593,7 @@ export default function PublicProfilePage() {
                           <div className="mt-2 space-y-2">
                             <div className="flex items-baseline gap-2 text-white">
                               <span className="text-2xl font-semibold">
-                                {numberFormatter.format(reputationEvidence.totalDeals)}
+                                {numberFormatter.format(reputationEvidence.uniquePeople)}
                               </span>
                               <span className="text-sm text-white/70">
                                 {formatPlural(
