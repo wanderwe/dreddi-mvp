@@ -340,7 +340,6 @@ export default function PublicProfilePage() {
     const disputeRate = profile?.dispute_rate ?? null;
     const reputationAgeDays = profile?.reputation_age_days ?? null;
     const avgDealsPerMonth = profile?.avg_deals_per_month ?? null;
-    const hasReliableMonthlyPace = totalDeals >= 3;
 
     return {
       totalDeals,
@@ -351,7 +350,7 @@ export default function PublicProfilePage() {
       disputes,
       disputeRate,
       reputationAgeDays,
-      avgDealsPerMonth: hasReliableMonthlyPace ? avgDealsPerMonth : null,
+      avgDealsPerMonth,
     };
   }, [
     profile?.avg_deals_per_month,
