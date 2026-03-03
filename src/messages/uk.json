@@ -505,7 +505,7 @@
         "workedWith": "Співпраця",
         "commitments": "Зобовʼязання",
         "disputes": "Спори",
-        "trackRecord": "Трек-рекорд"
+        "trackRecord": "Темп угод"
       },
       "workedWith": {
         "secondary": "серед {count} {label} загалом"
@@ -517,8 +517,9 @@
         "rate": "{rate}% угод"
       },
       "trackRecord": {
-        "perMonth": "/ місяць",
-        "activeDays": "активність {count} {label}"
+        "perMonthValue": "{count} / місяць",
+        "activeDays": "за {count} {label} активності",
+        "summary": "{deals} за {days}"
       },
       "labels": {
         "people": {
@@ -532,6 +533,12 @@
           "few": "угод",
           "many": "угод",
           "other": "угод"
+        },
+        "dealsPace": {
+          "one": "угода",
+          "few": "угоди",
+          "many": "угод",
+          "other": "угоди"
         },
         "deadlines": {
           "one": "з дедлайном",
