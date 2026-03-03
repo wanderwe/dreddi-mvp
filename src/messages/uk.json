@@ -512,7 +512,7 @@
         "trackRecord": "Темп угод"
       },
       "workedWith": {
-        "secondary": "серед {count} {label} загалом"
+        "secondary": "з {count} {label}"
       },
       "commitments": {
         "onTime": "{count} вчасно"
@@ -521,8 +521,9 @@
         "rate": "{rate}% угод"
       },
       "trackRecord": {
-        "perMonthValue": "{count} / місяць",
-        "activeDays": "за {count} {label} активності"
+        "perMonthSuffix": "/ місяць",
+        "activeDays": "за {count} {label} активності",
+        "summary": "{dealsCount} {dealsLabel} за {daysCount} {daysLabel}"
       },
       "labels": {
         "people": {
