@@ -512,7 +512,7 @@
         "trackRecord": "Темп угод"
       },
       "workedWith": {
-        "secondary": "з {count} {label}"
+        "secondary": "з {count} {label} загалом"
       },
       "commitments": {
         "onTime": "{count} вчасно"
@@ -527,6 +527,12 @@
       },
       "labels": {
         "people": {
+          "one": "людина",
+          "few": "людини",
+          "many": "людей",
+          "other": "людей"
+        },
+        "workedWithPeople": {
           "one": "людина",
           "few": "людини",
           "many": "людей",
@@ -555,6 +561,18 @@
           "few": "угоди",
           "many": "угод",
           "other": "угоди"
+        },
+        "dealsPace": {
+          "one": "угода",
+          "few": "угоди",
+          "many": "угод",
+          "other": "угоди"
+        },
+        "workedWithDeals": {
+          "one": "угоди",
+          "few": "угод",
+          "many": "угод",
+          "other": "угод"
         },
         "dealsPace": {
           "one": "угода",

@@ -499,7 +499,7 @@
         "trackRecord": "Deal pace"
       },
       "workedWith": {
-        "secondary": "with {count} {label}"
+        "secondary": "out of {count} {label} total"
       },
       "commitments": {
         "onTime": "{count} on time"
@@ -517,7 +517,15 @@
           "one": "person",
           "other": "people"
         },
+        "workedWithPeople": {
+          "one": "person",
+          "other": "people"
+        },
         "deals": {
+          "one": "deal",
+          "other": "deals"
+        },
+        "workedWithDeals": {
           "one": "deal",
           "other": "deals"
         },

@@ -597,8 +597,8 @@ export default function PublicProfilePage() {
                               </span>
                               <span className="text-sm text-white/70">
                                 {formatPlural(
-                                  reputationEvidence.totalDeals,
-                                  "deals"
+                                  reputationEvidence.uniquePeople,
+                                  "workedWithPeople"
                                 )}
                               </span>
                             </div>
@@ -606,8 +606,7 @@ export default function PublicProfilePage() {
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
                                   count: numberFormatter.format(reputationEvidence.totalDeals),
-                                  // Keep legacy worked-with wording ("серед ... угод") separate from deal-pace noun forms.
-                                  label: formatPlural(reputationEvidence.totalDeals, "deals"),
+                                  label: formatPlural(reputationEvidence.totalDeals, "workedWithDeals"),
                                 })}
                               </p>
                             )}
