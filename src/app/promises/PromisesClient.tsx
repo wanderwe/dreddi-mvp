@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, BadgeCheck, BellRing } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
 import { IconButton } from "@/app/components/ui/IconButton";
@@ -203,6 +203,9 @@ export default function PromisesClient() {
   const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
+  const [summaryLoaded, setSummaryLoaded] = useState(false);
+  const lastFilterRef = useRef<MetricFilter | null>(null);
+  const autoSwitchHandledForFilterRef = useRef(false);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -221,6 +224,7 @@ export default function PromisesClient() {
 
     (async () => {
       setError(null);
+      setSummaryLoaded(false);
 
       let supabase;
       try {
@@ -258,6 +262,8 @@ export default function PromisesClient() {
 
         setSummaryRows(filtered);
       }
+
+      setSummaryLoaded(true);
     })();
 
     return () => {
@@ -492,6 +498,9 @@ export default function PromisesClient() {
     [listRowsByTab, activeMetricFilter]
   );
 
+  const countMeExecutor = roleCounts.promisor;
+  const countOtherExecutor = roleCounts.counterparty;
+
   const rows = filteredListRowsByTab[tab];
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
@@ -550,18 +559,29 @@ export default function PromisesClient() {
   ]);
 
   useEffect(() => {
-    if (listLoading) return;
-    if (activeMetricFilter !== "awaiting_my_action") return;
+    if (!summaryLoaded) return;
 
-    const currentCount = filteredListRowsByTab[tab]?.length ?? 0;
-    if (currentCount > 0) return;
+    if (lastFilterRef.current !== activeMetricFilter) {
+      lastFilterRef.current = activeMetricFilter;
+      autoSwitchHandledForFilterRef.current = false;
+    }
+
+    if (autoSwitchHandledForFilterRef.current) return;
+
+    const currentCount = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
+    if (currentCount > 0) {
+      autoSwitchHandledForFilterRef.current = true;
+      return;
+    }
 
     const fallbackTab: TabKey = tab === "i-promised" ? "promised-to-me" : "i-promised";
-    const fallbackCount = filteredListRowsByTab[fallbackTab]?.length ?? 0;
+    const fallbackCount = fallbackTab === "i-promised" ? countMeExecutor : countOtherExecutor;
+
+    autoSwitchHandledForFilterRef.current = true;
     if (fallbackCount > 0) {
       setTab(fallbackTab);
     }
-  }, [activeMetricFilter, filteredListRowsByTab, listLoading, tab]);
+  }, [activeMetricFilter, countMeExecutor, countOtherExecutor, summaryLoaded, tab]);
 
   const handleMarkCompleted = async (promiseId: string) => {
     setBusyMap((m) => ({ ...m, [promiseId]: true }));
