@@ -508,7 +508,8 @@
       },
       "trackRecord": {
         "perMonthValue": "{count} / month",
-        "activeDays": "active {count} {label}"
+        "perMonthUnit": "/ month",
+        "activeDays": "active {count} days"
       },
       "labels": {
         "people": {
