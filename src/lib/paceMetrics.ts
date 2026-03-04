@@ -2,27 +2,40 @@ export type PaceMetricInput = {
   accepted_at: string | null;
 };
 
-export const ROLLING_WINDOW_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-const WINDOW_MS = ROLLING_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-
-export const getPaceMetricsLast30Days = (
+export const getLifetimePaceMetrics = (
   promises: PaceMetricInput[],
   nowTimestamp = Date.now()
 ) => {
-  const acceptedDates = promises.flatMap((promise) => {
+  const acceptedTimestamps = promises.flatMap((promise) => {
     if (!promise.accepted_at) return [];
-    const acceptedTimestamp = new Date(promise.accepted_at).getTime();
 
+    const acceptedTimestamp = new Date(promise.accepted_at).getTime();
     if (Number.isNaN(acceptedTimestamp)) return [];
     if (acceptedTimestamp > nowTimestamp) return [];
-    if (nowTimestamp - acceptedTimestamp > WINDOW_MS) return [];
 
-    return [new Date(acceptedTimestamp).toISOString().slice(0, 10)];
+    return [acceptedTimestamp];
   });
 
+  const totalDeals = acceptedTimestamps.length;
+
+  if (totalDeals === 0) {
+    return {
+      totalDeals,
+      activeDays: 0,
+      pace: 0,
+    };
+  }
+
+  const startAt = Math.min(...acceptedTimestamps);
+  const activeDays = Math.max(1, Math.floor((nowTimestamp - startAt) / DAY_MS));
+  const months = Math.max(1, activeDays / 30);
+  const pace = Number((totalDeals / months).toFixed(1));
+
   return {
-    deals30d: acceptedDates.length,
-    activeDays30d: new Set(acceptedDates).size,
+    totalDeals,
+    activeDays,
+    pace,
   };
 };

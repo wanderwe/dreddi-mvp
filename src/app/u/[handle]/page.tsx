@@ -13,7 +13,7 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
-import { getPaceMetricsLast30Days } from "@/lib/paceMetrics";
+import { getLifetimePaceMetrics } from "@/lib/paceMetrics";
 
 type PublicProfileRow = {
   handle: string;
@@ -364,6 +364,10 @@ export default function PublicProfilePage() {
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
     : t("publicProfile.summary.lastActivityEmpty");
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const paceFormatter = useMemo(
+    () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    [locale]
+  );
   const percentFormatter = useMemo(
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }),
     [locale]
@@ -384,7 +388,7 @@ export default function PublicProfilePage() {
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
     const disputeRate = profile?.dispute_rate ?? null;
-    const { deals30d, activeDays30d } = getPaceMetricsLast30Days(promises);
+    const { pace, activeDays } = getLifetimePaceMetrics(promises);
 
     return {
       totalDeals,
@@ -394,8 +398,8 @@ export default function PublicProfilePage() {
       onTimeCompletions,
       disputes,
       disputeRate,
-      deals30d,
-      activeDays30d,
+      pace,
+      activeDays,
     };
   }, [
     profile?.deals_with_due_date_count,
@@ -670,14 +674,17 @@ export default function PublicProfilePage() {
                           {t("publicProfile.reputationDetails.sections.trackRecord")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <div className="text-2xl font-semibold text-white">
-                            {t("publicProfile.reputationDetails.trackRecord.perMonthValue", {
-                              count: numberFormatter.format(reputationEvidence.deals30d),
-                            })}
+                          <div className="flex items-baseline gap-2 text-white">
+                            <span className="text-2xl font-semibold">
+                              {paceFormatter.format(reputationEvidence.pace)}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {t("publicProfile.reputationDetails.trackRecord.perMonthUnit")}
+                            </span>
                           </div>
                           <p className="text-xs text-white/60">
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
-                              count: numberFormatter.format(reputationEvidence.activeDays30d),
+                              count: numberFormatter.format(reputationEvidence.activeDays),
                             })}
                           </p>
                         </div>
