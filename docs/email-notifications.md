@@ -6,7 +6,7 @@ Provider: **Resend** transactional email API.
 
 - `NEXT_PUBLIC_APP_URL` – absolute app URL used for CTA/manage links.
 - `RESEND_API_KEY` – API key for `POST https://api.resend.com/emails`.
-- `RESEND_FROM_EMAIL` – verified sender identity (e.g. `notifications@yourdomain.com`).
+- `RESEND_FROM_EMAIL` – verified sender identity. For local quickstart you can use `onboarding@resend.dev`; for production use your verified domain sender (e.g. `notifications@yourdomain.com`).
 
 ## Sending rules
 
@@ -41,3 +41,12 @@ _dmarc.yourdomain.com TXT "v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com; fo
 ```
 
 Use Resend dashboard domain verification to validate SPF/DKIM propagation before production traffic.
+
+
+## Dev smoke test
+
+- Endpoint: `POST /api/notifications/email/test` (authenticated; sends to current user).
+- CLI helper: `npm run test:email`
+  - Required env: `TEST_USER_EMAIL`, `TEST_USER_PASSWORD`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+The endpoint returns the persisted `notification_email_sends` row so you can verify provider status and errors.

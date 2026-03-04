@@ -14,6 +14,7 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
 ]);
 
 type EmailSendStatus = "sent" | "failed" | "provider_not_configured" | "disabled";
+type EmailProvider = "resend" | "none";
 
 type EmailPayload = {
   eventId: string;
@@ -25,12 +26,24 @@ type EmailPayload = {
   body: string;
 };
 
+type EmailLogOptions = {
+  provider?: EmailProvider;
+  providerId?: string | null;
+  error?: string | null;
+  toEmail?: string | null;
+};
+
 const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
 const absoluteUrl = (path: string) => {
   if (/^https?:\/\//.test(path)) return path;
   return `${getBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
+};
+
+const resolveEmailProvider = (): EmailProvider => {
+  if (process.env.RESEND_API_KEY) return "resend";
+  return "none";
 };
 
 const renderTemplate = (data: {
@@ -151,16 +164,41 @@ const logEmailSend = async (
   admin: SupabaseClient,
   payload: EmailPayload,
   status: EmailSendStatus,
-  providerId?: string | null
+  options?: EmailLogOptions
 ) => {
+  const provider = options?.provider ?? resolveEmailProvider();
+  const errorMessage = options?.error?.slice(0, 2000) ?? null;
+
   await admin.from("notification_email_sends").insert({
     event_id: payload.eventId,
     user_id: payload.userId,
     type: payload.type,
     status,
-    provider_id: providerId ?? null,
+    provider,
+    provider_id: options?.providerId ?? null,
     dedupe_key: payload.dedupeKey,
+    error_message: errorMessage,
+    to_email: options?.toEmail ?? null,
   });
+
+  const logData = {
+    eventType: payload.type,
+    eventId: payload.eventId,
+    userId: payload.userId,
+    dedupeKey: payload.dedupeKey,
+    status,
+    provider,
+    providerMessageId: options?.providerId ?? null,
+    toEmail: options?.toEmail ?? null,
+    error: errorMessage,
+  };
+
+  if (status === "sent") {
+    console.info("[notifications] email_send", logData);
+    return;
+  }
+
+  console.error("[notifications] email_send", logData);
 };
 
 export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload: EmailPayload) => {
@@ -193,48 +231,75 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
 
   const getUserById = admin.auth?.admin?.getUserById?.bind(admin.auth.admin);
   if (!getUserById) {
-    await logEmailSend(admin, payload, "failed");
+    await logEmailSend(admin, payload, "failed", {
+      error: "Supabase admin auth.getUserById is unavailable",
+    });
     return;
   }
 
   const { data: userData, error: userError } = await getUserById(payload.userId);
   const to = userData.user?.email;
   if (userError || !to) {
-    await logEmailSend(admin, payload, "failed");
+    await logEmailSend(admin, payload, "failed", {
+      error: userError?.message ?? "No recipient email found",
+    });
+    return;
+  }
+
+  const provider = resolveEmailProvider();
+  if (provider === "none") {
+    await logEmailSend(admin, payload, "provider_not_configured", {
+      provider,
+      toEmail: to,
+      error: "Missing RESEND_API_KEY",
+    });
     return;
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const fromAddress = process.env.RESEND_FROM_EMAIL ?? "notifications@dreddi.com";
-  if (!resendApiKey) {
-    await logEmailSend(admin, payload, "provider_not_configured");
-    return;
-  }
-
+  const fromAddress = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
   const copy = resolveEmailCopy(payload);
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromAddress,
-      to: [to],
-      subject: copy.subject,
-      html: copy.html,
-      text: copy.text,
-    }),
-  });
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromAddress,
+        to: [to],
+        subject: copy.subject,
+        html: copy.html,
+        text: copy.text,
+      }),
+    });
 
-  if (!response.ok) {
-    await logEmailSend(admin, payload, "failed");
-    return;
+    if (!response.ok) {
+      const responseText = await response.text().catch(() => "Unknown provider error");
+      await logEmailSend(admin, payload, "failed", {
+        provider,
+        toEmail: to,
+        error: `Resend error ${response.status}: ${responseText}`,
+      });
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as { id?: string } | null;
+    await logEmailSend(admin, payload, "sent", {
+      provider,
+      providerId: body?.id ?? null,
+      toEmail: to,
+    });
+  } catch (error) {
+    await logEmailSend(admin, payload, "failed", {
+      provider,
+      toEmail: to,
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
-
-  const body = (await response.json().catch(() => null)) as { id?: string } | null;
-  await logEmailSend(admin, payload, "sent", body?.id ?? null);
 };
 
 export const isEmailEligibleType = (type: NotificationType) => EMAIL_ELIGIBLE_TYPES.has(type);
+export const getConfiguredEmailProvider = resolveEmailProvider;

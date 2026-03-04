@@ -34,6 +34,16 @@ type ProfileState = {
   deadlineRemindersEnabled: boolean;
 };
 
+type EmailHealthStatus = "sent" | "failed" | "disabled" | "provider_not_configured";
+
+type EmailHealthState = {
+  providerConfigured: boolean;
+  lastAttempt: {
+    status: EmailHealthStatus;
+    createdAt: string;
+  } | null;
+};
+
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
   const t = useT();
   const [authState, setAuthState] = useState<AuthState | null>(null);
@@ -50,6 +60,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
+  const [emailHealth, setEmailHealth] = useState<EmailHealthState | null>(null);
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
@@ -166,6 +177,48 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     };
   }, [t]);
 
+  const loadEmailHealth = async () => {
+    if (authState?.isMock) {
+      setEmailHealth({
+        providerConfigured: true,
+        lastAttempt: null,
+      });
+      return;
+    }
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch {
+      return;
+    }
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !sessionData.session?.access_token) {
+      return;
+    }
+
+    const response = await fetch("/api/notifications/email/health", {
+      headers: {
+        Authorization: `Bearer ${sessionData.session.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as EmailHealthState | null;
+    if (body) {
+      setEmailHealth(body);
+    }
+  };
+
+  useEffect(() => {
+    void loadEmailHealth();
+  }, [authState?.isMock]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setOrigin(window.location.origin);
@@ -202,6 +255,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     return `/u/${encodeURIComponent(profile.handle)}`;
   }, [profile?.handle]);
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : publicProfilePath;
+  const emailProviderConfigured = emailHealth?.providerConfigured ?? true;
+  const emailToggleDisabled = loading || saving || !profile || !emailProviderConfigured;
+  const emailToggleChecked = emailProviderConfigured ? (profile?.emailEnabled ?? false) : false;
 
   const updateProfileRow = async (
     dbPatch: Record<string, unknown>,
@@ -797,41 +853,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
                       <div className="text-sm font-medium text-white">
-                        {t("profileSettings.emailLabel")}
-                      </div>
-                      <HelperText>{t("profileSettings.emailDescription")}</HelperText>
-                    </div>
-                    <div className="flex justify-end self-center">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={profile?.emailEnabled ?? false}
-                        onClick={toggleEmailNotifications}
-                        disabled={loading || saving || !profile}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                          profile?.emailEnabled
-                            ? "border-emerald-300/50 bg-emerald-400/70"
-                            : "border-white/20 bg-white/10"
-                        } ${
-                          loading || saving || !profile
-                            ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                          }`}
-                      >
-                        <span
-                          className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                            profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-white">
                         {t("profileSettings.deadlineLabel")}
                       </div>
                       <HelperText>{t("profileSettings.deadlineDescription")}</HelperText>
@@ -859,6 +880,85 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           }`}
                         />
                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                    <div className="space-y-1">
+                      <div className="text-sm font-medium text-white">
+                        {t("profileSettings.emailLabel")}
+                      </div>
+                      <HelperText>{t("profileSettings.emailDescription")}</HelperText>
+                      {!emailProviderConfigured && (
+                        <HelperText className="text-amber-300">
+                          {t("profileSettings.emailTemporarilyUnavailable")}
+                        </HelperText>
+                      )}
+                      {emailProviderConfigured && emailHealth?.lastAttempt && (
+                        <HelperText>
+                          {`${t("profileSettings.lastEmailAttempt")}: ${emailHealth.lastAttempt.status} · ${new Date(
+                            emailHealth.lastAttempt.createdAt
+                          ).toLocaleString()}`}
+                        </HelperText>
+                      )}
+                    </div>
+                    <div className="flex justify-end self-center">
+                      {!emailProviderConfigured ? (
+                        <Tooltip
+                          label={t("profileSettings.emailTemporarilyUnavailable")}
+                          placement="top-right"
+                        >
+                          <span className="inline-flex">
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={emailToggleChecked}
+                                onClick={toggleEmailNotifications}
+                                disabled={emailToggleDisabled}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                                emailToggleChecked
+                                  ? "border-emerald-300/50 bg-emerald-400/70"
+                                  : "border-white/20 bg-white/10"
+                              } ${
+                                emailToggleDisabled
+                                  ? "cursor-not-allowed opacity-60"
+                                  : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                                }`}
+                            >
+                              <span
+                                className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                                  emailToggleChecked ? "translate-x-5" : "translate-x-1"
+                                }`}
+                              />
+                            </button>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={emailToggleChecked}
+                          onClick={toggleEmailNotifications}
+                          disabled={emailToggleDisabled}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                            emailToggleChecked
+                              ? "border-emerald-300/50 bg-emerald-400/70"
+                              : "border-white/20 bg-white/10"
+                          } ${
+                            emailToggleDisabled
+                              ? "cursor-not-allowed opacity-60"
+                              : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                            }`}
+                        >
+                          <span
+                            className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                              emailToggleChecked ? "translate-x-5" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
