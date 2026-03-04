@@ -53,6 +53,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
+  const [emailProviderConfigured, setEmailProviderConfigured] = useState(true);
   const lastHandleRef = useRef<string | null>(null);
   const maxTags = 7;
   const minTagLength = 2;
@@ -85,6 +86,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           emailEnabled: true,
           deadlineRemindersEnabled: true,
         });
+        setEmailProviderConfigured(true);
         setLoading(false);
         return;
       }
@@ -156,6 +158,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         emailEnabled,
         deadlineRemindersEnabled,
       });
+
+      const healthResponse = await fetch("/api/notifications/email/health", {
+        method: "GET",
+        credentials: "include",
+      });
+      if (healthResponse.ok) {
+        const health = (await healthResponse.json()) as { configured?: boolean };
+        setEmailProviderConfigured(Boolean(health.configured));
+      } else {
+        setEmailProviderConfigured(false);
+      }
+
       setLoading(false);
     };
 
@@ -285,7 +299,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   };
 
   const toggleEmailNotifications = async () => {
-    if (!profile) return;
+    if (!profile || !emailProviderConfigured) return;
     await updateProfileRow(
       { email_notifications_enabled: !profile.emailEnabled },
       { emailEnabled: !profile.emailEnabled }
@@ -807,13 +821,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         role="switch"
                         aria-checked={profile?.emailEnabled ?? false}
                         onClick={toggleEmailNotifications}
-                        disabled={loading || saving || !profile}
+                        disabled={loading || saving || !profile || !emailProviderConfigured}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                           profile?.emailEnabled
                             ? "border-emerald-300/50 bg-emerald-400/70"
                             : "border-white/20 bg-white/10"
                         } ${
-                          loading || saving || !profile
+                          loading || saving || !profile || !emailProviderConfigured
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
                           }`}
@@ -826,6 +840,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </button>
                     </div>
                   </div>
+                  {!emailProviderConfigured ? (
+                    <p className="mt-2 text-xs text-amber-200">
+                      {t("profileSettings.emailTemporarilyUnavailable")}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">

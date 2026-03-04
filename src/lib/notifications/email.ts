@@ -28,6 +28,14 @@ type EmailPayload = {
 const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
+export const getEmailProviderHealth = () => {
+  const configured = Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL);
+  return {
+    configured,
+    status: configured ? "configured" : "not_configured",
+  } as const;
+};
+
 const absoluteUrl = (path: string) => {
   if (/^https?:\/\//.test(path)) return path;
   return `${getBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
@@ -151,15 +159,23 @@ const logEmailSend = async (
   admin: SupabaseClient,
   payload: EmailPayload,
   status: EmailSendStatus,
-  providerId?: string | null
+  meta?: {
+    providerId?: string | null;
+    toEmail?: string | null;
+    errorMessage?: string | null;
+    providerResponse?: unknown;
+  }
 ) => {
   await admin.from("notification_email_sends").insert({
     event_id: payload.eventId,
     user_id: payload.userId,
     type: payload.type,
     status,
-    provider_id: providerId ?? null,
+    provider_id: meta?.providerId ?? null,
     dedupe_key: payload.dedupeKey,
+    to_email: meta?.toEmail ?? null,
+    error_message: meta?.errorMessage ?? null,
+    provider_response: meta?.providerResponse ?? null,
   });
 };
 
@@ -187,7 +203,9 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     .maybeSingle();
 
   if (profile?.email_notifications_enabled === false) {
-    await logEmailSend(admin, payload, "disabled");
+    await logEmailSend(admin, payload, "disabled", {
+      errorMessage: "Email notifications are disabled by user preference",
+    });
     return;
   }
 
@@ -200,14 +218,20 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
   const { data: userData, error: userError } = await getUserById(payload.userId);
   const to = userData.user?.email;
   if (userError || !to) {
-    await logEmailSend(admin, payload, "failed");
+    await logEmailSend(admin, payload, "failed", {
+      errorMessage: userError?.message ?? "Recipient email is missing",
+    });
     return;
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const fromAddress = process.env.RESEND_FROM_EMAIL ?? "notifications@dreddi.com";
-  if (!resendApiKey) {
-    await logEmailSend(admin, payload, "provider_not_configured");
+  const fromAddress = process.env.RESEND_FROM_EMAIL;
+  const providerHealth = getEmailProviderHealth();
+  if (!providerHealth.configured || !resendApiKey || !fromAddress) {
+    await logEmailSend(admin, payload, "provider_not_configured", {
+      toEmail: to,
+      errorMessage: "RESEND_API_KEY or RESEND_FROM_EMAIL is missing",
+    });
     return;
   }
 
@@ -229,12 +253,36 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
   });
 
   if (!response.ok) {
-    await logEmailSend(admin, payload, "failed");
+    const providerResponse = (await response.json().catch(() => null)) as
+      | Record<string, unknown>
+      | null;
+    const providerError =
+      typeof providerResponse?.message === "string"
+        ? providerResponse.message
+        : `Resend rejected request (HTTP ${response.status})`;
+    await logEmailSend(admin, payload, "failed", {
+      toEmail: to,
+      errorMessage: providerError,
+      providerResponse,
+    });
     return;
   }
 
   const body = (await response.json().catch(() => null)) as { id?: string } | null;
-  await logEmailSend(admin, payload, "sent", body?.id ?? null);
+  await logEmailSend(admin, payload, "sent", {
+    providerId: body?.id ?? null,
+    toEmail: to,
+    providerResponse: body,
+  });
+
+  console.info("[notifications] email_sent", {
+    userId: payload.userId,
+    eventId: payload.eventId,
+    type: payload.type,
+    toEmail: to,
+    providerId: body?.id ?? null,
+    status: "sent",
+  });
 };
 
 export const isEmailEligibleType = (type: NotificationType) => EMAIL_ELIGIBLE_TYPES.has(type);
