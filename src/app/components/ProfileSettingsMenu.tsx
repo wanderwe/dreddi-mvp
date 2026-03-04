@@ -257,6 +257,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : publicProfilePath;
   const emailProviderConfigured = emailHealth?.providerConfigured ?? true;
   const emailToggleDisabled = loading || saving || !profile || !emailProviderConfigured;
+  const emailToggleChecked = emailProviderConfigured ? (profile?.emailEnabled ?? false) : false;
 
   const updateProfileRow = async (
     dbPatch: Record<string, unknown>,
@@ -910,14 +911,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           placement="top-right"
                         >
                           <span className="inline-flex">
-                            <button
-                              type="button"
-                              role="switch"
-                              aria-checked={profile?.emailEnabled ?? false}
-                              onClick={toggleEmailNotifications}
-                              disabled={emailToggleDisabled}
-                              className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                                profile?.emailEnabled
+                              <button
+                                type="button"
+                                role="switch"
+                                aria-checked={emailToggleChecked}
+                                onClick={toggleEmailNotifications}
+                                disabled={emailToggleDisabled}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                                emailToggleChecked
                                   ? "border-emerald-300/50 bg-emerald-400/70"
                                   : "border-white/20 bg-white/10"
                               } ${
@@ -928,7 +929,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             >
                               <span
                                 className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                                  profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
+                                  emailToggleChecked ? "translate-x-5" : "translate-x-1"
                                 }`}
                               />
                             </button>
@@ -938,11 +939,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         <button
                           type="button"
                           role="switch"
-                          aria-checked={profile?.emailEnabled ?? false}
+                          aria-checked={emailToggleChecked}
                           onClick={toggleEmailNotifications}
                           disabled={emailToggleDisabled}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                            profile?.emailEnabled
+                            emailToggleChecked
                               ? "border-emerald-300/50 bg-emerald-400/70"
                               : "border-white/20 bg-white/10"
                           } ${
@@ -953,7 +954,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         >
                           <span
                             className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                              profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
+                              emailToggleChecked ? "translate-x-5" : "translate-x-1"
                             }`}
                           />
                         </button>
