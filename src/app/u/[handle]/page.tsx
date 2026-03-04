@@ -13,6 +13,7 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
+import { getLifetimePaceMetrics } from "@/lib/paceMetrics";
 
 type PublicProfileRow = {
   handle: string;
@@ -363,6 +364,10 @@ export default function PublicProfilePage() {
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
     : t("publicProfile.summary.lastActivityEmpty");
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const paceFormatter = useMemo(
+    () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
+    [locale]
+  );
   const percentFormatter = useMemo(
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }),
     [locale]
@@ -383,19 +388,7 @@ export default function PublicProfilePage() {
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
     const disputeRate = profile?.dispute_rate ?? null;
-    const now = Date.now();
-    const rollingWindowMs = 30 * 24 * 60 * 60 * 1000;
-    const acceptedDealDates = promises
-      .flatMap((promise) => {
-        const relevantDate = promise.counterparty_accepted_at ?? promise.accepted_at;
-        if (!relevantDate) return [];
-        const timestamp = new Date(relevantDate).getTime();
-        if (Number.isNaN(timestamp)) return [];
-        if (now - timestamp > rollingWindowMs || timestamp > now) return [];
-        return [new Date(timestamp).toISOString().slice(0, 10)];
-      });
-    const deals30d = acceptedDealDates.length;
-    const activeDays30d = new Set(acceptedDealDates).size;
+    const { pace, activeDays } = getLifetimePaceMetrics(promises);
 
     return {
       totalDeals,
@@ -405,8 +398,8 @@ export default function PublicProfilePage() {
       onTimeCompletions,
       disputes,
       disputeRate,
-      deals30d,
-      activeDays30d,
+      pace,
+      activeDays,
     };
   }, [
     profile?.deals_with_due_date_count,
@@ -683,7 +676,7 @@ export default function PublicProfilePage() {
                         <div className="mt-2 space-y-2">
                           <div className="flex items-baseline gap-2 text-white">
                             <span className="text-2xl font-semibold">
-                              {numberFormatter.format(reputationEvidence.deals30d)}
+                              {paceFormatter.format(reputationEvidence.pace)}
                             </span>
                             <span className="text-sm text-white/70">
                               {t("publicProfile.reputationDetails.trackRecord.perMonthUnit")}
@@ -691,7 +684,7 @@ export default function PublicProfilePage() {
                           </div>
                           <p className="text-xs text-white/60">
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
-                              count: numberFormatter.format(reputationEvidence.activeDays30d),
+                              count: numberFormatter.format(reputationEvidence.activeDays),
                             })}
                           </p>
                         </div>
