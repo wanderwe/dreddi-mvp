@@ -446,7 +446,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.displayNameLabel")}
                       </label>
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <div className="min-w-0">
                           <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                             <input
@@ -456,7 +456,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               onChange={(event) => setDisplayNameInput(event.target.value)}
                               placeholder={t("profileSettings.displayNamePlaceholder")}
                               maxLength={40}
-                              className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                              className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
                             />
                             {displayNameInput.length > 0 && (
                               <button
@@ -480,7 +480,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.handleLabel")}
                       </label>
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <div className="min-w-0">
                           <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                             <span className="text-slate-400">@</span>
@@ -490,7 +490,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               value={handleInput}
                               onChange={(event) => setHandleInput(event.target.value)}
                               placeholder={t("profileSettings.handlePlaceholder")}
-                              className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                              className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
                             />
                           </div>
                         </div>
@@ -498,7 +498,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           type="button"
                           onClick={saveIdentity}
                           disabled={identityDisabled}
-                          className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                          className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         >
                           {t("profileSettings.save")}
                         </button>
@@ -563,7 +563,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </HelperText>
                       </div>
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <div className="space-y-1">
                           <div className="text-sm font-semibold text-white">
                             {t("profileSettings.publicLabel")}
@@ -666,7 +666,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             <HelperText>{t("profileSettings.tagsEmpty")}</HelperText>
                           )}
                         </div>
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                        <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                           <div className="min-w-0">
                             <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                               <input
@@ -684,7 +684,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 }}
                                 onBlur={() => addTagsFromInput(profileTagsInput)}
                                 placeholder={t("profileSettings.tagsPlaceholder")}
-                                className="w-full min-w-0 bg-transparent text-sm text-white placeholder:text-slate-500 focus-visible:outline-none"
+                                className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
                               />
                               {profileTagsInput.trim().length > 0 && (
                                 <button
@@ -703,7 +703,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             type="button"
                             onClick={saveTags}
                             disabled={tagsSaveDisabled}
-                            className="h-9 cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                            className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                           >
                             {t("profileSettings.save")}
                           </button>
@@ -944,7 +944,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       )}
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 lg:overflow-y-auto">
+        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 overflow-y-auto pb-[max(env(safe-area-inset-bottom),1rem)]">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
