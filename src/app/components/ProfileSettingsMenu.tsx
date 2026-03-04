@@ -61,7 +61,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
   const [emailHealth, setEmailHealth] = useState<EmailHealthState | null>(null);
-  const [emailHealthLoading, setEmailHealthLoading] = useState(false);
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
@@ -194,11 +193,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       return;
     }
 
-    setEmailHealthLoading(true);
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !sessionData.session?.access_token) {
-      setEmailHealthLoading(false);
       return;
     }
 
@@ -209,7 +206,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     });
 
     if (!response.ok) {
-      setEmailHealthLoading(false);
       return;
     }
 
@@ -217,7 +213,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (body) {
       setEmailHealth(body);
     }
-    setEmailHealthLoading(false);
   };
 
   useEffect(() => {
@@ -860,30 +855,74 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         {t("profileSettings.emailLabel")}
                       </div>
                       <HelperText>{t("profileSettings.emailDescription")}</HelperText>
+                      {!emailProviderConfigured && (
+                        <HelperText className="text-amber-300">
+                          {t("profileSettings.emailTemporarilyUnavailable")}
+                        </HelperText>
+                      )}
+                      {emailProviderConfigured && emailHealth?.lastAttempt && (
+                        <HelperText>
+                          {`${t("profileSettings.lastEmailAttempt")}: ${emailHealth.lastAttempt.status} · ${new Date(
+                            emailHealth.lastAttempt.createdAt
+                          ).toLocaleString()}`}
+                        </HelperText>
+                      )}
                     </div>
                     <div className="flex justify-end self-center">
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={profile?.emailEnabled ?? false}
-                        onClick={toggleEmailNotifications}
-                        disabled={emailToggleDisabled}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                          profile?.emailEnabled
-                            ? "border-emerald-300/50 bg-emerald-400/70"
-                            : "border-white/20 bg-white/10"
-                        } ${
-                          emailToggleDisabled
-                            ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                          }`}
-                      >
-                        <span
-                          className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                            profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
+                      {!emailProviderConfigured ? (
+                        <Tooltip
+                          label={t("profileSettings.emailTemporarilyUnavailable")}
+                          placement="top-right"
+                        >
+                          <span className="inline-flex">
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={profile?.emailEnabled ?? false}
+                              onClick={toggleEmailNotifications}
+                              disabled={emailToggleDisabled}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                                profile?.emailEnabled
+                                  ? "border-emerald-300/50 bg-emerald-400/70"
+                                  : "border-white/20 bg-white/10"
+                              } ${
+                                emailToggleDisabled
+                                  ? "cursor-not-allowed opacity-60"
+                                  : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                                }`}
+                            >
+                              <span
+                                className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                                  profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
+                                }`}
+                              />
+                            </button>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={profile?.emailEnabled ?? false}
+                          onClick={toggleEmailNotifications}
+                          disabled={emailToggleDisabled}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                            profile?.emailEnabled
+                              ? "border-emerald-300/50 bg-emerald-400/70"
+                              : "border-white/20 bg-white/10"
+                          } ${
+                            emailToggleDisabled
+                              ? "cursor-not-allowed opacity-60"
+                              : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                            }`}
+                        >
+                          <span
+                            className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                              profile?.emailEnabled ? "translate-x-5" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -918,38 +957,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
                           }`}
                         />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-                  <div className="space-y-1 text-xs text-slate-300">
-                    {!emailProviderConfigured && (
-                      <div className="font-medium text-amber-300">
-                        {t("profileSettings.emailTemporarilyUnavailable")}
-                      </div>
-                    )}
-                    {emailProviderConfigured && (
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-slate-200">{t("profileSettings.lastEmailAttempt")}</span>
-                        <span className="font-medium text-slate-100">
-                          {emailHealth?.lastAttempt
-                            ? `${emailHealth.lastAttempt.status} · ${new Date(
-                                emailHealth.lastAttempt.createdAt
-                              ).toLocaleString()}`
-                            : t("profileSettings.noAttempts")}
-                        </span>
-                      </div>
-                    )}
-                    <div className="pt-1">
-                      <button
-                        type="button"
-                        onClick={() => void loadEmailHealth()}
-                        disabled={emailHealthLoading}
-                        className="rounded-md border border-white/15 px-2 py-1 text-[11px] font-semibold text-slate-100 hover:border-emerald-300/50 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {emailHealthLoading ? t("profileSettings.loading") : t("profileSettings.refresh")}
                       </button>
                     </div>
                   </div>
