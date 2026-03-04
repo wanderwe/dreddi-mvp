@@ -51,11 +51,10 @@ export async function GET(req: Request) {
       );
     }
 
-    const provider = getConfiguredEmailProvider();
+    const providerConfigured = getConfiguredEmailProvider() !== "none";
 
     return NextResponse.json({
-      provider,
-      providerConfigured: provider !== "none",
+      providerConfigured: providerConfigured,
       lastAttempt: lastAttempt
         ? {
             status: lastAttempt.status,

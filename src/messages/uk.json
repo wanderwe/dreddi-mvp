@@ -91,12 +91,10 @@
     "deadlineLabel": "Нагадування про дедлайн",
     "deadlineDescription": "Коли увімкнено, ви отримуєте нагадування перед завершенням угоди з дедлайном",
     "save": "Зберегти",
-    "emailProviderStatus": "Провайдер email",
-    "configured": "Налаштовано",
-    "notConfigured": "Не налаштовано",
     "lastEmailAttempt": "Остання спроба email",
     "noAttempts": "Спроб ще не було",
-    "refresh": "Оновити статус"
+    "refresh": "Оновити статус",
+    "emailTemporarilyUnavailable": "Email-сповіщення тимчасово недоступні"
   },
   "promises": {
     "entity": {

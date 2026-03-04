@@ -37,7 +37,6 @@ type ProfileState = {
 type EmailHealthStatus = "sent" | "failed" | "disabled" | "provider_not_configured";
 
 type EmailHealthState = {
-  provider: string;
   providerConfigured: boolean;
   lastAttempt: {
     status: EmailHealthStatus;
@@ -182,8 +181,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const loadEmailHealth = async () => {
     if (authState?.isMock) {
       setEmailHealth({
-        provider: "none",
-        providerConfigured: false,
+        providerConfigured: true,
         lastAttempt: null,
       });
       return;
@@ -262,6 +260,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     return `/u/${encodeURIComponent(profile.handle)}`;
   }, [profile?.handle]);
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : publicProfilePath;
+  const emailProviderConfigured = emailHealth?.providerConfigured ?? true;
+  const emailToggleDisabled = loading || saving || !profile || !emailProviderConfigured;
 
   const updateProfileRow = async (
     dbPatch: Record<string, unknown>,
@@ -867,13 +867,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         role="switch"
                         aria-checked={profile?.emailEnabled ?? false}
                         onClick={toggleEmailNotifications}
-                        disabled={loading || saving || !profile}
+                        disabled={emailToggleDisabled}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                           profile?.emailEnabled
                             ? "border-emerald-300/50 bg-emerald-400/70"
                             : "border-white/20 bg-white/10"
                         } ${
-                          loading || saving || !profile
+                          emailToggleDisabled
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
                           }`}
@@ -925,28 +925,23 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
                   <div className="space-y-1 text-xs text-slate-300">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-200">{t("profileSettings.emailProviderStatus")}</span>
-                      <span
-                        className={`font-medium ${
-                          emailHealth?.providerConfigured ? "text-emerald-300" : "text-amber-300"
-                        }`}
-                      >
-                        {emailHealth?.providerConfigured
-                          ? t("profileSettings.configured")
-                          : t("profileSettings.notConfigured")}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-slate-200">{t("profileSettings.lastEmailAttempt")}</span>
-                      <span className="font-medium text-slate-100">
-                        {emailHealth?.lastAttempt
-                          ? `${emailHealth.lastAttempt.status} · ${new Date(
-                              emailHealth.lastAttempt.createdAt
-                            ).toLocaleString()}`
-                          : t("profileSettings.noAttempts")}
-                      </span>
-                    </div>
+                    {!emailProviderConfigured && (
+                      <div className="font-medium text-amber-300">
+                        {t("profileSettings.emailTemporarilyUnavailable")}
+                      </div>
+                    )}
+                    {emailProviderConfigured && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-slate-200">{t("profileSettings.lastEmailAttempt")}</span>
+                        <span className="font-medium text-slate-100">
+                          {emailHealth?.lastAttempt
+                            ? `${emailHealth.lastAttempt.status} · ${new Date(
+                                emailHealth.lastAttempt.createdAt
+                              ).toLocaleString()}`
+                            : t("profileSettings.noAttempts")}
+                        </span>
+                      </div>
+                    )}
                     <div className="pt-1">
                       <button
                         type="button"
