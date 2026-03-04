@@ -13,7 +13,7 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
-import { getLifetimePaceMetrics } from "@/lib/paceMetrics";
+import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 
 type PublicProfileRow = {
   handle: string;
@@ -388,7 +388,17 @@ export default function PublicProfilePage() {
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
     const disputeRate = profile?.dispute_rate ?? null;
-    const { pace, activeDays } = getLifetimePaceMetrics(promises);
+    const promisePaceMetrics = getLifetimePaceMetrics(promises);
+    const profileActiveDays = profile?.reputation_age_days ?? null;
+    const hasProfilePace =
+      typeof profile?.avg_deals_per_month === "number" && Number.isFinite(profile.avg_deals_per_month);
+    const pace = hasProfilePace
+      ? Number(profile.avg_deals_per_month.toFixed(1))
+      : profileActiveDays && profileActiveDays > 0
+        ? getMonthlyPace(totalDeals, profileActiveDays)
+        : promisePaceMetrics.pace;
+    const activeDays =
+      profileActiveDays && profileActiveDays > 0 ? profileActiveDays : promisePaceMetrics.activeDays;
 
     return {
       totalDeals,
@@ -402,10 +412,12 @@ export default function PublicProfilePage() {
       activeDays,
     };
   }, [
+    profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
     profile?.dispute_rate,
     profile?.disputed_count,
     profile?.on_time_completion_count,
+    profile?.reputation_age_days,
     profile?.unique_counterparties_count,
     promises,
     totalConfirmedDeals,

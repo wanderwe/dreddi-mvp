@@ -1,9 +1,19 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getLifetimePaceMetrics } from "../src/lib/paceMetrics";
+import { getLifetimePaceMetrics, getMonthlyPace } from "../src/lib/paceMetrics";
 
 const NOW = new Date("2026-06-01T12:00:00.000Z").getTime();
+
+
+test("getMonthlyPace returns 3.8/month for five deals over 39 active days", () => {
+  assert.equal(getMonthlyPace(5, 39), 3.8);
+});
+
+test("getMonthlyPace returns 0 for non-positive inputs", () => {
+  assert.equal(getMonthlyPace(0, 39), 0);
+  assert.equal(getMonthlyPace(5, 0), 0);
+});
 
 test("returns 1/month for one confirmed deal when active period is less than 30 days", () => {
   const metrics = getLifetimePaceMetrics([{ accepted_at: "2026-05-20T10:00:00.000Z" }], NOW);
@@ -56,4 +66,18 @@ test("returns zero pace and zero active days when no confirmed deals exist", () 
   assert.equal(metrics.totalDeals, 0);
   assert.equal(metrics.activeDays, 0);
   assert.equal(metrics.pace, 0);
+});
+
+test("uses counterparty acceptance timestamp when accepted_at is missing", () => {
+  const metrics = getLifetimePaceMetrics(
+    [
+      { accepted_at: null, counterparty_accepted_at: "2026-05-20T10:00:00.000Z" },
+      { accepted_at: null, counterparty_accepted_at: "2026-05-28T10:00:00.000Z" },
+    ],
+    NOW
+  );
+
+  assert.equal(metrics.totalDeals, 2);
+  assert.equal(metrics.activeDays, 12);
+  assert.equal(metrics.pace, 2);
 });
