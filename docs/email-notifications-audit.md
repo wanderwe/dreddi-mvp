@@ -66,6 +66,6 @@ Current transactional email sends are tied to notification creation:
 
 - Ensure production secrets are set in deployment env:
   - `RESEND_API_KEY`
-  - `RESEND_FROM_EMAIL` (verified sender/domain)
+  - `RESEND_FROM_EMAIL` (verified sender/domain; local fallback can be `onboarding@resend.dev`)
   - `NEXT_PUBLIC_APP_URL` (public app URL)
 - Verify sender domain SPF/DKIM/DMARC in Resend dashboard before scaling traffic.

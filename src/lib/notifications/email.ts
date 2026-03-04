@@ -257,7 +257,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const fromAddress = process.env.RESEND_FROM_EMAIL ?? "notifications@dreddi.com";
+  const fromAddress = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
   const copy = resolveEmailCopy(payload);
 
   try {

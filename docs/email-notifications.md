@@ -6,7 +6,7 @@ Provider: **Resend** transactional email API.
 
 - `NEXT_PUBLIC_APP_URL` – absolute app URL used for CTA/manage links.
 - `RESEND_API_KEY` – API key for `POST https://api.resend.com/emails`.
-- `RESEND_FROM_EMAIL` – verified sender identity (e.g. `notifications@yourdomain.com`).
+- `RESEND_FROM_EMAIL` – verified sender identity. For local quickstart you can use `onboarding@resend.dev`; for production use your verified domain sender (e.g. `notifications@yourdomain.com`).
 
 ## Sending rules
 
