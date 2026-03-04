@@ -390,10 +390,11 @@ export default function PublicProfilePage() {
     const disputeRate = profile?.dispute_rate ?? null;
     const promisePaceMetrics = getLifetimePaceMetrics(promises);
     const profileActiveDays = profile?.reputation_age_days ?? null;
+    const profileAvgDealsPerMonth = profile?.avg_deals_per_month;
     const hasProfilePace =
-      typeof profile?.avg_deals_per_month === "number" && Number.isFinite(profile.avg_deals_per_month);
+      typeof profileAvgDealsPerMonth === "number" && Number.isFinite(profileAvgDealsPerMonth);
     const pace = hasProfilePace
-      ? Number(profile.avg_deals_per_month.toFixed(1))
+      ? Number(profileAvgDealsPerMonth.toFixed(1))
       : profileActiveDays && profileActiveDays > 0
         ? getMonthlyPace(totalDeals, profileActiveDays)
         : promisePaceMetrics.pace;
