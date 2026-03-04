@@ -5,6 +5,13 @@ export type PaceMetricInput = {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+export const getMonthlyPace = (totalDeals: number, activeDays: number) => {
+  if (totalDeals <= 0 || activeDays <= 0) return 0;
+
+  const months = Math.max(1, activeDays / 30);
+  return Number((totalDeals / months).toFixed(1));
+};
+
 export const getLifetimePaceMetrics = (
   promises: PaceMetricInput[],
   nowTimestamp = Date.now()
@@ -33,8 +40,7 @@ export const getLifetimePaceMetrics = (
 
   const startAt = Math.min(...acceptedTimestamps);
   const activeDays = Math.max(1, Math.floor((nowTimestamp - startAt) / DAY_MS));
-  const months = Math.max(1, activeDays / 30);
-  const pace = Number((totalDeals / months).toFixed(1));
+  const pace = getMonthlyPace(totalDeals, activeDays);
 
   return {
     totalDeals,
