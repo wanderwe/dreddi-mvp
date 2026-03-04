@@ -1,5 +1,6 @@
 export type PaceMetricInput = {
   accepted_at: string | null;
+  counterparty_accepted_at?: string | null;
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -9,13 +10,15 @@ export const getLifetimePaceMetrics = (
   nowTimestamp = Date.now()
 ) => {
   const acceptedTimestamps = promises.flatMap((promise) => {
-    if (!promise.accepted_at) return [];
+    const candidateTimestamps = [promise.accepted_at, promise.counterparty_accepted_at]
+      .filter((value): value is string => Boolean(value))
+      .map((value) => new Date(value).getTime())
+      .filter((value) => !Number.isNaN(value) && value <= nowTimestamp)
+      .sort((a, b) => a - b);
 
-    const acceptedTimestamp = new Date(promise.accepted_at).getTime();
-    if (Number.isNaN(acceptedTimestamp)) return [];
-    if (acceptedTimestamp > nowTimestamp) return [];
+    if (candidateTimestamps.length === 0) return [];
 
-    return [acceptedTimestamp];
+    return [candidateTimestamps[0]];
   });
 
   const totalDeals = acceptedTimestamps.length;

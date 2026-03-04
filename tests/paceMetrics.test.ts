@@ -57,3 +57,17 @@ test("returns zero pace and zero active days when no confirmed deals exist", () 
   assert.equal(metrics.activeDays, 0);
   assert.equal(metrics.pace, 0);
 });
+
+test("uses counterparty acceptance timestamp when accepted_at is missing", () => {
+  const metrics = getLifetimePaceMetrics(
+    [
+      { accepted_at: null, counterparty_accepted_at: "2026-05-20T10:00:00.000Z" },
+      { accepted_at: null, counterparty_accepted_at: "2026-05-28T10:00:00.000Z" },
+    ],
+    NOW
+  );
+
+  assert.equal(metrics.totalDeals, 2);
+  assert.equal(metrics.activeDays, 12);
+  assert.equal(metrics.pace, 2);
+});
