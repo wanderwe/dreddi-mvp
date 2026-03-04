@@ -378,7 +378,7 @@ export default function NotificationsClient() {
                         <Link
                           href={ctaUrl}
                           onClick={() => unread && void markAsRead(row.id)}
-                          className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-3 py-1 text-center text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
+                          className="flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-center text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:inline-flex sm:min-h-0 sm:w-auto sm:rounded-full"
                         >
                           {ctaLabel}
                         </Link>
@@ -387,7 +387,7 @@ export default function NotificationsClient() {
                         <button
                           type="button"
                           onClick={() => void markAsRead(row.id)}
-                          className="min-h-12 w-full cursor-pointer rounded-xl border border-transparent px-3 py-1 text-center text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-none"
+                          className="inline-flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-transparent px-3 py-2 text-center text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-none"
                         >
                           {t("notifications.markRead")}
                         </button>
