@@ -90,7 +90,13 @@
     "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
     "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
-    "save": "Save"
+    "save": "Save",
+    "emailProviderStatus": "Email provider",
+    "configured": "Configured",
+    "notConfigured": "Not configured",
+    "lastEmailAttempt": "Last email attempt",
+    "noAttempts": "No attempts yet",
+    "refresh": "Refresh status"
   },
   "promises": {
     "entity": {

@@ -34,6 +34,17 @@ type ProfileState = {
   deadlineRemindersEnabled: boolean;
 };
 
+type EmailHealthStatus = "sent" | "failed" | "disabled" | "provider_not_configured";
+
+type EmailHealthState = {
+  provider: string;
+  providerConfigured: boolean;
+  lastAttempt: {
+    status: EmailHealthStatus;
+    createdAt: string;
+  } | null;
+};
+
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
   const t = useT();
   const [authState, setAuthState] = useState<AuthState | null>(null);
@@ -50,6 +61,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
+  const [emailHealth, setEmailHealth] = useState<EmailHealthState | null>(null);
+  const [emailHealthLoading, setEmailHealthLoading] = useState(false);
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
@@ -165,6 +178,53 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       active = false;
     };
   }, [t]);
+
+  const loadEmailHealth = async () => {
+    if (authState?.isMock) {
+      setEmailHealth({
+        provider: "none",
+        providerConfigured: false,
+        lastAttempt: null,
+      });
+      return;
+    }
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch {
+      return;
+    }
+
+    setEmailHealthLoading(true);
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !sessionData.session?.access_token) {
+      setEmailHealthLoading(false);
+      return;
+    }
+
+    const response = await fetch("/api/notifications/email/health", {
+      headers: {
+        Authorization: `Bearer ${sessionData.session.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      setEmailHealthLoading(false);
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as EmailHealthState | null;
+    if (body) {
+      setEmailHealth(body);
+    }
+    setEmailHealthLoading(false);
+  };
+
+  useEffect(() => {
+    void loadEmailHealth();
+  }, [authState?.isMock]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -858,6 +918,43 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             profile?.deadlineRemindersEnabled ? "translate-x-5" : "translate-x-1"
                           }`}
                         />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                  <div className="space-y-1 text-xs text-slate-300">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-200">{t("profileSettings.emailProviderStatus")}</span>
+                      <span
+                        className={`font-medium ${
+                          emailHealth?.providerConfigured ? "text-emerald-300" : "text-amber-300"
+                        }`}
+                      >
+                        {emailHealth?.providerConfigured
+                          ? t("profileSettings.configured")
+                          : t("profileSettings.notConfigured")}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-slate-200">{t("profileSettings.lastEmailAttempt")}</span>
+                      <span className="font-medium text-slate-100">
+                        {emailHealth?.lastAttempt
+                          ? `${emailHealth.lastAttempt.status} · ${new Date(
+                              emailHealth.lastAttempt.createdAt
+                            ).toLocaleString()}`
+                          : t("profileSettings.noAttempts")}
+                      </span>
+                    </div>
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => void loadEmailHealth()}
+                        disabled={emailHealthLoading}
+                        className="rounded-md border border-white/15 px-2 py-1 text-[11px] font-semibold text-slate-100 hover:border-emerald-300/50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {emailHealthLoading ? t("profileSettings.loading") : t("profileSettings.refresh")}
                       </button>
                     </div>
                   </div>
