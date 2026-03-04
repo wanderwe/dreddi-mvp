@@ -30,7 +30,7 @@ test("public profile track record card keeps legacy monthly pace + activity form
   );
   assert.equal(
     ukMessages.publicProfile.reputationDetails.trackRecord.activeDays,
-    "активність {count} {label}"
+    "активність {count} днів"
   );
   assert.equal(
     enMessages.publicProfile.reputationDetails.trackRecord.perMonthValue,
@@ -38,6 +38,6 @@ test("public profile track record card keeps legacy monthly pace + activity form
   );
   assert.equal(
     enMessages.publicProfile.reputationDetails.trackRecord.activeDays,
-    "active {count} {label}"
+    "active {count} days"
   );
 });
