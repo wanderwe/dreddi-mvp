@@ -257,6 +257,8 @@ export const mapPriorityForType = (type: NotificationType): NotificationPriority
       return "high";
     case "overdue":
     case "reminder_overdue":
+    case "deadline_passed":
+    case "manual_reminder":
       return "high";
     default:
       return "normal";

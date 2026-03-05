@@ -43,7 +43,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     overdue: {
       title: "Agreement is overdue",
-      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done.",
+      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
     marked_completed: {
@@ -66,9 +66,19 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
       ctaLabel: "View",
     },
+    deadline_passed: {
+      title: "Agreement deadline passed",
+      body: "Review the agreement and mark it completed if it’s done",
+      ctaLabel: "Open",
+    },
+    manual_reminder: {
+      title: "Agreement reminder",
+      body: "Review the agreement and mark it completed if it’s done",
+      ctaLabel: "Open",
+    },
     reminder_overdue: {
       title: "Agreement is overdue",
-      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done.",
+      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
     completion_waiting: {
@@ -120,7 +130,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     overdue: {
       title: "Дедлайн минув",
-      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено.",
+      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
       ctaLabel: "Відкрити",
     },
     marked_completed: {
@@ -143,9 +153,19 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Причина: дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
       ctaLabel: "Переглянути",
     },
+    deadline_passed: {
+      title: "Дедлайн угоди минув",
+      body: "Перегляньте угоду та позначте виконаною, якщо все завершено",
+      ctaLabel: "Відкрити",
+    },
+    manual_reminder: {
+      title: "Нагадування про угоду",
+      body: "Перегляньте угоду та позначте виконаною, якщо все завершено",
+      ctaLabel: "Відкрити",
+    },
     reminder_overdue: {
       title: "Дедлайн минув",
-      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено.",
+      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
       ctaLabel: "Відкрити",
     },
     completion_waiting: {

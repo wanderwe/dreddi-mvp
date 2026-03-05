@@ -8,6 +8,8 @@ export type NotificationType =
   | "confirmed"
   | "disputed"
   | "reminder_due_24h"
+  | "deadline_passed"
+  | "manual_reminder"
   | "reminder_overdue"
   | "due_soon"
   | "overdue"

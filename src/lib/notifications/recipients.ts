@@ -8,7 +8,7 @@ export type NotificationEvent =
   | "confirmed"
   | "disputed"
   | "reminder_due_24h"
-  | "reminder_overdue";
+  | "deadline_passed";
 
 export type PromiseNotificationContext = PromiseAcceptance & {
   id: string;
@@ -64,7 +64,7 @@ export const getNotificationRecipients = (
     case "disputed":
       return addRecipient(promise, executorId, actorId);
     case "reminder_due_24h":
-    case "reminder_overdue":
+    case "deadline_passed":
       return addRecipient(promise, executorId, actorId);
     default:
       return [];
@@ -83,8 +83,8 @@ export const getNotificationDedupeKey = (event: NotificationEvent, promiseId: st
       return `disputed:${promiseId}`;
     case "reminder_due_24h":
       return `reminder_due_24h:${promiseId}`;
-    case "reminder_overdue":
-      return `reminder_overdue:${promiseId}`;
+    case "deadline_passed":
+      return `deadline_passed:${promiseId}`;
     default:
       return `event:${promiseId}`;
   }
@@ -102,8 +102,8 @@ export const mapEventToNotificationType = (event: NotificationEvent): Notificati
       return "disputed";
     case "reminder_due_24h":
       return "reminder_due_24h";
-    case "reminder_overdue":
-      return "reminder_overdue";
+    case "deadline_passed":
+      return "deadline_passed";
     default:
       return "accepted";
   }
