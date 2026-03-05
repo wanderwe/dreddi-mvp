@@ -9,6 +9,8 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "completion_waiting",
   "reminder_due_24h",
   "reminder_overdue",
+  "deadline_passed",
+  "manual_reminder",
   "due_soon",
   "overdue",
 ]);
@@ -136,7 +138,18 @@ const resolveEmailCopy = (payload: EmailPayload) => {
       });
       return { subject: "Deal due soon", ...content };
     }
+    case "manual_reminder": {
+      const content = renderTemplate({
+        heading: "Agreement reminder",
+        message: payload.body || "Review the agreement and mark it completed if it's done.",
+        ctaLabel: "Open agreement",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "Agreement reminder", ...content };
+    }
     case "reminder_overdue":
+    case "deadline_passed":
     case "overdue": {
       const content = renderTemplate({
         heading: "Deal is overdue",

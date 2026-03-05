@@ -250,7 +250,7 @@ const runCron = async (req: Request) => {
       try {
         const [result] = await dispatchNotificationEvent({
           admin,
-          event: "reminder_overdue",
+          event: "deadline_passed",
           promise: row,
           requiresDeadlineReminder: true,
         });
