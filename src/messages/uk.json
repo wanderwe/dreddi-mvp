@@ -90,11 +90,7 @@
     "emailDescription": "Транзакційні листи про запрошення та нагадування щодо дедлайнів",
     "deadlineLabel": "Нагадування про дедлайн",
     "deadlineDescription": "Коли увімкнено, ви отримуєте нагадування перед завершенням угоди з дедлайном",
-    "save": "Зберегти",
-    "lastEmailAttempt": "Остання спроба email",
-    "noAttempts": "Спроб ще не було",
-    "refresh": "Оновити статус",
-    "emailTemporarilyUnavailable": "Email-сповіщення тимчасово недоступні"
+    "save": "Зберегти"
   },
   "promises": {
     "entity": {
