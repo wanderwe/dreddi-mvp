@@ -502,6 +502,8 @@ export default function PromisesClient() {
   const countOtherExecutor = roleCounts.counterparty;
 
   const rows = filteredListRowsByTab[tab];
+  const totalRowsForCurrentView = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
+  const canLoadMore = hasMoreByTab[tab] && rows.length < totalRowsForCurrentView;
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
@@ -629,7 +631,7 @@ export default function PromisesClient() {
   };
 
   const handleLoadMore = async () => {
-    if (loadingMore || listLoading || !hasMoreByTab[tab]) return;
+    if (loadingMore || listLoading || !canLoadMore) return;
     const nextPage = pageByTab[tab] + 1;
     setLoadingMore(true);
     try {
@@ -901,7 +903,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!listLoading && rows.length > 0 && hasMoreByTab[tab] && (
+            {!listLoading && rows.length > 0 && canLoadMore && (
               <div className="flex justify-center pt-2">
                 <button
                   type="button"
