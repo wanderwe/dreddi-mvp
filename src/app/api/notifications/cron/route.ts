@@ -5,6 +5,14 @@ import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
 
+const REQUIRED_ENV_VARS = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+] as const;
+
+const missingRequiredEnvVars = () =>
+  REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
+
 type PromiseNotificationState = {
   due_soon_notified_at?: string | null;
   overdue_notified_at?: string | null;
@@ -64,6 +72,15 @@ const runCron = async (req: Request) => {
     emailsSent: 0,
     errors: [],
   };
+
+  const missingEnvVars = missingRequiredEnvVars();
+  if (missingEnvVars.length > 0) {
+    const message = `Missing required environment variables: ${missingEnvVars.join(", ")}`;
+    response.errors.push(message);
+    console.error("[notifications] cron_env_missing", { missingEnvVars });
+
+    return NextResponse.json(response, { status: 500 });
+  }
 
   console.info("[notifications] cron_start", {
     route: "cron",
