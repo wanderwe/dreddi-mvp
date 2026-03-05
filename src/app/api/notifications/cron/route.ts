@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
 const HOURS_24 = 24 * 60 * 60 * 1000;
 
@@ -94,6 +95,7 @@ const runCron = async (req: Request) => {
 
   for (const row of dueSoonRows ?? []) {
     if (!row.due_at) continue;
+    if (!isPromiseAccepted(row)) continue;
 
     const state = getNotificationState(row.promise_notification_state);
     if (state.due_soon_notified_at) continue;
@@ -159,6 +161,7 @@ const runCron = async (req: Request) => {
 
   for (const row of overdueRows ?? []) {
     if (!row.due_at) continue;
+    if (!isPromiseAccepted(row)) continue;
 
     const state = getNotificationState(row.promise_notification_state);
 
