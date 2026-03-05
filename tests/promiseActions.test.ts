@@ -55,6 +55,18 @@ test("awaiting others mirrors CTA responsibility", () => {
   assert.equal(isAwaitingOthers(row), true);
 });
 
+test("promisor with completed status is not awaiting others before acceptance", () => {
+  const row: FixtureRow = {
+    role: "promisor",
+    status: "completed_by_promisor",
+    inviteStatus: "awaiting_acceptance",
+    isReviewer: false,
+  };
+
+  assert.equal(isAwaitingYourAction(row), false);
+  assert.equal(isAwaitingOthers(row), false);
+});
+
 test("counterparty with an active accepted promise is awaiting the promisor", () => {
   const row: FixtureRow = { role: "counterparty", status: "active", inviteStatus: "accepted", isReviewer: true };
 

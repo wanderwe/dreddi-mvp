@@ -337,7 +337,7 @@ export default function Home() {
       const { data, error } = await client
         .from("promises")
         .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at,invite_status,accepted_at,counterparty_accepted_at,ignored_at,expires_at,cancelled_at")
-        .or(`creator_id.eq.${userId},counterparty_id.eq.${userId}`)
+        .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(3);
 

@@ -115,7 +115,7 @@ const buildBaseFilter = (id: string) =>
   `promisor_id.eq.${id},promisee_id.eq.${id},creator_id.eq.${id},counterparty_id.eq.${id}`;
 
 const buildPromisorFilter = (id: string) =>
-  `promisor_id.eq.${id},and(promisor_id.is.null,promisee_id.is.null,creator_id.eq.${id})`;
+  `promisor_id.eq.${id},and(promisor_id.is.null,promisee_id.is.null,creator_id.eq.${id}),and(promisor_id.is.null,counterparty_id.eq.${id},promisee_id.not.eq.${id})`;
 
 const buildCounterpartyFilter = (id: string) =>
   // Regression test case: accepted deal where promisor_id === counterparty_id === userId

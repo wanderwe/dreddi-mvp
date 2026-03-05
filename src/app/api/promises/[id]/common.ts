@@ -48,7 +48,12 @@ export async function loadPromiseForUser(id: string, userId: string) {
     return NextResponse.json({ error: "Deal has unsupported status" }, { status: 400 });
   }
 
-  if (promise.creator_id !== userId && promise.counterparty_id !== userId) {
+  if (
+    promise.creator_id !== userId &&
+    promise.counterparty_id !== userId &&
+    promise.promisor_id !== userId &&
+    promise.promisee_id !== userId
+  ) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
