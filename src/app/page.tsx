@@ -559,6 +559,12 @@ export default function Home() {
             <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
+            <Link
+              href="/why"
+              className="inline-flex text-sm font-medium text-slate-300/80 transition-colors hover:text-emerald-200"
+            >
+              {copy.hero.whyLink}
+            </Link>
           </div>
 
           {!showAuthenticatedCta ? (
