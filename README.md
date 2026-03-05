@@ -80,5 +80,13 @@ and track fulfillment or breach over time.
 3) Install Playwright (first time only): `npm install -D @playwright/test` then `npx playwright install`.
 4) Run UI tests: `npm run test:ui`.
 
+## External Cron (cron-job.org)
+- We no longer use Vercel Cron on Hobby, so external scheduling is used for notifications.
+- Trigger URL example:
+  - `https://dreddi.com/api/notifications/cron?token=<CRON_SECRET>`
+- You can schedule this on cron-job.org every 5, 10, or 15 minutes.
+- For connectivity/auth debugging (without sending emails), call:
+  - `https://dreddi.com/api/notifications/cron-smoke?token=<CRON_SECRET>`
+
 ## Status
 Early MVP / in active development.

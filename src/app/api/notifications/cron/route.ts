@@ -10,12 +10,21 @@ const REQUIRED_ENV_VARS = [
   "SUPABASE_SERVICE_ROLE_KEY",
 ] as const;
 
-const missingRequiredEnvVars = () =>
-  REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
-
 type PromiseNotificationState = {
   due_soon_notified_at?: string | null;
   overdue_notified_at?: string | null;
+};
+
+type CronSuccessResponse = {
+  ok: true;
+  processed: number;
+  emailsSent: number;
+  errors: string[];
+};
+
+type CronErrorResponse = {
+  ok: false;
+  error: string;
 };
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
@@ -36,30 +45,55 @@ const getNotificationState = (raw: unknown): PromiseNotificationState => {
   };
 };
 
-type CronResponse = {
-  processed: number;
-  emailsSent: number;
-  errors: string[];
-};
+const unauthorizedResponse = () =>
+  NextResponse.json<CronErrorResponse>(
+    { ok: false, error: "unauthorized" },
+    { status: 401 }
+  );
+
+const missingCronSecretResponse = () =>
+  NextResponse.json<CronErrorResponse>(
+    { ok: false, error: "cron_secret_missing" },
+    { status: 500 }
+  );
 
 const getCronSecret = () =>
   process.env.CRON_SECRET ?? process.env.NOTIFICATIONS_CRON_SECRET;
 
-const unauthorizedResponse = () =>
-  NextResponse.json<CronResponse>(
-    { processed: 0, emailsSent: 0, errors: ["Unauthorized"] },
-    { status: 401 }
-  );
+const missingRequiredEnvVars = () =>
+  REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
 
-const authorizeCron = (req: Request): NextResponse<CronResponse> | null => {
-  const secret = getCronSecret();
+const getTokenFromAuthHeader = (req: Request) => {
   const authHeader = req.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
 
-  if (!secret || !authHeader || authHeader !== `Bearer ${secret}`) {
-    return unauthorizedResponse();
+  return authHeader.slice("Bearer ".length).trim();
+};
+
+const getTokenFromQuery = (req: Request) =>
+  new URL(req.url).searchParams.get("token");
+
+const authorizeCron = (
+  req: Request
+): NextResponse<CronErrorResponse> | null => {
+  const secret = getCronSecret();
+
+  if (!secret) {
+    console.error("[notifications] cron_secret_missing", {
+      ts: new Date().toISOString(),
+      route: "cron",
+    });
+    return missingCronSecretResponse();
   }
 
-  return null;
+  const queryToken = getTokenFromQuery(req);
+  const bearerToken = getTokenFromAuthHeader(req);
+
+  if (queryToken === secret || bearerToken === secret) {
+    return null;
+  }
+
+  return unauthorizedResponse();
 };
 
 const runCron = async (req: Request) => {
@@ -67,7 +101,8 @@ const runCron = async (req: Request) => {
   if (unauthorized) return unauthorized;
 
   const startedAt = new Date().toISOString();
-  const response: CronResponse = {
+  const response: CronSuccessResponse = {
+    ok: true,
     processed: 0,
     emailsSent: 0,
     errors: [],
@@ -89,6 +124,7 @@ const runCron = async (req: Request) => {
       resendKey: Boolean(process.env.RESEND_API_KEY),
       from: Boolean(process.env.RESEND_FROM_EMAIL),
       appUrl: Boolean(process.env.NEXT_PUBLIC_APP_URL),
+      cronSecret: Boolean(getCronSecret()),
     },
   });
 
@@ -115,14 +151,14 @@ const runCron = async (req: Request) => {
       skipReasonCounts[reason] = (skipReasonCounts[reason] ?? 0) + 1;
     };
 
-  const { data: dueSoonRows, error: dueSoonFetchError } = await admin
-    .from("promises")
-    .select(
-      "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(due_soon_notified_at)"
-    )
-    .eq("status", "active")
-    .gte("due_at", nowIso)
-    .lte("due_at", dueSoonCutoff);
+    const { data: dueSoonRows, error: dueSoonFetchError } = await admin
+      .from("promises")
+      .select(
+        "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(due_soon_notified_at)"
+      )
+      .eq("status", "active")
+      .gte("due_at", nowIso)
+      .lte("due_at", dueSoonCutoff);
 
     if (dueSoonFetchError) {
       response.errors.push(`Due soon fetch failed: ${dueSoonFetchError.message}`);
@@ -136,59 +172,59 @@ const runCron = async (req: Request) => {
     });
 
     for (const row of dueSoonRows ?? []) {
-    if (!row.due_at) continue;
-    if (!isPromiseAccepted(row)) continue;
+      if (!row.due_at) continue;
+      if (!isPromiseAccepted(row)) continue;
 
-    const state = getNotificationState(row.promise_notification_state);
-    if (state.due_soon_notified_at) continue;
+      const state = getNotificationState(row.promise_notification_state);
+      if (state.due_soon_notified_at) continue;
 
-    processed.dueSoon += 1;
+      processed.dueSoon += 1;
 
-    try {
-      const [result] = await dispatchNotificationEvent({
-        admin,
-        event: "reminder_due_24h",
-        promise: row,
-        requiresDeadlineReminder: true,
-      });
-      trackSkip(result?.outcome.skippedReason);
+      try {
+        const [result] = await dispatchNotificationEvent({
+          admin,
+          event: "reminder_due_24h",
+          promise: row,
+          requiresDeadlineReminder: true,
+        });
+        trackSkip(result?.outcome.skippedReason);
 
-      if (result?.outcome.created) {
-        const { error: upsertError } = await admin
-          .from("promise_notification_state")
-          .upsert({
-            promise_id: row.id,
-            due_soon_notified_at: nowIso,
-            updated_at: nowIso,
-          });
+        if (result?.outcome.created) {
+          const { error: upsertError } = await admin
+            .from("promise_notification_state")
+            .upsert({
+              promise_id: row.id,
+              due_soon_notified_at: nowIso,
+              updated_at: nowIso,
+            });
 
-        if (upsertError) {
-          response.errors.push(`Due soon state upsert failed for ${row.id}`);
-          console.error("[notifications] cron_due_soon_state_upsert_failed", {
-            promiseId: row.id,
-            error: upsertError,
-          });
-          continue;
+          if (upsertError) {
+            response.errors.push(`Due soon state upsert failed for ${row.id}`);
+            console.error("[notifications] cron_due_soon_state_upsert_failed", {
+              promiseId: row.id,
+              error: upsertError,
+            });
+            continue;
+          }
+
+          results.dueSoon += 1;
         }
-
-        results.dueSoon += 1;
+      } catch (error) {
+        response.errors.push(`Due soon dispatch failed for ${row.id}`);
+        console.error("[notifications] cron_due_soon_dispatch_failed", {
+          promiseId: row.id,
+          error,
+        });
       }
-    } catch (error) {
-      response.errors.push(`Due soon dispatch failed for ${row.id}`);
-      console.error("[notifications] cron_due_soon_dispatch_failed", {
-        promiseId: row.id,
-        error,
-      });
     }
-  }
 
-  const { data: overdueRows, error: overdueFetchError } = await admin
-    .from("promises")
-    .select(
-      "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(overdue_notified_at)"
-    )
-    .eq("status", "active")
-    .lte("due_at", overdueCutoff);
+    const { data: overdueRows, error: overdueFetchError } = await admin
+      .from("promises")
+      .select(
+        "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(overdue_notified_at)"
+      )
+      .eq("status", "active")
+      .lte("due_at", overdueCutoff);
 
     if (overdueFetchError) {
       response.errors.push(`Overdue fetch failed: ${overdueFetchError.message}`);
@@ -202,52 +238,52 @@ const runCron = async (req: Request) => {
     });
 
     for (const row of overdueRows ?? []) {
-    if (!row.due_at) continue;
-    if (!isPromiseAccepted(row)) continue;
+      if (!row.due_at) continue;
+      if (!isPromiseAccepted(row)) continue;
 
-    const state = getNotificationState(row.promise_notification_state);
+      const state = getNotificationState(row.promise_notification_state);
 
-    if (state.overdue_notified_at) continue;
+      if (state.overdue_notified_at) continue;
 
-    processed.overdue += 1;
+      processed.overdue += 1;
 
-    try {
-      const [result] = await dispatchNotificationEvent({
-        admin,
-        event: "reminder_overdue",
-        promise: row,
-        requiresDeadlineReminder: true,
-      });
-      trackSkip(result?.outcome.skippedReason);
+      try {
+        const [result] = await dispatchNotificationEvent({
+          admin,
+          event: "reminder_overdue",
+          promise: row,
+          requiresDeadlineReminder: true,
+        });
+        trackSkip(result?.outcome.skippedReason);
 
-      if (result?.outcome.created) {
-        const { error: upsertError } = await admin
-          .from("promise_notification_state")
-          .upsert({
-            promise_id: row.id,
-            overdue_notified_at: nowIso,
-            updated_at: nowIso,
-          });
+        if (result?.outcome.created) {
+          const { error: upsertError } = await admin
+            .from("promise_notification_state")
+            .upsert({
+              promise_id: row.id,
+              overdue_notified_at: nowIso,
+              updated_at: nowIso,
+            });
 
-        if (upsertError) {
-          response.errors.push(`Overdue state upsert failed for ${row.id}`);
-          console.error("[notifications] cron_overdue_state_upsert_failed", {
-            promiseId: row.id,
-            error: upsertError,
-          });
-          continue;
+          if (upsertError) {
+            response.errors.push(`Overdue state upsert failed for ${row.id}`);
+            console.error("[notifications] cron_overdue_state_upsert_failed", {
+              promiseId: row.id,
+              error: upsertError,
+            });
+            continue;
+          }
+
+          results.overdue += 1;
         }
-
-        results.overdue += 1;
+      } catch (error) {
+        response.errors.push(`Overdue dispatch failed for ${row.id}`);
+        console.error("[notifications] cron_overdue_dispatch_failed", {
+          promiseId: row.id,
+          error,
+        });
       }
-    } catch (error) {
-      response.errors.push(`Overdue dispatch failed for ${row.id}`);
-      console.error("[notifications] cron_overdue_dispatch_failed", {
-        promiseId: row.id,
-        error,
-      });
     }
-  }
 
     const remindersFound = (dueSoonRows?.length ?? 0) + (overdueRows?.length ?? 0);
     response.processed = processed.dueSoon + processed.overdue;
