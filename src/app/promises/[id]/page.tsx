@@ -167,7 +167,8 @@ export default function PromisePage() {
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
+  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const [conditionBusy, setConditionBusy] = useState(false);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
@@ -469,6 +470,12 @@ export default function PromisePage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const setCopyFeedback = (status: "success" | "error") => {
     if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
     setCopyStatus(status);
@@ -520,6 +527,50 @@ export default function PromisePage() {
     }
   }
 
+  async function respondToDeal(action: "accept" | "decline") {
+    if (!p) return;
+
+    setError(null);
+    setActionBusy(action);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/${action}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    setToast(
+      action === "accept"
+        ? t("promises.detail.acceptedToast", { entity: promiseLabels.entity })
+        : t("promises.detail.declinedToast", { entity: promiseLabels.entity })
+    );
+    await load();
+  }
+
   const executorId = p ? resolveExecutorId(p) : null;
   const counterpartyId = p ? resolveCounterpartyId(p) : null;
   const isExecutor = Boolean(userId && executorId && userId === executorId);
@@ -530,6 +581,13 @@ export default function PromisePage() {
   const canReview = isCounterparty;
   const inviteStatus = getPromiseInviteStatus(p);
   const isInviteAccepted = isPromiseAccepted(p);
+  const canRespondToInvite = Boolean(
+    p &&
+      userId &&
+      userId !== p.creator_id &&
+      inviteStatus === "awaiting_acceptance" &&
+      (!p.counterparty_id || p.counterparty_id === userId)
+  );
   const uiStatus = p ? getPromiseUiStatus(p) : null;
   const statusLabelMap: Record<PromiseUiStatus, string> = {
     active: t("promises.status.active"),
@@ -546,8 +604,9 @@ export default function PromisePage() {
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite;
   const hasStatusActions = Boolean(
-    (isExecutor && p?.status === "active" && isInviteAccepted) ||
-      (canReview && p?.status === "completed_by_promisor")
+      (isExecutor && p?.status === "active" && isInviteAccepted) ||
+      (canReview && p?.status === "completed_by_promisor") ||
+      (canRespondToInvite && p?.status === "active")
   );
   const showPublicStatus = p?.visibility === "public";
   const publicStatusText = showPublicStatus
@@ -577,6 +636,12 @@ export default function PromisePage() {
       {error && (
         <div className="rounded-2xl border border-red-900/40 bg-red-950/20 p-4 text-red-300">
           {error}
+        </div>
+      )}
+
+      {toast && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-100">
+          {toast}
         </div>
       )}
 
@@ -684,6 +749,25 @@ export default function PromisePage() {
                   >
                     {t("promises.detail.reviewConfirm")}
                   </Link>
+                )}
+
+                {canRespondToInvite && p.status === "active" && (
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <ActionButton
+                      label={t("promises.detail.acceptAction")}
+                      variant="ok"
+                      loading={actionBusy === "accept"}
+                      disabled={actionBusy !== null}
+                      onClick={() => void respondToDeal("accept")}
+                    />
+                    <ActionButton
+                      label={t("promises.detail.declineAction")}
+                      variant="danger"
+                      loading={actionBusy === "decline"}
+                      disabled={actionBusy !== null}
+                      onClick={() => void respondToDeal("decline")}
+                    />
+                  </div>
                 )}
               </div>
             </Card>

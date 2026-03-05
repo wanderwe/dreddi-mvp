@@ -260,7 +260,11 @@
         "unsupportedStatus": "{entity} has an unsupported status value",
         "updateStatus": "Could not update status",
         "copyClipboard": "Could not copy to clipboard"
-      }
+      },
+      "acceptAction": "Accept",
+      "declineAction": "Decline",
+      "acceptedToast": "{entity} accepted",
+      "declinedToast": "{entity} declined"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",

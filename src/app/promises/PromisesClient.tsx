@@ -120,7 +120,7 @@ const buildPromisorFilter = (id: string) =>
 const buildCounterpartyFilter = (id: string) =>
   // Regression test case: accepted deal where promisor_id === counterparty_id === userId
   // must not appear in the "Other executor" tab (only "I'm the executor").
-  `promisee_id.eq.${id},and(counterparty_id.eq.${id},promisor_id.not.eq.${id}),and(creator_id.eq.${id},or(promisor_id.not.is.null,promisee_id.not.is.null),promisor_id.not.eq.${id})`;
+  `promisee_id.eq.${id},and(counterparty_id.eq.${id},or(promisor_id.is.null,promisor_id.not.eq.${id})),and(creator_id.eq.${id},or(promisor_id.not.is.null,promisee_id.not.is.null),or(promisor_id.is.null,promisor_id.not.eq.${id}))`;
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
