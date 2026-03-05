@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { lookupInvitePreview } from "@/lib/invitePreview";
 
-const OG_IMAGE_URL = "https://dreddi.com/og.png";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
 const INVITE_METADATA_COPY = {
@@ -41,20 +40,11 @@ export async function generateMetadata(ctx: {
       type: "website",
       url: canonicalUrl,
       locale: copy.locale,
-      images: [
-        {
-          url: OG_IMAGE_URL,
-          width: 1200,
-          height: 630,
-          alt: "Dreddi",
-        },
-      ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: agreementTitle,
       description: copy.description,
-      images: [OG_IMAGE_URL],
     },
   };
 }
