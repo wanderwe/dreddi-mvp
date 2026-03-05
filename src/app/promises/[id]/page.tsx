@@ -734,11 +734,13 @@ export default function PromisePage() {
                       onClick={() => setShowConfirmModal(true)}
                     />
                   ) : (
-                    <div className="text-sm text-neutral-400">
-                      {inviteStatus === "awaiting_acceptance"
-                        ? stripTrailingPeriod(t("promises.detail.shareInvite"))
-                        : t(`promises.inviteStatus.${inviteStatus}`)}
-                    </div>
+                    !canRespondToInvite && (
+                      <div className="text-sm text-neutral-400">
+                        {inviteStatus === "awaiting_acceptance"
+                          ? stripTrailingPeriod(t("promises.detail.shareInvite"))
+                          : t(`promises.inviteStatus.${inviteStatus}`)}
+                      </div>
+                    )
                   )
                 )}
 

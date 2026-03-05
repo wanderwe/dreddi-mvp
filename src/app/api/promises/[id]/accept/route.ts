@@ -37,16 +37,30 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const nowIso = new Date().toISOString();
     const admin = getAdminClient();
 
+    const updatePayload: {
+      invite_status: "accepted";
+      accepted_at: string;
+      counterparty_accepted_at: string;
+      declined_at: null;
+      ignored_at: null;
+      cancelled_at: null;
+      promisor_id?: string;
+    } = {
+      invite_status: "accepted",
+      accepted_at: nowIso,
+      counterparty_accepted_at: nowIso,
+      declined_at: null,
+      ignored_at: null,
+      cancelled_at: null,
+    };
+
+    if (!promise.promisor_id && promise.counterparty_id === user.id) {
+      updatePayload.promisor_id = user.id;
+    }
+
     const { error: updateError } = await admin
       .from("promises")
-      .update({
-        invite_status: "accepted",
-        accepted_at: nowIso,
-        counterparty_accepted_at: nowIso,
-        declined_at: null,
-        ignored_at: null,
-        cancelled_at: null,
-      })
+      .update(updatePayload)
       .eq("id", id)
       .eq("invite_status", "awaiting_acceptance");
 
