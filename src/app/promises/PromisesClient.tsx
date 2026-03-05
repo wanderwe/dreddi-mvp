@@ -15,6 +15,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { getPromiseLabels } from "@/lib/promiseLabels";
 import {
   getPromiseInviteStatus,
   isPromiseAccepted,
@@ -142,6 +143,8 @@ export default function PromisesClient() {
     }),
     [t]
   );
+
+  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   const statusLabelForRole = (
     status: PromiseStatus,
@@ -933,7 +936,7 @@ export default function PromisesClient() {
               {t("promises.confirmModal.title")}
             </h2>
             <p className="mt-3 text-sm text-neutral-200">
-              {t("promises.confirmModal.body")}
+              {t("promises.confirmModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
