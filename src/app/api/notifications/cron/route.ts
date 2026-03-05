@@ -16,7 +16,6 @@ type PromiseNotificationState = {
 };
 
 type CronSuccessResponse = {
-  ok: true;
   processed: number;
   emailsSent: number;
   errors: string[];
@@ -70,9 +69,6 @@ const getTokenFromAuthHeader = (req: Request) => {
   return authHeader.slice("Bearer ".length).trim();
 };
 
-const getTokenFromQuery = (req: Request) =>
-  new URL(req.url).searchParams.get("token");
-
 const authorizeCron = (
   req: Request
 ): NextResponse<CronErrorResponse> | null => {
@@ -86,10 +82,8 @@ const authorizeCron = (
     return missingCronSecretResponse();
   }
 
-  const queryToken = getTokenFromQuery(req);
   const bearerToken = getTokenFromAuthHeader(req);
-
-  if (queryToken === secret || bearerToken === secret) {
+  if (bearerToken === secret) {
     return null;
   }
 
@@ -102,7 +96,6 @@ const runCron = async (req: Request) => {
 
   const startedAt = new Date().toISOString();
   const response: CronSuccessResponse = {
-    ok: true,
     processed: 0,
     emailsSent: 0,
     errors: [],
@@ -110,10 +103,10 @@ const runCron = async (req: Request) => {
 
   const missingEnvVars = missingRequiredEnvVars();
   if (missingEnvVars.length > 0) {
-    const message = `Missing required environment variables: ${missingEnvVars.join(", ")}`;
-    response.errors.push(message);
+    response.errors.push("env_missing");
     console.error("[notifications] cron_env_missing", { missingEnvVars });
 
+    response.errors = [...new Set(response.errors)].sort();
     return NextResponse.json(response, { status: 500 });
   }
 
@@ -161,7 +154,7 @@ const runCron = async (req: Request) => {
       .lte("due_at", dueSoonCutoff);
 
     if (dueSoonFetchError) {
-      response.errors.push(`Due soon fetch failed: ${dueSoonFetchError.message}`);
+      response.errors.push("due_soon_fetch_failed");
       console.error("[notifications] cron_due_soon_fetch_failed", {
         error: dueSoonFetchError,
       });
@@ -199,7 +192,7 @@ const runCron = async (req: Request) => {
             });
 
           if (upsertError) {
-            response.errors.push(`Due soon state upsert failed for ${row.id}`);
+            response.errors.push("due_soon_state_upsert_failed");
             console.error("[notifications] cron_due_soon_state_upsert_failed", {
               promiseId: row.id,
               error: upsertError,
@@ -210,7 +203,7 @@ const runCron = async (req: Request) => {
           results.dueSoon += 1;
         }
       } catch (error) {
-        response.errors.push(`Due soon dispatch failed for ${row.id}`);
+        response.errors.push("due_soon_dispatch_failed");
         console.error("[notifications] cron_due_soon_dispatch_failed", {
           promiseId: row.id,
           error,
@@ -227,7 +220,7 @@ const runCron = async (req: Request) => {
       .lte("due_at", overdueCutoff);
 
     if (overdueFetchError) {
-      response.errors.push(`Overdue fetch failed: ${overdueFetchError.message}`);
+      response.errors.push("overdue_fetch_failed");
       console.error("[notifications] cron_overdue_fetch_failed", {
         error: overdueFetchError,
       });
@@ -266,7 +259,7 @@ const runCron = async (req: Request) => {
             });
 
           if (upsertError) {
-            response.errors.push(`Overdue state upsert failed for ${row.id}`);
+            response.errors.push("overdue_state_upsert_failed");
             console.error("[notifications] cron_overdue_state_upsert_failed", {
               promiseId: row.id,
               error: upsertError,
@@ -277,7 +270,7 @@ const runCron = async (req: Request) => {
           results.overdue += 1;
         }
       } catch (error) {
-        response.errors.push(`Overdue dispatch failed for ${row.id}`);
+        response.errors.push("overdue_dispatch_failed");
         console.error("[notifications] cron_overdue_dispatch_failed", {
           promiseId: row.id,
           error,
@@ -300,11 +293,12 @@ const runCron = async (req: Request) => {
       errors: response.errors,
     });
 
+    response.errors = [...new Set(response.errors)].sort();
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
-    response.errors.push(errorMessage);
+    response.errors.push("cron_failed");
 
     console.error("[notifications] cron_failed", {
       message: errorMessage,
@@ -312,6 +306,7 @@ const runCron = async (req: Request) => {
       error,
     });
 
+    response.errors = [...new Set(response.errors)].sort();
     return NextResponse.json(response, { status: 500 });
   } finally {
     console.info("[notifications] cron_finish", {

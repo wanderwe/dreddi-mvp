@@ -7,6 +7,7 @@ import {
 } from "../src/lib/notifications/policy";
 import { buildDedupeKey } from "../src/lib/notifications/service";
 import { getInviteResponseCopy } from "../src/lib/notifications/inviteResponses";
+import { getNotificationCopy } from "../src/lib/notifications/copy";
 
 const dateAt = (iso: string) => new Date(iso);
 
@@ -83,5 +84,18 @@ describe("invite response notifications", () => {
     assert.equal(copy.title, "Запрошення без відповіді");
     assert.equal(copy.body, "@olena поки що не відповів(ла) на запрошення до угоди: UX аудит");
     assert.equal(copy.ctaLabel, "Відкрити угоду");
+  });
+});
+
+
+describe("manual reminder copy", () => {
+  it("uses non-deadline copy for manual reminders", () => {
+    const copy = getNotificationCopy({
+      locale: "en",
+      type: "reminder_manual",
+    });
+
+    assert.equal(copy.title, "Reminder");
+    assert.equal(copy.body.includes("due date"), false);
   });
 });

@@ -112,16 +112,21 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return errorResponse(500, "reminder_create_failed", "Could not create reminder", insertError.message);
     }
 
+    const reminderType =
+      isActive && promise.due_at ? "reminder_overdue" : isActive ? "reminder_manual" : "marked_completed";
+
     await createNotification(admin, {
       userId: receiverId,
       promiseId: id,
-      type: isActive ? "reminder_overdue" : "marked_completed",
-      dedupeKey: `manual_reminder:${id}:${Math.floor(Date.now() / DAY_MS)}`,
+      type: reminderType,
+      dedupeKey: `manual_reminder:${id}:${reminderType}:${Math.floor(Date.now() / DAY_MS)}`,
       ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
       ctaLabel: "Open",
-      priority: mapPriorityForType(isActive ? "reminder_overdue" : "marked_completed"),
+      priority: mapPriorityForType(reminderType),
       body: isActive
-        ? "The other side reminded you to complete this deal."
+        ? promise.due_at
+          ? "The other side reminded you to complete this deal."
+          : "The other side sent you a reminder on this deal."
         : "The other side reminded you to confirm or dispute this completed deal.",
     });
 

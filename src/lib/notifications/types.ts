@@ -9,6 +9,7 @@ export type NotificationType =
   | "disputed"
   | "reminder_due_24h"
   | "reminder_overdue"
+  | "reminder_manual"
   | "due_soon"
   | "overdue"
   | "completion_waiting"

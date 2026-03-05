@@ -9,6 +9,7 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "completion_waiting",
   "reminder_due_24h",
   "reminder_overdue",
+  "reminder_manual",
   "due_soon",
   "overdue",
 ]);
@@ -136,6 +137,16 @@ const resolveEmailCopy = (payload: EmailPayload) => {
       });
       return { subject: "Deal due soon", ...content };
     }
+    case "reminder_manual": {
+      const content = renderTemplate({
+        heading: "Reminder from your counterparty",
+        message: payload.body || "The other side sent a reminder for this deal.",
+        ctaLabel: "Open deal",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "Deal reminder", ...content };
+    }
     case "reminder_overdue":
     case "overdue": {
       const content = renderTemplate({
@@ -168,6 +179,18 @@ const logEmailSend = async (
 ) => {
   const provider = options?.provider ?? resolveEmailProvider();
   const errorMessage = options?.error?.slice(0, 2000) ?? null;
+
+  const attemptAt = new Date().toISOString();
+  const attemptStatus = status === "sent" ? "sent" : "failed";
+
+  await admin
+    .from("notifications")
+    .update({
+      last_email_attempt_at: attemptAt,
+      last_email_attempt_status: attemptStatus,
+      last_email_attempt_error: errorMessage,
+    })
+    .eq("id", payload.eventId);
 
   await admin.from("notification_email_sends").insert({
     event_id: payload.eventId,
