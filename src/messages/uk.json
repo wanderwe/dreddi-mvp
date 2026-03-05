@@ -268,7 +268,11 @@
         "unsupportedStatus": "Угода має непідтримуваний статус",
         "updateStatus": "Не вдалося оновити статус",
         "copyClipboard": "Не вдалося скопіювати в буфер обміну"
-      }
+      },
+      "acceptAction": "Прийняти",
+      "declineAction": "Відхилити",
+      "acceptedToast": "{entity} прийнято",
+      "declinedToast": "{entity} відхилено"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",

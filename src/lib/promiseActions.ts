@@ -22,10 +22,14 @@ const isInviteAccepted = (inviteStatus: InviteStatus) =>
  * so all surfaces use the same actionable semantics.
  */
 export function isAwaitingYourAction(row: PromiseListItem): boolean {
-  if (row.role === "promisor" && row.status === "active" && isInviteAccepted(row.inviteStatus)) {
+  if (!isInviteAccepted(row.inviteStatus)) {
+    return false;
+  }
+
+  if (row.role === "promisor" && row.status === "active") {
     return true;
   }
-  if (row.isReviewer && row.status === "completed_by_promisor" && isInviteAccepted(row.inviteStatus)) {
+  if (row.isReviewer && row.status === "completed_by_promisor") {
     return true;
   }
   return false;
@@ -36,10 +40,14 @@ export function isAwaitingYourAction(row: PromiseListItem): boolean {
  * items where the counterparty owes the next action.
  */
 export function isAwaitingOthers(row: PromiseListItem): boolean {
+  if (!isInviteAccepted(row.inviteStatus)) {
+    return false;
+  }
+
   if (row.role === "promisor" && row.status === "completed_by_promisor" && !row.isReviewer) {
     return true;
   }
-  if (row.isReviewer && row.role !== "promisor" && row.status === "active" && isInviteAccepted(row.inviteStatus)) {
+  if (row.isReviewer && row.role !== "promisor" && row.status === "active") {
     return true;
   }
   return false;
