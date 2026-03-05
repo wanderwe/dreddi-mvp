@@ -3,9 +3,6 @@ import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 const HOURS_24 = 24 * 60 * 60 * 1000;
 
 type PromiseNotificationState = {
