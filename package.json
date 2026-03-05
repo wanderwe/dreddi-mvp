@@ -11,6 +11,7 @@
     "test": "node --require ./tests/register-ts.js --test tests/**/*.test.ts",
     "test:ui": "playwright test",
     "prepare": "bash scripts/install-githooks.sh",
+    "ci:check": "npm ci",
     "validate:package-json": "node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8'))\"",
     "test:email": "node scripts/send-test-email.mjs"
   },
