@@ -167,7 +167,7 @@ export default function PromisePage() {
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | null>(null);
+  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
   const [conditionBusy, setConditionBusy] = useState(false);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
@@ -320,6 +320,44 @@ export default function PromisePage() {
     }
 
     const res = await fetch(`/api/promises/${p.id}/complete`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    load();
+  }
+
+  async function respondToPromise(nextAction: "accept" | "decline") {
+    if (!p) return;
+    setError(null);
+    setActionBusy(nextAction);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/${nextAction}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.access_token}`,
@@ -545,8 +583,15 @@ export default function PromisePage() {
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite;
+  const canRespondToAcceptance = Boolean(
+    p &&
+      userId &&
+      p.promisee_id === userId &&
+      inviteStatus === "awaiting_acceptance"
+  );
   const hasStatusActions = Boolean(
-    (isExecutor && p?.status === "active" && isInviteAccepted) ||
+    canRespondToAcceptance ||
+      (isExecutor && p?.status === "active" && isInviteAccepted) ||
       (canReview && p?.status === "completed_by_promisor")
   );
   const showPublicStatus = p?.visibility === "public";
@@ -659,6 +704,25 @@ export default function PromisePage() {
           {hasStatusActions && (
             <Card title={t("promises.detail.statusActions")}>
               <div className="space-y-3">
+                {canRespondToAcceptance && (
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <ActionButton
+                      label={t("promises.detail.accept")}
+                      variant="ok"
+                      loading={actionBusy === "accept"}
+                      disabled={actionBusy !== null}
+                      onClick={() => respondToPromise("accept")}
+                    />
+                    <ActionButton
+                      label={t("promises.detail.decline")}
+                      variant="danger"
+                      loading={actionBusy === "decline"}
+                      disabled={actionBusy !== null}
+                      onClick={() => respondToPromise("decline")}
+                    />
+                  </div>
+                )}
+
                 {isExecutor && p.status === "active" && (
                   isInviteAccepted ? (
                     <ActionButton

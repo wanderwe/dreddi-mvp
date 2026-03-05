@@ -67,10 +67,14 @@ export async function POST(req: Request) {
       counterpartyProfile = { id: data.id };
     }
 
+    const selectedCounterpartyId = counterpartyProfile?.id ?? null;
+    const promisorId = executor === "me" ? user.id : selectedCounterpartyId;
+    const promiseeId = executor === "other" ? user.id : selectedCounterpartyId;
+
     const insertPayload = {
       creator_id: user.id,
-      promisor_id: executor === "me" ? user.id : null,
-      promisee_id: executor === "other" ? user.id : null,
+      promisor_id: promisorId,
+      promisee_id: promiseeId,
       title,
       details: body?.details?.trim() || null,
       condition_text: body?.conditionText?.trim() || null,
@@ -78,7 +82,7 @@ export async function POST(req: Request) {
       due_at: dueAtIso,
       status: "active",
       invite_token: inviteToken,
-      counterparty_id: counterpartyProfile?.id ?? null,
+      counterparty_id: selectedCounterpartyId,
       invite_status: "awaiting_acceptance",
       invited_at: nowIso,
       accepted_at: null,
