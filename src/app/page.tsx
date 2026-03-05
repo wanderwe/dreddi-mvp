@@ -563,7 +563,7 @@ export default function Home() {
               href="/why"
               className="inline-flex text-sm font-medium text-slate-300/80 transition-colors hover:text-emerald-200"
             >
-              Why Dreddi exists →
+              {copy.hero.whyLink}
             </Link>
           </div>
 

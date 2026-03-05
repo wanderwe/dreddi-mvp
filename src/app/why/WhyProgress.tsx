@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export function WhyProgress() {
+export function WhyProgress({ title }: { title: string }) {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
 
@@ -35,7 +35,7 @@ export function WhyProgress() {
     >
       <div className="mx-auto w-full max-w-3xl px-6">
         <div className="border-b border-white/10 bg-slate-950/70 px-0 py-2.5 backdrop-blur">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-300">Why Dreddi Exists</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-300">{title}</p>
           <div className="mt-2 h-px w-full bg-white/10">
             <div
               className="h-full bg-emerald-300/80 transition-[width] duration-150"
