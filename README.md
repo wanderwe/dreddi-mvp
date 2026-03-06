@@ -83,15 +83,19 @@ and track fulfillment or breach over time.
 ## External Cron (cron-job.org)
 - We no longer use Vercel Cron on Hobby, so external scheduling is used for notifications.
 - Configure cron-job.org with:
-  - URL: `https://dreddi.com/api/notifications/cron`
+  - URL: `https://www.dreddi.com/api/notifications/cron`
   - Method: `GET`
   - Header: `Authorization: Bearer <CRON_SECRET>`
   - Schedule: every 15 minutes (30 minutes is acceptable for MVP)
-- Timezone: cron-job.org runs in the timezone you pick. Use UTC to avoid daylight-saving drift.
-- Optional smoke check (no reminder processing):
-  - URL: `https://dreddi.com/api/notifications/cron-smoke`
-  - Method: `GET`
-  - Header: `Authorization: Bearer <CRON_SECRET>`
+- Timezone: prefer UTC in cron-job.org to avoid daylight-saving drift.
+
+### Smoke test
+- Unauthorized check (expected `401` + `{"ok":false,"error":"unauthorized"}`):
+  - `curl -i https://www.dreddi.com/api/notifications/cron`
+- Authorized check (expected `200` + `{ "processed": <number>, "emailsSent": <number>, "errors": [] }`):
+  - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron`
+- Optional connectivity check endpoint:
+  - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron-smoke`
 
 ## Status
 Early MVP / in active development.
