@@ -18,11 +18,10 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, Copy, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
-import { Tooltip } from "@/app/components/ui/Tooltip";
 
 export default function NewPromisePage() {
   const t = useT();
@@ -69,6 +68,8 @@ export default function NewPromisePage() {
   const [isPublicDeal, setIsPublicDeal] = useState(true);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
+  const [inviteModal, setInviteModal] = useState<{ dealId: string; inviteToken: string } | null>(null);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
@@ -499,6 +500,43 @@ export default function NewPromisePage() {
     setCounterpartyActiveIndex(0);
   }, [counterpartyResults, showCounterpartyDropdown]);
 
+  const inviteLink = useMemo(() => {
+    if (!inviteModal || typeof window === "undefined") return "";
+    return `${window.location.origin}/p/invite/${inviteModal.inviteToken}`;
+  }, [inviteModal]);
+
+  const handleCopyInviteLink = async () => {
+    if (!inviteLink) return;
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteLink);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = inviteLink;
+        textArea.setAttribute("readonly", "true");
+        textArea.style.position = "absolute";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        const copied = document.execCommand("copy");
+        document.body.removeChild(textArea);
+        if (!copied) throw new Error("copy-failed");
+      }
+      setCopyStatus("success");
+    } catch {
+      setCopyStatus("error");
+    }
+  };
+
+  const closeInviteModal = () => {
+    if (!inviteModal) return;
+    const dealId = inviteModal.dealId;
+    setInviteModal(null);
+    setCopyStatus("idle");
+    router.push(`/promises/${dealId}`);
+  };
+
   const selectCounterparty = (user: {
     id: string;
     handle: string;
@@ -587,20 +625,57 @@ export default function NewPromisePage() {
       return;
     }
 
-    const body = (await res.json().catch(() => null)) as { id?: string } | null;
+    const body = (await res.json().catch(() => null)) as
+      | { id?: string; inviteToken?: string | null }
+      | null;
 
-    if (!body?.id) {
+    if (!body?.id || !body?.inviteToken) {
       setError(t("promises.new.errors.createFailed", { entityLower: promiseLabels.entityLower }));
       return;
     }
 
-    router.push(`/promises/${body.id}`);
+    setCopyStatus("idle");
+    setInviteModal({ dealId: body.id, inviteToken: body.inviteToken });
   }
+
+  const inviteModalLayer = inviteModal ? (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-4">
+      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-950 p-5 shadow-2xl shadow-black/60">
+        <h2 className="text-lg font-semibold text-white">{t("promises.new.inviteModal.title")}</h2>
+        <p className="mt-2 text-sm text-slate-300">{t("promises.new.inviteModal.description")}</p>
+        <div className="mt-4 break-all rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200">
+          {inviteLink}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleCopyInviteLink}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-emerald-300/40 px-3 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/10"
+          >
+            <Copy className="h-4 w-4" aria-hidden />
+            {copyStatus === "success"
+              ? t("promises.new.inviteModal.copySuccess")
+              : copyStatus === "error"
+                ? t("promises.new.inviteModal.copyFailed")
+                : t("promises.new.inviteModal.copy")}
+          </button>
+          <button
+            type="button"
+            onClick={closeInviteModal}
+            className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10"
+          >
+            {t("promises.new.inviteModal.openDeal")}
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
       {calendarPopover}
       {timePicker}
+      {inviteModalLayer}
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
@@ -718,45 +793,43 @@ export default function NewPromisePage() {
                         <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                           {t("promises.new.fields.counterparty")}
                         </span>
-                        <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
-                          <span
-                            aria-label={t("promises.new.fields.counterpartyHelper")}
-                            className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
-                          >
-                            <Info className="h-3.5 w-3.5" aria-hidden />
-                          </span>
-                        </Tooltip>
                       </div>
                       {selectedCounterparty ? (
-                        <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <div className="h-7 w-7 overflow-hidden rounded-full bg-white/10">
-                              {selectedCounterparty.avatarUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={selectedCounterparty.avatarUrl} alt="" className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center text-xs text-slate-200">
-                                  @{selectedCounterparty.handle.slice(0, 1).toUpperCase()}
-                                </div>
-                              )}
+                        <div className="space-y-2">
+                          <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <div className="h-7 w-7 overflow-hidden rounded-full bg-white/10">
+                                {selectedCounterparty.avatarUrl ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={selectedCounterparty.avatarUrl} alt="" className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-xs text-slate-200">
+                                    @{selectedCounterparty.handle.slice(0, 1).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-medium text-emerald-100">
+                                  {selectedCounterparty.displayName ?? `@${selectedCounterparty.handle}`}
+                                </p>
+                                <p className="truncate text-xs text-emerald-200/90">@{selectedCounterparty.handle}</p>
+                              </div>
                             </div>
-                            <span className="truncate">
-                              {selectedCounterparty.displayName ?? `@${selectedCounterparty.handle}`} · @{selectedCounterparty.handle}
-                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCounterparty(null);
+                                setCounterpartyQuery("");
+                                setCounterpartyResults([]);
+                                setShowCounterpartyDropdown(false);
+                              }}
+                              aria-label={t("promises.new.actions.removeCounterparty")}
+                              className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
+                            >
+                              <X className="h-3 w-3" aria-hidden />
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedCounterparty(null);
-                              setCounterpartyQuery("");
-                              setCounterpartyResults([]);
-                              setShowCounterpartyDropdown(false);
-                            }}
-                            aria-label={t("promises.new.actions.removeCounterparty")}
-                            className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
-                          >
-                            <X className="h-3 w-3" aria-hidden />
-                          </button>
+                          <p className="text-xs text-slate-400">{t("promises.new.search.selectedHint")}</p>
                         </div>
                       ) : (
                         <div className="relative">
@@ -853,6 +926,7 @@ export default function NewPromisePage() {
                           )}
                         </div>
                       )}
+                      <p className="pt-2 text-xs text-slate-400">{t("promises.new.fields.counterpartyHelper")}</p>
                     </label>
                   </div>
                 )}
