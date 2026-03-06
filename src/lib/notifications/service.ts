@@ -219,6 +219,7 @@ export async function createNotification(
       eventId: insertedNotification.id,
       userId: request.userId,
       type: normalizedType,
+      promiseId: request.promiseId,
       dedupeKey: request.dedupeKey,
       ctaUrl: request.ctaUrl,
       title,
@@ -258,7 +259,9 @@ export const mapPriorityForType = (type: NotificationType): NotificationPriority
     case "overdue":
     case "reminder_overdue":
     case "deadline_passed":
+    case "reminder_deadline":
     case "manual_reminder":
+    case "reminder_manual":
       return "high";
     default:
       return "normal";

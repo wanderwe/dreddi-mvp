@@ -115,11 +115,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     await createNotification(admin, {
       userId: receiverId,
       promiseId: id,
-      type: isActive ? "manual_reminder" : "marked_completed",
-      dedupeKey: `manual_reminder:${id}:${Math.floor(Date.now() / DAY_MS)}`,
+      type: isActive ? "reminder_manual" : "marked_completed",
+      dedupeKey: `reminder_manual:${id}:${receiverId}`,
       ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
       ctaLabel: "Open",
-      priority: mapPriorityForType(isActive ? "manual_reminder" : "marked_completed"),
+      priority: mapPriorityForType(isActive ? "reminder_manual" : "marked_completed"),
       body: isActive
         ? undefined
         : "The other side reminded you to confirm or dispute this completed deal.",

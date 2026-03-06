@@ -4,8 +4,8 @@ import { getConfiguredEmailProvider, isEmailEligibleType } from "../src/lib/noti
 
 describe("notification email eligibility", () => {
   it("includes manual reminder trigger notification types", () => {
-    assert.equal(isEmailEligibleType("manual_reminder"), true);
-    assert.equal(isEmailEligibleType("deadline_passed"), true);
+    assert.equal(isEmailEligibleType("reminder_manual"), true);
+    assert.equal(isEmailEligibleType("reminder_deadline"), true);
     assert.equal(isEmailEligibleType("marked_completed"), true);
   });
 

@@ -71,9 +71,19 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
+    reminder_deadline: {
+      title: "Deadline passed",
+      body: "The deadline has passed. Review the agreement and complete the needed actions",
+      ctaLabel: "Open",
+    },
     manual_reminder: {
       title: "Agreement reminder",
       body: "Review the agreement and mark it completed if it’s done",
+      ctaLabel: "Open",
+    },
+    reminder_manual: {
+      title: "Reminder",
+      body: "Review the agreement and complete the needed actions, if relevant",
       ctaLabel: "Open",
     },
     reminder_overdue: {
@@ -158,9 +168,19 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Перегляньте угоду та позначте виконаною, якщо все завершено",
       ctaLabel: "Відкрити",
     },
+    reminder_deadline: {
+      title: "Дедлайн минув",
+      body: "Термін виконання вже минув. Перегляньте угоду та виконайте потрібні дії",
+      ctaLabel: "Відкрити",
+    },
     manual_reminder: {
       title: "Нагадування про угоду",
       body: "Перегляньте угоду та позначте виконаною, якщо все завершено",
+      ctaLabel: "Відкрити",
+    },
+    reminder_manual: {
+      title: "Нагадування",
+      body: "Перегляньте угоду та виконайте потрібні дії, якщо актуально",
       ctaLabel: "Відкрити",
     },
     reminder_overdue: {
