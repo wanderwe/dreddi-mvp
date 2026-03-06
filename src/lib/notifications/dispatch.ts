@@ -46,18 +46,18 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
     return [];
   }
 
-  const dedupeKey = getNotificationDedupeKey(event, promise.id);
   const type = mapEventToNotificationType(event);
 
   const results = [];
 
   for (const recipient of recipients) {
+    const dedupeKey = getNotificationDedupeKey(event, promise.id, recipient.userId);
     const outcome = await createNotification(admin, {
       userId: recipient.userId,
       promiseId: promise.id,
       type,
       role: recipient.role,
-      dedupeKey,
+      dedupeKeys: results.map((result) => getNotificationDedupeKey(event, promise.id, result.userId)),
       ctaUrl,
       priority: mapPriorityForType(type),
       delta: delta ?? null,
@@ -72,7 +72,7 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
       promiseId: promise.id,
       actorId: actorId ?? null,
       recipients: recipients.map((recipient) => recipient.userId),
-      dedupeKey,
+      dedupeKeys: results.map((result) => getNotificationDedupeKey(event, promise.id, result.userId)),
       type,
       results: results.map((result) => ({
         userId: result.userId,

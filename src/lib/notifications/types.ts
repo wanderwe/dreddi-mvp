@@ -10,6 +10,8 @@ export type NotificationType =
   | "reminder_due_24h"
   | "deadline_passed"
   | "manual_reminder"
+  | "reminder_deadline"
+  | "reminder_manual"
   | "reminder_overdue"
   | "due_soon"
   | "overdue"
@@ -17,7 +19,13 @@ export type NotificationType =
   | "completion_followup"
   | "dispute";
 
-export const normalizeNotificationType = (type: NotificationType): NotificationType => type;
+export const normalizeNotificationType = (type: NotificationType): NotificationType => {
+  if (type === "manual_reminder") return "reminder_manual";
+  if (type === "deadline_passed" || type === "reminder_due_24h" || type === "reminder_overdue") {
+    return "reminder_deadline";
+  }
+  return type;
+};
 
 export type NotificationPriority = "low" | "normal" | "high" | "critical";
 

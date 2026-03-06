@@ -20,7 +20,9 @@ export const CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   "reminder_overdue",
   "deadline_passed",
   "manual_reminder",
+  "reminder_manual",
   "reminder_due_24h",
+  "reminder_deadline",
   "invite_declined",
   "invite_ignored",
 ];
@@ -34,7 +36,9 @@ export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   "reminder_overdue",
   "deadline_passed",
   "manual_reminder",
+  "reminder_manual",
   "reminder_due_24h",
+  "reminder_deadline",
   "invite_declined",
   "invite_ignored",
 ];

@@ -81,12 +81,16 @@ and track fulfillment or breach over time.
 4) Run UI tests: `npm run test:ui`.
 
 ## External Cron (cron-job.org)
-- We no longer use Vercel Cron on Hobby, so external scheduling is used for notifications.
-- Trigger URL example:
-  - `https://dreddi.com/api/notifications/cron?token=<CRON_SECRET>`
-- You can schedule this on cron-job.org every 5, 10, or 15 minutes.
+- Use this exact URL (avoid redirects so `Authorization` is preserved):
+  - `https://www.dreddi.com/api/notifications/cron`
+- Method: `GET`
+- Header: `Authorization: Bearer <CRON_SECRET>`
+- Schedule: every 15 minutes (or more often if needed).
+- Expected responses:
+  - `200` with `{ ok: true, processed, emailsSent, skipped, errors }`
+  - `401` with `{ ok: false, error: "unauthorized" }` when header is missing/invalid.
 - For connectivity/auth debugging (without sending emails), call:
-  - `https://dreddi.com/api/notifications/cron-smoke?token=<CRON_SECRET>`
+  - `https://www.dreddi.com/api/notifications/cron-smoke` with the same `Authorization` header.
 
 ## Status
 Early MVP / in active development.
