@@ -26,8 +26,6 @@ const getTokenFromAuthHeader = (req: Request) => {
   return authHeader.slice("Bearer ".length).trim();
 };
 
-const getTokenFromQuery = (req: Request) =>
-  new URL(req.url).searchParams.get("token");
 
 const unauthorizedResponse = () =>
   NextResponse.json<SmokeErrorResponse>(
@@ -53,10 +51,9 @@ const authorize = (req: Request): NextResponse<SmokeErrorResponse> | null => {
     return missingCronSecretResponse();
   }
 
-  const queryToken = getTokenFromQuery(req);
   const bearerToken = getTokenFromAuthHeader(req);
 
-  if (queryToken === secret || bearerToken === secret) {
+  if (bearerToken === secret) {
     return null;
   }
 

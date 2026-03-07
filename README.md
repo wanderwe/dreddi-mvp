@@ -81,16 +81,21 @@ and track fulfillment or breach over time.
 4) Run UI tests: `npm run test:ui`.
 
 ## External Cron (cron-job.org)
-- Use this exact URL (avoid redirects so `Authorization` is preserved):
-  - `https://www.dreddi.com/api/notifications/cron`
-- Method: `GET`
-- Header: `Authorization: Bearer <CRON_SECRET>`
-- Schedule: every 15 minutes (or more often if needed).
-- Expected responses:
-  - `200` with `{ ok: true, processed, emailsSent, skipped, errors }`
-  - `401` with `{ ok: false, error: "unauthorized" }` when header is missing/invalid.
-- For connectivity/auth debugging (without sending emails), call:
-  - `https://www.dreddi.com/api/notifications/cron-smoke` with the same `Authorization` header.
+- We no longer use Vercel Cron on Hobby, so external scheduling is used for notifications.
+- Configure cron-job.org with:
+  - URL: `https://www.dreddi.com/api/notifications/cron`
+  - Method: `GET`
+  - Header: `Authorization: Bearer <CRON_SECRET>`
+  - Schedule: every 15 minutes (30 minutes is acceptable for MVP)
+- Timezone: prefer UTC in cron-job.org to avoid daylight-saving drift.
+
+### Smoke test
+- Unauthorized check (expected `401` + `{"ok":false,"error":"unauthorized"}`):
+  - `curl -i https://www.dreddi.com/api/notifications/cron`
+- Authorized check (expected `200` + `{ "processed": <number>, "emailsSent": <number>, "errors": [] }`):
+  - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron`
+- Optional connectivity check endpoint:
+  - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron-smoke`
 
 ## Status
 Early MVP / in active development.

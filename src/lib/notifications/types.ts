@@ -13,6 +13,7 @@ export type NotificationType =
   | "reminder_deadline"
   | "reminder_manual"
   | "reminder_overdue"
+  | "reminder_manual"
   | "due_soon"
   | "overdue"
   | "completion_waiting"
