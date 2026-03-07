@@ -8,7 +8,7 @@ export type NotificationEvent =
   | "confirmed"
   | "disputed"
   | "reminder_due_24h"
-  | "reminder_overdue";
+  | "deadline_passed";
 
 export type PromiseNotificationContext = PromiseAcceptance & {
   id: string;
@@ -64,29 +64,32 @@ export const getNotificationRecipients = (
     case "disputed":
       return addRecipient(promise, executorId, actorId);
     case "reminder_due_24h":
-    case "reminder_overdue":
+    case "deadline_passed":
       return addRecipient(promise, executorId, actorId);
     default:
       return [];
   }
 };
 
-export const getNotificationDedupeKey = (event: NotificationEvent, promiseId: string) => {
+export const getNotificationDedupeKey = (
+  event: NotificationEvent,
+  promiseId: string,
+  recipientUserId: string
+) => {
   switch (event) {
     case "accepted":
-      return `accepted:${promiseId}`;
+      return `accepted:${promiseId}:${recipientUserId}`;
     case "marked_completed":
-      return `marked_completed:${promiseId}`;
+      return `marked_completed:${promiseId}:${recipientUserId}`;
     case "confirmed":
-      return `confirmed:${promiseId}`;
+      return `confirmed:${promiseId}:${recipientUserId}`;
     case "disputed":
-      return `disputed:${promiseId}`;
+      return `disputed:${promiseId}:${recipientUserId}`;
     case "reminder_due_24h":
-      return `reminder_due_24h:${promiseId}`;
-    case "reminder_overdue":
-      return `reminder_overdue:${promiseId}`;
+    case "deadline_passed":
+      return `reminder_deadline:${promiseId}:${recipientUserId}`;
     default:
-      return `event:${promiseId}`;
+      return `event:${promiseId}:${recipientUserId}`;
   }
 };
 
@@ -101,9 +104,8 @@ export const mapEventToNotificationType = (event: NotificationEvent): Notificati
     case "disputed":
       return "disputed";
     case "reminder_due_24h":
-      return "reminder_due_24h";
-    case "reminder_overdue":
-      return "reminder_overdue";
+    case "deadline_passed":
+      return "reminder_deadline";
     default:
       return "accepted";
   }

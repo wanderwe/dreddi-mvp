@@ -4,6 +4,7 @@ export type LandingCopy = {
     eyebrow: string;
     headline: string;
     description: string;
+    whyLink: string;
   };
   useDreddi: {
     label: string;
@@ -84,6 +85,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "Домовленість починається з підтвердження",
       description:
         "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
+      whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -178,6 +180,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       headline: "An agreement starts with confirmation",
       description:
         "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+      whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
       label: "Use cases",

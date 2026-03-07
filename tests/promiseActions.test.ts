@@ -12,10 +12,10 @@ type FixtureRow = {
   isReviewer: boolean;
 };
 
-test("promisor with an active accepted promise should be awaiting your action", () => {
+test("promisor with an active accepted promise should not be awaiting your action", () => {
   const row: FixtureRow = { role: "promisor", status: "active", inviteStatus: "accepted", isReviewer: false };
 
-  assert.equal(isAwaitingYourAction(row), true);
+  assert.equal(isAwaitingYourAction(row), false);
   assert.equal(isAwaitingOthers(row), false);
 });
 

@@ -15,7 +15,6 @@ const isInviteAccepted = (inviteStatus: InviteStatus) =>
 
 /**
  * Awaiting your action = promises where the signed-in user has a primary CTA available.
- * - Promisor + active + accepted invite → can mark as completed.
  * - Counterparty reviewer + completed_by_promisor + accepted invite → can confirm or dispute.
  *
  * This definition is shared with the overview metrics, header CTA count, and list CTAs
@@ -26,9 +25,6 @@ export function isAwaitingYourAction(row: PromiseListItem): boolean {
     return false;
   }
 
-  if (row.role === "promisor" && row.status === "active") {
-    return true;
-  }
   if (row.isReviewer && row.status === "completed_by_promisor") {
     return true;
   }
