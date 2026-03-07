@@ -119,7 +119,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       userId: receiverId,
       promiseId: id,
       type: reminderType,
-      dedupeKey: `manual_reminder:${id}:${reminderType}:${Math.floor(Date.now() / DAY_MS)}`,
+      dedupeKey: `reminder:${id}:${reminderType}:${Math.floor(Date.now() / DAY_MS)}`,
       ctaUrl: isActive ? `/promises/${id}` : `/promises/${id}/confirm`,
       ctaLabel: "Open",
       priority: mapPriorityForType(reminderType),
