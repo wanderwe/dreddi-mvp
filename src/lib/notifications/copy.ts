@@ -81,11 +81,6 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
-    reminder_manual: {
-      title: "Reminder",
-      body: "Review the agreement and complete the needed actions, if relevant",
-      ctaLabel: "Open",
-    },
     reminder_overdue: {
       title: "Agreement is overdue",
       body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done",
@@ -181,11 +176,6 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     manual_reminder: {
       title: "Нагадування про угоду",
       body: "Перегляньте угоду та позначте виконаною, якщо все завершено",
-      ctaLabel: "Відкрити",
-    },
-    reminder_manual: {
-      title: "Нагадування",
-      body: "Перегляньте угоду та виконайте потрібні дії, якщо актуально",
       ctaLabel: "Відкрити",
     },
     reminder_overdue: {
