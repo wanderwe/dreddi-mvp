@@ -20,7 +20,7 @@ type EmailProvider = "resend" | "none";
 type EmailPayload = {
   eventId: string;
   userId: string;
-  promiseId: string;
+  promiseId?: string | null;
   type: NotificationType;
   dedupeKey: string;
   ctaUrl: string;
@@ -180,6 +180,7 @@ const RATE_LIMITED_REMINDER_TYPES = new Set<NotificationType>(["reminder_manual"
 
 export const isReminderEmailRateLimited = async (admin: SupabaseClient, payload: EmailPayload, now: Date) => {
   if (!RATE_LIMITED_REMINDER_TYPES.has(payload.type)) return false;
+  if (!payload.promiseId) return false;
 
   const cutoff = new Date(now.getTime() - DAY_MS).toISOString();
   const { data } = await admin
@@ -222,7 +223,7 @@ const logEmailSend = async (
     event_id: payload.eventId,
     user_id: payload.userId,
     type: payload.type,
-    promise_id: payload.promiseId,
+    promise_id: payload.promiseId ?? null,
     status,
     provider,
     provider_id: options?.providerId ?? null,

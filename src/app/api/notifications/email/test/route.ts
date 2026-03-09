@@ -66,6 +66,7 @@ export async function POST(req: Request) {
     await maybeSendNotificationEmail(admin, {
       eventId: insertedNotification.id,
       userId,
+      promiseId: null,
       type: "invite",
       dedupeKey,
       ctaUrl,
