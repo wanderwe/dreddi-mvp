@@ -20,7 +20,7 @@ type EmailProvider = "resend" | "none";
 type EmailPayload = {
   eventId: string;
   userId: string;
-  promiseId?: string | null;
+  promiseId: string | null;
   type: NotificationType;
   dedupeKey: string;
   ctaUrl: string;
