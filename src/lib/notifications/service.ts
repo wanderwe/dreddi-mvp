@@ -36,6 +36,8 @@ export type NotificationOutcome = {
   created: boolean;
   skippedReason?: string;
   notificationId?: string;
+  emailSent?: boolean;
+  emailSkippedReason?: string;
 };
 
 const defaultSettings: NotificationSettings = {
@@ -144,7 +146,7 @@ export async function createNotification(
     .maybeSingle();
 
   if (existing?.id) {
-    return skip("dedupe");
+    return skip("dedupe_key_exists");
   }
 
   if (request.requiresDeadlineReminder && !settings.deadlineRemindersEnabled) {
@@ -159,14 +161,14 @@ export async function createNotification(
   );
 
   if (isPerDealCapExceeded(lastDealNotification, now, request.type)) {
-    return skip("per_deal_cap");
+    return skip("rate_limited_24h");
   }
 
   const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const count = await countNotificationsSince(admin, request.userId, cutoff);
 
   if (isDailyCapExceeded(count, request.type)) {
-    return skip("daily_cap");
+    return skip("rate_limited_24h");
   }
 
   const shouldSendPush = settings.pushEnabled;
@@ -214,8 +216,11 @@ export async function createNotification(
     });
   }
 
+  let emailSent = false;
+  let emailSkippedReason: string | undefined;
+
   if (settings.emailEnabled && insertedNotification?.id) {
-    await maybeSendNotificationEmail(admin, {
+    const emailResult = await maybeSendNotificationEmail(admin, {
       eventId: insertedNotification.id,
       userId: request.userId,
       type: normalizedType,
@@ -225,9 +230,17 @@ export async function createNotification(
       title,
       body,
     });
+
+    emailSent = emailResult?.sent ?? false;
+    emailSkippedReason = emailResult?.skippedReason;
   }
 
-  return { created: true, notificationId: insertedNotification?.id };
+  return {
+    created: true,
+    notificationId: insertedNotification?.id,
+    emailSent,
+    emailSkippedReason,
+  };
 }
 
 export async function sendPush(payload: {

@@ -253,7 +253,7 @@ const logEmailSend = async (
 
 export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload: EmailPayload) => {
   if (!EMAIL_ELIGIBLE_TYPES.has(payload.type)) {
-    return;
+    return { sent: false, skippedReason: "email_type_not_supported" };
   }
 
   const now = new Date();
@@ -267,7 +267,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     .maybeSingle();
 
   if (existing?.id) {
-    return;
+    return { sent: false, skippedReason: "dedupe_key_exists" };
   }
 
   if (await isReminderEmailRateLimited(admin, payload, now)) {
@@ -276,7 +276,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
       promiseId: payload.promiseId,
       type: payload.type,
     });
-    return;
+    return { sent: false, skippedReason: "rate_limited_24h" };
   }
 
   const { data: profile } = await admin
@@ -287,7 +287,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
 
   if (profile?.email_notifications_enabled === false) {
     await logEmailSend(admin, payload, "disabled");
-    return;
+    return { sent: false, skippedReason: "email_notifications_disabled" };
   }
 
   const getUserById = admin.auth?.admin?.getUserById?.bind(admin.auth.admin);
@@ -295,7 +295,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     await logEmailSend(admin, payload, "failed", {
       error: "Supabase admin auth.getUserById is unavailable",
     });
-    return;
+    return { sent: false, skippedReason: "resend_failed" };
   }
 
   const { data: userData, error: userError } = await getUserById(payload.userId);
@@ -304,7 +304,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     await logEmailSend(admin, payload, "failed", {
       error: userError?.message ?? "No recipient email found",
     });
-    return;
+    return { sent: false, skippedReason: "missing_recipient_email" };
   }
 
   const provider = resolveEmailProvider();
@@ -314,7 +314,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
       toEmail: to,
       error: "Missing RESEND_API_KEY",
     });
-    return;
+    return { sent: false, skippedReason: "resend_failed" };
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -344,7 +344,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
         toEmail: to,
         error: `Resend error ${response.status}: ${responseText}`,
       });
-      return;
+      return { sent: false, skippedReason: "resend_failed" };
     }
 
     const body = (await response.json().catch(() => null)) as { id?: string } | null;
@@ -353,12 +353,14 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
       providerId: body?.id ?? null,
       toEmail: to,
     });
+    return { sent: true };
   } catch (error) {
     await logEmailSend(admin, payload, "failed", {
       provider,
       toEmail: to,
       error: error instanceof Error ? error.message : String(error),
     });
+    return { sent: false, skippedReason: "resend_failed" };
   }
 };
 
