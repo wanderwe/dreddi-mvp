@@ -57,7 +57,7 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
       promiseId: promise.id,
       type,
       role: recipient.role,
-      dedupeKeys: results.map((result) => getNotificationDedupeKey(event, promise.id, result.userId)),
+      dedupeKey,
       ctaUrl,
       priority: mapPriorityForType(type),
       delta: delta ?? null,
