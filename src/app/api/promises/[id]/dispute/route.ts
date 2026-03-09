@@ -105,7 +105,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         event: "disputed",
         promiseId: updatedPromise.id,
         actorId: user.id,
-        dedupeKey: getNotificationDedupeKey("disputed", updatedPromise.id),
+        dedupeKeys: notificationResults.map((result) =>
+          getNotificationDedupeKey("disputed", updatedPromise.id, result.userId)
+        ),
         results: notificationResults.map((result) => ({
           userId: result.userId,
           created: result.outcome.created,
