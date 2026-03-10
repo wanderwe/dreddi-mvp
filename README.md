@@ -80,6 +80,18 @@ and track fulfillment or breach over time.
 3) Install Playwright (first time only): `npm install -D @playwright/test` then `npx playwright install`.
 4) Run UI tests: `npm run test:ui`.
 
+
+## Manual reminder email diagnostics
+- Use this when sender sees “Last reminder” but recipient says no email arrived.
+- Requires env vars: `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+- Command:
+  - `node scripts/diagnose-reminder.mjs --deal=<deal_id> --receiver=<receiver_user_id>`
+- The script prints:
+  - recipient email settings (`email_notifications_enabled`)
+  - auth email presence (actual target used for sending)
+  - latest `deal_reminders`, `notifications`, and `notification_email_sends` rows
+  - a `likelyReason` hint based on the observed data
+
 ## External Cron (cron-job.org)
 - We no longer use Vercel Cron on Hobby, so external scheduling is used for notifications.
 - Configure cron-job.org with:
