@@ -16,6 +16,7 @@ type ReminderErrorCode =
   | "reminder_rate_limit"
   | "reminder_feature_unavailable"
   | "reminder_create_failed"
+  | "reminder_notification_failed"
   | "reminder_unexpected";
 
 const errorResponse = (
@@ -102,7 +103,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         sender_id: user.id,
         receiver_id: receiverId,
       })
-      .select("created_at")
+      .select("id,created_at")
       .single();
 
     if (insertError) {
@@ -114,7 +115,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const reminderType = isActive ? "reminder_manual" : "marked_completed";
 
-    await createNotification(admin, {
+    const notification = await createNotification(admin, {
       userId: receiverId,
       promiseId: id,
       type: reminderType,
@@ -126,6 +127,17 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         ? "The other side sent you a reminder on this deal."
         : "The other side reminded you to confirm or dispute this completed deal.",
     });
+
+    if (!notification.created) {
+      await admin.from("deal_reminders").delete().eq("id", inserted.id);
+
+      return errorResponse(
+        500,
+        "reminder_notification_failed",
+        "Could not dispatch reminder notification",
+        notification.skippedReason ?? undefined
+      );
+    }
 
     const { count } = await admin
       .from("deal_reminders")
