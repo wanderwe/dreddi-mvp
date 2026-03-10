@@ -174,30 +174,6 @@ const resolveEmailCopy = (payload: EmailPayload) => {
   }
 };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-const RATE_LIMITED_REMINDER_TYPES = new Set<NotificationType>(["reminder_manual", "reminder_deadline"]);
-
-export const isReminderEmailRateLimited = async (admin: SupabaseClient, payload: EmailPayload, now: Date) => {
-  if (!RATE_LIMITED_REMINDER_TYPES.has(payload.type)) return false;
-  if (!payload.promiseId) return false;
-
-  const cutoff = new Date(now.getTime() - DAY_MS).toISOString();
-  const { data } = await admin
-    .from("notification_email_sends")
-    .select("id,created_at")
-    .eq("user_id", payload.userId)
-    .eq("promise_id", payload.promiseId)
-    .eq("type", payload.type)
-    .gte("created_at", cutoff)
-    .in("status", ["sent", "failed", "provider_not_configured", "disabled"])
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  return Boolean(data?.id);
-};
-
 const logEmailSend = async (
   admin: SupabaseClient,
   payload: EmailPayload,
@@ -257,8 +233,6 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     return { sent: false, skippedReason: "email_type_not_supported" };
   }
 
-  const now = new Date();
-
   const { data: existing } = await admin
     .from("notification_email_sends")
     .select("id")
@@ -269,15 +243,6 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
 
   if (existing?.id) {
     return { sent: false, skippedReason: "dedupe_key_exists" };
-  }
-
-  if (await isReminderEmailRateLimited(admin, payload, now)) {
-    console.info("[notifications] email_send_skipped_rate_limited", {
-      userId: payload.userId,
-      promiseId: payload.promiseId,
-      type: payload.type,
-    });
-    return { sent: false, skippedReason: "rate_limited_24h" };
   }
 
   const { data: profile } = await admin

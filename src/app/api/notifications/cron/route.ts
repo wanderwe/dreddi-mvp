@@ -158,12 +158,12 @@ const runCron = async (req: Request) => {
         console.info("[notifications] reminder_cron_candidate", {
           ...logBase,
           eligibility: false,
-          skippedReason: reason,
+          reason,
         });
       };
 
       if (reminderType === "deadline_passed" && !row.due_at) {
-        skip("no_due_at_for_deadline_reminder");
+        skip("invalid_due_at_for_deadline");
         return;
       }
 
@@ -176,12 +176,12 @@ const runCron = async (req: Request) => {
       }
 
       if (!isPromiseAccepted(row)) {
-        skip("manual_reminder_not_due");
+        skip("dedupe_key_exists");
         return;
       }
 
       if (reminderType === "deadline_passed" && !isEligibleDeadlineReminder(row.due_at, now)) {
-        skip("manual_reminder_not_due");
+        skip("invalid_due_at_for_deadline");
         return;
       }
 
@@ -189,11 +189,11 @@ const runCron = async (req: Request) => {
       console.info("[notifications] reminder_cron_candidate", {
         ...logBase,
         eligibility: true,
-        skippedReason: null,
+        reason: null,
       });
 
       if (dryRun) {
-        skip("dry_run");
+        skip("dedupe_key_exists");
         return;
       }
 
@@ -211,13 +211,19 @@ const runCron = async (req: Request) => {
             createdCount += 1;
             if (result.outcome.emailSent) {
               response.emailsSent += 1;
+              console.info("[notifications] reminder_cron_candidate", {
+                ...logBase,
+                userId: result.userId,
+                eligibility: true,
+                reason: "sent",
+              });
             } else if (result.outcome.emailSkippedReason) {
               response.skipped += 1;
               console.info("[notifications] reminder_cron_candidate", {
                 ...logBase,
                 userId: result.userId,
                 eligibility: false,
-                skippedReason: result.outcome.emailSkippedReason,
+                reason: result.outcome.emailSkippedReason,
               });
             }
           } else {
@@ -226,7 +232,7 @@ const runCron = async (req: Request) => {
               ...logBase,
               userId: result.userId,
               eligibility: false,
-              skippedReason: result.outcome.skippedReason ?? "resend_failed",
+              reason: result.outcome.skippedReason ?? "resend_failed",
             });
           }
         }
@@ -236,7 +242,7 @@ const runCron = async (req: Request) => {
           console.info("[notifications] reminder_cron_candidate", {
             ...logBase,
             eligibility: false,
-            skippedReason: "missing_recipient_email",
+            reason: "missing_recipient_email",
           });
         }
 

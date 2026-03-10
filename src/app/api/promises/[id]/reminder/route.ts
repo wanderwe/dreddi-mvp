@@ -112,8 +112,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return errorResponse(500, "reminder_create_failed", "Could not create reminder", insertError.message);
     }
 
-    const reminderType =
-      isActive && promise.due_at ? "reminder_overdue" : isActive ? "reminder_manual" : "marked_completed";
+    const reminderType = isActive ? "reminder_manual" : "marked_completed";
 
     await createNotification(admin, {
       userId: receiverId,
@@ -124,9 +123,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       ctaLabel: "Open",
       priority: mapPriorityForType(reminderType),
       body: isActive
-        ? promise.due_at
-          ? "The other side reminded you to complete this deal."
-          : "The other side sent you a reminder on this deal."
+        ? "The other side sent you a reminder on this deal."
         : "The other side reminded you to confirm or dispute this completed deal.",
     });
 
