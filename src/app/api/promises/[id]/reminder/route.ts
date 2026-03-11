@@ -5,6 +5,7 @@ import { getAdminClient, loadPromiseForUser } from "../common";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { getNextActionOwner, resolveNextActionOwnerId } from "@/lib/promiseNextAction";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
+import { isNotificationTypeConstraintError } from "@/lib/notifications/errors";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -131,13 +132,27 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (!notification.created) {
       await admin.from("deal_reminders").delete().eq("id", inserted.id);
 
+      const detail = notification.skippedDetail
+        ? `${notification.skippedReason ?? "unknown"}: ${notification.skippedDetail}`
+        : notification.skippedReason ?? undefined;
+
+      if (
+        notification.skippedReason === "db_error" &&
+        isNotificationTypeConstraintError(notification.skippedDetail)
+      ) {
+        return errorResponse(
+          503,
+          "reminder_feature_unavailable",
+          "Reminder feature is temporarily unavailable",
+          "Database notifications schema is outdated. Apply the latest Supabase migrations."
+        );
+      }
+
       return errorResponse(
         500,
         "reminder_notification_failed",
         "Could not dispatch reminder notification",
-        notification.skippedDetail
-          ? `${notification.skippedReason ?? "unknown"}: ${notification.skippedDetail}`
-          : notification.skippedReason ?? undefined
+        detail
       );
     }
 
