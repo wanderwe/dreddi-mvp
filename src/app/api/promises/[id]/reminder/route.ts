@@ -135,7 +135,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         500,
         "reminder_notification_failed",
         "Could not dispatch reminder notification",
-        notification.skippedReason ?? undefined
+        notification.skippedDetail
+          ? `${notification.skippedReason ?? "unknown"}: ${notification.skippedDetail}`
+          : notification.skippedReason ?? undefined
       );
     }
 

@@ -35,6 +35,7 @@ export type NotificationRequest = {
 export type NotificationOutcome = {
   created: boolean;
   skippedReason?: string;
+  skippedDetail?: string;
   notificationId?: string;
   emailSent?: boolean;
   emailSkippedReason?: string;
@@ -133,7 +134,7 @@ export async function createNotification(
 
   const skip = (skippedReason: string, extra?: { dbError?: string }): NotificationOutcome => {
     logNotificationSkip(request, skippedReason, settings, extra);
-    return { created: false, skippedReason };
+    return { created: false, skippedReason, skippedDetail: extra?.dbError };
   };
 
   const normalizedType = normalizeNotificationType(request.type);
