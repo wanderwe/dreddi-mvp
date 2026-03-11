@@ -213,12 +213,22 @@ export default function PromisesClient() {
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
 
-  const reminderErrorMessage = (errorCode?: string) => {
+  const reminderErrorMessage = (errorCode?: string, detail?: string) => {
     if (errorCode === "reminder_rate_limit") return t("promises.list.reminder.rateLimited");
     if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
     if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
     if (errorCode === "reminder_acceptance_required") return t("promises.list.reminder.acceptedOnly");
     if (errorCode === "reminder_invalid_state") return t("promises.list.reminder.invalidState");
+    if (errorCode === "reminder_participants_invalid") return t("promises.list.reminder.participantsInvalid");
+    if (errorCode === "reminder_create_failed") {
+      return t("promises.list.reminder.createFailed", { detail: detail ?? "unknown" });
+    }
+    if (errorCode === "reminder_notification_failed") {
+      return t("promises.list.reminder.notificationFailed", { detail: detail ?? "unknown" });
+    }
+    if (errorCode === "reminder_unexpected") {
+      return t("promises.list.reminder.unexpected", { detail: detail ?? "unknown" });
+    }
     return t("promises.list.reminder.sendFailed");
   };
 
@@ -434,11 +444,12 @@ export default function PromisesClient() {
       const body = await res.json().catch(() => ({})) as {
         error?: string;
         error_code?: string;
+        detail?: string | null;
         count?: number;
         created_at?: string;
       };
       if (!res.ok) {
-        throw new Error(reminderErrorMessage(body.error_code));
+        throw new Error(reminderErrorMessage(body.error_code, body.detail ?? undefined));
       }
 
       setReminderInfoByDeal((prev) => ({
