@@ -184,7 +184,11 @@
         "acceptedOnly": "Reminders are available only after a deal is accepted",
         "last": "Last reminder: {date}",
         "tooltip": "Send a reminder to the other side",
-        "tooltipWithLast": "Send a reminder to the other side\nLast reminder: {date}"
+        "tooltipWithLast": "Send a reminder to the other side\nLast reminder: {date}",
+        "participantsInvalid": "Deal participants are invalid",
+        "createFailed": "Could not create reminder ({detail})",
+        "notificationFailed": "Could not dispatch reminder notification ({detail})",
+        "unexpected": "Unexpected reminder error ({detail})"
       },
       "errors": {
         "markComplete": "Could not mark complete",
