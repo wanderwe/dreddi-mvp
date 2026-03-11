@@ -7,6 +7,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { stripTrailingPeriod } from "@/lib/text";
 import { normalizeNotificationType } from "@/lib/notifications/types";
+import { emitNotificationCountDelta } from "@/lib/notifications/clientSync";
 
 type NotificationRow = {
   id: string;
@@ -238,9 +239,13 @@ export default function NotificationsClient() {
   };
 
   const markAsRead = async (id: string) => {
+    const target = rows.find((row) => row.id === id);
+    if (!target || target.read_at) return;
+
     setRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, read_at: new Date().toISOString() } : row))
     );
+    emitNotificationCountDelta(-1);
 
     try {
       const supabase = requireSupabase();
@@ -252,11 +257,15 @@ export default function NotificationsClient() {
 
   const markAllAsRead = async () => {
     if (markingAll) return;
+    const unreadCount = rows.filter((row) => !row.read_at).length;
+    if (!unreadCount) return;
+
     const timestamp = new Date().toISOString();
     setMarkingAll(true);
     setRows((prev) =>
       prev.map((row) => (row.read_at ? row : { ...row, read_at: timestamp }))
     );
+    emitNotificationCountDelta(-unreadCount);
 
     try {
       const supabase = requireSupabase();
