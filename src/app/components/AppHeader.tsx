@@ -31,7 +31,6 @@ export function AppHeader() {
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
   const isAuthenticated = authState.isLoggedIn;
-  const showBackLink = !isAuthenticated && pathname !== "/";
   const showSignIn = !isAuthenticated && pathname !== "/login";
   const linkBaseClasses =
     "cursor-pointer whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
@@ -174,14 +173,6 @@ export function AppHeader() {
             <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
               MOCK AUTH
             </span>
-          )}
-          {showBackLink && (
-            <Link
-              href="/"
-              className="cursor-pointer text-sm font-medium text-emerald-200 hover:text-emerald-100"
-            >
-              ← {t("auth.login.back")}
-            </Link>
           )}
           {isAuthenticated ? (
             <>
