@@ -8,6 +8,10 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { fetchUnreadNotificationCount } from "@/lib/notifications/queries";
+import {
+  isNotificationCountEvent,
+  NOTIFICATION_COUNT_EVENT,
+} from "@/lib/notifications/clientSync";
 
 export function NotificationBell({ className = "" }: { className?: string }) {
   const t = useT();
@@ -68,6 +72,15 @@ export function NotificationBell({ className = "" }: { className?: string }) {
       }, 45000);
     };
 
+    const onCountDelta = (event: Event) => {
+      if (!isNotificationCountEvent(event)) return;
+      const delta = event.detail?.delta ?? 0;
+      if (!delta) return;
+      setCount((prev) => Math.max(0, prev + delta));
+    };
+
+    window.addEventListener(NOTIFICATION_COUNT_EVENT, onCountDelta);
+
     void init();
 
     return () => {
@@ -83,6 +96,7 @@ export function NotificationBell({ className = "" }: { className?: string }) {
       if (pollId) {
         clearInterval(pollId);
       }
+      window.removeEventListener(NOTIFICATION_COUNT_EVENT, onCountDelta);
     };
   }, []);
 
