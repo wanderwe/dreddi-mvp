@@ -36,14 +36,6 @@ export const whyCopy: Record<Locale, WhyCopy> = {
         ],
       },
       {
-        heading: "Trust without evidence",
-        paragraphs: [
-          "Over time, people stop trusting words.",
-          "You hear things like: Can I rely on them? Do they actually deliver? Have they done this before?",
-          "Too often, the answers come from opinions and selective memories instead of a clear record of outcomes.",
-        ],
-      },
-      {
         heading: "A simple idea",
         paragraphs: [
           "Dreddi is built on a very simple principle:",
@@ -144,14 +136,6 @@ export const whyCopy: Record<Locale, WhyCopy> = {
           "Коли їх виконують — усі забувають.",
           "Коли їх порушують — усі сперечаються.",
           "Але майже ніколи немає чіткого запису того, що сталося насправді.",
-        ],
-      },
-      {
-        heading: "Довіра без доказів",
-        paragraphs: [
-          "З часом люди перестають довіряти словам.",
-          "Часто можна почути: «Чи можна на них покластися?», «Вони реально виконують?», «Вони вже робили таке раніше?»",
-          "Надто часто відповіді базуються на думках і вибірковій памʼяті, а не на чіткому записі результатів.",
         ],
       },
       {
