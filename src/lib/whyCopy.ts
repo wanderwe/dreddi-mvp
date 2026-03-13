@@ -39,12 +39,8 @@ export const whyCopy: Record<Locale, WhyCopy> = {
         heading: "Trust without evidence",
         paragraphs: [
           "Over time, people stop trusting words.",
-          "You hear things like:\n• “Can I rely on them?”\n• “Do they actually deliver?”\n• “Have they done this before?”",
-          "But the answers are usually based on opinions, not outcomes.",
-          "Reviews can be biased.",
-          "Stories can be exaggerated.",
-          "Memories can be selective.",
-          "There is rarely an objective trail of promises and results.",
+          "You hear things like: Can I rely on them? Do they actually deliver? Have they done this before?",
+          "Too often, the answers come from opinions and selective memories instead of a clear record of outcomes.",
         ],
       },
       {
@@ -127,9 +123,6 @@ export const whyCopy: Record<Locale, WhyCopy> = {
           "Dreddi is an attempt to close that gap.",
         ],
       },
-      {
-        paragraphs: ["Final note:", "Dreddi does not judge people.", "It simply records what happened."],
-      },
     ],
     cta: "Create your first deal",
   },
@@ -157,12 +150,8 @@ export const whyCopy: Record<Locale, WhyCopy> = {
         heading: "Довіра без доказів",
         paragraphs: [
           "З часом люди перестають довіряти словам.",
-          "Часто можна почути:\n• «Чи можна на них покластися?»\n• «Вони реально виконують?»\n• «Вони вже робили таке раніше?»",
-          "Але відповіді зазвичай базуються на думках, а не на результатах.",
-          "Відгуки можуть бути упередженими.",
-          "Історії можуть бути перебільшеними.",
-          "Памʼять може бути вибірковою.",
-          "Рідко є обʼєктивний слід обіцянок і результатів.",
+          "Часто можна почути: «Чи можна на них покластися?», «Вони реально виконують?», «Вони вже робили таке раніше?»",
+          "Надто часто відповіді базуються на думках і вибірковій памʼяті, а не на чіткому записі результатів.",
         ],
       },
       {
@@ -244,9 +233,6 @@ export const whyCopy: Record<Locale, WhyCopy> = {
           "Оскільки цифрова робота і віддалена співпраця зростають, розрив між обіцянками і відповідальністю теж зростає.",
           "Dreddi — це спроба закрити цей розрив.",
         ],
-      },
-      {
-        paragraphs: ["Фінальна думка:", "Dreddi не судить людей.", "Він просто фіксує, що сталося."],
       },
     ],
     cta: "Створити першу угоду",

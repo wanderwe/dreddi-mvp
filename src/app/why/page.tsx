@@ -28,9 +28,9 @@ export default async function WhyPage() {
         <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p>
       </header>
 
-      <div className="mt-14 space-y-14 text-base leading-relaxed text-slate-200">
+      <div className="mt-10 space-y-10 text-base leading-7 text-slate-200">
         {copy.sections.map((section, index) => (
-          <section key={`section-${index}`} className="space-y-4">
+          <section key={`section-${index}`} className="space-y-3">
             {section.heading ? (
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
             ) : null}
@@ -64,7 +64,7 @@ export default async function WhyPage() {
         ))}
       </div>
 
-      <div className="mt-14">
+      <div className="mt-10">
         <Link
           href="/"
           className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
