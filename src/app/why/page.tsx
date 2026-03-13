@@ -36,19 +36,14 @@ export default async function WhyPage() {
             ) : null}
             {section.paragraphs.map((paragraph, paragraphIndex) => {
               const isPrinciple =
-                paragraph === "Promises should have a record." ||
-                paragraph === "Обіцянки мають бути зафіксовані.";
-              const isFinalNoteLabel = !section.heading && paragraphIndex === 0;
+                paragraph === "Promises and deals should have a record" ||
+                paragraph === "Обіцянки та угоди мають бути зафіксовані";
 
               return (
                 <p
                   key={`paragraph-${paragraphIndex}`}
                   className={
-                    isPrinciple
-                      ? "font-semibold text-white"
-                      : isFinalNoteLabel
-                        ? "text-sm font-semibold uppercase tracking-[0.12em] text-slate-300"
-                        : undefined
+                    isPrinciple ? "font-semibold text-white" : undefined
                   }
                 >
                   {paragraph.split("\n").map((line, lineIndex, lines) => (
