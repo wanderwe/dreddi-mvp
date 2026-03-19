@@ -539,28 +539,30 @@ export default function PromisePage() {
     ].join("\n");
   };
 
-  async function copyReminder() {
+  function shareViaTelegram() {
     if (!p || !userId || !promiseLink) {
       setToastTone("error");
-      setToast(t("promises.detail.reminder.copyFailed"));
+      setToast(t("promises.detail.telegram.openFailed"));
       return;
     }
 
     const message = getReminderMessage();
     if (!message) {
       setToastTone("error");
-      setToast(t("promises.detail.reminder.copyFailed"));
+      setToast(t("promises.detail.telegram.openFailed"));
       return;
     }
 
-    try {
-      await navigator.clipboard.writeText(message);
-      console.log("[reminder_manual_copy]", { promiseId: p.id, userId });
-      setToastTone("success");
-      setToast(t("promises.detail.reminder.copied"));
-    } catch {
+    const encodedUrl = encodeURIComponent(promiseLink);
+    const encodedText = encodeURIComponent(message);
+    const telegramShareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+
+    console.log("[telegram_share_click]", { promiseId: p.id, userId });
+
+    const shareWindow = window.open(telegramShareUrl, "_blank");
+    if (!shareWindow) {
       setToastTone("error");
-      setToast(t("promises.detail.reminder.copyFailed"));
+      setToast(t("promises.detail.telegram.openFailed"));
     }
   }
 
@@ -694,10 +696,10 @@ export default function PromisePage() {
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
             <ActionButton
-              label={t("promises.detail.reminder.label")}
+              label={t("promises.detail.telegram.label")}
               variant="ghost"
               disabled={!userId || !promiseLink}
-              onClick={() => void copyReminder()}
+              onClick={shareViaTelegram}
             />
           )}
           {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}

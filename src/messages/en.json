@@ -265,10 +265,9 @@
       "declineAction": "Decline",
       "acceptedToast": "{entity} accepted",
       "declinedToast": "{entity} declined",
-      "reminder": {
-        "label": "Remind",
-        "copied": "Reminder copied",
-        "copyFailed": "Failed to copy"
+      "telegram": {
+        "label": "Send via Telegram",
+        "openFailed": "Failed to open Telegram"
       }
     },
     "inviteStatus": {
