@@ -519,10 +519,14 @@ export default function PromisePage() {
   };
 
   const getTelegramMessage = () => {
+    if (!promiseLink) return null;
+
     if (locale === "uk") {
       return [
         "Нагадування 👇",
-        "Будь ласка, перевір угоду за посиланням вище.",
+        "Будь ласка, перевір цю угоду:",
+        "",
+        promiseLink,
         "",
         "Тут є дія, яка очікується від тебе.",
       ].join("\n");
@@ -530,7 +534,9 @@ export default function PromisePage() {
 
     return [
       "Quick reminder 👇",
-      "Please check the agreement at the link above.",
+      "Please check this agreement:",
+      "",
+      promiseLink,
       "",
       "There’s an action pending from your side.",
     ].join("\n");
@@ -550,9 +556,8 @@ export default function PromisePage() {
       return;
     }
 
-    const encodedUrl = encodeURIComponent(promiseLink);
     const encodedText = encodeURIComponent(message);
-    const telegramShareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+    const telegramShareUrl = `https://t.me/share/url?text=${encodedText}`;
 
     console.log("[telegram_share_click]", { promiseId: p.id, userId });
 
