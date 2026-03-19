@@ -522,7 +522,7 @@ export default function PromisePage() {
     if (locale === "uk") {
       return [
         "Нагадування 👇",
-        "Будь ласка, перевір цю угоду:",
+        "Будь ласка, перевір угоду за посиланням вище.",
         "",
         "Тут є дія, яка очікується від тебе.",
       ].join("\n");
@@ -530,7 +530,7 @@ export default function PromisePage() {
 
     return [
       "Quick reminder 👇",
-      "Please check this agreement:",
+      "Please check the agreement at the link above.",
       "",
       "There’s an action pending from your side.",
     ].join("\n");
