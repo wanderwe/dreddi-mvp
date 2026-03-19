@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Send } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -518,11 +518,15 @@ export default function PromisePage() {
     }
   };
 
-  const getTelegramMessage = () => {
+  const getReminderMessage = () => {
+    if (!promiseLink) return null;
+
     if (locale === "uk") {
       return [
         "Нагадування 👇",
         "Будь ласка, перевір цю угоду:",
+        "",
+        promiseLink,
         "",
         "Тут є дія, яка очікується від тебе.",
       ].join("\n");
@@ -532,56 +536,35 @@ export default function PromisePage() {
       "Quick reminder 👇",
       "Please check this agreement:",
       "",
+      promiseLink,
+      "",
       "There’s an action pending from your side.",
     ].join("\n");
   };
 
-  function shareViaTelegram() {
+  async function copyReminder() {
     if (!p || !userId || !promiseLink) {
       setToastTone("error");
-      setToast(t("promises.detail.telegram.openFailed"));
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
       return;
     }
 
-    const message = getTelegramMessage();
+    const message = getReminderMessage();
     if (!message) {
       setToastTone("error");
-      setToast(t("promises.detail.telegram.openFailed"));
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
       return;
     }
 
-    const encodedUrl = encodeURIComponent(promiseLink);
-    const encodedText = encodeURIComponent(message);
-    const telegramAppUrl = `tg://msg_url?url=${encodedUrl}&text=${encodedText}`;
-    const telegramWebUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
-
-    console.log("[telegram_share_click]", { promiseId: p.id, userId });
-
-    let fallbackUsed = false;
-    const fallbackToWeb = () => {
-      if (fallbackUsed) return;
-      fallbackUsed = true;
-      const shareWindow = window.open(telegramWebUrl, "_blank");
-      if (!shareWindow) {
-        setToastTone("error");
-        setToast(t("promises.detail.telegram.openFailed"));
-      }
-    };
-
-    const fallbackTimer = window.setTimeout(() => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      fallbackToWeb();
-    }, 800);
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        window.clearTimeout(fallbackTimer);
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.location.href = telegramAppUrl;
+    try {
+      await navigator.clipboard.writeText(message);
+      console.log("[reminder_manual_copy]", { promiseId: p.id, userId });
+      setToastTone("success");
+      setToast(t("promises.detail.reminderCopy.copied"));
+    } catch {
+      setToastTone("error");
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
+    }
   }
 
   async function copyInvite() {
@@ -713,14 +696,14 @@ export default function PromisePage() {
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
-            <Tooltip label={t("promises.detail.telegram.tooltip")} placement="bottom-right">
+            <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
               <span>
                 <IconButton
-                  icon={<Send className="h-4 w-4" />}
-                  ariaLabel={t("promises.detail.telegram.label")}
+                  icon={<Copy className="h-4 w-4" />}
+                  ariaLabel={t("promises.detail.reminderCopy.label")}
                   className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
                   disabled={!userId || !promiseLink}
-                  onClick={shareViaTelegram}
+                  onClick={() => void copyReminder()}
                 />
               </span>
             </Tooltip>

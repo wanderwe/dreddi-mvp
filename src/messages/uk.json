@@ -273,10 +273,11 @@
       "declineAction": "Відхилити",
       "acceptedToast": "{entity} прийнято",
       "declinedToast": "{entity} відхилено",
-      "telegram": {
-        "label": "Надіслати нагадування через Telegram",
-        "tooltip": "Надіслати нагадування через Telegram",
-        "openFailed": "Не вдалося відкрити Telegram"
+      "reminderCopy": {
+        "label": "Скопіювати посилання-нагадування",
+        "tooltip": "Скопіювати посилання-нагадування",
+        "copied": "Нагадування скопійовано",
+        "copyFailed": "Не вдалося скопіювати"
       }
     },
     "inviteStatus": {

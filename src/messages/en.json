@@ -265,10 +265,11 @@
       "declineAction": "Decline",
       "acceptedToast": "{entity} accepted",
       "declinedToast": "{entity} declined",
-      "telegram": {
-        "label": "Send reminder via Telegram",
-        "tooltip": "Send reminder via Telegram",
-        "openFailed": "Failed to open Telegram"
+      "reminderCopy": {
+        "label": "Copy reminder link",
+        "tooltip": "Copy reminder link",
+        "copied": "Reminder copied",
+        "copyFailed": "Failed to copy"
       }
     },
     "inviteStatus": {
