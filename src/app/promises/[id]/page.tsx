@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -16,7 +17,9 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 
 type PromiseRow = {
   id: string;
@@ -515,15 +518,11 @@ export default function PromisePage() {
     }
   };
 
-  const getReminderMessage = () => {
-    if (!promiseLink) return null;
-
+  const getTelegramMessage = () => {
     if (locale === "uk") {
       return [
         "Нагадування 👇",
         "Будь ласка, перевір цю угоду:",
-        "",
-        promiseLink,
         "",
         "Тут є дія, яка очікується від тебе.",
       ].join("\n");
@@ -532,8 +531,6 @@ export default function PromisePage() {
     return [
       "Quick reminder 👇",
       "Please check this agreement:",
-      "",
-      promiseLink,
       "",
       "There’s an action pending from your side.",
     ].join("\n");
@@ -546,7 +543,7 @@ export default function PromisePage() {
       return;
     }
 
-    const message = getReminderMessage();
+    const message = getTelegramMessage();
     if (!message) {
       setToastTone("error");
       setToast(t("promises.detail.telegram.openFailed"));
@@ -695,12 +692,17 @@ export default function PromisePage() {
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
-            <ActionButton
-              label={t("promises.detail.telegram.label")}
-              variant="ghost"
-              disabled={!userId || !promiseLink}
-              onClick={shareViaTelegram}
-            />
+            <Tooltip label={t("promises.detail.telegram.tooltip")} placement="bottom-right">
+              <span>
+                <IconButton
+                  icon={<Send className="h-4 w-4" />}
+                  ariaLabel={t("promises.detail.telegram.label")}
+                  className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                  disabled={!userId || !promiseLink}
+                  onClick={shareViaTelegram}
+                />
+              </span>
+            </Tooltip>
           )}
           {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
         </div>

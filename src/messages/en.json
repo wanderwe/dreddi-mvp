@@ -266,7 +266,8 @@
       "acceptedToast": "{entity} accepted",
       "declinedToast": "{entity} declined",
       "telegram": {
-        "label": "Send via Telegram",
+        "label": "Send reminder via Telegram",
+        "tooltip": "Send reminder via Telegram",
         "openFailed": "Failed to open Telegram"
       }
     },
