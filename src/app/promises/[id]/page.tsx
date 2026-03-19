@@ -519,14 +519,10 @@ export default function PromisePage() {
   };
 
   const getTelegramMessage = () => {
-    if (!promiseLink) return null;
-
     if (locale === "uk") {
       return [
         "Нагадування 👇",
         "Будь ласка, перевір цю угоду:",
-        "",
-        promiseLink,
         "",
         "Тут є дія, яка очікується від тебе.",
       ].join("\n");
@@ -535,8 +531,6 @@ export default function PromisePage() {
     return [
       "Quick reminder 👇",
       "Please check this agreement:",
-      "",
-      promiseLink,
       "",
       "There’s an action pending from your side.",
     ].join("\n");
@@ -556,16 +550,38 @@ export default function PromisePage() {
       return;
     }
 
+    const encodedUrl = encodeURIComponent(promiseLink);
     const encodedText = encodeURIComponent(message);
-    const telegramShareUrl = `https://t.me/share/url?text=${encodedText}`;
+    const telegramAppUrl = `tg://msg_url?url=${encodedUrl}&text=${encodedText}`;
+    const telegramWebUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
 
     console.log("[telegram_share_click]", { promiseId: p.id, userId });
 
-    const shareWindow = window.open(telegramShareUrl, "_blank");
-    if (!shareWindow) {
-      setToastTone("error");
-      setToast(t("promises.detail.telegram.openFailed"));
-    }
+    let fallbackUsed = false;
+    const fallbackToWeb = () => {
+      if (fallbackUsed) return;
+      fallbackUsed = true;
+      const shareWindow = window.open(telegramWebUrl, "_blank");
+      if (!shareWindow) {
+        setToastTone("error");
+        setToast(t("promises.detail.telegram.openFailed"));
+      }
+    };
+
+    const fallbackTimer = window.setTimeout(() => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      fallbackToWeb();
+    }, 800);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        window.clearTimeout(fallbackTimer);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.location.href = telegramAppUrl;
   }
 
   async function copyInvite() {
