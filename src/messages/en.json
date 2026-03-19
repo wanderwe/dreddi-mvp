@@ -264,7 +264,13 @@
       "acceptAction": "Accept",
       "declineAction": "Decline",
       "acceptedToast": "{entity} accepted",
-      "declinedToast": "{entity} declined"
+      "declinedToast": "{entity} declined",
+      "reminderCopy": {
+        "label": "Copy reminder link",
+        "tooltip": "Copy reminder link",
+        "copied": "Reminder copied",
+        "copyFailed": "Failed to copy"
+      }
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",

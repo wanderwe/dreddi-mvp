@@ -272,7 +272,13 @@
       "acceptAction": "Прийняти",
       "declineAction": "Відхилити",
       "acceptedToast": "{entity} прийнято",
-      "declinedToast": "{entity} відхилено"
+      "declinedToast": "{entity} відхилено",
+      "reminderCopy": {
+        "label": "Скопіювати посилання-нагадування",
+        "tooltip": "Скопіювати посилання-нагадування",
+        "copied": "Нагадування скопійовано",
+        "copyFailed": "Не вдалося скопіювати"
+      }
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",

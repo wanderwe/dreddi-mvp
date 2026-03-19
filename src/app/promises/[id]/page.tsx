@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Copy } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -16,7 +17,9 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 
 type PromiseRow = {
   id: string;
@@ -169,6 +172,7 @@ export default function PromisePage() {
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const [conditionBusy, setConditionBusy] = useState(false);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
@@ -458,11 +462,21 @@ export default function PromisePage() {
     load();
   }
 
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "");
+
   const inviteLink = useMemo(() => {
     if (!p?.invite_token) return null;
+    if (appUrl) return `${appUrl}/p/invite/${p.invite_token}`;
     if (typeof window === "undefined") return null;
     return `${window.location.origin}/p/invite/${p.invite_token}`;
-  }, [p?.invite_token]);
+  }, [appUrl, p?.invite_token]);
+
+  const promiseLink = useMemo(() => {
+    if (!id) return null;
+    if (appUrl) return `${appUrl}/promises/${id}`;
+    if (typeof window === "undefined") return null;
+    return `${window.location.origin}/promises/${id}`;
+  }, [appUrl, id]);
 
   useEffect(() => {
     return () => {
@@ -503,6 +517,55 @@ export default function PromisePage() {
       return false;
     }
   };
+
+  const getReminderMessage = () => {
+    if (!promiseLink) return null;
+
+    if (locale === "uk") {
+      return [
+        "Нагадування 👇",
+        "Будь ласка, перевір цю угоду:",
+        "",
+        promiseLink,
+        "",
+        "Тут є дія, яка очікується від тебе.",
+      ].join("\n");
+    }
+
+    return [
+      "Quick reminder 👇",
+      "Please check this agreement:",
+      "",
+      promiseLink,
+      "",
+      "There’s an action pending from your side.",
+    ].join("\n");
+  };
+
+  async function copyReminder() {
+    if (!p || !userId || !promiseLink) {
+      setToastTone("error");
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
+      return;
+    }
+
+    const message = getReminderMessage();
+    if (!message) {
+      setToastTone("error");
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(message);
+      console.log("[reminder_manual_copy]", { promiseId: p.id, userId });
+      setToastTone("success");
+      setToast(t("promises.detail.reminderCopy.copied"));
+    } catch {
+      setToastTone("error");
+      setToast(t("promises.detail.reminderCopy.copyFailed"));
+    }
+  }
 
   async function copyInvite() {
     if (!inviteLink || !canManageInvite || isInviteAccepted || isFinal) return;
@@ -563,6 +626,7 @@ export default function PromisePage() {
       return;
     }
 
+    setToastTone("success");
     setToast(
       action === "accept"
         ? t("promises.detail.acceptedToast", { entity: promiseLabels.entity })
@@ -630,7 +694,22 @@ export default function PromisePage() {
         >
           {backLink.label}
         </Link>
-        <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}</div>
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {p && (
+            <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
+              <span>
+                <IconButton
+                  icon={<Copy className="h-4 w-4" />}
+                  ariaLabel={t("promises.detail.reminderCopy.label")}
+                  className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                  disabled={!userId || !promiseLink}
+                  onClick={() => void copyReminder()}
+                />
+              </span>
+            </Tooltip>
+          )}
+          {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
+        </div>
       </div>
 
       {error && (
@@ -640,7 +719,13 @@ export default function PromisePage() {
       )}
 
       {toast && (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-100">
+        <div
+          className={`rounded-2xl border p-4 ${
+            toastTone === "success"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-100"
+              : "border-red-500/30 bg-red-500/10 text-red-100"
+          }`}
+        >
           {toast}
         </div>
       )}
