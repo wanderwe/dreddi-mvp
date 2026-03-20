@@ -667,6 +667,7 @@ export default function PromisePage() {
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite;
+  const canShareReminder = Boolean(p && inviteStatus === "accepted");
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
       (canReview && p?.status === "completed_by_promisor") ||
@@ -696,17 +697,21 @@ export default function PromisePage() {
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
-            <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
-              <span>
-                <IconButton
-                  icon={<Copy className="h-4 w-4" />}
-                  ariaLabel={t("promises.detail.reminderCopy.label")}
-                  className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
-                  disabled={!userId || !promiseLink}
-                  onClick={() => void copyReminder()}
-                />
-              </span>
-            </Tooltip>
+            <div className="h-10 w-10 shrink-0">
+              {canShareReminder ? (
+                <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
+                  <span>
+                    <IconButton
+                      icon={<Copy className="h-4 w-4" />}
+                      ariaLabel={t("promises.detail.reminderCopy.label")}
+                      className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                      disabled={!userId || !promiseLink}
+                      onClick={() => void copyReminder()}
+                    />
+                  </span>
+                </Tooltip>
+              ) : null}
+            </div>
           )}
           {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
         </div>
