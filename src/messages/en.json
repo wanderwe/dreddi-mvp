@@ -462,7 +462,18 @@
       "notFound": "Invite not found or expired",
       "acceptFailed": "Accept failed",
       "declineFailed": "Decline failed"
-    }
+    },
+    "roleExplanation": {
+      "executor": {
+        "title": "You are invited as the executor",
+        "body": "{creatorLabel} expects you to complete this agreement"
+      },
+      "counterparty": {
+        "title": "You are invited as the counterparty",
+        "body": "{creatorLabel} expects you to review and confirm this agreement"
+      }
+    },
+    "acceptCta": "Accept and take responsibility"
   },
   "auth": {
     "login": {

@@ -35,6 +35,8 @@ type InviteInfo = {
   cancelled_at: string | null;
   counterparty_contact: string | null;
   visibility: "private" | "public";
+  promisor_id: string | null;
+  promisee_id: string | null;
 };
 
 export default function InvitePage() {
@@ -196,10 +198,37 @@ export default function InvitePage() {
 
   const creatorName = useMemo(() => {
     if (!info) return t("invite.unknown");
-    return info.creator_handle
-      ? `@${info.creator_handle}`
-      : info.creator_display_name ?? t("invite.unknown");
+    const displayName = info.creator_display_name?.trim();
+    if (displayName) return displayName;
+    return info.creator_handle ? `@${info.creator_handle}` : t("invite.unknown");
   }, [info, t]);
+
+  const inviteRole = useMemo<"executor" | "counterparty">(() => {
+    if (!info) return "counterparty";
+    const creatorIsPromisee = Boolean(info.promisee_id && info.promisee_id === info.creator_id);
+    const creatorIsPromisor = Boolean(info.promisor_id && info.promisor_id === info.creator_id);
+
+    if (creatorIsPromisee && !info.promisor_id) return "executor";
+    if (creatorIsPromisor && !info.promisee_id) return "counterparty";
+
+    return "counterparty";
+  }, [info]);
+
+  const roleExplanation = useMemo(() => {
+    const creatorLabel = creatorName;
+
+    if (inviteRole === "executor") {
+      return {
+        title: t("invite.roleExplanation.executor.title"),
+        body: t("invite.roleExplanation.executor.body", { creatorLabel }),
+      };
+    }
+
+    return {
+      title: t("invite.roleExplanation.counterparty.title"),
+      body: t("invite.roleExplanation.counterparty.body", { creatorLabel }),
+    };
+  }, [creatorName, inviteRole, t]);
 
   const acceptingUserName = useMemo(() => {
     if (!info?.counterparty_id) return t("invite.unknown");
@@ -273,14 +302,21 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
-          <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            {t("invite.title", { entity: promiseLabels.entity })}
-          </h1>
-          <p className="max-w-2xl text-base text-slate-200">
-            {t("invite.subtitle", { entityLower: promiseLabels.entityLower })}
-          </p>
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
+              {t("invite.title", { entity: promiseLabels.entity })}
+            </h1>
+            <p className="max-w-2xl text-base text-slate-200">
+              {t("invite.subtitle", { entityLower: promiseLabels.entityLower })}
+            </p>
+          </div>
+
+          <div className="max-w-2xl rounded-2xl border border-emerald-300/20 bg-emerald-500/10 px-5 py-4 shadow-lg shadow-emerald-950/10">
+            <p className="text-sm font-semibold text-emerald-100 sm:text-base">{roleExplanation.title}</p>
+            <p className="mt-1 text-sm leading-relaxed text-emerald-50/90">{roleExplanation.body}</p>
+          </div>
         </div>
 
         {error && (
@@ -423,7 +459,7 @@ export default function InvitePage() {
                         >
                           {busy
                             ? t("invite.processing")
-                            : t("invite.accept", { entityLower: promiseLabels.entityLower })}
+                            : t("invite.acceptCta")}
                         </button>
                         {canDecline && (
                           <button
