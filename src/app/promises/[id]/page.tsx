@@ -1,11 +1,10 @@
 "use client";
 
-import { LocalizedLink } from "@/app/components/LocalizedLink";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
@@ -204,7 +203,7 @@ export default function PromisePage() {
   ) {
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      router.push(localizeLoginPath(nextPath, locale));
+      router.push(`/login?next=${encodeURIComponent(nextPath)}`);
       return null;
     }
     setUserId(data.session.user.id);
@@ -462,8 +461,8 @@ export default function PromisePage() {
   const inviteLink = useMemo(() => {
     if (!p?.invite_token) return null;
     if (typeof window === "undefined") return null;
-    return `${window.location.origin}${localizePath(`/p/invite/${p.invite_token}`, locale)}`;
-  }, [locale, p?.invite_token]);
+    return `${window.location.origin}/p/invite/${p.invite_token}`;
+  }, [p?.invite_token]);
 
   useEffect(() => {
     return () => {
@@ -625,12 +624,12 @@ export default function PromisePage() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <LocalizedLink
+        <Link
           href={backLink.href}
           className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {backLink.label}
-        </LocalizedLink>
+        </Link>
         <div className="flex items-center gap-3">{uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}</div>
       </div>
 
@@ -746,12 +745,12 @@ export default function PromisePage() {
                 )}
 
                 {canReview && p.status === "completed_by_promisor" && (
-                  <LocalizedLink
+                  <Link
                     href={`/promises/${p.id}/confirm`}
                     className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                   >
                     {t("promises.detail.reviewConfirm")}
-                  </LocalizedLink>
+                  </Link>
                 )}
 
                 {canRespondToInvite && p.status === "active" && (
@@ -835,12 +834,12 @@ export default function PromisePage() {
                     />
 
                     {inviteLink && (
-                      <LocalizedLink
+                      <Link
                         href={`/p/invite/${p.invite_token}`}
                         className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                       >
                         {t("promises.detail.openInvite")}
-                      </LocalizedLink>
+                      </Link>
                     )}
 
                     {isCreator && inviteStatus === "awaiting_acceptance" && (
