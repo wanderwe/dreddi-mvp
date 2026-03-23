@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import {
   addDays,
   addMonths,
@@ -409,7 +410,7 @@ export default function NewPromisePage() {
       const { data: sessionData } = await supabase.auth.getSession();
       if (!active) return;
       if (!sessionData.session) {
-        router.replace(`/login?next=${encodeURIComponent("/promises/new")}`);
+        router.replace(localizeLoginPath(localizePath("/promises/new", locale), locale));
         return;
       }
 
@@ -965,12 +966,12 @@ export default function NewPromisePage() {
               <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
                 <p>{error}</p>
                 {sessionExpired && (
-                  <Link
-                    href={`/login?next=${encodeURIComponent("/promises/new")}`}
+                  <LocalizedLink
+                    href={localizeLoginPath(localizePath("/promises/new", locale), locale)}
                     className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"
                   >
                     Sign in again →
-                  </Link>
+                  </LocalizedLink>
                 )}
               </div>
             )}

@@ -1,7 +1,14 @@
 import { cookies, headers } from "next/headers";
 import { LOCALE_COOKIE_NAME, Locale, defaultLocale, normalizeLocale } from "./locales";
+import { detectLocaleFromAcceptLanguage } from "./routing";
 
 export async function getLocale(): Promise<Locale> {
+  const requestHeaders = await headers();
+  const pathnameLocale = normalizeLocale(requestHeaders.get("x-dreddi-locale"));
+  if (pathnameLocale) {
+    return pathnameLocale;
+  }
+
   // IMPORTANT:
   // Do NOT use cookies().get() here.
   // In Next.js App Router (especially with Turbopack),
@@ -18,16 +25,8 @@ export async function getLocale(): Promise<Locale> {
     return normalizedCookie;
   }
 
-  const acceptLanguage = (await headers()).get("accept-language");
-  if (acceptLanguage) {
-    // Example: "en-US,en;q=0.9,uk;q=0.8"
-    const [preferred] = acceptLanguage.split(",");
-    const lang = preferred?.trim().split(";")[0]; // drop q=...
-    const normalizedHeaderLocale = normalizeLocale(lang);
-    if (normalizedHeaderLocale) {
-      return normalizedHeaderLocale;
-    }
-  }
+  const acceptLanguage = requestHeaders.get("accept-language");
+  if (acceptLanguage) return detectLocaleFromAcceptLanguage(acceptLanguage);
 
   return defaultLocale;
 }

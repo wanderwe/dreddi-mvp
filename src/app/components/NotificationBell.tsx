@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { fetchUnreadNotificationCount } from "@/lib/notifications/queries";
 import {
@@ -15,6 +16,7 @@ import {
 
 export function NotificationBell({ className = "" }: { className?: string }) {
   const t = useT();
+  const locale = useLocale();
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ export function NotificationBell({ className = "" }: { className?: string }) {
 
   return (
     <IconButton
-      href="/notifications"
+      href={localizePath("/notifications", locale)}
       ariaLabel={t("nav.notifications")}
       className={className}
       icon={

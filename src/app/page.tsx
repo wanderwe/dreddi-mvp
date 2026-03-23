@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
@@ -118,9 +118,9 @@ function DealRow({
   }
 
   return (
-    <Link href={href} className={`${baseClass} ${interactiveClass}`}>
+    <LocalizedLink href={href} className={`${baseClass} ${interactiveClass}`}>
       {content}
-    </Link>
+    </LocalizedLink>
   );
 }
 
@@ -559,43 +559,43 @@ export default function Home() {
             <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
-            <Link
+            <LocalizedLink
               href="/why"
               className="inline-flex text-sm font-medium text-slate-300/80 transition-colors hover:text-emerald-200"
             >
               {copy.hero.whyLink}
-            </Link>
+            </LocalizedLink>
           </div>
 
           {!showAuthenticatedCta ? (
             <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
-              <Link
+              <LocalizedLink
                 href="/login"
                 className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.getStarted}
-              </Link>
-              <Link
+              </LocalizedLink>
+              <LocalizedLink
                 href="/u"
                 className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.publicProfiles}
-              </Link>
+              </LocalizedLink>
             </div>
           ) : (
             <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
-              <Link
+              <LocalizedLink
                 href="/promises/new"
                 className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.createPromise}
-              </Link>
-              <Link
+              </LocalizedLink>
+              <LocalizedLink
                 href="/promises"
                 className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
               >
                 {copy.cta.reviewDeals}
-              </Link>
+              </LocalizedLink>
             </div>
           )}
 
@@ -683,12 +683,12 @@ export default function Home() {
                 <div>
                   <div className="flex items-center justify-between text-sm text-slate-300">
                     <span>{recentDealsTitle}</span>
-                    <Link
+                    <LocalizedLink
                       href={recentDealsHref}
                       className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
                     >
                       {copy.recentDeals.seeAll}
-                    </Link>
+                    </LocalizedLink>
                   </div>
                   {!isAuthenticated ? (
                     <div className="mt-3">

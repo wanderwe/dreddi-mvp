@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useState } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
 import {
@@ -55,31 +55,31 @@ export function MobileMenu({
             {isAuthenticated ? (
               <>
                 <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/promises">
+                  <LocalizedLink className={baseLinkClasses} href="/promises">
                     {t("nav.myPromises")}
-                  </Link>
+                  </LocalizedLink>
                 </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
-                    <Link className={baseLinkClasses} href={actionQueueHref}>
+                    <LocalizedLink className={baseLinkClasses} href={actionQueueHref}>
                       {t("nav.actionQueueBadge")} ({actionQueueCount})
-                    </Link>
+                    </LocalizedLink>
                   </SheetClose>
                 )}
                 <SheetClose asChild>
-                  <Link className={primaryLinkClasses} href="/promises/new">
+                  <LocalizedLink className={primaryLinkClasses} href="/promises/new">
                     {t("nav.newPromise")}
-                  </Link>
+                  </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/u">
+                  <LocalizedLink className={baseLinkClasses} href="/u">
                     {t("nav.publicProfiles")}
-                  </Link>
+                  </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
-                  <Link className={baseLinkClasses} href="/notifications">
+                  <LocalizedLink className={baseLinkClasses} href="/notifications">
                     {t("nav.notifications")}
-                  </Link>
+                  </LocalizedLink>
                 </SheetClose>
                 <div className="mt-2 border-t border-white/10 pt-4">
                   <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
@@ -90,9 +90,9 @@ export function MobileMenu({
               </>
             ) : (
               <SheetClose asChild>
-                <Link className={primaryLinkClasses} href="/login">
+                <LocalizedLink className={primaryLinkClasses} href="/login">
                   {t("auth.login.signInCta")}
-                </Link>
+                </LocalizedLink>
               </SheetClose>
             )}
           </nav>

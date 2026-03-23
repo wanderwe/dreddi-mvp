@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getMessages } from "@/lib/i18n/getMessages";
+import { localizePath } from "@/lib/i18n/routing";
 import { AppFooter } from "@/app/components/AppFooter";
 import { AppHeader } from "@/app/components/AppHeader";
 import "./globals.css";
@@ -38,6 +39,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: copy.title,
     description: copy.description,
     metadataBase: new URL("https://dreddi.com"),
+    alternates: {
+      canonical: localizePath("/", locale),
+      languages: {
+        en: localizePath("/", "en"),
+        uk: localizePath("/", "uk"),
+      },
+    },
     openGraph: {
       title: copy.title,
       description: copy.description,

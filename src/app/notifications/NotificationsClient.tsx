@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { stripTrailingPeriod } from "@/lib/text";
 import { normalizeNotificationType } from "@/lib/notifications/types";
 import { emitNotificationCountDelta } from "@/lib/notifications/clientSync";
@@ -62,7 +63,8 @@ export default function NotificationsClient() {
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
-        window.location.href = `/login?next=${encodeURIComponent("/notifications")}`;
+        const nextPath = localizePath("/notifications", locale);
+        window.location.href = localizeLoginPath(nextPath, locale);
         return;
       }
 
@@ -143,7 +145,8 @@ export default function NotificationsClient() {
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
-        window.location.href = `/login?next=${encodeURIComponent("/notifications")}`;
+        const nextPath = localizePath("/notifications", locale);
+        window.location.href = localizeLoginPath(nextPath, locale);
         return;
       }
 
@@ -190,7 +193,7 @@ export default function NotificationsClient() {
         clearInterval(pollId);
       }
     };
-  }, [pageSize, t]);
+  }, [locale, pageSize, t]);
 
   const loadMore = () => {
     if (loadingMore || !hasMore) return;
@@ -210,7 +213,8 @@ export default function NotificationsClient() {
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
-        window.location.href = `/login?next=${encodeURIComponent("/notifications")}`;
+        const nextPath = localizePath("/notifications", locale);
+        window.location.href = localizeLoginPath(nextPath, locale);
         return;
       }
 
@@ -384,13 +388,13 @@ export default function NotificationsClient() {
                     </div>
                     <div className="flex flex-col gap-3 sm:items-end">
                       {ctaLabel && (
-                        <Link
+                        <LocalizedLink
                           href={ctaUrl}
                           onClick={() => unread && void markAsRead(row.id)}
                           className="flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-center text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:inline-flex sm:min-h-0 sm:w-auto sm:rounded-full"
                         >
                           {ctaLabel}
-                        </Link>
+                        </LocalizedLink>
                       )}
                       {unread && (
                         <button

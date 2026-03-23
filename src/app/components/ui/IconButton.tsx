@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
+import { useLocale } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
 
 export type IconButtonProps = {
   icon: React.ReactNode;
@@ -25,6 +29,7 @@ export function IconButton({
   disabled = false,
   type = "button",
 }: IconButtonProps) {
+  const locale = useLocale();
   const stateClasses = active
     ? "bg-emerald-400/20 text-emerald-100"
     : "bg-transparent hover:bg-white/5 hover:text-slate-100";
@@ -32,8 +37,9 @@ export function IconButton({
   const combinedClasses = `${baseClasses} ${stateClasses} ${disabledClasses} ${className}`;
 
   if (href) {
+    const localizedHref = href.startsWith("/") ? localizePath(href, locale) : href;
     return (
-      <Link href={href} aria-label={ariaLabel} className={combinedClasses}>
+      <Link href={localizedHref} aria-label={ariaLabel} className={combinedClasses}>
         {icon}
       </Link>
     );

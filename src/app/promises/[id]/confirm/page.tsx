@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
@@ -92,7 +93,8 @@ export default function ConfirmPromisePage() {
       const action = searchParams?.get("action");
       const actionSuffix = action === "confirm" || action === "dispute" ? `?action=${action}` : "";
       if (!data.session) {
-        router.push(`/login?next=${encodeURIComponent(`/promises/${params.id}/confirm${actionSuffix}`)}`);
+        const nextPath = localizePath(`/promises/${params.id}/confirm${actionSuffix}`, locale);
+        router.push(localizeLoginPath(nextPath, locale));
         return;
       }
       setUserId(data.session.user.id);
@@ -132,7 +134,7 @@ export default function ConfirmPromisePage() {
     return () => {
       mounted = false;
     };
-  }, [params?.id, router, searchParams]);
+  }, [locale, params?.id, router, searchParams]);
 
   function statusNote(status: PromiseStatus) {
     if (status === "confirmed") return t("promises.confirm.statusNote.confirmed");
@@ -176,7 +178,8 @@ export default function ConfirmPromisePage() {
     const supabase = requireSupabase();
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      router.push(`/login?next=${encodeURIComponent(`/promises/${promise.id}/confirm`)}`);
+      const nextPath = localizePath(`/promises/${promise.id}/confirm`, locale);
+      router.push(localizeLoginPath(nextPath, locale));
       return;
     }
 
@@ -205,7 +208,7 @@ export default function ConfirmPromisePage() {
     try {
       await postAction(`/api/promises/${promise.id}/confirm`);
       setSuccessMessage(t("promises.confirm.success.confirmed", { entity: promiseLabels.entity }));
-      setTimeout(() => router.push("/promises"), 1000);
+      setTimeout(() => router.push(localizePath("/promises", locale)), 1000);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("promises.confirm.errors.confirmFailed"));
     } finally {
@@ -223,7 +226,7 @@ export default function ConfirmPromisePage() {
         reason: disputeCode === "other" ? disputeReason : undefined,
       });
       setSuccessMessage(t("promises.confirm.success.disputed"));
-      setTimeout(() => router.push("/promises"), 1200);
+      setTimeout(() => router.push(localizePath("/promises", locale)), 1200);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("promises.confirm.errors.disputeFailed"));
     } finally {
