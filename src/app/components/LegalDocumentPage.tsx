@@ -1,5 +1,6 @@
 import { LegalDocumentContent } from "@/app/components/LegalDocumentContent";
 import { getLocale } from "@/lib/i18n/getLocale";
+import { type Locale } from "@/lib/i18n/locales";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { createTranslator } from "@/lib/i18n/t";
 import { getLegalDocument, type LegalDocumentType } from "@/lib/legalDocuments";
@@ -16,7 +17,7 @@ export async function LegalDocumentPage({
   locale: localeOverride,
 }: {
   type: LegalDocumentType;
-  locale?: string;
+  locale?: Locale;
 }) {
   const locale = localeOverride ?? (await getLocale());
   const messages = await getMessages(locale);
