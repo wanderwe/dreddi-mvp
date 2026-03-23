@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { lookupInvitePreview } from "@/lib/invitePreview";
+import { localizePath } from "@/lib/i18n/routing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
@@ -26,13 +27,20 @@ export async function generateMetadata(ctx: {
   const invitePreview = await lookupInvitePreview(token);
   const agreementTitle = invitePreview?.title ?? copy.fallbackTitle;
   const pageTitle = `${agreementTitle} — Dreddi`;
-  const canonicalUrl = new URL(`/p/invite/${encodeURIComponent(token)}`, SITE_URL).toString();
+  const canonicalUrl = new URL(
+    localizePath(`/p/invite/${encodeURIComponent(token)}`, locale),
+    SITE_URL
+  ).toString();
 
   return {
     title: pageTitle,
     description: copy.description,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        en: new URL(localizePath(`/p/invite/${encodeURIComponent(token)}`, "en"), SITE_URL).toString(),
+        uk: new URL(localizePath(`/p/invite/${encodeURIComponent(token)}`, "uk"), SITE_URL).toString(),
+      },
     },
     openGraph: {
       title: agreementTitle,

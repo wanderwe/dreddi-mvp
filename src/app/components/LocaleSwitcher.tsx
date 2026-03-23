@@ -1,14 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Locale, locales } from "@/lib/i18n/locales";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { switchLocaleInPath } from "@/lib/i18n/routing";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 
 export function LocaleSwitcher({ className }: { className?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useT();
   const [busy, setBusy] = useState(false);
@@ -40,22 +43,9 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     setToast(null);
 
     try {
-      const res = await fetch("/api/locale", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale: nextLocale }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Could not update language");
-      }
-
-      try {
-        router.refresh();
-      } catch {
-        window.location.reload();
-      }
+      const nextPathname = switchLocaleInPath(pathname || "/", nextLocale);
+      const query = searchParams.toString();
+      router.push(query ? `${nextPathname}?${query}` : nextPathname);
     } catch (err) {
       if (process.env.NODE_ENV !== "production") {
         console.error("Failed to switch locale", err);

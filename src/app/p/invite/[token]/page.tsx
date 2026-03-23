@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { formatDueDate } from "@/lib/formatDueDate";
 import {
   canCounterpartyRespond,
@@ -97,7 +98,7 @@ export default function InvitePage() {
 
     if (inviteStatus === "accepted" && info.counterparty_id && userId === info.counterparty_id) {
       setAutoAcceptAttempted(true);
-      router.push("/promises");
+      router.push(localizePath("/promises", locale));
       return;
     }
 
@@ -126,7 +127,8 @@ export default function InvitePage() {
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
       // відправляємо на логін і повертаємо назад сюди
-      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}?accept=1`)}`);
+      const nextPath = localizePath(`/p/invite/${token}?accept=1`, locale);
+      router.push(localizeLoginPath(nextPath, locale));
       setBusy(false);
       return;
     }
@@ -151,7 +153,7 @@ export default function InvitePage() {
 
     // успіх: перезавантажимо дані і перекинемо на promises
     await load();
-    router.push("/promises");
+    router.push(localizePath("/promises", locale));
   }
 
   async function decline() {
@@ -168,7 +170,8 @@ export default function InvitePage() {
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
-      router.push(`/login?next=${encodeURIComponent(`/p/invite/${token}`)}`);
+      const nextPath = localizePath(`/p/invite/${token}`, locale);
+      router.push(localizeLoginPath(nextPath, locale));
       setBusy(false);
       return;
     }

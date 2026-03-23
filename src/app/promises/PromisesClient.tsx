@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { CheckCircle2, BadgeCheck, BellRing } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,6 +12,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { formatDealMeta } from "@/lib/formatDealMeta";
@@ -251,7 +252,7 @@ export default function PromisesClient() {
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
-        window.location.href = `/login?next=${encodeURIComponent("/promises")}`;
+        window.location.href = localizeLoginPath(localizePath("/promises", locale), locale);
         return;
       }
 
@@ -430,7 +431,7 @@ export default function PromisesClient() {
       const supabase = requireSupabase();
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
-        router.push(`/login?next=${encodeURIComponent("/promises")}`);
+        router.push(localizeLoginPath(localizePath("/promises", locale), locale));
         return;
       }
 
@@ -606,7 +607,7 @@ export default function PromisesClient() {
       const supabase = requireSupabase();
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
-        router.push(`/login?next=${encodeURIComponent("/promises")}`);
+        router.push(localizeLoginPath(localizePath("/promises", locale), locale));
         return;
       }
 
@@ -832,12 +833,12 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <Link
+                        <LocalizedLink
                           href={`/promises/${p.id}?from=deals`}
                           className="block text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                         >
                           {p.title}
-                        </Link>
+                        </LocalizedLink>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 
@@ -895,12 +896,12 @@ export default function PromisesClient() {
                 <p className="text-sm text-slate-400">{emptyDescription}</p>
                 {isGlobalEmpty && (
                   <div className="mt-4">
-                    <Link
+                    <LocalizedLink
                       href="/promises/new"
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
                     >
                       {t("promises.empty.cta")}
-                    </Link>
+                    </LocalizedLink>
                   </div>
                 )}
                 {isFilteredEmpty && showAllAction && (

@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
 import { UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { MobileMenu } from "@/app/components/MobileMenu";
@@ -12,7 +13,7 @@ import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { isAwaitingYourAction } from "@/lib/promiseActions";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
@@ -26,12 +27,14 @@ import {
 
 export function AppHeader() {
   const t = useT();
+  const locale = useLocale();
   const pathname = usePathname();
+  const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
   const isAuthenticated = authState.isLoggedIn;
-  const showSignIn = !isAuthenticated && pathname !== "/login";
+  const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
     "cursor-pointer whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
@@ -157,7 +160,7 @@ export function AppHeader() {
   return (
     <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
-        <Link href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
+        <LocalizedLink href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
           <DreddiLogo
             accentClassName="text-xs"
             markClassName="h-11 w-11"
@@ -166,7 +169,7 @@ export function AppHeader() {
           <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-200/70">
             beta
           </span>
-        </Link>
+        </LocalizedLink>
 
         <div className="flex items-center gap-3">
           {authState.isMock && (
@@ -178,17 +181,17 @@ export function AppHeader() {
             <>
               <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-slate-200 md:flex">
                 <div className="flex items-center gap-3 pr-4">
-                  <Link className={linkBaseClasses} href="/promises">
+                  <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
-                  </Link>
+                  </LocalizedLink>
                   {actionQueueCount > 0 && (
-                    <Link
+                    <LocalizedLink
                       href={actionQueueHref}
                       className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100 transition"
                     >
                       {t("nav.actionQueueBadge")}
                       <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-slate-900">{actionQueueCount}</span>
-                    </Link>
+                    </LocalizedLink>
                   )}
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
@@ -197,7 +200,7 @@ export function AppHeader() {
                 <div className="ml-auto flex items-center gap-3">
                   <Tooltip label={t("nav.publicProfiles")} placement="top">
                     <IconButton
-                      href="/u"
+                      href={localizePath("/u", locale)}
                       ariaLabel={t("nav.publicProfiles")}
                       icon={<UsersRound className="h-4 w-4" aria-hidden />}
                     />
@@ -222,12 +225,12 @@ export function AppHeader() {
             <>
               <nav className="hidden items-center gap-3 text-sm font-medium text-slate-200 md:flex">
                 {showSignIn && (
-                  <Link
+                  <LocalizedLink
                     href="/login"
                     className="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                   >
                     {t("auth.login.signInCta")}
-                  </Link>
+                  </LocalizedLink>
                 )}
                 <LocaleSwitcher />
               </nav>

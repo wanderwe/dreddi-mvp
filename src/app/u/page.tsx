@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useMemo, useState } from "react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
@@ -183,7 +183,7 @@ export default function PublicProfilesDirectoryPage() {
         const reputationScore = profile.reputation_score ?? 50;
 
         return (
-          <Link
+          <LocalizedLink
             key={profile.handle}
             href={`/u/${encodeURIComponent(profile.handle)}?from=profiles`}
             className="group relative flex w-full min-w-0 flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
@@ -225,7 +225,7 @@ export default function PublicProfilesDirectoryPage() {
                 {t("publicProfile.disputed")}: {disputedCount}
               </span>
             </div>
-          </Link>
+          </LocalizedLink>
         );
       }),
     [profiles, t]

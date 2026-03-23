@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { isMockAuthEnabled } from "@/lib/auth/getAuthState";
+import { useLocale } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath } from "@/lib/i18n/routing";
 import { requireSupabase } from "@/lib/supabaseClient";
 
 export default function NotificationsLayout({ children }: { children: React.ReactNode }) {
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const pathname = usePathname();
+  const locale = useLocale();
   const mockMode = isMockAuthEnabled();
   useEffect(() => {
     let active = true;
@@ -33,7 +36,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
       const { data } = await supabase.auth.getSession();
       if (!active) return;
       if (!data.session) {
-        window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+        window.location.href = localizeLoginPath(pathname, locale);
       }
     };
 
@@ -49,7 +52,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
       subscription = supabase.auth.onAuthStateChange((_e, session) => {
         if (!active) return;
         if (!session) {
-          window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+          window.location.href = localizeLoginPath(pathname, locale);
         }
       });
     } catch (error) {
@@ -66,7 +69,7 @@ export default function NotificationsLayout({ children }: { children: React.Reac
       active = false;
       subscription?.data.subscription.unsubscribe();
     };
-  }, [pathname, mockMode]);
+  }, [locale, pathname, mockMode]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">

@@ -1,5 +1,5 @@
 import { BadgeCheck, CheckCircle2, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 
 import type { LandingCopy } from "@/lib/landingCopy";
 
@@ -71,12 +71,12 @@ export function ReputationSection({ copy, scoreCopy }: ReputationSectionProps) {
               </span>
             </div>
 
-            <Link
+            <LocalizedLink
               href="/u"
               className="mt-8 inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50"
             >
               {copy.cta}
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
       </div>

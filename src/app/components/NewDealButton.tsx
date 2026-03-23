@@ -1,6 +1,10 @@
-import Link from "next/link";
+"use client";
+
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { Plus } from "lucide-react";
 import { IconButton } from "@/app/components/ui/IconButton";
+import { useLocale } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
 
 type NewDealButtonProps = {
   label: string;
@@ -13,13 +17,14 @@ export function NewDealButton({
   className,
   variant = "text",
 }: NewDealButtonProps) {
+  const locale = useLocale();
   const baseClasses =
     "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
   if (variant === "icon") {
     return (
       <IconButton
-        href="/promises/new"
+        href={localizePath("/promises/new", locale)}
         ariaLabel={label}
         className={[
           "bg-emerald-400 text-slate-50 shadow-lg shadow-emerald-500/30 hover:bg-emerald-300 hover:text-slate-50 focus-visible:text-slate-50 active:text-slate-50 border-emerald-300/60",
@@ -35,9 +40,9 @@ export function NewDealButton({
   }
 
   return (
-    <Link href="/promises/new" className={[baseClasses, className].filter(Boolean).join(" ")}>
+    <LocalizedLink href="/promises/new" className={[baseClasses, className].filter(Boolean).join(" ")}>
       {label}
-    </Link>
+    </LocalizedLink>
   );
 }
 

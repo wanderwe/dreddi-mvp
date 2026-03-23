@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -435,12 +435,12 @@ export default function PublicProfilePage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#0b0f1a] text-white">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10">
-        <Link
+        <LocalizedLink
           href={backLink.href}
           className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
         >
           {backLink.label}
-        </Link>
+        </LocalizedLink>
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}

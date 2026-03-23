@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { StaticPageLayout } from "@/components/StaticPageLayout";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { getWhyCopy } from "@/lib/whyCopy";
@@ -65,12 +65,12 @@ export default async function WhyPage() {
       </div>
 
       <div className="mt-14">
-        <Link
+        <LocalizedLink
           href="/"
           className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
         >
           {copy.cta}
-        </Link>
+        </LocalizedLink>
       </div>
     </StaticPageLayout>
   );
