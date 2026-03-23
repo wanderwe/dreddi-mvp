@@ -16,10 +16,10 @@ function resolvePreferredLocale(request: NextRequest) {
   return detectLocaleFromAcceptLanguage(request.headers.get("accept-language"));
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  const { locale, localeSegment, pathnameWithoutLocale } = extractLocaleFromPathname(pathname);
+  const { locale, localeSegment } = extractLocaleFromPathname(pathname);
 
   if (!locale) {
     const preferredLocale = resolvePreferredLocale(request);
@@ -36,10 +36,7 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-dreddi-locale", locale);
 
-  const rewrittenUrl = request.nextUrl.clone();
-  rewrittenUrl.pathname = pathnameWithoutLocale;
-
-  const response = NextResponse.rewrite(rewrittenUrl, {
+  const response = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
