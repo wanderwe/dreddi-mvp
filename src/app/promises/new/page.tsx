@@ -595,7 +595,7 @@ export default function NewPromisePage() {
       return;
     }
 
-    router.push(`/promises/${body.id}`);
+    router.push(localizePath(`/promises/${body.id}`, locale));
   }
 
   return (

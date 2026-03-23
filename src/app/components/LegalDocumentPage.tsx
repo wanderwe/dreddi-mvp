@@ -11,8 +11,14 @@ const formatDate = (value: string, locale: string) =>
     day: "numeric",
   }).format(new Date(value));
 
-export async function LegalDocumentPage({ type }: { type: LegalDocumentType }) {
-  const locale = await getLocale();
+export async function LegalDocumentPage({
+  type,
+  locale: localeOverride,
+}: {
+  type: LegalDocumentType;
+  locale?: string;
+}) {
+  const locale = localeOverride ?? (await getLocale());
   const messages = await getMessages(locale);
   const t = createTranslator(locale, messages);
   const { document, error } = await getLegalDocument(type, locale);

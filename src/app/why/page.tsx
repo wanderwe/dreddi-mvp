@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { StaticPageLayout } from "@/components/StaticPageLayout";
 import { getLocale } from "@/lib/i18n/getLocale";
+import { type Locale } from "@/lib/i18n/locales";
 import { getWhyCopy } from "@/lib/whyCopy";
 import { WhyProgress } from "./WhyProgress";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
+export function buildWhyMetadata(locale: Locale): Metadata {
   const copy = getWhyCopy(locale);
 
   return {
@@ -15,8 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function WhyPage() {
+export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  return buildWhyMetadata(locale);
+}
+
+export function WhyPageContent({ locale }: { locale: Locale }) {
   const copy = getWhyCopy(locale);
 
   return (
@@ -60,13 +64,18 @@ export default async function WhyPage() {
       </div>
 
       <div className="mt-10">
-        <Link
+        <LocalizedLink
           href="/"
           className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
         >
           {copy.cta}
-        </Link>
+        </LocalizedLink>
       </div>
     </StaticPageLayout>
   );
+}
+
+export default async function WhyPage() {
+  const locale = await getLocale();
+  return <WhyPageContent locale={locale} />;
 }
