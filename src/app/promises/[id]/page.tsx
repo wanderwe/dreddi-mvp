@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
@@ -207,7 +208,7 @@ export default function PromisePage() {
   ) {
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      router.push(`/login?next=${encodeURIComponent(nextPath)}`);
+      router.push(localizeLoginPath(nextPath, locale));
       return null;
     }
     setUserId(data.session.user.id);
@@ -230,7 +231,7 @@ export default function PromisePage() {
     const actionQuery = actionParam === "confirm" || actionParam === "dispute"
       ? `?action=${actionParam}`
       : "";
-    const session = await requireSessionOrRedirect(`/promises/${id}${actionQuery}`, supabase);
+    const session = await requireSessionOrRedirect(localizePath(`/promises/${id}${actionQuery}`, locale), supabase);
     if (!session) return;
 
     const { data, error } = await supabase
@@ -263,7 +264,7 @@ export default function PromisePage() {
   useEffect(() => {
     if (!id || !userId) return;
     if (actionParam !== "confirm" && actionParam !== "dispute") return;
-    router.replace(`/promises/${id}/confirm?action=${actionParam}`);
+    router.replace(localizePath(`/promises/${id}/confirm?action=${actionParam}`, locale));
   }, [actionParam, id, router, userId]);
 
   useEffect(() => {

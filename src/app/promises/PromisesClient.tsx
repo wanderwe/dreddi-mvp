@@ -288,7 +288,7 @@ export default function PromisesClient() {
   const setTab = (next: TabKey) => {
     const sp = new URLSearchParams(searchParams.toString());
     sp.set("tab", next);
-    router.push(`/promises?${sp.toString()}`);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
   const fetchTabPage = async ({
@@ -667,7 +667,7 @@ export default function PromisesClient() {
     const sp = new URLSearchParams(searchParams.toString());
     if (resolved === "total") sp.delete("filter");
     else sp.set("filter", resolved);
-    router.push(`/promises?${sp.toString()}`);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
   return (

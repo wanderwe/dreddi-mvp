@@ -1,5 +1,6 @@
 import { LegalDocumentContent } from "@/app/components/LegalDocumentContent";
 import { getLocale } from "@/lib/i18n/getLocale";
+import { type Locale } from "@/lib/i18n/locales";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { createTranslator } from "@/lib/i18n/t";
 import { getLegalDocument, type LegalDocumentType } from "@/lib/legalDocuments";
@@ -11,8 +12,14 @@ const formatDate = (value: string, locale: string) =>
     day: "numeric",
   }).format(new Date(value));
 
-export async function LegalDocumentPage({ type }: { type: LegalDocumentType }) {
-  const locale = await getLocale();
+export async function LegalDocumentPage({
+  type,
+  locale: localeOverride,
+}: {
+  type: LegalDocumentType;
+  locale?: Locale;
+}) {
+  const locale = localeOverride ?? (await getLocale());
   const messages = await getMessages(locale);
   const t = createTranslator(locale, messages);
   const { document, error } = await getLegalDocument(type, locale);

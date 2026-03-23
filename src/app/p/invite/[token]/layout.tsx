@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale } from "@/lib/i18n/getLocale";
+import { type Locale } from "@/lib/i18n/locales";
 import { lookupInvitePreview } from "@/lib/invitePreview";
 import { localizePath } from "@/lib/i18n/routing";
 
@@ -18,11 +19,7 @@ const INVITE_METADATA_COPY = {
   },
 };
 
-export async function generateMetadata(ctx: {
-  params: Promise<{ token: string }>;
-}): Promise<Metadata> {
-  const { token } = await ctx.params;
-  const locale = await getLocale();
+export async function buildInviteMetadata(token: string, locale: Locale): Promise<Metadata> {
   const copy = INVITE_METADATA_COPY[locale] ?? INVITE_METADATA_COPY.en;
   const invitePreview = await lookupInvitePreview(token);
   const agreementTitle = invitePreview?.title ?? copy.fallbackTitle;
@@ -55,6 +52,14 @@ export async function generateMetadata(ctx: {
       description: copy.description,
     },
   };
+}
+
+export async function generateMetadata(ctx: {
+  params: Promise<{ token: string }>;
+}): Promise<Metadata> {
+  const { token } = await ctx.params;
+  const locale = await getLocale();
+  return buildInviteMetadata(token, locale);
 }
 
 export default function InviteLayout({ children }: { children: React.ReactNode }) {
