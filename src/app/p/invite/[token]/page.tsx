@@ -206,32 +206,24 @@ export default function InvitePage() {
     return info.creator_handle ? `@${info.creator_handle}` : t("invite.unknown");
   }, [info, t]);
 
-  const inviteRole = useMemo<"executor" | "counterparty">(() => {
-    if (!info) return "counterparty";
-    const creatorIsPromisee = Boolean(info.promisee_id && info.promisee_id === info.creator_id);
-    const creatorIsPromisor = Boolean(info.promisor_id && info.promisor_id === info.creator_id);
+  const inviteRole = useMemo<"executor" | "receiver">(() => {
+    if (!info) return "receiver";
+    const creatorIsPromisee = info.promisee_id === info.creator_id;
+    const creatorIsPromisor = info.promisor_id === info.creator_id;
 
     if (creatorIsPromisee && !info.promisor_id) return "executor";
-    if (creatorIsPromisor && !info.promisee_id) return "counterparty";
+    if (creatorIsPromisor && !info.promisee_id) return "receiver";
 
-    return "counterparty";
+    return "receiver";
   }, [info]);
 
-  const roleExplanation = useMemo(() => {
-    const creatorLabel = creatorName;
-
+  const roleLine = useMemo(() => {
     if (inviteRole === "executor") {
-      return {
-        title: t("invite.roleExplanation.executor.title"),
-        body: t("invite.roleExplanation.executor.body", { creatorLabel }),
-      };
+      return t("invite.roleLine.executor");
     }
 
-    return {
-      title: t("invite.roleExplanation.counterparty.title"),
-      body: t("invite.roleExplanation.counterparty.body", { creatorLabel }),
-    };
-  }, [creatorName, inviteRole, t]);
+    return t("invite.roleLine.receiver");
+  }, [inviteRole, t]);
 
   const acceptingUserName = useMemo(() => {
     if (!info?.counterparty_id) return t("invite.unknown");
@@ -316,9 +308,11 @@ export default function InvitePage() {
             </p>
           </div>
 
-          <div className="max-w-2xl rounded-2xl border border-emerald-300/20 bg-emerald-500/10 px-5 py-4 shadow-lg shadow-emerald-950/10">
-            <p className="text-sm font-semibold text-emerald-100 sm:text-base">{roleExplanation.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-emerald-50/90">{roleExplanation.body}</p>
+          <div className="max-w-2xl rounded-2xl border border-emerald-300/20 bg-emerald-500/10 px-4 py-3 shadow-lg shadow-emerald-950/10">
+            <p className="text-sm text-emerald-50/95">
+              <span className="font-semibold text-emerald-100">{t("invite.roleLine.label")}:</span>{" "}
+              <span>{roleLine}</span>
+            </p>
           </div>
         </div>
 
