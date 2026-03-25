@@ -412,13 +412,27 @@
     "signedIn": "Signed in",
     "guestMode": "Guest mode",
     "eyebrow": "Invitation",
+    "heading": {
+      "pending": "Deal invitation",
+      "accepted": "This invite has been accepted",
+      "acceptedByYou": "Invitation status"
+    },
+    "invitedStateTitle": "You’re invited to a deal",
+    "acceptedStateTitle": "You joined this deal",
     "title": "Join this {entity} on Dreddi",
-    "subtitle": "Review the {entityLower} details below. If everything looks good, accept the invite to start collaborating and keep each other accountable.",
+    "subtitle": "Review the {entityLower} details and your role. If it looks right, accept to continue.",
     "accepted": "This invite was already accepted",
+    "acceptedStateMessage": "You already accepted this deal",
+    "acceptedStateMessageYou": "You accepted this deal",
     "acceptedBy": "Invitation accepted by: {name}",
+    "acceptedByLabel": "Accepted by",
     "badge": "{entity} invite",
     "createdBy": "{creatorLabel}: {name}",
+    "createdByLabel": "Created by",
+    "invitedSideLabel": "Invited side",
+    "invitedSidePending": "Not assigned yet",
     "deadline": "Deadline",
+    "publicTag": "Public",
     "counterCondition": "Counter-condition",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",
@@ -463,17 +477,15 @@
       "acceptFailed": "Accept failed",
       "declineFailed": "Decline failed"
     },
-    "roleExplanation": {
-      "executor": {
-        "title": "You are invited as the executor",
-        "body": "{creatorLabel} expects you to complete this agreement"
-      },
-      "counterparty": {
-        "title": "You are invited as the counterparty",
-        "body": "{creatorLabel} expects you to review and confirm this agreement"
-      }
+    "roleLine": {
+      "label": "Your role",
+      "executor": "You are expected to complete this deal",
+      "receiver": "This deal is a promise made to you"
     },
-    "acceptCta": "Accept and take responsibility"
+    "acceptCta": "Accept and take responsibility",
+    "acceptDeal": "Accept deal",
+    "goToDeal": "Open deal",
+    "viewDeal": "View deal"
   },
   "auth": {
     "login": {

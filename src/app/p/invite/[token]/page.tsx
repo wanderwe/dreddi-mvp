@@ -199,46 +199,24 @@ export default function InvitePage() {
     await load();
   }
 
-  const creatorName = useMemo(() => {
-    if (!info) return t("invite.unknown");
-    const displayName = info.creator_display_name?.trim();
-    if (displayName) return displayName;
-    return info.creator_handle ? `@${info.creator_handle}` : t("invite.unknown");
-  }, [info, t]);
-
-  const inviteRole = useMemo<"executor" | "counterparty">(() => {
-    if (!info) return "counterparty";
-    const creatorIsPromisee = Boolean(info.promisee_id && info.promisee_id === info.creator_id);
-    const creatorIsPromisor = Boolean(info.promisor_id && info.promisor_id === info.creator_id);
+  const inviteRole = useMemo<"executor" | "receiver">(() => {
+    if (!info) return "receiver";
+    const creatorIsPromisee = info.promisee_id === info.creator_id;
+    const creatorIsPromisor = info.promisor_id === info.creator_id;
 
     if (creatorIsPromisee && !info.promisor_id) return "executor";
-    if (creatorIsPromisor && !info.promisee_id) return "counterparty";
+    if (creatorIsPromisor && !info.promisee_id) return "receiver";
 
-    return "counterparty";
+    return "receiver";
   }, [info]);
 
-  const roleExplanation = useMemo(() => {
-    const creatorLabel = creatorName;
-
+  const roleLine = useMemo(() => {
     if (inviteRole === "executor") {
-      return {
-        title: t("invite.roleExplanation.executor.title"),
-        body: t("invite.roleExplanation.executor.body", { creatorLabel }),
-      };
+      return t("invite.roleLine.executor");
     }
 
-    return {
-      title: t("invite.roleExplanation.counterparty.title"),
-      body: t("invite.roleExplanation.counterparty.body", { creatorLabel }),
-    };
-  }, [creatorName, inviteRole, t]);
-
-  const acceptingUserName = useMemo(() => {
-    if (!info?.counterparty_id) return t("invite.unknown");
-    const displayName = info.counterparty_display_name?.trim();
-    if (displayName) return displayName;
-    return info.counterparty_id.slice(0, 8);
-  }, [info, t]);
+    return t("invite.roleLine.receiver");
+  }, [inviteRole, t]);
 
   const dueParts = useMemo(() => {
     if (!info?.due_at) return null;
@@ -261,10 +239,30 @@ export default function InvitePage() {
     }
   }, [info?.due_at, locale]);
 
-  const counterCondition = info?.condition_text?.trim();
-  const conditionMet = Boolean(info?.condition_met_at);
   const inviteStatus = getPromiseInviteStatus(info);
   const inviteAccepted = isPromiseAccepted(info);
+  const creatorName = useMemo(() => {
+    if (!info) return t("invite.unknown");
+    const displayName = info.creator_display_name?.trim();
+    if (displayName) return displayName;
+    return info.creator_handle ? `@${info.creator_handle}` : t("invite.unknown");
+  }, [info, t]);
+  const invitedSideName = useMemo(() => {
+    if (!info?.counterparty_id) return t("invite.invitedSidePending");
+    const displayName = info.counterparty_display_name?.trim();
+    if (displayName) return displayName;
+    return info.counterparty_id.slice(0, 8);
+  }, [info, t]);
+  const isCreatorViewer = Boolean(info?.creator_id && userId && info.creator_id === userId);
+  const isAcceptedInviteeViewer = Boolean(
+    inviteAccepted && info?.counterparty_id && userId && info.counterparty_id === userId
+  );
+  const heading = inviteAccepted
+    ? isAcceptedInviteeViewer
+      ? t("invite.heading.acceptedByYou")
+      : t("invite.heading.accepted")
+    : t("invite.heading.pending");
+  const openDealLabel = isCreatorViewer ? t("invite.viewDeal") : t("invite.goToDeal");
   const canDecline = canCounterpartyRespond({
     userId,
     creatorId: info?.creator_id ?? "",
@@ -305,23 +303,6 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-              {t("invite.title", { entity: promiseLabels.entity })}
-            </h1>
-            <p className="max-w-2xl text-base text-slate-200">
-              {t("invite.subtitle", { entityLower: promiseLabels.entityLower })}
-            </p>
-          </div>
-
-          <div className="max-w-2xl rounded-2xl border border-emerald-300/20 bg-emerald-500/10 px-5 py-4 shadow-lg shadow-emerald-950/10">
-            <p className="text-sm font-semibold text-emerald-100 sm:text-base">{roleExplanation.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-emerald-50/90">{roleExplanation.body}</p>
-          </div>
-        </div>
-
         {error && (
           <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
             {error}
@@ -337,151 +318,110 @@ export default function InvitePage() {
         )}
 
         {info && (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
-            {inviteAccepted && (
-              <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-                {info.counterparty_id
-                  ? t("invite.acceptedBy", { name: acceptingUserName })
-                  : t("invite.accepted")}
-              </div>
-            )}
-            {info.visibility === "public" && (
-              <div className="mb-4 rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-                <p className="font-semibold">
-                  {t("invite.publicProposal.title", { entityLower: promiseLabels.entityLower })}
-                </p>
-                <p className="mt-1 text-xs text-amber-100/80">
-                  {t("invite.publicProposal.body", { entityLower: promiseLabels.entityLower })}
-                </p>
-              </div>
-            )}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  {t("invite.badge", { entity: promiseLabels.entity })}
-                </div>
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-7">
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+            <h1 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              {heading}
+            </h1>
 
-                {/* What exactly you accept */}
-                <h2 className="text-2xl font-semibold text-white sm:text-3xl">{info.title}</h2>
+            <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
 
-                {info.details && (
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-                    {info.details}
-                  </p>
-                )}
-
-                <p className="text-sm text-slate-300">
-                  {t("invite.createdBy", { creatorLabel: promiseLabels.creatorLabel, name: creatorName })}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
-                  <div className="rounded-full bg-white/10 p-2 text-emerald-300" aria-hidden>
-                    ⏰
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.deadline")}</p>
-                    {dueParts ? (
-                      <div className="flex flex-col font-semibold text-white">
-                        <span className="whitespace-nowrap leading-snug">{dueParts.dateText}</span>
-                        {dueParts.timeText && (
-                          <span className="whitespace-nowrap text-sm text-slate-200">
-                            {dueParts.timeText}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="font-semibold text-white">{t("invite.noDeadline")}</p>
-                    )}
-                  </div>
-                </div>
-                {counterCondition && (
-                  <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-sm text-slate-200 shadow-inner shadow-black/40">
-                    <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
-                      {t("invite.counterCondition")}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap font-semibold text-white">
-                      {counterCondition}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-400">
-                      {conditionMet
-                        ? t("promises.detail.conditionMet")
-                        : t("promises.detail.conditionWaiting")}
-                    </p>
-                  </div>
-                )}
-              </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">
+                <span className="mr-2" aria-hidden>
+                  ⏰
+                </span>
+                {t("invite.deadline")}:{" "}
+                <span className="ml-1 font-semibold text-white">
+                  {dueParts
+                    ? `${dueParts.dateText}${dueParts.timeText ? `, ${dueParts.timeText}` : ""}`
+                    : t("invite.noDeadline")}
+                </span>
+              </span>
+              {info.visibility === "public" && (
+                <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
+                  {t("invite.publicTag")}
+                </span>
+              )}
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.statusLabel")}</p>
-                <p className="mt-1 text-lg font-semibold text-white">
-                  {t(`invite.status.${inviteStatus}`)}
-                </p>
-                <p className="text-sm text-slate-300">
-                  {inviteStatus === "accepted"
-                    ? t("invite.statusAcceptedBody", { entityLower: promiseLabels.entityLower })
-                    : inviteStatus === "awaiting_acceptance"
-                    ? t("invite.statusAwaitingBody", { entityLower: promiseLabels.entityLower })
-                    : t("invite.statusClosedBody", { entityLower: promiseLabels.entityLower })}
-                </p>
+            <dl className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.createdByLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{creatorName}</dd>
               </div>
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.invitedSideLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.roleLine.label")}</dt>
+                <dd className="mt-1 font-medium text-white">{roleLine}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.statusLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{t(`invite.status.${inviteStatus}`)}</dd>
+              </div>
+              {inviteAccepted && (
+                <div className="sm:col-span-2">
+                  <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.acceptedByLabel")}</dt>
+                  <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+                </div>
+              )}
+            </dl>
 
-              <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-inner shadow-black/40">
-                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{t("invite.nextStep")}</p>
-
-                {inviteStatus === "accepted" ? (
-                  <div className="mt-2 flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-100">
-                    <span aria-hidden>✅</span> {t("invite.statusAccepted")}
+            <div className="mt-6">
+              {inviteAccepted ? (
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+                    {isAcceptedInviteeViewer
+                      ? t("invite.acceptedStateMessageYou")
+                      : t("invite.acceptedStateMessage")}
                   </div>
-                ) : inviteStatus === "declined" ? (
-                  <div className="mt-2 text-sm text-slate-300">{t("invite.declinedMessage")}</div>
-                ) : inviteStatus === "expired" ? (
-                  <div className="mt-2 text-sm text-slate-300">{t("invite.ignoredMessage")}</div>
-                ) : inviteStatus === "cancelled_by_creator" ? (
-                  <div className="mt-2 text-sm text-slate-300">{t("invite.withdrawnMessage")}</div>
-                ) : (
-                  <>
-                    <p className="mt-2 text-xs text-slate-400">
-                      {t("invite.nextStepHint", { entityLower: promiseLabels.entityLower })}
-                    </p>
-                    {canAccept ? (
-                      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-                        <button
-                          disabled={busy}
-                          onClick={() => {
-                            if (info.visibility === "public") {
-                              setShowAcceptModal(true);
-                            } else {
-                              void accept();
-                            }
-                          }}
-                          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
-                        >
-                          {busy
-                            ? t("invite.processing")
-                            : t("invite.acceptCta")}
-                        </button>
-                        {canDecline && (
-                          <button
-                            disabled={busy}
-                            onClick={() => void decline()}
-                            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {busy ? t("invite.processing") : t("invite.decline")}
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="mt-2 text-sm text-slate-300">
-                        {t("invite.awaitingCounterparty")}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+                  >
+                    {openDealLabel}
+                  </button>
+                </div>
+              ) : canAccept ? (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    disabled={busy}
+                    onClick={() => {
+                      if (info.visibility === "public") {
+                        setShowAcceptModal(true);
+                      } else {
+                        void accept();
+                      }
+                    }}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                  >
+                    {busy ? t("invite.processing") : t("invite.acceptDeal")}
+                  </button>
+                  {canDecline && (
+                    <button
+                      disabled={busy}
+                      onClick={() => void decline()}
+                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {busy ? t("invite.processing") : t("invite.decline")}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
+                  {inviteStatus === "declined"
+                    ? t("invite.declinedMessage")
+                    : inviteStatus === "expired"
+                    ? t("invite.ignoredMessage")
+                    : inviteStatus === "cancelled_by_creator"
+                    ? t("invite.withdrawnMessage")
+                    : t("invite.awaitingCounterparty")}
+                </div>
+              )}
             </div>
           </div>
         )}

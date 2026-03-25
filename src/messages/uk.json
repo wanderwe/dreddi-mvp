@@ -420,13 +420,27 @@
     "signedIn": "Увійшли",
     "guestMode": "Гостьовий режим",
     "eyebrow": "Запрошення",
+    "heading": {
+      "pending": "Запрошення до угоди",
+      "accepted": "Це запрошення вже прийнято",
+      "acceptedByYou": "Статус запрошення"
+    },
+    "invitedStateTitle": "Вас запрошено до угоди",
+    "acceptedStateTitle": "Ви приєдналися до угоди",
     "title": "Приєднайтеся до угоди в Dreddi",
-    "subtitle": "Перегляньте деталі угоди нижче. Якщо все влаштовує, прийміть запрошення, щоб почати співпрацювати і тримати відповідальність.",
+    "subtitle": "Перегляньте деталі угоди та вашу роль. Якщо все підходить, прийміть запрошення.",
     "accepted": "Це запрошення вже прийнято",
+    "acceptedStateMessage": "Ви вже прийняли цю угоду",
+    "acceptedStateMessageYou": "Ви прийняли цю угоду",
     "acceptedBy": "Запрошення прийняв користувач: {name}",
+    "acceptedByLabel": "Прийняв",
     "badge": "Запрошення до угоди",
     "createdBy": "{creatorLabel}: {name}",
+    "createdByLabel": "Створив",
+    "invitedSideLabel": "Запрошена сторона",
+    "invitedSidePending": "Ще не визначена",
     "deadline": "Строк",
+    "publicTag": "Публічна",
     "counterCondition": "Контрумова",
     "rewardLabel": "Винагорода",
     "rewardUnset": "Не вказано",
@@ -471,17 +485,15 @@
       "acceptFailed": "Не вдалося прийняти запрошення",
       "declineFailed": "Не вдалося відхилити запрошення"
     },
-    "roleExplanation": {
-      "executor": {
-        "title": "Ви запрошені як виконавець",
-        "body": "{creatorLabel} очікує, що ви виконаєте цю угоду"
-      },
-      "counterparty": {
-        "title": "Ви запрошені як інша сторона",
-        "body": "{creatorLabel} очікує, що ви переглянете та підтвердите цю угоду"
-      }
+    "roleLine": {
+      "label": "Ваша роль",
+      "executor": "Від вас очікується виконання цієї угоди",
+      "receiver": "Ця угода — обіцянка вам"
     },
-    "acceptCta": "Прийняти та виконати"
+    "acceptCta": "Прийняти та виконати",
+    "acceptDeal": "Прийняти угоду",
+    "goToDeal": "Відкрити угоду",
+    "viewDeal": "Переглянути угоду"
   },
   "auth": {
     "login": {
