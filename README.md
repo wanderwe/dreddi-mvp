@@ -99,6 +99,7 @@ and track fulfillment or breach over time.
   - Method: `GET`
   - Header: `Authorization: Bearer <CRON_SECRET>`
   - Schedule: every 15 minutes (30 minutes is acceptable for MVP)
+  - This single endpoint now handles both deadline reminders and invite auto-ignore expiry.
 - Timezone: prefer UTC in cron-job.org to avoid daylight-saving drift.
 
 ### Smoke test
@@ -106,6 +107,8 @@ and track fulfillment or breach over time.
   - `curl -i https://www.dreddi.com/api/notifications/cron`
 - Authorized check (expected `200` + `{ "processed": <number>, "emailsSent": <number>, "errors": [] }`):
   - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron`
+- Optional short-timeout invite ignore dry run (for debugging):
+  - `curl -i -H "Authorization: Bearer <CRON_SECRET>" "https://www.dreddi.com/api/notifications/cron?dryRun=1&inviteIgnoreMinutes=2"`
 - Optional connectivity check endpoint:
   - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron-smoke`
 
