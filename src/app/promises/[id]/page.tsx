@@ -169,6 +169,7 @@ export default function PromisePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
+  const [participantNames, setParticipantNames] = useState<Record<string, string>>({});
 
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
@@ -638,6 +639,7 @@ export default function PromisePage() {
 
   const executorId = p ? resolveExecutorId(p) : null;
   const counterpartyId = p ? resolveCounterpartyId(p) : null;
+  const promiseMadeToId = p?.promisee_id ?? counterpartyId ?? null;
   const isExecutor = Boolean(userId && executorId && userId === executorId);
   const isCounterparty = Boolean(
     userId && counterpartyId && userId === counterpartyId && !isExecutor
@@ -680,12 +682,80 @@ export default function PromisePage() {
     : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
+  const roleVariant = useMemo<"invited_side_executes" | "invited_side_receives">(() => {
+    if (!p?.creator_id) return "invited_side_receives";
+    if (executorId && executorId !== p.creator_id) return "invited_side_executes";
+    return "invited_side_receives";
+  }, [executorId, p?.creator_id]);
+  const roleSummaryKey =
+    roleVariant === "invited_side_executes"
+      ? "promises.detail.roles.summary.invitedSideExecutes"
+      : "promises.detail.roles.summary.invitedSideReceives";
+  const getParticipantLabel = (participantId: string | null) => {
+    if (!participantId) return t("promises.detail.counterpartyFallback");
+    if (userId && participantId === userId) return t("promises.detail.you");
+    return participantNames[participantId] ?? participantId.slice(0, 8);
+  };
+  const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
+  const responsibleLabel = getParticipantLabel(executorId);
+  const promiseToLabel = getParticipantLabel(promiseMadeToId);
+  const roleSummary = t(roleSummaryKey, {
+    responsible: responsibleLabel,
+    recipient: promiseToLabel,
+  });
   const acceptingUserName = useMemo(() => {
     if (!p?.counterparty_id) return t("promises.detail.unknownUser");
     const displayName = counterpartyDisplayName?.trim();
     if (displayName) return displayName;
     return p.counterparty_id.slice(0, 8);
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
+
+  useEffect(() => {
+    let active = true;
+
+    const participantIds = Array.from(
+      new Set(
+        [p?.creator_id, p?.counterparty_id, p?.promisor_id, p?.promisee_id].filter(
+          (value): value is string => Boolean(value)
+        )
+      )
+    );
+
+    if (participantIds.length === 0) {
+      setParticipantNames({});
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadParticipantNames = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("id,display_name,email")
+        .in("id", participantIds);
+
+      if (!active) return;
+      const names: Record<string, string> = {};
+      for (const profile of data ?? []) {
+        const label = profile.display_name?.trim() || profile.email?.trim() || "";
+        if (label) names[profile.id] = label;
+      }
+      setParticipantNames(names);
+    };
+
+    void loadParticipantNames();
+
+    return () => {
+      active = false;
+    };
+  }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
@@ -744,7 +814,33 @@ export default function PromisePage() {
             <div className="space-y-3">
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
-                <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
+                  {t("promises.detail.roles.title")}
+                </p>
+                <dl className="mt-3 grid gap-3 text-sm text-neutral-300 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                      {t("promises.detail.roles.createdBy")}
+                    </dt>
+                    <dd className="mt-1 font-medium text-white">{createdByLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                      {t("promises.detail.roles.responsible")}
+                    </dt>
+                    <dd className="mt-1 font-medium text-white">{responsibleLabel}</dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                      {t("promises.detail.roles.madeTo")}
+                    </dt>
+                    <dd className="mt-1 font-medium text-white">{promiseToLabel}</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-sm text-emerald-200">{roleSummary}</p>
               </div>
 
               {showPublicStatus && (
@@ -757,6 +853,11 @@ export default function PromisePage() {
                   </span>
                 </div>
               )}
+
+              <div className="text-sm text-neutral-400">
+                {t("promises.detail.deadline")}:{" "}
+                <span className="text-neutral-200">{dueText}</span>
+              </div>
 
               <div className="text-sm text-neutral-400">
                 {t("promises.detail.inviteStatusLabel")}:{" "}
