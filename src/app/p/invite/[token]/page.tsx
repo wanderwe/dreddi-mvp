@@ -241,6 +241,28 @@ export default function InvitePage() {
 
   const inviteStatus = getPromiseInviteStatus(info);
   const inviteAccepted = isPromiseAccepted(info);
+  const creatorName = useMemo(() => {
+    if (!info) return t("invite.unknown");
+    const displayName = info.creator_display_name?.trim();
+    if (displayName) return displayName;
+    return info.creator_handle ? `@${info.creator_handle}` : t("invite.unknown");
+  }, [info, t]);
+  const invitedSideName = useMemo(() => {
+    if (!info?.counterparty_id) return t("invite.invitedSidePending");
+    const displayName = info.counterparty_display_name?.trim();
+    if (displayName) return displayName;
+    return info.counterparty_id.slice(0, 8);
+  }, [info, t]);
+  const isCreatorViewer = Boolean(info?.creator_id && userId && info.creator_id === userId);
+  const isAcceptedInviteeViewer = Boolean(
+    inviteAccepted && info?.counterparty_id && userId && info.counterparty_id === userId
+  );
+  const heading = inviteAccepted
+    ? isAcceptedInviteeViewer
+      ? t("invite.heading.acceptedByYou")
+      : t("invite.heading.accepted")
+    : t("invite.heading.pending");
+  const openDealLabel = isCreatorViewer ? t("invite.viewDeal") : t("invite.goToDeal");
   const canDecline = canCounterpartyRespond({
     userId,
     creatorId: info?.creator_id ?? "",
@@ -299,15 +321,8 @@ export default function InvitePage() {
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-7">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
-              {inviteAccepted ? t("invite.acceptedStateTitle") : t("invite.invitedStateTitle")}
+              {heading}
             </h1>
-
-            {!inviteAccepted && (
-              <p className="mt-4 text-sm text-emerald-50/95">
-                <span className="font-semibold text-emerald-100">{t("invite.roleLine.label")}:</span>{" "}
-                <span>{roleLine}</span>
-              </p>
-            )}
 
             <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
 
@@ -330,59 +345,84 @@ export default function InvitePage() {
               )}
             </div>
 
-            {inviteAccepted ? (
-              <div className="mt-6 space-y-4">
-                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
-                  {t("invite.acceptedStateMessage")}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                  className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
-                >
-                  {t("invite.goToDeal")}
-                </button>
+            <dl className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.createdByLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{creatorName}</dd>
               </div>
-            ) : (
-              <div className="mt-6">
-                {canAccept ? (
-                  <div className="flex flex-col gap-2 sm:flex-row">
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.invitedSideLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.roleLine.label")}</dt>
+                <dd className="mt-1 font-medium text-white">{roleLine}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.statusLabel")}</dt>
+                <dd className="mt-1 font-medium text-white">{t(`invite.status.${inviteStatus}`)}</dd>
+              </div>
+              {inviteAccepted && (
+                <div className="sm:col-span-2">
+                  <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.acceptedByLabel")}</dt>
+                  <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+                </div>
+              )}
+            </dl>
+
+            <div className="mt-6">
+              {inviteAccepted ? (
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+                    {isAcceptedInviteeViewer
+                      ? t("invite.acceptedStateMessageYou")
+                      : t("invite.acceptedStateMessage")}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+                  >
+                    {openDealLabel}
+                  </button>
+                </div>
+              ) : canAccept ? (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    disabled={busy}
+                    onClick={() => {
+                      if (info.visibility === "public") {
+                        setShowAcceptModal(true);
+                      } else {
+                        void accept();
+                      }
+                    }}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                  >
+                    {busy ? t("invite.processing") : t("invite.acceptDeal")}
+                  </button>
+                  {canDecline && (
                     <button
                       disabled={busy}
-                      onClick={() => {
-                        if (info.visibility === "public") {
-                          setShowAcceptModal(true);
-                        } else {
-                          void accept();
-                        }
-                      }}
-                      className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                      onClick={() => void decline()}
+                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {busy ? t("invite.processing") : t("invite.acceptDeal")}
+                      {busy ? t("invite.processing") : t("invite.decline")}
                     </button>
-                    {canDecline && (
-                      <button
-                        disabled={busy}
-                        onClick={() => void decline()}
-                        className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {busy ? t("invite.processing") : t("invite.decline")}
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
-                    {inviteStatus === "declined"
-                      ? t("invite.declinedMessage")
-                      : inviteStatus === "expired"
-                      ? t("invite.ignoredMessage")
-                      : inviteStatus === "cancelled_by_creator"
-                      ? t("invite.withdrawnMessage")
-                      : t("invite.awaitingCounterparty")}
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
+                  {inviteStatus === "declined"
+                    ? t("invite.declinedMessage")
+                    : inviteStatus === "expired"
+                    ? t("invite.ignoredMessage")
+                    : inviteStatus === "cancelled_by_creator"
+                    ? t("invite.withdrawnMessage")
+                    : t("invite.awaitingCounterparty")}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
