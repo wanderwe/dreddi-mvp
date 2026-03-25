@@ -412,13 +412,17 @@
     "signedIn": "Signed in",
     "guestMode": "Guest mode",
     "eyebrow": "Invitation",
+    "invitedStateTitle": "You’re invited to a deal",
+    "acceptedStateTitle": "You joined this deal",
     "title": "Join this {entity} on Dreddi",
     "subtitle": "Review the {entityLower} details and your role. If it looks right, accept to continue.",
     "accepted": "This invite was already accepted",
+    "acceptedStateMessage": "You already accepted this deal",
     "acceptedBy": "Invitation accepted by: {name}",
     "badge": "{entity} invite",
     "createdBy": "{creatorLabel}: {name}",
     "deadline": "Deadline",
+    "publicTag": "Public",
     "counterCondition": "Counter-condition",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",
@@ -468,7 +472,9 @@
       "executor": "You are expected to complete this deal",
       "receiver": "This deal is a promise made to you"
     },
-    "acceptCta": "Accept and take responsibility"
+    "acceptCta": "Accept and take responsibility",
+    "acceptDeal": "Accept deal",
+    "goToDeal": "Go to deal"
   },
   "auth": {
     "login": {

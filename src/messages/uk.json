@@ -420,13 +420,17 @@
     "signedIn": "Увійшли",
     "guestMode": "Гостьовий режим",
     "eyebrow": "Запрошення",
+    "invitedStateTitle": "Вас запрошено до угоди",
+    "acceptedStateTitle": "Ви приєдналися до угоди",
     "title": "Приєднайтеся до угоди в Dreddi",
     "subtitle": "Перегляньте деталі угоди та вашу роль. Якщо все підходить, прийміть запрошення.",
     "accepted": "Це запрошення вже прийнято",
+    "acceptedStateMessage": "Ви вже прийняли цю угоду",
     "acceptedBy": "Запрошення прийняв користувач: {name}",
     "badge": "Запрошення до угоди",
     "createdBy": "{creatorLabel}: {name}",
     "deadline": "Строк",
+    "publicTag": "Публічна",
     "counterCondition": "Контрумова",
     "rewardLabel": "Винагорода",
     "rewardUnset": "Не вказано",
@@ -476,7 +480,9 @@
       "executor": "Від вас очікується виконання цієї угоди",
       "receiver": "Ця угода — обіцянка вам"
     },
-    "acceptCta": "Прийняти та виконати"
+    "acceptCta": "Прийняти та виконати",
+    "acceptDeal": "Прийняти угоду",
+    "goToDeal": "Перейти до угоди"
   },
   "auth": {
     "login": {
