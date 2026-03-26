@@ -669,7 +669,7 @@ export default function PromisePage() {
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const shouldShowInviteBlock = !isFinal && canManageInvite;
+  const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canShareReminder = Boolean(p && inviteStatus === "accepted");
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
@@ -709,6 +709,9 @@ export default function PromisePage() {
     if (displayName) return displayName;
     return p.counterparty_id.slice(0, 8);
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
+  const inviteMetaText = inviteStatus === "accepted"
+    ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
+    : t(`promises.inviteStatus.${inviteStatus}`);
 
   useEffect(() => {
     let active = true;
@@ -860,14 +863,14 @@ export default function PromisePage() {
               </div>
 
               <div className="text-sm text-neutral-400">
-                {t("promises.detail.inviteStatusLabel")}:{" "}
+                {t("promises.detail.inviteLabel")}:{" "}
                 <span
                   className={
                     "text-sm font-medium " +
                     (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
                   }
                 >
-                  {t(`promises.inviteStatus.${inviteStatus}`)}
+                  {inviteMetaText}
                 </span>
               </div>
 
@@ -968,19 +971,8 @@ export default function PromisePage() {
           )}
 
           {shouldShowInviteBlock && (
-            <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
-              {isInviteAccepted ? (
-                <div className="flex flex-col gap-2 text-sm text-neutral-300">
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100">
-                    {t("promises.detail.inviteAccepted")}
-                  </div>
-                  <div className="text-neutral-300">
-                    {t("promises.detail.inviteAcceptedBy", {
-                      name: acceptingUserName,
-                    })}
-                  </div>
-                </div>
-              ) : !p.invite_token ? (
+            <Card title={t("promises.detail.inviteLinkTitle")}>
+              {!p.invite_token ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-neutral-400">
                     {t("promises.detail.noInviteToken")}
