@@ -682,27 +682,17 @@ export default function PromisePage() {
     : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
-  const roleVariant = useMemo<"invited_side_executes" | "invited_side_receives">(() => {
-    if (!p?.creator_id) return "invited_side_receives";
-    if (executorId && executorId !== p.creator_id) return "invited_side_executes";
-    return "invited_side_receives";
-  }, [executorId, p?.creator_id]);
-  const roleSummaryKey =
-    roleVariant === "invited_side_executes"
-      ? "promises.detail.roles.summary.invitedSideExecutes"
-      : "promises.detail.roles.summary.invitedSideReceives";
   const getParticipantLabel = (participantId: string | null) => {
     if (!participantId) return t("promises.detail.counterpartyFallback");
-    if (userId && participantId === userId) return t("promises.detail.you");
-    return participantNames[participantId] ?? participantId.slice(0, 8);
+    const baseLabel = participantNames[participantId] ?? participantId.slice(0, 8);
+    if (userId && participantId === userId) {
+      return `${baseLabel} (${t("promises.detail.you")})`;
+    }
+    return baseLabel;
   };
   const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
   const responsibleLabel = getParticipantLabel(executorId);
   const promiseToLabel = getParticipantLabel(promiseMadeToId);
-  const roleSummary = t(roleSummaryKey, {
-    responsible: responsibleLabel,
-    recipient: promiseToLabel,
-  });
   const acceptingUserName = useMemo(() => {
     if (!p?.counterparty_id) return t("promises.detail.unknownUser");
     const displayName = counterpartyDisplayName?.trim();
@@ -819,31 +809,33 @@ export default function PromisePage() {
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div>
                 <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
                   {t("promises.detail.roles.title")}
                 </p>
-                <dl className="mt-3 grid gap-3 text-sm text-neutral-300 sm:grid-cols-2">
+                <dl className="mt-3 space-y-2 text-sm text-neutral-300">
                   <div>
-                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                    <dt className="inline text-neutral-400">
                       {t("promises.detail.roles.createdBy")}
+                      {": "}
                     </dt>
-                    <dd className="mt-1 font-medium text-white">{createdByLabel}</dd>
+                    <dd className="inline font-medium text-white">{createdByLabel}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                    <dt className="inline text-neutral-400">
                       {t("promises.detail.roles.responsible")}
+                      {": "}
                     </dt>
-                    <dd className="mt-1 font-medium text-white">{responsibleLabel}</dd>
+                    <dd className="inline font-medium text-white">{responsibleLabel}</dd>
                   </div>
-                  <div className="sm:col-span-2">
-                    <dt className="text-xs uppercase tracking-[0.1em] text-neutral-500">
+                  <div>
+                    <dt className="inline text-neutral-400">
                       {t("promises.detail.roles.madeTo")}
+                      {": "}
                     </dt>
-                    <dd className="mt-1 font-medium text-white">{promiseToLabel}</dd>
+                    <dd className="inline font-medium text-white">{promiseToLabel}</dd>
                   </div>
                 </dl>
-                <p className="mt-3 text-sm text-emerald-200">{roleSummary}</p>
               </div>
 
               {showPublicStatus && (
