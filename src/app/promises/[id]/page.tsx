@@ -169,6 +169,7 @@ export default function PromisePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
+  const [participantNames, setParticipantNames] = useState<Record<string, string>>({});
 
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
@@ -638,6 +639,7 @@ export default function PromisePage() {
 
   const executorId = p ? resolveExecutorId(p) : null;
   const counterpartyId = p ? resolveCounterpartyId(p) : null;
+  const promiseMadeToId = p?.promisee_id ?? counterpartyId ?? null;
   const isExecutor = Boolean(userId && executorId && userId === executorId);
   const isCounterparty = Boolean(
     userId && counterpartyId && userId === counterpartyId && !isExecutor
@@ -667,7 +669,7 @@ export default function PromisePage() {
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
-  const shouldShowInviteBlock = !isFinal && canManageInvite;
+  const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canShareReminder = Boolean(p && inviteStatus === "accepted");
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
@@ -680,12 +682,73 @@ export default function PromisePage() {
     : "";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
+  const getParticipantLabel = (participantId: string | null) => {
+    if (!participantId) return t("promises.detail.counterpartyFallback");
+    const baseLabel = participantNames[participantId] ?? participantId.slice(0, 8);
+    if (userId && participantId === userId) {
+      return `${baseLabel} (${t("promises.detail.you")})`;
+    }
+    return baseLabel;
+  };
+  const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
+  const responsibleLabel = getParticipantLabel(executorId);
+  const promiseToLabel = getParticipantLabel(promiseMadeToId);
   const acceptingUserName = useMemo(() => {
     if (!p?.counterparty_id) return t("promises.detail.unknownUser");
     const displayName = counterpartyDisplayName?.trim();
     if (displayName) return displayName;
     return p.counterparty_id.slice(0, 8);
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
+  const inviteMetaText = inviteStatus === "accepted"
+    ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
+    : t(`promises.inviteStatus.${inviteStatus}`);
+
+  useEffect(() => {
+    let active = true;
+
+    const participantIds = Array.from(
+      new Set(
+        [p?.creator_id, p?.counterparty_id, p?.promisor_id, p?.promisee_id].filter(
+          (value): value is string => Boolean(value)
+        )
+      )
+    );
+
+    if (participantIds.length === 0) {
+      setParticipantNames({});
+      return () => {
+        active = false;
+      };
+    }
+
+    const loadParticipantNames = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("id,display_name,email")
+        .in("id", participantIds);
+
+      if (!active) return;
+      const names: Record<string, string> = {};
+      for (const profile of data ?? []) {
+        const label = profile.display_name?.trim() || profile.email?.trim() || "";
+        if (label) names[profile.id] = label;
+      }
+      setParticipantNames(names);
+    };
+
+    void loadParticipantNames();
+
+    return () => {
+      active = false;
+    };
+  }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
@@ -744,7 +807,35 @@ export default function PromisePage() {
             <div className="space-y-3">
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
-                <div className="mt-2 text-sm text-neutral-400">{dueText}</div>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
+                  {t("promises.detail.roles.title")}
+                </p>
+                <dl className="mt-3 space-y-2 text-sm text-neutral-300">
+                  <div>
+                    <dt className="inline text-neutral-400">
+                      {t("promises.detail.roles.createdBy")}
+                      {": "}
+                    </dt>
+                    <dd className="inline font-medium text-white">{createdByLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline text-neutral-400">
+                      {t("promises.detail.roles.responsible")}
+                      {": "}
+                    </dt>
+                    <dd className="inline font-medium text-white">{responsibleLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline text-neutral-400">
+                      {t("promises.detail.roles.madeTo")}
+                      {": "}
+                    </dt>
+                    <dd className="inline font-medium text-white">{promiseToLabel}</dd>
+                  </div>
+                </dl>
               </div>
 
               {showPublicStatus && (
@@ -759,14 +850,19 @@ export default function PromisePage() {
               )}
 
               <div className="text-sm text-neutral-400">
-                {t("promises.detail.inviteStatusLabel")}:{" "}
+                {t("promises.detail.deadline")}:{" "}
+                <span className="text-neutral-200">{dueText}</span>
+              </div>
+
+              <div className="text-sm text-neutral-400">
+                {t("promises.detail.inviteLabel")}:{" "}
                 <span
                   className={
                     "text-sm font-medium " +
                     (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
                   }
                 >
-                  {t(`promises.inviteStatus.${inviteStatus}`)}
+                  {inviteMetaText}
                 </span>
               </div>
 
@@ -867,19 +963,8 @@ export default function PromisePage() {
           )}
 
           {shouldShowInviteBlock && (
-            <Card title={isInviteAccepted ? t("promises.detail.inviteTitle") : t("promises.detail.inviteLinkTitle")}>
-              {isInviteAccepted ? (
-                <div className="flex flex-col gap-2 text-sm text-neutral-300">
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100">
-                    {t("promises.detail.inviteAccepted")}
-                  </div>
-                  <div className="text-neutral-300">
-                    {t("promises.detail.inviteAcceptedBy", {
-                      name: acceptingUserName,
-                    })}
-                  </div>
-                </div>
-              ) : !p.invite_token ? (
+            <Card title={t("promises.detail.inviteLinkTitle")}>
+              {!p.invite_token ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-neutral-400">
                     {t("promises.detail.noInviteToken")}

@@ -209,8 +209,12 @@
       "cardTitle": "Угода",
       "backToList": "← Назад до угод",
       "backToDashboard": "← Назад до дашборду",
+      "you": "Ви",
       "acceptedBySecondSide": "Прийнято другою стороною",
+      "inviteLabel": "Запрошення",
       "inviteStatusLabel": "Статус запрошення",
+      "inviteAcceptedByInline": "Прийняв(-ла): {name}",
+      "deadline": "Строк",
       "yes": "Так",
       "no": "Ні",
       "counterparty": "Інша сторона",
@@ -278,6 +282,16 @@
         "tooltip": "Скопіювати посилання-нагадування",
         "copied": "Нагадування скопійовано",
         "copyFailed": "Не вдалося скопіювати"
+      },
+      "roles": {
+        "title": "Ролі в угоді",
+        "createdBy": "Створив",
+        "responsible": "Відповідальна сторона",
+        "madeTo": "Обіцянку дано",
+        "summary": {
+          "invitedSideExecutes": "{responsible} має виконати цю угоду для {recipient}",
+          "invitedSideReceives": "Ця угода — обіцянка від {responsible} для {recipient}"
+        }
       }
     },
     "inviteStatus": {
