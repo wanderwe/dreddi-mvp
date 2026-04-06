@@ -18,10 +18,6 @@ const narrativeSections = [
   {
     paragraphs: [
       "You agreed on something",
-    ],
-  },
-  {
-    paragraphs: [
       "A deadline",
       "A result",
       "A responsibility",
@@ -47,16 +43,8 @@ const narrativeSections = [
   {
     paragraphs: [
       "That’s the problem",
-    ],
-  },
-  {
-    paragraphs: [
       "Not people",
       "Not intentions",
-    ],
-  },
-  {
-    paragraphs: [
       "Just the fact that agreements disappear",
     ],
   },
@@ -75,10 +63,6 @@ const narrativeSections = [
   {
     paragraphs: [
       "Just to record:",
-    ],
-  },
-  {
-    paragraphs: [
       "what was agreed",
       "and what actually happened",
     ],
@@ -86,20 +70,12 @@ const narrativeSections = [
   {
     paragraphs: [
       "Because reputation is not what people say",
-    ],
-  },
-  {
-    paragraphs: [
       "It’s what you actually do",
     ],
   },
   {
     paragraphs: [
       "Over time, it becomes obvious",
-    ],
-  },
-  {
-    paragraphs: [
       "Who delivers",
       "And who doesn’t",
     ],
@@ -108,10 +84,6 @@ const narrativeSections = [
     paragraphs: [
       "No contracts",
       "No pressure",
-    ],
-  },
-  {
-    paragraphs: [
       "Just clarity — and consequences",
     ],
   },

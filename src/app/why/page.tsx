@@ -28,6 +28,7 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
     "Dreddi exists to keep them visible",
     "Because reputation is not what people say",
   ]);
+  const majorTransitionBlocks = new Set([1, 5, 8]);
 
   return (
     <StaticPageLayout id="why-top">
@@ -38,34 +39,39 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
         {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
-      <div className="mt-6 space-y-7 text-base leading-7 text-slate-200">
-        {copy.sections.map((section, index) => (
-          <section key={`section-${index}`} className="space-y-2">
-            {section.heading ? (
-              <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
-            ) : null}
-            {section.paragraphs.map((paragraph, paragraphIndex) => (
-              <p
-                key={`paragraph-${paragraphIndex}`}
-                className={
-                  emphasizedLines.has(paragraph)
-                    ? "text-lg font-semibold text-slate-50 sm:text-xl"
-                    : "text-slate-200"
-                }
-              >
-                {paragraph.split("\n").map((line, lineIndex, lines) => (
-                  <span key={`${line}-${lineIndex}`}>
-                    {line}
-                    {lineIndex < lines.length - 1 ? <br /> : null}
-                  </span>
-                ))}
-              </p>
-            ))}
-          </section>
-        ))}
-      </div>
+      <article className="mt-5 text-base leading-7 text-slate-200">
+        {copy.sections.map((section, index) => {
+          const spacingClass =
+            index === 0 ? "mt-0" : majorTransitionBlocks.has(index) ? "mt-8" : "mt-6";
 
-      <div className="mt-7">
+          return (
+            <section key={`section-${index}`} className={`${spacingClass} space-y-1.5`}>
+              {section.heading ? (
+                <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
+              ) : null}
+              {section.paragraphs.map((paragraph, paragraphIndex) => (
+                <p
+                  key={`paragraph-${paragraphIndex}`}
+                  className={
+                    emphasizedLines.has(paragraph)
+                      ? "text-lg font-semibold text-slate-50 sm:text-xl"
+                      : "text-slate-200"
+                  }
+                >
+                  {paragraph.split("\n").map((line, lineIndex, lines) => (
+                    <span key={`${line}-${lineIndex}`}>
+                      {line}
+                      {lineIndex < lines.length - 1 ? <br /> : null}
+                    </span>
+                  ))}
+                </p>
+              ))}
+            </section>
+          );
+        })}
+      </article>
+
+      <div className="mt-6">
         <LocalizedLink
           href="/"
           className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
