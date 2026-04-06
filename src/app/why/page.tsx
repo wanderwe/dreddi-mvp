@@ -22,24 +22,37 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export function WhyPageContent({ locale }: { locale: Locale }) {
   const copy = getWhyCopy(locale);
+  const emphasizedLines = new Set([
+    "And then… nothing happens",
+    "That’s the problem",
+    "Dreddi exists to keep them visible",
+    "Because reputation is not what people say",
+  ]);
 
   return (
     <StaticPageLayout id="why-top">
       <WhyProgress title={copy.title} />
 
-      <header className="space-y-3">
+      <header className="space-y-2">
         <h1 className="text-4xl font-semibold text-white sm:text-5xl">{copy.title}</h1>
         {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
-      <div className="mt-10 space-y-10 text-base leading-7 text-slate-200">
+      <div className="mt-6 space-y-7 text-base leading-7 text-slate-200">
         {copy.sections.map((section, index) => (
-          <section key={`section-${index}`} className="space-y-3">
+          <section key={`section-${index}`} className="space-y-2">
             {section.heading ? (
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
             ) : null}
             {section.paragraphs.map((paragraph, paragraphIndex) => (
-              <p key={`paragraph-${paragraphIndex}`}>
+              <p
+                key={`paragraph-${paragraphIndex}`}
+                className={
+                  emphasizedLines.has(paragraph)
+                    ? "text-lg font-semibold text-slate-50 sm:text-xl"
+                    : "text-slate-200"
+                }
+              >
                 {paragraph.split("\n").map((line, lineIndex, lines) => (
                   <span key={`${line}-${lineIndex}`}>
                     {line}
@@ -52,7 +65,7 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
         ))}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-7">
         <LocalizedLink
           href="/"
           className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
