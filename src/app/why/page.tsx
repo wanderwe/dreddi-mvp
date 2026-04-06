@@ -29,7 +29,7 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
 
       <header className="space-y-3">
         <h1 className="text-4xl font-semibold text-white sm:text-5xl">{copy.title}</h1>
-        <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p>
+        {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
       <div className="mt-10 space-y-10 text-base leading-7 text-slate-200">
@@ -38,27 +38,16 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
             {section.heading ? (
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
             ) : null}
-            {section.paragraphs.map((paragraph, paragraphIndex) => {
-              const isPrinciple =
-                paragraph === "Promises and deals should have a record" ||
-                paragraph === "Обіцянки та угоди мають бути зафіксовані";
-
-              return (
-                <p
-                  key={`paragraph-${paragraphIndex}`}
-                  className={
-                    isPrinciple ? "font-semibold text-white" : undefined
-                  }
-                >
-                  {paragraph.split("\n").map((line, lineIndex, lines) => (
-                    <span key={`${line}-${lineIndex}`}>
-                      {line}
-                      {lineIndex < lines.length - 1 ? <br /> : null}
-                    </span>
-                  ))}
-                </p>
-              );
-            })}
+            {section.paragraphs.map((paragraph, paragraphIndex) => (
+              <p key={`paragraph-${paragraphIndex}`}>
+                {paragraph.split("\n").map((line, lineIndex, lines) => (
+                  <span key={`${line}-${lineIndex}`}>
+                    {line}
+                    {lineIndex < lines.length - 1 ? <br /> : null}
+                  </span>
+                ))}
+              </p>
+            ))}
           </section>
         ))}
       </div>
