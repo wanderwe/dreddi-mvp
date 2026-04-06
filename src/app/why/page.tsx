@@ -22,10 +22,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export function WhyPageContent({ locale }: { locale: Locale }) {
   const copy = getWhyCopy(locale);
-  const emphasizedLines = new Set([
+  const strongEmphasisLines = new Set([
     "And then… nothing happens",
     "That’s the problem",
     "Dreddi exists to keep them visible",
+  ]);
+  const mediumEmphasisLines = new Set([
     "Because reputation is not what people say",
   ]);
   const majorTransitionBlocks = new Set([1, 5, 8]);
@@ -53,9 +55,11 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
                 <p
                   key={`paragraph-${paragraphIndex}`}
                   className={
-                    emphasizedLines.has(paragraph)
+                    strongEmphasisLines.has(paragraph)
                       ? "text-lg font-semibold text-slate-50 sm:text-xl"
-                      : "text-slate-200"
+                      : mediumEmphasisLines.has(paragraph)
+                        ? "font-semibold text-slate-100"
+                        : "text-slate-200"
                   }
                 >
                   {paragraph.split("\n").map((line, lineIndex, lines) => (
