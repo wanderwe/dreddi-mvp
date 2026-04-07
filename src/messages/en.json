@@ -275,6 +275,10 @@
         "copied": "Reminder copied",
         "copyFailed": "Failed to copy"
       },
+      "recreate": {
+        "label": "Recreate deal",
+        "tooltip": "Recreate deal"
+      },
       "roles": {
         "title": "Agreement roles",
         "createdBy": "Created by",
@@ -345,6 +349,9 @@
       "eyebrow": "{newEntity}",
       "title": "Document the {entityLower}",
       "subtitle": "Name the {entityLower}, add context, and an optional deadline",
+      "prefill": {
+        "fromExpiredDeal": "Based on expired deal"
+      },
       "back": "Back",
       "fields": {
         "title": "Title",

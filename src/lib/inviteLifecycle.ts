@@ -1,6 +1,6 @@
 import { InviteStatus } from "@/lib/promiseAcceptance";
 
-export const INVITE_TTL_HOURS = 72;
+export const INVITE_TTL_HOURS = 24 * 7;
 
 export const getInviteExpiryIso = (from = new Date()) =>
   new Date(from.getTime() + INVITE_TTL_HOURS * 60 * 60 * 1000).toISOString();

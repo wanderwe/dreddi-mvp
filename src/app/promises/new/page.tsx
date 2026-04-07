@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
@@ -24,11 +24,14 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 
 export default function NewPromisePage() {
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPromiseId = searchParams?.get("fromPromise");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
@@ -72,6 +75,8 @@ export default function NewPromisePage() {
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
+  const prefillApplied = useRef(false);
+  const [prefilledFromExpired, setPrefilledFromExpired] = useState<string | null>(null);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -496,6 +501,81 @@ export default function NewPromisePage() {
   }, [counterpartyQuery, selectedCounterparty]);
 
   useEffect(() => {
+    if (!fromPromiseId || prefillApplied.current) return;
+
+    let active = true;
+    prefillApplied.current = true;
+
+    const prefillFromExpiredDeal = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) return;
+
+      const { data: sourceDeal } = await supabase
+        .from("promises")
+        .select(
+          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+        )
+        .eq("id", fromPromiseId)
+        .eq("creator_id", session.user.id)
+        .maybeSingle();
+
+      if (!active || !sourceDeal) return;
+
+      const sourceInviteStatus = getPromiseInviteStatus(sourceDeal);
+      if (sourceInviteStatus !== "expired") return;
+
+      setTitle(sourceDeal.title ?? "");
+      setDetails(sourceDeal.details ?? "");
+      const nextCondition = sourceDeal.condition_text ?? "";
+      setConditionText(nextCondition);
+      setShowCondition(nextCondition.trim().length > 0);
+      setIsPublicDeal(sourceDeal.visibility === "public");
+      if (sourceDeal.due_at) {
+        const dueDate = new Date(sourceDeal.due_at);
+        if (!Number.isNaN(dueDate.getTime())) {
+          setDueAt(dueDate);
+        }
+      }
+
+      const wasCreatorExecutor = sourceDeal.promisor_id === sourceDeal.creator_id;
+      setExecutor(wasCreatorExecutor ? "me" : "other");
+
+      if (sourceDeal.counterparty_id) {
+        const { data: counterpartyProfile } = await supabase
+          .from("profiles")
+          .select("id,handle,display_name,avatar_url")
+          .eq("id", sourceDeal.counterparty_id)
+          .maybeSingle();
+
+        if (active && counterpartyProfile?.id) {
+          setSelectedCounterparty({
+            id: counterpartyProfile.id,
+            handle: counterpartyProfile.handle,
+            displayName: counterpartyProfile.display_name,
+            avatarUrl: counterpartyProfile.avatar_url,
+          });
+        }
+      }
+
+      setPrefilledFromExpired(sourceDeal.id);
+    };
+
+    void prefillFromExpiredDeal();
+
+    return () => {
+      active = false;
+    };
+  }, [fromPromiseId]);
+
+  useEffect(() => {
     if (!showCounterpartyDropdown) return;
     setCounterpartyActiveIndex(0);
   }, [counterpartyResults, showCounterpartyDropdown]);
@@ -618,6 +698,11 @@ export default function NewPromisePage() {
               <p className="text-sm text-slate-300">
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
+              {prefilledFromExpired && (
+                <p className="text-xs text-emerald-200">
+                  {t("promises.new.prefill.fromExpiredDeal")}
+                </p>
+              )}
             </div>
           </div>
 
