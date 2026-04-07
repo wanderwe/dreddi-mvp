@@ -22,15 +22,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export function WhyPageContent({ locale }: { locale: Locale }) {
   const copy = getWhyCopy(locale);
-  const strongEmphasisLines = new Set([
+  const emphasizedLines = new Set([
     "And then… nothing happens",
     "That’s the problem",
     "Dreddi exists to keep them visible",
-  ]);
-  const mediumEmphasisLines = new Set([
     "Because reputation is not what people say",
   ]);
-  const majorTransitionBlocks = new Set([1, 5, 8]);
 
   return (
     <StaticPageLayout id="why-top">
@@ -41,38 +38,27 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
         {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
-      <article className="mt-5 text-base leading-7 text-slate-200">
-        {copy.sections.map((section, index) => {
-          const spacingClass =
-            index === 0 ? "mt-0" : majorTransitionBlocks.has(index) ? "mt-8" : "mt-6";
-
-          return (
-            <section key={`section-${index}`} className={`${spacingClass} space-y-1.5`}>
-              {section.heading ? (
-                <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
-              ) : null}
-              {section.paragraphs.map((paragraph, paragraphIndex) => (
-                <p
-                  key={`paragraph-${paragraphIndex}`}
-                  className={
-                    strongEmphasisLines.has(paragraph)
-                      ? "text-lg font-semibold text-slate-50 sm:text-xl"
-                      : mediumEmphasisLines.has(paragraph)
-                        ? "font-semibold text-slate-100"
-                        : "text-slate-200"
-                  }
-                >
-                  {paragraph.split("\n").map((line, lineIndex, lines) => (
-                    <span key={`${line}-${lineIndex}`}>
-                      {line}
-                      {lineIndex < lines.length - 1 ? <br /> : null}
-                    </span>
-                  ))}
-                </p>
-              ))}
-            </section>
-          );
-        })}
+      <article className="mt-6 space-y-6 text-base leading-7 text-slate-200">
+        {copy.sections.map((section, index) => (
+          <section key={`section-${index}`} className="space-y-2">
+            {section.heading ? (
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
+            ) : null}
+            {section.paragraphs.map((paragraph, paragraphIndex) => (
+              <p
+                key={`paragraph-${paragraphIndex}`}
+                className={emphasizedLines.has(paragraph) ? "font-semibold text-slate-50" : "text-slate-200"}
+              >
+                {paragraph.split("\n").map((line, lineIndex, lines) => (
+                  <span key={`${line}-${lineIndex}`}>
+                    {line}
+                    {lineIndex < lines.length - 1 ? <br /> : null}
+                  </span>
+                ))}
+              </p>
+            ))}
+          </section>
+        ))}
       </article>
 
       <div className="mt-6">
