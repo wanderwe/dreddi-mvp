@@ -1,5 +1,7 @@
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
+export type WhySectionKind = "turn" | "body" | "list";
+
 export type WhyCopy = {
   seo: {
     title: string;
@@ -8,7 +10,7 @@ export type WhyCopy = {
   title: string;
   subtitle: string;
   sections: {
-    heading?: string;
+    kind: WhySectionKind;
     paragraphs: string[];
   }[];
   cta: string;
@@ -21,88 +23,35 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       description:
         "Learn why Dreddi was built and how it turns promises into reputation through real outcomes",
     },
-    title: "Why Dreddi Exists",
-    subtitle: "Dreddi knows who delivers",
+    title: "Why Dreddi exists",
+    subtitle: "",
     sections: [
+      { kind: "body", paragraphs: ["You agreed on something"] },
+      { kind: "list", paragraphs: ["A deadline", "A result", "A responsibility"] },
+      { kind: "turn", paragraphs: ["And then… nothing happens"] },
+      { kind: "list", paragraphs: ["No reminder", "No confirmation", "No clear outcome"] },
+      { kind: "body", paragraphs: ["Just different memories of what was supposed to happen"] },
       {
-        heading: "The promise problem",
-        paragraphs: [
-          "Every day people make promises",
-          "Deadlines. Deliverables. Agreements",
-          "Most of them live in chats, calls, and memory",
-          "When they are kept — everyone forgets",
-          "When they are broken — everyone argues",
-          "But almost never is there a clear record of what actually happened",
-        ],
+        kind: "turn",
+        paragraphs: ["That’s the problem"],
       },
       {
-        heading: "A simple idea",
-        paragraphs: [
-          "Dreddi is built on a very simple principle:",
-          "Promises and deals should have a record",
-          "Not to judge people",
-          "Not to shame anyone",
-          "But simply to remember what was agreed — and what happened next",
-        ],
+        kind: "body",
+        paragraphs: ["Not people", "Not intentions", "Just the fact that agreements disappear"],
+      },
+      { kind: "turn", paragraphs: ["Dreddi exists to keep them visible"] },
+      { kind: "list", paragraphs: ["Not to judge", "Not to rate", "Not to argue"] },
+      {
+        kind: "body",
+        paragraphs: ["Just to record:", "what was agreed", "and what actually happened"],
       },
       {
-        heading: "What Dreddi is not",
-        paragraphs: [
-          "Dreddi is not a rating system",
-          "It does not collect opinions",
-          "It does not publish reviews",
-          "It does not allow anonymous criticism",
-          "Dreddi does not decide who is good or bad",
-          "It only records commitments and outcomes",
-          "Because reputation should not depend on what people say about you",
-          "It should depend on what actually happened",
-        ],
+        kind: "turn",
+        paragraphs: ["Because reputation is not what people say"],
       },
-      {
-        heading: "Reputation through actions",
-        paragraphs: [
-          "In Dreddi, reputation is not built on reviews",
-          "It emerges from outcomes",
-          "Did the promise happen?",
-          "Was the deadline met?",
-          "Was the commitment completed?",
-          "Over time, a pattern appears",
-          "Not through opinions",
-          "Through actions",
-        ],
-      },
-      {
-        heading: "Why it matters",
-        paragraphs: [
-          "Trust is one of the most valuable things people have",
-          "But in many situations it depends on vague memories and assumptions",
-          "Dreddi aims to make trust easier by introducing transparent commitments",
-          "A place where promises are visible",
-          "Deadlines are clear",
-          "And results are recorded",
-        ],
-      },
-      {
-        heading: "Our vision",
-        paragraphs: [
-          "We believe reputation should be earned through actions",
-          "Not through marketing",
-          "Not through stories",
-          "Through what actually happened",
-          "Dreddi is a small step toward a world where promises are clearer and trust is easier",
-        ],
-      },
-      {
-        heading: "Where Dreddi can be used",
-        paragraphs: [
-          "Dreddi works anywhere people make commitments",
-          "Freelancers and clients — confirming deadlines and deliverables",
-          "Partners and collaborators — recording responsibilities in joint work",
-          "Teams and small businesses — tracking who committed to what",
-          "Individuals — keeping personal promises visible and accountable",
-          "Anywhere a promise matters, a record can help",
-        ],
-      },
+      { kind: "body", paragraphs: ["It’s what you actually do"] },
+      { kind: "body", paragraphs: ["Over time, it becomes obvious", "Who delivers", "And who doesn’t"] },
+      { kind: "list", paragraphs: ["No contracts", "No pressure", "Just clarity — and consequences"] },
     ],
     cta: "Create your first deal",
   },
@@ -113,87 +62,34 @@ export const whyCopy: Record<Locale, WhyCopy> = {
         "Дізнайтесь, чому створили Dreddi і як сервіс перетворює обіцянки на репутацію через реальні результати",
     },
     title: "Чому існує Dreddi",
-    subtitle: "Dreddi знає, хто виконує",
+    subtitle: "",
     sections: [
+      { kind: "body", paragraphs: ["Ви про щось домовилися"] },
+      { kind: "list", paragraphs: ["Дедлайн", "Результат", "Відповідальність"] },
+      { kind: "turn", paragraphs: ["А потім… нічого не відбувається"] },
+      { kind: "list", paragraphs: ["Нагадування немає", "Підтвердження немає", "Чіткого результату немає"] },
+      { kind: "body", paragraphs: ["Лише різні спогади про те, що мало статися"] },
       {
-        heading: "Проблема обіцянок",
-        paragraphs: [
-          "Щодня люди дають обіцянки",
-          "Дедлайни. Результати. Домовленості",
-          "Більшість із них живе в чатах, дзвінках і памʼяті",
-          "Коли їх виконують — усі забувають",
-          "Коли їх порушують — усі сперечаються",
-          "Але майже ніколи немає чіткого запису того, що сталося насправді",
-        ],
+        kind: "turn",
+        paragraphs: ["Ось у чому проблема"],
       },
       {
-        heading: "Проста ідея",
-        paragraphs: [
-          "Dreddi побудований на дуже простому принципі:",
-          "Обіцянки та угоди мають бути зафіксовані",
-          "Не для того, щоб судити людей",
-          "Не для того, щоб когось соромити",
-          "А просто, щоб памʼятати, про що домовились — і що сталося далі",
-        ],
+        kind: "body",
+        paragraphs: ["Не в людях", "Не в намірах", "А в тому, що домовленості зникають"],
+      },
+      { kind: "turn", paragraphs: ["Dreddi існує, щоб тримати їх видимими"] },
+      { kind: "list", paragraphs: ["Не щоб судити", "Не щоб оцінювати", "Не щоб сперечатися"] },
+      {
+        kind: "body",
+        paragraphs: ["Лише щоб зафіксувати:", "про що домовилися", "і що насправді сталося"],
       },
       {
-        heading: "Чим Dreddi не є",
-        paragraphs: [
-          "Dreddi — це не рейтингова система",
-          "Він не збирає думки",
-          "Він не публікує відгуки",
-          "Він не дозволяє анонімну критику",
-          "Dreddi не вирішує, хто хороший, а хто поганий",
-          "Він лише фіксує зобовʼязання та результати",
-          "Бо репутація не має залежати від того, що про вас говорять",
-          "Вона має залежати від того, що реально сталося",
-        ],
+        kind: "turn",
+        paragraphs: ["Бо репутація — це не те, що кажуть люди"],
       },
-      {
-        heading: "Репутація через дії",
-        paragraphs: [
-          "У Dreddi репутація будується не на відгуках",
-          "Вона виникає з результатів",
-          "Обіцянка була виконана?",
-          "Дедлайн дотримано?",
-          "Зобовʼязання завершено?",
-          "З часом зʼявляється закономірність",
-          "Не через думки",
-          "Через дії",
-        ],
-      },
-      {
-        heading: "Чому це важливо",
-        paragraphs: [
-          "Довіра — одна з найцінніших речей, які мають люди",
-          "Але в багатьох ситуаціях вона залежить від нечітких спогадів і припущень",
-          "Dreddi прагне спростити довіру через прозорі зобовʼязання",
-          "Місце, де обіцянки видимі",
-          "Дедлайни чіткі",
-          "А результати зафіксовані",
-        ],
-      },
-      {
-        heading: "Наше бачення",
-        paragraphs: [
-          "Ми віримо, що репутація має зароблятися діями",
-          "Не маркетингом",
-          "Не історіями",
-          "А тим, що реально сталося",
-          "Dreddi — це невеликий крок до світу, де обіцянки чіткіші, а довіра — простіша",
-        ],
-      },
-      {
-        heading: "Де можна використовувати Dreddi",
-        paragraphs: [
-          "Dreddi працює всюди, де люди беруть зобовʼязання",
-          "Фрілансери та клієнти — підтвердження дедлайнів і результатів",
-          "Партнери та колаборатори — фіксація відповідальностей у спільній роботі",
-          "Команди та малі бізнеси — відстеження, хто і на що погодився",
-          "Окремі люди — видимість і підзвітність особистих обіцянок",
-          "Усюди, де важлива обіцянка, запис може допомогти",
-        ],
-      },
+      { kind: "body", paragraphs: ["Це те, що ви реально робите"] },
+      { kind: "body", paragraphs: ["З часом це стає очевидно", "Хто виконує", "А хто ні"] },
+      { kind: "list", paragraphs: ["Без контрактів", "Без тиску", "Лише ясність — і наслідки"] },
     ],
     cta: "Створити першу угоду",
   },
