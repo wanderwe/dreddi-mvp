@@ -3,10 +3,10 @@ import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import { INVITE_TTL_HOURS } from "@/lib/inviteLifecycle";
 
 const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 const HOURS_24 = 24 * 60 * 60 * 1000;
-const INVITE_IGNORE_TIMEOUT_HOURS = 72;
 
 type CronSuccessResponse = {
   processed: number;
@@ -99,7 +99,7 @@ const runCron = async (req: Request) => {
   const inviteIgnoreTimeoutMs =
     inviteIgnoreMinutesOverride !== null
       ? inviteIgnoreMinutesOverride * 60 * 1000
-      : INVITE_IGNORE_TIMEOUT_HOURS * 60 * 60 * 1000;
+      : INVITE_TTL_HOURS * 60 * 60 * 1000;
 
   const response: CronSuccessResponse = {
     processed: 0,

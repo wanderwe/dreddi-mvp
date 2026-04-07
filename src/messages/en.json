@@ -470,8 +470,8 @@
     "processing": "Processing...",
     "accept": "Accept {entityLower}",
     "decline": "Decline",
-    "declinedMessage": "You declined this invite.",
-    "ignoredMessage": "This invite expired without a response.",
+    "declinedMessage": "You declined this invite",
+    "ignoredMessage": "This invite expired without a response",
     "withdrawnMessage": "This agreement was withdrawn by the creator",
     "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {

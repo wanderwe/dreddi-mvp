@@ -478,8 +478,8 @@
     "processing": "Обробка...",
     "accept": "Прийняти угоду",
     "decline": "Відхилити",
-    "declinedMessage": "Ви відхилили це запрошення.",
-    "ignoredMessage": "Це запрошення завершилося без відповіді.",
+    "declinedMessage": "Ви відхилили це запрошення",
+    "ignoredMessage": "Це запрошення завершилося без відповіді",
     "withdrawnMessage": "Цю угоду відкликав ініціатор",
     "awaitingCounterparty": "Очікуємо відповіді другої сторони",
     "publicProposal": {
