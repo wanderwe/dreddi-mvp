@@ -27,6 +27,7 @@ import { Tooltip } from "@/app/components/ui/Tooltip";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 
 export default function NewPromisePage() {
+  const PREFILL_MAX_RETRIES = 20;
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
@@ -78,6 +79,7 @@ export default function NewPromisePage() {
   const prefillResolved = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
   const [prefilledFromExpired, setPrefilledFromExpired] = useState<string | null>(null);
+  const [isPrefillingFromExpired, setIsPrefillingFromExpired] = useState(false);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -504,6 +506,7 @@ export default function NewPromisePage() {
   useEffect(() => {
     prefillResolved.current = false;
     setPrefilledFromExpired(null);
+    setIsPrefillingFromExpired(Boolean(fromPromiseId));
     setPrefillRetryTick(0);
   }, [fromPromiseId]);
 
@@ -517,12 +520,18 @@ export default function NewPromisePage() {
       try {
         supabase = requireSupabase();
       } catch {
+        setIsPrefillingFromExpired(false);
         return;
       }
 
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (!session) {
+        if (prefillRetryTick >= PREFILL_MAX_RETRIES) {
+          prefillResolved.current = true;
+          setIsPrefillingFromExpired(false);
+          return;
+        }
         if (active) {
           window.setTimeout(() => {
             setPrefillRetryTick((prev) => prev + 1);
@@ -543,12 +552,14 @@ export default function NewPromisePage() {
       if (!active) return;
       if (!sourceDeal) {
         prefillResolved.current = true;
+        setIsPrefillingFromExpired(false);
         return;
       }
 
       const sourceInviteStatus = getPromiseInviteStatus(sourceDeal);
       if (sourceInviteStatus !== "expired") {
         prefillResolved.current = true;
+        setIsPrefillingFromExpired(false);
         return;
       }
 
@@ -587,6 +598,7 @@ export default function NewPromisePage() {
 
       setPrefilledFromExpired(sourceDeal.id);
       prefillResolved.current = true;
+      setIsPrefillingFromExpired(false);
     };
 
     void prefillFromExpiredDeal();
@@ -594,7 +606,7 @@ export default function NewPromisePage() {
     return () => {
       active = false;
     };
-  }, [fromPromiseId, prefillRetryTick]);
+  }, [fromPromiseId, prefillRetryTick, PREFILL_MAX_RETRIES]);
 
   useEffect(() => {
     if (!showCounterpartyDropdown) return;
@@ -719,7 +731,12 @@ export default function NewPromisePage() {
               <p className="text-sm text-slate-300">
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
-              {prefilledFromExpired && (
+              {isPrefillingFromExpired && (
+                <p className="text-xs text-slate-300">
+                  {t("promises.new.prefill.loading")}
+                </p>
+              )}
+              {!isPrefillingFromExpired && prefilledFromExpired && (
                 <p className="text-xs text-emerald-200">
                   {t("promises.new.prefill.fromExpiredDeal")}
                 </p>

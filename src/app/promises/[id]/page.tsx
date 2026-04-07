@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, RotateCcw } from "lucide-react";
+import { Copy, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -779,7 +779,7 @@ export default function PromisePage() {
                 <Tooltip label={t("promises.detail.recreate.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
-                      icon={<RotateCcw className="h-4 w-4" />}
+                      icon={<RefreshCw className="h-4 w-4" />}
                       ariaLabel={t("promises.detail.recreate.label")}
                       className="h-10 w-10 border-emerald-400/30 text-emerald-200 hover:border-emerald-300/50 hover:bg-emerald-500/10 hover:text-emerald-100"
                       onClick={() =>
