@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Copy } from "lucide-react";
+import { Copy, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -671,6 +671,7 @@ export default function PromisePage() {
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canShareReminder = Boolean(p && inviteStatus === "accepted");
+  const canRecreateDeal = Boolean(p && uiStatus === "expired" && isCreator);
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
       (canReview && p?.status === "completed_by_promisor") ||
@@ -771,6 +772,19 @@ export default function PromisePage() {
                       className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
                       disabled={!userId || !promiseLink}
                       onClick={() => void copyReminder()}
+                    />
+                  </span>
+                </Tooltip>
+              ) : canRecreateDeal ? (
+                <Tooltip label={t("promises.detail.recreate.tooltip")} placement="bottom-right">
+                  <span>
+                    <IconButton
+                      icon={<RefreshCw className="h-4 w-4" />}
+                      ariaLabel={t("promises.detail.recreate.label")}
+                      className="h-10 w-10 border-emerald-400/30 text-emerald-200 hover:border-emerald-300/50 hover:bg-emerald-500/10 hover:text-emerald-100"
+                      onClick={() =>
+                        router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))
+                      }
                     />
                   </span>
                 </Tooltip>
