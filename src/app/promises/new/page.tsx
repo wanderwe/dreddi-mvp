@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
@@ -24,11 +24,15 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 
 export default function NewPromisePage() {
+  const PREFILL_MAX_RETRIES = 20;
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPromiseId = searchParams?.get("fromPromise");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
@@ -72,6 +76,8 @@ export default function NewPromisePage() {
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
+  const prefillResolved = useRef(false);
+  const [prefillRetryTick, setPrefillRetryTick] = useState(0);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -499,6 +505,100 @@ export default function NewPromisePage() {
     if (!showCounterpartyDropdown) return;
     setCounterpartyActiveIndex(0);
   }, [counterpartyResults, showCounterpartyDropdown]);
+
+  useEffect(() => {
+    prefillResolved.current = false;
+    setPrefillRetryTick(0);
+  }, [fromPromiseId]);
+
+  useEffect(() => {
+    if (!fromPromiseId || prefillResolved.current) return;
+
+    let active = true;
+
+    const prefillFromExpiredDeal = async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+
+      if (!session) {
+        if (prefillRetryTick >= PREFILL_MAX_RETRIES) {
+          prefillResolved.current = true;
+          return;
+        }
+        if (active) {
+          window.setTimeout(() => {
+            setPrefillRetryTick((prev) => prev + 1);
+          }, 250);
+        }
+        return;
+      }
+
+      const { data: sourceDeal } = await supabase
+        .from("promises")
+        .select(
+          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+        )
+        .eq("id", fromPromiseId)
+        .eq("creator_id", session.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (!sourceDeal || getPromiseInviteStatus(sourceDeal) !== "expired") {
+        prefillResolved.current = true;
+        return;
+      }
+
+      setTitle(sourceDeal.title ?? "");
+      setDetails(sourceDeal.details ?? "");
+      const nextCondition = sourceDeal.condition_text ?? "";
+      setConditionText(nextCondition);
+      setShowCondition(nextCondition.trim().length > 0);
+      setIsPublicDeal(sourceDeal.visibility === "public");
+
+      if (sourceDeal.due_at) {
+        const dueDate = new Date(sourceDeal.due_at);
+        if (!Number.isNaN(dueDate.getTime())) {
+          setDueAt(dueDate);
+        }
+      }
+
+      const wasCreatorExecutor = sourceDeal.promisor_id === sourceDeal.creator_id;
+      setExecutor(wasCreatorExecutor ? "me" : "other");
+
+      if (sourceDeal.counterparty_id) {
+        const { data: counterpartyProfile } = await supabase
+          .from("profiles")
+          .select("id,handle,display_name,avatar_url")
+          .eq("id", sourceDeal.counterparty_id)
+          .maybeSingle();
+
+        if (active && counterpartyProfile?.id) {
+          setSelectedCounterparty({
+            id: counterpartyProfile.id,
+            handle: counterpartyProfile.handle,
+            displayName: counterpartyProfile.display_name,
+            avatarUrl: counterpartyProfile.avatar_url,
+          });
+        }
+      }
+
+      prefillResolved.current = true;
+    };
+
+    void prefillFromExpiredDeal();
+
+    return () => {
+      active = false;
+    };
+  }, [fromPromiseId, prefillRetryTick]);
 
   const selectCounterparty = (user: {
     id: string;
