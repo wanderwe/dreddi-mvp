@@ -22,49 +22,39 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export function WhyPageContent({ locale }: { locale: Locale }) {
   const copy = getWhyCopy(locale);
-  const emphasizedLines = new Set([
-    "And then… nothing happens",
-    "That’s the problem",
-    "Dreddi exists to keep them visible",
-    "Because reputation is not what people say",
-  ]);
 
   return (
-    <StaticPageLayout id="why-top">
+    <StaticPageLayout id="why-top" className="max-w-4xl">
       <WhyProgress title={copy.title} />
 
-      <header className="space-y-2">
+      <header className="space-y-3">
         <h1 className="text-4xl font-semibold text-white sm:text-5xl">{copy.title}</h1>
         {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
-      <article className="mt-6 space-y-6 text-base leading-7 text-slate-200">
-        {copy.sections.map((section, index) => (
-          <section key={`section-${index}`} className="space-y-2">
-            {section.heading ? (
-              <h2 className="text-2xl font-semibold text-white sm:text-3xl">{section.heading}</h2>
-            ) : null}
-            {section.paragraphs.map((paragraph, paragraphIndex) => (
-              <p
-                key={`paragraph-${paragraphIndex}`}
-                className={emphasizedLines.has(paragraph) ? "font-semibold text-slate-50" : "text-slate-200"}
-              >
-                {paragraph.split("\n").map((line, lineIndex, lines) => (
-                  <span key={`${line}-${lineIndex}`}>
-                    {line}
-                    {lineIndex < lines.length - 1 ? <br /> : null}
-                  </span>
-                ))}
-              </p>
-            ))}
-          </section>
-        ))}
+      <article className="mt-8 space-y-10 text-base leading-7 text-slate-200">
+        {copy.sections.map((section, index) => {
+          const sectionClassName =
+            section.kind === "turn"
+              ? "space-y-3 text-xl font-semibold leading-8 text-slate-50 sm:text-2xl sm:leading-9"
+              : section.kind === "list"
+                ? "space-y-1.5 text-slate-300"
+                : "space-y-2 text-slate-200";
+
+          return (
+            <section key={`section-${index}`} className={sectionClassName}>
+              {section.paragraphs.map((paragraph, paragraphIndex) => (
+                <p key={`paragraph-${paragraphIndex}`}>{paragraph}</p>
+              ))}
+            </section>
+          );
+        })}
       </article>
 
-      <div className="mt-6">
+      <div className="mt-10">
         <LocalizedLink
           href="/"
-          className="inline-flex rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+          className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
         >
           {copy.cta}
         </LocalizedLink>
