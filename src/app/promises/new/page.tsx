@@ -75,7 +75,8 @@ export default function NewPromisePage() {
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
-  const prefillApplied = useRef(false);
+  const prefillResolved = useRef(false);
+  const [prefillRetryTick, setPrefillRetryTick] = useState(0);
   const [prefilledFromExpired, setPrefilledFromExpired] = useState<string | null>(null);
 
   const handleRemoveCondition = () => {
@@ -501,10 +502,15 @@ export default function NewPromisePage() {
   }, [counterpartyQuery, selectedCounterparty]);
 
   useEffect(() => {
-    if (!fromPromiseId || prefillApplied.current) return;
+    prefillResolved.current = false;
+    setPrefilledFromExpired(null);
+    setPrefillRetryTick(0);
+  }, [fromPromiseId]);
+
+  useEffect(() => {
+    if (!fromPromiseId || prefillResolved.current) return;
 
     let active = true;
-    prefillApplied.current = true;
 
     const prefillFromExpiredDeal = async () => {
       let supabase;
@@ -516,7 +522,14 @@ export default function NewPromisePage() {
 
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
-      if (!session) return;
+      if (!session) {
+        if (active) {
+          window.setTimeout(() => {
+            setPrefillRetryTick((prev) => prev + 1);
+          }, 250);
+        }
+        return;
+      }
 
       const { data: sourceDeal } = await supabase
         .from("promises")
@@ -527,10 +540,17 @@ export default function NewPromisePage() {
         .eq("creator_id", session.user.id)
         .maybeSingle();
 
-      if (!active || !sourceDeal) return;
+      if (!active) return;
+      if (!sourceDeal) {
+        prefillResolved.current = true;
+        return;
+      }
 
       const sourceInviteStatus = getPromiseInviteStatus(sourceDeal);
-      if (sourceInviteStatus !== "expired") return;
+      if (sourceInviteStatus !== "expired") {
+        prefillResolved.current = true;
+        return;
+      }
 
       setTitle(sourceDeal.title ?? "");
       setDetails(sourceDeal.details ?? "");
@@ -566,6 +586,7 @@ export default function NewPromisePage() {
       }
 
       setPrefilledFromExpired(sourceDeal.id);
+      prefillResolved.current = true;
     };
 
     void prefillFromExpiredDeal();
@@ -573,7 +594,7 @@ export default function NewPromisePage() {
     return () => {
       active = false;
     };
-  }, [fromPromiseId]);
+  }, [fromPromiseId, prefillRetryTick]);
 
   useEffect(() => {
     if (!showCounterpartyDropdown) return;
