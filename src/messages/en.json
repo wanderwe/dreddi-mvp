@@ -345,6 +345,9 @@
       "eyebrow": "{newEntity}",
       "title": "Document the {entityLower}",
       "subtitle": "Name the {entityLower}, add context, and an optional deadline",
+      "prefill": {
+        "fromExpiredDeal": ""
+      },
       "back": "Back",
       "fields": {
         "title": "Title",
