@@ -275,6 +275,10 @@
         "copied": "Reminder copied",
         "copyFailed": "Failed to copy"
       },
+      "recreate": {
+        "label": "Recreate deal",
+        "tooltip": "Recreate deal"
+      },
       "roles": {
         "title": "Agreement roles",
         "createdBy": "Created by",
