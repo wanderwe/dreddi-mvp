@@ -340,7 +340,7 @@ export default function Home() {
         .neq("status", "expired")
         .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(20);
 
       if (cancelled) return;
 
@@ -380,7 +380,7 @@ export default function Home() {
           ];
         });
 
-        setRecentDeals(normalized);
+        setRecentDeals(normalized.filter((deal) => deal.uiStatus !== "expired").slice(0, 3));
       }
 
       setRecentLoading(false);
