@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
 const FEEDBACK_CATEGORIES = ["bug", "suggestion", "confusing_ux", "other"] as const;
@@ -24,8 +25,14 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const trimmedMessage = message.trim();
   const canSubmit = Boolean(category) && trimmedMessage.length > 0 && !submitting;
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const submitFeedback = async () => {
     if (!category) {
@@ -88,7 +95,8 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
         {triggerLabel ?? t("nav.sendFeedback")}
       </button>
 
-      {open && (
+      {open && mounted &&
+        createPortal(
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <button
             type="button"
@@ -202,7 +210,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
             </div>
           </div>
         </div>
-      )}
+        , document.body)}
     </>
   );
 }
