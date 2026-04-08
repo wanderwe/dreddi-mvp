@@ -78,7 +78,7 @@ export default function NewPromisePage() {
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
   const prefillResolved = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
-  const [isPrefillingFromExpired, setIsPrefillingFromExpired] = useState(false);
+  const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -510,7 +510,7 @@ export default function NewPromisePage() {
   useEffect(() => {
     prefillResolved.current = false;
     setPrefillRetryTick(0);
-    setIsPrefillingFromExpired(Boolean(fromPromiseId));
+    setShowPrefillConfirmation(false);
   }, [fromPromiseId]);
 
   useEffect(() => {
@@ -523,7 +523,6 @@ export default function NewPromisePage() {
       try {
         supabase = requireSupabase();
       } catch {
-        setIsPrefillingFromExpired(false);
         return;
       }
 
@@ -533,7 +532,6 @@ export default function NewPromisePage() {
       if (!session) {
         if (prefillRetryTick >= PREFILL_MAX_RETRIES) {
           prefillResolved.current = true;
-          setIsPrefillingFromExpired(false);
           return;
         }
         if (active) {
@@ -557,7 +555,6 @@ export default function NewPromisePage() {
 
       if (!sourceDeal || getPromiseInviteStatus(sourceDeal) !== "expired") {
         prefillResolved.current = true;
-        setIsPrefillingFromExpired(false);
         return;
       }
 
@@ -596,7 +593,7 @@ export default function NewPromisePage() {
       }
 
       prefillResolved.current = true;
-      setIsPrefillingFromExpired(false);
+      setShowPrefillConfirmation(true);
     };
 
     void prefillFromExpiredDeal();
@@ -724,8 +721,11 @@ export default function NewPromisePage() {
               <p className="text-sm text-slate-300">
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
-              {isPrefillingFromExpired && (
-                <p className="text-xs text-slate-400">{t("promises.new.prefill.loading")}</p>
+              {showPrefillConfirmation && (
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/20 bg-emerald-400/5 px-2.5 py-1.5 text-xs text-emerald-100/90">
+                  <Info className="h-3.5 w-3.5" aria-hidden />
+                  {t("promises.new.prefill.fromExpiredDeal")}
+                </p>
               )}
             </div>
           </div>
