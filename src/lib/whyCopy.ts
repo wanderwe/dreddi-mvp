@@ -1,14 +1,6 @@
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
-export type WhySectionKind =
-  | "setup"
-  | "list"
-  | "trigger"
-  | "quote"
-  | "realization"
-  | "positioning"
-  | "outcome"
-  | "closing";
+export type WhySectionKind = "setup" | "list" | "trigger" | "quote" | "realization" | "positioning" | "outcome" | "closing";
 
 export type WhyCopy = {
   seo: {
@@ -29,43 +21,45 @@ export const whyCopy: Record<Locale, WhyCopy> = {
     seo: {
       title: "Why Dreddi Exists — Dreddi",
       description:
-        "Why Dreddi exists: to keep agreements clear, visible, and accountable without becoming a marketplace",
+        "Dreddi exists so agreements don’t disappear into memory, chats, and assumptions — with clear accountability, not marketplace hiring",
     },
     title: "Why Dreddi exists",
     subtitle: "",
     sections: [
       { kind: "setup", paragraphs: ["You agreed on something"] },
       { kind: "list", paragraphs: ["A deadline", "A result", "A responsibility"] },
-      { kind: "setup", paragraphs: ["A few days pass", "Nothing happens"] },
-      { kind: "quote", paragraphs: ["You think:", "“I thought we agreed”"] },
-      { kind: "quote", paragraphs: ["They think:", "“That wasn’t urgent”"] },
-      { kind: "realization", paragraphs: ["No one is wrong", "There was just no clear record"] },
+      { kind: "setup", paragraphs: ["A few days pass", "Silence"] },
+      { kind: "trigger", paragraphs: ["You expected it yesterday", "They thought it was not urgent"] },
+      { kind: "quote", paragraphs: ["You: “I thought we agreed on this.”", "Them: “That’s not how I understood it.”"] },
       {
-        kind: "trigger",
-        paragraphs: ["No reminder", "No confirmation", "No final state", "No shared reality"],
+        kind: "list",
+        paragraphs: ["No reminder", "No confirmation", "No follow-up", "No final state"],
       },
-      { kind: "setup", paragraphs: ["Just memory", "And memory is unreliable"] },
-      { kind: "realization", paragraphs: ["That’s the problem", "Not people", "Not intentions"] },
-      { kind: "trigger", paragraphs: ["The agreement itself disappears"] },
+      { kind: "realization", paragraphs: ["Was it done or not?", "No one recorded the outcome"] },
+      { kind: "trigger", paragraphs: ["Now you have to remind them", "And it already feels awkward"] },
+      { kind: "setup", paragraphs: ["No fact", "Only chats, calls, memory, assumptions"] },
+      { kind: "realization", paragraphs: ["That’s the real failure", "Not people", "Not intentions"] },
+      { kind: "positioning", paragraphs: ["The agreement itself disappears"] },
       { kind: "positioning", paragraphs: ["Dreddi exists to prevent that"] },
       {
         kind: "positioning",
-        paragraphs: ["It doesn’t find people", "It doesn’t assign work", "It doesn’t act as a marketplace"],
-      },
-      {
-        kind: "setup",
-        paragraphs: ["It simply records:", "what was agreed", "and what actually happened"],
-      },
-      { kind: "realization", paragraphs: ["And that changes everything"] },
-      {
-        kind: "outcome",
-        paragraphs: ["Because now there is:", "a clear start", "a visible expectation", "a defined outcome"],
+        paragraphs: [
+          "It is not a labor marketplace",
+          "Not a freelance hiring platform",
+          "Not a job board",
+          "Not a place to find strangers for gigs",
+        ],
       },
       {
         kind: "outcome",
-        paragraphs: ["And over time, something else appears", "Not opinions", "Not ratings", "A pattern of behavior"],
+        paragraphs: ["Dreddi simply records", "what was agreed", "and what actually happened"],
       },
-      { kind: "trigger", paragraphs: ["Who delivers", "And who doesn’t"] },
+      { kind: "realization", paragraphs: ["Then accountability becomes real"] },
+      {
+        kind: "outcome",
+        paragraphs: ["A clear start", "A visible expectation", "A defined outcome"],
+      },
+      { kind: "trigger", paragraphs: ["Over time: a pattern of behavior", "Who delivers", "Who doesn’t"] },
       { kind: "closing", paragraphs: ["No contracts", "No pressure", "Just clarity — and consequences"] },
     ],
     cta: "Create your first deal",
@@ -74,43 +68,45 @@ export const whyCopy: Record<Locale, WhyCopy> = {
     seo: {
       title: "Чому існує Dreddi — Dreddi",
       description:
-        "Чому існує Dreddi: щоб домовленості не зникали в чатах, памʼяті та припущеннях, без перетворення на маркетплейс",
+        "Dreddi існує, щоб домовленості не зникали в памʼяті, чатах і припущеннях: чітка відповідальність без моделі маркетплейсу",
     },
     title: "Чому існує Dreddi",
     subtitle: "",
     sections: [
       { kind: "setup", paragraphs: ["Ви про щось домовилися"] },
       { kind: "list", paragraphs: ["Дедлайн", "Результат", "Відповідальність"] },
-      { kind: "setup", paragraphs: ["Минає кілька днів", "Нічого не відбувається"] },
-      { kind: "quote", paragraphs: ["Ви думаєте:", "«Ми ж домовилися»"] },
-      { kind: "quote", paragraphs: ["Вони думають:", "«Я не думав, що це терміново»"] },
-      { kind: "realization", paragraphs: ["Ніхто не винен", "Просто не було чіткої фіксації"] },
+      { kind: "setup", paragraphs: ["Минає кілька днів", "Тиша"] },
+      { kind: "trigger", paragraphs: ["Ви чекали ще вчора", "Вони думали, що це не терміново"] },
+      { kind: "quote", paragraphs: ["Ви: «Я думав, ми це погодили.»", "Вони: «Я зрозумів це інакше.»"] },
       {
-        kind: "trigger",
-        paragraphs: ["Немає нагадування", "Немає підтвердження", "Немає фінального стану", "Немає спільної реальності"],
+        kind: "list",
+        paragraphs: ["Немає нагадування", "Немає підтвердження", "Немає подальшого контакту", "Немає фінального стану"],
       },
-      { kind: "setup", paragraphs: ["Лише памʼять", "А памʼять ненадійна"] },
-      { kind: "realization", paragraphs: ["Ось у чому проблема", "Не в людях", "Не в намірах"] },
-      { kind: "trigger", paragraphs: ["Сама домовленість просто зникає"] },
-      { kind: "positioning", paragraphs: ["Dreddi існує, щоб цього не сталося"] },
+      { kind: "realization", paragraphs: ["То зроблено чи ні?", "Ніхто не зафіксував результат"] },
+      { kind: "trigger", paragraphs: ["Тепер треба наздоганяти самому", "І це вже незручно"] },
+      { kind: "setup", paragraphs: ["Немає факту", "Лише чати, дзвінки, памʼять і припущення"] },
+      { kind: "realization", paragraphs: ["Ось де справжній збій", "Не в людях", "Не в намірах"] },
+      { kind: "positioning", paragraphs: ["Зникає сама домовленість"] },
+      { kind: "positioning", paragraphs: ["Для цього і існує Dreddi"] },
       {
         kind: "positioning",
-        paragraphs: ["Він не шукає людей", "Він не роздає задачі", "Він не є маркетплейсом"],
-      },
-      {
-        kind: "setup",
-        paragraphs: ["Він просто фіксує:", "про що домовилися", "і що насправді сталося"],
-      },
-      { kind: "realization", paragraphs: ["І це змінює все"] },
-      {
-        kind: "outcome",
-        paragraphs: ["Бо тепер є:", "чіткий старт", "видиме очікування", "визначений результат"],
+        paragraphs: [
+          "Це не маркетплейс послуг",
+          "Не фриланс-платформа для найму",
+          "Не дошка вакансій",
+          "Не місце, де шукають виконавців на разові задачі",
+        ],
       },
       {
         kind: "outcome",
-        paragraphs: ["А з часом проявляється інше", "Не думки", "Не рейтинги", "А модель поведінки"],
+        paragraphs: ["Dreddi просто фіксує", "про що домовилися", "і що реально сталося"],
       },
-      { kind: "trigger", paragraphs: ["Хто виконує", "А хто ні"] },
+      { kind: "realization", paragraphs: ["І тоді відповідальність стає реальною"] },
+      {
+        kind: "outcome",
+        paragraphs: ["Чіткий старт", "Видиме очікування", "Визначений результат"],
+      },
+      { kind: "trigger", paragraphs: ["З часом видно патерн поведінки", "Хто виконує", "А хто ні"] },
       { kind: "closing", paragraphs: ["Без контрактів", "Без тиску", "Лише ясність — і наслідки"] },
     ],
     cta: "Створити першу угоду",
