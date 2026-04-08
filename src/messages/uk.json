@@ -13,7 +13,8 @@
     "switchLanguage": "Змінити мову",
     "privacy": "Політика конфіденційності",
     "terms": "Умови користування",
-    "actionQueueBadge": "Потрібні дії"
+    "actionQueueBadge": "Потрібні дії",
+    "sendFeedback": "Надіслати фідбек"
   },
   "legal": {
     "sectionEyebrow": "ЮРИДИЧНЕ",
@@ -782,6 +783,31 @@
         "description": "Угоду оскаржено, перевірте деталі",
         "cta": "Переглянути"
       }
+    }
+  },
+  "feedback": {
+    "title": "Надіслати фідбек",
+    "close": "Закрити форму фідбеку",
+    "categoryLabel": "Категорія",
+    "messageLabel": "Що ви хочете повідомити?",
+    "messagePlaceholder": "Опишіть ваш фідбек…",
+    "allowContact": "Можна зв’язатися зі мною щодо цього фідбеку",
+    "submit": "Надіслати",
+    "sending": "Надсилання…",
+    "cancel": "Скасувати",
+    "success": "Фідбек надіслано",
+    "categories": {
+      "bug": "Баг",
+      "suggestion": "Пропозиція",
+      "confusingUx": "Незрозумілий UX",
+      "other": "Інше"
+    },
+    "validation": {
+      "categoryRequired": "Категорія є обов’язковою",
+      "messageRequired": "Повідомлення є обов’язковим"
+    },
+    "errors": {
+      "submitFailed": "Не вдалося надіслати фідбек"
     }
   }
 }
