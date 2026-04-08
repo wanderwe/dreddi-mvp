@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { StaticPageLayout } from "@/components/StaticPageLayout";
 import { getLocale } from "@/lib/i18n/getLocale";
 import { type Locale } from "@/lib/i18n/locales";
 import { getWhyCopy } from "@/lib/whyCopy";
+import { WhyCta } from "./WhyCta";
 import { WhyProgress } from "./WhyProgress";
 
 export function buildWhyMetadata(locale: Locale): Metadata {
@@ -52,12 +52,7 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
       </article>
 
       <div className="mt-10">
-        <LocalizedLink
-          href="/"
-          className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
-        >
-          {copy.cta}
-        </LocalizedLink>
+        <WhyCta label={copy.cta} />
       </div>
     </StaticPageLayout>
   );
