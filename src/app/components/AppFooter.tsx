@@ -30,12 +30,12 @@ export function AppFooter() {
 
   return (
     <footer className="border-t border-white/5 bg-slate-950/60 text-slate-400">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs sm:flex-row">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs sm:flex-row sm:gap-3">
         <span>© {year} Dreddi knows</span>
-        <div className="flex items-center gap-4">
+        <div className="flex w-full flex-col items-center gap-1 text-center sm:w-auto sm:flex-row sm:gap-4 sm:text-left">
           {canSendFeedback && (
             <FeedbackModalTrigger
-              triggerClassName="cursor-pointer rounded-lg border border-white/10 px-2.5 py-1.5 text-slate-300 transition hover:border-emerald-300/40 hover:text-emerald-100"
+              triggerClassName="cursor-pointer text-slate-400 transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40 rounded-sm"
             />
           )}
           <LocalizedLink href="/privacy" className="transition hover:text-emerald-200">
