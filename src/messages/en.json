@@ -350,8 +350,8 @@
       "title": "Document the {entityLower}",
       "subtitle": "Name the {entityLower}, add context, and an optional deadline",
       "prefill": {
-        "loading": "Prefilling from expired deal…",
-        "fromExpiredDeal": ""
+        "loading": "Prefilled from expired deal",
+        "fromExpiredDeal": "Prefilled from expired deal"
       },
       "back": "Back",
       "fields": {

@@ -78,7 +78,8 @@ export default function NewPromisePage() {
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
   const prefillResolved = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
-  const [isPrefillingFromExpired, setIsPrefillingFromExpired] = useState(false);
+  const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
+  const prefillConfirmationTimeoutRef = useRef<number | null>(null);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -510,8 +511,16 @@ export default function NewPromisePage() {
   useEffect(() => {
     prefillResolved.current = false;
     setPrefillRetryTick(0);
-    setIsPrefillingFromExpired(Boolean(fromPromiseId));
+    setShowPrefillConfirmation(false);
   }, [fromPromiseId]);
+
+  useEffect(() => {
+    return () => {
+      if (prefillConfirmationTimeoutRef.current !== null) {
+        window.clearTimeout(prefillConfirmationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!fromPromiseId || prefillResolved.current) return;
@@ -523,7 +532,6 @@ export default function NewPromisePage() {
       try {
         supabase = requireSupabase();
       } catch {
-        setIsPrefillingFromExpired(false);
         return;
       }
 
@@ -533,7 +541,6 @@ export default function NewPromisePage() {
       if (!session) {
         if (prefillRetryTick >= PREFILL_MAX_RETRIES) {
           prefillResolved.current = true;
-          setIsPrefillingFromExpired(false);
           return;
         }
         if (active) {
@@ -557,7 +564,6 @@ export default function NewPromisePage() {
 
       if (!sourceDeal || getPromiseInviteStatus(sourceDeal) !== "expired") {
         prefillResolved.current = true;
-        setIsPrefillingFromExpired(false);
         return;
       }
 
@@ -596,7 +602,14 @@ export default function NewPromisePage() {
       }
 
       prefillResolved.current = true;
-      setIsPrefillingFromExpired(false);
+      setShowPrefillConfirmation(true);
+      if (prefillConfirmationTimeoutRef.current !== null) {
+        window.clearTimeout(prefillConfirmationTimeoutRef.current);
+      }
+      prefillConfirmationTimeoutRef.current = window.setTimeout(() => {
+        setShowPrefillConfirmation(false);
+        prefillConfirmationTimeoutRef.current = null;
+      }, 4000);
     };
 
     void prefillFromExpiredDeal();
@@ -724,8 +737,8 @@ export default function NewPromisePage() {
               <p className="text-sm text-slate-300">
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
-              {isPrefillingFromExpired && (
-                <p className="text-xs text-slate-400">{t("promises.new.prefill.loading")}</p>
+              {showPrefillConfirmation && (
+                <p className="text-xs text-emerald-200/80">{t("promises.new.prefill.fromExpiredDeal")}</p>
               )}
             </div>
           </div>
