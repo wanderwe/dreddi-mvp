@@ -385,8 +385,8 @@ export default function InvitePage() {
 
             <div className="mt-6">
               {inviteAccepted ? (
-                <div className="space-y-4">
-                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
                     {isAcceptedInviteeViewer
                       ? t("invite.acceptedStateMessageYou")
                       : t("invite.acceptedStateMessage")}
@@ -394,7 +394,7 @@ export default function InvitePage() {
                   <button
                     type="button"
                     onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 sm:shrink-0"
                   >
                     {openDealLabel}
                   </button>
