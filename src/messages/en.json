@@ -761,7 +761,7 @@
     "title": "Send feedback",
     "close": "Close feedback form",
     "categoryLabel": "Category",
-    "messageLabel": "What would you like to tell us?",
+    "messageLabel": "What happened?",
     "messagePlaceholder": "Share your feedback…",
     "allowContact": "You can contact me about this feedback",
     "submit": "Send",

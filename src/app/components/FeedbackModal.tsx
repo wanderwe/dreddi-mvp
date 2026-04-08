@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
-const FEEDBACK_CATEGORIES = ["bug", "suggestion", "confusing_ux", "other"] as const;
+const FEEDBACK_CATEGORIES = ["suggestion", "bug", "confusing_ux", "other"] as const;
 
 type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
@@ -19,7 +19,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
   const locale = useLocale();
 
   const [open, setOpen] = useState(false);
-  const [category, setCategory] = useState<FeedbackCategory>("bug");
+  const [category, setCategory] = useState<FeedbackCategory>("suggestion");
   const [message, setMessage] = useState("");
   const [allowContact, setAllowContact] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +71,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
         setOpen(false);
         setMessage("");
         setAllowContact(false);
-        setCategory("bug");
+        setCategory("suggestion");
         setSuccess(false);
       }, 700);
     } catch (err) {
@@ -97,7 +97,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
 
       {open && mounted &&
         createPortal(
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[10020] flex items-center justify-center p-4">
           <button
             type="button"
             className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
