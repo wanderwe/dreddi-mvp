@@ -230,6 +230,23 @@ export default function Home() {
     });
   };
 
+  const getRecentDealActionTime = (item: DealRow) => {
+    const candidates = [
+      item.disputed_at,
+      item.confirmed_at,
+      item.declined_at,
+      item.completed_at,
+      item.counterparty_accepted_at,
+      item.accepted_at,
+      item.created_at,
+    ].filter((value): value is string => Boolean(value));
+
+    return candidates.reduce((latest, current) => {
+      const currentTime = new Date(current).getTime();
+      return Number.isFinite(currentTime) && currentTime > latest ? currentTime : latest;
+    }, 0);
+  };
+
   useEffect(() => {
     if (!isBeta) {
       setIsBannerDismissed(true);
@@ -380,7 +397,12 @@ export default function Home() {
           ];
         });
 
-        setRecentDeals(normalized.filter((deal) => deal.uiStatus !== "expired").slice(0, 3));
+        setRecentDeals(
+          normalized
+            .filter((deal) => deal.uiStatus !== "expired")
+            .sort((a, b) => getRecentDealActionTime(b) - getRecentDealActionTime(a))
+            .slice(0, 3)
+        );
       }
 
       setRecentLoading(false);
