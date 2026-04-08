@@ -230,6 +230,23 @@ export default function Home() {
     });
   };
 
+  const getRecentDealActionTime = (item: DealRow) => {
+    const candidates = [
+      item.disputed_at,
+      item.confirmed_at,
+      item.declined_at,
+      item.completed_at,
+      item.counterparty_accepted_at,
+      item.accepted_at,
+      item.created_at,
+    ].filter((value): value is string => Boolean(value));
+
+    return candidates.reduce((latest, current) => {
+      const currentTime = new Date(current).getTime();
+      return Number.isFinite(currentTime) && currentTime > latest ? currentTime : latest;
+    }, 0);
+  };
+
   useEffect(() => {
     if (!isBeta) {
       setIsBannerDismissed(true);
@@ -337,9 +354,10 @@ export default function Home() {
       const { data, error } = await client
         .from("promises")
         .select("id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,declined_at,invite_status,accepted_at,counterparty_accepted_at,ignored_at,expires_at,cancelled_at")
+        .neq("status", "expired")
         .or(`promisor_id.eq.${userId},promisee_id.eq.${userId},creator_id.eq.${userId},counterparty_id.eq.${userId}`)
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(20);
 
       if (cancelled) return;
 
@@ -379,7 +397,12 @@ export default function Home() {
           ];
         });
 
-        setRecentDeals(normalized);
+        setRecentDeals(
+          normalized
+            .filter((deal) => deal.uiStatus !== "expired")
+            .sort((a, b) => getRecentDealActionTime(b) - getRecentDealActionTime(a))
+            .slice(0, 3)
+        );
       }
 
       setRecentLoading(false);
