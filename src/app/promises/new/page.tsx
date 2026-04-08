@@ -609,7 +609,7 @@ export default function NewPromisePage() {
       prefillConfirmationTimeoutRef.current = window.setTimeout(() => {
         setShowPrefillConfirmation(false);
         prefillConfirmationTimeoutRef.current = null;
-      }, 4000);
+      }, 5000);
     };
 
     void prefillFromExpiredDeal();
@@ -738,7 +738,10 @@ export default function NewPromisePage() {
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
               {showPrefillConfirmation && (
-                <p className="text-xs text-emerald-200/80">{t("promises.new.prefill.fromExpiredDeal")}</p>
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs text-emerald-100">
+                  <Info className="h-3.5 w-3.5" aria-hidden />
+                  {t("promises.new.prefill.fromExpiredDeal")}
+                </p>
               )}
             </div>
           </div>
