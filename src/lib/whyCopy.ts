@@ -1,6 +1,14 @@
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
-export type WhySectionKind = "turn" | "body" | "list";
+export type WhySectionKind =
+  | "setup"
+  | "list"
+  | "trigger"
+  | "quote"
+  | "realization"
+  | "positioning"
+  | "outcome"
+  | "closing";
 
 export type WhyCopy = {
   seo: {
@@ -21,37 +29,44 @@ export const whyCopy: Record<Locale, WhyCopy> = {
     seo: {
       title: "Why Dreddi Exists — Dreddi",
       description:
-        "Learn why Dreddi was built and how it turns promises into reputation through real outcomes",
+        "Why Dreddi exists: to keep agreements clear, visible, and accountable without becoming a marketplace",
     },
     title: "Why Dreddi exists",
     subtitle: "",
     sections: [
-      { kind: "body", paragraphs: ["You agreed on something"] },
+      { kind: "setup", paragraphs: ["You agreed on something"] },
       { kind: "list", paragraphs: ["A deadline", "A result", "A responsibility"] },
-      { kind: "turn", paragraphs: ["And then… nothing happens"] },
-      { kind: "list", paragraphs: ["No reminder", "No confirmation", "No clear outcome"] },
-      { kind: "body", paragraphs: ["Just different memories of what was supposed to happen"] },
+      { kind: "setup", paragraphs: ["A few days pass", "Nothing happens"] },
+      { kind: "quote", paragraphs: ["You think:", "“I thought we agreed”"] },
+      { kind: "quote", paragraphs: ["They think:", "“That wasn’t urgent”"] },
+      { kind: "realization", paragraphs: ["No one is wrong", "There was just no clear record"] },
       {
-        kind: "turn",
-        paragraphs: ["That’s the problem"],
+        kind: "trigger",
+        paragraphs: ["No reminder", "No confirmation", "No final state", "No shared reality"],
+      },
+      { kind: "setup", paragraphs: ["Just memory", "And memory is unreliable"] },
+      { kind: "realization", paragraphs: ["That’s the problem", "Not people", "Not intentions"] },
+      { kind: "trigger", paragraphs: ["The agreement itself disappears"] },
+      { kind: "positioning", paragraphs: ["Dreddi exists to prevent that"] },
+      {
+        kind: "positioning",
+        paragraphs: ["It doesn’t find people", "It doesn’t assign work", "It doesn’t act as a marketplace"],
       },
       {
-        kind: "body",
-        paragraphs: ["Not people", "Not intentions", "Just the fact that agreements disappear"],
+        kind: "setup",
+        paragraphs: ["It simply records:", "what was agreed", "and what actually happened"],
       },
-      { kind: "turn", paragraphs: ["Dreddi exists to keep them visible"] },
-      { kind: "list", paragraphs: ["Not to judge", "Not to rate", "Not to argue"] },
+      { kind: "realization", paragraphs: ["And that changes everything"] },
       {
-        kind: "body",
-        paragraphs: ["Just to record:", "what was agreed", "and what actually happened"],
+        kind: "outcome",
+        paragraphs: ["Because now there is:", "a clear start", "a visible expectation", "a defined outcome"],
       },
       {
-        kind: "turn",
-        paragraphs: ["Because reputation is not what people say"],
+        kind: "outcome",
+        paragraphs: ["And over time, something else appears", "Not opinions", "Not ratings", "A pattern of behavior"],
       },
-      { kind: "body", paragraphs: ["It’s what you actually do"] },
-      { kind: "body", paragraphs: ["Over time, it becomes obvious", "Who delivers", "And who doesn’t"] },
-      { kind: "list", paragraphs: ["No contracts", "No pressure", "Just clarity — and consequences"] },
+      { kind: "trigger", paragraphs: ["Who delivers", "And who doesn’t"] },
+      { kind: "closing", paragraphs: ["No contracts", "No pressure", "Just clarity — and consequences"] },
     ],
     cta: "Create your first deal",
   },
@@ -59,37 +74,44 @@ export const whyCopy: Record<Locale, WhyCopy> = {
     seo: {
       title: "Чому існує Dreddi — Dreddi",
       description:
-        "Дізнайтесь, чому створили Dreddi і як сервіс перетворює обіцянки на репутацію через реальні результати",
+        "Чому існує Dreddi: щоб домовленості не зникали в чатах, памʼяті та припущеннях, без перетворення на маркетплейс",
     },
     title: "Чому існує Dreddi",
     subtitle: "",
     sections: [
-      { kind: "body", paragraphs: ["Ви про щось домовилися"] },
+      { kind: "setup", paragraphs: ["Ви про щось домовилися"] },
       { kind: "list", paragraphs: ["Дедлайн", "Результат", "Відповідальність"] },
-      { kind: "turn", paragraphs: ["А потім… нічого не відбувається"] },
-      { kind: "list", paragraphs: ["Нагадування немає", "Підтвердження немає", "Чіткого результату немає"] },
-      { kind: "body", paragraphs: ["Лише різні спогади про те, що мало статися"] },
+      { kind: "setup", paragraphs: ["Минає кілька днів", "Нічого не відбувається"] },
+      { kind: "quote", paragraphs: ["Ви думаєте:", "«Ми ж домовилися»"] },
+      { kind: "quote", paragraphs: ["Вони думають:", "«Я не думав, що це терміново»"] },
+      { kind: "realization", paragraphs: ["Ніхто не винен", "Просто не було чіткої фіксації"] },
       {
-        kind: "turn",
-        paragraphs: ["Ось у чому проблема"],
+        kind: "trigger",
+        paragraphs: ["Немає нагадування", "Немає підтвердження", "Немає фінального стану", "Немає спільної реальності"],
+      },
+      { kind: "setup", paragraphs: ["Лише памʼять", "А памʼять ненадійна"] },
+      { kind: "realization", paragraphs: ["Ось у чому проблема", "Не в людях", "Не в намірах"] },
+      { kind: "trigger", paragraphs: ["Сама домовленість просто зникає"] },
+      { kind: "positioning", paragraphs: ["Dreddi існує, щоб цього не сталося"] },
+      {
+        kind: "positioning",
+        paragraphs: ["Він не шукає людей", "Він не роздає задачі", "Він не є маркетплейсом"],
       },
       {
-        kind: "body",
-        paragraphs: ["Не в людях", "Не в намірах", "А в тому, що домовленості зникають"],
+        kind: "setup",
+        paragraphs: ["Він просто фіксує:", "про що домовилися", "і що насправді сталося"],
       },
-      { kind: "turn", paragraphs: ["Dreddi існує, щоб тримати їх видимими"] },
-      { kind: "list", paragraphs: ["Не щоб судити", "Не щоб оцінювати", "Не щоб сперечатися"] },
+      { kind: "realization", paragraphs: ["І це змінює все"] },
       {
-        kind: "body",
-        paragraphs: ["Лише щоб зафіксувати:", "про що домовилися", "і що насправді сталося"],
+        kind: "outcome",
+        paragraphs: ["Бо тепер є:", "чіткий старт", "видиме очікування", "визначений результат"],
       },
       {
-        kind: "turn",
-        paragraphs: ["Бо репутація — це не те, що кажуть люди"],
+        kind: "outcome",
+        paragraphs: ["А з часом проявляється інше", "Не думки", "Не рейтинги", "А модель поведінки"],
       },
-      { kind: "body", paragraphs: ["Це те, що ви реально робите"] },
-      { kind: "body", paragraphs: ["З часом це стає очевидно", "Хто виконує", "А хто ні"] },
-      { kind: "list", paragraphs: ["Без контрактів", "Без тиску", "Лише ясність — і наслідки"] },
+      { kind: "trigger", paragraphs: ["Хто виконує", "А хто ні"] },
+      { kind: "closing", paragraphs: ["Без контрактів", "Без тиску", "Лише ясність — і наслідки"] },
     ],
     cta: "Створити першу угоду",
   },
