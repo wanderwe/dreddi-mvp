@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, UserRound, X } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
 import {
   Sheet,
   SheetClose,
@@ -36,7 +37,6 @@ type ProfileState = {
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
   const t = useT();
-  const locale = useLocale();
   const [authState, setAuthState] = useState<AuthState | null>(null);
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,13 +54,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [feedbackCategory, setFeedbackCategory] = useState("bug");
-  const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [feedbackAllowContact, setFeedbackAllowContact] = useState(false);
-  const [feedbackError, setFeedbackError] = useState<string | null>(null);
-  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
-  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const lastHandleRef = useRef<string | null>(null);
   const maxTags = 7;
   const minTagLength = 2;
@@ -300,55 +293,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       { email_notifications_enabled: !profile.emailEnabled },
       { emailEnabled: !profile.emailEnabled }
     );
-  };
-
-  const submitFeedback = async () => {
-    const trimmed = feedbackMessage.trim();
-
-    if (!feedbackCategory) {
-      setFeedbackError(t("feedback.validation.categoryRequired"));
-      return;
-    }
-
-    if (!trimmed) {
-      setFeedbackError(t("feedback.validation.messageRequired"));
-      return;
-    }
-
-    setFeedbackSubmitting(true);
-    setFeedbackError(null);
-
-    try {
-      const payload = {
-        category: feedbackCategory,
-        message: trimmed,
-        allowContact: feedbackAllowContact,
-        pageUrl: typeof window !== "undefined" ? window.location.href : "",
-        locale,
-      };
-
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? t("feedback.errors.submitFailed"));
-      }
-
-      setFeedbackSuccess(true);
-      setFeedbackMessage("");
-      setFeedbackAllowContact(false);
-      setTimeout(() => {
-        setFeedbackOpen(false);
-      }, 700);
-    } catch (err) {
-      setFeedbackError(err instanceof Error ? err.message : t("feedback.errors.submitFailed"));
-    } finally {
-      setFeedbackSubmitting(false);
-    }
   };
 
   const toggleDeadlineReminders = async () => {
@@ -934,22 +878,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         )}
 
         <div className="mt-4 border-t border-white/10 pt-4">
-          <button
-            type="button"
-            onClick={() => {
-              setFeedbackError(null);
-              setFeedbackSuccess(false);
-              setFeedbackOpen(true);
-            }}
-            className="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-          >
-            {t("nav.sendFeedback")}
-          </button>
-          {feedbackSuccess && (
-            <div className="mt-2 rounded-xl border border-emerald-300/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-              {t("feedback.success")}
-            </div>
-          )}
+          <FeedbackModalTrigger
+            triggerClassName="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+          />
 
           <button
             type="button"
@@ -972,7 +903,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 );
               }
             }}
-            className="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+            className="mt-3 w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
           >
             {t("nav.logout")}
           </button>
@@ -984,97 +915,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         </div>
       </div>
 
-      {feedbackOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <button
-            type="button"
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
-            onClick={() => setFeedbackOpen(false)}
-            aria-label={t("feedback.close")}
-          />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-4 shadow-2xl shadow-black/60 sm:p-5">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <h3 className="text-base font-semibold text-white">{t("feedback.title")}</h3>
-              <button
-                type="button"
-                onClick={() => setFeedbackOpen(false)}
-                className="cursor-pointer rounded-lg border border-white/10 p-1.5 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
-                aria-label={t("feedback.close")}
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <label className="block space-y-1.5">
-                <span className="text-xs font-medium text-slate-200">{t("feedback.categoryLabel")}</span>
-                <select
-                  value={feedbackCategory}
-                  onChange={(event) => setFeedbackCategory(event.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/50"
-                >
-                  <option value="bug">{t("feedback.categories.bug")}</option>
-                  <option value="suggestion">{t("feedback.categories.suggestion")}</option>
-                  <option value="confusing_ux">{t("feedback.categories.confusingUx")}</option>
-                  <option value="other">{t("feedback.categories.other")}</option>
-                </select>
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-xs font-medium text-slate-200">{t("feedback.messageLabel")}</span>
-                <textarea
-                  value={feedbackMessage}
-                  onChange={(event) => setFeedbackMessage(event.target.value)}
-                  rows={4}
-                  placeholder={t("feedback.messagePlaceholder")}
-                  className="w-full resize-y rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-400 focus:border-emerald-300/50"
-                />
-              </label>
-
-              <label className="flex items-start gap-2 text-xs text-slate-200">
-                <input
-                  type="checkbox"
-                  checked={feedbackAllowContact}
-                  onChange={(event) => setFeedbackAllowContact(event.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/10"
-                />
-                <span>{t("feedback.allowContact")}</span>
-              </label>
-
-              {feedbackError && (
-                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                  {feedbackError}
-                </div>
-              )}
-
-              {feedbackSuccess ? (
-                <div className="rounded-xl border border-emerald-300/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-                  {t("feedback.success")}
-                </div>
-              ) : (
-                <div className="flex items-center justify-end gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setFeedbackOpen(false)}
-                    className="cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-200 transition hover:border-white/30"
-                    disabled={feedbackSubmitting}
-                  >
-                    {t("feedback.cancel")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={submitFeedback}
-                    className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={feedbackSubmitting}
-                  >
-                    {feedbackSubmitting ? t("feedback.sending") : t("feedback.submit")}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
