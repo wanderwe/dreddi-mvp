@@ -24,16 +24,16 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const trimmedMessage = message.trim();
+  const canSubmit = Boolean(category) && trimmedMessage.length > 0 && !submitting;
 
   const submitFeedback = async () => {
-    const trimmed = message.trim();
-
     if (!category) {
       setError(t("feedback.validation.categoryRequired"));
       return;
     }
 
-    if (!trimmed) {
+    if (!trimmedMessage) {
       setError(t("feedback.validation.messageRequired"));
       return;
     }
@@ -47,7 +47,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           category,
-          message: trimmed,
+          message: trimmedMessage,
           allowContact,
           pageUrl: typeof window !== "undefined" ? window.location.href : "",
           locale,
@@ -126,10 +126,10 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
                         key={item}
                         type="button"
                         onClick={() => setCategory(item)}
-                        className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
+                        className={`cursor-pointer rounded-xl border px-3 py-2 text-left text-sm transition ${
                           active
-                            ? "border-emerald-300/60 bg-emerald-400/15 text-emerald-100"
-                            : "border-white/10 bg-white/[0.03] text-slate-200 hover:border-white/30"
+                            ? "border-emerald-300/60 bg-emerald-400/15 text-emerald-100 hover:bg-emerald-400/20"
+                            : "border-white/10 bg-white/[0.03] text-slate-200 hover:border-white/30 hover:bg-white/[0.06]"
                         }`}
                       >
                         {t(labelKey)}
@@ -192,8 +192,8 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
                   <button
                     type="button"
                     onClick={submitFeedback}
-                    className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={submitting}
+                    className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-emerald-400/40 disabled:text-slate-800 disabled:opacity-80"
+                    disabled={!canSubmit}
                   >
                     {submitting ? t("feedback.sending") : t("feedback.submit")}
                   </button>

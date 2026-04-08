@@ -877,7 +877,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         )}
 
-        <div className="mt-4 border-t border-white/10 pt-4">
+        <div className="mt-4 border-t border-white/10 pt-4 pb-3">
           <FeedbackModalTrigger
             triggerClassName="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
           />
