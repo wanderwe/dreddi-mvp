@@ -263,6 +263,8 @@ export default function InvitePage() {
       : t("invite.heading.accepted")
     : t("invite.heading.pending");
   const openDealLabel = isCreatorViewer ? t("invite.viewDeal") : t("invite.goToDeal");
+  const detailsText = info?.details?.trim() ?? "";
+  const hasDetails = detailsText.length > 0;
   const canDecline = canCounterpartyRespond({
     userId,
     creatorId: info?.creator_id ?? "",
@@ -369,6 +371,17 @@ export default function InvitePage() {
                 </div>
               )}
             </dl>
+
+            {hasDetails && (
+              <section className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <h3 className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                  {t("invite.dealDetailsLabel")}
+                </h3>
+                <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-100">
+                  {detailsText}
+                </p>
+              </section>
+            )}
 
             <div className="mt-6">
               {inviteAccepted ? (
