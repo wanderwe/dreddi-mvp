@@ -454,6 +454,7 @@
     "createdByLabel": "Created by",
     "invitedSideLabel": "Invited side",
     "invitedSidePending": "Not assigned yet",
+    "dealDetailsLabel": "Deal details",
     "deadline": "Deadline",
     "publicTag": "Public",
     "counterCondition": "Counter-condition",
