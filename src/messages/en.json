@@ -13,7 +13,8 @@
     "switchLanguage": "Switch language",
     "privacy": "Privacy",
     "terms": "Terms",
-    "actionQueueBadge": "Action required"
+    "actionQueueBadge": "Action required",
+    "sendFeedback": "Send feedback"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -754,6 +755,32 @@
         "description": "The deal was disputed, check details",
         "cta": "View"
       }
+    }
+  },
+  "feedback": {
+    "title": "Send feedback",
+    "close": "Close feedback form",
+    "categoryLabel": "Category",
+    "messageLabel": "What happened?",
+    "messagePlaceholder": "Share your feedback…",
+    "allowContact": "You can contact me about this feedback",
+    "submit": "Send",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "success": "Feedback sent",
+    "categories": {
+      "bug": "Bug",
+      "suggestion": "Suggestion",
+      "confusingUx": "Confusing UX",
+      "other": "Other"
+    },
+    "validation": {
+      "categoryRequired": "Category is required",
+      "messageRequired": "Message is required",
+      "messageMinLength": "Message should be at least {min} characters"
+    },
+    "errors": {
+      "submitFailed": "Failed to send feedback"
     }
   }
 }

@@ -8,6 +8,7 @@ import { useT } from "@/lib/i18n/I18nProvider";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
 import {
   Sheet,
   SheetClose,
@@ -876,7 +877,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         )}
 
-        <div className="mt-4 border-t border-white/10 pt-4">
+        <div className="mt-4 border-t border-white/10 pt-4 pb-3">
+          <FeedbackModalTrigger
+            triggerClassName="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+          />
+
           <button
             type="button"
             onClick={async () => {
@@ -898,7 +903,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 );
               }
             }}
-            className="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+            className="mt-3 w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
           >
             {t("nav.logout")}
           </button>
@@ -909,6 +914,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           )}
         </div>
       </div>
+
     </div>
   );
 }
