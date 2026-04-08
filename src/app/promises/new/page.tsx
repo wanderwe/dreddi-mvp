@@ -79,7 +79,6 @@ export default function NewPromisePage() {
   const prefillResolved = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
   const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
-  const prefillConfirmationTimeoutRef = useRef<number | null>(null);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -515,14 +514,6 @@ export default function NewPromisePage() {
   }, [fromPromiseId]);
 
   useEffect(() => {
-    return () => {
-      if (prefillConfirmationTimeoutRef.current !== null) {
-        window.clearTimeout(prefillConfirmationTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     if (!fromPromiseId || prefillResolved.current) return;
 
     let active = true;
@@ -603,13 +594,6 @@ export default function NewPromisePage() {
 
       prefillResolved.current = true;
       setShowPrefillConfirmation(true);
-      if (prefillConfirmationTimeoutRef.current !== null) {
-        window.clearTimeout(prefillConfirmationTimeoutRef.current);
-      }
-      prefillConfirmationTimeoutRef.current = window.setTimeout(() => {
-        setShowPrefillConfirmation(false);
-        prefillConfirmationTimeoutRef.current = null;
-      }, 5000);
     };
 
     void prefillFromExpiredDeal();
@@ -738,7 +722,7 @@ export default function NewPromisePage() {
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
               {showPrefillConfirmation && (
-                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs text-emerald-100">
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/20 bg-emerald-400/5 px-2.5 py-1.5 text-xs text-emerald-100/90">
                   <Info className="h-3.5 w-3.5" aria-hidden />
                   {t("promises.new.prefill.fromExpiredDeal")}
                 </p>
