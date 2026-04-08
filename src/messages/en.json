@@ -776,7 +776,8 @@
     },
     "validation": {
       "categoryRequired": "Category is required",
-      "messageRequired": "Message is required"
+      "messageRequired": "Message is required",
+      "messageMinLength": "Message should be at least {min} characters"
     },
     "errors": {
       "submitFailed": "Failed to send feedback"

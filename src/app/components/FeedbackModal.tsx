@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 
 const FEEDBACK_CATEGORIES = ["suggestion", "bug", "confusing_ux", "other"] as const;
+const MIN_FEEDBACK_LENGTH = 5;
 
 type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
@@ -27,7 +28,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
   const trimmedMessage = message.trim();
-  const canSubmit = Boolean(category) && trimmedMessage.length > 0 && !submitting;
+  const canSubmit = Boolean(category) && trimmedMessage.length >= MIN_FEEDBACK_LENGTH && !submitting;
 
   useEffect(() => {
     setMounted(true);
@@ -42,6 +43,10 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
 
     if (!trimmedMessage) {
       setError(t("feedback.validation.messageRequired"));
+      return;
+    }
+    if (trimmedMessage.length < MIN_FEEDBACK_LENGTH) {
+      setError(t("feedback.validation.messageMinLength", { min: String(MIN_FEEDBACK_LENGTH) }));
       return;
     }
 

@@ -804,7 +804,8 @@
     },
     "validation": {
       "categoryRequired": "Категорія є обов’язковою",
-      "messageRequired": "Повідомлення є обов’язковим"
+      "messageRequired": "Повідомлення є обов’язковим",
+      "messageMinLength": "Повідомлення має містити щонайменше {min} символів"
     },
     "errors": {
       "submitFailed": "Не вдалося надіслати фідбек"

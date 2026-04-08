@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { requireUser } from "@/lib/auth/requireUser";
 
 const FEEDBACK_CATEGORIES = ["bug", "suggestion", "confusing_ux", "other"] as const;
+const MIN_FEEDBACK_LENGTH = 5;
 type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
 type FeedbackRequestBody = {
@@ -33,6 +34,12 @@ export async function POST(req: Request) {
 
   if (!message) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
+  }
+  if (message.length < MIN_FEEDBACK_LENGTH) {
+    return NextResponse.json(
+      { error: `Message must be at least ${MIN_FEEDBACK_LENGTH} characters` },
+      { status: 400 }
+    );
   }
 
   if (!pageUrl) {
