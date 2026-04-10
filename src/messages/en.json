@@ -570,7 +570,7 @@
         "completionReview": "Completion review"
       },
       "workedWith": {
-        "secondary": "out of {count} {label}"
+        "secondary": "out of {count} closed deals"
       },
       "commitments": {
         "onTime": "{count} on time"

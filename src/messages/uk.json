@@ -583,7 +583,7 @@
         "completionReview": "Розгляд виконання"
       },
       "workedWith": {
-        "secondary": "з {count} {label}"
+        "secondary": "з {count} закритих угод"
       },
       "commitments": {
         "onTime": "{count} вчасно"

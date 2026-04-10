@@ -386,6 +386,7 @@ export default function PublicProfilePage() {
   };
   const reputationEvidence = useMemo(() => {
     const totalDeals = totalConfirmedDeals ?? 0;
+    const workedWithDeals = profile?.completed_count ?? 0;
     const hasDeals = totalDeals > 0;
     const uniquePeople = profile?.unique_counterparties_count ?? null;
     const dealsWithDeadlines = profile?.deals_with_due_date_count ?? null;
@@ -419,6 +420,7 @@ export default function PublicProfilePage() {
 
     return {
       totalDeals,
+      workedWithDeals,
       hasDeals,
       uniquePeople,
       dealsWithDeadlines,
@@ -437,6 +439,7 @@ export default function PublicProfilePage() {
     profile?.completion_executor_total_count,
     profile?.completion_reviewer_responded_count,
     profile?.completion_reviewer_total_count,
+    profile?.completed_count,
     profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
     profile?.dispute_rate,
@@ -638,11 +641,10 @@ export default function PublicProfilePage() {
                                 )}
                               </span>
                             </div>
-                            {reputationEvidence.totalDeals > 0 && (
+                            {reputationEvidence.workedWithDeals > 0 && (
                               <p className="text-xs text-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
-                                  count: numberFormatter.format(reputationEvidence.totalDeals),
-                                  label: formatPlural(reputationEvidence.totalDeals, "fulfilledDeals"),
+                                  count: numberFormatter.format(reputationEvidence.workedWithDeals),
                                 })}
                               </p>
                             )}
