@@ -1164,8 +1164,8 @@ export default function PromisePage() {
       )}
 
       {showNotDeliveredModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-black/60">
             <h2 className="text-xl font-semibold text-white">
               {t("promises.notDeliveredModal.title")}
             </h2>
