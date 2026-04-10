@@ -580,7 +580,7 @@
         "disputes": "Спори",
         "trackRecord": "Темп угод",
         "completionRate": "Виконання",
-        "completionReview": "Розгляд виконання"
+        "completionReview": "Реакція"
       },
       "workedWith": {
         "secondary": "з {count} закритих угод"
