@@ -583,7 +583,7 @@
         "completionReview": "Розгляд виконання"
       },
       "workedWith": {
-        "secondary": "з {count} {label} загалом"
+        "secondary": "з {count} {label}"
       },
       "commitments": {
         "onTime": "{count} вчасно"
@@ -628,11 +628,11 @@
           "many": "прийнятих угод",
           "other": "прийнятих угод"
         },
-        "dealsTotal": {
-          "one": "угоди",
-          "few": "угод",
-          "many": "угод",
-          "other": "угоди"
+        "fulfilledDeals": {
+          "one": "дотриманої угоди",
+          "few": "дотриманих угод",
+          "many": "дотриманих угод",
+          "other": "дотриманих угод"
         },
         "dealsPace": {
           "one": "угода",
