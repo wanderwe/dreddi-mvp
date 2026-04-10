@@ -23,6 +23,7 @@ type DispatchOptions = {
   title?: string;
   body?: string;
   ctaLabel?: string | null;
+  dedupeKeyOverride?: string;
 };
 
 export const dispatchNotificationEvent = async (options: DispatchOptions) => {
@@ -37,6 +38,7 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
     title,
     body,
     ctaLabel,
+    dedupeKeyOverride,
   } = options;
 
   const recipients = getNotificationRecipients(event, promise, actorId);
@@ -57,7 +59,8 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
   const results = [];
 
   for (const recipient of recipients) {
-    const dedupeKey = getNotificationDedupeKey(event, promise.id, recipient.userId);
+    const dedupeKey =
+      dedupeKeyOverride ?? getNotificationDedupeKey(event, promise.id, recipient.userId);
     const outcome = await createNotification(admin, {
       userId: recipient.userId,
       promiseId: promise.id,
@@ -81,7 +84,7 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
       promiseId: promise.id,
       actorId: actorId ?? null,
       recipients: recipients.map((recipient) => recipient.userId),
-      dedupeKeys: results.map((result) => getNotificationDedupeKey(event, promise.id, result.userId)),
+      dedupeKeys: results.map((result) => dedupeKeyOverride ?? getNotificationDedupeKey(event, promise.id, result.userId)),
       type,
       results: results.map((result) => ({
         userId: result.userId,

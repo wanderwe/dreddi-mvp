@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getNotificationCopy } from "../src/lib/notifications/copy";
-import { authorizeCron, isEligibleDeadlineReminder } from "../src/app/api/notifications/cron/route";
+import {
+  authorizeCron,
+  getOverdueTimeBucket,
+  isEligibleDeadlineReminder,
+  shouldSendOverdueReminder,
+} from "../src/app/api/notifications/cron/route";
 
 describe("manual reminder copy", () => {
   it("does not mention deadline for no-deadline promises", () => {
@@ -14,6 +19,21 @@ describe("manual reminder copy", () => {
 describe("deadline reminder eligibility", () => {
   it("does not trigger when due_at is null", () => {
     assert.equal(isEligibleDeadlineReminder(null, new Date("2026-01-01T00:00:00Z")), false);
+  });
+});
+
+describe("overdue reminder cadence", () => {
+  it("repeats only after 72h window elapses", () => {
+    const now = new Date("2026-01-05T00:00:00Z");
+    assert.equal(shouldSendOverdueReminder(null, now), true);
+    assert.equal(shouldSendOverdueReminder("2026-01-02T00:00:00Z", now), true);
+    assert.equal(shouldSendOverdueReminder("2026-01-03T12:01:00Z", now), false);
+  });
+
+  it("uses a stable 72h time bucket", () => {
+    const first = getOverdueTimeBucket(new Date("2026-01-05T00:00:00Z"));
+    const second = getOverdueTimeBucket(new Date("2026-01-05T10:00:00Z"));
+    assert.equal(first, second);
   });
 });
 

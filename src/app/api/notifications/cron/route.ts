@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
+import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { INVITE_TTL_HOURS } from "@/lib/inviteLifecycle";
 
 const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 const HOURS_24 = 24 * 60 * 60 * 1000;
+const HOURS_72 = 72 * 60 * 60 * 1000;
 
 type CronSuccessResponse = {
   processed: number;
@@ -36,7 +39,14 @@ type PromiseRow = {
   invite_status: string | null;
   promisor_id: string | null;
   promisee_id: string | null;
-  promise_notification_state?: Array<{ due_soon_notified_at?: string | null }> | null;
+  confirmed_at?: string | null;
+  disputed_at?: string | null;
+  promise_notification_state?: Array<{
+    due_soon_notified_at?: string | null;
+    overdue_notified_at?: string | null;
+    completion_notified_at?: string | null;
+    completion_followups_count?: number | null;
+  }> | null;
 };
 
 const unauthorizedResponse = () =>
@@ -78,6 +88,16 @@ export const isEligibleDeadlineReminder = (dueAt: string | null, now: Date) => {
   if (!dueAt) return false;
   return new Date(dueAt).getTime() <= now.getTime();
 };
+export const shouldSendOverdueReminder = (
+  overdueNotifiedAt: string | null | undefined,
+  now: Date
+) => {
+  if (!overdueNotifiedAt) return true;
+  const lastSentAt = new Date(overdueNotifiedAt).getTime();
+  if (Number.isNaN(lastSentAt)) return true;
+  return now.getTime() - lastSentAt >= HOURS_72;
+};
+export const getOverdueTimeBucket = (now: Date) => Math.floor(now.getTime() / HOURS_72);
 
 const getNotificationState = (state: PromiseRow["promise_notification_state"]) => state?.[0] ?? {};
 
@@ -147,7 +167,7 @@ const runCron = async (req: Request) => {
     const { data: overdueRows, error: overdueFetchError } = await admin
       .from("promises")
       .select(
-        "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id"
+        "id,due_at,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,promise_notification_state(overdue_notified_at)"
       )
       .eq("status", "active")
       .not("due_at", "is", null)
@@ -160,6 +180,19 @@ const runCron = async (req: Request) => {
 
     const dueSoonCandidates = (dueSoonRows ?? []) as PromiseRow[];
     const overdueCandidates = (overdueRows ?? []) as PromiseRow[];
+    const { data: completionRows, error: completionFetchError } = await admin
+      .from("promises")
+      .select(
+        "id,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,status,confirmed_at,disputed_at,promise_notification_state(completion_notified_at,completion_followups_count)"
+      )
+      .eq("status", "completed_by_promisor");
+    if (completionFetchError) {
+      response.errors.push("completion_followup_fetch_failed");
+      console.error("[notifications] cron_completion_followup_fetch_failed", {
+        error: completionFetchError.message,
+      });
+    }
+    const completionCandidates = (completionRows ?? []) as PromiseRow[];
     const { data: inviteIgnoredRows, error: inviteIgnoredFetchError } = await admin
       .from("promises")
       .select(
@@ -183,7 +216,8 @@ const runCron = async (req: Request) => {
       ts: nowIso,
       dueSoon: dueSoonCandidates.length,
       overdue: overdueCandidates.length,
-      total: dueSoonCandidates.length + overdueCandidates.length,
+      completionFollowup: completionCandidates.length,
+      total: dueSoonCandidates.length + overdueCandidates.length + completionCandidates.length,
     });
     console.info("[notifications] reminder_cron_candidate_invite_ignored_found", {
       ts: nowIso,
@@ -223,6 +257,13 @@ const runCron = async (req: Request) => {
           return;
         }
       }
+      if (reminderType === "deadline_passed") {
+        const state = getNotificationState(row.promise_notification_state);
+        if (!shouldSendOverdueReminder(state.overdue_notified_at, now)) {
+          skip("overdue_interval_not_elapsed");
+          return;
+        }
+      }
 
       if (!isPromiseAccepted(row)) {
         skip("dedupe_key_exists");
@@ -252,6 +293,10 @@ const runCron = async (req: Request) => {
           event: reminderType,
           promise: row,
           requiresDeadlineReminder: true,
+          dedupeKeyOverride:
+            reminderType === "deadline_passed"
+              ? `reminder_overdue:${row.id}:${resolveExecutorId(row)}:${getOverdueTimeBucket(now)}`
+              : undefined,
         });
 
         let createdCount = 0;
@@ -327,6 +372,92 @@ const runCron = async (req: Request) => {
           error: error instanceof Error ? error.message : String(error),
         });
       }
+    };
+
+    const processCompletionFollowupCandidate = async (row: PromiseRow) => {
+      const reviewerId = resolveCounterpartyId(row);
+      const state = getNotificationState(row.promise_notification_state);
+      const followupsCount = state.completion_followups_count ?? 0;
+      const completionNotifiedAt = state.completion_notified_at
+        ? new Date(state.completion_notified_at)
+        : null;
+      const stage = getCompletionFollowupStage(completionNotifiedAt, followupsCount, now);
+      const logBase = {
+        ts: nowIso,
+        promiseId: row.id,
+        userId: reviewerId,
+        reminderType: "completion_followup",
+      };
+
+      const skip = (reason: string) => {
+        response.skipped += 1;
+        console.info("[notifications] reminder_cron_candidate", {
+          ...logBase,
+          eligibility: false,
+          reason,
+        });
+      };
+
+      if (!reviewerId) return skip("missing_reviewer");
+      if (!isPromiseAccepted(row)) return skip("not_accepted");
+      if (row.status !== "completed_by_promisor") return skip("status_not_pending_review");
+      if (row.confirmed_at || row.disputed_at) return skip("already_reviewed");
+      if (!completionNotifiedAt) return skip("completion_notified_at_missing");
+      if (!stage) return skip("followup_not_due");
+      if (followupsCount >= 2) return skip("followup_limit_reached");
+
+      response.processed += 1;
+
+      if (dryRun) return skip("dry_run");
+
+      const nextCount = followupsCount + 1;
+      const dedupeKey = `completion_followup:${row.id}:${reviewerId}:${nextCount}`;
+      const outcome = await createNotification(admin, {
+        userId: reviewerId,
+        promiseId: row.id,
+        type: "completion_waiting",
+        role: "counterparty",
+        dedupeKey,
+        ctaUrl: `/promises/${row.id}/confirm`,
+        priority: mapPriorityForType("completion_waiting"),
+        followup: stage === "24h" ? "completion24" : "completion72",
+      });
+
+      if (outcome.created) {
+        triggeredTypes.add("completion_followup");
+        if (outcome.emailSent) {
+          response.emailsSent += 1;
+        } else if (outcome.emailSkippedReason) {
+          response.skipped += 1;
+          console.info("[notifications] reminder_cron_candidate", {
+            ...logBase,
+            eligibility: false,
+            reason: outcome.emailSkippedReason,
+          });
+        }
+
+        const { error: upsertError } = await admin.from("promise_notification_state").upsert({
+          promise_id: row.id,
+          completion_followups_count: nextCount,
+          completion_followup_last_at: nowIso,
+          updated_at: nowIso,
+        });
+        if (upsertError) {
+          response.errors.push("completion_followup_state_upsert_failed");
+          console.error("[notifications] cron_completion_followup_state_upsert_failed", {
+            promiseId: row.id,
+            error: upsertError.message,
+          });
+        }
+        return;
+      }
+
+      response.skipped += 1;
+      console.info("[notifications] reminder_cron_candidate", {
+        ...logBase,
+        eligibility: false,
+        reason: outcome.skippedReason ?? "completion_followup_not_created",
+      });
     };
 
     const processInviteIgnoredCandidate = async (row: PromiseRow) => {
@@ -442,6 +573,9 @@ const runCron = async (req: Request) => {
     }
     for (const row of overdueCandidates) {
       await processCandidate(row, "deadline_passed");
+    }
+    for (const row of completionCandidates) {
+      await processCompletionFollowupCandidate(row);
     }
     for (const row of inviteIgnoredCandidates) {
       await processInviteIgnoredCandidate(row);
