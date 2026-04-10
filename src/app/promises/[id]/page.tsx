@@ -864,22 +864,27 @@ export default function PromisePage() {
               )}
 
               <div className="text-sm text-slate-400">
-                <span className="text-xs uppercase tracking-[0.14em]">{t("promises.detail.deadline")}</span>
+                <span>{t("promises.detail.deadline")}</span>
                 {": "}
                 <span className="font-medium text-white">{dueText}</span>
               </div>
 
               <div className="text-sm text-slate-400">
-                <span className="text-xs uppercase tracking-[0.14em]">{t("promises.detail.inviteLabel")}</span>
+                <span>{t("promises.detail.inviteLabel")}</span>
                 {": "}
-                <span className="font-medium text-white">{inviteMetaText}</span>
+                <span
+                  className={
+                    "font-medium " +
+                    (inviteStatus === "accepted" ? "text-emerald-300" : "text-white")
+                  }
+                >
+                  {inviteMetaText}
+                </span>
               </div>
 
               {p.counterparty_contact && (
                 <div className="text-sm text-slate-400">
-                  <span className="text-xs uppercase tracking-[0.14em]">
-                    {t("promises.detail.counterparty")}
-                  </span>
+                  <span>{t("promises.detail.counterparty")}</span>
                   {": "}
                   <span className="font-medium text-white">{p.counterparty_contact}</span>
                 </div>
