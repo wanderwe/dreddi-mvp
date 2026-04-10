@@ -7,8 +7,10 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "invite_declined",
   "marked_completed",
   "completion_waiting",
+  "completion_followup",
   "reminder_due_24h",
   "reminder_overdue",
+  "reminder_deadline",
   "reminder_manual",
   "due_soon",
   "overdue",
@@ -230,6 +232,13 @@ const logEmailSend = async (
 
 export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload: EmailPayload) => {
   if (!EMAIL_ELIGIBLE_TYPES.has(payload.type)) {
+    console.info("[notifications] email_skipped", {
+      eventType: payload.type,
+      eventId: payload.eventId,
+      userId: payload.userId,
+      dedupeKey: payload.dedupeKey,
+      reason: "email_type_not_supported",
+    });
     return { sent: false, skippedReason: "email_type_not_supported" };
   }
 
@@ -280,7 +289,7 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
       toEmail: to,
       error: "Missing RESEND_API_KEY",
     });
-    return { sent: false, skippedReason: "resend_failed" };
+    return { sent: false, skippedReason: "email_provider_not_configured" };
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
