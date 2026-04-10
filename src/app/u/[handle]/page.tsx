@@ -405,6 +405,10 @@ export default function PublicProfilePage() {
       responded: profile?.completion_reviewer_responded_count ?? 0,
       total: profile?.completion_reviewer_total_count ?? 0,
     };
+    const completionRatePercent =
+      completionRate.total > 0 ? (completionRate.completed / completionRate.total) * 100 : 0;
+    const completionReviewPercent =
+      completionReview.total > 0 ? (completionReview.responded / completionReview.total) * 100 : 0;
     const pace = hasProfilePace
       ? Number(profileAvgDealsPerMonth.toFixed(1))
       : profileActiveDays && profileActiveDays > 0
@@ -425,6 +429,8 @@ export default function PublicProfilePage() {
       activeDays,
       completionRate,
       completionReview,
+      completionRatePercent,
+      completionReviewPercent,
     };
   }, [
     profile?.completion_executor_marked_count,
@@ -727,17 +733,20 @@ export default function PublicProfilePage() {
                         <div className="mt-2 space-y-2">
                           <div className="flex items-baseline gap-2 text-white">
                             <span className="text-2xl font-semibold">
-                              {numberFormatter.format(reputationEvidence.completionRate.completed)}
+                              {percentFormatter.format(reputationEvidence.completionRatePercent)}
                             </span>
                             <span className="text-sm text-white/70">
-                              {t("publicProfile.reputationDetails.completionRate.outOf", {
-                                total: numberFormatter.format(reputationEvidence.completionRate.total),
-                                label: formatPlural(reputationEvidence.completionRate.total, "deals"),
-                              })}
+                              {t("publicProfile.reputationDetails.disputes.rateLabel")}
                             </span>
                           </div>
                           <p className="text-xs text-white/60">
-                            {t("publicProfile.reputationDetails.completionRate.secondary")}
+                            {t("publicProfile.reputationDetails.completionRate.breakdown", {
+                              completed: numberFormatter.format(
+                                reputationEvidence.completionRate.completed
+                              ),
+                                total: numberFormatter.format(reputationEvidence.completionRate.total),
+                                label: formatPlural(reputationEvidence.completionRate.total, "deals"),
+                              })}
                           </p>
                         </div>
                       </div>
@@ -748,17 +757,20 @@ export default function PublicProfilePage() {
                         <div className="mt-2 space-y-2">
                           <div className="flex items-baseline gap-2 text-white">
                             <span className="text-2xl font-semibold">
-                              {numberFormatter.format(reputationEvidence.completionReview.responded)}
+                              {percentFormatter.format(reputationEvidence.completionReviewPercent)}
                             </span>
                             <span className="text-sm text-white/70">
-                              {t("publicProfile.reputationDetails.completionReview.outOf", {
-                                total: numberFormatter.format(reputationEvidence.completionReview.total),
-                                label: formatPlural(reputationEvidence.completionReview.total, "deals"),
-                              })}
+                              {t("publicProfile.reputationDetails.disputes.rateLabel")}
                             </span>
                           </div>
                           <p className="text-xs text-white/60">
-                            {t("publicProfile.reputationDetails.completionReview.secondary")}
+                            {t("publicProfile.reputationDetails.completionReview.breakdown", {
+                              responded: numberFormatter.format(
+                                reputationEvidence.completionReview.responded
+                              ),
+                                total: numberFormatter.format(reputationEvidence.completionReview.total),
+                                label: formatPlural(reputationEvidence.completionReview.total, "deals"),
+                              })}
                           </p>
                         </div>
                       </div>

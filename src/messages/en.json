@@ -567,7 +567,8 @@
         "onTime": "{count} on time"
       },
       "disputes": {
-        "rate": "{rate}% of deals"
+        "rate": "{rate}% of deals",
+        "rateLabel": "%"
       },
       "trackRecord": {
         "perMonthValue": "{count} / month",
@@ -575,12 +576,10 @@
         "activeDays": "active {count} days"
       },
       "completionRate": {
-        "outOf": "of {total} {label}",
-        "secondary": "marked completed"
+        "breakdown": "{completed} of {total} {label} marked completed"
       },
       "completionReview": {
-        "outOf": "of {total} {label}",
-        "secondary": "responded after completion"
+        "breakdown": "{responded} of {total} {label} responded after completion"
       },
       "labels": {
         "people": {

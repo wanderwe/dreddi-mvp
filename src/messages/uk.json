@@ -580,7 +580,8 @@
         "onTime": "{count} вчасно"
       },
       "disputes": {
-        "rate": "{rate}% угод"
+        "rate": "{rate}% угод",
+        "rateLabel": "%"
       },
       "trackRecord": {
         "perMonthValue": "{count} / місяць",
@@ -588,12 +589,10 @@
         "activeDays": "активність {count} днів"
       },
       "completionRate": {
-        "outOf": "з {total} {label}",
-        "secondary": "позначено як виконані"
+        "breakdown": "{completed} з {total} {label} позначено як виконані"
       },
       "completionReview": {
-        "outOf": "з {total} {label}",
-        "secondary": "відповідь після позначки виконання"
+        "breakdown": "{responded} з {total} {label} відповідь після позначки виконання"
       },
       "labels": {
         "people": {
