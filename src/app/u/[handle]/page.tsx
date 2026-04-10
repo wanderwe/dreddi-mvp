@@ -33,6 +33,10 @@ type PublicProfileRow = {
   total_confirmed_deals: number | null;
   reputation_age_days: number | null;
   avg_deals_per_month: number | null;
+  completion_executor_marked_count: number | null;
+  completion_executor_total_count: number | null;
+  completion_reviewer_responded_count: number | null;
+  completion_reviewer_total_count: number | null;
 };
 
 type PublicPromiseRow = {
@@ -393,6 +397,18 @@ export default function PublicProfilePage() {
     const profileAvgDealsPerMonth = profile?.avg_deals_per_month;
     const hasProfilePace =
       typeof profileAvgDealsPerMonth === "number" && Number.isFinite(profileAvgDealsPerMonth);
+    const completionRate = {
+      completed: profile?.completion_executor_marked_count ?? 0,
+      total: profile?.completion_executor_total_count ?? 0,
+    };
+    const completionReview = {
+      responded: profile?.completion_reviewer_responded_count ?? 0,
+      total: profile?.completion_reviewer_total_count ?? 0,
+    };
+    const completionRatePercent =
+      completionRate.total > 0 ? (completionRate.completed / completionRate.total) * 100 : 0;
+    const completionReviewPercent =
+      completionReview.total > 0 ? (completionReview.responded / completionReview.total) * 100 : 0;
     const pace = hasProfilePace
       ? Number(profileAvgDealsPerMonth.toFixed(1))
       : profileActiveDays && profileActiveDays > 0
@@ -411,8 +427,16 @@ export default function PublicProfilePage() {
       disputeRate,
       pace,
       activeDays,
+      completionRate,
+      completionReview,
+      completionRatePercent,
+      completionReviewPercent,
     };
   }, [
+    profile?.completion_executor_marked_count,
+    profile?.completion_executor_total_count,
+    profile?.completion_reviewer_responded_count,
+    profile?.completion_reviewer_total_count,
     profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
     profile?.dispute_rate,
@@ -699,6 +723,56 @@ export default function PublicProfilePage() {
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
                               count: numberFormatter.format(reputationEvidence.activeDays),
                             })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-white">
+                          {t("publicProfile.reputationDetails.sections.completionRate")}
+                        </h3>
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-baseline gap-2 text-white">
+                            <span className="text-2xl font-semibold">
+                              {percentFormatter.format(reputationEvidence.completionRatePercent)}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {t("publicProfile.reputationDetails.disputes.rateLabel")}
+                            </span>
+                          </div>
+                          <p className="text-xs text-white/60">
+                            {t("publicProfile.reputationDetails.completionRate.breakdown", {
+                              completed: numberFormatter.format(
+                                reputationEvidence.completionRate.completed
+                              ),
+                                total: numberFormatter.format(reputationEvidence.completionRate.total),
+                                label: formatPlural(
+                                  reputationEvidence.completionRate.total,
+                                  "acceptedDeals"
+                                ),
+                              })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-white">
+                          {t("publicProfile.reputationDetails.sections.completionReview")}
+                        </h3>
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-baseline gap-2 text-white">
+                            <span className="text-2xl font-semibold">
+                              {percentFormatter.format(reputationEvidence.completionReviewPercent)}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {t("publicProfile.reputationDetails.disputes.rateLabel")}
+                            </span>
+                          </div>
+                          <p className="text-xs text-white/60">
+                            {t("publicProfile.reputationDetails.completionReview.breakdown", {
+                              responded: numberFormatter.format(
+                                reputationEvidence.completionReview.responded
+                              ),
+                              total: numberFormatter.format(reputationEvidence.completionReview.total),
+                              })}
                           </p>
                         </div>
                       </div>

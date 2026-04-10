@@ -556,7 +556,9 @@
         "workedWith": "Worked with",
         "commitments": "Commitments",
         "disputes": "Disputes",
-        "trackRecord": "Deal pace"
+        "trackRecord": "Deal pace",
+        "completionRate": "Completion rate",
+        "completionReview": "Completion review"
       },
       "workedWith": {
         "secondary": "out of {count} {label} total"
@@ -565,12 +567,19 @@
         "onTime": "{count} on time"
       },
       "disputes": {
-        "rate": "{rate}% of deals"
+        "rate": "{rate}% of deals",
+        "rateLabel": "%"
       },
       "trackRecord": {
         "perMonthValue": "{count} / month",
         "perMonthUnit": "/ month",
         "activeDays": "active {count} days"
+      },
+      "completionRate": {
+        "breakdown": "{completed} of {total} {label} marked completed"
+      },
+      "completionReview": {
+        "breakdown": "{responded} of {total} accepted deals confirmed or disputed"
       },
       "labels": {
         "people": {
@@ -584,6 +593,10 @@
         "deals": {
           "one": "deal",
           "other": "deals"
+        },
+        "acceptedDeals": {
+          "one": "accepted deal",
+          "other": "accepted deals"
         },
         "workedWithDeals": {
           "one": "deal",
