@@ -745,7 +745,10 @@ export default function PublicProfilePage() {
                                 reputationEvidence.completionRate.completed
                               ),
                                 total: numberFormatter.format(reputationEvidence.completionRate.total),
-                                label: formatPlural(reputationEvidence.completionRate.total, "deals"),
+                                label: formatPlural(
+                                  reputationEvidence.completionRate.total,
+                                  "acceptedDeals"
+                                ),
                               })}
                           </p>
                         </div>
@@ -769,7 +772,10 @@ export default function PublicProfilePage() {
                                 reputationEvidence.completionReview.responded
                               ),
                                 total: numberFormatter.format(reputationEvidence.completionReview.total),
-                                label: formatPlural(reputationEvidence.completionReview.total, "deals"),
+                                label: formatPlural(
+                                  reputationEvidence.completionReview.total,
+                                  "acceptedDeals"
+                                ),
                               })}
                           </p>
                         </div>

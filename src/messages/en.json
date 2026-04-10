@@ -594,6 +594,10 @@
           "one": "deal",
           "other": "deals"
         },
+        "acceptedDeals": {
+          "one": "accepted deal",
+          "other": "accepted deals"
+        },
         "workedWithDeals": {
           "one": "deal",
           "other": "deals"
