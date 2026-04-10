@@ -579,7 +579,7 @@
         "breakdown": "{completed} of {total} {label} marked completed"
       },
       "completionReview": {
-        "breakdown": "{responded} of {total} {label} responded after completion"
+        "breakdown": "{responded} of {total} accepted deals confirmed or disputed"
       },
       "labels": {
         "people": {

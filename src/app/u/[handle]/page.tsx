@@ -771,11 +771,7 @@ export default function PublicProfilePage() {
                               responded: numberFormatter.format(
                                 reputationEvidence.completionReview.responded
                               ),
-                                total: numberFormatter.format(reputationEvidence.completionReview.total),
-                                label: formatPlural(
-                                  reputationEvidence.completionReview.total,
-                                  "acceptedDeals"
-                                ),
+                              total: numberFormatter.format(reputationEvidence.completionReview.total),
                               })}
                           </p>
                         </div>
