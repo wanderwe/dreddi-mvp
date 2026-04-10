@@ -588,11 +588,11 @@
         "activeDays": "активність {count} днів"
       },
       "completionRate": {
-        "value": "{completed} з {total} угод",
+        "outOf": "з {total} {label}",
         "secondary": "позначено як виконані"
       },
       "completionReview": {
-        "value": "{responded} з {total} угод",
+        "outOf": "з {total} {label}",
         "secondary": "відповідь після позначки виконання"
       },
       "labels": {

@@ -575,11 +575,11 @@
         "activeDays": "active {count} days"
       },
       "completionRate": {
-        "value": "{completed} of {total} deals",
+        "outOf": "of {total} {label}",
         "secondary": "marked completed"
       },
       "completionReview": {
-        "value": "{responded} of {total} deals",
+        "outOf": "of {total} {label}",
         "secondary": "responded after completion"
       },
       "labels": {

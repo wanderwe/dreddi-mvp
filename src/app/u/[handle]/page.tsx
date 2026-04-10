@@ -14,7 +14,6 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
-import { getCompletionMetrics } from "@/lib/reputation/completionMetrics";
 
 type PublicProfileRow = {
   handle: string;
@@ -34,6 +33,10 @@ type PublicProfileRow = {
   total_confirmed_deals: number | null;
   reputation_age_days: number | null;
   avg_deals_per_month: number | null;
+  completion_executor_marked_count: number | null;
+  completion_executor_total_count: number | null;
+  completion_reviewer_responded_count: number | null;
+  completion_reviewer_total_count: number | null;
 };
 
 type PublicPromiseRow = {
@@ -50,11 +53,6 @@ type PublicPromiseRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
-  completed_at: string | null;
-  creator_id: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-  counterparty_id: string | null;
 };
 
 type PublicPromise = {
@@ -72,11 +70,6 @@ type PublicPromise = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
-  completed_at: string | null;
-  creator_id: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-  counterparty_id: string | null;
 };
 
 const getPublicProfileStats = async (handle: string) => {
@@ -242,11 +235,6 @@ export default function PublicProfilePage() {
               ignored_at: row.ignored_at,
               expires_at: row.expires_at,
               cancelled_at: row.cancelled_at,
-              completed_at: row.completed_at,
-              creator_id: row.creator_id,
-              promisor_id: row.promisor_id,
-              promisee_id: row.promisee_id,
-              counterparty_id: row.counterparty_id,
             },
           ];
         });
@@ -409,7 +397,14 @@ export default function PublicProfilePage() {
     const profileAvgDealsPerMonth = profile?.avg_deals_per_month;
     const hasProfilePace =
       typeof profileAvgDealsPerMonth === "number" && Number.isFinite(profileAvgDealsPerMonth);
-    const completionMetrics = getCompletionMetrics(promises);
+    const completionRate = {
+      completed: profile?.completion_executor_marked_count ?? 0,
+      total: profile?.completion_executor_total_count ?? 0,
+    };
+    const completionReview = {
+      responded: profile?.completion_reviewer_responded_count ?? 0,
+      total: profile?.completion_reviewer_total_count ?? 0,
+    };
     const pace = hasProfilePace
       ? Number(profileAvgDealsPerMonth.toFixed(1))
       : profileActiveDays && profileActiveDays > 0
@@ -428,10 +423,14 @@ export default function PublicProfilePage() {
       disputeRate,
       pace,
       activeDays,
-      completionRate: completionMetrics.completionRate,
-      completionReview: completionMetrics.completionReview,
+      completionRate,
+      completionReview,
     };
   }, [
+    profile?.completion_executor_marked_count,
+    profile?.completion_executor_total_count,
+    profile?.completion_reviewer_responded_count,
+    profile?.completion_reviewer_total_count,
     profile?.avg_deals_per_month,
     profile?.deals_with_due_date_count,
     profile?.dispute_rate,
@@ -726,14 +725,17 @@ export default function PublicProfilePage() {
                           {t("publicProfile.reputationDetails.sections.completionRate")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <p className="text-2xl font-semibold text-white">
-                            {t("publicProfile.reputationDetails.completionRate.value", {
-                              completed: numberFormatter.format(
-                                reputationEvidence.completionRate.completed
-                              ),
-                              total: numberFormatter.format(reputationEvidence.completionRate.total),
-                            })}
-                          </p>
+                          <div className="flex items-baseline gap-2 text-white">
+                            <span className="text-2xl font-semibold">
+                              {numberFormatter.format(reputationEvidence.completionRate.completed)}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {t("publicProfile.reputationDetails.completionRate.outOf", {
+                                total: numberFormatter.format(reputationEvidence.completionRate.total),
+                                label: formatPlural(reputationEvidence.completionRate.total, "deals"),
+                              })}
+                            </span>
+                          </div>
                           <p className="text-xs text-white/60">
                             {t("publicProfile.reputationDetails.completionRate.secondary")}
                           </p>
@@ -744,16 +746,17 @@ export default function PublicProfilePage() {
                           {t("publicProfile.reputationDetails.sections.completionReview")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <p className="text-2xl font-semibold text-white">
-                            {t("publicProfile.reputationDetails.completionReview.value", {
-                              responded: numberFormatter.format(
-                                reputationEvidence.completionReview.responded
-                              ),
-                              total: numberFormatter.format(
-                                reputationEvidence.completionReview.total
-                              ),
-                            })}
-                          </p>
+                          <div className="flex items-baseline gap-2 text-white">
+                            <span className="text-2xl font-semibold">
+                              {numberFormatter.format(reputationEvidence.completionReview.responded)}
+                            </span>
+                            <span className="text-sm text-white/70">
+                              {t("publicProfile.reputationDetails.completionReview.outOf", {
+                                total: numberFormatter.format(reputationEvidence.completionReview.total),
+                                label: formatPlural(reputationEvidence.completionReview.total, "deals"),
+                              })}
+                            </span>
+                          </div>
                           <p className="text-xs text-white/60">
                             {t("publicProfile.reputationDetails.completionReview.secondary")}
                           </p>
