@@ -20,6 +20,9 @@ type DispatchOptions = {
   ctaUrl?: string;
   delta?: number | null;
   requiresDeadlineReminder?: boolean;
+  title?: string;
+  body?: string;
+  ctaLabel?: string | null;
 };
 
 export const dispatchNotificationEvent = async (options: DispatchOptions) => {
@@ -31,6 +34,9 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
     ctaUrl = buildCtaUrl(promise.id),
     delta,
     requiresDeadlineReminder,
+    title,
+    body,
+    ctaLabel,
   } = options;
 
   const recipients = getNotificationRecipients(event, promise, actorId);
@@ -62,6 +68,9 @@ export const dispatchNotificationEvent = async (options: DispatchOptions) => {
       priority: mapPriorityForType(type),
       delta: delta ?? null,
       requiresDeadlineReminder,
+      title,
+      body,
+      ctaLabel,
     });
     results.push({ userId: recipient.userId, outcome });
   }

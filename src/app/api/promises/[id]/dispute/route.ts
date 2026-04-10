@@ -60,8 +60,27 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    if (promise.status !== "completed_by_promisor") {
+    const nowMs = Date.now();
+    const dueAtMs = promise.due_at ? new Date(promise.due_at).getTime() : null;
+    const isNotDeliveredFlow = code === "not_delivered";
+
+    if (!isNotDeliveredFlow && promise.status !== "completed_by_promisor") {
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
+    }
+
+    if (isNotDeliveredFlow) {
+      if (promise.status !== "active") {
+        return NextResponse.json({ error: "Deal is no longer active" }, { status: 409 });
+      }
+      if (!promise.due_at || !Number.isFinite(dueAtMs)) {
+        return NextResponse.json({ error: "Deadline is required" }, { status: 400 });
+      }
+      if ((dueAtMs as number) >= nowMs) {
+        return NextResponse.json({ error: "Deadline has not passed yet" }, { status: 409 });
+      }
+      if (promise.completed_at) {
+        return NextResponse.json({ error: "Deal is already marked as completed" }, { status: 409 });
+      }
     }
 
     const admin = getAdminClient();
@@ -71,6 +90,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .update({
         status: "disputed",
         disputed_at: disputedAt,
+        disputed_by: user.id,
         disputed_code: code,
         dispute_reason: reason ?? null,
       })
@@ -78,12 +98,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .select(
         "id,title,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at"
       )
+      .eq("status", promise.status)
       .single<PromiseRowMin>();
 
     if (error || !updatedPromise) {
+      const statusCode = error?.code === "PGRST116" ? 409 : 500;
       return NextResponse.json(
         { error: "Could not update promise", detail: error?.message },
-        { status: 500 }
+        { status: statusCode }
       );
     }
 

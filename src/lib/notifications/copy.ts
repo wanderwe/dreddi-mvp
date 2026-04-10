@@ -58,7 +58,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     disputed: {
       title: "Outcome disputed",
-      body: "The agreement was disputed. Check details.",
+      body: "The deal was marked as not delivered",
       ctaLabel: "View",
     },
     reminder_due_24h: {
@@ -103,7 +103,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     dispute: {
       title: "Outcome disputed",
-      body: "The agreement was disputed. Check details.",
+      body: "The deal was marked as not delivered",
       ctaLabel: "View",
     },
   },
@@ -155,7 +155,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     disputed: {
       title: "Результат оскаржено",
-      body: "Домовленість оскаржено. Перевірте деталі.",
+      body: "Угоду позначено як не виконану",
       ctaLabel: "Переглянути",
     },
     reminder_due_24h: {
@@ -200,7 +200,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     dispute: {
       title: "Результат оскаржено",
-      body: "Домовленість оскаржено. Перевірте деталі.",
+      body: "Угоду позначено як не виконану",
       ctaLabel: "Переглянути",
     },
   },
