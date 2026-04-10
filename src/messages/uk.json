@@ -601,7 +601,7 @@
         "breakdown": "{completed} з {total} {label} позначено як виконані"
       },
       "completionReview": {
-        "breakdown": "{responded} з {total} прийнятих угод підтверджено або оскаржено"
+        "breakdown": "{responded} з {total} угод, що вимагали вашої відповіді"
       },
       "labels": {
         "people": {

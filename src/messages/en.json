@@ -588,7 +588,7 @@
         "breakdown": "{completed} of {total} {label} marked completed"
       },
       "completionReview": {
-        "breakdown": "{responded} of {total} accepted deals confirmed or disputed"
+        "breakdown": "{responded} of {total} deals requiring your response"
       },
       "labels": {
         "people": {
