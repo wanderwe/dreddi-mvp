@@ -570,7 +570,7 @@
         "completionReview": "Completion review"
       },
       "workedWith": {
-        "secondary": "out of {count} {label} total"
+        "secondary": "out of {count} {label}"
       },
       "commitments": {
         "onTime": "{count} on time"
@@ -607,9 +607,9 @@
           "one": "accepted deal",
           "other": "accepted deals"
         },
-        "workedWithDeals": {
-          "one": "deal",
-          "other": "deals"
+        "fulfilledDeals": {
+          "one": "confirmed deal",
+          "other": "confirmed deals"
         },
         "dealsPace": {
           "one": "deal",
