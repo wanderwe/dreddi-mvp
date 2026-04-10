@@ -6,6 +6,7 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "accepted",
   "invite_declined",
   "marked_completed",
+  "disputed",
   "completion_waiting",
   "completion_followup",
   "reminder_due_24h",
@@ -261,6 +262,11 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
     .maybeSingle();
 
   if (profile?.email_notifications_enabled === false) {
+    console.info("[notifications] email_skipped", {
+      type: payload.type,
+      userId: payload.userId,
+      reason: "user_disabled",
+    });
     await logEmailSend(admin, payload, "disabled");
     return { sent: false, skippedReason: "email_notifications_disabled" };
   }
@@ -276,6 +282,11 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
   const { data: userData, error: userError } = await getUserById(payload.userId);
   const to = userData.user?.email;
   if (userError || !to) {
+    console.info("[notifications] email_skipped", {
+      type: payload.type,
+      userId: payload.userId,
+      reason: "no_email",
+    });
     await logEmailSend(admin, payload, "failed", {
       error: userError?.message ?? "No recipient email found",
     });
@@ -284,6 +295,11 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
 
   const provider = resolveEmailProvider();
   if (provider === "none") {
+    console.info("[notifications] email_skipped", {
+      type: payload.type,
+      userId: payload.userId,
+      reason: "no_provider",
+    });
     await logEmailSend(admin, payload, "provider_not_configured", {
       provider,
       toEmail: to,
