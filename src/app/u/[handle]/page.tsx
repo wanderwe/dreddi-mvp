@@ -14,6 +14,7 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
+import { getCompletionMetrics } from "@/lib/reputation/completionMetrics";
 
 type PublicProfileRow = {
   handle: string;
@@ -49,6 +50,11 @@ type PublicPromiseRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  completed_at: string | null;
+  creator_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
+  counterparty_id: string | null;
 };
 
 type PublicPromise = {
@@ -66,6 +72,11 @@ type PublicPromise = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  completed_at: string | null;
+  creator_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
+  counterparty_id: string | null;
 };
 
 const getPublicProfileStats = async (handle: string) => {
@@ -231,6 +242,11 @@ export default function PublicProfilePage() {
               ignored_at: row.ignored_at,
               expires_at: row.expires_at,
               cancelled_at: row.cancelled_at,
+              completed_at: row.completed_at,
+              creator_id: row.creator_id,
+              promisor_id: row.promisor_id,
+              promisee_id: row.promisee_id,
+              counterparty_id: row.counterparty_id,
             },
           ];
         });
@@ -393,6 +409,7 @@ export default function PublicProfilePage() {
     const profileAvgDealsPerMonth = profile?.avg_deals_per_month;
     const hasProfilePace =
       typeof profileAvgDealsPerMonth === "number" && Number.isFinite(profileAvgDealsPerMonth);
+    const completionMetrics = getCompletionMetrics(promises);
     const pace = hasProfilePace
       ? Number(profileAvgDealsPerMonth.toFixed(1))
       : profileActiveDays && profileActiveDays > 0
@@ -411,6 +428,8 @@ export default function PublicProfilePage() {
       disputeRate,
       pace,
       activeDays,
+      completionRate: completionMetrics.completionRate,
+      completionReview: completionMetrics.completionReview,
     };
   }, [
     profile?.avg_deals_per_month,
@@ -699,6 +718,44 @@ export default function PublicProfilePage() {
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
                               count: numberFormatter.format(reputationEvidence.activeDays),
                             })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-white">
+                          {t("publicProfile.reputationDetails.sections.completionRate")}
+                        </h3>
+                        <div className="mt-2 space-y-2">
+                          <p className="text-2xl font-semibold text-white">
+                            {t("publicProfile.reputationDetails.completionRate.value", {
+                              completed: numberFormatter.format(
+                                reputationEvidence.completionRate.completed
+                              ),
+                              total: numberFormatter.format(reputationEvidence.completionRate.total),
+                            })}
+                          </p>
+                          <p className="text-xs text-white/60">
+                            {t("publicProfile.reputationDetails.completionRate.secondary")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-white">
+                          {t("publicProfile.reputationDetails.sections.completionReview")}
+                        </h3>
+                        <div className="mt-2 space-y-2">
+                          <p className="text-2xl font-semibold text-white">
+                            {t("publicProfile.reputationDetails.completionReview.value", {
+                              responded: numberFormatter.format(
+                                reputationEvidence.completionReview.responded
+                              ),
+                              total: numberFormatter.format(
+                                reputationEvidence.completionReview.total
+                              ),
+                            })}
+                          </p>
+                          <p className="text-xs text-white/60">
+                            {t("publicProfile.reputationDetails.completionReview.secondary")}
                           </p>
                         </div>
                       </div>

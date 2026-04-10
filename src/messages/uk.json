@@ -569,7 +569,9 @@
         "workedWith": "Співпраця",
         "commitments": "Зобовʼязання",
         "disputes": "Спори",
-        "trackRecord": "Темп угод"
+        "trackRecord": "Темп угод",
+        "completionRate": "Виконання",
+        "completionReview": "Розгляд виконання"
       },
       "workedWith": {
         "secondary": "з {count} {label} загалом"
@@ -584,6 +586,14 @@
         "perMonthValue": "{count} / місяць",
         "perMonthUnit": "/ місяць",
         "activeDays": "активність {count} днів"
+      },
+      "completionRate": {
+        "value": "{completed} з {total} угод",
+        "secondary": "позначено як виконані"
+      },
+      "completionReview": {
+        "value": "{responded} з {total} угод",
+        "secondary": "відповідь після позначки виконання"
       },
       "labels": {
         "people": {
