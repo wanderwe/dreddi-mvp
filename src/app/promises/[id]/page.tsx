@@ -824,30 +824,27 @@ export default function PromisePage() {
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-[0.15em] text-neutral-400">
+                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
                   {t("promises.detail.roles.title")}
                 </p>
-                <dl className="mt-3 space-y-2 text-sm text-neutral-300">
+                <dl className="mt-3 space-y-3 text-sm">
                   <div>
-                    <dt className="inline text-neutral-400">
+                    <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">
                       {t("promises.detail.roles.createdBy")}
-                      {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{createdByLabel}</dd>
+                    <dd className="mt-1 font-medium text-white">{createdByLabel}</dd>
                   </div>
                   <div>
-                    <dt className="inline text-neutral-400">
+                    <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">
                       {t("promises.detail.roles.responsible")}
-                      {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{responsibleLabel}</dd>
+                    <dd className="mt-1 font-medium text-white">{responsibleLabel}</dd>
                   </div>
                   <div>
-                    <dt className="inline text-neutral-400">
+                    <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">
                       {t("promises.detail.roles.madeTo")}
-                      {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{promiseToLabel}</dd>
+                    <dd className="mt-1 font-medium text-white">{promiseToLabel}</dd>
                   </div>
                 </dl>
               </div>
@@ -863,35 +860,41 @@ export default function PromisePage() {
                 </div>
               )}
 
-              <div className="text-sm text-neutral-400">
-                {t("promises.detail.deadline")}:{" "}
-                <span className="text-neutral-200">{dueText}</span>
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                  {t("promises.detail.deadline")}
+                </p>
+                <p className="mt-1 text-sm font-medium text-white">{dueText}</p>
               </div>
 
-              <div className="text-sm text-neutral-400">
-                {t("promises.detail.inviteLabel")}:{" "}
-                <span
-                  className={
-                    "text-sm font-medium " +
-                    (inviteStatus === "accepted" ? "text-emerald-300" : "text-neutral-200")
-                  }
-                >
-                  {inviteMetaText}
-                </span>
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                  {t("promises.detail.inviteLabel")}
+                </p>
+                <p className="mt-1 text-sm font-medium text-white">{inviteMetaText}</p>
               </div>
 
               {p.counterparty_contact && (
-                <div className="text-sm text-neutral-400">
-                  {t("promises.detail.counterparty")}:{" "}
-                  <span className="text-neutral-200">{p.counterparty_contact}</span>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                    {t("promises.detail.counterparty")}
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-white">{p.counterparty_contact}</p>
                 </div>
               )}
 
-              {p.details ? (
-                <div className="pt-2 text-neutral-200 whitespace-pre-wrap">{p.details}</div>
-              ) : (
-                <div className="pt-2 text-neutral-500">{t("promises.detail.noDetails")}</div>
-              )}
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                  {t("invite.dealDetailsLabel")}
+                </p>
+                {p.details ? (
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-100">
+                    {p.details}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-slate-400">{t("promises.detail.noDetails")}</p>
+                )}
+              </div>
 
               {hasCondition && (
                 <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
