@@ -7,6 +7,8 @@ describe("notification email eligibility", () => {
     assert.equal(isEmailEligibleType("reminder_overdue"), true);
     assert.equal(isEmailEligibleType("reminder_manual"), true);
     assert.equal(isEmailEligibleType("marked_completed"), true);
+    assert.equal(isEmailEligibleType("reminder_deadline"), true);
+    assert.equal(isEmailEligibleType("completion_followup"), true);
   });
 
   it("does not include passive in-app-only notifications", () => {

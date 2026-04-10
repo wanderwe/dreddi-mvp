@@ -86,8 +86,9 @@ export const getNotificationDedupeKey = (
     case "disputed":
       return `disputed:${promiseId}:${recipientUserId}`;
     case "reminder_due_24h":
+      return `reminder_due_soon:${promiseId}:${recipientUserId}`;
     case "deadline_passed":
-      return `reminder_deadline:${promiseId}:${recipientUserId}`;
+      return `reminder_overdue:${promiseId}:${recipientUserId}`;
     default:
       return `event:${promiseId}:${recipientUserId}`;
   }
