@@ -32,6 +32,8 @@ type PromiseRow = {
   counterparty_contact: string | null;
   due_at: string | null;
   status: PromiseStatus;
+  completed_at: string | null;
+  disputed_code: string | null;
   created_at: string;
 
   invite_token: string | null;
@@ -172,7 +174,9 @@ export default function PromisePage() {
   const [participantNames, setParticipantNames] = useState<Record<string, string>>({});
 
   // отдельные "busy" чтобы не ломать UX всего экрана
-  const [actionBusy, setActionBusy] = useState<"complete" | "confirm" | "dispute" | "accept" | "decline" | null>(null);
+  const [actionBusy, setActionBusy] = useState<
+    "complete" | "confirm" | "dispute" | "accept" | "decline" | "notDelivered" | null
+  >(null);
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const [conditionBusy, setConditionBusy] = useState(false);
@@ -180,6 +184,7 @@ export default function PromisePage() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showNotDeliveredModal, setShowNotDeliveredModal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -238,7 +243,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -637,6 +642,51 @@ export default function PromisePage() {
     await load();
   }
 
+  async function markNotDelivered() {
+    if (!p) return;
+    setError(null);
+    setActionBusy("notDelivered");
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/dispute`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ code: "not_delivered" }),
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    console.info("[analytics] deal_marked_not_delivered", {
+      promise_id: p.id,
+      user_id: session.user.id,
+      timestamp: new Date().toISOString(),
+    });
+    await load();
+  }
+
   const executorId = p ? resolveExecutorId(p) : null;
   const counterpartyId = p ? resolveCounterpartyId(p) : null;
   const promiseMadeToId = p?.promisee_id ?? counterpartyId ?? null;
@@ -672,8 +722,19 @@ export default function PromisePage() {
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canShareReminder = Boolean(p && inviteStatus === "accepted");
   const canRecreateDeal = Boolean(p && uiStatus === "expired" && isCreator);
+  const isDeadlinePassed = Boolean(p?.due_at && new Date(p.due_at).getTime() < Date.now());
+  const canMarkNotDelivered = Boolean(
+    p &&
+      isCounterparty &&
+      p.status === "active" &&
+      p.due_at &&
+      isDeadlinePassed &&
+      !p.completed_at &&
+      isInviteAccepted
+  );
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
+      canMarkNotDelivered ||
       (canReview && p?.status === "completed_by_promisor") ||
       (canRespondToInvite && p?.status === "active")
   );
@@ -868,6 +929,9 @@ export default function PromisePage() {
                 {": "}
                 <span className="font-medium text-white">{dueText}</span>
               </div>
+              {p.status === "disputed" && p.disputed_code === "not_delivered" && (
+                <div className="text-sm text-amber-200">{t("promises.detail.notDeliveredHint")}</div>
+              )}
 
               <div className="text-sm text-slate-400">
                 <span>{t("promises.detail.inviteLabel")}</span>
@@ -957,6 +1021,16 @@ export default function PromisePage() {
                   >
                     {t("promises.detail.reviewConfirm")}
                   </Link>
+                )}
+
+                {canMarkNotDelivered && (
+                  <ActionButton
+                    label={t("promises.detail.notDelivered")}
+                    variant="ghost"
+                    loading={actionBusy === "notDelivered"}
+                    disabled={actionBusy !== null}
+                    onClick={() => setShowNotDeliveredModal(true)}
+                  />
                 )}
 
                 {canRespondToInvite && p.status === "active" && (
@@ -1083,6 +1157,39 @@ export default function PromisePage() {
                 className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("promises.confirmModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNotDeliveredModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-black/60">
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.notDeliveredModal.title")}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              {t("promises.notDeliveredModal.body")}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowNotDeliveredModal(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("promises.notDeliveredModal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowNotDeliveredModal(false);
+                  await markNotDelivered();
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("promises.notDeliveredModal.confirm")}
               </button>
             </div>
           </div>

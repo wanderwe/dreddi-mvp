@@ -7,7 +7,7 @@ type PromiseRecord = PromiseRowMin & {
   details: string | null;
 };
 
-export const DISPUTE_CODES = ["not_completed", "partial", "late", "other"] as const;
+export const DISPUTE_CODES = ["not_completed", "partial", "late", "other", "not_delivered"] as const;
 export type DisputeCode = (typeof DISPUTE_CODES)[number];
 
 export function getEnv(name: string) {

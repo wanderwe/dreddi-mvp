@@ -270,6 +270,8 @@
       "declineAction": "Decline",
       "acceptedToast": "{entity} accepted",
       "declinedToast": "{entity} declined",
+      "notDelivered": "Not delivered",
+      "notDeliveredHint": "Not delivered after deadline",
       "reminderCopy": {
         "label": "Copy reminder link",
         "tooltip": "Copy reminder link",
@@ -344,7 +346,14 @@
       "not_completed": "It wasn’t completed",
       "partial": "Partially completed",
       "late": "Completed late",
+      "not_delivered": "Not delivered after deadline",
       "other": "Other"
+    },
+    "notDeliveredModal": {
+      "title": "Mark as not delivered?",
+      "body": "The executor has not marked the deal as completed after the deadline. Are you sure it was not fulfilled?",
+      "confirm": "Yes, not delivered",
+      "cancel": "Cancel"
     },
     "new": {
       "eyebrow": "{newEntity}",

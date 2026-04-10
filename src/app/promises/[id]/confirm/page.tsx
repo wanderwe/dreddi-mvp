@@ -33,7 +33,7 @@ type PromiseRow = {
   cancelled_at: string | null;
 };
 
-const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
+const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other", "not_delivered"] as const;
 
 export default function ConfirmPromisePage() {
   const t = useT();
