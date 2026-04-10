@@ -567,7 +567,7 @@
         "disputes": "Disputes",
         "trackRecord": "Deal pace",
         "completionRate": "Completion rate",
-        "completionReview": "Completion review"
+        "completionReview": "Response"
       },
       "workedWith": {
         "secondary": "out of {count} closed deals"
