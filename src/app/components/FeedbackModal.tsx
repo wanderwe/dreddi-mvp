@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { requireSupabase } from "@/lib/supabaseClient";
 
 const FEEDBACK_CATEGORIES = ["suggestion", "bug", "confusing_ux", "other"] as const;
 const MIN_FEEDBACK_LENGTH = 5;
@@ -54,9 +55,20 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
     setError(null);
 
     try {
+      const supabase = requireSupabase();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
+      if (!accessToken) {
+        throw new Error(t("feedback.errors.submitFailed"));
+      }
+
       const res = await fetch("/api/feedback", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({
           category,
           message: trimmedMessage,
