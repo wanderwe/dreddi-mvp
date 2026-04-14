@@ -144,3 +144,22 @@ test("reasons avoid duplicated actor history wording", () => {
 
   assert.equal(historyReasonCount, 1);
 });
+
+test("dispute rate at exactly 10% does not trigger dispute risk reason", () => {
+  const result = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 90,
+      completionRate: 90,
+      disputeRate: 10,
+      finalizedDealsCount: 10,
+    },
+    deal: {
+      hasDeadline: true,
+      hoursToDeadline: 96,
+      isPublic: false,
+      detailsText: "Detailed description with enough context to be clear for both sides.",
+    },
+  });
+
+  assert.ok(!result.reasonKeys.includes("high_dispute_rate"));
+});

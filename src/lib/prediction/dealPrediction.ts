@@ -196,7 +196,7 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
   if (typeof actor?.disputeRate === "number") {
     if (actor.disputeRate >= 30) addModifier("actor_dispute_rate", -12, "high_dispute_rate");
     else if (actor.disputeRate >= 20) addModifier("actor_dispute_rate", -8, "high_dispute_rate");
-    else if (actor.disputeRate >= 10) addModifier("actor_dispute_rate", -4, "high_dispute_rate");
+    else if (actor.disputeRate > 10) addModifier("actor_dispute_rate", -4, "high_dispute_rate");
     else addModifier("actor_dispute_rate", 0, "high_dispute_rate");
   }
 
