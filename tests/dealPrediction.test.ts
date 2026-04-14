@@ -163,3 +163,22 @@ test("dispute rate at exactly 10% does not trigger dispute risk reason", () => {
 
   assert.ok(!result.reasonKeys.includes("high_dispute_rate"));
 });
+
+test("dispute rate below 20% does not trigger dispute risk reason", () => {
+  const result = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 88,
+      completionRate: 84,
+      disputeRate: 12.5,
+      finalizedDealsCount: 8,
+    },
+    deal: {
+      hasDeadline: true,
+      hoursToDeadline: 96,
+      isPublic: false,
+      detailsText: "Detailed description with enough context to be clear for both sides.",
+    },
+  });
+
+  assert.ok(!result.reasonKeys.includes("high_dispute_rate"));
+});
