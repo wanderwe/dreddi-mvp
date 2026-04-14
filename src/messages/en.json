@@ -427,6 +427,10 @@
         "title": "Dreddi prediction",
         "chance": "Chance of fulfillment: {score}%",
         "why": "Why",
+        "actions": {
+          "expand": "Show details",
+          "collapse": "Hide details"
+        },
         "bands": {
           "strong": "Strong chance of fulfillment",
           "good": "Good chance of fulfillment",

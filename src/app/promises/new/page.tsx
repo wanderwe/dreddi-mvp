@@ -19,7 +19,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
@@ -86,6 +86,7 @@ export default function NewPromisePage() {
   const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [predictionInput, setPredictionInput] = useState<PredictionInput>({});
+  const [isPredictionExpanded, setIsPredictionExpanded] = useState(false);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -1142,26 +1143,56 @@ export default function NewPromisePage() {
 
             {predictionResult && (
               <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
-                <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
-                  {t("promises.new.prediction.title")}
-                </p>
-                <p className="mt-2 text-lg font-semibold text-white">
-                  {t("promises.new.prediction.chance", { score: predictionResult.score })}
-                </p>
-                <p className="mt-1 text-xs text-slate-300">
-                  {t(`promises.new.prediction.bands.${predictionResult.band}`)}
-                </p>
-                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                  {t("promises.new.prediction.why")}
-                </p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
-                  {predictionResult.reasonKeys.map((reasonKey) => (
-                    <li key={reasonKey} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-200/80" />
-                      <span>{reasonText[reasonKey]}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.prediction.title")}
+                    </p>
+                    <p className="mt-2 text-lg font-semibold text-white">
+                      {t("promises.new.prediction.chance", { score: predictionResult.score })}
+                    </p>
+                    {!isPredictionExpanded && (
+                      <p className="mt-1 text-xs text-slate-300">
+                        {t(`promises.new.prediction.bands.${predictionResult.band}`)}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsPredictionExpanded((prev) => !prev)}
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                  >
+                    {isPredictionExpanded
+                      ? t("promises.new.prediction.actions.collapse")
+                      : t("promises.new.prediction.actions.expand")}
+                    <ChevronDown
+                      className={clsx(
+                        "h-3.5 w-3.5 transition-transform",
+                        isPredictionExpanded && "rotate-180"
+                      )}
+                      aria-hidden
+                    />
+                  </button>
+                </div>
+
+                {isPredictionExpanded && (
+                  <>
+                    <p className="mt-2 text-xs text-slate-300">
+                      {t(`promises.new.prediction.bands.${predictionResult.band}`)}
+                    </p>
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                      {t("promises.new.prediction.why")}
+                    </p>
+                    <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
+                      {predictionResult.reasonKeys.map((reasonKey) => (
+                        <li key={reasonKey} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-200/80" />
+                          <span>{reasonText[reasonKey]}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </section>
             )}
           </div>
