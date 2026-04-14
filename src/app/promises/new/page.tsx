@@ -19,12 +19,17 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
+import { CalendarIcon, ChevronDown, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
+import {
+  generateDealPrediction,
+  type PredictionInput,
+  type PredictionReasonKey,
+} from "@/lib/prediction/dealPrediction";
 
 export default function NewPromisePage() {
   const PREFILL_MAX_RETRIES = 20;
@@ -79,6 +84,9 @@ export default function NewPromisePage() {
   const prefillResolved = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
   const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [predictionInput, setPredictionInput] = useState<PredictionInput>({});
+  const [isPredictionExpanded, setIsPredictionExpanded] = useState(false);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -111,6 +119,45 @@ export default function NewPromisePage() {
     normalized.setSeconds(0, 0);
     return normalized;
   }, [dueAt]);
+
+  const predictionReady = title.trim().length > 0;
+
+  const reasonText = useMemo(
+    () =>
+      ({
+        strong_fulfillment_history: t("promises.new.prediction.reasons.strongFulfillmentHistory"),
+        low_fulfillment_history: t("promises.new.prediction.reasons.lowFulfillmentHistory"),
+        strong_completion_history: t("promises.new.prediction.reasons.strongCompletionHistory"),
+        low_completion_history: t("promises.new.prediction.reasons.lowCompletionHistory"),
+        high_dispute_rate: t("promises.new.prediction.reasons.highDisputeRate"),
+        limited_history_uncertain: t("promises.new.prediction.reasons.limitedHistory"),
+        deep_shared_history: t("promises.new.prediction.reasons.deepSharedHistory"),
+        some_shared_history: t("promises.new.prediction.reasons.someSharedHistory"),
+        new_counterparty: t("promises.new.prediction.reasons.newCounterparty"),
+        counterparty_responsive: t("promises.new.prediction.reasons.counterpartyResponsive"),
+        counterparty_unresponsive: t("promises.new.prediction.reasons.counterpartyUnresponsive"),
+        has_deadline: t("promises.new.prediction.reasons.hasDeadline"),
+        no_deadline: t("promises.new.prediction.reasons.noDeadline"),
+        short_deadline_risk: t("promises.new.prediction.reasons.shortDeadlineRisk"),
+        clear_details: t("promises.new.prediction.reasons.clearDetails"),
+        unclear_details: t("promises.new.prediction.reasons.unclearDetails"),
+        public_commitment: t("promises.new.prediction.reasons.publicCommitment"),
+      }) as Record<PredictionReasonKey, string>,
+    [t]
+  );
+
+  const predictionResult = useMemo(() => {
+    if (!predictionReady) return null;
+    return generateDealPrediction({
+      ...predictionInput,
+      deal: {
+        hasDeadline: Boolean(dueAt),
+        hoursToDeadline: dueAt ? (dueAt.getTime() - Date.now()) / (60 * 60 * 1000) : null,
+        isPublic: Boolean(isPublicDeal),
+        detailsText: details,
+      },
+    });
+  }, [predictionInput, predictionReady, dueAt, isPublicDeal, details]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });
@@ -420,6 +467,7 @@ export default function NewPromisePage() {
         router.replace(localizeLoginPath(localizePath("/promises/new", locale), locale));
         return;
       }
+      setAuthToken(sessionData.session.access_token);
 
       const { data: profileData } = await supabase
         .from("profiles")
@@ -501,6 +549,41 @@ export default function NewPromisePage() {
       window.clearTimeout(timeoutId);
     };
   }, [counterpartyQuery, selectedCounterparty]);
+
+  useEffect(() => {
+    if (!authToken) return;
+    let active = true;
+    const controller = new AbortController();
+
+    const loadPredictionMetrics = async () => {
+      try {
+        const query = selectedCounterparty
+          ? `?counterpartyId=${encodeURIComponent(selectedCounterparty.id)}`
+          : "";
+        const response = await fetch(`/api/promises/prediction${query}`, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (!response.ok) return;
+        const payload = (await response.json()) as PredictionInput;
+        if (!active) return;
+        setPredictionInput(payload);
+      } catch {
+        if (!active) return;
+        setPredictionInput({});
+      }
+    };
+
+    void loadPredictionMetrics();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [authToken, selectedCounterparty]);
 
   useEffect(() => {
     if (!showCounterpartyDropdown) return;
@@ -1056,6 +1139,61 @@ export default function NewPromisePage() {
                   </button>
                 </div>
               </div>
+            )}
+
+            {predictionResult && (
+              <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("promises.new.prediction.title")}
+                    </p>
+                    <p className="mt-2 text-lg font-semibold text-white">
+                      {t("promises.new.prediction.chance", { score: predictionResult.score })}
+                    </p>
+                    {!isPredictionExpanded && (
+                      <p className="mt-1 text-xs text-slate-300">
+                        {t(`promises.new.prediction.bands.${predictionResult.band}`)}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsPredictionExpanded((prev) => !prev)}
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                  >
+                    {isPredictionExpanded
+                      ? t("promises.new.prediction.actions.collapse")
+                      : t("promises.new.prediction.actions.expand")}
+                    <ChevronDown
+                      className={clsx(
+                        "h-3.5 w-3.5 transition-transform",
+                        isPredictionExpanded && "rotate-180"
+                      )}
+                      aria-hidden
+                    />
+                  </button>
+                </div>
+
+                {isPredictionExpanded && (
+                  <>
+                    <p className="mt-2 text-xs text-slate-300">
+                      {t(`promises.new.prediction.bands.${predictionResult.band}`)}
+                    </p>
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                      {t("promises.new.prediction.why")}
+                    </p>
+                    <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
+                      {predictionResult.reasonKeys.map((reasonKey) => (
+                        <li key={reasonKey} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-200/80" />
+                          <span>{reasonText[reasonKey]}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
             )}
           </div>
           </div>
