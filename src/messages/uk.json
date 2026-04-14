@@ -445,7 +445,7 @@
         "reasons": {
           "strongFulfillmentHistory": "сильна історія виконання",
           "lowFulfillmentHistory": "низька історія виконання підвищує ризик",
-          "strongCompletionHistory": "цей користувач зазвичай позначає угоди як виконані",
+          "strongCompletionHistory": "сильна історія завершення знижує ризик",
           "lowCompletionHistory": "низька історія завершення підвищує ризик",
           "highDisputeRate": "висока частка спорів підвищує ризик",
           "limitedHistory": "обмежена історія робить цей прогноз менш певним",

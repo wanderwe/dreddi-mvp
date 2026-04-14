@@ -437,7 +437,7 @@
         "reasons": {
           "strongFulfillmentHistory": "strong fulfillment history",
           "lowFulfillmentHistory": "low fulfillment history increases risk",
-          "strongCompletionHistory": "this user usually marks deals as completed",
+          "strongCompletionHistory": "strong completion history lowers risk",
           "lowCompletionHistory": "low completion history increases risk",
           "highDisputeRate": "high dispute rate increases risk",
           "limitedHistory": "limited history makes this prediction less certain",

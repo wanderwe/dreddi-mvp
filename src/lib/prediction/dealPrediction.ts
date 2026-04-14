@@ -60,7 +60,7 @@ const MAX_SCORE = 95;
 const EN_REASONS: Record<PredictionReasonKey, string> = {
   strong_fulfillment_history: "strong fulfillment history",
   low_fulfillment_history: "low fulfillment history increases risk",
-  strong_completion_history: "this user usually marks deals as completed",
+  strong_completion_history: "strong completion history lowers risk",
   low_completion_history: "low completion history increases risk",
   high_dispute_rate: "high dispute rate increases risk",
   limited_history_uncertain: "limited history makes this prediction less certain",
