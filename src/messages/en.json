@@ -422,7 +422,38 @@
         "network": "Unable to reach the server. Please try again."
       },
       "submit": "Create {entityLower}",
-      "creating": "Creating {entityLower}…"
+      "creating": "Creating {entityLower}…",
+      "prediction": {
+        "title": "Dreddi prediction",
+        "chance": "Chance of fulfillment: {score}%",
+        "why": "Why",
+        "bands": {
+          "strong": "Strong chance of fulfillment",
+          "good": "Good chance of fulfillment",
+          "moderate": "Moderate risk",
+          "high_risk": "High risk",
+          "very_high_risk": "Very high risk"
+        },
+        "reasons": {
+          "strongFulfillmentHistory": "strong fulfillment history",
+          "lowFulfillmentHistory": "low fulfillment history increases risk",
+          "strongCompletionHistory": "this user usually marks deals as completed",
+          "lowCompletionHistory": "low completion history increases risk",
+          "highDisputeRate": "high dispute rate increases risk",
+          "limitedHistory": "limited history makes this prediction less certain",
+          "deepSharedHistory": "you have successful history with this person",
+          "someSharedHistory": "you have fulfilled deals together",
+          "newCounterparty": "this is a new counterparty with no shared history",
+          "counterpartyResponsive": "this counterparty usually responds to deal outcomes",
+          "counterpartyUnresponsive": "this counterparty often does not respond to deal outcomes",
+          "hasDeadline": "a clear deadline improves clarity",
+          "noDeadline": "no deadline makes outcome less clear",
+          "shortDeadlineRisk": "short deadline increases risk",
+          "clearDetails": "clear deal details improve clarity",
+          "unclearDetails": "unclear deal details increase ambiguity",
+          "publicCommitment": "public commitment adds accountability"
+        }
+      }
     },
     "actionQueue": {
       "title": "Requires your action",
