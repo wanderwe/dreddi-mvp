@@ -1156,8 +1156,8 @@ export default function NewPromisePage() {
                 </p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
                   {predictionResult.reasonKeys.map((reasonKey) => (
-                    <li key={reasonKey} className="flex gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-200/80" />
+                    <li key={reasonKey} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-200/80" />
                       <span>{reasonText[reasonKey]}</span>
                     </li>
                   ))}
