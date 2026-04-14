@@ -77,6 +77,26 @@ const EN_REASONS: Record<PredictionReasonKey, string> = {
   public_commitment: "public commitment adds accountability",
 };
 
+const REASON_TOPIC: Record<PredictionReasonKey, string> = {
+  strong_fulfillment_history: "actor_track_record",
+  low_fulfillment_history: "actor_track_record",
+  strong_completion_history: "actor_track_record",
+  low_completion_history: "actor_track_record",
+  high_dispute_rate: "disputes",
+  limited_history_uncertain: "certainty",
+  deep_shared_history: "relationship",
+  some_shared_history: "relationship",
+  new_counterparty: "relationship",
+  counterparty_responsive: "counterparty_responsiveness",
+  counterparty_unresponsive: "counterparty_responsiveness",
+  has_deadline: "deadline_clarity",
+  no_deadline: "deadline_clarity",
+  short_deadline_risk: "deadline_pressure",
+  clear_details: "details_quality",
+  unclear_details: "details_quality",
+  public_commitment: "public_accountability",
+};
+
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
@@ -118,9 +138,17 @@ function pickReasons(modifiers: AppliedModifier[]) {
     .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
   const selected: AppliedModifier[] = [];
+  const selectedTopics = new Set<string>();
+  const tryPush = (item: AppliedModifier) => {
+    const topic = REASON_TOPIC[item.reasonKey];
+    if (selectedTopics.has(topic)) return false;
+    selected.push(item);
+    selectedTopics.add(topic);
+    return true;
+  };
 
-  if (positives.length > 0) selected.push(positives[0]);
-  if (negatives.length > 0) selected.push(negatives[0]);
+  if (positives.length > 0) tryPush(positives[0]);
+  if (negatives.length > 0) tryPush(negatives[0]);
 
   const rest = nonZero
     .filter((item) => !selected.includes(item))
@@ -128,7 +156,7 @@ function pickReasons(modifiers: AppliedModifier[]) {
 
   for (const item of rest) {
     if (selected.length >= 4) break;
-    selected.push(item);
+    tryPush(item);
   }
 
   if (selected.length < 2) {

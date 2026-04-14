@@ -122,3 +122,25 @@ test("very short deadline applies clear penalty", () => {
 
   assert.ok(aggressive.score <= normal.score - 10);
 });
+
+test("reasons avoid duplicated actor history wording", () => {
+  const result = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 96,
+      completionRate: 93,
+      disputeRate: 2,
+      finalizedDealsCount: 30,
+    },
+    deal: {
+      hasDeadline: false,
+      isPublic: false,
+      detailsText: "Do it",
+    },
+  });
+
+  const historyReasonCount = result.reasonKeys.filter((key) =>
+    ["strong_fulfillment_history", "strong_completion_history"].includes(key)
+  ).length;
+
+  assert.equal(historyReasonCount, 1);
+});
