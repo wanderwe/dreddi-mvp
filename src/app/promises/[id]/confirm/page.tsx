@@ -33,7 +33,8 @@ type PromiseRow = {
   cancelled_at: string | null;
 };
 
-const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other", "not_delivered"] as const;
+const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
+const DISPUTE_LABEL_CODES = [...DISPUTE_OPTIONS, "not_delivered"] as const;
 
 export default function ConfirmPromisePage() {
   const t = useT();
@@ -220,10 +221,11 @@ export default function ConfirmPromisePage() {
     if (!promise) return;
     setActionBusy("dispute");
     setError(null);
+    const trimmedReason = disputeReason.trim();
     try {
       await postAction(`/api/promises/${promise.id}/dispute`, {
         code: disputeCode,
-        reason: disputeCode === "other" ? disputeReason : undefined,
+        reason: trimmedReason,
       });
       setSuccessMessage(t("promises.confirm.success.disputed"));
       setTimeout(() => router.push(localizePath("/promises", locale)), 1200);
@@ -235,12 +237,13 @@ export default function ConfirmPromisePage() {
     }
   }
 
-  const disputeDisabled =
-    disputeCode === "other" && disputeReason.trim().length < 4;
+  const disputeDisabled = disputeReason.trim().length < 4;
 
   const disputeLabel = useMemo(() => {
     if (!promise?.disputed_code) return promise?.disputed_code;
-    const known = DISPUTE_OPTIONS.includes(promise.disputed_code as (typeof DISPUTE_OPTIONS)[number]);
+    const known = DISPUTE_LABEL_CODES.includes(
+      promise.disputed_code as (typeof DISPUTE_LABEL_CODES)[number]
+    );
     return known ? t(`promises.disputeOptions.${promise.disputed_code}`) : promise.disputed_code;
   }, [promise?.disputed_code, t]);
 
@@ -414,27 +417,25 @@ export default function ConfirmPromisePage() {
                       value={opt.code}
                       checked={disputeCode === opt.code}
                       onChange={() => setDisputeCode(opt.code)}
-                      className="h-4 w-4 accent-emerald-400"
+                      className="h-4 w-4 cursor-pointer accent-emerald-400"
                     />
                     <span>{opt.label}</span>
                   </label>
                 ))}
               </div>
 
-              {disputeCode === "other" && (
-                <div className="mt-4">
-                  <label className="text-xs uppercase tracking-[0.14em] text-slate-400">
-                    {t("promises.confirm.reasonLabel")}
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={disputeReason}
-                    onChange={(e) => setDisputeReason(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
-                    placeholder={t("promises.confirm.disputePlaceholder")}
-                  />
-                </div>
-              )}
+              <div className="mt-4">
+                <label className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                  {t("promises.confirm.disputeExplanationLabel")}
+                </label>
+                <textarea
+                  rows={3}
+                  value={disputeReason}
+                  onChange={(e) => setDisputeReason(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+                  placeholder={t("promises.confirm.disputePlaceholder")}
+                />
+              </div>
 
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
