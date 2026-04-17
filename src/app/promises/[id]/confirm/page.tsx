@@ -414,7 +414,7 @@ export default function ConfirmPromisePage() {
                       value={opt.code}
                       checked={disputeCode === opt.code}
                       onChange={() => setDisputeCode(opt.code)}
-                      className="h-4 w-4 accent-emerald-400"
+                      className="h-4 w-4 cursor-pointer accent-emerald-400"
                     />
                     <span>{opt.label}</span>
                   </label>
