@@ -33,7 +33,8 @@ type PromiseRow = {
   cancelled_at: string | null;
 };
 
-const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other", "not_delivered"] as const;
+const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
+const DISPUTE_LABEL_CODES = [...DISPUTE_OPTIONS, "not_delivered"] as const;
 
 export default function ConfirmPromisePage() {
   const t = useT();
@@ -240,7 +241,9 @@ export default function ConfirmPromisePage() {
 
   const disputeLabel = useMemo(() => {
     if (!promise?.disputed_code) return promise?.disputed_code;
-    const known = DISPUTE_OPTIONS.includes(promise.disputed_code as (typeof DISPUTE_OPTIONS)[number]);
+    const known = DISPUTE_LABEL_CODES.includes(
+      promise.disputed_code as (typeof DISPUTE_LABEL_CODES)[number]
+    );
     return known ? t(`promises.disputeOptions.${promise.disputed_code}`) : promise.disputed_code;
   }, [promise?.disputed_code, t]);
 
