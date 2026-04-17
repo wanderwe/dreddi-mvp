@@ -22,7 +22,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const body = await req.json().catch(() => null);
     const code = body?.code as DisputeCode | undefined;
-    const reason = typeof body?.reason === "string" ? body.reason : undefined;
+    const reason = typeof body?.reason === "string" ? body.reason.trim() : undefined;
 
     if (!code || !DISPUTE_CODES.includes(code)) {
       return NextResponse.json({ error: "Invalid dispute code" }, { status: 400 });
@@ -63,6 +63,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const nowMs = Date.now();
     const dueAtMs = promise.due_at ? new Date(promise.due_at).getTime() : null;
     const isNotDeliveredFlow = code === "not_delivered";
+    const reasonRequired = !isNotDeliveredFlow;
+
+    if (reasonRequired && (!reason || reason.length < 4)) {
+      return NextResponse.json(
+        { error: "Please explain what was not fulfilled" },
+        { status: 400 }
+      );
+    }
 
     if (!isNotDeliveredFlow && promise.status !== "completed_by_promisor") {
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });

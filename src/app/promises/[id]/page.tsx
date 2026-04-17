@@ -34,6 +34,7 @@ type PromiseRow = {
   status: PromiseStatus;
   completed_at: string | null;
   disputed_code: string | null;
+  dispute_reason: string | null;
   created_at: string;
 
   invite_token: string | null;
@@ -243,7 +244,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -931,6 +932,14 @@ export default function PromisePage() {
               </div>
               {p.status === "disputed" && p.disputed_code === "not_delivered" && (
                 <div className="text-sm text-amber-200">{t("promises.detail.notDeliveredHint")}</div>
+              )}
+              {p.status === "disputed" && p.dispute_reason && (
+                <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+                  <p className="text-xs uppercase tracking-[0.14em] text-amber-200">
+                    {t("promises.detail.disputeExplanationLabel")}
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap">{p.dispute_reason}</p>
+                </div>
               )}
 
               <div className="text-sm text-slate-400">
