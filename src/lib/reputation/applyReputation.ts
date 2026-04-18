@@ -15,6 +15,7 @@ type EventMeta = {
   on_time?: boolean;
   late_penalty?: boolean;
   role?: string;
+  is_high_stake?: boolean;
 };
 
 type EventInput = {
@@ -37,12 +38,14 @@ function computeDeltas(promise: PromiseRowMin): EventInput[] {
     confirmed_at: promise.confirmed_at,
     disputed_at: promise.disputed_at,
     due_at: promise.due_at,
+    is_high_stake: promise.is_high_stake,
   };
 
   const impactInput = {
     status: promise.status,
     due_at: promise.due_at,
     completed_at: promise.completed_at,
+    is_high_stake: promise.is_high_stake,
   };
   const onTime = calcOnTime(impactInput);
   const late = calcLatePenalty(impactInput);

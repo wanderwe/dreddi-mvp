@@ -38,6 +38,8 @@ type InviteInfo = {
   visibility: "private" | "public";
   promisor_id: string | null;
   promisee_id: string | null;
+  is_high_stake: boolean;
+  high_stake_enabled_at: string | null;
 };
 
 export default function InvitePage() {
@@ -345,7 +347,18 @@ export default function InvitePage() {
                   {t("invite.publicTag")}
                 </span>
               )}
+              {info.is_high_stake && (
+                <span className="inline-flex items-center rounded-full border border-indigo-300/30 bg-indigo-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-indigo-100">
+                  {t("invite.highStake.badge")}
+                </span>
+              )}
             </div>
+
+            {info.is_high_stake && (
+              <p className="mt-4 rounded-xl border border-indigo-300/20 bg-indigo-400/5 px-3 py-2 text-xs text-indigo-100/90">
+                {t("invite.highStake.meta")}
+              </p>
+            )}
 
             <dl className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm sm:grid-cols-2">
               <div>

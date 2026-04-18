@@ -291,6 +291,10 @@
           "invitedSideExecutes": "{responsible} is expected to complete this deal for {recipient}",
           "invitedSideReceives": "This deal is a promise made by {responsible} to {recipient}"
         }
+      },
+      "highStake": {
+        "badge": "High-stake",
+        "meta": "This deal carries stronger reputational consequences"
       }
     },
     "inviteStatus": {
@@ -422,7 +426,25 @@
         "network": "Unable to reach the server. Please try again."
       },
       "submit": "Create {entityLower}",
-      "creating": "Creating {entityLower}…"
+      "creating": "Creating {entityLower}…",
+      "highStake": {
+        "label": "High-stake",
+        "subtitle": "Stronger consequences. Higher trust.",
+        "collapsedHint": "A deliberate mode for stronger reputational consequences.",
+        "enableCta": "Enable high-stake",
+        "enabled": "High-stake enabled",
+        "points": {
+          "impact": "Failure has stronger reputation impact",
+          "visible": "This deal will remain visible on profile",
+          "shared": "Both sides will see that higher consequences were chosen"
+        },
+        "modal": {
+          "title": "Enable high-stake for this deal?",
+          "body": "This raises the reputational cost of failure and makes the deal visibly higher-stakes for both sides.",
+          "confirm": "Enable high-stake",
+          "cancel": "Keep standard deal"
+        }
+      }
     },
     "actionQueue": {
       "title": "Requires your action",
@@ -518,7 +540,11 @@
     "acceptCta": "Accept and take responsibility",
     "acceptDeal": "Accept deal",
     "goToDeal": "Open deal",
-    "viewDeal": "View deal"
+    "viewDeal": "View deal",
+    "highStake": {
+      "badge": "High-stake deal",
+      "meta": "Stronger consequences were chosen for this agreement"
+    }
   },
   "auth": {
     "login": {
@@ -665,7 +691,8 @@
       "title": "Streak: {count}",
       "zero": "Start confirming deals in a row to launch your streak",
       "nonZero": "{count} deals in a row fulfilled without disputes"
-    }
+    },
+    "highStake": "High-stake"
   },
   "deal": {
     "meta": {

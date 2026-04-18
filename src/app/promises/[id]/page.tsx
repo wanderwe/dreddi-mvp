@@ -50,6 +50,8 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "private" | "public";
+  is_high_stake: boolean;
+  high_stake_enabled_at: string | null;
 };
 
 function Card({
@@ -243,7 +245,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,is_high_stake,high_stake_enabled_at"
       )
       .eq("id", id)
       .single();
@@ -921,6 +923,14 @@ export default function PromisePage() {
                   <span className="text-emerald-200">
                     {publicStatusText}
                   </span>
+                </div>
+              )}
+              {p.is_high_stake && (
+                <div className="flex items-center gap-3 rounded-xl border border-indigo-300/20 bg-indigo-400/5 px-3 py-2 text-xs text-indigo-100">
+                  <span className="rounded-full border border-indigo-300/30 bg-indigo-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-100">
+                    {t("promises.detail.highStake.badge")}
+                  </span>
+                  <span>{t("promises.detail.highStake.meta")}</span>
                 </div>
               )}
 

@@ -15,7 +15,7 @@
 | Deal accepted/confirmed (invite acceptance) | Counterparty | Counterparty accepts invite / counterparty is set | `active` (no change) | **No reputation change** | No reputation logic runs on acceptance. |
 | Executor marks completed | Executor | Counterparty has accepted; status is `active` | `active → completed_by_promisor` | **No reputation change** | Only `completed_at` is set. |
 | Counterparty confirms completion | Counterparty | Status is `completed_by_promisor` | `completed_by_promisor → confirmed` | **Executor:** +4 if `completed_at ≤ due_at`, else +3 | If no due date or `completed_at` missing, treated as “not on time” (+3). |
-| Counterparty disputes completion | Counterparty | Status is `completed_by_promisor` | `completed_by_promisor → disputed` | **Executor:** -7 if `completed_at > due_at`, else -6 | If no due date or `completed_at` missing, treated as “not late” (-6). |
+| Counterparty disputes completion | Counterparty | Status is `completed_by_promisor` | `completed_by_promisor → disputed` | **Executor:** normal deal = -7 if `completed_at > due_at`, else -6. **High-stake deal:** penalty multiplied by `1.5` and rounded (`-10` late, `-9` otherwise). | If no due date or `completed_at` missing, treated as “not late” baseline (-6). |
 | Dispute resolution | N/A | No explicit resolution flow in code | N/A | **No reputation change** | No separate dispute-resolution reputation logic exists. |
 
 ## C) Evidence pointers (code + SQL)

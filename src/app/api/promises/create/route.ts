@@ -13,6 +13,7 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
+  isHighStake?: boolean;
 };
 
 export async function POST(req: Request) {
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
 
     const admin = getAdminClient();
     const requestedVisibility = body?.visibility === "private" ? "private" : "public";
+    const isHighStake = body?.isHighStake === true;
 
     const { data: profileRow } = await admin
       .from("profiles")
@@ -88,6 +90,8 @@ export async function POST(req: Request) {
       cancelled_at: null,
       visibility,
       promise_mode: "deal",
+      is_high_stake: isHighStake,
+      high_stake_enabled_at: isHighStake ? nowIso : null,
     };
 
     const { data: insertData, error: insertError } = await admin

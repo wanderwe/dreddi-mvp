@@ -26,4 +26,6 @@ export type PromiseRowMin = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  is_high_stake?: boolean;
+  high_stake_enabled_at?: string | null;
 };

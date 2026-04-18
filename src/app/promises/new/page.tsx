@@ -72,6 +72,8 @@ export default function NewPromisePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
   const [isPublicDeal, setIsPublicDeal] = useState(true);
+  const [isHighStake, setIsHighStake] = useState(false);
+  const [showHighStakeConfirm, setShowHighStakeConfirm] = useState(false);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
@@ -545,7 +547,7 @@ export default function NewPromisePage() {
       const { data: sourceDeal } = await supabase
         .from("promises")
         .select(
-          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,is_high_stake"
         )
         .eq("id", fromPromiseId)
         .eq("creator_id", session.user.id)
@@ -564,6 +566,7 @@ export default function NewPromisePage() {
       setConditionText(nextCondition);
       setShowCondition(nextCondition.trim().length > 0);
       setIsPublicDeal(sourceDeal.visibility === "public");
+      setIsHighStake(sourceDeal.is_high_stake === true);
 
       if (sourceDeal.due_at) {
         const dueDate = new Date(sourceDeal.due_at);
@@ -655,6 +658,7 @@ export default function NewPromisePage() {
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
+      isHighStake,
     };
 
     let res: Response;
@@ -1019,6 +1023,46 @@ export default function NewPromisePage() {
                 </div>
             </div>
 
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-200">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                    {t("promises.new.highStake.label")}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">
+                    {t("promises.new.highStake.subtitle")}
+                  </p>
+                  {isHighStake ? (
+                    <ul className="mt-3 space-y-1.5 text-xs text-slate-300">
+                      <li>{t("promises.new.highStake.points.impact")}</li>
+                      <li>{t("promises.new.highStake.points.visible")}</li>
+                      <li>{t("promises.new.highStake.points.shared")}</li>
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-xs text-slate-400">{t("promises.new.highStake.collapsedHint")}</p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isHighStake) {
+                      setIsHighStake(false);
+                      return;
+                    }
+                    setShowHighStakeConfirm(true);
+                  }}
+                  className={clsx(
+                    "inline-flex cursor-pointer items-center justify-center rounded-xl border px-3 py-1.5 text-xs font-semibold transition",
+                    isHighStake
+                      ? "border-emerald-300/40 bg-emerald-400/10 text-emerald-100 hover:border-emerald-200/60"
+                      : "border-white/15 bg-white/5 text-slate-200 hover:border-white/30 hover:text-white"
+                  )}
+                >
+                  {isHighStake ? t("promises.new.highStake.enabled") : t("promises.new.highStake.enableCta")}
+                </button>
+              </div>
+            </div>
+
             {isPublicProfile && (
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
@@ -1099,6 +1143,34 @@ export default function NewPromisePage() {
           </div>
         </div>
       </div>
+
+      {showHighStakeConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-950 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">{t("promises.new.highStake.modal.title")}</h2>
+            <p className="mt-3 text-sm text-slate-300">{t("promises.new.highStake.modal.body")}</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowHighStakeConfirm(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                {t("promises.new.highStake.modal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsHighStake(true);
+                  setShowHighStakeConfirm(false);
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-400/90 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+              >
+                {t("promises.new.highStake.modal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

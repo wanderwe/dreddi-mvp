@@ -53,6 +53,7 @@ type PublicPromiseRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  is_high_stake: boolean | null;
 };
 
 type PublicPromise = {
@@ -70,6 +71,7 @@ type PublicPromise = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  is_high_stake: boolean;
 };
 
 const getPublicProfileStats = async (handle: string) => {
@@ -235,6 +237,7 @@ export default function PublicProfilePage() {
               ignored_at: row.ignored_at,
               expires_at: row.expires_at,
               cancelled_at: row.cancelled_at,
+              is_high_stake: row.is_high_stake === true,
             },
           ];
         });
@@ -799,6 +802,11 @@ export default function PublicProfilePage() {
                     >
                       <div>
                         <p className="text-sm font-medium text-white">{promise.title}</p>
+                        {promise.is_high_stake && (
+                          <p className="mt-1 inline-flex rounded-full border border-indigo-300/25 bg-indigo-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-100">
+                            {t("publicProfile.highStake")}
+                          </p>
+                        )}
                         <p className="text-xs text-white/50">
                           {formatDealMeta(promise, locale, dealMetaLabels)}
                         </p>

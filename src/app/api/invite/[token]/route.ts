@@ -31,6 +31,8 @@ type PromiseInviteRow = {
   visibility: "private" | "public";
   promisor_id: string | null;
   promisee_id: string | null;
+  is_high_stake: boolean;
+  high_stake_enabled_at: string | null;
 };
 
 export async function GET(_req: Request, ctx: { params: Promise<{ token: string }> }) {
@@ -47,7 +49,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const { data: p, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,due_at,status,created_at,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,invite_token,counterparty_contact,visibility,promisor_id,promisee_id"
+        "id,title,details,condition_text,condition_met_at,due_at,status,created_at,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,invite_token,counterparty_contact,visibility,promisor_id,promisee_id,is_high_stake,high_stake_enabled_at"
       )
       .eq("invite_token", token)
       .maybeSingle<PromiseInviteRow>(); // ✅ якщо TS не любить — прибери generic
@@ -115,6 +117,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         visibility: p.visibility ?? "private",
         promisor_id: p.promisor_id ?? null,
         promisee_id: p.promisee_id ?? null,
+        is_high_stake: p.is_high_stake === true,
+        high_stake_enabled_at: p.high_stake_enabled_at ?? null,
       },
       { status: 200 }
     );
