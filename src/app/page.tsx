@@ -399,7 +399,10 @@ export default function Home() {
 
         setRecentDeals(
           normalized
-            .filter((deal) => deal.uiStatus !== "expired")
+            .filter(
+              (deal) =>
+                deal.uiStatus !== "expired" && deal.uiStatus !== "cancelled_by_creator"
+            )
             .sort((a, b) => getRecentDealActionTime(b) - getRecentDealActionTime(a))
             .slice(0, 3)
         );
