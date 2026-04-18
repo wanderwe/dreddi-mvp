@@ -202,7 +202,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (!profile?.handle) return "";
     return `/u/${encodeURIComponent(profile.handle)}`;
   }, [profile?.handle]);
+  const passportPath = useMemo(() => {
+    if (!profile?.handle) return "";
+    return `/passport/${encodeURIComponent(profile.handle)}`;
+  }, [profile?.handle]);
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : publicProfilePath;
+  const passportUrl = origin && passportPath ? `${origin}${passportPath}` : passportPath;
   const emailToggleDisabled = loading || saving || !profile;
   const emailToggleChecked = profile?.emailEnabled ?? false;
 
@@ -272,6 +277,17 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (!publicProfileUrl) return;
     try {
       await navigator.clipboard.writeText(publicProfileUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profileSettings.errors.copyFailed"));
+    }
+  };
+
+  const handleCopyPassportLink = async () => {
+    if (!passportUrl) return;
+    try {
+      await navigator.clipboard.writeText(passportUrl);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -565,6 +581,36 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             : t("profileSettings.publicLinkDescription")}
                         </HelperText>
                       </div>
+                    {passportPath ? (
+                      <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                        <div className="text-sm font-medium text-white">
+                          {t("profileSettings.passportLinkLabel")}
+                        </div>
+                        <div className="break-words rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200 [overflow-wrap:anywhere]">
+                          {passportUrl}
+                        </div>
+                        <div className="flex w-full flex-wrap gap-2 md:justify-end">
+                          <a
+                            href={passportPath}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                          >
+                            {t("profileSettings.viewPassport")}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={handleCopyPassportLink}
+                            className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                          >
+                            {copied
+                              ? t("profileSettings.copySuccess")
+                              : t("profileSettings.copyPassportLink")}
+                          </button>
+                        </div>
+                        <HelperText>{t("profileSettings.passportLinkDescription")}</HelperText>
+                      </div>
+                    ) : null}
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
                       <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <div className="space-y-1">
