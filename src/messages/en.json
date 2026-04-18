@@ -842,5 +842,36 @@
     "errors": {
       "submitFailed": "Failed to send feedback"
     }
+  },
+  "passport": {
+    "label": "Reputation Passport",
+    "loading": "Loading passport…",
+    "unavailableTitle": "Passport unavailable",
+    "unavailable": "This passport is not public",
+    "trustLine": "Reputation based on real deal outcomes",
+    "basedOnOutcomes": "Based on confirmed outcomes, not reviews",
+    "score": "Score",
+    "fulfilled": "Fulfilled",
+    "disputed": "Disputed",
+    "streak": "Streak",
+    "copyLink": "Copy link",
+    "copyEmbed": "Copy embed",
+    "copySuccess": "Copied",
+    "shareHelper": "Share your passport or embed it on another site.",
+    "poweredBy": "Verified by Dreddi",
+    "details": {
+      "workedWith": "Worked with",
+      "partners": "partners",
+      "commitments": "Commitments",
+      "onTime": "On-time: {count}",
+      "disputes": "Disputes",
+      "disputeRate": "Dispute rate: {rate}%",
+      "dealPace": "Deal pace",
+      "perMonth": "deals / month",
+      "completionRate": "Completion rate",
+      "outcomesConfirmed": "confirmed outcomes",
+      "response": "Response",
+      "counterpartyResponses": "counterparty responses"
+    }
   }
 }

@@ -872,5 +872,36 @@
     "errors": {
       "submitFailed": "Не вдалося надіслати фідбек"
     }
+  },
+  "passport": {
+    "label": "Паспорт репутації",
+    "loading": "Завантажуємо паспорт…",
+    "unavailableTitle": "Паспорт недоступний",
+    "unavailable": "Цей паспорт недоступний публічно",
+    "trustLine": "Репутація на основі реальних результатів угод",
+    "basedOnOutcomes": "На основі підтверджених результатів, а не відгуків",
+    "score": "Бал",
+    "fulfilled": "Виконано",
+    "disputed": "Спори",
+    "streak": "Серія",
+    "copyLink": "Скопіювати посилання",
+    "copyEmbed": "Скопіювати embed",
+    "copySuccess": "Скопійовано",
+    "shareHelper": "Поділіться паспортом або вбудуйте його на інший сайт.",
+    "poweredBy": "Verified by Dreddi",
+    "details": {
+      "workedWith": "Співпраця",
+      "partners": "партнерів",
+      "commitments": "Зобовʼязання",
+      "onTime": "Вчасно: {count}",
+      "disputes": "Спори",
+      "disputeRate": "Рівень спорів: {rate}%",
+      "dealPace": "Темп угод",
+      "perMonth": "угод / місяць",
+      "completionRate": "Виконання",
+      "outcomesConfirmed": "підтверджені результати",
+      "response": "Реакція",
+      "counterpartyResponses": "відповіді контрагентів"
+    }
   }
 }
