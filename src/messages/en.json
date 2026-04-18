@@ -91,7 +91,11 @@
     "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
     "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
-    "save": "Save"
+    "save": "Save",
+    "passportLinkLabel": "Reputation passport link",
+    "passportLinkDescription": "Share this link to show your portable trust snapshot outside Dreddi",
+    "viewPassport": "View passport",
+    "copyPassportLink": "Copy passport link"
   },
   "promises": {
     "entity": {
@@ -702,7 +706,8 @@
       "title": "Streak: {count}",
       "zero": "Start confirming deals in a row to launch your streak",
       "nonZero": "{count} deals in a row fulfilled without disputes"
-    }
+    },
+    "viewPassport": "Open passport"
   },
   "deal": {
     "meta": {

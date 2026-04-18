@@ -316,6 +316,10 @@ export default function PublicProfilePage() {
     () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
     [handle]
   );
+  const passportPath = useMemo(
+    () => (handle ? `/passport/${encodeURIComponent(handle)}` : ""),
+    [handle]
+  );
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
 
   const handleCopyLink = async () => {
@@ -515,13 +519,21 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
-                </button>
+                <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
+                  <LocalizedLink
+                    href={passportPath}
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                  >
+                    {t("publicProfile.viewPassport")}
+                  </LocalizedLink>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                  >
+                    {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
+                  </button>
+                </div>
               </div>
               <div className="text-xs text-white/50">{lastActivityLabel}</div>
             </section>
