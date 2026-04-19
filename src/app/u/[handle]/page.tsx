@@ -289,7 +289,10 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const confirmedCount = profile?.confirmed_count ?? 0;
   const disputedCount = profile?.disputed_count ?? 0;
   const reputationScore = profile?.reputation_score ?? 50;
-  const totalConfirmedDeals = profile?.total_confirmed_deals ?? confirmedCount;
+  const totalFinalizedDeals = Math.max(
+    profile?.total_confirmed_deals ?? confirmedCount,
+    confirmedCount + disputedCount
+  );
   const lastActivityFromPromises = useMemo(() => {
     if (promises.length === 0) return null;
     const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
@@ -408,7 +411,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     );
   };
   const reputationEvidence = useMemo(() => {
-    const totalDeals = totalConfirmedDeals ?? 0;
+    const totalDeals = totalFinalizedDeals;
     const workedWithDeals = profile?.completed_count ?? 0;
     const hasDeals = totalDeals > 0;
     const uniquePeople = profile?.unique_counterparties_count ?? null;
@@ -471,7 +474,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     profile?.reputation_age_days,
     profile?.unique_counterparties_count,
     promises,
-    totalConfirmedDeals,
+    totalFinalizedDeals,
   ]);
   const dealMetaLabels = useMemo(
     () => ({
