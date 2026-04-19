@@ -333,7 +333,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
   const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
   const embedCode = embedUrl
-    ? `<iframe src="${embedUrl}" width="420" height="420" style="border:0;overflow:hidden;" scrolling="no"></iframe>`
+    ? `<iframe src="${embedUrl}" width="420" height="300" style="border:0;overflow:hidden;" scrolling="no"></iframe>`
     : "";
 
   const handleCopyLink = async () => {
