@@ -577,7 +577,7 @@ export default function PublicProfilePage() {
               ) : null}
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
               <button
                 type="button"
                 onClick={() => setReputationDetailsOpen((prev) => !prev)}
