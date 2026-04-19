@@ -16,7 +16,7 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
-import { Code2, Copy } from "lucide-react";
+import { Code2, Copy, ExternalLink } from "lucide-react";
 
 type PublicProfileRow = {
   handle: string;
@@ -503,36 +503,35 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           ) : (
             <div className="space-y-4">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
-                    {profile?.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={profile.avatar_url} alt={primaryLabel} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="text-lg font-semibold text-white/80">
-                        {avatarLabel.slice(0, 1).toUpperCase()}
-                      </span>
-                    )}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                      {profile?.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={profile.avatar_url} alt={primaryLabel} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-lg font-semibold text-white/80">
+                          {avatarLabel.slice(0, 1).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h1 className="truncate text-xl font-semibold">{primaryLabel}</h1>
+                      {identity.subtitle ? (
+                        <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <h1 className="truncate text-xl font-semibold">{primaryLabel}</h1>
-                    {identity.subtitle ? (
-                      <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
-                    ) : null}
-                  </div>
+                  {publicProfilePath ? (
+                    <LocalizedLink
+                      href={publicProfilePath}
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                      aria-label={t("publicProfile.copyLink")}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </LocalizedLink>
+                  ) : null}
                 </div>
-                {profileTags.length > 0 ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {profileTags.slice(0, 8).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-200/90"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
                 <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
                   {t("publicProfile.embed.verifiedBy")}
                 </p>
@@ -567,10 +566,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   <p className="text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
                 </div>
               ) : null}
-
-              <p className="text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
-                {t("publicProfile.embed.trustLine")}
-              </p>
               <p className="text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
             </div>
           )}
