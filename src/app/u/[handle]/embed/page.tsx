@@ -3,5 +3,5 @@
 import { PublicProfilePageView } from "@/app/u/[handle]/page";
 
 export default function PublicProfileEmbedPage() {
-  return <PublicProfilePageView forcedMode="embed" />;
+  return <PublicProfilePageView variant="embed" />;
 }

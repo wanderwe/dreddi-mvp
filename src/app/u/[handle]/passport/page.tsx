@@ -1,7 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { PublicProfilePageView } from "@/app/u/[handle]/page";
+type Props = {
+  params: Promise<{ handle: string }>;
+};
 
-export default function PublicProfilePassportPage() {
-  return <PublicProfilePageView forcedMode="passport" />;
+export default async function PublicProfilePassportAliasPage({ params }: Props) {
+  const { handle } = await params;
+  redirect(`/u/${encodeURIComponent(handle)}`);
 }

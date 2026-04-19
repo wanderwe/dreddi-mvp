@@ -705,17 +705,10 @@
       "nonZero": "{count} deals in a row fulfilled without disputes"
     },
     "copyEmbedCode": "Copy embed code",
-    "passport": {
-      "trustLine": "Based on confirmed outcomes, not reviews",
-      "snapshotHint": "A share-friendly trust snapshot based on your public profile."
-    },
     "embed": {
+      "trustLine": "Based on confirmed outcomes, not reviews",
       "verifiedBy": "Verified by Dreddi",
       "poweredBy": "Powered by Dreddi"
-    },
-    "modes": {
-      "profile": "Profile view",
-      "passport": "Passport view"
     }
   },
   "deal": {
