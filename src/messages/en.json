@@ -578,8 +578,8 @@
   },
   "publicProfile": {
     "backToDirectory": "← Back to public profiles",
-    "confirmed": "Fulfilled",
-    "disputed": "Disputed",
+    "confirmed": "Fulfilled deals",
+    "disputed": "Disputed deals",
     "loading": "Loading profile…",
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
