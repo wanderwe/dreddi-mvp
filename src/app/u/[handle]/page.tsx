@@ -332,6 +332,10 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
     [handle]
   );
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
+  const passportPath = useMemo(
+    () => (handle ? `/u/${encodeURIComponent(handle)}/passport` : ""),
+    [handle]
+  );
   const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
   const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
   const embedCode = embedUrl
@@ -505,6 +509,30 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
             {backLink.label}
           </LocalizedLink>
         ) : null}
+        {!isEmbed && publicProfilePath && passportPath ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <LocalizedLink
+              href={publicProfilePath}
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                !isPassport
+                  ? "border-emerald-300/50 bg-emerald-400/10 text-emerald-100"
+                  : "border-white/15 bg-white/5 text-white/70 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              {t("publicProfile.modes.profile")}
+            </LocalizedLink>
+            <LocalizedLink
+              href={passportPath}
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                isPassport
+                  ? "border-emerald-300/50 bg-emerald-400/10 text-emerald-100"
+                  : "border-white/15 bg-white/5 text-white/70 hover:border-white/30 hover:text-white"
+              }`}
+            >
+              {t("publicProfile.modes.passport")}
+            </LocalizedLink>
+          </div>
+        ) : null}
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}
@@ -635,6 +663,9 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
                 <p className="mt-4 text-xs uppercase tracking-[0.15em] text-emerald-100/70">
                   {t("publicProfile.passport.trustLine")}
                 </p>
+              ) : null}
+              {isPassport ? (
+                <p className="mt-2 text-xs text-white/60">{t("publicProfile.passport.snapshotHint")}</p>
               ) : null}
               {isEmbed ? (
                 <p className="mt-3 text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>

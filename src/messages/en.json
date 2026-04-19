@@ -706,11 +706,16 @@
     },
     "copyEmbedCode": "Copy embed code",
     "passport": {
-      "trustLine": "Based on confirmed outcomes, not reviews"
+      "trustLine": "Based on confirmed outcomes, not reviews",
+      "snapshotHint": "A share-friendly trust snapshot based on your public profile."
     },
     "embed": {
       "verifiedBy": "Verified by Dreddi",
       "poweredBy": "Powered by Dreddi"
+    },
+    "modes": {
+      "profile": "Profile view",
+      "passport": "Passport view"
     }
   },
   "deal": {
