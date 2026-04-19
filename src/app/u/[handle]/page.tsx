@@ -488,6 +488,97 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     [t]
   );
 
+  if (isEmbed) {
+    return (
+      <main className="w-full bg-transparent text-white">
+        <section className="w-full max-w-[420px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
+          {loading ? (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/70">
+              {t("publicProfile.loading")}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/70">
+              {error}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    {profile?.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={profile.avatar_url} alt={primaryLabel} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-lg font-semibold text-white/80">
+                        {avatarLabel.slice(0, 1).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h1 className="truncate text-xl font-semibold">{primaryLabel}</h1>
+                    {identity.subtitle ? (
+                      <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
+                    ) : null}
+                  </div>
+                </div>
+                {profileTags.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {profileTags.slice(0, 8).map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-200/90"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
+                  {t("publicProfile.embed.verifiedBy")}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-xl border border-white/10 bg-black/30 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-white/60">
+                    {t("publicProfile.reputationScore")}
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-white">{reputationScore}</p>
+                </div>
+                <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/10 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-emerald-200">
+                    {t("publicProfile.confirmed")}
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-white">{confirmedCount}</p>
+                </div>
+                <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-amber-200">
+                    {t("publicProfile.disputed")}
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold text-white">{disputedCount}</p>
+                </div>
+              </div>
+
+              {streakCount > 0 ? (
+                <div>
+                  <p className="text-lg font-semibold text-white">
+                    {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
+                  </p>
+                  <p className="text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
+                </div>
+              ) : null}
+
+              <p className="text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
+                {t("publicProfile.embed.trustLine")}
+              </p>
+              <p className="text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
+            </div>
+          )}
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className={`overflow-x-hidden bg-[#0b0f1a] text-white ${isEmbed ? "min-h-0" : "min-h-screen"}`}>
       <div

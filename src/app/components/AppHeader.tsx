@@ -30,6 +30,7 @@ export function AppHeader() {
   const locale = useLocale();
   const pathname = usePathname();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale);
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
@@ -156,6 +157,8 @@ export function AppHeader() {
       );
     };
   }, [authState.isLoggedIn, authState.user]);
+
+  if (isEmbedPath) return null;
 
   return (
     <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
