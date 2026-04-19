@@ -72,6 +72,8 @@ type PublicPromise = {
   cancelled_at: string | null;
 };
 
+export type PublicProfileMode = "full" | "passport" | "embed";
+
 const getPublicProfileStats = async (handle: string) => {
   if (!supabase) {
     return {
@@ -98,7 +100,11 @@ const statusTones: Record<PromiseUiStatus, StatusPillTone> = {
   cancelled_by_creator: "danger",
 };
 
-export default function PublicProfilePage() {
+type PublicProfilePageProps = {
+  forcedMode?: PublicProfileMode;
+};
+
+export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
   const params = useParams();
   const searchParams = useSearchParams();
   const t = useT();
@@ -109,13 +115,22 @@ export default function PublicProfilePage() {
     return Array.isArray(raw) ? raw[0] : raw;
   }, [params]);
   const backFrom = searchParams?.get("from");
+  const viewParam = searchParams?.get("view");
+  const mode: PublicProfileMode = useMemo(() => {
+    if (forcedMode) return forcedMode;
+    if (viewParam === "passport") return "passport";
+    return "full";
+  }, [forcedMode, viewParam]);
+  const isPassport = mode === "passport";
+  const isEmbed = mode === "embed";
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
   const [promises, setPromises] = useState<PublicPromise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedEmbed, setCopiedEmbed] = useState(false);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
   const streakFireGradientId = useId();
 
@@ -170,7 +185,7 @@ export default function PublicProfilePage() {
       if (!active) return;
 
       if (profileErr || !profileRow) {
-        setError(profileErr?.message ?? t("publicProfile.errors.private"));
+        setError(t("publicProfile.errors.unavailablePublic"));
         setLoading(false);
         return;
       }
@@ -317,13 +332,29 @@ export default function PublicProfilePage() {
     [handle]
   );
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
+  const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
+  const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
+  const embedCode = embedUrl
+    ? `<iframe src="${embedUrl}" width="420" height="280"></iframe>`
+    : "";
 
   const handleCopyLink = async () => {
     if (!publicProfileUrl) return;
     try {
       await navigator.clipboard.writeText(publicProfileUrl);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      setCopiedLink(true);
+      window.setTimeout(() => setCopiedLink(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCopyEmbed = async () => {
+    if (!embedCode) return;
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      setCopiedEmbed(true);
+      window.setTimeout(() => setCopiedEmbed(false), 2000);
     } catch (err) {
       console.error(err);
     }
@@ -460,14 +491,20 @@ export default function PublicProfilePage() {
   );
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#0b0f1a] text-white">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10">
-        <LocalizedLink
-          href={backLink.href}
-          className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
-        >
-          {backLink.label}
-        </LocalizedLink>
+    <main className={`overflow-x-hidden bg-[#0b0f1a] text-white ${isEmbed ? "min-h-0" : "min-h-screen"}`}>
+      <div
+        className={`mx-auto flex w-full flex-col gap-8 ${
+          isEmbed ? "max-w-md px-4 py-4" : "max-w-4xl px-6 py-10"
+        }`}
+      >
+        {!isEmbed ? (
+          <LocalizedLink
+            href={backLink.href}
+            className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+          >
+            {backLink.label}
+          </LocalizedLink>
+        ) : null}
         {loading ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
             {t("publicProfile.loading")}
@@ -478,7 +515,11 @@ export default function PublicProfilePage() {
           </div>
         ) : (
           <>
-            <section className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-8">
+            <section
+              className={`flex flex-col rounded-3xl border border-white/10 bg-white/5 ${
+                isEmbed ? "gap-4 p-5" : "gap-6 p-8"
+              }`}
+            >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
@@ -515,19 +556,34 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
-                >
-                  {copied ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
-                </button>
+                {!isEmbed ? (
+                  <div className="flex w-full flex-col gap-2 sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                    >
+                      {copiedLink ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopyEmbed}
+                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                    >
+                      {copiedEmbed
+                        ? t("profileSettings.copySuccess")
+                        : t("publicProfile.copyEmbedCode")}
+                    </button>
+                  </div>
+                ) : null}
               </div>
-              <div className="text-xs text-white/50">{lastActivityLabel}</div>
+              <div className="text-xs text-white/50">
+                {isEmbed ? t("publicProfile.embed.verifiedBy") : lastActivityLabel}
+              </div>
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="grid gap-3 sm:grid-cols-3">
+            <section className={`rounded-3xl border border-white/10 bg-white/5 ${isEmbed ? "p-5" : "p-8"}`}>
+              <div className={`grid gap-3 ${isEmbed ? "grid-cols-2" : "sm:grid-cols-3"}`}>
                 <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
                   <div className="text-xs uppercase tracking-[0.2em] text-white/60">
                     {t("publicProfile.reputationScore")}
@@ -575,9 +631,18 @@ export default function PublicProfilePage() {
                   <p className="mt-1 text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
                 </div>
               ) : null}
+              {(isPassport || isEmbed) ? (
+                <p className="mt-4 text-xs uppercase tracking-[0.15em] text-emerald-100/70">
+                  {t("publicProfile.passport.trustLine")}
+                </p>
+              ) : null}
+              {isEmbed ? (
+                <p className="mt-3 text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
+              ) : null}
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            {!isPassport && !isEmbed ? (
+              <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
               <button
                 type="button"
                 onClick={() => setReputationDetailsOpen((prev) => !prev)}
@@ -782,9 +847,11 @@ export default function PublicProfilePage() {
                   )}
                 </div>
               </div>
-            </section>
+              </section>
+            ) : null}
 
-            <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            {!isPassport && !isEmbed ? (
+              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
@@ -811,10 +878,15 @@ export default function PublicProfilePage() {
                   ))}
                 </div>
               )}
-            </section>
+              </section>
+            ) : null}
           </>
         )}
       </div>
     </main>
   );
+}
+
+export default function PublicProfilePage() {
+  return <PublicProfilePageView forcedMode="full" />;
 }
