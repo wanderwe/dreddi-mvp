@@ -497,8 +497,12 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
   return (
     <main className={`overflow-x-hidden bg-[#0b0f1a] text-white ${isEmbed ? "min-h-0" : "min-h-screen"}`}>
       <div
-        className={`mx-auto flex w-full flex-col gap-8 ${
-          isEmbed ? "max-w-md px-4 py-4" : "max-w-4xl px-6 py-10"
+        className={`mx-auto flex w-full flex-col ${isPassport ? "gap-4" : "gap-8"} ${
+          isEmbed
+            ? "max-w-md px-4 py-4"
+            : isPassport
+              ? "max-w-2xl px-4 py-6"
+              : "max-w-4xl px-6 py-10"
         }`}
       >
         {!isEmbed ? (
@@ -545,12 +549,16 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
           <>
             <section
               className={`flex flex-col rounded-3xl border border-white/10 bg-white/5 ${
-                isEmbed ? "gap-4 p-5" : "gap-6 p-8"
+                isEmbed ? "gap-4 p-5" : isPassport ? "gap-4 p-5" : "gap-6 p-8"
               }`}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className={`flex items-center justify-center overflow-hidden rounded-full bg-white/10 ${
+                      isPassport ? "h-12 w-12" : "h-16 w-16"
+                    }`}
+                  >
                     {profile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -565,11 +573,13 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold truncate">{primaryLabel}</h1>
+                    <h1 className={`font-semibold truncate ${isPassport ? "text-xl" : "text-2xl"}`}>
+                      {primaryLabel}
+                    </h1>
                     {identity.subtitle && (
                       <p className="text-sm text-white/60 truncate">{identity.subtitle}</p>
                     )}
-                    {profileTags.length > 0 && (
+                    {!isPassport && profileTags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {profileTags.map((tag) => (
                           <span
@@ -589,14 +599,18 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
                     <button
                       type="button"
                       onClick={handleCopyLink}
-                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                      className={`inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 ${
+                        isPassport ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"
+                      } font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto`}
                     >
                       {copiedLink ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
                     </button>
                     <button
                       type="button"
                       onClick={handleCopyEmbed}
-                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                      className={`inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 ${
+                        isPassport ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"
+                      } font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto`}
                     >
                       {copiedEmbed
                         ? t("profileSettings.copySuccess")
@@ -605,26 +619,36 @@ export function PublicProfilePageView({ forcedMode }: PublicProfilePageProps) {
                   </div>
                 ) : null}
               </div>
-              <div className="text-xs text-white/50">
+              <div className={`text-white/50 ${isPassport ? "text-[11px]" : "text-xs"}`}>
                 {isEmbed ? t("publicProfile.embed.verifiedBy") : lastActivityLabel}
               </div>
             </section>
 
-            <section className={`rounded-3xl border border-white/10 bg-white/5 ${isEmbed ? "p-5" : "p-8"}`}>
+            <section
+              className={`rounded-3xl border border-white/10 bg-white/5 ${
+                isEmbed ? "p-5" : isPassport ? "p-5" : "p-8"
+              }`}
+            >
               <div className={`grid gap-3 ${isEmbed ? "grid-cols-2" : "sm:grid-cols-3"}`}>
-                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
+                <div
+                  className={`rounded-2xl border px-4 py-4 text-sm shadow-inner shadow-black/30 ${
+                    isPassport
+                      ? "border-white/5 bg-black/20 text-white/75"
+                      : "border-white/10 bg-black/30 text-white/80"
+                  }`}
+                >
                   <div className="text-xs uppercase tracking-[0.2em] text-white/60">
                     {t("publicProfile.reputationScore")}
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">{reputationScore}</div>
                 </div>
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100 shadow-inner shadow-black/30">
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100 shadow-inner shadow-black/30">
                   <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                     {t("publicProfile.confirmed")}
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">{confirmedCount}</div>
                 </div>
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-4 text-sm text-amber-50 shadow-inner shadow-black/30">
+                <div className="rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-4 text-sm text-amber-50 shadow-inner shadow-black/30">
                   <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                     {t("publicProfile.disputed")}
                   </div>
