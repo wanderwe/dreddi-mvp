@@ -332,8 +332,27 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
   const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
   const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
+  const embedFrameId = useMemo(
+    () => `dreddi-embed-${(handle ?? "profile").replace(/[^a-zA-Z0-9_-]/g, "-")}`,
+    [handle]
+  );
   const embedCode = embedUrl
-    ? `<iframe src="${embedUrl}" width="420" height="300" style="border:0;overflow:hidden;" scrolling="no"></iframe>`
+    ? `<iframe id="${embedFrameId}" src="${embedUrl}" width="420" height="1" style="border:0;overflow:hidden;" scrolling="no"></iframe>
+<script>
+  (function () {
+    var iframe = document.getElementById("${embedFrameId}");
+    if (!iframe) return;
+    function onMessage(event) {
+      if (!event || !event.data || event.data.type !== "dreddi:embed:resize") return;
+      if (event.source !== iframe.contentWindow) return;
+      var nextHeight = Number(event.data.height);
+      if (!Number.isFinite(nextHeight) || nextHeight <= 0) return;
+      iframe.style.height = Math.ceil(nextHeight) + "px";
+      iframe.height = String(Math.ceil(nextHeight));
+    }
+    window.addEventListener("message", onMessage);
+  })();
+</script>`
     : "";
 
   const handleCopyLink = async () => {
@@ -487,6 +506,28 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     }),
     [t]
   );
+
+  useEffect(() => {
+    if (!isEmbed) return;
+    const postHeight = () => {
+      const nextHeight = Math.ceil(document.documentElement.scrollHeight);
+      window.parent.postMessage({ type: "dreddi:embed:resize", height: nextHeight }, "*");
+    };
+
+    postHeight();
+    window.addEventListener("load", postHeight);
+    window.addEventListener("resize", postHeight);
+
+    const observer = new ResizeObserver(() => postHeight());
+    observer.observe(document.documentElement);
+    if (document.body) observer.observe(document.body);
+
+    return () => {
+      window.removeEventListener("load", postHeight);
+      window.removeEventListener("resize", postHeight);
+      observer.disconnect();
+    };
+  }, [isEmbed, loading, error, profile?.avatar_url, primaryLabel, identity.subtitle, reputationScore, confirmedCount, disputedCount]);
 
   if (isEmbed) {
     return (
