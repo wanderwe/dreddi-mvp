@@ -586,8 +586,8 @@
   },
   "publicProfile": {
     "backToDirectory": "← Назад до публічних профілів",
-    "confirmed": "Дотримано",
-    "disputed": "Оскаржено",
+    "confirmed": "Дотримано угод",
+    "disputed": "Оскаржено угод",
     "loading": "Завантаження профілю…",
     "copyLink": "Скопіювати посилання",
     "reputationScore": "Репутаційний бал",
