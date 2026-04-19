@@ -731,7 +731,14 @@
       "supabase": "Supabase не налаштовано.",
       "missing": "Відсутній хендл профілю.",
       "private": "Профіль приватний",
-      "notFound": "Профіль не знайдено"
+      "notFound": "Профіль не знайдено",
+      "unavailablePublic": "Цей профіль недоступний публічно"
+    },
+    "copyEmbedCode": "Скопіювати embed-код",
+    "embed": {
+      "trustLine": "На основі підтверджених результатів, а не відгуків",
+      "verifiedBy": "Підтверджено Dreddi",
+      "poweredBy": "Працює на Dreddi"
     }
   },
   "deal": {

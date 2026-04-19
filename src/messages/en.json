@@ -696,12 +696,19 @@
       "supabase": "Supabase is not configured",
       "missing": "Profile handle is missing",
       "private": "This profile is private",
-      "notFound": "Profile not found"
+      "notFound": "Profile not found",
+      "unavailablePublic": "This profile is not public"
     },
     "streak": {
       "title": "Streak: {count}",
       "zero": "Start confirming deals in a row to launch your streak",
       "nonZero": "{count} deals in a row fulfilled without disputes"
+    },
+    "copyEmbedCode": "Copy embed code",
+    "embed": {
+      "trustLine": "Based on confirmed outcomes, not reviews",
+      "verifiedBy": "Verified by Dreddi",
+      "poweredBy": "Powered by Dreddi"
     }
   },
   "deal": {
