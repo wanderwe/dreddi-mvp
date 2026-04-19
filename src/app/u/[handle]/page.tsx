@@ -117,6 +117,7 @@ export default function PublicProfilePage() {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
+  const [publicDealsOpen, setPublicDealsOpen] = useState(true);
   const streakFireGradientId = useId();
 
   const formatRelativeTime = useMemo(() => {
@@ -785,32 +786,67 @@ export default function PublicProfilePage() {
             </section>
 
             <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-              <div className="mb-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setPublicDealsOpen((prev) => !prev)}
+                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                aria-label={
+                  publicDealsOpen
+                    ? t("publicProfile.publicDeals.collapseLabel")
+                    : t("publicProfile.publicDeals.expandLabel")
+                }
+                aria-expanded={publicDealsOpen}
+              >
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
-              </div>
-              {publicDealsEmpty ? (
-                <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {promises.map((promise) => (
-                    <div
-                      key={`${promise.title}-${promise.created_at}`}
-                      className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-white">{promise.title}</p>
-                        <p className="text-xs text-white/50">
-                          {formatDealMeta(promise, locale, dealMetaLabels)}
-                        </p>
-                      </div>
-                      <StatusPill
-                        label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
-                        tone={statusTones[promise.uiStatus] ?? "neutral"}
-                      />
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
+                    publicDealsOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25 12 15.75 4.5 8.25" />
+                  </svg>
+                </span>
+              </button>
+              <div
+                className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+                  publicDealsOpen ? "max-h-[900px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="pt-5">
+                  {publicDealsEmpty ? (
+                    <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {promises.map((promise) => (
+                        <div
+                          key={`${promise.title}-${promise.created_at}`}
+                          className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-white">{promise.title}</p>
+                            <p className="text-xs text-white/50">
+                              {formatDealMeta(promise, locale, dealMetaLabels)}
+                            </p>
+                          </div>
+                          <StatusPill
+                            label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
+                            tone={statusTones[promise.uiStatus] ?? "neutral"}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
+              </div>
             </section>
           </>
         )}

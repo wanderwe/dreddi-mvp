@@ -703,6 +703,10 @@
         }
       }
     },
+    "publicDeals": {
+      "expandLabel": "Розгорнути публічні угоди",
+      "collapseLabel": "Згорнути публічні угоди"
+    },
     "sections": {
       "responsibilityStatus": "Статус відповідальностей",
       "trackRecord": "Історія",

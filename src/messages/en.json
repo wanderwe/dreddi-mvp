@@ -666,6 +666,10 @@
         }
       }
     },
+    "publicDeals": {
+      "expandLabel": "Expand public deals",
+      "collapseLabel": "Collapse public deals"
+    },
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
