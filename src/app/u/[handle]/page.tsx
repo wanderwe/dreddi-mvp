@@ -333,7 +333,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
   const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
   const embedCode = embedUrl
-    ? `<iframe src="${embedUrl}" width="420" height="280"></iframe>`
+    ? `<iframe src="${embedUrl}" width="420" height="420" style="border:0;overflow:hidden;" scrolling="no"></iframe>`
     : "";
 
   const handleCopyLink = async () => {
@@ -523,13 +523,15 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                     </div>
                   </div>
                   {publicProfilePath ? (
-                    <LocalizedLink
-                      href={publicProfilePath}
+                    <a
+                      href={publicProfileUrl || publicProfilePath}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
                       aria-label={t("publicProfile.copyLink")}
                     >
                       <ExternalLink className="h-4 w-4" />
-                    </LocalizedLink>
+                    </a>
                   ) : null}
                 </div>
                 <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
@@ -558,14 +560,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 </div>
               </div>
 
-              {streakCount > 0 ? (
-                <div>
-                  <p className="text-lg font-semibold text-white">
-                    {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
-                  </p>
-                  <p className="text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
-                </div>
-              ) : null}
               <p className="text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
             </div>
           )}
