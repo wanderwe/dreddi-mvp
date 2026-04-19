@@ -3,11 +3,16 @@
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
 import { getAuthState } from "@/lib/auth/getAuthState";
+import { extractLocaleFromPathname } from "@/lib/i18n/routing";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function AppFooter() {
   const t = useT();
+  const pathname = usePathname();
+  const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale);
   const [canSendFeedback, setCanSendFeedback] = useState(false);
   const year = new Date().getFullYear();
   const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA;
@@ -27,6 +32,8 @@ export function AppFooter() {
       active = false;
     };
   }, []);
+
+  if (isEmbedPath) return null;
 
   return (
     <footer className="border-t border-white/5 bg-slate-950/60 text-slate-400">
