@@ -1,6 +1,8 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { IconButton } from "@/app/components/ui/IconButton";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -14,6 +16,7 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
+import { Code2, Copy } from "lucide-react";
 
 type PublicProfileRow = {
   handle: string;
@@ -548,23 +551,37 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   </div>
                 </div>
                 {!isEmbed ? (
-                  <div className="flex w-full flex-col gap-2 sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                  <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+                    <Tooltip
+                      label={copiedLink ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
+                      placement="top"
                     >
-                      {copiedLink ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCopyEmbed}
-                      className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition hover:border-emerald-300/40 hover:bg-white/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] sm:w-auto"
+                      <span>
+                        <IconButton
+                          icon={<Copy className="h-4 w-4" />}
+                          ariaLabel={t("publicProfile.copyLink")}
+                          className="h-10 w-10 border-white/15 bg-white/5 text-white/75 hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100"
+                          onClick={() => void handleCopyLink()}
+                        />
+                      </span>
+                    </Tooltip>
+                    <Tooltip
+                      label={
+                        copiedEmbed
+                          ? t("profileSettings.copySuccess")
+                          : t("publicProfile.copyEmbedCode")
+                      }
+                      placement="top"
                     >
-                      {copiedEmbed
-                        ? t("profileSettings.copySuccess")
-                        : t("publicProfile.copyEmbedCode")}
-                    </button>
+                      <span>
+                        <IconButton
+                          icon={<Code2 className="h-4 w-4" />}
+                          ariaLabel={t("publicProfile.copyEmbedCode")}
+                          className="h-10 w-10 border-white/15 bg-white/5 text-white/75 hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100"
+                          onClick={() => void handleCopyEmbed()}
+                        />
+                      </span>
+                    </Tooltip>
                   </div>
                 ) : null}
               </div>
