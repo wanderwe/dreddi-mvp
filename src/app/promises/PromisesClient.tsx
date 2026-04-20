@@ -728,7 +728,9 @@ export default function PromisesClient() {
 
   const metricValueClass = "mt-1 text-base font-semibold leading-tight";
   const metricBaseClass =
-    "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+    "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30";
+  const metricToggleBaseClass =
+    "min-h-11 rounded-xl border px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
   const handleMetricClick = (next: MetricFilter) => {
     const resolved = activeMetricFilter === next && next !== "total" ? "total" : next;
@@ -789,57 +791,39 @@ export default function PromisesClient() {
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
-            <button
-              type="button"
-              onClick={() => handleMetricClick("total")}
-              aria-pressed={activeMetricFilter === "total"}
+            <div
               className={[
                 metricBaseClass,
-                "cursor-pointer border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10",
-                activeMetricFilter === "total"
-                  ? "ring-2 ring-emerald-400/60"
-                  : "active:scale-[0.99]",
+                "border-white/10 bg-white/5 text-slate-200",
               ].join(" ")}
             >
               <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
                 {t("promises.overview.metrics.total")}
               </div>
               <div className={`${metricValueClass} text-white`}>{overview.total}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleMetricClick("awaiting_my_action")}
-              aria-pressed={activeMetricFilter === "awaiting_my_action"}
+            </div>
+            <div
               className={[
                 metricBaseClass,
-                "cursor-pointer border-emerald-400/20 bg-emerald-500/10 text-emerald-100 hover:border-emerald-300/40 hover:bg-emerald-500/15",
-                activeMetricFilter === "awaiting_my_action"
-                  ? "ring-2 ring-emerald-300/70"
-                  : "active:scale-[0.99]",
+                "border-emerald-400/20 bg-emerald-500/10 text-emerald-100",
               ].join(" ")}
             >
               <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className={metricValueClass}>{overview.awaitingYou}</div>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleMetricClick("awaiting_others")}
-              aria-pressed={activeMetricFilter === "awaiting_others"}
+            </div>
+            <div
               className={[
                 metricBaseClass,
-                "cursor-pointer border-amber-300/30 bg-amber-400/10 text-amber-50 hover:border-amber-300/60 hover:bg-amber-400/15",
-                activeMetricFilter === "awaiting_others"
-                  ? "ring-2 ring-amber-300/70"
-                  : "active:scale-[0.99]",
+                "border-amber-300/30 bg-amber-400/10 text-amber-50",
               ].join(" ")}
             >
               <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className={metricValueClass}>{overview.awaitingOthers}</div>
-            </button>
+            </div>
           </div>
         </div>
 
@@ -870,6 +854,45 @@ export default function PromisesClient() {
             >
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
+
+            <div className="flex w-full gap-2 sm:w-auto sm:ml-2">
+              <button
+                type="button"
+                onClick={() => handleMetricClick("total")}
+                aria-pressed={activeMetricFilter === "total"}
+                className={[
+                  metricToggleBaseClass,
+                  "flex-1 sm:flex-initial border-white/15 bg-white/[0.04] text-slate-100 hover:bg-white/[0.08]",
+                  activeMetricFilter === "total" ? "ring-2 ring-emerald-400/60" : "",
+                ].join(" ")}
+              >
+                {t("promises.overview.metrics.total")}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleMetricClick("awaiting_my_action")}
+                aria-pressed={activeMetricFilter === "awaiting_my_action"}
+                className={[
+                  metricToggleBaseClass,
+                  "flex-1 sm:flex-initial border-emerald-400/20 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/15",
+                  activeMetricFilter === "awaiting_my_action" ? "ring-2 ring-emerald-300/70" : "",
+                ].join(" ")}
+              >
+                {t("promises.overview.metrics.awaitingYou")}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleMetricClick("awaiting_others")}
+                aria-pressed={activeMetricFilter === "awaiting_others"}
+                className={[
+                  metricToggleBaseClass,
+                  "flex-1 sm:flex-initial border-amber-300/30 bg-amber-400/10 text-amber-50 hover:bg-amber-400/15",
+                  activeMetricFilter === "awaiting_others" ? "ring-2 ring-amber-300/70" : "",
+                ].join(" ")}
+              >
+                {t("promises.overview.metrics.awaitingOthers")}
+              </button>
+            </div>
 
             <div className="relative sm:ml-auto" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
