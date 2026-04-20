@@ -60,17 +60,7 @@ const normalizeTabParam = (value: string | null): TabKey => {
 };
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
-type StatusFilter =
-  | "all"
-  | "active"
-  | "overdue"
-  | "needs_review"
-  | "confirmed"
-  | "disputed"
-  | "awaiting_acceptance"
-  | "declined"
-  | "expired"
-  | "cancelled_by_creator";
+type StatusFilter = string;
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -108,6 +98,9 @@ type ReminderInfo = {
 };
 
 const PAGE_SIZE = 12;
+const STATUS_FILTER_ALL = "all";
+const STATUS_FILTER_OVERDUE = "overdue";
+const STATUS_FILTER_UI_PREFIX = "ui:";
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
@@ -134,6 +127,24 @@ const buildCounterpartyFilter = (id: string) =>
   // Regression test case: accepted deal where promisor_id === counterparty_id === userId
   // must not appear in the "Other executor" tab (only "I'm the executor").
   `promisee_id.eq.${id},and(counterparty_id.eq.${id},promisor_id.not.eq.${id}),and(creator_id.eq.${id},or(promisor_id.not.is.null,promisee_id.not.is.null),promisor_id.not.eq.${id})`;
+
+const toUiStatusFilterValue = (uiStatus: PromiseUiStatus) =>
+  `${STATUS_FILTER_UI_PREFIX}${uiStatus}`;
+
+const fromUiStatusFilterValue = (value: string): PromiseUiStatus | null => {
+  if (!value.startsWith(STATUS_FILTER_UI_PREFIX)) return null;
+  const uiStatus = value.slice(STATUS_FILTER_UI_PREFIX.length);
+  return uiStatus.length ? (uiStatus as PromiseUiStatus) : null;
+};
+
+const normalizeStatusParam = (value: string | null): StatusFilter => {
+  if (!value || value === STATUS_FILTER_ALL) return STATUS_FILTER_ALL;
+  if (value === STATUS_FILTER_OVERDUE) return STATUS_FILTER_OVERDUE;
+  if (value.startsWith(STATUS_FILTER_UI_PREFIX)) return value;
+
+  if (value === "needs_review") return toUiStatusFilterValue("completed_by_promisor");
+  return toUiStatusFilterValue(value as PromiseUiStatus);
+};
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -147,18 +158,7 @@ export default function PromisesClient() {
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
-  const statusFromSearch: StatusFilter = (() => {
-    if (statusParam === "active") return "active";
-    if (statusParam === "overdue") return "overdue";
-    if (statusParam === "needs_review") return "needs_review";
-    if (statusParam === "confirmed") return "confirmed";
-    if (statusParam === "disputed") return "disputed";
-    if (statusParam === "awaiting_acceptance") return "awaiting_acceptance";
-    if (statusParam === "declined") return "declined";
-    if (statusParam === "expired") return "expired";
-    if (statusParam === "cancelled_by_creator") return "cancelled_by_creator";
-    return "all";
-  })();
+  const statusFromSearch: StatusFilter = normalizeStatusParam(statusParam);
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -548,24 +548,19 @@ export default function PromisesClient() {
     row: T,
     status: StatusFilter
   ) => {
-    if (status === "all") return true;
-    if (status === "active") return row.uiStatus === "active";
-    if (status === "overdue") return isOverdueRow(row);
-    if (status === "needs_review") return row.uiStatus === "completed_by_promisor";
-    if (status === "confirmed") return row.uiStatus === "confirmed";
-    if (status === "disputed") return row.uiStatus === "disputed";
-    if (status === "awaiting_acceptance") return row.uiStatus === "awaiting_acceptance";
-    if (status === "declined") return row.uiStatus === "declined";
-    if (status === "expired") return row.uiStatus === "expired";
-    if (status === "cancelled_by_creator") return row.uiStatus === "cancelled_by_creator";
-    return false;
+    if (status === STATUS_FILTER_ALL) return true;
+    if (status === STATUS_FILTER_OVERDUE) return isOverdueRow(row);
+
+    const uiStatus = fromUiStatusFilterValue(status);
+    if (!uiStatus) return false;
+    return row.uiStatus === uiStatus;
   };
 
   const applyStatusFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
 
     let filtered = rows;
 
-    if (activeStatusFilter !== "all") {
+    if (activeStatusFilter !== STATUS_FILTER_ALL) {
       filtered = filtered.filter((row) => matchesStatusFilter(row, activeStatusFilter));
     }
 
@@ -616,22 +611,28 @@ export default function PromisesClient() {
 
   const rows = filteredListRowsByTab[tab];
   const metricRowsForCurrentTab = metricFilteredListRowsByTab[tab];
-  const availableStatusValues = useMemo(() => {
-    const ordered: StatusFilter[] = [
-      "active",
-      "overdue",
-      "needs_review",
-      "confirmed",
-      "disputed",
-      "awaiting_acceptance",
-      "declined",
-      "expired",
-      "cancelled_by_creator",
-    ];
-    return ordered.filter((status) =>
-      metricRowsForCurrentTab.some((row) => matchesStatusFilter(row, status))
-    );
-  }, [metricRowsForCurrentTab]);
+  const metricSummaryRowsForCurrentTab = useMemo(
+    () =>
+      filteredSummaryRows.filter((row) =>
+        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+      ),
+    [filteredSummaryRows, tab]
+  );
+  const availableStatusOptions = useMemo(() => {
+    const optionsMap = new Map<StatusFilter, string>();
+
+    for (const row of metricSummaryRowsForCurrentTab) {
+      const uiValue = toUiStatusFilterValue(row.uiStatus);
+      if (!optionsMap.has(uiValue)) {
+        optionsMap.set(uiValue, statusLabelForRole(row.status, row.role, row.uiStatus));
+      }
+      if (isOverdueRow(row) && !optionsMap.has(STATUS_FILTER_OVERDUE)) {
+        optionsMap.set(STATUS_FILTER_OVERDUE, t("promises.list.statusFilter.options.overdue"));
+      }
+    }
+
+    return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
+  }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
   const totalRowsForCurrentView = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
   const canLoadMore = hasMoreByTab[tab] && metricRowsForCurrentTab.length < totalRowsForCurrentView;
   const totalPromises = summaryRows.length;
@@ -640,7 +641,7 @@ export default function PromisesClient() {
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
   const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
-  const hasStatusFilter = activeStatusFilter !== "all";
+  const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
   const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
   const showAllActionWithFilters = isListEmpty && totalPromises > 0 && hasAnyFilter;
   const emptyTitle = isGlobalEmpty
@@ -791,39 +792,24 @@ export default function PromisesClient() {
     setActiveStatusFilter(next);
     setIsStatusMenuOpen(false);
     const sp = new URLSearchParams(searchParams.toString());
-    if (next === "all") sp.delete("status");
+    if (next === STATUS_FILTER_ALL) sp.delete("status");
     else sp.set("status", next);
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
   useEffect(() => {
-    if (activeStatusFilter === "all") return;
-    if (availableStatusValues.includes(activeStatusFilter)) return;
-    handleStatusFilterChange("all");
+    if (activeStatusFilter === STATUS_FILTER_ALL) return;
+    if (availableStatusOptions.some((option) => option.value === activeStatusFilter)) return;
+    handleStatusFilterChange(STATUS_FILTER_ALL);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeStatusFilter, availableStatusValues]);
+  }, [activeStatusFilter, availableStatusOptions]);
 
   const statusOptions: Array<{ value: StatusFilter; label: string }> = useMemo(() => {
-    const optionLabels: Record<Exclude<StatusFilter, "all">, string> = {
-      active: t("promises.list.statusFilter.options.active"),
-      overdue: t("promises.list.statusFilter.options.overdue"),
-      needs_review: t("promises.list.statusFilter.options.needsReview"),
-      confirmed: t("promises.list.statusFilter.options.confirmed"),
-      disputed: t("promises.list.statusFilter.options.disputed"),
-      awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
-      declined: t("promises.inviteStatus.declined"),
-      expired: t("promises.inviteStatus.expired"),
-      cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
-    };
-
     return [
-      { value: "all", label: t("promises.list.statusFilter.options.all") },
-      ...availableStatusValues.map((status) => ({
-        value: status,
-        label: optionLabels[status],
-      })),
+      { value: STATUS_FILTER_ALL, label: t("promises.list.statusFilter.options.all") },
+      ...availableStatusOptions,
     ];
-  }, [availableStatusValues, t]);
+  }, [availableStatusOptions, t]);
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
     t("promises.list.statusFilter.options.all");
