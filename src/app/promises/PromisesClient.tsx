@@ -471,15 +471,17 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (listLoading) return;
-    const summaryRowsForCurrentTab = filteredSummaryRows.filter((row) =>
+    const summaryRowsForCurrentTab = applyMetricFilter(summaryRows).filter((row) =>
       tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
     );
-    const filteredRows = hasAnyFilter
+    const hasAnyActiveFilter =
+      activeMetricFilter !== "total" || activeStatusFilter !== STATUS_FILTER_ALL;
+    const filteredRows = hasAnyActiveFilter
       ? applyStatusFilter(summaryRowsForCurrentTab)
       : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, tab, filteredSummaryRows]);
+  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
