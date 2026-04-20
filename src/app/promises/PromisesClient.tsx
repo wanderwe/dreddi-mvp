@@ -633,7 +633,7 @@ export default function PromisesClient() {
 
     return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
-  const totalRowsForCurrentView = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
+  const totalRowsForCurrentView = applyStatusFilter(metricSummaryRowsForCurrentTab).length;
   const canLoadMore = hasMoreByTab[tab] && metricRowsForCurrentTab.length < totalRowsForCurrentView;
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
