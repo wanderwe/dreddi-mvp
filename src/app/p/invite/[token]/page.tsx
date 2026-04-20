@@ -387,9 +387,7 @@ export default function InvitePage() {
               {inviteAccepted ? (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
-                    {isAcceptedInviteeViewer
-                      ? t("invite.acceptedStateMessageYou")
-                      : t("invite.acceptedStateMessage")}
+                    {t("invite.acceptedStateMessage")}
                   </div>
                   <button
                     type="button"

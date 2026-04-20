@@ -499,7 +499,7 @@
     "title": "Приєднайтеся до угоди в Dreddi",
     "subtitle": "Перегляньте деталі угоди та вашу роль. Якщо все підходить, прийміть запрошення.",
     "accepted": "Це запрошення вже прийнято",
-    "acceptedStateMessage": "Ви вже прийняли цю угоду",
+    "acceptedStateMessage": "Угоду вже прийнято",
     "acceptedStateMessageYou": "Ви прийняли цю угоду",
     "acceptedBy": "Запрошення прийняв користувач: {name}",
     "acceptedByLabel": "Прийняв",
