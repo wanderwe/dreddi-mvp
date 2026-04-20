@@ -84,7 +84,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Легкий трекер домовленостей",
       headline: "Домовленість починається з підтвердження",
       description:
-        "Фіксуйте угоди з друзями, партнерами та клієнтами.\nПросто, публічно або приватно — без контрактів, без тиску.\nАле з видимими наслідками для репутації.",
+        "Фіксуйте угоди з друзями, партнерами та клієнтами.\n\nПросто: публічно або приватно. Без контрактів, без тиску.\n\nЛише видимі наслідки для репутації.",
       whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
@@ -179,7 +179,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
-        "Record deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+        "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
