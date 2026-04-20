@@ -460,16 +460,10 @@ export default function PromisesClient() {
   useEffect(() => {
     if (listLoading) return;
     const sourceRows = listRowsByTab[tab] ?? [];
-    const filteredRows =
-      activeMetricFilter === "awaiting_my_action"
-        ? sourceRows.filter((row) => isAwaitingYourAction(row))
-        : activeMetricFilter === "awaiting_others"
-          ? sourceRows.filter((row) => isAwaitingOthers(row))
-          : sourceRows;
-
+    const filteredRows = applyListFilters(sourceRows);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, listLoading, listRowsByTab, tab]);
+  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -521,7 +515,7 @@ export default function PromisesClient() {
     return diff < 24 * 60 * 60 * 1000;
   };
 
-  const applyFilters = <T extends PromiseSummary | PromiseWithRole>(
+  const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
   ): T[] => {
     let filtered = rows;
@@ -533,11 +527,19 @@ export default function PromisesClient() {
       filtered = filtered.filter((row) => isAwaitingOthers(row));
     }
 
+    return filtered;
+  };
+
+  const applyStatusFilter = <T extends PromiseSummary | PromiseWithRole>(
+    rows: T[]
+  ): T[] => {
     const isOverdue = (row: T) => {
       if (row.uiStatus !== "active") return false;
       if (!row.due_at) return false;
       return new Date(row.due_at).getTime() < Date.now();
     };
+
+    let filtered = rows;
 
     if (activeStatusFilter === "active") {
       filtered = filtered.filter((row) => row.uiStatus === "active");
@@ -554,9 +556,13 @@ export default function PromisesClient() {
     return filtered;
   };
 
+  const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
+    rows: T[]
+  ): T[] => applyStatusFilter(applyMetricFilter(rows));
+
   const filteredSummaryRows = useMemo(
-    () => applyFilters(summaryRows),
-    [summaryRows, activeMetricFilter, activeStatusFilter]
+    () => applyMetricFilter(summaryRows),
+    [summaryRows, activeMetricFilter]
   );
 
   const roleCounts = useMemo(
@@ -573,20 +579,29 @@ export default function PromisesClient() {
     [filteredSummaryRows]
   );
 
+  const metricFilteredListRowsByTab = useMemo(
+    () => ({
+      "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
+      "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+    }),
+    [listRowsByTab, activeMetricFilter]
+  );
+
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyFilters(listRowsByTab["i-promised"]),
-      "promised-to-me": applyFilters(listRowsByTab["promised-to-me"]),
+      "i-promised": applyStatusFilter(metricFilteredListRowsByTab["i-promised"]),
+      "promised-to-me": applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]),
     }),
-    [listRowsByTab, activeMetricFilter, activeStatusFilter]
+    [metricFilteredListRowsByTab, activeStatusFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
 
   const rows = filteredListRowsByTab[tab];
+  const metricRowsForCurrentTab = metricFilteredListRowsByTab[tab];
   const totalRowsForCurrentView = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
-  const canLoadMore = hasMoreByTab[tab] && rows.length < totalRowsForCurrentView;
+  const canLoadMore = hasMoreByTab[tab] && metricRowsForCurrentTab.length < totalRowsForCurrentView;
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
