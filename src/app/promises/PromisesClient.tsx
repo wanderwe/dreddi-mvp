@@ -66,8 +66,7 @@ type StatusFilter =
   | "overdue"
   | "needs_review"
   | "confirmed"
-  | "disputed"
-  | "invite_issues";
+  | "disputed";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -150,14 +149,6 @@ export default function PromisesClient() {
     if (statusParam === "needs_review") return "needs_review";
     if (statusParam === "confirmed") return "confirmed";
     if (statusParam === "disputed") return "disputed";
-    if (
-      statusParam === "invite_issues" ||
-      statusParam === "awaiting_acceptance" ||
-      statusParam === "withdrawn" ||
-      statusParam === "closed"
-    ) {
-      return "invite_issues";
-    }
     return "all";
   })();
 
@@ -558,14 +549,6 @@ export default function PromisesClient() {
       filtered = filtered.filter((row) => row.uiStatus === "confirmed");
     } else if (activeStatusFilter === "disputed") {
       filtered = filtered.filter((row) => row.uiStatus === "disputed");
-    } else if (activeStatusFilter === "invite_issues") {
-      filtered = filtered.filter(
-        (row) =>
-          row.uiStatus === "awaiting_acceptance" ||
-          row.uiStatus === "declined" ||
-          row.uiStatus === "expired" ||
-          row.uiStatus === "cancelled_by_creator"
-      );
     }
 
     return filtered;
@@ -773,7 +756,6 @@ export default function PromisesClient() {
     { value: "needs_review", label: t("promises.list.statusFilter.options.needsReview") },
     { value: "confirmed", label: t("promises.list.statusFilter.options.confirmed") },
     { value: "disputed", label: t("promises.list.statusFilter.options.disputed") },
-    { value: "invite_issues", label: t("promises.list.statusFilter.options.inviteIssues") },
   ];
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
