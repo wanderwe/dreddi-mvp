@@ -50,7 +50,7 @@ test("new user gets moderate score with limited history reason", () => {
       hasDeadline: true,
       hoursToDeadline: 120,
       isPublic: false,
-      detailsText: "Build landing page and send draft by next week.",
+      detailsText: "Build landing page and send draft by next week",
     },
   });
 
@@ -75,7 +75,7 @@ test("shared fulfilled history with same counterparty increases score", () => {
       hasDeadline: true,
       hoursToDeadline: 120,
       isPublic: false,
-      detailsText: "Detailed scope and deliverables included here to avoid ambiguity.",
+      detailsText: "Detailed scope and deliverables included here to avoid ambiguity",
     },
   });
 
@@ -95,11 +95,49 @@ test("shared fulfilled history with same counterparty increases score", () => {
       hasDeadline: true,
       hoursToDeadline: 120,
       isPublic: false,
-      detailsText: "Detailed scope and deliverables included here to avoid ambiguity.",
+      detailsText: "Detailed scope and deliverables included here to avoid ambiguity",
     },
   });
 
   assert.ok(withHistory.score > withoutHistory.score);
+});
+
+test("unknown counterparty gets stronger penalty than known new counterparty", () => {
+  const unknownCounterparty = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 90,
+      completionRate: 90,
+      disputeRate: 5,
+      finalizedDealsCount: 20,
+    },
+    deal: {
+      hasDeadline: true,
+      hoursToDeadline: 120,
+      isPublic: true,
+      detailsText: "Detailed scope with milestones and acceptance criteria for each step",
+    },
+  });
+
+  const knownButNewCounterparty = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 90,
+      completionRate: 90,
+      disputeRate: 5,
+      finalizedDealsCount: 20,
+    },
+    counterpartyMetrics: {
+      priorFulfilledTogether: 0,
+      isPublicProfile: false,
+    },
+    deal: {
+      hasDeadline: true,
+      hoursToDeadline: 120,
+      isPublic: true,
+      detailsText: "Detailed scope with milestones and acceptance criteria for each step",
+    },
+  });
+
+  assert.ok(unknownCounterparty.score < knownButNewCounterparty.score);
 });
 
 test("very short deadline applies clear penalty", () => {
@@ -108,7 +146,7 @@ test("very short deadline applies clear penalty", () => {
       hasDeadline: true,
       hoursToDeadline: 100,
       isPublic: false,
-      detailsText: "Write complete scope for this agreement with milestones and checks.",
+      detailsText: "Write complete scope for this agreement with milestones and checks",
     },
   });
   const aggressive = generateDealPrediction({
@@ -116,7 +154,7 @@ test("very short deadline applies clear penalty", () => {
       hasDeadline: true,
       hoursToDeadline: 8,
       isPublic: false,
-      detailsText: "Write complete scope for this agreement with milestones and checks.",
+      detailsText: "Write complete scope for this agreement with milestones and checks",
     },
   });
 
@@ -157,7 +195,7 @@ test("dispute rate at exactly 10% does not trigger dispute risk reason", () => {
       hasDeadline: true,
       hoursToDeadline: 96,
       isPublic: false,
-      detailsText: "Detailed description with enough context to be clear for both sides.",
+      detailsText: "Detailed description with enough context to be clear for both sides",
     },
   });
 
@@ -176,7 +214,7 @@ test("dispute rate below 20% does not trigger dispute risk reason", () => {
       hasDeadline: true,
       hoursToDeadline: 96,
       isPublic: false,
-      detailsText: "Detailed description with enough context to be clear for both sides.",
+      detailsText: "Detailed description with enough context to be clear for both sides",
     },
   });
 

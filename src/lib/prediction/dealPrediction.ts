@@ -209,6 +209,8 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
     if (counterparty.priorFulfilledTogether >= 3) addModifier("counterparty_prior_fulfilled_together", 8, "deep_shared_history");
     else if (counterparty.priorFulfilledTogether >= 1) addModifier("counterparty_prior_fulfilled_together", 4, "some_shared_history");
     else addModifier("counterparty_prior_fulfilled_together", -3, "new_counterparty");
+  } else {
+    addModifier("counterparty_unknown", -8, "new_counterparty");
   }
 
   if (counterparty?.isPublicProfile && typeof counterparty.responseRate === "number") {
