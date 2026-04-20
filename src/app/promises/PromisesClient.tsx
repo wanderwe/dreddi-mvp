@@ -66,7 +66,11 @@ type StatusFilter =
   | "overdue"
   | "needs_review"
   | "confirmed"
-  | "disputed";
+  | "disputed"
+  | "awaiting_acceptance"
+  | "declined"
+  | "expired"
+  | "cancelled_by_creator";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -149,6 +153,10 @@ export default function PromisesClient() {
     if (statusParam === "needs_review") return "needs_review";
     if (statusParam === "confirmed") return "confirmed";
     if (statusParam === "disputed") return "disputed";
+    if (statusParam === "awaiting_acceptance") return "awaiting_acceptance";
+    if (statusParam === "declined") return "declined";
+    if (statusParam === "expired") return "expired";
+    if (statusParam === "cancelled_by_creator") return "cancelled_by_creator";
     return "all";
   })();
 
@@ -546,6 +554,10 @@ export default function PromisesClient() {
     if (status === "needs_review") return row.uiStatus === "completed_by_promisor";
     if (status === "confirmed") return row.uiStatus === "confirmed";
     if (status === "disputed") return row.uiStatus === "disputed";
+    if (status === "awaiting_acceptance") return row.uiStatus === "awaiting_acceptance";
+    if (status === "declined") return row.uiStatus === "declined";
+    if (status === "expired") return row.uiStatus === "expired";
+    if (status === "cancelled_by_creator") return row.uiStatus === "cancelled_by_creator";
     return false;
   };
 
@@ -605,7 +617,17 @@ export default function PromisesClient() {
   const rows = filteredListRowsByTab[tab];
   const metricRowsForCurrentTab = metricFilteredListRowsByTab[tab];
   const availableStatusValues = useMemo(() => {
-    const ordered: StatusFilter[] = ["active", "overdue", "needs_review", "confirmed", "disputed"];
+    const ordered: StatusFilter[] = [
+      "active",
+      "overdue",
+      "needs_review",
+      "confirmed",
+      "disputed",
+      "awaiting_acceptance",
+      "declined",
+      "expired",
+      "cancelled_by_creator",
+    ];
     return ordered.filter((status) =>
       metricRowsForCurrentTab.some((row) => matchesStatusFilter(row, status))
     );
@@ -788,6 +810,10 @@ export default function PromisesClient() {
       needs_review: t("promises.list.statusFilter.options.needsReview"),
       confirmed: t("promises.list.statusFilter.options.confirmed"),
       disputed: t("promises.list.statusFilter.options.disputed"),
+      awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+      declined: t("promises.inviteStatus.declined"),
+      expired: t("promises.inviteStatus.expired"),
+      cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
     };
 
     return [
