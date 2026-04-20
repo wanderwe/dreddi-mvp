@@ -84,7 +84,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "Легкий трекер домовленостей",
       headline: "Домовленість починається з підтвердження",
       description:
-        "Більшість домовленостей ніколи не виконуються,\nпросто тому, що їх ніде не зафіксовано.\n\nБез контрактів. Без тиску.\nАле з видимими наслідками для репутації.",
+        "Більшість домовленостей не виконуються\nбо їх ніде не зафіксовано\n\nІ з часом уже ніхто не розуміє, що сталося насправді\n— незалежно від того, кому ви довіряли",
       whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
@@ -179,7 +179,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
-        "Most agreements are never fulfilled,\nsimply because they are never recorded.\n\nNo contracts. No pressure.\nBut visible consequences for reputation.",
+        "Most agreements are never fulfilled\nbecause they are never recorded\n\nAnd over time, no one knows what actually happened\n— no matter who you trusted",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
