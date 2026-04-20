@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -233,6 +233,9 @@ export default function PromisesClient() {
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const statusMenuRef = useRef<HTMLDivElement | null>(null);
+  const statusButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -428,6 +431,29 @@ export default function PromisesClient() {
     const timer = setTimeout(() => setToast(null), 1800);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  useEffect(() => {
+    if (!isStatusMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (statusMenuRef.current?.contains(target)) return;
+      if (statusButtonRef.current?.contains(target)) return;
+      setIsStatusMenuOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsStatusMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isStatusMenuOpen]);
 
   useEffect(() => {
     setActiveMetricFilter(metricFromSearch);
@@ -733,11 +759,27 @@ export default function PromisesClient() {
 
   const handleStatusFilterChange = (next: StatusFilter) => {
     setActiveStatusFilter(next);
+    setIsStatusMenuOpen(false);
     const sp = new URLSearchParams(searchParams.toString());
     if (next === "all") sp.delete("status");
     else sp.set("status", next);
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
+
+  const statusOptions: Array<{ value: StatusFilter; label: string }> = [
+    { value: "all", label: t("promises.list.statusFilter.options.all") },
+    { value: "active", label: t("promises.list.statusFilter.options.active") },
+    { value: "overdue", label: t("promises.list.statusFilter.options.overdue") },
+    { value: "awaiting_acceptance", label: t("promises.list.statusFilter.options.awaitingAcceptance") },
+    { value: "needs_review", label: t("promises.list.statusFilter.options.needsReview") },
+    { value: "confirmed", label: t("promises.list.statusFilter.options.confirmed") },
+    { value: "disputed", label: t("promises.list.statusFilter.options.disputed") },
+    { value: "withdrawn", label: t("promises.list.statusFilter.options.withdrawn") },
+    { value: "closed", label: t("promises.list.statusFilter.options.closed") },
+  ];
+  const activeStatusLabel =
+    statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
+    t("promises.list.statusFilter.options.all");
 
   return (
     <main className="relative py-10">
@@ -849,43 +891,53 @@ export default function PromisesClient() {
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
 
-            <label className="sm:ml-auto">
+            <div className="relative sm:ml-auto" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
-              <select
-                value={activeStatusFilter}
-                onChange={(event) => handleStatusFilterChange(event.target.value as StatusFilter)}
-                className="min-h-12 w-full cursor-pointer rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
+              <button
+                type="button"
+                ref={statusButtonRef}
+                onClick={() => setIsStatusMenuOpen((open) => !open)}
+                aria-haspopup="listbox"
+                aria-expanded={isStatusMenuOpen}
                 aria-label={t("promises.list.statusFilter.label")}
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
               >
-                <option value="all" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.all")}
-                </option>
-                <option value="active" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.active")}
-                </option>
-                <option value="overdue" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.overdue")}
-                </option>
-                <option value="awaiting_acceptance" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.awaitingAcceptance")}
-                </option>
-                <option value="needs_review" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.needsReview")}
-                </option>
-                <option value="confirmed" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.confirmed")}
-                </option>
-                <option value="disputed" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.disputed")}
-                </option>
-                <option value="withdrawn" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.withdrawn")}
-                </option>
-                <option value="closed" className="bg-slate-900 text-white">
-                  {t("promises.list.statusFilter.options.closed")}
-                </option>
-              </select>
-            </label>
+                <span className="truncate">{activeStatusLabel}</span>
+                <ChevronDown
+                  className={`h-4 w-4 text-slate-300 transition-transform ${isStatusMenuOpen ? "rotate-180" : ""}`}
+                  aria-hidden
+                />
+              </button>
+
+              {isStatusMenuOpen && (
+                <div
+                  role="listbox"
+                  aria-label={t("promises.list.statusFilter.label")}
+                  className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                >
+                  {statusOptions.map((option) => {
+                    const selected = option.value === activeStatusFilter;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="option"
+                        aria-selected={selected}
+                        onClick={() => handleStatusFilterChange(option.value)}
+                        className={[
+                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                          selected
+                            ? "bg-emerald-400/90 text-slate-950"
+                            : "text-slate-100 hover:bg-white/10",
+                        ].join(" ")}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {error && (
