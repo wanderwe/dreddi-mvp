@@ -64,12 +64,10 @@ type StatusFilter =
   | "all"
   | "active"
   | "overdue"
-  | "awaiting_acceptance"
   | "needs_review"
   | "confirmed"
   | "disputed"
-  | "withdrawn"
-  | "closed";
+  | "invite_issues";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -146,17 +144,22 @@ export default function PromisesClient() {
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
-  const statusFromSearch: StatusFilter =
-    statusParam === "active" ||
-    statusParam === "overdue" ||
-    statusParam === "awaiting_acceptance" ||
-    statusParam === "needs_review" ||
-    statusParam === "confirmed" ||
-    statusParam === "disputed" ||
-    statusParam === "withdrawn" ||
-    statusParam === "closed"
-      ? statusParam
-      : "all";
+  const statusFromSearch: StatusFilter = (() => {
+    if (statusParam === "active") return "active";
+    if (statusParam === "overdue") return "overdue";
+    if (statusParam === "needs_review") return "needs_review";
+    if (statusParam === "confirmed") return "confirmed";
+    if (statusParam === "disputed") return "disputed";
+    if (
+      statusParam === "invite_issues" ||
+      statusParam === "awaiting_acceptance" ||
+      statusParam === "withdrawn" ||
+      statusParam === "closed"
+    ) {
+      return "invite_issues";
+    }
+    return "all";
+  })();
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -549,19 +552,16 @@ export default function PromisesClient() {
       filtered = filtered.filter((row) => row.uiStatus === "active");
     } else if (activeStatusFilter === "overdue") {
       filtered = filtered.filter((row) => isOverdue(row));
-    } else if (activeStatusFilter === "awaiting_acceptance") {
-      filtered = filtered.filter((row) => row.uiStatus === "awaiting_acceptance");
     } else if (activeStatusFilter === "needs_review") {
       filtered = filtered.filter((row) => row.uiStatus === "completed_by_promisor");
     } else if (activeStatusFilter === "confirmed") {
       filtered = filtered.filter((row) => row.uiStatus === "confirmed");
     } else if (activeStatusFilter === "disputed") {
       filtered = filtered.filter((row) => row.uiStatus === "disputed");
-    } else if (activeStatusFilter === "withdrawn") {
-      filtered = filtered.filter((row) => row.uiStatus === "cancelled_by_creator");
-    } else if (activeStatusFilter === "closed") {
+    } else if (activeStatusFilter === "invite_issues") {
       filtered = filtered.filter(
         (row) =>
+          row.uiStatus === "awaiting_acceptance" ||
           row.uiStatus === "declined" ||
           row.uiStatus === "expired" ||
           row.uiStatus === "cancelled_by_creator"
@@ -770,12 +770,10 @@ export default function PromisesClient() {
     { value: "all", label: t("promises.list.statusFilter.options.all") },
     { value: "active", label: t("promises.list.statusFilter.options.active") },
     { value: "overdue", label: t("promises.list.statusFilter.options.overdue") },
-    { value: "awaiting_acceptance", label: t("promises.list.statusFilter.options.awaitingAcceptance") },
     { value: "needs_review", label: t("promises.list.statusFilter.options.needsReview") },
     { value: "confirmed", label: t("promises.list.statusFilter.options.confirmed") },
     { value: "disputed", label: t("promises.list.statusFilter.options.disputed") },
-    { value: "withdrawn", label: t("promises.list.statusFilter.options.withdrawn") },
-    { value: "closed", label: t("promises.list.statusFilter.options.closed") },
+    { value: "invite_issues", label: t("promises.list.statusFilter.options.inviteIssues") },
   ];
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??

@@ -168,6 +168,7 @@
           "needsReview": "Needs review",
           "confirmed": "Kept",
           "disputed": "Disputed",
+          "inviteIssues": "Invite issues",
           "withdrawn": "Withdrawn",
           "closed": "Closed invites"
         }
