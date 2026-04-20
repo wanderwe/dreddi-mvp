@@ -804,7 +804,10 @@ export default function PromisesClient() {
                 const canSendReminder = getNextActionOwner(p, userId) === "other";
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const isArchivedInviteStatus =
-                  p.uiStatus === "expired" || p.uiStatus === "cancelled_by_creator";
+                  p.status === "declined" ||
+                  p.uiStatus === "declined" ||
+                  p.uiStatus === "expired" ||
+                  p.uiStatus === "cancelled_by_creator";
                 const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
                 const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
                 const reminderTooltip = reminderInfo.lastSentAt
