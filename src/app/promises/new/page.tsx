@@ -58,6 +58,9 @@ export default function NewPromisePage() {
     }>
   >([]);
   const [isCounterpartySearching, setIsCounterpartySearching] = useState(false);
+  const [groups, setGroups] = useState<Array<{ id: string; title: string }>>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  const [isGroupsLoading, setIsGroupsLoading] = useState(true);
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -493,6 +496,47 @@ export default function NewPromisePage() {
   }, [isPublicProfile]);
 
   useEffect(() => {
+    let active = true;
+
+    const loadGroups = async () => {
+      setIsGroupsLoading(true);
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        if (active) setIsGroupsLoading(false);
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        if (active) {
+          setGroups([]);
+          setIsGroupsLoading(false);
+        }
+        return;
+      }
+
+      const { data } = await supabase
+        .from("promise_groups")
+        .select("id,title")
+        .eq("owner_user_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      if (!active) return;
+      setGroups((data ?? []) as Array<{ id: string; title: string }>);
+      setIsGroupsLoading(false);
+    };
+
+    void loadGroups();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (selectedCounterparty || counterpartyQuery.trim().length < 2) {
       setCounterpartyResults([]);
       setIsCounterpartySearching(false);
@@ -628,7 +672,7 @@ export default function NewPromisePage() {
       const { data: sourceDeal } = await supabase
         .from("promises")
         .select(
-          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+          "id,title,details,condition_text,counterparty_id,due_at,visibility,group_id,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
         )
         .eq("id", fromPromiseId)
         .eq("creator_id", session.user.id)
@@ -647,6 +691,7 @@ export default function NewPromisePage() {
       setConditionText(nextCondition);
       setShowCondition(nextCondition.trim().length > 0);
       setIsPublicDeal(sourceDeal.visibility === "public");
+      setSelectedGroupId(sourceDeal.group_id ?? "");
 
       if (sourceDeal.due_at) {
         const dueDate = new Date(sourceDeal.due_at);
@@ -738,6 +783,7 @@ export default function NewPromisePage() {
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
+      groupId: selectedGroupId || null,
     };
 
     let res: Response;
@@ -854,6 +900,33 @@ export default function NewPromisePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.group")}
+              </span>
+              <select
+                className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                value={selectedGroupId}
+                onChange={(e) => setSelectedGroupId(e.target.value)}
+                disabled={isGroupsLoading}
+              >
+                <option value="" className="bg-slate-900 text-slate-100">
+                  {t("promises.new.group.none")}
+                </option>
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id} className="bg-slate-900 text-slate-100">
+                    {group.title}
+                  </option>
+                ))}
+              </select>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>{t("promises.new.group.helper")}</span>
+                <LocalizedLink href="/promises/groups" className="text-emerald-200 hover:text-emerald-100">
+                  {t("promises.new.group.manage")}
+                </LocalizedLink>
+              </div>
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">

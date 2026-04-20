@@ -187,6 +187,9 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
+                  <LocalizedLink className={linkBaseClasses} href="/promises/groups">
+                    {t("nav.groups")}
+                  </LocalizedLink>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}

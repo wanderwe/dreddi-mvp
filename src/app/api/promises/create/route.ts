@@ -13,6 +13,7 @@ type CreatePromisePayload = {
   dueAt?: string | null;
   executor?: "me" | "other";
   visibility?: "private" | "public";
+  groupId?: string | null;
 };
 
 export async function POST(req: Request) {
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
 
     const admin = getAdminClient();
     const requestedVisibility = body?.visibility === "private" ? "private" : "public";
+    const groupId = body?.groupId?.trim() || null;
 
     const { data: profileRow } = await admin
       .from("profiles")
@@ -53,6 +55,19 @@ export async function POST(req: Request) {
 
     const visibility =
       requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
+
+    if (groupId) {
+      const { data: groupRow } = await admin
+        .from("promise_groups")
+        .select("id")
+        .eq("id", groupId)
+        .eq("owner_user_id", user.id)
+        .maybeSingle();
+
+      if (!groupRow?.id) {
+        return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      }
+    }
 
     let counterpartyProfile: { id: string } | null = null;
     if (secondPartyUserId) {
@@ -88,6 +103,7 @@ export async function POST(req: Request) {
       cancelled_at: null,
       visibility,
       promise_mode: "deal",
+      group_id: groupId,
     };
 
     const { data: insertData, error: insertError } = await admin

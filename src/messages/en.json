@@ -14,7 +14,8 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "actionQueueBadge": "Action required",
-    "sendFeedback": "Send feedback"
+    "sendFeedback": "Send feedback",
+    "groups": "Groups"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -393,7 +394,8 @@
         "reward": "Reward (optional)",
         "rewardHelper": "Add an amount + currency or describe the reward in text",
         "rewardText": "Reward details (optional)",
-        "paymentTerms": "Payment terms (optional)"
+        "paymentTerms": "Payment terms (optional)",
+        "group": "Group"
       },
       "executor": {
         "me": "Me",
@@ -473,6 +475,11 @@
           "unclearDetails": "unclear deal details increase ambiguity",
           "publicCommitment": "public commitment adds accountability"
         }
+      },
+      "group": {
+        "none": "No group",
+        "helper": "Optional: attach this deal to a group to view related context together.",
+        "manage": "Manage groups"
       }
     },
     "actionQueue": {
@@ -862,6 +869,42 @@
     },
     "errors": {
       "submitFailed": "Failed to send feedback"
+    }
+  },
+  "groups": {
+    "eyebrow": "GROUPS",
+    "title": "Deal groups",
+    "subtitle": "A lightweight way to organize related deals in one list without boards or extra workflow stages.",
+    "back": "Back to groups",
+    "loading": "Loading groups…",
+    "empty": "No groups yet. Create your first group for related deals.",
+    "dealsTitle": "Deals in this group",
+    "dealsEmpty": "No deals in this group yet.",
+    "create": {
+      "title": "Create group",
+      "titlePlaceholder": "Example: Launch preparation",
+      "descriptionPlaceholder": "Short description (optional)",
+      "submit": "Create group",
+      "creating": "Creating…"
+    },
+    "list": {
+      "title": "Your groups ({count})"
+    },
+    "summary": {
+      "total": "Total deals: {count}",
+      "awaitingAcceptance": "Awaiting acceptance: {count}",
+      "active": "Active: {count}",
+      "awaitingReview": "Awaiting review: {count}",
+      "confirmed": "Fulfilled: {count}",
+      "disputed": "Disputed: {count}"
+    },
+    "dealLine": {
+      "iAmResponsible": "You are the responsible side",
+      "otherResponsible": "The other side is responsible"
+    },
+    "errors": {
+      "createFailed": "Could not create group",
+      "notFound": "Group not found or unavailable"
     }
   }
 }
