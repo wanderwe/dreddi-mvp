@@ -65,6 +65,10 @@ type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
   | "status"
+  | "created_at"
+  | "completed_at"
+  | "confirmed_at"
+  | "disputed_at"
   | "counterparty_accepted_at"
   | "invite_status"
   | "invited_at"
@@ -290,7 +294,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -467,11 +471,15 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (listLoading) return;
-    const sourceRows = listRowsByTab[tab] ?? [];
-    const filteredRows = applyListFilters(sourceRows);
+    const summaryRowsForCurrentTab = filteredSummaryRows.filter((row) =>
+      tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+    );
+    const filteredRows = hasAnyFilter
+      ? applyStatusFilter(summaryRowsForCurrentTab)
+      : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, tab]);
+  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, tab, filteredSummaryRows]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -608,9 +616,9 @@ export default function PromisesClient() {
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
+  const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
 
-  const rows = filteredListRowsByTab[tab];
-  const metricRowsForCurrentTab = metricFilteredListRowsByTab[tab];
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
       filteredSummaryRows.filter((row) =>
@@ -618,6 +626,13 @@ export default function PromisesClient() {
       ),
     [filteredSummaryRows, tab]
   );
+  const summaryRowsForCurrentTab = useMemo(
+    () => applyStatusFilter(metricSummaryRowsForCurrentTab),
+    [metricSummaryRowsForCurrentTab, activeStatusFilter]
+  );
+  const rows = hasAnyFilter
+    ? (summaryRowsForCurrentTab as PromiseWithRole[])
+    : filteredListRowsByTab[tab];
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -633,16 +648,13 @@ export default function PromisesClient() {
 
     return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
-  const totalRowsForCurrentView = applyStatusFilter(metricSummaryRowsForCurrentTab).length;
-  const canLoadMore = hasMoreByTab[tab] && metricRowsForCurrentTab.length < totalRowsForCurrentView;
+  const canLoadMore = !hasAnyFilter && hasMoreByTab[tab];
   const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
   const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
-  const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
   const showAllActionWithFilters = isListEmpty && totalPromises > 0 && hasAnyFilter;
   const emptyTitle = isGlobalEmpty
     ? t("promises.empty.title")
