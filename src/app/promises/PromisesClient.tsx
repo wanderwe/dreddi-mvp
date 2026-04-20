@@ -530,27 +530,31 @@ export default function PromisesClient() {
     return filtered;
   };
 
-  const applyStatusFilter = <T extends PromiseSummary | PromiseWithRole>(
-    rows: T[]
-  ): T[] => {
-    const isOverdue = (row: T) => {
-      if (row.uiStatus !== "active") return false;
-      if (!row.due_at) return false;
-      return new Date(row.due_at).getTime() < Date.now();
-    };
+  const isOverdueRow = <T extends PromiseSummary | PromiseWithRole>(row: T) => {
+    if (row.uiStatus !== "active") return false;
+    if (!row.due_at) return false;
+    return new Date(row.due_at).getTime() < Date.now();
+  };
+
+  const matchesStatusFilter = <T extends PromiseSummary | PromiseWithRole>(
+    row: T,
+    status: StatusFilter
+  ) => {
+    if (status === "all") return true;
+    if (status === "active") return row.uiStatus === "active";
+    if (status === "overdue") return isOverdueRow(row);
+    if (status === "needs_review") return row.uiStatus === "completed_by_promisor";
+    if (status === "confirmed") return row.uiStatus === "confirmed";
+    if (status === "disputed") return row.uiStatus === "disputed";
+    return false;
+  };
+
+  const applyStatusFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
 
     let filtered = rows;
 
-    if (activeStatusFilter === "active") {
-      filtered = filtered.filter((row) => row.uiStatus === "active");
-    } else if (activeStatusFilter === "overdue") {
-      filtered = filtered.filter((row) => isOverdue(row));
-    } else if (activeStatusFilter === "needs_review") {
-      filtered = filtered.filter((row) => row.uiStatus === "completed_by_promisor");
-    } else if (activeStatusFilter === "confirmed") {
-      filtered = filtered.filter((row) => row.uiStatus === "confirmed");
-    } else if (activeStatusFilter === "disputed") {
-      filtered = filtered.filter((row) => row.uiStatus === "disputed");
+    if (activeStatusFilter !== "all") {
+      filtered = filtered.filter((row) => matchesStatusFilter(row, activeStatusFilter));
     }
 
     return filtered;
@@ -600,6 +604,12 @@ export default function PromisesClient() {
 
   const rows = filteredListRowsByTab[tab];
   const metricRowsForCurrentTab = metricFilteredListRowsByTab[tab];
+  const availableStatusValues = useMemo(() => {
+    const ordered: StatusFilter[] = ["active", "overdue", "needs_review", "confirmed", "disputed"];
+    return ordered.filter((status) =>
+      metricRowsForCurrentTab.some((row) => matchesStatusFilter(row, status))
+    );
+  }, [metricRowsForCurrentTab]);
   const totalRowsForCurrentView = tab === "i-promised" ? countMeExecutor : countOtherExecutor;
   const canLoadMore = hasMoreByTab[tab] && metricRowsForCurrentTab.length < totalRowsForCurrentView;
   const totalPromises = summaryRows.length;
@@ -764,14 +774,30 @@ export default function PromisesClient() {
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
-  const statusOptions: Array<{ value: StatusFilter; label: string }> = [
-    { value: "all", label: t("promises.list.statusFilter.options.all") },
-    { value: "active", label: t("promises.list.statusFilter.options.active") },
-    { value: "overdue", label: t("promises.list.statusFilter.options.overdue") },
-    { value: "needs_review", label: t("promises.list.statusFilter.options.needsReview") },
-    { value: "confirmed", label: t("promises.list.statusFilter.options.confirmed") },
-    { value: "disputed", label: t("promises.list.statusFilter.options.disputed") },
-  ];
+  useEffect(() => {
+    if (activeStatusFilter === "all") return;
+    if (availableStatusValues.includes(activeStatusFilter)) return;
+    handleStatusFilterChange("all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStatusFilter, availableStatusValues]);
+
+  const statusOptions: Array<{ value: StatusFilter; label: string }> = useMemo(() => {
+    const optionLabels: Record<Exclude<StatusFilter, "all">, string> = {
+      active: t("promises.list.statusFilter.options.active"),
+      overdue: t("promises.list.statusFilter.options.overdue"),
+      needs_review: t("promises.list.statusFilter.options.needsReview"),
+      confirmed: t("promises.list.statusFilter.options.confirmed"),
+      disputed: t("promises.list.statusFilter.options.disputed"),
+    };
+
+    return [
+      { value: "all", label: t("promises.list.statusFilter.options.all") },
+      ...availableStatusValues.map((status) => ({
+        value: status,
+        label: optionLabels[status],
+      })),
+    ];
+  }, [availableStatusValues, t]);
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
     t("promises.list.statusFilter.options.all");
