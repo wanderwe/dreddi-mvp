@@ -166,6 +166,20 @@
         "executorMe": "Я виконавець ({count})",
         "executorOther": "Інший виконавець ({count})"
       },
+      "statusFilter": {
+        "label": "Фільтр за статусом",
+        "options": {
+          "all": "Усі статуси",
+          "active": "Активні",
+          "overdue": "Прострочені",
+          "awaitingAcceptance": "Очікує прийняття",
+          "needsReview": "Очікує перегляду",
+          "confirmed": "Дотримано",
+          "disputed": "Оскаржено",
+          "withdrawn": "Відкликані",
+          "closed": "Закриті запрошення"
+        }
+      },
       "cardLabel": "Угода",
       "dueLabel": "Строк",
       "noDeadline": "Без строку",

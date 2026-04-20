@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -60,6 +60,13 @@ const normalizeTabParam = (value: string | null): TabKey => {
 };
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
+type StatusFilter =
+  | "all"
+  | "active"
+  | "overdue"
+  | "needs_review"
+  | "confirmed"
+  | "disputed";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -131,10 +138,19 @@ export default function PromisesClient() {
 
   const tab = normalizeTabParam(searchParams.get("tab"));
   const filterParam = searchParams.get("filter");
+  const statusParam = searchParams.get("status");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
+  const statusFromSearch: StatusFilter = (() => {
+    if (statusParam === "active") return "active";
+    if (statusParam === "overdue") return "overdue";
+    if (statusParam === "needs_review") return "needs_review";
+    if (statusParam === "confirmed") return "confirmed";
+    if (statusParam === "disputed") return "disputed";
+    return "all";
+  })();
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -207,9 +223,13 @@ export default function PromisesClient() {
   const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const statusMenuRef = useRef<HTMLDivElement | null>(null);
+  const statusButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -407,8 +427,35 @@ export default function PromisesClient() {
   }, [toast]);
 
   useEffect(() => {
+    if (!isStatusMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (statusMenuRef.current?.contains(target)) return;
+      if (statusButtonRef.current?.contains(target)) return;
+      setIsStatusMenuOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsStatusMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isStatusMenuOpen]);
+
+  useEffect(() => {
     setActiveMetricFilter(metricFromSearch);
   }, [metricFromSearch]);
+
+  useEffect(() => {
+    setActiveStatusFilter(statusFromSearch);
+  }, [statusFromSearch]);
 
   useEffect(() => {
     if (listLoading) return;
@@ -474,21 +521,42 @@ export default function PromisesClient() {
     return diff < 24 * 60 * 60 * 1000;
   };
 
-  const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
+  const applyFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
   ): T[] => {
+    let filtered = rows;
+
     if (activeMetricFilter === "awaiting_my_action") {
-      return rows.filter((row) => isAwaitingYourAction(row));
+      filtered = filtered.filter((row) => isAwaitingYourAction(row));
     }
     if (activeMetricFilter === "awaiting_others") {
-      return rows.filter((row) => isAwaitingOthers(row));
+      filtered = filtered.filter((row) => isAwaitingOthers(row));
     }
-    return rows;
+
+    const isOverdue = (row: T) => {
+      if (row.uiStatus !== "active") return false;
+      if (!row.due_at) return false;
+      return new Date(row.due_at).getTime() < Date.now();
+    };
+
+    if (activeStatusFilter === "active") {
+      filtered = filtered.filter((row) => row.uiStatus === "active");
+    } else if (activeStatusFilter === "overdue") {
+      filtered = filtered.filter((row) => isOverdue(row));
+    } else if (activeStatusFilter === "needs_review") {
+      filtered = filtered.filter((row) => row.uiStatus === "completed_by_promisor");
+    } else if (activeStatusFilter === "confirmed") {
+      filtered = filtered.filter((row) => row.uiStatus === "confirmed");
+    } else if (activeStatusFilter === "disputed") {
+      filtered = filtered.filter((row) => row.uiStatus === "disputed");
+    }
+
+    return filtered;
   };
 
   const filteredSummaryRows = useMemo(
-    () => applyMetricFilter(summaryRows),
-    [summaryRows, activeMetricFilter]
+    () => applyFilters(summaryRows),
+    [summaryRows, activeMetricFilter, activeStatusFilter]
   );
 
   const roleCounts = useMemo(
@@ -507,10 +575,10 @@ export default function PromisesClient() {
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
-      "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+      "i-promised": applyFilters(listRowsByTab["i-promised"]),
+      "promised-to-me": applyFilters(listRowsByTab["promised-to-me"]),
     }),
-    [listRowsByTab, activeMetricFilter]
+    [listRowsByTab, activeMetricFilter, activeStatusFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
@@ -525,7 +593,9 @@ export default function PromisesClient() {
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
   const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
-  const showAllAction = isListEmpty && totalPromises > 0 && activeMetricFilter !== "total";
+  const hasStatusFilter = activeStatusFilter !== "all";
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const showAllActionWithFilters = isListEmpty && totalPromises > 0 && hasAnyFilter;
   const emptyTitle = isGlobalEmpty
     ? t("promises.empty.title")
     : isAwaitingMyActionEmpty
@@ -670,6 +740,27 @@ export default function PromisesClient() {
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
+  const handleStatusFilterChange = (next: StatusFilter) => {
+    setActiveStatusFilter(next);
+    setIsStatusMenuOpen(false);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (next === "all") sp.delete("status");
+    else sp.set("status", next);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  };
+
+  const statusOptions: Array<{ value: StatusFilter; label: string }> = [
+    { value: "all", label: t("promises.list.statusFilter.options.all") },
+    { value: "active", label: t("promises.list.statusFilter.options.active") },
+    { value: "overdue", label: t("promises.list.statusFilter.options.overdue") },
+    { value: "needs_review", label: t("promises.list.statusFilter.options.needsReview") },
+    { value: "confirmed", label: t("promises.list.statusFilter.options.confirmed") },
+    { value: "disputed", label: t("promises.list.statusFilter.options.disputed") },
+  ];
+  const activeStatusLabel =
+    statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
+    t("promises.list.statusFilter.options.all");
+
   return (
     <main className="relative py-10">
       {toast && (
@@ -779,6 +870,54 @@ export default function PromisesClient() {
             >
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
+
+            <div className="relative sm:ml-auto" ref={statusMenuRef}>
+              <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
+              <button
+                type="button"
+                ref={statusButtonRef}
+                onClick={() => setIsStatusMenuOpen((open) => !open)}
+                aria-haspopup="listbox"
+                aria-expanded={isStatusMenuOpen}
+                aria-label={t("promises.list.statusFilter.label")}
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
+              >
+                <span className="truncate">{activeStatusLabel}</span>
+                <ChevronDown
+                  className={`h-4 w-4 text-slate-300 transition-transform ${isStatusMenuOpen ? "rotate-180" : ""}`}
+                  aria-hidden
+                />
+              </button>
+
+              {isStatusMenuOpen && (
+                <div
+                  role="listbox"
+                  aria-label={t("promises.list.statusFilter.label")}
+                  className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                >
+                  {statusOptions.map((option) => {
+                    const selected = option.value === activeStatusFilter;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        role="option"
+                        aria-selected={selected}
+                        onClick={() => handleStatusFilterChange(option.value)}
+                        className={[
+                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                          selected
+                            ? "bg-emerald-400/90 text-slate-950"
+                            : "text-slate-100 hover:bg-white/10",
+                        ].join(" ")}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {error && (
@@ -912,11 +1051,18 @@ export default function PromisesClient() {
                     </LocalizedLink>
                   </div>
                 )}
-                {isFilteredEmpty && showAllAction && (
+                {isFilteredEmpty && showAllActionWithFilters && (
                   <div className="mt-4">
                     <button
                       type="button"
-                      onClick={() => setActiveMetricFilter("total")}
+                      onClick={() => {
+                        setActiveMetricFilter("total");
+                        setActiveStatusFilter("all");
+                        const sp = new URLSearchParams(searchParams.toString());
+                        sp.delete("filter");
+                        sp.delete("status");
+                        router.push(localizePath(`/promises?${sp.toString()}`, locale));
+                      }}
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
                     >
                       {t("promises.empty.showAll")}
