@@ -166,7 +166,7 @@
           "overdue": "Overdue",
           "awaitingAcceptance": "Awaiting acceptance",
           "needsReview": "Needs review",
-          "confirmed": "Kept",
+          "confirmed": "Fulfilled",
           "disputed": "Disputed",
           "inviteIssues": "Invite issues",
           "withdrawn": "Withdrawn",
