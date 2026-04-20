@@ -179,7 +179,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       eyebrow: "A lightweight deal tracker",
       headline: "An agreement starts with confirmation",
       description:
-        "Track deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
+        "Record deals with friends, partners and clients.\nSimple, public or private — no contracts, no pressure.\nBut with visible consequences for reputation.",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
