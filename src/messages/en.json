@@ -155,8 +155,22 @@
     },
     "list": {
       "tabs": {
-        "executorMe": "I’m the executor ({count})",
+        "executorMe": "I'm the executor ({count})",
         "executorOther": "Other executor ({count})"
+      },
+      "statusFilter": {
+        "label": "Filter by status",
+        "options": {
+          "all": "All statuses",
+          "active": "Active",
+          "overdue": "Overdue",
+          "awaitingAcceptance": "Awaiting acceptance",
+          "needsReview": "Needs review",
+          "confirmed": "Kept",
+          "disputed": "Disputed",
+          "withdrawn": "Withdrawn",
+          "closed": "Closed invites"
+        }
       },
       "cardLabel": "Deal",
       "dueLabel": "Due",

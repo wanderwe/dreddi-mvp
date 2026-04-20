@@ -60,6 +60,16 @@ const normalizeTabParam = (value: string | null): TabKey => {
 };
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
+type StatusFilter =
+  | "all"
+  | "active"
+  | "overdue"
+  | "awaiting_acceptance"
+  | "needs_review"
+  | "confirmed"
+  | "disputed"
+  | "withdrawn"
+  | "closed";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -131,10 +141,22 @@ export default function PromisesClient() {
 
   const tab = normalizeTabParam(searchParams.get("tab"));
   const filterParam = searchParams.get("filter");
+  const statusParam = searchParams.get("status");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
+  const statusFromSearch: StatusFilter =
+    statusParam === "active" ||
+    statusParam === "overdue" ||
+    statusParam === "awaiting_acceptance" ||
+    statusParam === "needs_review" ||
+    statusParam === "confirmed" ||
+    statusParam === "disputed" ||
+    statusParam === "withdrawn" ||
+    statusParam === "closed"
+      ? statusParam
+      : "all";
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -207,6 +229,7 @@ export default function PromisesClient() {
   const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
@@ -411,6 +434,10 @@ export default function PromisesClient() {
   }, [metricFromSearch]);
 
   useEffect(() => {
+    setActiveStatusFilter(statusFromSearch);
+  }, [statusFromSearch]);
+
+  useEffect(() => {
     if (listLoading) return;
     const sourceRows = listRowsByTab[tab] ?? [];
     const filteredRows =
@@ -474,21 +501,53 @@ export default function PromisesClient() {
     return diff < 24 * 60 * 60 * 1000;
   };
 
-  const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
+  const applyFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
   ): T[] => {
+    let filtered = rows;
+
     if (activeMetricFilter === "awaiting_my_action") {
-      return rows.filter((row) => isAwaitingYourAction(row));
+      filtered = filtered.filter((row) => isAwaitingYourAction(row));
     }
     if (activeMetricFilter === "awaiting_others") {
-      return rows.filter((row) => isAwaitingOthers(row));
+      filtered = filtered.filter((row) => isAwaitingOthers(row));
     }
-    return rows;
+
+    const isOverdue = (row: T) => {
+      if (row.uiStatus !== "active") return false;
+      if (!row.due_at) return false;
+      return new Date(row.due_at).getTime() < Date.now();
+    };
+
+    if (activeStatusFilter === "active") {
+      filtered = filtered.filter((row) => row.uiStatus === "active");
+    } else if (activeStatusFilter === "overdue") {
+      filtered = filtered.filter((row) => isOverdue(row));
+    } else if (activeStatusFilter === "awaiting_acceptance") {
+      filtered = filtered.filter((row) => row.uiStatus === "awaiting_acceptance");
+    } else if (activeStatusFilter === "needs_review") {
+      filtered = filtered.filter((row) => row.uiStatus === "completed_by_promisor");
+    } else if (activeStatusFilter === "confirmed") {
+      filtered = filtered.filter((row) => row.uiStatus === "confirmed");
+    } else if (activeStatusFilter === "disputed") {
+      filtered = filtered.filter((row) => row.uiStatus === "disputed");
+    } else if (activeStatusFilter === "withdrawn") {
+      filtered = filtered.filter((row) => row.uiStatus === "cancelled_by_creator");
+    } else if (activeStatusFilter === "closed") {
+      filtered = filtered.filter(
+        (row) =>
+          row.uiStatus === "declined" ||
+          row.uiStatus === "expired" ||
+          row.uiStatus === "cancelled_by_creator"
+      );
+    }
+
+    return filtered;
   };
 
   const filteredSummaryRows = useMemo(
-    () => applyMetricFilter(summaryRows),
-    [summaryRows, activeMetricFilter]
+    () => applyFilters(summaryRows),
+    [summaryRows, activeMetricFilter, activeStatusFilter]
   );
 
   const roleCounts = useMemo(
@@ -507,10 +566,10 @@ export default function PromisesClient() {
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
-      "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+      "i-promised": applyFilters(listRowsByTab["i-promised"]),
+      "promised-to-me": applyFilters(listRowsByTab["promised-to-me"]),
     }),
-    [listRowsByTab, activeMetricFilter]
+    [listRowsByTab, activeMetricFilter, activeStatusFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
@@ -525,7 +584,9 @@ export default function PromisesClient() {
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
   const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
-  const showAllAction = isListEmpty && totalPromises > 0 && activeMetricFilter !== "total";
+  const hasStatusFilter = activeStatusFilter !== "all";
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const showAllActionWithFilters = isListEmpty && totalPromises > 0 && hasAnyFilter;
   const emptyTitle = isGlobalEmpty
     ? t("promises.empty.title")
     : isAwaitingMyActionEmpty
@@ -670,6 +731,14 @@ export default function PromisesClient() {
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
 
+  const handleStatusFilterChange = (next: StatusFilter) => {
+    setActiveStatusFilter(next);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (next === "all") sp.delete("status");
+    else sp.set("status", next);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  };
+
   return (
     <main className="relative py-10">
       {toast && (
@@ -779,6 +848,44 @@ export default function PromisesClient() {
             >
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
+
+            <label className="sm:ml-auto">
+              <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
+              <select
+                value={activeStatusFilter}
+                onChange={(event) => handleStatusFilterChange(event.target.value as StatusFilter)}
+                className="min-h-12 w-full cursor-pointer rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
+                aria-label={t("promises.list.statusFilter.label")}
+              >
+                <option value="all" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.all")}
+                </option>
+                <option value="active" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.active")}
+                </option>
+                <option value="overdue" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.overdue")}
+                </option>
+                <option value="awaiting_acceptance" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.awaitingAcceptance")}
+                </option>
+                <option value="needs_review" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.needsReview")}
+                </option>
+                <option value="confirmed" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.confirmed")}
+                </option>
+                <option value="disputed" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.disputed")}
+                </option>
+                <option value="withdrawn" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.withdrawn")}
+                </option>
+                <option value="closed" className="bg-slate-900 text-white">
+                  {t("promises.list.statusFilter.options.closed")}
+                </option>
+              </select>
+            </label>
           </div>
 
           {error && (
@@ -909,11 +1016,18 @@ export default function PromisesClient() {
                     </LocalizedLink>
                   </div>
                 )}
-                {isFilteredEmpty && showAllAction && (
+                {isFilteredEmpty && showAllActionWithFilters && (
                   <div className="mt-4">
                     <button
                       type="button"
-                      onClick={() => setActiveMetricFilter("total")}
+                      onClick={() => {
+                        setActiveMetricFilter("total");
+                        setActiveStatusFilter("all");
+                        const sp = new URLSearchParams(searchParams.toString());
+                        sp.delete("filter");
+                        sp.delete("status");
+                        router.push(localizePath(`/promises?${sp.toString()}`, locale));
+                      }}
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
                     >
                       {t("promises.empty.showAll")}
