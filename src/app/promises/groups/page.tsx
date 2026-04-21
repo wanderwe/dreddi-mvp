@@ -120,18 +120,13 @@ export default function PromiseGroupsPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
-          <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
-        </div>
-        <LocalizedLink
-          href={returnToPath}
-          className="rounded-xl border border-emerald-300/40 px-3 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-200 hover:bg-emerald-400/10"
-        >
-          {t("groups.backToDeal")}
-        </LocalizedLink>
+      <LocalizedLink href={returnToPath} className="text-sm text-emerald-200 hover:text-emerald-100">
+        ← {t("groups.backToDeal")}
+      </LocalizedLink>
+      <div className="mb-6 mt-4">
+        <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
+        <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
