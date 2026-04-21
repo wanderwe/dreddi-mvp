@@ -5,6 +5,7 @@ import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
+import { useSearchParams } from "next/navigation";
 
 type GroupRow = {
   id: string;
@@ -16,6 +17,12 @@ type GroupRow = {
 export default function PromiseGroupsPage() {
   const t = useT();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const rawReturnTo = searchParams?.get("returnTo");
+  const returnToPath =
+    rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//")
+      ? rawReturnTo
+      : "/promises/new";
   const [groups, setGroups] = useState<GroupRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -119,6 +126,12 @@ export default function PromiseGroupsPage() {
           <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
           <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
         </div>
+        <LocalizedLink
+          href={returnToPath}
+          className="rounded-xl border border-emerald-300/40 px-3 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-200 hover:bg-emerald-400/10"
+        >
+          {t("groups.backToDeal")}
+        </LocalizedLink>
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">

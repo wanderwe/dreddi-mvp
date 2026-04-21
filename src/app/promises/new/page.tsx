@@ -33,6 +33,7 @@ import {
 
 export default function NewPromisePage() {
   const PREFILL_MAX_RETRIES = 20;
+  const DEAL_DRAFT_STORAGE_KEY = "dreddi:new-promise-draft";
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
@@ -88,6 +89,7 @@ export default function NewPromisePage() {
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
   const prefillResolved = useRef(false);
+  const draftHydrated = useRef(false);
   const [prefillRetryTick, setPrefillRetryTick] = useState(0);
   const [showPrefillConfirmation, setShowPrefillConfirmation] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -664,6 +666,67 @@ export default function NewPromisePage() {
   }, [counterpartyResults, showCounterpartyDropdown]);
 
   useEffect(() => {
+    if (typeof window === "undefined" || draftHydrated.current) return;
+
+    try {
+      const rawDraft = window.sessionStorage.getItem(DEAL_DRAFT_STORAGE_KEY);
+      if (!rawDraft) return;
+      const parsedDraft = JSON.parse(rawDraft) as {
+        title?: string;
+        details?: string;
+        conditionText?: string;
+        selectedGroupId?: string;
+        dueAt?: string | null;
+        executor?: "me" | "other";
+        isPublicDeal?: boolean;
+        selectedCounterparty?: {
+          id: string;
+          handle: string;
+          displayName: string | null;
+          avatarUrl: string | null;
+        } | null;
+      };
+
+      setTitle(parsedDraft.title ?? "");
+      setDetails(parsedDraft.details ?? "");
+      setConditionText(parsedDraft.conditionText ?? "");
+      setShowCondition((parsedDraft.conditionText ?? "").trim().length > 0);
+      setSelectedGroupId(parsedDraft.selectedGroupId ?? "");
+      setExecutor(parsedDraft.executor === "other" ? "other" : "me");
+      setIsPublicDeal(parsedDraft.isPublicDeal ?? true);
+      setSelectedCounterparty(parsedDraft.selectedCounterparty ?? null);
+
+      if (parsedDraft.dueAt) {
+        const parsedDate = new Date(parsedDraft.dueAt);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          setDueAt(parsedDate);
+        }
+      }
+    } catch {
+      window.sessionStorage.removeItem(DEAL_DRAFT_STORAGE_KEY);
+    } finally {
+      draftHydrated.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !draftHydrated.current) return;
+
+    const draft = {
+      title,
+      details,
+      conditionText,
+      selectedGroupId,
+      dueAt: dueAt ? dueAt.toISOString() : null,
+      executor,
+      isPublicDeal,
+      selectedCounterparty,
+    };
+
+    window.sessionStorage.setItem(DEAL_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+  }, [conditionText, details, dueAt, executor, isPublicDeal, selectedCounterparty, selectedGroupId, title]);
+
+  useEffect(() => {
     prefillResolved.current = false;
     setPrefillRetryTick(0);
     setShowPrefillConfirmation(false);
@@ -856,6 +919,10 @@ export default function NewPromisePage() {
       return;
     }
 
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(DEAL_DRAFT_STORAGE_KEY);
+    }
+
     router.push(localizePath(`/promises/${body.id}`, locale));
   }
 
@@ -1003,7 +1070,10 @@ export default function NewPromisePage() {
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>{t("promises.new.group.helper")}</span>
-                <LocalizedLink href="/promises/groups" className="text-emerald-200 hover:text-emerald-100">
+                <LocalizedLink
+                  href="/promises/groups?returnTo=%2Fpromises%2Fnew"
+                  className="text-emerald-200 hover:text-emerald-100"
+                >
                   {t("promises.new.group.manage")}
                 </LocalizedLink>
               </div>
