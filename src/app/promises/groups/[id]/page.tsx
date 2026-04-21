@@ -519,13 +519,14 @@ export default function PromiseGroupDetailPage() {
                               {row.role === "promisor" ? t("groups.dealLine.iAmResponsible") : t("groups.dealLine.otherResponsible")}
                               {" • "}
                               {formatDealMeta({
-                                dueAt: row.due_at,
-                                createdAt: row.created_at,
-                                labels: {
-                                  created: (date) => t("deal.meta.created", { date }),
-                                  due: (date) => t("deal.meta.due", { date }),
-                                  closed: (date) => t("deal.meta.closed", { date }),
-                                },
+                                status: row.status,
+                                due_at: row.due_at,
+                                created_at: row.created_at,
+                                declined_at: row.declined_at,
+                              }, locale, {
+                                created: (date) => t("deal.meta.created", { date }),
+                                due: (date) => t("deal.meta.due", { date }),
+                                closed: (date) => t("deal.meta.closed", { date }),
                               })}
                             </p>
                           </LocalizedLink>
