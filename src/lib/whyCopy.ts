@@ -29,6 +29,10 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       { kind: "body", paragraphs: ["You agreed on something"] },
       { kind: "list", paragraphs: ["A deadline", "A result", "A responsibility"] },
       { kind: "turn", paragraphs: ["And then… nothing happens"] },
+      {
+        kind: "list",
+        paragraphs: ["I’ll do it tomorrow", "I’ll send it later", "Let’s follow up next week"],
+      },
       { kind: "list", paragraphs: ["No reminder", "No confirmation", "No clear outcome"] },
       { kind: "body", paragraphs: ["Just different memories of what was supposed to happen"] },
       {
@@ -67,6 +71,10 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       { kind: "body", paragraphs: ["Ви про щось домовилися"] },
       { kind: "list", paragraphs: ["Дедлайн", "Результат", "Відповідальність"] },
       { kind: "turn", paragraphs: ["А потім… нічого не відбувається"] },
+      {
+        kind: "list",
+        paragraphs: ["Зроблю завтра", "Скину пізніше", "Давай повернемось до цього наступного тижня"],
+      },
       { kind: "list", paragraphs: ["Нагадування немає", "Підтвердження немає", "Чіткого результату немає"] },
       { kind: "body", paragraphs: ["Лише різні спогади про те, що мало статися"] },
       {
