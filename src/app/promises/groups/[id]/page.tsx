@@ -8,7 +8,6 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole } from "@/lib/promiseActions";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
-import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDealMeta } from "@/lib/formatDealMeta";
@@ -139,11 +138,7 @@ export default function PromiseGroupDetailPage() {
             return {
               ...typed,
               role,
-              uiStatus: getPromiseUiStatus({
-                ...typed,
-                inviteStatus: getPromiseInviteStatus(typed),
-                isReviewer: role !== "promisor",
-              }),
+              uiStatus: getPromiseUiStatus(typed),
             };
           });
         setRows(normalized);
