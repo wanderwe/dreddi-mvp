@@ -20,9 +20,7 @@ export default function PromiseGroupsPage() {
   const searchParams = useSearchParams();
   const rawReturnTo = searchParams?.get("returnTo");
   const returnToPath =
-    rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//")
-      ? rawReturnTo
-      : "/promises/new";
+    rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : null;
   const [groups, setGroups] = useState<GroupRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -120,13 +118,22 @@ export default function PromiseGroupsPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-10">
-      <LocalizedLink href={returnToPath} className="text-sm text-emerald-200 hover:text-emerald-100">
-        ← {t("groups.backToDeal")}
-      </LocalizedLink>
-      <div className="mb-6 mt-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
-        <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
+      <div className="mb-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
+            <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
+            <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
+          </div>
+          {returnToPath && (
+            <LocalizedLink
+              href={returnToPath}
+              className="mt-1 shrink-0 text-sm text-emerald-200 hover:text-emerald-100"
+            >
+              ← {t("groups.backToDeal")}
+            </LocalizedLink>
+          )}
+        </div>
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
