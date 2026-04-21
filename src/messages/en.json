@@ -478,7 +478,7 @@
       },
       "group": {
         "none": "No group",
-        "helper": "Optional: attach this deal to a group to view related context together.",
+        "helper": "Optional: attach this deal to a group to view related context together",
         "manage": "Manage groups"
       }
     },
@@ -874,12 +874,12 @@
   "groups": {
     "eyebrow": "GROUPS",
     "title": "Deal groups",
-    "subtitle": "A lightweight way to organize related deals in one list without boards or extra workflow stages.",
+    "subtitle": "A lightweight way to organize related deals in one list without boards or extra workflow stages",
     "back": "Back to groups",
     "loading": "Loading groups…",
-    "empty": "No groups yet. Create your first group for related deals.",
+    "empty": "No groups yet. Create your first group for related deals",
     "dealsTitle": "Deals in this group",
-    "dealsEmpty": "No deals in this group yet.",
+    "dealsEmpty": "No deals in this group yet",
     "create": {
       "title": "Create group",
       "titlePlaceholder": "Example: Launch preparation",
