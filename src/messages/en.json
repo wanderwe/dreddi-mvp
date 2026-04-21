@@ -874,12 +874,16 @@
   "groups": {
     "eyebrow": "GROUPS",
     "title": "Deal groups",
-    "subtitle": "A lightweight way to organize related deals in one list without boards or extra workflow stages",
+    "subtitle": "A lightweight way to organize related deals in one list without boards and extra steps",
     "back": "Back to groups",
     "loading": "Loading groups…",
     "empty": "No groups yet. Create your first group for related deals",
     "dealsTitle": "Deals in this group",
     "dealsEmpty": "No deals in this group yet",
+    "deals": {
+      "unlink": "Unlink",
+      "unlinking": "Unlinking…"
+    },
     "attachExisting": {
       "title": "Add an existing deal",
       "hint": "Choose one of your previously created deals and attach it to this group",

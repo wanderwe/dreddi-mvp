@@ -70,6 +70,7 @@ export default function PromiseGroupDetailPage() {
   const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
   const [attaching, setAttaching] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
+  const [unlinkingDealId, setUnlinkingDealId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
@@ -293,6 +294,44 @@ export default function PromiseGroupDetailPage() {
     router.push(localizePath("/promises/groups", locale));
   };
 
+  const unlinkDealFromGroup = async (dealId: string) => {
+    if (!groupId) return;
+    setUnlinkingDealId(dealId);
+    setError(null);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setUnlinkingDealId(null);
+      setError(err instanceof Error ? err.message : "Authentication is unavailable.");
+      return;
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) {
+      setUnlinkingDealId(null);
+      return;
+    }
+
+    const { error: unlinkError } = await supabase
+      .from("promises")
+      .update({ group_id: null })
+      .eq("id", dealId)
+      .eq("creator_id", session.user.id)
+      .eq("group_id", groupId);
+
+    setUnlinkingDealId(null);
+
+    if (unlinkError) {
+      setError(unlinkError.message);
+      return;
+    }
+
+    setReloadTick((prev) => prev + 1);
+  };
+
   const summary = useMemo(() => {
     const counts = {
       awaiting_acceptance: 0,
@@ -477,12 +516,9 @@ export default function PromiseGroupDetailPage() {
                   const pill = statusPillFor(row.status, row.uiStatus);
                   return (
                     <li key={row.id}>
-                      <LocalizedLink
-                        href={`/promises/${row.id}`}
-                        className="block rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
-                      >
+                      <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5">
                         <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
+                          <LocalizedLink href={`/promises/${row.id}`} className="min-w-0 flex-1">
                             <p className="truncate font-semibold text-white">{row.title}</p>
                             <p className="mt-1 text-xs text-slate-400">
                               {row.role === "promisor" ? t("groups.dealLine.iAmResponsible") : t("groups.dealLine.otherResponsible")}
@@ -497,10 +533,22 @@ export default function PromiseGroupDetailPage() {
                                 },
                               })}
                             </p>
+                          </LocalizedLink>
+                          <div className="flex shrink-0 items-center gap-2">
+                            <StatusPill tone={pill.tone} icon={pill.icon} label={statusLabel(row)} />
+                            <button
+                              type="button"
+                              onClick={() => void unlinkDealFromGroup(row.id)}
+                              disabled={unlinkingDealId === row.id}
+                              className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {unlinkingDealId === row.id
+                                ? t("groups.deals.unlinking")
+                                : t("groups.deals.unlink")}
+                            </button>
                           </div>
-                          <StatusPill tone={pill.tone} icon={pill.icon} label={statusLabel(row)} />
                         </div>
-                      </LocalizedLink>
+                      </div>
                     </li>
                   );
                 })}
