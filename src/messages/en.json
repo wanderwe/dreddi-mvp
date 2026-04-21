@@ -884,8 +884,16 @@
       "title": "Add an existing deal",
       "hint": "Choose one of your previously created deals and attach it to this group",
       "empty": "No available deals to add",
+      "selectPlaceholder": "Select deal",
+      "searchPlaceholder": "Search by deal title",
+      "noMatches": "No deals found",
       "submit": "Add to group",
       "attaching": "Adding…"
+    },
+    "delete": {
+      "action": "Delete group",
+      "deleting": "Deleting…",
+      "confirm": "Delete group \"{title}\"? All deals will be unlinked from this group"
     },
     "create": {
       "title": "Create group",

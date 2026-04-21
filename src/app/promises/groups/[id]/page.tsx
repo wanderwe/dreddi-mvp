@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole } from "@/lib/promiseActions";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
@@ -12,6 +12,8 @@ import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDealMeta } from "@/lib/formatDealMeta";
+import { localizePath } from "@/lib/i18n/routing";
+import { ChevronDown } from "lucide-react";
 
 type DealRow = {
   id: string;
@@ -56,16 +58,23 @@ const statusPillFor = (
 
 export default function PromiseGroupDetailPage() {
   const t = useT();
+  const locale = useLocale();
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const groupId = params?.id;
   const [group, setGroup] = useState<GroupRow | null>(null);
   const [rows, setRows] = useState<RowWithUi[]>([]);
   const [attachableDeals, setAttachableDeals] = useState<AttachableDealRow[]>([]);
   const [selectedAttachDealId, setSelectedAttachDealId] = useState("");
+  const [attachDealQuery, setAttachDealQuery] = useState("");
+  const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
   const [attaching, setAttaching] = useState(false);
+  const [deletingGroup, setDeletingGroup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
+  const attachMenuRef = useRef<HTMLDivElement | null>(null);
+  const attachButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!groupId) return;
@@ -150,6 +159,7 @@ export default function PromiseGroupDetailPage() {
       if (!candidateError) {
         setAttachableDeals((candidateRows ?? []) as AttachableDealRow[]);
         setSelectedAttachDealId((candidateRows?.[0]?.id as string | undefined) ?? "");
+        setAttachDealQuery("");
       }
 
       setLoading(false);
@@ -196,6 +206,91 @@ export default function PromiseGroupDetailPage() {
     }
 
     setReloadTick((prev) => prev + 1);
+  };
+
+  const filteredAttachableDeals = useMemo(() => {
+    const query = attachDealQuery.trim().toLowerCase();
+    if (!query) return attachableDeals;
+    return attachableDeals.filter((deal) => deal.title.toLowerCase().includes(query));
+  }, [attachDealQuery, attachableDeals]);
+
+  const activeAttachDealTitle = useMemo(
+    () => attachableDeals.find((deal) => deal.id === selectedAttachDealId)?.title ?? "",
+    [attachableDeals, selectedAttachDealId]
+  );
+
+  useEffect(() => {
+    if (!isAttachMenuOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!attachMenuRef.current?.contains(target) && !attachButtonRef.current?.contains(target)) {
+        setIsAttachMenuOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsAttachMenuOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isAttachMenuOpen]);
+
+  const deleteGroup = async () => {
+    if (!groupId || !group) return;
+    const confirmed = window.confirm(t("groups.delete.confirm", { title: group.title }));
+    if (!confirmed) return;
+
+    setDeletingGroup(true);
+    setError(null);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setDeletingGroup(false);
+      setError(err instanceof Error ? err.message : "Authentication is unavailable.");
+      return;
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) {
+      setDeletingGroup(false);
+      return;
+    }
+
+    const { error: unlinkError } = await supabase
+      .from("promises")
+      .update({ group_id: null })
+      .eq("group_id", groupId)
+      .eq("creator_id", session.user.id);
+
+    if (unlinkError) {
+      setDeletingGroup(false);
+      setError(unlinkError.message);
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("promise_groups")
+      .delete()
+      .eq("id", groupId)
+      .eq("owner_user_id", session.user.id);
+
+    setDeletingGroup(false);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    router.push(localizePath("/promises/groups", locale));
   };
 
   const summary = useMemo(() => {
@@ -252,7 +347,17 @@ export default function PromiseGroupDetailPage() {
         <>
           <header className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{group.title}</h1>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
+              <button
+                type="button"
+                onClick={() => void deleteGroup()}
+                disabled={deletingGroup}
+                className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
+              </button>
+            </div>
             {group.description && <p className="mt-2 text-sm text-slate-300">{group.description}</p>}
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
               <span className="rounded-full border border-white/15 px-3 py-1">
@@ -285,18 +390,69 @@ export default function PromiseGroupDetailPage() {
               </p>
             ) : (
               <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <select
-                  className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-emerald-300/60 sm:max-w-xl"
-                  value={selectedAttachDealId}
-                  onChange={(event) => setSelectedAttachDealId(event.target.value)}
-                  disabled={attaching}
-                >
-                  {attachableDeals.map((deal) => (
-                    <option key={deal.id} value={deal.id} className="bg-slate-900 text-slate-100">
-                      {deal.title}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative w-full sm:max-w-xl">
+                  <button
+                    type="button"
+                    ref={attachButtonRef}
+                    onClick={() => setIsAttachMenuOpen((open) => !open)}
+                    aria-haspopup="listbox"
+                    aria-expanded={isAttachMenuOpen}
+                    className="inline-flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  >
+                    <span className="truncate">
+                      {activeAttachDealTitle || t("groups.attachExisting.selectPlaceholder")}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-300 transition-transform ${isAttachMenuOpen ? "rotate-180" : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+
+                  {isAttachMenuOpen && (
+                    <div
+                      ref={attachMenuRef}
+                      role="listbox"
+                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                    >
+                      <input
+                        type="text"
+                        value={attachDealQuery}
+                        onChange={(event) => setAttachDealQuery(event.target.value)}
+                        placeholder={t("groups.attachExisting.searchPlaceholder")}
+                        className="mb-2 h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
+                      />
+                      <div className="max-h-56 overflow-y-auto">
+                        {filteredAttachableDeals.length === 0 ? (
+                          <div className="px-3 py-2 text-sm text-slate-400">
+                            {t("groups.attachExisting.noMatches")}
+                          </div>
+                        ) : (
+                          filteredAttachableDeals.map((deal) => {
+                            const selected = selectedAttachDealId === deal.id;
+                            return (
+                              <button
+                                key={deal.id}
+                                type="button"
+                                role="option"
+                                aria-selected={selected}
+                                onClick={() => {
+                                  setSelectedAttachDealId(deal.id);
+                                  setIsAttachMenuOpen(false);
+                                }}
+                                className={[
+                                  "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                                  selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
+                                ].join(" ")}
+                              >
+                                <span className="truncate">{deal.title}</span>
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={() => void attachDealToGroup()}
