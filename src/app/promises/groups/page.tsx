@@ -125,14 +125,14 @@ export default function PromiseGroupsPage() {
         <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
         <form className="mt-4 space-y-3" onSubmit={createGroup}>
           <input
-            className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-white outline-none focus:border-emerald-300/60"
+            className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
             placeholder={t("groups.create.titlePlaceholder")}
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={120}
           />
           <textarea
-            className="min-h-[80px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-white outline-none focus:border-emerald-300/60"
+            className="min-h-[80px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
             placeholder={t("groups.create.descriptionPlaceholder")}
             value={description}
             onChange={(event) => setDescription(event.target.value)}

@@ -33,6 +33,7 @@ type DealRow = {
 };
 
 type GroupRow = { id: string; title: string; description: string | null };
+type AttachableDealRow = { id: string; title: string };
 
 type RowWithUi = DealRow & {
   role: PromiseRole;
@@ -59,8 +60,12 @@ export default function PromiseGroupDetailPage() {
   const groupId = params?.id;
   const [group, setGroup] = useState<GroupRow | null>(null);
   const [rows, setRows] = useState<RowWithUi[]>([]);
+  const [attachableDeals, setAttachableDeals] = useState<AttachableDealRow[]>([]);
+  const [selectedAttachDealId, setSelectedAttachDealId] = useState("");
+  const [attaching, setAttaching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     if (!groupId) return;
@@ -133,6 +138,20 @@ export default function PromiseGroupDetailPage() {
         setRows(normalized);
       }
 
+      const { data: candidateRows, error: candidateError } = await supabase
+        .from("promises")
+        .select("id,title")
+        .eq("creator_id", session.user.id)
+        .or(`group_id.is.null,group_id.neq.${groupId}`)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!active) return;
+      if (!candidateError) {
+        setAttachableDeals((candidateRows ?? []) as AttachableDealRow[]);
+        setSelectedAttachDealId((candidateRows?.[0]?.id as string | undefined) ?? "");
+      }
+
       setLoading(false);
     };
 
@@ -140,7 +159,44 @@ export default function PromiseGroupDetailPage() {
     return () => {
       active = false;
     };
-  }, [groupId, t]);
+  }, [groupId, reloadTick, t]);
+
+  const attachDealToGroup = async () => {
+    if (!groupId || !selectedAttachDealId) return;
+    setAttaching(true);
+    setError(null);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setAttaching(false);
+      setError(err instanceof Error ? err.message : "Authentication is unavailable.");
+      return;
+    }
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) {
+      setAttaching(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("promises")
+      .update({ group_id: groupId })
+      .eq("id", selectedAttachDealId)
+      .eq("creator_id", session.user.id);
+
+    setAttaching(false);
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    setReloadTick((prev) => prev + 1);
+  };
 
   const summary = useMemo(() => {
     const counts = {
@@ -219,6 +275,39 @@ export default function PromiseGroupDetailPage() {
               </span>
             </div>
           </header>
+
+          <section className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h2 className="text-base font-semibold text-white">{t("groups.attachExisting.title")}</h2>
+            <p className="mt-1 text-xs text-slate-400">{t("groups.attachExisting.hint")}</p>
+            {attachableDeals.length === 0 ? (
+              <p className="mt-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+                {t("groups.attachExisting.empty")}
+              </p>
+            ) : (
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <select
+                  className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-emerald-300/60 sm:max-w-xl"
+                  value={selectedAttachDealId}
+                  onChange={(event) => setSelectedAttachDealId(event.target.value)}
+                  disabled={attaching}
+                >
+                  {attachableDeals.map((deal) => (
+                    <option key={deal.id} value={deal.id} className="bg-slate-900 text-slate-100">
+                      {deal.title}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => void attachDealToGroup()}
+                  disabled={attaching || !selectedAttachDealId}
+                  className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {attaching ? t("groups.attachExisting.attaching") : t("groups.attachExisting.submit")}
+                </button>
+              </div>
+            )}
+          </section>
 
           <section className="mt-6 space-y-3">
             <h2 className="text-lg font-semibold text-white">{t("groups.dealsTitle")}</h2>

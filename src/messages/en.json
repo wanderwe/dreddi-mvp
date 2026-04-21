@@ -880,6 +880,13 @@
     "empty": "No groups yet. Create your first group for related deals",
     "dealsTitle": "Deals in this group",
     "dealsEmpty": "No deals in this group yet",
+    "attachExisting": {
+      "title": "Add an existing deal",
+      "hint": "Choose one of your previously created deals and attach it to this group",
+      "empty": "No available deals to add",
+      "submit": "Add to group",
+      "attaching": "Adding…"
+    },
     "create": {
       "title": "Create group",
       "titlePlaceholder": "Example: Launch preparation",
