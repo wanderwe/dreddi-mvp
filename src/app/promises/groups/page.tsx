@@ -5,6 +5,7 @@ import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
+import { useSearchParams } from "next/navigation";
 
 type GroupRow = {
   id: string;
@@ -16,6 +17,12 @@ type GroupRow = {
 export default function PromiseGroupsPage() {
   const t = useT();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const rawReturnTo = searchParams?.get("returnTo");
+  const returnToPath =
+    rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//")
+      ? rawReturnTo
+      : "/promises/new";
   const [groups, setGroups] = useState<GroupRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -113,12 +120,13 @@ export default function PromiseGroupsPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
-          <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
-        </div>
+      <LocalizedLink href={returnToPath} className="text-sm text-emerald-200 hover:text-emerald-100">
+        ← {t("groups.backToDeal")}
+      </LocalizedLink>
+      <div className="mb-6 mt-4">
+        <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
+        <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">

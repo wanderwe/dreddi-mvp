@@ -875,6 +875,7 @@
     "eyebrow": "GROUPS",
     "title": "Deal groups",
     "subtitle": "A lightweight way to organize related deals in one list without boards and extra steps",
+    "backToDeal": "Back to deal draft",
     "back": "Back to groups",
     "loading": "Loading groups…",
     "empty": "No groups yet. Create your first group for related deals",
