@@ -199,11 +199,11 @@ export function AppHeader() {
                       <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-slate-900">{actionQueueCount}</span>
                     </LocalizedLink>
                   )}
+                </div>
+                <div className="ml-auto flex items-center gap-3">
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
-                </div>
-                <div className="ml-auto flex items-center gap-3">
                   <Tooltip label={t("nav.publicProfiles")} placement="top">
                     <IconButton
                       href={localizePath("/u", locale)}
