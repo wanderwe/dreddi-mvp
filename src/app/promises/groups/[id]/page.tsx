@@ -491,7 +491,7 @@ export default function PromiseGroupDetailPage() {
                   type="button"
                   onClick={() => void attachDealToGroup()}
                   disabled={attaching || !selectedAttachDealId}
-                  className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex h-11 w-full cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {attaching ? t("groups.attachExisting.attaching") : t("groups.attachExisting.submit")}
                 </button>
@@ -536,7 +536,7 @@ export default function PromiseGroupDetailPage() {
                               type="button"
                               onClick={() => void unlinkDealFromGroup(row.id)}
                               disabled={unlinkingDealId === row.id}
-                              className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                              className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200 transition hover:border-emerald-300/40 hover:bg-emerald-300/10 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                               {unlinkingDealId === row.id
                                 ? t("groups.deals.unlinking")
