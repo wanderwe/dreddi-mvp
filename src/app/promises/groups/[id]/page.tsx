@@ -41,6 +41,8 @@ type RowWithUi = DealRow & {
   uiStatus: PromiseUiStatus;
 };
 
+const PAGE_SIZE = 6;
+
 const statusPillFor = (
   status: PromiseStatus,
   uiStatus: PromiseUiStatus
@@ -74,6 +76,8 @@ export default function PromiseGroupDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
   const attachMenuRef = useRef<HTMLDivElement | null>(null);
   const attachButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -345,6 +349,13 @@ export default function PromiseGroupDetailPage() {
 
     return counts;
   }, [rows]);
+  const visibleRows = useMemo(() => rows.slice(0, visibleCount), [rows, visibleCount]);
+  const canLoadMore = rows.length > visibleCount;
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+    setLoadingMore(false);
+  }, [rows]);
 
   const statusLabel = (row: RowWithUi) => {
     if (row.uiStatus === "awaiting_acceptance") return t("promises.status.awaitingInviteAcceptance");
@@ -364,6 +375,13 @@ export default function PromiseGroupDetailPage() {
     if (row.status === "confirmed") return t("promises.status.confirmed");
     if (row.status === "disputed") return t("promises.status.disputed");
     return row.status;
+  };
+
+  const handleLoadMore = () => {
+    if (!canLoadMore || loadingMore) return;
+    setLoadingMore(true);
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, rows.length));
+    setLoadingMore(false);
   };
 
   return (
@@ -507,7 +525,7 @@ export default function PromiseGroupDetailPage() {
               </p>
             ) : (
               <ul className="space-y-2">
-                {rows.map((row) => {
+                {visibleRows.map((row) => {
                   const pill = statusPillFor(row.status, row.uiStatus);
                   return (
                     <li key={row.id}>
@@ -549,6 +567,25 @@ export default function PromiseGroupDetailPage() {
                   );
                 })}
               </ul>
+            )}
+            {rows.length > 0 && canLoadMore && (
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
+                >
+                  {loadingMore ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      {t("promises.list.loadingMore")}
+                    </>
+                  ) : (
+                    t("promises.list.loadMore")
+                  )}
+                </button>
+              </div>
             )}
           </section>
         </>
