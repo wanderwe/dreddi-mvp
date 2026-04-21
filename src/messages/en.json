@@ -463,7 +463,7 @@
           "limitedHistory": "limited history makes this prediction less certain",
           "deepSharedHistory": "you have successful history with this person",
           "someSharedHistory": "you have fulfilled deals together",
-          "newCounterparty": "the counterparty is not selected yet, so shared history is unknown",
+          "newCounterparty": "shared history with counterparty is unknown for now",
           "counterpartyResponsive": "this counterparty usually responds to deal outcomes",
           "counterpartyUnresponsive": "this counterparty often does not respond to deal outcomes",
           "hasDeadline": "a clear deadline improves clarity",
