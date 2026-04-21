@@ -59,6 +59,11 @@ export function MobileMenu({
                     {t("nav.myPromises")}
                   </LocalizedLink>
                 </SheetClose>
+                <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/promises/groups">
+                    {t("nav.groups")}
+                  </LocalizedLink>
+                </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
                     <LocalizedLink className={baseLinkClasses} href={actionQueueHref}>
