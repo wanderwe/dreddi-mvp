@@ -58,6 +58,10 @@ export default function NewPromisePage() {
     }>
   >([]);
   const [isCounterpartySearching, setIsCounterpartySearching] = useState(false);
+  const [groups, setGroups] = useState<Array<{ id: string; title: string }>>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  const [isGroupsLoading, setIsGroupsLoading] = useState(true);
+  const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false);
   const [dueAt, setDueAt] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -65,6 +69,8 @@ export default function NewPromisePage() {
   const defaultDueTime = { hour: 18, minute: 0 };
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const groupMenuRef = useRef<HTMLDivElement | null>(null);
+  const groupButtonRef = useRef<HTMLButtonElement | null>(null);
   const [popoverStyles, setPopoverStyles] = useState<{
     top: number;
     left: number;
@@ -119,6 +125,10 @@ export default function NewPromisePage() {
     normalized.setSeconds(0, 0);
     return normalized;
   }, [dueAt]);
+  const selectedGroupLabel = useMemo(() => {
+    if (!selectedGroupId) return t("promises.new.group.none");
+    return groups.find((group) => group.id === selectedGroupId)?.title ?? t("promises.new.group.none");
+  }, [groups, selectedGroupId, t]);
 
   const predictionReady = title.trim().length > 0;
 
@@ -493,6 +503,69 @@ export default function NewPromisePage() {
   }, [isPublicProfile]);
 
   useEffect(() => {
+    let active = true;
+
+    const loadGroups = async () => {
+      setIsGroupsLoading(true);
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        if (active) setIsGroupsLoading(false);
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        if (active) {
+          setGroups([]);
+          setIsGroupsLoading(false);
+        }
+        return;
+      }
+
+      const { data } = await supabase
+        .from("promise_groups")
+        .select("id,title")
+        .eq("owner_user_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      if (!active) return;
+      setGroups((data ?? []) as Array<{ id: string; title: string }>);
+      setIsGroupsLoading(false);
+    };
+
+    void loadGroups();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isGroupMenuOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!groupMenuRef.current?.contains(target) && !groupButtonRef.current?.contains(target)) {
+        setIsGroupMenuOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsGroupMenuOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isGroupMenuOpen]);
+
+  useEffect(() => {
     if (selectedCounterparty || counterpartyQuery.trim().length < 2) {
       setCounterpartyResults([]);
       setIsCounterpartySearching(false);
@@ -628,7 +701,7 @@ export default function NewPromisePage() {
       const { data: sourceDeal } = await supabase
         .from("promises")
         .select(
-          "id,title,details,condition_text,counterparty_id,due_at,visibility,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+          "id,title,details,condition_text,counterparty_id,due_at,visibility,group_id,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
         )
         .eq("id", fromPromiseId)
         .eq("creator_id", session.user.id)
@@ -647,6 +720,7 @@ export default function NewPromisePage() {
       setConditionText(nextCondition);
       setShowCondition(nextCondition.trim().length > 0);
       setIsPublicDeal(sourceDeal.visibility === "public");
+      setSelectedGroupId(sourceDeal.group_id ?? "");
 
       if (sourceDeal.due_at) {
         const dueDate = new Date(sourceDeal.due_at);
@@ -738,6 +812,7 @@ export default function NewPromisePage() {
       dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
       executor,
       visibility: shouldMakePublic ? "public" : "private",
+      groupId: selectedGroupId || null,
     };
 
     let res: Response;
@@ -854,6 +929,84 @@ export default function NewPromisePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.group")}
+              </span>
+              <div className="relative">
+                <button
+                  type="button"
+                  ref={groupButtonRef}
+                  onClick={() => !isGroupsLoading && setIsGroupMenuOpen((open) => !open)}
+                  aria-haspopup="listbox"
+                  aria-expanded={isGroupMenuOpen}
+                  aria-label={t("promises.new.fields.group")}
+                  disabled={isGroupsLoading}
+                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="truncate">{selectedGroupLabel}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 text-slate-300 transition-transform ${isGroupMenuOpen ? "rotate-180" : ""}`}
+                    aria-hidden
+                  />
+                </button>
+
+                {isGroupMenuOpen && (
+                  <div
+                    ref={groupMenuRef}
+                    role="listbox"
+                    aria-label={t("promises.new.fields.group")}
+                    className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur"
+                  >
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={selectedGroupId === ""}
+                      onClick={() => {
+                        setSelectedGroupId("");
+                        setIsGroupMenuOpen(false);
+                      }}
+                      className={[
+                        "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                        selectedGroupId === ""
+                          ? "bg-emerald-400/90 text-slate-950"
+                          : "text-slate-100 hover:bg-white/10",
+                      ].join(" ")}
+                    >
+                      {t("promises.new.group.none")}
+                    </button>
+                    {groups.map((group) => {
+                      const selected = selectedGroupId === group.id;
+                      return (
+                        <button
+                          key={group.id}
+                          type="button"
+                          role="option"
+                          aria-selected={selected}
+                          onClick={() => {
+                            setSelectedGroupId(group.id);
+                            setIsGroupMenuOpen(false);
+                          }}
+                          className={[
+                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                            selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          {group.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>{t("promises.new.group.helper")}</span>
+                <LocalizedLink href="/promises/groups" className="text-emerald-200 hover:text-emerald-100">
+                  {t("promises.new.group.manage")}
+                </LocalizedLink>
+              </div>
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
