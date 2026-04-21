@@ -117,10 +117,10 @@ export default function PromiseGroupsPage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 py-10">
+    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6">
-        <div className="flex items-start justify-between gap-3">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
             <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
             <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
@@ -128,7 +128,7 @@ export default function PromiseGroupsPage() {
           {returnToPath && (
             <LocalizedLink
               href={returnToPath}
-              className="mt-1 shrink-0 text-sm text-emerald-200 hover:text-emerald-100"
+              className="self-start rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-emerald-200 transition hover:border-emerald-300/30 hover:text-emerald-100 sm:mt-1 sm:shrink-0 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0"
             >
               ← {t("groups.backToDeal")}
             </LocalizedLink>
@@ -140,14 +140,14 @@ export default function PromiseGroupsPage() {
         <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
         <form className="mt-4 space-y-3" onSubmit={createGroup}>
           <input
-            className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
+            className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:text-sm"
             placeholder={t("groups.create.titlePlaceholder")}
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={120}
           />
           <textarea
-            className="min-h-[80px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
+            className="min-h-[96px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:min-h-[80px] sm:text-sm"
             placeholder={t("groups.create.descriptionPlaceholder")}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
@@ -156,7 +156,7 @@ export default function PromiseGroupsPage() {
           <button
             type="submit"
             disabled={submitting || !title.trim()}
-            className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full cursor-pointer rounded-xl bg-emerald-400 px-4 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2 sm:text-sm"
           >
             {submitting ? t("groups.create.creating") : t("groups.create.submit")}
           </button>
