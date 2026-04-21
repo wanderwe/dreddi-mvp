@@ -141,7 +141,7 @@ export default function PromiseGroupsPage() {
           <button
             type="submit"
             disabled={submitting || !title.trim()}
-            className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? t("groups.create.creating") : t("groups.create.submit")}
           </button>

@@ -70,6 +70,7 @@ export default function PromiseGroupDetailPage() {
   const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
   const [attaching, setAttaching] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [unlinkingDealId, setUnlinkingDealId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -244,8 +245,6 @@ export default function PromiseGroupDetailPage() {
 
   const deleteGroup = async () => {
     if (!groupId || !group) return;
-    const confirmed = window.confirm(t("groups.delete.confirm", { title: group.title }));
-    if (!confirmed) return;
 
     setDeletingGroup(true);
     setError(null);
@@ -291,6 +290,7 @@ export default function PromiseGroupDetailPage() {
       return;
     }
 
+    setShowDeleteConfirm(false);
     router.push(localizePath("/promises/groups", locale));
   };
 
@@ -390,9 +390,9 @@ export default function PromiseGroupDetailPage() {
               <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
               <button
                 type="button"
-                onClick={() => void deleteGroup()}
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={deletingGroup}
-                className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:bg-red-500/20 hover:border-red-300/60 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
               </button>
@@ -496,7 +496,7 @@ export default function PromiseGroupDetailPage() {
                   type="button"
                   onClick={() => void attachDealToGroup()}
                   disabled={attaching || !selectedAttachDealId}
-                  className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {attaching ? t("groups.attachExisting.attaching") : t("groups.attachExisting.submit")}
                 </button>
@@ -556,6 +556,39 @@ export default function PromiseGroupDetailPage() {
             )}
           </section>
         </>
+      )}
+
+      {showDeleteConfirm && group && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label={t("groups.delete.cancel")}
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !deletingGroup && setShowDeleteConfirm(false)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl shadow-black/50">
+            <h3 className="text-lg font-semibold text-white">{t("groups.delete.action")}</h3>
+            <p className="mt-2 text-sm text-slate-300">{t("groups.delete.confirm", { title: group.title })}</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deletingGroup}
+                className="cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {t("groups.delete.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void deleteGroup()}
+                disabled={deletingGroup}
+                className="cursor-pointer rounded-xl border border-red-300/40 bg-red-500/15 px-3 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.confirmAction")}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
