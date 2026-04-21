@@ -15,17 +15,21 @@ create index if not exists promise_groups_owner_created_idx
 
 alter table public.promise_groups enable row level security;
 
-create policy if not exists promise_groups_owner_select on public.promise_groups
+drop policy if exists promise_groups_owner_select on public.promise_groups;
+create policy promise_groups_owner_select on public.promise_groups
   for select using (auth.uid() = owner_user_id);
 
-create policy if not exists promise_groups_owner_insert on public.promise_groups
+drop policy if exists promise_groups_owner_insert on public.promise_groups;
+create policy promise_groups_owner_insert on public.promise_groups
   for insert with check (auth.uid() = owner_user_id);
 
-create policy if not exists promise_groups_owner_update on public.promise_groups
+drop policy if exists promise_groups_owner_update on public.promise_groups;
+create policy promise_groups_owner_update on public.promise_groups
   for update using (auth.uid() = owner_user_id)
   with check (auth.uid() = owner_user_id);
 
-create policy if not exists promise_groups_owner_delete on public.promise_groups
+drop policy if exists promise_groups_owner_delete on public.promise_groups;
+create policy promise_groups_owner_delete on public.promise_groups
   for delete using (auth.uid() = owner_user_id);
 
 alter table public.promises
