@@ -491,7 +491,7 @@ export default function PromiseGroupDetailPage() {
                   type="button"
                   onClick={() => void attachDealToGroup()}
                   disabled={attaching || !selectedAttachDealId}
-                  className="flex h-11 w-full cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex h-10 w-full cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {attaching ? t("groups.attachExisting.attaching") : t("groups.attachExisting.submit")}
                 </button>
@@ -512,7 +512,7 @@ export default function PromiseGroupDetailPage() {
                   return (
                     <li key={row.id}>
                       <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5">
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <LocalizedLink href={`/promises/${row.id}`} className="min-w-0 flex-1">
                             <p className="truncate font-semibold text-white">{row.title}</p>
                             <p className="mt-1 text-xs text-slate-400">
@@ -530,7 +530,7 @@ export default function PromiseGroupDetailPage() {
                               })}
                             </p>
                           </LocalizedLink>
-                          <div className="flex shrink-0 items-center gap-2">
+                          <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:shrink-0 sm:flex-nowrap sm:justify-start">
                             <StatusPill tone={pill.tone} icon={pill.icon} label={statusLabel(row)} />
                             <button
                               type="button"
