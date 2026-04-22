@@ -955,9 +955,9 @@ export default function NewPromisePage() {
             </div>
           </div>
 
-          <div className="grid items-start gap-5 sm:grid-cols-2">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
@@ -987,7 +987,7 @@ export default function NewPromisePage() {
             </div>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.title")}
               </span>
               <input
@@ -999,7 +999,7 @@ export default function NewPromisePage() {
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.group")}
               </span>
               <div className="relative">
@@ -1068,8 +1068,7 @@ export default function NewPromisePage() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{t("promises.new.group.helper")}</span>
+              <div className="flex items-center justify-end text-xs text-slate-400">
                 <LocalizedLink
                   href="/promises/groups?returnTo=%2Fpromises%2Fnew"
                   className="text-emerald-200 hover:text-emerald-100"
@@ -1080,7 +1079,7 @@ export default function NewPromisePage() {
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.details")}
               </span>
               <textarea
@@ -1104,9 +1103,19 @@ export default function NewPromisePage() {
 
             {shouldShowCondition && (
               <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                  {t("promises.new.fields.condition")}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="block text-sm font-medium text-emerald-100">
+                    {t("promises.new.fields.condition")}
+                  </span>
+                  <Tooltip label={t("promises.new.fields.conditionHelper")} placement="top">
+                    <span
+                      aria-label={t("promises.new.fields.conditionHelper")}
+                      className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
+                    >
+                      <Info className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                  </Tooltip>
+                </div>
                 <textarea
                   className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                   placeholder={t("promises.new.placeholders.condition")}
@@ -1126,12 +1135,12 @@ export default function NewPromisePage() {
             )}
 
             <div className="sm:col-span-2">
-              <div className="grid items-start gap-5 sm:grid-cols-2">
+              <div className="grid items-start gap-3 sm:grid-cols-2">
                 {executor && (
                   <div className="text-sm text-slate-200">
                     <label className="space-y-2 text-sm text-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                        <span className="block text-sm font-medium text-emerald-100">
                           {t("promises.new.fields.counterparty")}
                         </span>
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
@@ -1274,7 +1283,7 @@ export default function NewPromisePage() {
                 )}
 
                 <div className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  <span className="block text-sm font-medium text-emerald-100">
                     {t("promises.new.fields.dueDate")}
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
@@ -1326,7 +1335,7 @@ export default function NewPromisePage() {
             </div>
 
             {isPublicProfile && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm font-semibold text-white">
@@ -1334,11 +1343,6 @@ export default function NewPromisePage() {
                         publicEntity: promiseLabels.publicEntity,
                       })}
                     </div>
-                    <p className="text-xs text-slate-400">
-                      {t("promises.new.publicDeal.helper", {
-                        entityPlural: promiseLabels.entityPlural,
-                      })}
-                    </p>
                   </div>
                   <button
                     type="button"

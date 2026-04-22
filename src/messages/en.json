@@ -389,11 +389,14 @@
       "back": "Back",
       "fields": {
         "title": "Title",
+        "titleHelper": "One clear action + (if needed) a deadline",
         "details": "Details",
         "condition": "Counter-condition",
+        "conditionHelper": "What happens if the agreement is not fulfilled",
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
         "counterparty": "Counterparty",
+        "counterpartyHint": "The person who will confirm this agreement",
         "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
         "dueDate": "Due date",
         "dueTime": "Due time",
@@ -429,7 +432,7 @@
       },
       "publicDeal": {
         "label": "{publicEntity}",
-        "helper": "Public {entityPlural} appear on your profile"
+        "helper": "Other users can see this agreement on your profile"
       },
       "search": {
         "searching": "Searching users…",
@@ -445,6 +448,7 @@
         "createFailed": "Failed to create {entityLower}",
         "network": "Unable to reach the server. Please try again."
       },
+      "preSubmitHint": "The other side must confirm before this becomes active",
       "submit": "Create {entityLower}",
       "creating": "Creating {entityLower}…",
       "prediction": {
