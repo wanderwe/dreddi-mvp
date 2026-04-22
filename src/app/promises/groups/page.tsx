@@ -12,6 +12,7 @@ type GroupRow = {
   title: string;
   description: string | null;
   created_at: string;
+  dealCount?: number;
 };
 
 export default function PromiseGroupsPage() {
@@ -58,8 +59,34 @@ export default function PromiseGroupsPage() {
         .order("created_at", { ascending: false });
 
       if (!active) return;
-      if (loadError) setError(loadError.message);
-      else setGroups((data ?? []) as GroupRow[]);
+      if (loadError) {
+        setError(loadError.message);
+      } else {
+        const baseGroups = (data ?? []) as GroupRow[];
+        const { data: dealsInGroups, error: dealsCountError } = await supabase
+          .from("promises")
+          .select("group_id")
+          .eq("creator_id", session.user.id)
+          .not("group_id", "is", null);
+
+        if (!active) return;
+        if (dealsCountError) {
+          setGroups(baseGroups);
+        } else {
+          const dealsByGroupId = new Map<string, number>();
+          for (const deal of dealsInGroups ?? []) {
+            const groupId = (deal as { group_id: string | null }).group_id;
+            if (!groupId) continue;
+            dealsByGroupId.set(groupId, (dealsByGroupId.get(groupId) ?? 0) + 1);
+          }
+          setGroups(
+            baseGroups.map((group) => ({
+              ...group,
+              dealCount: dealsByGroupId.get(group.id) ?? 0,
+            }))
+          );
+        }
+      }
       setLoading(false);
     };
 
@@ -136,7 +163,33 @@ export default function PromiseGroupsPage() {
         </div>
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-white">{t("groups.list.title", { count: groups.length })}</h2>
+        {error && <p className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</p>}
+        {loading ? (
+          <p className="text-sm text-slate-400">{t("groups.loading")}</p>
+        ) : groups.length === 0 ? (
+          <p className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">{t("groups.empty")}</p>
+        ) : (
+          <ul className="space-y-2">
+            {groups.map((group) => (
+              <li key={group.id}>
+                <LocalizedLink
+                  href={`/promises/groups/${group.id}`}
+                  className="block rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
+                >
+                  <p className="font-semibold text-white">
+                    {group.title} <span className="text-slate-300">({group.dealCount ?? 0})</span>
+                  </p>
+                  {group.description && <p className="mt-1 text-sm text-slate-300">{group.description}</p>}
+                </LocalizedLink>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
         <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
         <form className="mt-4 space-y-3" onSubmit={createGroup}>
           <input
@@ -161,30 +214,6 @@ export default function PromiseGroupsPage() {
             {submitting ? t("groups.create.creating") : t("groups.create.submit")}
           </button>
         </form>
-      </section>
-
-      <section className="mt-6 space-y-3">
-        <h2 className="text-lg font-semibold text-white">{t("groups.list.title", { count: groups.length })}</h2>
-        {error && <p className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</p>}
-        {loading ? (
-          <p className="text-sm text-slate-400">{t("groups.loading")}</p>
-        ) : groups.length === 0 ? (
-          <p className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">{t("groups.empty")}</p>
-        ) : (
-          <ul className="space-y-2">
-            {groups.map((group) => (
-              <li key={group.id}>
-                <LocalizedLink
-                  href={`/promises/groups/${group.id}`}
-                  className="block rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
-                >
-                  <p className="font-semibold text-white">{group.title}</p>
-                  {group.description && <p className="mt-1 text-sm text-slate-300">{group.description}</p>}
-                </LocalizedLink>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
     </main>
   );
