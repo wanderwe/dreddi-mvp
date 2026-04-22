@@ -183,13 +183,15 @@ export function AppHeader() {
           {isAuthenticated ? (
             <>
               <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-slate-200 md:flex">
-                <div className="flex items-center gap-3 pr-4">
-                  <LocalizedLink className={linkBaseClasses} href="/promises">
-                    {t("nav.myPromises")}
-                  </LocalizedLink>
-                  <LocalizedLink className={linkBaseClasses} href="/promises/groups">
-                    {t("nav.groups")}
-                  </LocalizedLink>
+                <div className="flex items-center gap-3 pr-2">
+                  <div className="inline-flex items-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 p-1">
+                    <LocalizedLink className={linkBaseClasses} href="/promises">
+                      {t("nav.myPromises")}
+                    </LocalizedLink>
+                    <LocalizedLink className={linkBaseClasses} href="/promises/groups">
+                      {t("nav.groups")}
+                    </LocalizedLink>
+                  </div>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
@@ -200,7 +202,7 @@ export function AppHeader() {
                     </LocalizedLink>
                   )}
                 </div>
-                <div className="ml-auto flex items-center gap-3">
+                <div className="ml-2 flex items-center gap-3">
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
