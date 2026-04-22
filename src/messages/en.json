@@ -393,7 +393,7 @@
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
-        "executorHelper": "First, choose who is responsible for execution",
+        "executorHelper": "Choose who is responsible for execution",
         "counterparty": "Counterparty",
         "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
         "dueDate": "Due date",
