@@ -393,6 +393,7 @@
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
+        "executorHelper": "Who is responsible for execution",
         "counterparty": "Counterparty",
         "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
         "dueDate": "Due date",
@@ -401,15 +402,16 @@
         "rewardHelper": "Add an amount + currency or describe the reward in text",
         "rewardText": "Reward details (optional)",
         "paymentTerms": "Payment terms (optional)",
-        "group": "Group"
+        "group": "Group",
+        "groupHelperTooltip": "Group\nOptional: you can skip this step now and add a group later."
       },
       "executor": {
         "me": "Me",
         "other": "Other person"
       },
       "placeholders": {
-        "title": "Short summary of the {entityLower}",
-        "details": "Details (optional)",
+        "title": "For example: Record the video by Friday",
+        "details": "For example: Align scope, format, and acceptance criteria",
         "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "@username or name",
         "counterpartyOther": "@username or name",
@@ -420,6 +422,8 @@
       },
       "actions": {
         "addCondition": "+ Add counter-condition",
+        "showSecondary": "Show secondary",
+        "hideSecondary": "Hide secondary",
         "removeCounterparty": "Remove selected user",
         "removeCondition": "Remove counter-condition",
         "clearDate": "Clear date",
@@ -447,6 +451,7 @@
       },
       "submit": "Create {entityLower}",
       "creating": "Creating {entityLower}…",
+      "agreementHint": "This becomes an agreement after confirmation from the other side",
       "prediction": {
         "title": "Dreddi prediction",
         "chance": "Chance of fulfillment: {score}%",
@@ -484,7 +489,7 @@
       },
       "group": {
         "none": "No group",
-        "helper": "Optional: attach this deal to a group to view related context together",
+        "helper": "Add this deal to a group to view related context together",
         "manage": "Manage groups"
       }
     },
