@@ -183,7 +183,7 @@ export function AppHeader() {
           {isAuthenticated ? (
             <>
               <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-slate-200 md:flex">
-                <div className="flex items-center gap-3 pr-4">
+                <div className="flex items-center gap-2 pr-3">
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
@@ -200,7 +200,7 @@ export function AppHeader() {
                     </LocalizedLink>
                   )}
                 </div>
-                <div className="ml-auto flex items-center gap-3">
+                <div className="ml-1 flex items-center gap-3">
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
