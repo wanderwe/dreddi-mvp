@@ -955,9 +955,9 @@ export default function NewPromisePage() {
             </div>
           </div>
 
-          <div className="grid items-start gap-5 sm:grid-cols-2">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
               </span>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
@@ -987,7 +987,7 @@ export default function NewPromisePage() {
             </div>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.title")}
               </span>
               <input
@@ -996,11 +996,10 @@ export default function NewPromisePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
-              <span className="block text-xs text-slate-400">{t("promises.new.fields.titleHelper")}</span>
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.group")}
               </span>
               <div className="relative">
@@ -1069,8 +1068,7 @@ export default function NewPromisePage() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{t("promises.new.group.helper")}</span>
+              <div className="flex items-center justify-end text-xs text-slate-400">
                 <LocalizedLink
                   href="/promises/groups?returnTo=%2Fpromises%2Fnew"
                   className="text-emerald-200 hover:text-emerald-100"
@@ -1081,7 +1079,7 @@ export default function NewPromisePage() {
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <span className="block text-sm font-medium text-emerald-100">
                 {t("promises.new.fields.details")}
               </span>
               <textarea
@@ -1106,7 +1104,7 @@ export default function NewPromisePage() {
             {shouldShowCondition && (
               <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
                 <div className="flex items-center gap-2">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  <span className="block text-sm font-medium text-emerald-100">
                     {t("promises.new.fields.condition")}
                   </span>
                   <Tooltip label={t("promises.new.fields.conditionHelper")} placement="top">
@@ -1137,12 +1135,12 @@ export default function NewPromisePage() {
             )}
 
             <div className="sm:col-span-2">
-              <div className="grid items-start gap-5 sm:grid-cols-2">
+              <div className="grid items-start gap-3 sm:grid-cols-2">
                 {executor && (
                   <div className="text-sm text-slate-200">
                     <label className="space-y-2 text-sm text-slate-200">
                       <div className="flex items-center gap-2">
-                        <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                        <span className="block text-sm font-medium text-emerald-100">
                           {t("promises.new.fields.counterparty")}
                         </span>
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
@@ -1280,13 +1278,12 @@ export default function NewPromisePage() {
                           )}
                         </div>
                       )}
-                      <p className="mt-2 text-xs text-slate-400">{t("promises.new.fields.counterpartyHint")}</p>
                     </label>
                   </div>
                 )}
 
                 <div className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  <span className="block text-sm font-medium text-emerald-100">
                     {t("promises.new.fields.dueDate")}
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
@@ -1338,7 +1335,7 @@ export default function NewPromisePage() {
             </div>
 
             {isPublicProfile && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm font-semibold text-white">
@@ -1346,11 +1343,6 @@ export default function NewPromisePage() {
                         publicEntity: promiseLabels.publicEntity,
                       })}
                     </div>
-                    <p className="text-xs text-slate-400">
-                      {t("promises.new.publicDeal.helper", {
-                        entityPlural: promiseLabels.entityPlural,
-                      })}
-                    </p>
                   </div>
                   <button
                     type="button"
@@ -1434,7 +1426,6 @@ export default function NewPromisePage() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs text-slate-400">{t("promises.new.preSubmitHint")}</p>
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}
@@ -1461,7 +1452,6 @@ export default function NewPromisePage() {
           </div>
 
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur sm:hidden">
-            <p className="mb-2 text-xs text-slate-400">{t("promises.new.preSubmitHint")}</p>
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}
