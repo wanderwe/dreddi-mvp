@@ -31,6 +31,64 @@ import {
   type PredictionReasonKey,
 } from "@/lib/prediction/dealPrediction";
 
+function parseSimpleDeadline(value: string, baseDate: Date, fallbackHour = 18, fallbackMinute = 0): Date | null {
+  const input = value.toLowerCase();
+
+  const isoMatch = input.match(/до\s+(\d{4})-(\d{1,2})-(\d{1,2})/i);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    const candidate = new Date(Number(year), Number(month) - 1, Number(day), fallbackHour, fallbackMinute, 0, 0);
+    return Number.isNaN(candidate.getTime()) ? null : candidate;
+  }
+
+  const shortDateMatch = input.match(/до\s+(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?/i);
+  if (shortDateMatch) {
+    const [, dayRaw, monthRaw, yearRaw] = shortDateMatch;
+    const resolvedYear = yearRaw
+      ? Number(yearRaw.length === 2 ? `20${yearRaw}` : yearRaw)
+      : baseDate.getFullYear();
+    const candidate = new Date(
+      resolvedYear,
+      Number(monthRaw) - 1,
+      Number(dayRaw),
+      fallbackHour,
+      fallbackMinute,
+      0,
+      0
+    );
+    return Number.isNaN(candidate.getTime()) ? null : candidate;
+  }
+
+  const weekdayMap: Record<string, number> = {
+    понеділок: 1,
+    понеділка: 1,
+    вівторок: 2,
+    вівторка: 2,
+    середа: 3,
+    середи: 3,
+    четвер: 4,
+    четверга: 4,
+    "п'ятниця": 5,
+    "п'ятниці": 5,
+    "п’ятниця": 5,
+    "п’ятниці": 5,
+    субота: 6,
+    суботи: 6,
+    неділя: 0,
+    неділі: 0,
+  };
+  const weekdayMatch = input.match(/до\s+(понеділок|понеділка|вівторок|вівторка|середа|середи|четвер|четверга|п'ятниця|п'ятниці|п’ятниця|п’ятниці|субота|суботи|неділя|неділі)/i);
+  if (!weekdayMatch) return null;
+
+  const target = weekdayMap[weekdayMatch[1].toLowerCase()];
+  if (typeof target !== "number") return null;
+  const candidate = new Date(baseDate);
+  candidate.setHours(fallbackHour, fallbackMinute, 0, 0);
+  const delta = (target - candidate.getDay() + 7) % 7;
+  candidate.setDate(candidate.getDate() + delta);
+  return candidate;
+}
+
 export default function NewPromisePage() {
   const PREFILL_MAX_RETRIES = 20;
   const DEAL_DRAFT_STORAGE_KEY = "dreddi:new-promise-draft";
@@ -95,6 +153,7 @@ export default function NewPromisePage() {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [predictionInput, setPredictionInput] = useState<PredictionInput>({});
   const [isPredictionExpanded, setIsPredictionExpanded] = useState(false);
+  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
 
   const handleRemoveCondition = () => {
     setConditionText("");
@@ -865,17 +924,24 @@ export default function NewPromisePage() {
     }
 
     const secondPartyUserId = selectedCounterparty?.id ?? null;
+    const parsedSimpleDueAt =
+      !isAdvancedMode && !dueAt ? parseSimpleDeadline(title.trim(), new Date(), defaultDueTime.hour, defaultDueTime.minute) : null;
+    const effectiveDueAt = normalizedDueAt ?? parsedSimpleDueAt;
+    const effectiveExecutor = isAdvancedMode ? executor : "other";
+    const effectiveDetails = isAdvancedMode ? details.trim() || null : null;
+    const effectiveConditionText = isAdvancedMode ? conditionText.trim() || null : null;
+    const effectiveGroupId = isAdvancedMode ? selectedGroupId || null : null;
 
     const shouldMakePublic = isPublicDeal && isPublicProfile;
     const payload = {
       title: title.trim(),
-      details: details.trim() || null,
-      conditionText: conditionText.trim() || null,
+      details: effectiveDetails,
+      conditionText: effectiveConditionText,
       secondPartyUserId,
-      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-      executor,
+      dueAt: effectiveDueAt ? effectiveDueAt.toISOString() : null,
+      executor: effectiveExecutor,
       visibility: shouldMakePublic ? "public" : "private",
-      groupId: selectedGroupId || null,
+      groupId: effectiveGroupId,
     };
 
     let res: Response;
@@ -955,7 +1021,108 @@ export default function NewPromisePage() {
             </div>
           </div>
 
-          <div className="grid items-start gap-5 sm:grid-cols-2">
+          {!isAdvancedMode && (
+            <div className="space-y-4">
+              <label className="space-y-2 text-sm text-slate-200">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.simple.fields.title")}
+                </span>
+                <input
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                  placeholder={t("promises.new.simple.placeholders.title")}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </label>
+
+              <label className="space-y-2 text-sm text-slate-200">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.simple.fields.counterparty")}
+                </span>
+                {selectedCounterparty ? (
+                  <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
+                    <span className="truncate">
+                      {selectedCounterparty.displayName ?? `@${selectedCounterparty.handle}`} · @{selectedCounterparty.handle}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCounterparty(null);
+                        setCounterpartyQuery("");
+                        setCounterpartyResults([]);
+                        setShowCounterpartyDropdown(false);
+                      }}
+                      aria-label={t("promises.new.actions.removeCounterparty")}
+                      className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
+                    >
+                      <X className="h-3 w-3" aria-hidden />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <input
+                      id="counterparty-simple"
+                      autoComplete="off"
+                      className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                      placeholder={t("promises.new.placeholders.counterpartyOther")}
+                      value={counterpartyQuery}
+                      onFocus={() => setShowCounterpartyDropdown(true)}
+                      onBlur={() => {
+                        window.setTimeout(() => setShowCounterpartyDropdown(false), 120);
+                      }}
+                      onChange={(e) => {
+                        setCounterpartyQuery(e.target.value);
+                        setShowCounterpartyDropdown(true);
+                      }}
+                    />
+                    {showCounterpartyDropdown && counterpartyQuery.trim().length >= 2 && (
+                      <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-xl shadow-black/40">
+                        {isCounterpartySearching && (
+                          <p className="px-3 py-2 text-xs text-slate-400">{t("promises.new.search.searching")}</p>
+                        )}
+                        {!isCounterpartySearching && counterpartyResults.length === 0 && (
+                          <div className="px-3 py-3">
+                            <p className="text-xs text-slate-400">{t("promises.new.search.noResults")}</p>
+                          </div>
+                        )}
+                        {!isCounterpartySearching &&
+                          counterpartyResults.map((user) => (
+                            <button
+                              key={user.id}
+                              type="button"
+                              onMouseDown={(event) => {
+                                event.preventDefault();
+                                selectCounterparty(user);
+                              }}
+                              className="flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5"
+                            >
+                              <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
+                                {user.avatar_url ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-xs text-slate-300">
+                                    @{user.handle.slice(0, 1).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold text-white">
+                                  {user.display_name ?? `@${user.handle}`}
+                                </p>
+                                <p className="truncate text-xs text-slate-400">@{user.handle}</p>
+                              </div>
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </label>
+            </div>
+          )}
+
+          <div className={clsx("grid items-start gap-5 sm:grid-cols-2", !isAdvancedMode && "hidden")}>
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                 {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
@@ -1323,6 +1490,7 @@ export default function NewPromisePage() {
                     </div>
                   )}
                 </div>
+              </div>
             </div>
 
             {isPublicProfile && (
@@ -1419,9 +1587,18 @@ export default function NewPromisePage() {
               </section>
             )}
           </div>
-          </div>
+          
 
           <div className="space-y-3">
+            {!isAdvancedMode && (
+              <button
+                type="button"
+                onClick={() => setIsAdvancedMode(true)}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+              >
+                {t("promises.new.simple.toggle")}
+              </button>
+            )}
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}
