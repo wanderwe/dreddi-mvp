@@ -505,12 +505,6 @@ export default function NewPromisePage() {
   }, [router]);
 
   useEffect(() => {
-    if (isPublicProfile === false) {
-      setIsPublicDeal(false);
-    }
-  }, [isPublicProfile]);
-
-  useEffect(() => {
     if (!ENABLE_GROUP_SELECTION) {
       setIsGroupsLoading(false);
       return;
@@ -1349,44 +1343,42 @@ export default function NewPromisePage() {
                 </div>
             </div>
 
-            {isPublicProfile && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="text-sm font-semibold text-white">
-                      {t("promises.new.publicDeal.label", {
-                        publicEntity: promiseLabels.publicEntity,
-                      })}
-                    </div>
-                    <p className="text-xs text-slate-400">
-                      {t("promises.new.publicDeal.helper", {
-                        entityPlural: promiseLabels.entityPlural,
-                      })}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={isPublicDeal}
-                    aria-label={t("promises.new.publicDeal.label", {
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="text-sm font-semibold text-white">
+                    {t("promises.new.publicDeal.label", {
                       publicEntity: promiseLabels.publicEntity,
                     })}
-                    onClick={() => setIsPublicDeal((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
-                      isPublicDeal
-                        ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                        : "border-white/20 bg-white/10 hover:bg-white/20"
-                    } hover:border-emerald-300/60`}
-                  >
-                    <span
-                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                        isPublicDeal ? "translate-x-5" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {t("promises.new.publicDeal.helper", {
+                      entityPlural: promiseLabels.entityPlural,
+                    })}
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isPublicDeal}
+                  aria-label={t("promises.new.publicDeal.label", {
+                    publicEntity: promiseLabels.publicEntity,
+                  })}
+                  onClick={() => setIsPublicDeal((prev) => !prev)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                    isPublicDeal
+                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                      : "border-white/20 bg-white/10 hover:bg-white/20"
+                  } hover:border-emerald-300/60`}
+                >
+                  <span
+                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                      isPublicDeal ? "translate-x-5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
               </div>
-            )}
+            </div>
 
             {predictionResult && (
               <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
