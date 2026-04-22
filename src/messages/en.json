@@ -410,7 +410,7 @@
       },
       "placeholders": {
         "title": "Short {entityLower} description, for example: “Shoot a video by Friday”",
-        "details": "Clarify what is included in this {entityLower} (optional)",
+        "details": "Clarify what is included in this deal (optional)",
         "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "@username or name",
         "counterpartyOther": "@username or name",
@@ -430,7 +430,7 @@
       },
       "publicDeal": {
         "label": "{publicEntity}",
-        "helper": "{publicEntity} will be visible on your profile to other users"
+        "helper": "Visible on your profile to other users"
       },
       "search": {
         "searching": "Searching users…",
