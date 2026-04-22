@@ -996,6 +996,7 @@ export default function NewPromisePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+              <span className="block text-xs text-slate-400">{t("promises.new.fields.titleHelper")}</span>
             </label>
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
@@ -1422,6 +1423,7 @@ export default function NewPromisePage() {
           </div>
 
           <div className="space-y-3">
+            <p className="text-xs text-slate-400">{t("promises.new.preSubmitHint")}</p>
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}
@@ -1448,6 +1450,7 @@ export default function NewPromisePage() {
           </div>
 
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur sm:hidden">
+            <p className="mb-2 text-xs text-slate-400">{t("promises.new.preSubmitHint")}</p>
             <button
               onClick={createPromise}
               disabled={busy || !title.trim()}

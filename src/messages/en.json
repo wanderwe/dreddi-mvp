@@ -389,6 +389,7 @@
       "back": "Back",
       "fields": {
         "title": "Title",
+        "titleHelper": "One clear action + (if needed) a deadline",
         "details": "Details",
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
@@ -445,6 +446,7 @@
         "createFailed": "Failed to create {entityLower}",
         "network": "Unable to reach the server. Please try again."
       },
+      "preSubmitHint": "This becomes an agreement after the other side confirms",
       "submit": "Create {entityLower}",
       "creating": "Creating {entityLower}…",
       "prediction": {
