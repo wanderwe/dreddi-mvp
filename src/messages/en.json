@@ -393,6 +393,7 @@
         "condition": "Counter-condition",
         "conditionHint": "Execution becomes possible after…",
         "executor": "{executorRole}",
+        "executorHelper": "Choose who is responsible for execution",
         "counterparty": "Counterparty",
         "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the deal.",
         "dueDate": "Due date",
@@ -408,8 +409,8 @@
         "other": "Other person"
       },
       "placeholders": {
-        "title": "Short summary of the {entityLower}",
-        "details": "Details (optional)",
+        "title": "Short {entityLower} description, for example: “Shoot a video by Friday”",
+        "details": "Clarify what is included in this deal (optional)",
         "condition": "Execution becomes possible after… (optional)",
         "counterpartyMe": "@username or name",
         "counterpartyOther": "@username or name",
@@ -429,7 +430,7 @@
       },
       "publicDeal": {
         "label": "{publicEntity}",
-        "helper": "Public {entityPlural} appear on your profile"
+        "helper": "Visible on your profile to other users"
       },
       "search": {
         "searching": "Searching users…",
