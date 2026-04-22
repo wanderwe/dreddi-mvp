@@ -9,12 +9,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 const INVITE_METADATA_COPY = {
   en: {
     fallbackTitle: "Invite",
-    description: "Invitation to an agreement. Confirm participation in Dreddi.",
+    description: "You’ve been invited to an agreement. Confirm your participation.",
     locale: "en_US",
   },
   uk: {
     fallbackTitle: "Запрошення",
-    description: "Запрошення до угоди. Підтвердьте участь у Dreddi.",
+    description: "Вас запросили до домовленості. Підтвердіть участь.",
     locale: "uk_UA",
   },
 };
