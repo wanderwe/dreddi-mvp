@@ -575,6 +575,35 @@ export default function PromisePage() {
     }
   }
 
+  async function copyPromiseLink() {
+    if (!promiseLink) {
+      setToastTone("error");
+      setToast(t("promises.detail.linkCopy.copyFailed"));
+      return;
+    }
+
+    let didCopy = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(promiseLink);
+        didCopy = true;
+      } else {
+        didCopy = fallbackCopy(promiseLink);
+      }
+    } catch {
+      didCopy = fallbackCopy(promiseLink);
+    }
+
+    if (didCopy) {
+      setToastTone("success");
+      setToast(t("promises.detail.linkCopy.copied"));
+      return;
+    }
+
+    setToastTone("error");
+    setToast(t("promises.detail.linkCopy.copyFailed"));
+  }
+
   async function copyInvite() {
     if (!inviteLink || !canManageInvite || isInviteAccepted || isFinal) return;
     setCopyStatus("idle");
@@ -721,7 +750,13 @@ export default function PromisePage() {
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
-  const canShareReminder = Boolean(p && inviteStatus === "accepted");
+  const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
+  const canShareReminder = Boolean(
+    p &&
+      inviteStatus === "accepted" &&
+      (p.status === "active" || p.status === "completed_by_promisor") &&
+      getNextActionOwner(p, userId) === "other"
+  );
   const canRecreateDeal = Boolean(p && uiStatus === "expired" && isCreator);
   const isDeadlinePassed = Boolean(p?.due_at && new Date(p.due_at).getTime() < Date.now());
   const canMarkNotDelivered = Boolean(
@@ -824,8 +859,20 @@ export default function PromisePage() {
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
-            <div className="h-10 w-10 shrink-0">
-              {canShareReminder ? (
+            <>
+              {canCopyPromiseLink && (
+                <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
+                  <span>
+                    <IconButton
+                      icon={<Copy className="h-4 w-4" />}
+                      ariaLabel={t("promises.detail.linkCopy.label")}
+                      className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
+                      onClick={() => void copyPromiseLink()}
+                    />
+                  </span>
+                </Tooltip>
+              )}
+              {canShareReminder && (
                 <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
@@ -837,7 +884,8 @@ export default function PromisePage() {
                     />
                   </span>
                 </Tooltip>
-              ) : canRecreateDeal ? (
+              )}
+              {!canShareReminder && canRecreateDeal && (
                 <Tooltip label={t("promises.detail.recreate.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
@@ -850,8 +898,8 @@ export default function PromisePage() {
                     />
                   </span>
                 </Tooltip>
-              ) : null}
-            </div>
+              )}
+            </>
           )}
           {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
         </div>
