@@ -47,6 +47,7 @@ type PromiseRow = {
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
+  group_id: string | null;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -81,6 +82,7 @@ type PromiseRoleBase = Pick<
   | "promisor_id"
   | "promisee_id"
   | "counterparty_id"
+  | "group_id"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -100,6 +102,13 @@ type ReminderInfo = {
   count: number;
   lastSentAt: string | null;
 };
+
+type GroupRow = {
+  id: string;
+  title: string;
+};
+
+type GroupFilter = "all" | "none" | string;
 
 const PAGE_SIZE = 12;
 const STATUS_FILTER_ALL = "all";
@@ -163,6 +172,8 @@ export default function PromisesClient() {
       ? filterParam
       : "total";
   const statusFromSearch: StatusFilter = normalizeStatusParam(statusParam);
+  const groupParam = searchParams.get("group");
+  const groupFromSearch: GroupFilter = groupParam === "none" ? "none" : groupParam && groupParam.trim() ? groupParam : "all";
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -236,6 +247,8 @@ export default function PromisesClient() {
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
+  const [activeGroupFilter, setActiveGroupFilter] = useState<GroupFilter>(groupFromSearch);
+  const [groups, setGroups] = useState<GroupRow[]>([]);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
@@ -291,10 +304,20 @@ export default function PromisesClient() {
       const user = session.user;
       setUserId(user.id);
 
+      const { data: groupsData, error: groupsError } = await supabase
+        .from("promise_groups")
+        .select("id,title")
+        .eq("owner_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!cancelled && !groupsError) {
+        setGroups((groupsData ?? []) as GroupRow[]);
+      }
+
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id,group_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -354,7 +377,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,group_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -470,12 +493,18 @@ export default function PromisesClient() {
   }, [statusFromSearch]);
 
   useEffect(() => {
+    setActiveGroupFilter(groupFromSearch);
+  }, [groupFromSearch]);
+
+  useEffect(() => {
     if (listLoading) return;
     const summaryRowsForCurrentTab = applyMetricFilter(summaryRows).filter((row) =>
       tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
     );
     const hasAnyActiveFilter =
-      activeMetricFilter !== "total" || activeStatusFilter !== STATUS_FILTER_ALL;
+      activeMetricFilter !== "total" ||
+      activeStatusFilter !== STATUS_FILTER_ALL ||
+      activeGroupFilter !== "all";
     const filteredRows = hasAnyActiveFilter
       ? applyStatusFilter(summaryRowsForCurrentTab)
       : applyListFilters(listRowsByTab[tab] ?? []);
@@ -581,9 +610,18 @@ export default function PromisesClient() {
     rows: T[]
   ): T[] => applyStatusFilter(applyMetricFilter(rows));
 
+  const matchesGroupFilter = <T extends PromiseSummary | PromiseWithRole>(row: T) => {
+    if (activeGroupFilter === "all") return true;
+    if (activeGroupFilter === "none") return !row.group_id;
+    return row.group_id === activeGroupFilter;
+  };
+
+  const applyGroupFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] =>
+    rows.filter((row) => matchesGroupFilter(row));
+
   const filteredSummaryRows = useMemo(
-    () => applyMetricFilter(summaryRows),
-    [summaryRows, activeMetricFilter]
+    () => applyGroupFilter(applyMetricFilter(summaryRows)),
+    [summaryRows, activeMetricFilter, activeGroupFilter]
   );
 
   const roleCounts = useMemo(
@@ -602,10 +640,10 @@ export default function PromisesClient() {
 
   const metricFilteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
-      "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+      "i-promised": applyGroupFilter(applyMetricFilter(listRowsByTab["i-promised"])),
+      "promised-to-me": applyGroupFilter(applyMetricFilter(listRowsByTab["promised-to-me"])),
     }),
-    [listRowsByTab, activeMetricFilter]
+    [listRowsByTab, activeMetricFilter, activeGroupFilter]
   );
 
   const filteredListRowsByTab = useMemo(
@@ -619,7 +657,8 @@ export default function PromisesClient() {
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const hasGroupFilter = activeGroupFilter !== "all";
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasGroupFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
@@ -828,6 +867,65 @@ export default function PromisesClient() {
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
     t("promises.list.statusFilter.options.all");
 
+  const groupSummaryRowsForCurrentTab = useMemo(
+    () =>
+      applyStatusFilter(metricSummaryRowsForCurrentTab),
+    [metricSummaryRowsForCurrentTab, activeStatusFilter]
+  );
+
+  const groupCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    let ungrouped = 0;
+
+    for (const row of groupSummaryRowsForCurrentTab) {
+      if (!row.group_id) {
+        ungrouped += 1;
+        continue;
+      }
+      counts.set(row.group_id, (counts.get(row.group_id) ?? 0) + 1);
+    }
+
+    return { counts, ungrouped, total: groupSummaryRowsForCurrentTab.length };
+  }, [groupSummaryRowsForCurrentTab]);
+
+  const groupOptions = useMemo(() => {
+    const base = [
+      {
+        value: "all" as GroupFilter,
+        label: t("promises.list.groupFilter.all"),
+        count: groupCounts.total,
+      },
+      {
+        value: "none" as GroupFilter,
+        label: t("promises.list.groupFilter.none"),
+        count: groupCounts.ungrouped,
+      },
+    ];
+
+    const dynamic = groups.map((group) => ({
+      value: group.id as GroupFilter,
+      label: group.title,
+      count: groupCounts.counts.get(group.id) ?? 0,
+    }));
+
+    return [...base, ...dynamic];
+  }, [groupCounts, groups, t]);
+
+  const handleGroupFilterChange = (next: GroupFilter) => {
+    setActiveGroupFilter(next);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (next === "all") sp.delete("group");
+    else sp.set("group", next);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  };
+
+  useEffect(() => {
+    if (activeGroupFilter === "all" || activeGroupFilter === "none") return;
+    if (groups.some((group) => group.id === activeGroupFilter)) return;
+    handleGroupFilterChange("all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGroupFilter, groups]);
+
   return (
     <main className="relative py-10">
       {toast && (
@@ -911,6 +1009,30 @@ export default function PromisesClient() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
+          <div className="mb-3 -mx-1 overflow-x-auto pb-1">
+            <div className="flex min-w-max gap-2 px-1">
+              {groupOptions.map((option) => {
+                const selected = activeGroupFilter === option.value;
+                return (
+                  <button
+                    key={String(option.value)}
+                    type="button"
+                    onClick={() => handleGroupFilterChange(option.value)}
+                    aria-pressed={selected}
+                    className={[
+                      "whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium ring-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                      selected
+                        ? "bg-emerald-400 text-slate-950 ring-emerald-300"
+                        : "bg-white/5 text-slate-100 ring-white/15 hover:bg-white/10 hover:ring-white/30",
+                    ].join(" ")}
+                  >
+                    {`${option.label} (${option.count})`}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <button
               type="button"
