@@ -34,6 +34,7 @@ import {
 export default function NewPromisePage() {
   const PREFILL_MAX_RETRIES = 20;
   const DEAL_DRAFT_STORAGE_KEY = "dreddi:new-promise-draft";
+  const ENABLE_GROUP_SELECTION = false;
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
@@ -461,6 +462,11 @@ export default function NewPromisePage() {
   }, [isCalendarOpen, calendarMonth]);
 
   useEffect(() => {
+    if (!ENABLE_GROUP_SELECTION) {
+      setIsGroupsLoading(false);
+      return;
+    }
+
     let active = true;
 
     const ensureSession = async () => {
@@ -505,6 +511,11 @@ export default function NewPromisePage() {
   }, [isPublicProfile]);
 
   useEffect(() => {
+    if (!ENABLE_GROUP_SELECTION) {
+      setIsGroupsLoading(false);
+      return;
+    }
+
     let active = true;
 
     const loadGroups = async () => {
@@ -543,9 +554,10 @@ export default function NewPromisePage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [ENABLE_GROUP_SELECTION]);
 
   useEffect(() => {
+    if (!ENABLE_GROUP_SELECTION) return;
     if (!isGroupMenuOpen) return;
 
     const onPointerDown = (event: PointerEvent) => {
@@ -565,7 +577,7 @@ export default function NewPromisePage() {
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isGroupMenuOpen]);
+  }, [ENABLE_GROUP_SELECTION, isGroupMenuOpen]);
 
   useEffect(() => {
     if (selectedCounterparty || counterpartyQuery.trim().length < 2) {
@@ -957,9 +969,19 @@ export default function NewPromisePage() {
 
           <div className="grid items-start gap-5 sm:grid-cols-2">
             <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
+                </span>
+                <Tooltip label={t("promises.new.fields.executorHelper")} placement="top">
+                  <span
+                    aria-label={t("promises.new.fields.executorHelper")}
+                    className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
+                  >
+                    <Info className="h-3.5 w-3.5" aria-hidden />
+                  </span>
+                </Tooltip>
+              </div>
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
                   type="button"
@@ -998,86 +1020,88 @@ export default function NewPromisePage() {
               />
             </label>
 
-            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                {t("promises.new.fields.group")}
-              </span>
-              <div className="relative">
-                <button
-                  type="button"
-                  ref={groupButtonRef}
-                  onClick={() => !isGroupsLoading && setIsGroupMenuOpen((open) => !open)}
-                  aria-haspopup="listbox"
-                  aria-expanded={isGroupMenuOpen}
-                  aria-label={t("promises.new.fields.group")}
-                  disabled={isGroupsLoading}
-                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <span className="truncate">{selectedGroupLabel}</span>
-                  <ChevronDown
-                    className={`h-4 w-4 text-slate-300 transition-transform ${isGroupMenuOpen ? "rotate-180" : ""}`}
-                    aria-hidden
-                  />
-                </button>
-
-                {isGroupMenuOpen && (
-                  <div
-                    ref={groupMenuRef}
-                    role="listbox"
+            {ENABLE_GROUP_SELECTION && (
+              <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  {t("promises.new.fields.group")}
+                </span>
+                <div className="relative">
+                  <button
+                    type="button"
+                    ref={groupButtonRef}
+                    onClick={() => !isGroupsLoading && setIsGroupMenuOpen((open) => !open)}
+                    aria-haspopup="listbox"
+                    aria-expanded={isGroupMenuOpen}
                     aria-label={t("promises.new.fields.group")}
-                    className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur"
+                    disabled={isGroupsLoading}
+                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={selectedGroupId === ""}
-                      onClick={() => {
-                        setSelectedGroupId("");
-                        setIsGroupMenuOpen(false);
-                      }}
-                      className={[
-                        "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
-                        selectedGroupId === ""
-                          ? "bg-emerald-400/90 text-slate-950"
-                          : "text-slate-100 hover:bg-white/10",
-                      ].join(" ")}
+                    <span className="truncate">{selectedGroupLabel}</span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-300 transition-transform ${isGroupMenuOpen ? "rotate-180" : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+
+                  {isGroupMenuOpen && (
+                    <div
+                      ref={groupMenuRef}
+                      role="listbox"
+                      aria-label={t("promises.new.fields.group")}
+                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur"
                     >
-                      {t("promises.new.group.none")}
-                    </button>
-                    {groups.map((group) => {
-                      const selected = selectedGroupId === group.id;
-                      return (
-                        <button
-                          key={group.id}
-                          type="button"
-                          role="option"
-                          aria-selected={selected}
-                          onClick={() => {
-                            setSelectedGroupId(group.id);
-                            setIsGroupMenuOpen(false);
-                          }}
-                          className={[
-                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
-                            selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
-                          ].join(" ")}
-                        >
-                          {group.title}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{t("promises.new.group.helper")}</span>
-                <LocalizedLink
-                  href="/promises/groups?returnTo=%2Fpromises%2Fnew"
-                  className="text-emerald-200 hover:text-emerald-100"
-                >
-                  {t("promises.new.group.manage")}
-                </LocalizedLink>
-              </div>
-            </label>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={selectedGroupId === ""}
+                        onClick={() => {
+                          setSelectedGroupId("");
+                          setIsGroupMenuOpen(false);
+                        }}
+                        className={[
+                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                          selectedGroupId === ""
+                            ? "bg-emerald-400/90 text-slate-950"
+                            : "text-slate-100 hover:bg-white/10",
+                        ].join(" ")}
+                      >
+                        {t("promises.new.group.none")}
+                      </button>
+                      {groups.map((group) => {
+                        const selected = selectedGroupId === group.id;
+                        return (
+                          <button
+                            key={group.id}
+                            type="button"
+                            role="option"
+                            aria-selected={selected}
+                            onClick={() => {
+                              setSelectedGroupId(group.id);
+                              setIsGroupMenuOpen(false);
+                            }}
+                            className={[
+                              "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                              selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
+                            ].join(" ")}
+                          >
+                            {group.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span>{t("promises.new.group.helper")}</span>
+                  <LocalizedLink
+                    href="/promises/groups?returnTo=%2Fpromises%2Fnew"
+                    className="text-emerald-200 hover:text-emerald-100"
+                  >
+                    {t("promises.new.group.manage")}
+                  </LocalizedLink>
+                </div>
+              </label>
+            )}
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
