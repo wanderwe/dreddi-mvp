@@ -290,13 +290,13 @@
       "disputeExplanationLabel": "Dispute explanation",
       "reminderCopy": {
         "label": "Copy reminder text",
-        "tooltip": "Copy a messenger-ready reminder text (includes deal link)",
+        "tooltip": "Copy messenger reminder text (includes deal link)",
         "copied": "Reminder copied",
         "copyFailed": "Failed to copy"
       },
       "linkCopy": {
         "label": "Copy direct link",
-        "tooltip": "Copy only the deal link",
+        "tooltip": "Copy deal link",
         "copied": "Deal link copied",
         "copyFailed": "Failed to copy link"
       },
