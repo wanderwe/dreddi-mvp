@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, RefreshCw } from "lucide-react";
+import { Link2, MessageCircle, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -865,7 +865,7 @@ export default function PromisePage() {
                 <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
-                      icon={<Copy className="h-4 w-4" />}
+                      icon={<Link2 className="h-4 w-4" />}
                       ariaLabel={t("promises.detail.linkCopy.label")}
                       className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
                       onClick={() => void copyPromiseLink()}
@@ -877,7 +877,7 @@ export default function PromisePage() {
                 <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
-                      icon={<Copy className="h-4 w-4" />}
+                      icon={<MessageCircle className="h-4 w-4" />}
                       ariaLabel={t("promises.detail.reminderCopy.label")}
                       className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
                       disabled={!userId || !promiseLink}

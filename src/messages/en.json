@@ -289,14 +289,14 @@
       "notDeliveredHint": "Not delivered after deadline",
       "disputeExplanationLabel": "Dispute explanation",
       "reminderCopy": {
-        "label": "Copy reminder link",
-        "tooltip": "Copy reminder link",
+        "label": "Copy reminder text",
+        "tooltip": "Copy a messenger-ready reminder text (includes deal link)",
         "copied": "Reminder copied",
         "copyFailed": "Failed to copy"
       },
       "linkCopy": {
-        "label": "Copy deal link",
-        "tooltip": "Copy deal link",
+        "label": "Copy direct link",
+        "tooltip": "Copy only the deal link",
         "copied": "Deal link copied",
         "copyFailed": "Failed to copy link"
       },
