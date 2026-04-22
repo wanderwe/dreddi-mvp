@@ -1105,9 +1105,19 @@ export default function NewPromisePage() {
 
             {shouldShowCondition && (
               <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
-                  {t("promises.new.fields.condition")}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    {t("promises.new.fields.condition")}
+                  </span>
+                  <Tooltip label={t("promises.new.fields.conditionHelper")} placement="top">
+                    <span
+                      aria-label={t("promises.new.fields.conditionHelper")}
+                      className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
+                    >
+                      <Info className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                  </Tooltip>
+                </div>
                 <textarea
                   className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
                   placeholder={t("promises.new.placeholders.condition")}
@@ -1270,6 +1280,7 @@ export default function NewPromisePage() {
                           )}
                         </div>
                       )}
+                      <p className="mt-2 text-xs text-slate-400">{t("promises.new.fields.counterpartyHint")}</p>
                     </label>
                   </div>
                 )}
