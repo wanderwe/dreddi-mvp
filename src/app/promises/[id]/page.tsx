@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Copy, RefreshCw } from "lucide-react";
+import { Link2, MessageCircle, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -17,6 +17,7 @@ import {
   isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
+import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
@@ -575,6 +576,35 @@ export default function PromisePage() {
     }
   }
 
+  async function copyPromiseLink() {
+    if (!promiseLink) {
+      setToastTone("error");
+      setToast(t("promises.detail.linkCopy.copyFailed"));
+      return;
+    }
+
+    let didCopy = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(promiseLink);
+        didCopy = true;
+      } else {
+        didCopy = fallbackCopy(promiseLink);
+      }
+    } catch {
+      didCopy = fallbackCopy(promiseLink);
+    }
+
+    if (didCopy) {
+      setToastTone("success");
+      setToast(t("promises.detail.linkCopy.copied"));
+      return;
+    }
+
+    setToastTone("error");
+    setToast(t("promises.detail.linkCopy.copyFailed"));
+  }
+
   async function copyInvite() {
     if (!inviteLink || !canManageInvite || isInviteAccepted || isFinal) return;
     setCopyStatus("idle");
@@ -721,7 +751,13 @@ export default function PromisePage() {
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
-  const canShareReminder = Boolean(p && inviteStatus === "accepted");
+  const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
+  const canShareReminder = Boolean(
+    p &&
+      inviteStatus === "accepted" &&
+      (p.status === "active" || p.status === "completed_by_promisor") &&
+      getNextActionOwner(p, userId) === "other"
+  );
   const canRecreateDeal = Boolean(p && uiStatus === "expired" && isCreator);
   const isDeadlinePassed = Boolean(p?.due_at && new Date(p.due_at).getTime() < Date.now());
   const canMarkNotDelivered = Boolean(
@@ -824,12 +860,24 @@ export default function PromisePage() {
         </Link>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {p && (
-            <div className="h-10 w-10 shrink-0">
-              {canShareReminder ? (
+            <>
+              {canCopyPromiseLink && (
+                <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
+                  <span>
+                    <IconButton
+                      icon={<Link2 className="h-4 w-4" />}
+                      ariaLabel={t("promises.detail.linkCopy.label")}
+                      className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
+                      onClick={() => void copyPromiseLink()}
+                    />
+                  </span>
+                </Tooltip>
+              )}
+              {canShareReminder && (
                 <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
-                      icon={<Copy className="h-4 w-4" />}
+                      icon={<MessageCircle className="h-4 w-4" />}
                       ariaLabel={t("promises.detail.reminderCopy.label")}
                       className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
                       disabled={!userId || !promiseLink}
@@ -837,7 +885,8 @@ export default function PromisePage() {
                     />
                   </span>
                 </Tooltip>
-              ) : canRecreateDeal ? (
+              )}
+              {!canShareReminder && canRecreateDeal && (
                 <Tooltip label={t("promises.detail.recreate.tooltip")} placement="bottom-right">
                   <span>
                     <IconButton
@@ -850,8 +899,8 @@ export default function PromisePage() {
                     />
                   </span>
                 </Tooltip>
-              ) : null}
-            </div>
+              )}
+            </>
           )}
           {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
         </div>
