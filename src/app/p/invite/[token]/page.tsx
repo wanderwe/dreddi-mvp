@@ -415,7 +415,7 @@ export default function InvitePage() {
                   <button
                     disabled={busy}
                     onClick={() => {
-                      if (info.visibility === "public") {
+                      if (info.visibility === "public" && signedIn) {
                         setShowAcceptModal(true);
                       } else {
                         void accept();
