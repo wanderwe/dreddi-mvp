@@ -100,7 +100,6 @@ export default function InvitePage() {
 
     if (inviteStatus === "accepted" && info.counterparty_id && userId === info.counterparty_id) {
       setAutoAcceptAttempted(true);
-      router.push(localizePath("/promises", locale));
       return;
     }
 
@@ -153,9 +152,8 @@ export default function InvitePage() {
       return;
     }
 
-    // успіх: перезавантажимо дані і перекинемо на promises
+    // успіх: перезавантажимо дані, щоб показати accepted-state прямо на сторінці інвайту
     await load();
-    router.push(localizePath("/promises", locale));
   }
 
   async function decline() {
