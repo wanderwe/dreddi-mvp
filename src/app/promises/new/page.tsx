@@ -462,11 +462,6 @@ export default function NewPromisePage() {
   }, [isCalendarOpen, calendarMonth]);
 
   useEffect(() => {
-    if (!ENABLE_GROUP_SELECTION) {
-      setIsGroupsLoading(false);
-      return;
-    }
-
     let active = true;
 
     const ensureSession = async () => {
@@ -502,7 +497,7 @@ export default function NewPromisePage() {
     return () => {
       active = false;
     };
-  }, [router]);
+  }, [locale, router]);
 
   useEffect(() => {
     if (!ENABLE_GROUP_SELECTION) {
