@@ -25,6 +25,11 @@ import {
   type AuthState,
 } from "@/lib/auth/getAuthState";
 
+type HeaderGroupShortcut = {
+  id: string;
+  title: string;
+};
+
 export function AppHeader() {
   const t = useT();
   const locale = useLocale();
@@ -34,6 +39,7 @@ export function AppHeader() {
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
+  const [groupShortcuts, setGroupShortcuts] = useState<HeaderGroupShortcut[]>([]);
   const isAuthenticated = authState.isLoggedIn;
   const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
@@ -158,6 +164,36 @@ export function AppHeader() {
     };
   }, [authState.isLoggedIn, authState.user]);
 
+  useEffect(() => {
+    const client = supabase;
+    const userId = authState.user?.id;
+
+    if (!authState.isLoggedIn || !userId || !client) {
+      setGroupShortcuts([]);
+      return;
+    }
+
+    let active = true;
+
+    const loadGroupShortcuts = async () => {
+      const { data, error } = await client
+        .from("promise_groups")
+        .select("id,title")
+        .eq("owner_user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+      if (!active || error) return;
+      setGroupShortcuts((data ?? []) as HeaderGroupShortcut[]);
+    };
+
+    void loadGroupShortcuts();
+
+    return () => {
+      active = false;
+    };
+  }, [authState.isLoggedIn, authState.user]);
+
   if (isEmbedPath) return null;
 
   return (
@@ -187,9 +223,33 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <LocalizedLink className={linkBaseClasses} href="/promises/groups">
-                    {t("nav.groups")}
-                  </LocalizedLink>
+                  <div className="group relative">
+                    <LocalizedLink className={`${linkBaseClasses} relative z-10`} href="/promises/groups">
+                      {t("nav.groups")}
+                    </LocalizedLink>
+                    {groupShortcuts.length > 0 && (
+                      <div className="pointer-events-none invisible absolute left-0 top-full z-30 mt-2 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 opacity-0 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
+                        <ul className="space-y-1">
+                          {groupShortcuts.map((group) => (
+                            <li key={group.id}>
+                              <LocalizedLink
+                                href={`/promises/groups/${group.id}`}
+                                className="block rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-emerald-100"
+                              >
+                                {group.title}
+                              </LocalizedLink>
+                            </li>
+                          ))}
+                        </ul>
+                        <LocalizedLink
+                          href="/promises/groups"
+                          className="mt-2 block rounded-lg border-t border-white/10 px-3 pt-2 text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+                        >
+                          {t("nav.allGroups")}
+                        </LocalizedLink>
+                      </div>
+                    )}
+                  </div>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
