@@ -12,6 +12,7 @@ type GroupRow = {
   title: string;
   description: string | null;
   created_at: string;
+  dealCount: number;
 };
 
 export default function PromiseGroupsPage() {
@@ -58,8 +59,33 @@ export default function PromiseGroupsPage() {
         .order("created_at", { ascending: false });
 
       if (!active) return;
-      if (loadError) setError(loadError.message);
-      else setGroups((data ?? []) as GroupRow[]);
+      if (loadError) {
+        setError(loadError.message);
+      } else {
+        const groupsData = (data ?? []) as Omit<GroupRow, "dealCount">[];
+        const groupIds = groupsData.map((group) => group.id);
+        const countsByGroupId = new Map<string, number>();
+
+        if (groupIds.length > 0) {
+          const { data: groupedDeals, error: countsError } = await supabase
+            .from("promises")
+            .select("group_id")
+            .eq("creator_id", session.user.id)
+            .in("group_id", groupIds);
+
+          if (countsError) {
+            setError(countsError.message);
+          } else {
+            for (const row of groupedDeals ?? []) {
+              const groupId = (row as { group_id: string | null }).group_id;
+              if (!groupId) continue;
+              countsByGroupId.set(groupId, (countsByGroupId.get(groupId) ?? 0) + 1);
+            }
+          }
+        }
+
+        setGroups(groupsData.map((group) => ({ ...group, dealCount: countsByGroupId.get(group.id) ?? 0 })));
+      }
       setLoading(false);
     };
 
@@ -111,7 +137,7 @@ export default function PromiseGroupsPage() {
       return;
     }
 
-    setGroups((prev) => [inserted as GroupRow, ...prev]);
+    setGroups((prev) => [{ ...(inserted as Omit<GroupRow, "dealCount">), dealCount: 0 }, ...prev]);
     setTitle("");
     setDescription("");
   };
@@ -139,7 +165,11 @@ export default function PromiseGroupsPage() {
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
         <form className="mt-4 space-y-3" onSubmit={createGroup}>
+          <label htmlFor="group-name" className="block text-sm font-medium text-slate-200">
+            {t("groups.create.titleLabel")}
+          </label>
           <input
+            id="group-name"
             className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:text-sm"
             placeholder={t("groups.create.titlePlaceholder")}
             value={title}
@@ -153,13 +183,15 @@ export default function PromiseGroupsPage() {
             onChange={(event) => setDescription(event.target.value)}
             maxLength={280}
           />
-          <button
-            type="submit"
-            disabled={submitting || !title.trim()}
-            className="w-full cursor-pointer rounded-xl bg-emerald-400 px-4 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2 sm:text-sm"
-          >
-            {submitting ? t("groups.create.creating") : t("groups.create.submit")}
-          </button>
+          <div className="flex justify-end pt-1">
+            <button
+              type="submit"
+              disabled={submitting || !title.trim()}
+              className="w-full cursor-pointer rounded-xl bg-emerald-400 px-4 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2 sm:text-sm"
+            >
+              {submitting ? t("groups.create.creating") : t("groups.create.submit")}
+            </button>
+          </div>
         </form>
       </section>
 
@@ -176,9 +208,11 @@ export default function PromiseGroupsPage() {
               <li key={group.id}>
                 <LocalizedLink
                   href={`/promises/groups/${group.id}`}
-                  className="block rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
+                  className="block cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
                 >
-                  <p className="font-semibold text-white">{group.title}</p>
+                  <p className="font-semibold text-white">
+                    {group.title} • {t("groups.list.dealCount", { count: group.dealCount })}
+                  </p>
                   {group.description && <p className="mt-1 text-sm text-slate-300">{group.description}</p>}
                 </LocalizedLink>
               </li>
