@@ -12,7 +12,7 @@ import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { localizePath } from "@/lib/i18n/routing";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, EllipsisVertical } from "lucide-react";
 
 type DealRow = {
   id: string;
@@ -78,8 +78,14 @@ export default function PromiseGroupDetailPage() {
   const [reloadTick, setReloadTick] = useState(0);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
+  const [openDealActionsId, setOpenDealActionsId] = useState<string | null>(null);
   const attachMenuRef = useRef<HTMLDivElement | null>(null);
   const attachButtonRef = useRef<HTMLButtonElement | null>(null);
+  const actionsMenuRef = useRef<HTMLDivElement | null>(null);
+  const actionsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dealActionsMenuRef = useRef<HTMLDivElement | null>(null);
+  const dealActionsButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!groupId) return;
@@ -242,6 +248,50 @@ export default function PromiseGroupDetailPage() {
     };
   }, [isAttachMenuOpen]);
 
+  useEffect(() => {
+    if (!isActionsMenuOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!actionsMenuRef.current?.contains(target) && !actionsButtonRef.current?.contains(target)) {
+        setIsActionsMenuOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsActionsMenuOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isActionsMenuOpen]);
+
+  useEffect(() => {
+    if (!openDealActionsId) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!dealActionsMenuRef.current?.contains(target) && !dealActionsButtonRef.current?.contains(target)) {
+        setOpenDealActionsId(null);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenDealActionsId(null);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [openDealActionsId]);
+
   const deleteGroup = async () => {
     if (!groupId || !group) return;
 
@@ -290,6 +340,7 @@ export default function PromiseGroupDetailPage() {
     }
 
     setShowDeleteConfirm(false);
+    setIsActionsMenuOpen(false);
     router.push(localizePath("/promises/groups", locale));
   };
 
@@ -401,14 +452,40 @@ export default function PromiseGroupDetailPage() {
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={deletingGroup}
-                className="cursor-pointer rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:bg-red-500/20 hover:border-red-300/60 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
-              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  ref={actionsButtonRef}
+                  onClick={() => setIsActionsMenuOpen((open) => !open)}
+                  aria-haspopup="menu"
+                  aria-expanded={isActionsMenuOpen}
+                  aria-label={t("groups.actions.menu")}
+                  className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                >
+                  <EllipsisVertical className="h-5 w-5" aria-hidden />
+                </button>
+
+                {isActionsMenuOpen && (
+                  <div
+                    ref={actionsMenuRef}
+                    role="menu"
+                    className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setShowDeleteConfirm(true);
+                        setIsActionsMenuOpen(false);
+                      }}
+                      disabled={deletingGroup}
+                      className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-semibold leading-none text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             {group.description && <p className="mt-2 text-sm text-slate-300">{group.description}</p>}
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
@@ -551,18 +628,41 @@ export default function PromiseGroupDetailPage() {
                               })}
                             </p>
                           </LocalizedLink>
-                          <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:shrink-0 sm:flex-nowrap sm:justify-start">
+                          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:shrink-0 sm:self-start sm:justify-end">
                             <StatusPill tone={pill.tone} icon={pill.icon} label={statusLabel(row)} />
-                            <button
-                              type="button"
-                              onClick={() => void unlinkDealFromGroup(row.id)}
-                              disabled={unlinkingDealId === row.id}
-                              className="cursor-pointer rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200 transition hover:border-emerald-300/40 hover:bg-emerald-300/10 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {unlinkingDealId === row.id
-                                ? t("groups.deals.unlinking")
-                                : t("groups.deals.unlink")}
-                            </button>
+                            <div className="relative">
+                              <button
+                                type="button"
+                                ref={openDealActionsId === row.id ? dealActionsButtonRef : undefined}
+                                onClick={() => setOpenDealActionsId((prev) => (prev === row.id ? null : row.id))}
+                                aria-haspopup="menu"
+                                aria-expanded={openDealActionsId === row.id}
+                                aria-label={t("groups.deals.menu")}
+                                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                              >
+                                <EllipsisVertical className="h-4 w-4" aria-hidden />
+                              </button>
+                              {openDealActionsId === row.id && (
+                                <div
+                                  ref={dealActionsMenuRef}
+                                  role="menu"
+                                  className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                                >
+                                  <button
+                                    type="button"
+                                    role="menuitem"
+                                    onClick={() => {
+                                      setOpenDealActionsId(null);
+                                      void unlinkDealFromGroup(row.id);
+                                    }}
+                                    disabled={unlinkingDealId === row.id}
+                                    className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-medium leading-none text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                  >
+                                    {unlinkingDealId === row.id ? t("groups.deals.unlinking") : t("groups.deals.unlink")}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

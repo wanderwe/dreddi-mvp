@@ -920,8 +920,12 @@
     "dealsTitle": "Угоди в цій групі",
     "dealsEmpty": "У цій групі ще немає угод",
     "deals": {
+      "menu": "Дії угоди",
       "unlink": "Відв’язати",
       "unlinking": "Відв’язуємо…"
+    },
+    "actions": {
+      "menu": "Дії групи"
     },
     "attachExisting": {
       "title": "Додати існуючу угоду",
