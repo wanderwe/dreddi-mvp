@@ -890,8 +890,12 @@
     "dealsTitle": "Deals in this group",
     "dealsEmpty": "No deals in this group yet",
     "deals": {
+      "menu": "Deal actions",
       "unlink": "Unlink",
       "unlinking": "Unlinking…"
+    },
+    "actions": {
+      "menu": "Group actions"
     },
     "attachExisting": {
       "title": "Add an existing deal",
