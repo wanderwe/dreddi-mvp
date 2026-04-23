@@ -9,6 +9,15 @@ type PromiseStatsRow = {
   accepted_at: string | null;
 };
 
+const COUNTERPARTY_COLUMNS = ["creator_id", "counterparty_id", "promisor_id", "promisee_id"] as const;
+
+export const buildSharedDealsOrFilter = (userId: string, counterpartyId: string) =>
+  COUNTERPARTY_COLUMNS.flatMap((userColumn) =>
+    COUNTERPARTY_COLUMNS.map(
+      (counterpartyColumn) => `and(${userColumn}.eq.${userId},${counterpartyColumn}.eq.${counterpartyId})`
+    )
+  ).join(",");
+
 export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
@@ -63,9 +72,7 @@ export async function GET(req: Request) {
         .from("promises")
         .select("status")
         .eq("status", "confirmed")
-        .or(
-          `and(creator_id.eq.${user.id},counterparty_id.eq.${counterpartyId}),and(creator_id.eq.${counterpartyId},counterparty_id.eq.${user.id})`
-        );
+        .or(buildSharedDealsOrFilter(user.id, counterpartyId));
 
       if (sharedDealsError) {
         return NextResponse.json(
