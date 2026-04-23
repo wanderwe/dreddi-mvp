@@ -454,16 +454,31 @@ export default function InvitePage() {
       </div>
 
       {showAcceptModal && info && !inviteAccepted && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
-              {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
-            </h2>
-            <p className="mt-3 text-sm text-neutral-200">
-              {t("invite.publicModal.body", { entityLower: promiseLabels.entityLower })}
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-emerald-300/25 bg-neutral-950/95 p-6 shadow-2xl shadow-emerald-500/10">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-70"
+              aria-hidden
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 15% 20%, rgba(16, 185, 129, 0.16), transparent 45%)," +
+                  "radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.12), transparent 50%)",
+              }}
+            />
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <div className="relative">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200/90">
+                {t("invite.publicTag")}
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">
+                {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-neutral-200">
+                {t("invite.publicModal.body", { entityLower: promiseLabels.entityLower })}
+              </p>
+            </div>
+
+            <div className="relative mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setShowAcceptModal(false)}
@@ -477,7 +492,7 @@ export default function InvitePage() {
                   setShowAcceptModal(false);
                   await accept();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("invite.publicModal.confirm")}
               </button>
