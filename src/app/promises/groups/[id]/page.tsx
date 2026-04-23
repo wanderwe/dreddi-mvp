@@ -469,7 +469,7 @@ export default function PromiseGroupDetailPage() {
                   <div
                     ref={actionsMenuRef}
                     role="menu"
-                    className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                    className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
                   >
                     <button
                       type="button"
@@ -479,7 +479,7 @@ export default function PromiseGroupDetailPage() {
                         setIsActionsMenuOpen(false);
                       }}
                       disabled={deletingGroup}
-                      className="flex h-10 w-full cursor-pointer items-center justify-center rounded-lg px-3 text-center text-sm font-semibold leading-none text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-semibold leading-none text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
                     </button>
@@ -607,7 +607,7 @@ export default function PromiseGroupDetailPage() {
                   return (
                     <li key={row.id}>
                       <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <LocalizedLink
                             href={`/promises/${row.id}?from=group&groupId=${groupId}`}
                             className="min-w-0 flex-1"
@@ -628,7 +628,7 @@ export default function PromiseGroupDetailPage() {
                               })}
                             </p>
                           </LocalizedLink>
-                          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
+                          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:shrink-0 sm:self-start sm:justify-end">
                             <StatusPill tone={pill.tone} icon={pill.icon} label={statusLabel(row)} />
                             <div className="relative">
                               <button
@@ -646,7 +646,7 @@ export default function PromiseGroupDetailPage() {
                                 <div
                                   ref={dealActionsMenuRef}
                                   role="menu"
-                                  className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                                  className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
                                 >
                                   <button
                                     type="button"
@@ -656,7 +656,7 @@ export default function PromiseGroupDetailPage() {
                                       void unlinkDealFromGroup(row.id);
                                     }}
                                     disabled={unlinkingDealId === row.id}
-                                    className="flex h-10 w-full cursor-pointer items-center justify-center rounded-lg px-3 text-center text-sm font-medium leading-none text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-medium leading-none text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                                   >
                                     {unlinkingDealId === row.id ? t("groups.deals.unlinking") : t("groups.deals.unlink")}
                                   </button>
