@@ -202,7 +202,7 @@ export function AppHeader() {
   if (isEmbedPath) return null;
 
   return (
-    <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
+    <header className="relative z-50 border-b border-white/10 bg-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
         <LocalizedLink href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
           <DreddiLogo
@@ -249,7 +249,7 @@ export function AppHeader() {
                     </LocalizedLink>
                     {groupShortcuts.length > 0 && (
                       <div
-                        className={`absolute left-0 top-full z-30 mt-1 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
+                        className={`absolute left-0 top-full z-[60] mt-1 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
                           isGroupsMenuOpen ? "visible opacity-100" : "invisible opacity-0"
                         }`}
                         role="menu"
