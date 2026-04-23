@@ -167,6 +167,7 @@ export default function PromisePage() {
   const searchParams = useSearchParams();
   const id = params?.id;
   const backFrom = searchParams?.get("from");
+  const backGroupId = searchParams?.get("groupId");
   const actionParam = searchParams?.get("action");
 
   const [p, setP] = useState<PromiseRow | null>(null);
@@ -201,6 +202,12 @@ export default function PromisePage() {
   }, [locale, p, t]);
 
   const backLink = useMemo(() => {
+    if (backFrom === "group" && backGroupId) {
+      return {
+        href: `/promises/groups/${backGroupId}`,
+        label: t("promises.detail.backToGroup"),
+      };
+    }
     if (backFrom === "dashboard") {
       return { href: "/", label: t("promises.detail.backToDashboard") };
     }
@@ -208,7 +215,7 @@ export default function PromisePage() {
       href: "/promises",
       label: t("promises.detail.backToList", { entityPlural: promiseLabels.entityPlural }),
     };
-  }, [backFrom, promiseLabels.entityPlural, t]);
+  }, [backFrom, backGroupId, promiseLabels.entityPlural, t]);
 
   async function requireSessionOrRedirect(
     nextPath: string,
@@ -236,10 +243,9 @@ export default function PromisePage() {
       return;
     }
 
-    const actionQuery = actionParam === "confirm" || actionParam === "dispute"
-      ? `?action=${actionParam}`
-      : "";
-    const session = await requireSessionOrRedirect(localizePath(`/promises/${id}${actionQuery}`, locale), supabase);
+    const currentQuery = searchParams?.toString();
+    const nextPath = `/promises/${id}${currentQuery ? `?${currentQuery}` : ""}`;
+    const session = await requireSessionOrRedirect(localizePath(nextPath, locale), supabase);
     if (!session) return;
 
     const { data, error } = await supabase

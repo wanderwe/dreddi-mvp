@@ -531,7 +531,10 @@ export default function PromiseGroupDetailPage() {
                     <li key={row.id}>
                       <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <LocalizedLink href={`/promises/${row.id}`} className="min-w-0 flex-1">
+                          <LocalizedLink
+                            href={`/promises/${row.id}?from=group&groupId=${groupId}`}
+                            className="min-w-0 flex-1"
+                          >
                             <p className="truncate font-semibold text-white">{row.title}</p>
                             <p className="mt-1 text-xs text-slate-400">
                               {row.role === "promisor" ? t("groups.dealLine.iAmResponsible") : t("groups.dealLine.otherResponsible")}
