@@ -25,6 +25,11 @@ import {
   type AuthState,
 } from "@/lib/auth/getAuthState";
 
+type HeaderGroupShortcut = {
+  id: string;
+  title: string;
+};
+
 export function AppHeader() {
   const t = useT();
   const locale = useLocale();
@@ -34,6 +39,8 @@ export function AppHeader() {
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
+  const [groupShortcuts, setGroupShortcuts] = useState<HeaderGroupShortcut[]>([]);
+  const [isGroupsMenuOpen, setIsGroupsMenuOpen] = useState(false);
   const isAuthenticated = authState.isLoggedIn;
   const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
@@ -158,10 +165,44 @@ export function AppHeader() {
     };
   }, [authState.isLoggedIn, authState.user]);
 
+  useEffect(() => {
+    setIsGroupsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const client = supabase;
+    const userId = authState.user?.id;
+
+    if (!authState.isLoggedIn || !userId || !client) {
+      setGroupShortcuts([]);
+      return;
+    }
+
+    let active = true;
+
+    const loadGroupShortcuts = async () => {
+      const { data, error } = await client
+        .from("promise_groups")
+        .select("id,title")
+        .eq("owner_user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+      if (!active || error) return;
+      setGroupShortcuts((data ?? []) as HeaderGroupShortcut[]);
+    };
+
+    void loadGroupShortcuts();
+
+    return () => {
+      active = false;
+    };
+  }, [authState.isLoggedIn, authState.user]);
+
   if (isEmbedPath) return null;
 
   return (
-    <header className="relative border-b border-white/10 bg-black/30/50 backdrop-blur">
+    <header className="relative z-50 border-b border-white/10 bg-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
         <LocalizedLink href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
           <DreddiLogo
@@ -187,9 +228,54 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <LocalizedLink className={linkBaseClasses} href="/promises/groups">
-                    {t("nav.groups")}
-                  </LocalizedLink>
+                  <div
+                    className="relative"
+                    onMouseEnter={() => setIsGroupsMenuOpen(true)}
+                    onMouseLeave={() => setIsGroupsMenuOpen(false)}
+                    onFocusCapture={() => setIsGroupsMenuOpen(true)}
+                    onBlurCapture={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsGroupsMenuOpen(false);
+                      }
+                    }}
+                  >
+                    <LocalizedLink
+                      className={`${linkBaseClasses} relative z-10`}
+                      href="/promises/groups"
+                      aria-haspopup={groupShortcuts.length > 0 ? "menu" : undefined}
+                      aria-expanded={groupShortcuts.length > 0 ? isGroupsMenuOpen : undefined}
+                    >
+                      {t("nav.groups")}
+                    </LocalizedLink>
+                    {groupShortcuts.length > 0 && (
+                      <div
+                        className={`absolute left-0 top-full z-[60] mt-1 w-60 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
+                          isGroupsMenuOpen ? "visible opacity-100" : "invisible opacity-0"
+                        }`}
+                        role="menu"
+                      >
+                        <ul className="space-y-1">
+                          {groupShortcuts.map((group) => (
+                            <li key={group.id}>
+                              <LocalizedLink
+                                href={`/promises/groups/${group.id}`}
+                                className="block truncate rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-emerald-100"
+                                title={group.title}
+                              >
+                                {group.title}
+                              </LocalizedLink>
+                            </li>
+                          ))}
+                        </ul>
+                        <LocalizedLink
+                          href="/promises/groups"
+                          className="mt-2 block rounded-lg border-t border-white/10 px-3 pt-2 text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+                        >
+                          {t("nav.allGroups")}
+                        </LocalizedLink>
+                      </div>
+                    )}
+                  </div>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}

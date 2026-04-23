@@ -15,7 +15,8 @@
     "terms": "Terms",
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
-    "groups": "Groups"
+    "groups": "Groups",
+    "allGroups": "All groups"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
