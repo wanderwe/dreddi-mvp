@@ -942,13 +942,15 @@
     },
     "create": {
       "title": "Створити групу",
+      "titleLabel": "Назва групи",
       "titlePlaceholder": "Наприклад: Підготовка запуску",
       "descriptionPlaceholder": "Короткий опис (необов’язково)",
       "submit": "Створити групу",
       "creating": "Створюємо…"
     },
     "list": {
-      "title": "Ваші групи ({count})"
+      "title": "Ваші групи ({count})",
+      "dealCount": "{count} угод"
     },
     "summary": {
       "total": "Усього угод: {count}",

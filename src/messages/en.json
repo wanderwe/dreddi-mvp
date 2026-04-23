@@ -912,13 +912,15 @@
     },
     "create": {
       "title": "Create group",
+      "titleLabel": "Group name",
       "titlePlaceholder": "Example: Launch preparation",
       "descriptionPlaceholder": "Short description (optional)",
       "submit": "Create group",
       "creating": "Creating…"
     },
     "list": {
-      "title": "Your groups ({count})"
+      "title": "Your groups ({count})",
+      "dealCount": "{count} deals"
     },
     "summary": {
       "total": "Total deals: {count}",
