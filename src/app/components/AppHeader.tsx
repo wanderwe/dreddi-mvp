@@ -40,6 +40,7 @@ export function AppHeader() {
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
   const [groupShortcuts, setGroupShortcuts] = useState<HeaderGroupShortcut[]>([]);
+  const [isGroupsMenuOpen, setIsGroupsMenuOpen] = useState(false);
   const isAuthenticated = authState.isLoggedIn;
   const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
@@ -165,6 +166,10 @@ export function AppHeader() {
   }, [authState.isLoggedIn, authState.user]);
 
   useEffect(() => {
+    setIsGroupsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
     const client = supabase;
     const userId = authState.user?.id;
 
@@ -223,12 +228,32 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <div className="group relative">
-                    <LocalizedLink className={`${linkBaseClasses} relative z-10`} href="/promises/groups">
+                  <div
+                    className="relative"
+                    onMouseEnter={() => setIsGroupsMenuOpen(true)}
+                    onMouseLeave={() => setIsGroupsMenuOpen(false)}
+                    onFocusCapture={() => setIsGroupsMenuOpen(true)}
+                    onBlurCapture={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsGroupsMenuOpen(false);
+                      }
+                    }}
+                  >
+                    <LocalizedLink
+                      className={`${linkBaseClasses} relative z-10`}
+                      href="/promises/groups"
+                      aria-haspopup={groupShortcuts.length > 0 ? "menu" : undefined}
+                      aria-expanded={groupShortcuts.length > 0 ? isGroupsMenuOpen : undefined}
+                    >
                       {t("nav.groups")}
                     </LocalizedLink>
                     {groupShortcuts.length > 0 && (
-                      <div className="pointer-events-none invisible absolute left-0 top-full z-30 mt-2 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 opacity-0 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
+                      <div
+                        className={`absolute left-0 top-full z-30 mt-1 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
+                          isGroupsMenuOpen ? "visible opacity-100" : "invisible opacity-0"
+                        }`}
+                        role="menu"
+                      >
                         <ul className="space-y-1">
                           {groupShortcuts.map((group) => (
                             <li key={group.id}>
