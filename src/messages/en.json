@@ -906,7 +906,7 @@
     "delete": {
       "action": "Delete group",
       "deleting": "Deleting…",
-      "confirm": "Delete group \"{title}\"? All deals will be unlinked from this group",
+      "confirm": "Delete group \"{title}\"? All deals will be unlinked from this group.",
       "cancel": "Cancel",
       "confirmAction": "Delete"
     },

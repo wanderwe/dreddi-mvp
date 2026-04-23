@@ -595,22 +595,22 @@ export default function PromiseGroupDetailPage() {
       )}
 
       {showDeleteConfirm && group && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
           <button
             type="button"
             aria-label={t("groups.delete.cancel")}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0"
             onClick={() => !deletingGroup && setShowDeleteConfirm(false)}
           />
-          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl shadow-black/50">
-            <h3 className="text-lg font-semibold text-white">{t("groups.delete.action")}</h3>
-            <p className="mt-2 text-sm text-slate-300">{t("groups.delete.confirm", { title: group.title })}</p>
-            <div className="mt-5 flex justify-end gap-2">
+          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-black/60">
+            <h3 className="text-xl font-semibold text-white">{t("groups.delete.action")}</h3>
+            <p className="mt-3 text-sm text-neutral-200">{t("groups.delete.confirm", { title: group.title })}</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deletingGroup}
-                className="cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("groups.delete.cancel")}
               </button>
@@ -618,7 +618,7 @@ export default function PromiseGroupDetailPage() {
                 type="button"
                 onClick={() => void deleteGroup()}
                 disabled={deletingGroup}
-                className="cursor-pointer rounded-xl border border-red-300/40 bg-red-500/15 px-3 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-red-300/40 bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.confirmAction")}
               </button>
