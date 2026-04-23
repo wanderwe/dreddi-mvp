@@ -522,6 +522,8 @@
     "accepted": "This invite was already accepted",
     "acceptedStateMessage": "This deal has already been accepted",
     "acceptedStateMessageYou": "You accepted this deal",
+    "loopTriggerText": "Now you can record your own agreement with someone",
+    "loopTriggerCta": "Create your agreement",
     "acceptedBy": "Invitation accepted by: {name}",
     "acceptedByLabel": "Accepted by",
     "badge": "{entity} invite",

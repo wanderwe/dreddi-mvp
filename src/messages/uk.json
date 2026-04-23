@@ -530,6 +530,8 @@
     "accepted": "Це запрошення вже прийнято",
     "acceptedStateMessage": "Угоду вже прийнято",
     "acceptedStateMessageYou": "Ви прийняли цю угоду",
+    "loopTriggerText": "Тепер ти теж можеш зафіксувати свою домовленість",
+    "loopTriggerCta": "Створити домовленість",
     "acceptedBy": "Запрошення прийняв користувач: {name}",
     "acceptedByLabel": "Прийняв",
     "badge": "Запрошення до угоди",

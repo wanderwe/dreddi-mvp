@@ -385,17 +385,32 @@ export default function InvitePage() {
 
             <div className="mt-6">
               {inviteAccepted ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
-                    {t("invite.acceptedStateMessage")}
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
+                      {t("invite.acceptedStateMessage")}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
+                      className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 sm:shrink-0"
+                    >
+                      {openDealLabel}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 sm:shrink-0"
-                  >
-                    {openDealLabel}
-                  </button>
+
+                  {isAcceptedInviteeViewer && (
+                    <div className="mt-1 flex flex-col items-start gap-2">
+                      <p className="text-sm text-slate-200">{t("invite.loopTriggerText")}</p>
+                      <button
+                        type="button"
+                        onClick={() => router.push(localizePath("/promises/new", locale))}
+                        className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+                      >
+                        {t("invite.loopTriggerCta")}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : canAccept ? (
                 <div className="flex flex-wrap gap-2">
