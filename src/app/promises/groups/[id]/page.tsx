@@ -479,7 +479,7 @@ export default function PromiseGroupDetailPage() {
                         setIsActionsMenuOpen(false);
                       }}
                       disabled={deletingGroup}
-                      className="flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex h-10 w-full cursor-pointer items-center justify-center rounded-lg px-3 text-center text-sm font-semibold leading-none text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
                     </button>
@@ -656,7 +656,7 @@ export default function PromiseGroupDetailPage() {
                                       void unlinkDealFromGroup(row.id);
                                     }}
                                     disabled={unlinkingDealId === row.id}
-                                    className="flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex h-10 w-full cursor-pointer items-center justify-center rounded-lg px-3 text-center text-sm font-medium leading-none text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                                   >
                                     {unlinkingDealId === row.id ? t("groups.deals.unlinking") : t("groups.deals.unlink")}
                                   </button>

@@ -891,8 +891,8 @@
     "dealsEmpty": "No deals in this group yet",
     "deals": {
       "menu": "Deal actions",
-      "unlink": "Unlink",
-      "unlinking": "Unlinking…"
+      "unlink": "Unlink deal",
+      "unlinking": "Unlinking deal…"
     },
     "actions": {
       "menu": "Group actions"
