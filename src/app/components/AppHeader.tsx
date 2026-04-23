@@ -249,7 +249,7 @@ export function AppHeader() {
                     </LocalizedLink>
                     {groupShortcuts.length > 0 && (
                       <div
-                        className={`absolute left-0 top-full z-[60] mt-1 w-72 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
+                        className={`absolute left-0 top-full z-[60] mt-1 w-60 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
                           isGroupsMenuOpen ? "visible opacity-100" : "invisible opacity-0"
                         }`}
                         role="menu"
@@ -259,7 +259,8 @@ export function AppHeader() {
                             <li key={group.id}>
                               <LocalizedLink
                                 href={`/promises/groups/${group.id}`}
-                                className="block rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-emerald-100"
+                                className="block truncate rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-emerald-100"
+                                title={group.title}
                               >
                                 {group.title}
                               </LocalizedLink>
