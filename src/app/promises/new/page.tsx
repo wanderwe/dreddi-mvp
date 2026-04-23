@@ -161,8 +161,12 @@ export default function NewPromisePage() {
 
   const predictionResult = useMemo(() => {
     if (!predictionReady) return null;
+
+    const actorMetrics = executor === "me" ? predictionInput.actorMetrics : undefined;
+
     return generateDealPrediction({
       ...predictionInput,
+      actorMetrics,
       deal: {
         hasDeadline: Boolean(dueAt),
         hoursToDeadline: dueAt ? (dueAt.getTime() - Date.now()) / (60 * 60 * 1000) : null,
@@ -170,7 +174,7 @@ export default function NewPromisePage() {
         detailsText: details,
       },
     });
-  }, [predictionInput, predictionReady, dueAt, isPublicDeal, details]);
+  }, [predictionInput, predictionReady, dueAt, isPublicDeal, details, executor]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });
