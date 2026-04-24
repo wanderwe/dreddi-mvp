@@ -449,7 +449,7 @@ export default function PromiseGroupDetailPage() {
       ) : (
         <>
           <header className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
+            <p className="text-sm font-semibold text-slate-300">{t("groups.detailEyebrow")}</p>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
               <div className="relative">
