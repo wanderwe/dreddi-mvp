@@ -149,6 +149,11 @@ export default function InvitePage() {
     setBusy(false);
 
     if (!res.ok) {
+      if (res.status === 401) {
+        const nextPath = localizePath(`/p/invite/${token}?accept=1`, locale);
+        router.push(localizeLoginPath(nextPath, locale));
+        return;
+      }
       setError(j?.error ?? t("invite.errors.acceptFailed"));
       return;
     }
@@ -192,6 +197,11 @@ export default function InvitePage() {
     setBusy(false);
 
     if (!res.ok) {
+      if (res.status === 401) {
+        const nextPath = localizePath(`/p/invite/${token}`, locale);
+        router.push(localizeLoginPath(nextPath, locale));
+        return;
+      }
       setError(j?.error ?? t("invite.errors.declineFailed"));
       return;
     }

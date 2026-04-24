@@ -892,7 +892,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               try {
                 const supabase = requireSupabase();
                 const { error: signOutError } = await supabase.auth.signOut();
-                if (signOutError) {
+                if (
+                  signOutError &&
+                  !signOutError.message.toLowerCase().includes("auth session missing")
+                ) {
                   setLogoutError(signOutError.message);
                 }
               } catch (err) {
