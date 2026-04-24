@@ -882,6 +882,7 @@
   },
   "groups": {
     "eyebrow": "GROUPS",
+    "detailEyebrow": "Group",
     "title": "Deal groups",
     "subtitle": "A lightweight way to organize related deals in one list without boards and extra steps",
     "backToDeal": "Back to deal draft",
