@@ -465,10 +465,7 @@ export default function InvitePage() {
             />
 
             <div className="relative">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200/90">
-                {t("invite.publicTag")}
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">
+              <h2 className="text-2xl font-semibold text-white">
                 {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
               </h2>
               <p className="mt-3 text-sm leading-6 text-neutral-200">

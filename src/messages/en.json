@@ -567,7 +567,7 @@
     },
     "publicModal": {
       "title": "Accept public {entityLower}?",
-      "body": "This {entityLower} is public. After acceptance, key details become visible on public profiles for transparency.",
+      "body": "This {entityLower} is public. After acceptance, key details become visible in the executor’s public profile.",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
