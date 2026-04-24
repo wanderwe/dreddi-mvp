@@ -917,6 +917,8 @@
     },
     "create": {
       "title": "Create group",
+      "expandLabel": "Expand create group section",
+      "collapseLabel": "Collapse create group section",
       "titleLabel": "Group name",
       "titlePlaceholder": "Example: Launch preparation",
       "descriptionPlaceholder": "Short description (optional)",
