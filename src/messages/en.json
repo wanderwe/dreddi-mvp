@@ -523,6 +523,8 @@
     "accepted": "This invite was already accepted",
     "acceptedStateMessage": "This deal has already been accepted",
     "acceptedStateMessageYou": "You accepted this deal",
+    "loopTriggerText": "Now you can record your own agreement with someone",
+    "loopTriggerCta": "Create your agreement",
     "acceptedBy": "Invitation accepted by: {name}",
     "acceptedByLabel": "Accepted by",
     "badge": "{entity} invite",
@@ -566,7 +568,7 @@
     },
     "publicModal": {
       "title": "Accept public {entityLower}?",
-      "body": "This {entityLower} is public. If you proceed, its details will be visible on public profiles after confirmation",
+      "body": "This {entityLower} is public. After acceptance, key details become visible in the public profile",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
