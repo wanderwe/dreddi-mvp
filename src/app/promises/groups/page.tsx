@@ -6,6 +6,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 type GroupRow = {
   id: string;
@@ -28,6 +29,15 @@ export default function PromiseGroupsPage() {
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isCreateSectionOpen, setIsCreateSectionOpen] = useState(true);
+
+  useEffect(() => {
+    if (groups.length === 0) {
+      setIsCreateSectionOpen(true);
+      return;
+    }
+    setIsCreateSectionOpen(false);
+  }, [groups.length]);
 
   useEffect(() => {
     let active = true;
@@ -163,36 +173,59 @@ export default function PromiseGroupsPage() {
       </div>
 
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-        <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
-        <form className="mt-4 space-y-3" onSubmit={createGroup}>
-          <label htmlFor="group-name" className="block text-sm font-medium text-slate-200">
-            {t("groups.create.titleLabel")}
-          </label>
-          <input
-            id="group-name"
-            className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:text-sm"
-            placeholder={t("groups.create.titlePlaceholder")}
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={120}
-          />
-          <textarea
-            className="min-h-[96px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:min-h-[80px] sm:text-sm"
-            placeholder={t("groups.create.descriptionPlaceholder")}
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            maxLength={280}
-          />
-          <div className="flex justify-end pt-1">
-            <button
-              type="submit"
-              disabled={submitting || !title.trim()}
-              className="w-full cursor-pointer rounded-xl bg-emerald-400 px-4 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2 sm:text-sm"
-            >
-              {submitting ? t("groups.create.creating") : t("groups.create.submit")}
-            </button>
-          </div>
-        </form>
+        <button
+          type="button"
+          onClick={() => setIsCreateSectionOpen((prev) => !prev)}
+          className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+          aria-label={
+            isCreateSectionOpen ? t("groups.create.collapseLabel") : t("groups.create.expandLabel")
+          }
+          aria-expanded={isCreateSectionOpen}
+        >
+          <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
+          <span
+            className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
+              isCreateSectionOpen ? "rotate-180" : "rotate-0"
+            }`}
+          >
+            <ChevronDown className="h-4 w-4" aria-hidden />
+          </span>
+        </button>
+        <div
+          className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+            isCreateSectionOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <form className="mt-4 space-y-3" onSubmit={createGroup}>
+            <label htmlFor="group-name" className="block text-sm font-medium text-slate-200">
+              {t("groups.create.titleLabel")}
+            </label>
+            <input
+              id="group-name"
+              className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:text-sm"
+              placeholder={t("groups.create.titlePlaceholder")}
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              maxLength={120}
+            />
+            <textarea
+              className="min-h-[96px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:min-h-[80px] sm:text-sm"
+              placeholder={t("groups.create.descriptionPlaceholder")}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              maxLength={280}
+            />
+            <div className="flex justify-end pt-1">
+              <button
+                type="submit"
+                disabled={submitting || !title.trim()}
+                className="w-full cursor-pointer rounded-xl bg-emerald-400 px-4 py-2.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2 sm:text-sm"
+              >
+                {submitting ? t("groups.create.creating") : t("groups.create.submit")}
+              </button>
+            </div>
+          </form>
+        </div>
       </section>
 
       <section className="mt-6 space-y-3">
