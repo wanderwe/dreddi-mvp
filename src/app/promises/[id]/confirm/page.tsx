@@ -52,7 +52,7 @@ export default function ConfirmPromisePage() {
     DISPUTE_OPTIONS[0]
   );
   const [disputeReason, setDisputeReason] = useState("");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [successType, setSuccessType] = useState<"confirmed" | "disputed" | null>(null);
   const confirmButtonRef = useRef<HTMLButtonElement | null>(null);
   const disputeButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -208,8 +208,7 @@ export default function ConfirmPromisePage() {
     setError(null);
     try {
       await postAction(`/api/promises/${promise.id}/confirm`);
-      setSuccessMessage(t("promises.confirm.success.confirmed", { entity: promiseLabels.entity }));
-      setTimeout(() => router.push(localizePath("/promises", locale)), 1000);
+      setSuccessType("confirmed");
     } catch (e) {
       setError(e instanceof Error ? e.message : t("promises.confirm.errors.confirmFailed"));
     } finally {
@@ -227,7 +226,7 @@ export default function ConfirmPromisePage() {
         code: disputeCode,
         reason: trimmedReason,
       });
-      setSuccessMessage(t("promises.confirm.success.disputed"));
+      setSuccessType("disputed");
       setTimeout(() => router.push(localizePath("/promises", locale)), 1200);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("promises.confirm.errors.disputeFailed"));
@@ -347,9 +346,33 @@ export default function ConfirmPromisePage() {
                 </div>
               )}
 
-              {successMessage && (
-                <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-50">
-                  {successMessage}
+              {successType && (
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-50">
+                    {successType === "confirmed"
+                      ? (
+                          <div className="space-y-1">
+                            <p>{t("promises.confirm.success.confirmedTitle")}</p>
+                            <p className="text-emerald-100/80">
+                              {t("promises.confirm.success.reputationImpact")}
+                            </p>
+                          </div>
+                        )
+                      : t("promises.confirm.success.disputed")}
+                  </div>
+
+                  {successType === "confirmed" && (
+                    <div className="pl-1">
+                      <p className="text-sm text-slate-200">{t("promises.confirm.continuePrompt")}</p>
+                      <button
+                        type="button"
+                        onClick={() => router.push(localizePath("/promises/new", locale))}
+                        className="mt-2 inline-flex cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-transparent px-3 py-1.5 text-sm font-medium text-white transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                      >
+                        {t("promises.confirm.continueCta")}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
