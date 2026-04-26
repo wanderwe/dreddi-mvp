@@ -1130,7 +1130,7 @@ export default function PromisePage() {
                 )}
 
                 {canConfirmWithoutExecutorCompletion && (
-                  <div className="space-y-2">
+                  <div className="inline-flex flex-col items-start gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5">
                     <ActionButton
                       label={t("promises.detail.confirmCompletion")}
                       variant="ok"
@@ -1138,7 +1138,7 @@ export default function PromisePage() {
                       disabled={actionBusy !== null}
                       onClick={() => void confirmCompletion()}
                     />
-                    <p className="text-sm text-neutral-400">
+                    <p className="px-1 text-xs leading-relaxed text-emerald-100/70">
                       {t("promises.detail.confirmCompletionHelper")}
                     </p>
                   </div>
