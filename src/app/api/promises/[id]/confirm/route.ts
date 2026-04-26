@@ -46,7 +46,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    if (promise.status !== "completed_by_promisor") {
+    const isConfirmedWithoutExecutorCompletion =
+      promise.status === "active" && !promise.completed_at;
+    const canConfirm =
+      promise.status === "completed_by_promisor" || isConfirmedWithoutExecutorCompletion;
+    if (!canConfirm) {
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
     }
 
@@ -57,6 +61,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .update({
         status: "confirmed",
         confirmed_at: confirmedAt,
+        confirmed_without_executor_completion: isConfirmedWithoutExecutorCompletion,
       })
       .eq("id", id)
       .select(
