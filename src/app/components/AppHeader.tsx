@@ -267,12 +267,14 @@ export function AppHeader() {
                             </li>
                           ))}
                         </ul>
-                        <LocalizedLink
-                          href="/promises/groups"
-                          className="mt-2 block rounded-lg border-t border-white/10 px-3 pt-2 text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
-                        >
-                          {t("nav.allGroups")}
-                        </LocalizedLink>
+                        <div className="mt-1 border-t border-white/10 pt-1">
+                          <LocalizedLink
+                            href="/promises/groups"
+                            className="block rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-slate-100"
+                          >
+                            {t("nav.allGroups")}
+                          </LocalizedLink>
+                        </div>
                       </div>
                     )}
                   </div>
