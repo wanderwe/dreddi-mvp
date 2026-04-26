@@ -1375,11 +1375,9 @@ export default function NewPromisePage() {
               </div>
             </div>
 
-            <fieldset className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <legend className="text-sm font-semibold text-white">
-                {t("promises.new.visibility.label")}
-              </legend>
-              <div className="mt-3 space-y-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="text-sm font-semibold text-white/90">{t("promises.new.visibility.label")}</div>
+              <div className="mt-2.5 space-y-2.5">
                 <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
                   <input
                     type="radio"
@@ -1414,7 +1412,7 @@ export default function NewPromisePage() {
                   </span>
                 </label>
               </div>
-            </fieldset>
+            </div>
 
             {predictionResult && (
               <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
