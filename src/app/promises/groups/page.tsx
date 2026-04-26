@@ -7,6 +7,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import { notifyGroupsChanged } from "@/lib/groupsEvents";
 
 type GroupRow = {
   id: string;
@@ -148,6 +149,7 @@ export default function PromiseGroupsPage() {
     }
 
     setGroups((prev) => [{ ...(inserted as Omit<GroupRow, "dealCount">), dealCount: 0 }, ...prev]);
+    notifyGroupsChanged();
     setTitle("");
     setDescription("");
   };

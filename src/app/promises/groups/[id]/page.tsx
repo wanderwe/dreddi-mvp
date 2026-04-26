@@ -13,6 +13,7 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { localizePath } from "@/lib/i18n/routing";
 import { ChevronDown, EllipsisVertical } from "lucide-react";
+import { notifyGroupsChanged } from "@/lib/groupsEvents";
 
 type DealRow = {
   id: string;
@@ -341,6 +342,7 @@ export default function PromiseGroupDetailPage() {
 
     setShowDeleteConfirm(false);
     setIsActionsMenuOpen(false);
+    notifyGroupsChanged();
     router.push(localizePath("/promises/groups", locale));
   };
 
