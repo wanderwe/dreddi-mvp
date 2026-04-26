@@ -218,6 +218,10 @@
       "errors": {
         "markComplete": "Не вдалося позначити як виконану",
         "updateFailed": "Не вдалося оновити"
+      },
+      "groupFilter": {
+        "all": "Усі угоди",
+        "none": "Без групи"
       }
     },
     "detail": {
