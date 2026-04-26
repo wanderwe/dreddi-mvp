@@ -17,6 +17,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { isAwaitingYourAction } from "@/lib/promiseActions";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
+import { subscribeToGroupsChanged } from "@/lib/groupsEvents";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   buildAuthState,
@@ -193,9 +194,13 @@ export function AppHeader() {
     };
 
     void loadGroupShortcuts();
+    const unsubscribe = subscribeToGroupsChanged(() => {
+      void loadGroupShortcuts();
+    });
 
     return () => {
       active = false;
+      unsubscribe();
     };
   }, [authState.isLoggedIn, authState.user]);
 
