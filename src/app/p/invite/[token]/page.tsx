@@ -263,7 +263,6 @@ export default function InvitePage() {
     if (displayName) return displayName;
     return info.counterparty_id.slice(0, 8);
   }, [info, t]);
-  const isCreatorViewer = Boolean(info?.creator_id && userId && info.creator_id === userId);
   const isAcceptedInviteeViewer = Boolean(
     inviteAccepted && info?.counterparty_id && userId && info.counterparty_id === userId
   );
@@ -272,7 +271,6 @@ export default function InvitePage() {
       ? t("invite.heading.acceptedByYou")
       : t("invite.heading.accepted")
     : t("invite.heading.pending");
-  const openDealLabel = isCreatorViewer ? t("invite.viewDeal") : t("invite.goToDeal");
   const detailsText = info?.details?.trim() ?? "";
   const hasDetails = detailsText.length > 0;
   const canDecline = canCounterpartyRespond({
@@ -395,18 +393,14 @@ export default function InvitePage() {
 
             <div className="mt-6">
               {inviteAccepted ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
-                    {t("invite.acceptedStateMessage")}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 sm:shrink-0"
-                  >
-                    {openDealLabel}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
+                  className="inline-flex w-full cursor-pointer items-center justify-between rounded-2xl border border-emerald-400/35 bg-emerald-500/12 px-4 py-3 text-left text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/60 hover:bg-emerald-500/20"
+                >
+                  <span>{t("invite.acceptedStateMessage")} → {t("invite.viewDeal")}</span>
+                  <span className="text-base leading-none text-emerald-200" aria-hidden>→</span>
+                </button>
               ) : canAccept ? (
                 <div className="flex flex-wrap gap-2">
                   <button

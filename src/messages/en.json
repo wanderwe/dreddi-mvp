@@ -521,7 +521,7 @@
     "title": "Join this {entity} on Dreddi",
     "subtitle": "Review the {entityLower} details and your role. If it looks right, accept to continue.",
     "accepted": "This invite was already accepted",
-    "acceptedStateMessage": "This deal has already been accepted",
+    "acceptedStateMessage": "Deal accepted",
     "acceptedStateMessageYou": "You accepted this deal",
     "acceptedBy": "Invitation accepted by: {name}",
     "acceptedByLabel": "Accepted by",
