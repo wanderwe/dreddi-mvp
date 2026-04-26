@@ -17,6 +17,7 @@ type PromiseRow = {
   title: string;
   details: string | null;
   due_at: string | null;
+  completed_at: string | null;
   status: PromiseStatus;
   creator_id: string;
   creator_display_name: string | null;
@@ -152,7 +153,8 @@ export default function ConfirmPromisePage() {
   );
   const canReview = Boolean(
     promise &&
-      promise.status === "completed_by_promisor" &&
+      (promise.status === "completed_by_promisor" ||
+        (promise.status === "active" && !promise.completed_at)) &&
       isCounterparty &&
       isPromiseAccepted(promise)
   );

@@ -357,6 +357,44 @@ export default function PromisePage() {
     load();
   }
 
+  async function confirmCompletion() {
+    if (!p) return;
+    setError(null);
+    setActionBusy("confirm");
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setActionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/confirm`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    setActionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    await load();
+  }
+
   async function generateInvite() {
     if (!p) return;
 
@@ -775,9 +813,13 @@ export default function PromisePage() {
       !p.completed_at &&
       isInviteAccepted
   );
+  const canConfirmWithoutExecutorCompletion = Boolean(
+    canReview && p?.status === "active" && !p?.completed_at && isInviteAccepted
+  );
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
       canMarkNotDelivered ||
+      canConfirmWithoutExecutorCompletion ||
       (canReview && p?.status === "completed_by_promisor") ||
       (canRespondToInvite && p?.status === "active")
   );
@@ -1085,6 +1127,21 @@ export default function PromisePage() {
                   >
                     {t("promises.detail.reviewConfirm")}
                   </Link>
+                )}
+
+                {canConfirmWithoutExecutorCompletion && (
+                  <div className="space-y-2">
+                    <ActionButton
+                      label={t("promises.detail.confirmCompletion")}
+                      variant="ok"
+                      loading={actionBusy === "confirm"}
+                      disabled={actionBusy !== null}
+                      onClick={() => void confirmCompletion()}
+                    />
+                    <p className="text-sm text-neutral-400">
+                      {t("promises.detail.confirmCompletionHelper")}
+                    </p>
+                  </div>
                 )}
 
                 {canMarkNotDelivered && (
