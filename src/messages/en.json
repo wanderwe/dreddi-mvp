@@ -489,6 +489,16 @@
         "none": "No group",
         "helper": "Optional: attach this deal to a group to view related context together",
         "manage": "Manage groups"
+      },
+      "simple": {
+        "fields": {
+          "title": "What did you agree on?",
+          "counterparty": "Who to invite?"
+        },
+        "placeholders": {
+          "title": "For example: Record a video by Friday"
+        },
+        "toggle": "Advanced mode"
       }
     },
     "actionQueue": {
