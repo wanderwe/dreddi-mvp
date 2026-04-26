@@ -84,7 +84,7 @@ export default function NewPromisePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
-  const [isPublicDeal, setIsPublicDeal] = useState(true);
+  const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [isImportant, setIsImportant] = useState(false);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
@@ -171,11 +171,11 @@ export default function NewPromisePage() {
       deal: {
         hasDeadline: Boolean(dueAt),
         hoursToDeadline: dueAt ? (dueAt.getTime() - Date.now()) / (60 * 60 * 1000) : null,
-        isPublic: Boolean(isPublicDeal),
+        isPublic: visibility === "public",
         detailsText: details,
       },
     });
-  }, [predictionInput, predictionReady, dueAt, isPublicDeal, details, executor]);
+  }, [predictionInput, predictionReady, dueAt, visibility, details, executor]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });
@@ -684,7 +684,7 @@ export default function NewPromisePage() {
         selectedGroupId?: string;
         dueAt?: string | null;
         executor?: "me" | "other";
-        isPublicDeal?: boolean;
+        visibility?: "private" | "public";
         isImportant?: boolean;
         selectedCounterparty?: {
           id: string;
@@ -700,7 +700,7 @@ export default function NewPromisePage() {
       setShowCondition((parsedDraft.conditionText ?? "").trim().length > 0);
       setSelectedGroupId(parsedDraft.selectedGroupId ?? "");
       setExecutor(parsedDraft.executor === "other" ? "other" : "me");
-      setIsPublicDeal(parsedDraft.isPublicDeal ?? true);
+      setVisibility(parsedDraft.visibility === "public" ? "public" : "private");
       setIsImportant(parsedDraft.isImportant ?? false);
       setSelectedCounterparty(parsedDraft.selectedCounterparty ?? null);
 
@@ -727,13 +727,13 @@ export default function NewPromisePage() {
       selectedGroupId,
       dueAt: dueAt ? dueAt.toISOString() : null,
       executor,
-      isPublicDeal,
+      visibility,
       isImportant,
       selectedCounterparty,
     };
 
     window.sessionStorage.setItem(DEAL_DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  }, [conditionText, details, dueAt, executor, isPublicDeal, isImportant, selectedCounterparty, selectedGroupId, title]);
+  }, [conditionText, details, dueAt, executor, visibility, isImportant, selectedCounterparty, selectedGroupId, title]);
 
   useEffect(() => {
     prefillResolved.current = false;
@@ -791,7 +791,7 @@ export default function NewPromisePage() {
       const nextCondition = sourceDeal.condition_text ?? "";
       setConditionText(nextCondition);
       setShowCondition(nextCondition.trim().length > 0);
-      setIsPublicDeal(sourceDeal.visibility === "public");
+      setVisibility(sourceDeal.visibility === "public" ? "public" : "private");
       setIsImportant(sourceDeal.is_important === true);
       setSelectedGroupId(sourceDeal.group_id ?? "");
 
@@ -876,7 +876,7 @@ export default function NewPromisePage() {
 
     const secondPartyUserId = selectedCounterparty?.id ?? null;
 
-    const shouldMakePublic = isPublicDeal && isPublicProfile;
+    const shouldMakePublic = visibility === "public" && isPublicProfile;
     const payload = {
       title: title.trim(),
       details: details.trim() || null,
@@ -1375,42 +1375,46 @@ export default function NewPromisePage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <div className="flex items-center gap-3">
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="text-sm font-semibold text-white">
-                    {t("promises.new.publicDeal.label", {
-                      publicEntity: promiseLabels.publicEntity,
-                    })}
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    {t("promises.new.publicDeal.helper", {
-                      entityPlural: promiseLabels.entityPlural,
-                    })}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isPublicDeal}
-                  aria-label={t("promises.new.publicDeal.label", {
-                    publicEntity: promiseLabels.publicEntity,
-                  })}
-                  onClick={() => setIsPublicDeal((prev) => !prev)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
-                    isPublicDeal
-                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                      : "border-white/20 bg-white/10 hover:bg-white/20"
-                  } hover:border-emerald-300/60`}
-                >
-                  <span
-                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                      isPublicDeal ? "translate-x-5" : "translate-x-1"
-                    }`}
+            <fieldset className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <legend className="text-sm font-semibold text-white">
+                {t("promises.new.visibility.label")}
+              </legend>
+              <div className="mt-3 space-y-3">
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
+                  <input
+                    type="radio"
+                    name="visibility"
+                    value="private"
+                    checked={visibility === "private"}
+                    onChange={() => setVisibility("private")}
+                    className="mt-1 h-4 w-4 accent-emerald-300"
                   />
-                </button>
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-white">{t("promises.new.visibility.private.label")}</span>
+                    <span className="block text-xs text-slate-400">
+                      {t("promises.new.visibility.private.helper")}
+                    </span>
+                  </span>
+                </label>
+
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
+                  <input
+                    type="radio"
+                    name="visibility"
+                    value="public"
+                    checked={visibility === "public"}
+                    onChange={() => setVisibility("public")}
+                    className="mt-1 h-4 w-4 accent-emerald-300"
+                  />
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-white">{t("promises.new.visibility.public.label")}</span>
+                    <span className="block text-xs text-slate-400">
+                      {t("promises.new.visibility.public.helper")}
+                    </span>
+                  </span>
+                </label>
               </div>
-            </div>
+            </fieldset>
 
             {predictionResult && (
               <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">

@@ -434,9 +434,16 @@
         "selectTime": "Select time",
         "closeTimePicker": "Close time picker"
       },
-      "publicDeal": {
-        "label": "{publicEntity}",
-        "helper": "Visible on your profile to other users"
+      "visibility": {
+        "label": "Visibility",
+        "private": {
+          "label": "Private",
+          "helper": "Only participants can see this deal"
+        },
+        "public": {
+          "label": "Public",
+          "helper": "Visible on your profile. Shows your reliability"
+        }
       },
       "search": {
         "searching": "Searching users…",
