@@ -165,10 +165,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
   const [promises, setPromises] = useState<PublicPromise[]>([]);
-  const [publicDealsPage, setPublicDealsPage] = useState(0);
-  const [hasMorePublicDeals, setHasMorePublicDeals] = useState(false);
+  const [visiblePublicDealsCount, setVisiblePublicDealsCount] = useState(PUBLIC_DEALS_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
-  const [loadingMorePublicDeals, setLoadingMorePublicDeals] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
@@ -243,8 +241,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
       const { data, error: promisesErr } = await supabase.rpc("public_get_profile_public_promises", {
         p_handle: profileRow.handle,
-        p_limit: PUBLIC_DEALS_PAGE_SIZE + 1,
-        p_offset: 0,
+        p_limit: 200,
       });
       const promiseRows = (data ?? []) as PublicPromiseRow[];
 
@@ -252,24 +249,20 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
       if (promisesErr) {
         setPromises([]);
-        setPublicDealsPage(0);
-        setHasMorePublicDeals(false);
+        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
       } else {
         const normalized = normalizePublicPromiseRows(promiseRows);
-        const nextHasMore = normalized.length > PUBLIC_DEALS_PAGE_SIZE;
-        const pageRows = nextHasMore ? normalized.slice(0, PUBLIC_DEALS_PAGE_SIZE) : normalized;
-        setPromises(pageRows);
-        setPublicDealsPage(0);
-        setHasMorePublicDeals(nextHasMore);
+        setPromises(normalized);
+        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
 
         if (
           process.env.NODE_ENV !== "production" &&
-          pageRows.length > 0 &&
+          normalized.length > 0 &&
           !profileRow.last_activity_at
         ) {
           console.info("public_profile_stats missing last_activity_at despite promises", {
             handle: profileRow.handle,
-            promiseCount: pageRows.length,
+            promiseCount: normalized.length,
           });
         }
       }
@@ -284,29 +277,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     };
   }, [handle, t]);
 
-  const handleLoadMorePublicDeals = async () => {
-    if (!supabase || !profile || loadingMorePublicDeals || !hasMorePublicDeals) return;
-    setLoadingMorePublicDeals(true);
-    const nextPage = publicDealsPage + 1;
-    const offset = nextPage * PUBLIC_DEALS_PAGE_SIZE;
-    const { data, error: promisesErr } = await supabase.rpc("public_get_profile_public_promises", {
-      p_handle: profile.handle,
-      p_limit: PUBLIC_DEALS_PAGE_SIZE + 1,
-      p_offset: offset,
-    });
-    const promiseRows = (data ?? []) as PublicPromiseRow[];
-
-    if (!promisesErr) {
-      const normalized = normalizePublicPromiseRows(promiseRows);
-      const nextHasMore = normalized.length > PUBLIC_DEALS_PAGE_SIZE;
-      const pageRows = nextHasMore ? normalized.slice(0, PUBLIC_DEALS_PAGE_SIZE) : normalized;
-      setPromises((prev) => [...prev, ...pageRows]);
-      setPublicDealsPage(nextPage);
-      setHasMorePublicDeals(nextHasMore);
-    }
-
-    setLoadingMorePublicDeals(false);
-  };
+  const handleLoadMorePublicDeals = () =>
+    setVisiblePublicDealsCount((prev) => prev + PUBLIC_DEALS_PAGE_SIZE);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -425,6 +397,11 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   };
 
   const publicDealsEmpty = promises.length === 0;
+  const visiblePromises = useMemo(
+    () => promises.slice(0, visiblePublicDealsCount),
+    [promises, visiblePublicDealsCount]
+  );
+  const hasMorePublicDeals = promises.length > visiblePublicDealsCount;
   const streakCount = useMemo(() => {
     const finalizedDeals = promises
       .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
@@ -1027,7 +1004,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               ) : (
                 <>
                   <div className="flex flex-col gap-4">
-                    {promises.map((promise) => (
+                    {visiblePromises.map((promise) => (
                       <div
                         key={`${promise.title}-${promise.created_at}`}
                         className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
@@ -1049,18 +1026,10 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                     <div className="mt-4 flex justify-center pt-2">
                       <button
                         type="button"
-                        onClick={() => void handleLoadMorePublicDeals()}
-                        disabled={loadingMorePublicDeals}
+                        onClick={handleLoadMorePublicDeals}
                         className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
                       >
-                        {loadingMorePublicDeals ? (
-                          <>
-                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                            {t("promises.list.loadingMore")}
-                          </>
-                        ) : (
-                          t("promises.list.loadMore")
-                        )}
+                        {t("promises.list.loadMore")}
                       </button>
                     </div>
                   ) : null}
