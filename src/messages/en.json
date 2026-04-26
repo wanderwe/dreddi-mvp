@@ -149,6 +149,10 @@
       "needsReview": "Needs your review",
       "awaitingInviteAcceptance": "Pending acceptance"
     },
+    "important": {
+      "label": "Important",
+      "helper": "Stronger impact on reputation"
+    },
     "confirmModal": {
       "title": "Confirm completion?",
       "body": "You’re asking the other side to confirm you delivered this {entityLower}",

@@ -85,6 +85,7 @@ export default function NewPromisePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
   const [isPublicDeal, setIsPublicDeal] = useState(true);
+  const [isImportant, setIsImportant] = useState(false);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
@@ -684,6 +685,7 @@ export default function NewPromisePage() {
         dueAt?: string | null;
         executor?: "me" | "other";
         isPublicDeal?: boolean;
+        isImportant?: boolean;
         selectedCounterparty?: {
           id: string;
           handle: string;
@@ -699,6 +701,7 @@ export default function NewPromisePage() {
       setSelectedGroupId(parsedDraft.selectedGroupId ?? "");
       setExecutor(parsedDraft.executor === "other" ? "other" : "me");
       setIsPublicDeal(parsedDraft.isPublicDeal ?? true);
+      setIsImportant(parsedDraft.isImportant ?? false);
       setSelectedCounterparty(parsedDraft.selectedCounterparty ?? null);
 
       if (parsedDraft.dueAt) {
@@ -725,11 +728,12 @@ export default function NewPromisePage() {
       dueAt: dueAt ? dueAt.toISOString() : null,
       executor,
       isPublicDeal,
+      isImportant,
       selectedCounterparty,
     };
 
     window.sessionStorage.setItem(DEAL_DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  }, [conditionText, details, dueAt, executor, isPublicDeal, selectedCounterparty, selectedGroupId, title]);
+  }, [conditionText, details, dueAt, executor, isPublicDeal, isImportant, selectedCounterparty, selectedGroupId, title]);
 
   useEffect(() => {
     prefillResolved.current = false;
@@ -769,7 +773,7 @@ export default function NewPromisePage() {
       const { data: sourceDeal } = await supabase
         .from("promises")
         .select(
-          "id,title,details,condition_text,counterparty_id,due_at,visibility,group_id,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
+          "id,title,details,condition_text,is_important,counterparty_id,due_at,visibility,group_id,creator_id,promisor_id,promisee_id,invite_status,counterparty_accepted_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
         )
         .eq("id", fromPromiseId)
         .eq("creator_id", session.user.id)
@@ -788,6 +792,7 @@ export default function NewPromisePage() {
       setConditionText(nextCondition);
       setShowCondition(nextCondition.trim().length > 0);
       setIsPublicDeal(sourceDeal.visibility === "public");
+      setIsImportant(sourceDeal.is_important === true);
       setSelectedGroupId(sourceDeal.group_id ?? "");
 
       if (sourceDeal.due_at) {
@@ -881,6 +886,7 @@ export default function NewPromisePage() {
       executor,
       visibility: shouldMakePublic ? "public" : "private",
       groupId: selectedGroupId || null,
+      isImportant,
     };
 
     let res: Response;
@@ -1343,6 +1349,33 @@ export default function NewPromisePage() {
             </div>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="text-sm font-semibold text-white">{t("promises.important.label")}</div>
+                  <p className="text-xs text-slate-400">{t("promises.important.helper")}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isImportant}
+                  aria-label={t("promises.important.label")}
+                  onClick={() => setIsImportant((prev) => !prev)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                    isImportant
+                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                      : "border-white/20 bg-white/10 hover:bg-white/20"
+                  } hover:border-emerald-300/60`}
+                >
+                  <span
+                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                      isImportant ? "translate-x-5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
               <div className="flex items-center gap-3">
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="text-sm font-semibold text-white">

@@ -155,6 +155,7 @@ test("reputation applies to executor and is idempotent", async () => {
   const promise = {
     id: "promise-1",
     title: "Ship feature",
+    is_important: false,
     status: "confirmed" as PromiseStatus,
     due_at: new Date().toISOString(),
     completed_at: new Date().toISOString(),
@@ -172,8 +173,11 @@ test("reputation applies to executor and is idempotent", async () => {
     invite_status: "accepted" as const,
     invited_at: new Date().toISOString(),
     accepted_at: new Date().toISOString(),
+    counterparty_accepted_at: new Date().toISOString(),
     declined_at: null,
     ignored_at: null,
+    expires_at: null,
+    cancelled_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
@@ -197,6 +201,7 @@ test("reputation applies to creator on self deals", async () => {
   const promise = {
     id: "promise-2",
     title: "Solo work",
+    is_important: false,
     status: "confirmed" as PromiseStatus,
     due_at: new Date().toISOString(),
     completed_at: new Date().toISOString(),
@@ -214,8 +219,11 @@ test("reputation applies to creator on self deals", async () => {
     invite_status: "accepted" as const,
     invited_at: new Date().toISOString(),
     accepted_at: new Date().toISOString(),
+    counterparty_accepted_at: new Date().toISOString(),
     declined_at: null,
     ignored_at: null,
+    expires_at: null,
+    cancelled_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
@@ -234,6 +242,7 @@ test("reputation does not apply when executor is missing", async () => {
   const promise = {
     id: "promise-3",
     title: "Pending invite",
+    is_important: false,
     status: "confirmed" as PromiseStatus,
     due_at: new Date().toISOString(),
     completed_at: new Date().toISOString(),
@@ -251,8 +260,11 @@ test("reputation does not apply when executor is missing", async () => {
     invite_status: "awaiting_acceptance" as const,
     invited_at: new Date().toISOString(),
     accepted_at: null,
+    counterparty_accepted_at: null,
     declined_at: null,
     ignored_at: null,
+    expires_at: null,
+    cancelled_at: null,
   };
 
   await applyReputationForPromiseFinalization(admin as never, promise);
@@ -327,4 +339,40 @@ test("on-time metrics align with executor and completed timestamps", () => {
   assert.equal(metrics.confirmedWithDeadline, 2);
   assert.equal(metrics.onTime, 1);
   assert.equal(metrics.totalCompleted, 4);
+});
+
+test("important deals apply stronger reputation impact", async () => {
+  const admin = new FakeAdmin();
+  const promise = {
+    id: "promise-important",
+    title: "Critical launch",
+    is_important: true,
+    status: "confirmed" as PromiseStatus,
+    due_at: new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    creator_id: "creator",
+    counterparty_id: "executor",
+    promisor_id: "executor",
+    promisee_id: "creator",
+    confirmed_at: new Date().toISOString(),
+    disputed_at: null,
+    disputed_code: null,
+    dispute_reason: null,
+    condition_text: null,
+    condition_met_at: null,
+    condition_met_by: null,
+    invite_status: "accepted" as const,
+    invited_at: new Date().toISOString(),
+    accepted_at: new Date().toISOString(),
+    counterparty_accepted_at: new Date().toISOString(),
+    declined_at: null,
+    ignored_at: null,
+    expires_at: null,
+    cancelled_at: null,
+  };
+
+  await applyReputationForPromiseFinalization(admin as never, promise);
+
+  const executor = admin.reputation.get("executor");
+  assert.equal(executor?.score, 56);
 });
