@@ -187,6 +187,7 @@ export default function PromisePage() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCounterpartyConfirmModal, setShowCounterpartyConfirmModal] = useState(false);
   const [showNotDeliveredModal, setShowNotDeliveredModal] = useState(false);
 
   const supabaseErrorMessage = (err: unknown) =>
@@ -1130,18 +1131,13 @@ export default function PromisePage() {
                 )}
 
                 {canConfirmWithoutExecutorCompletion && (
-                  <div className="inline-flex flex-col items-start gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5">
-                    <ActionButton
-                      label={t("promises.detail.confirmCompletion")}
-                      variant="ok"
-                      loading={actionBusy === "confirm"}
-                      disabled={actionBusy !== null}
-                      onClick={() => void confirmCompletion()}
-                    />
-                    <p className="px-1 text-xs leading-relaxed text-emerald-100/70">
-                      {t("promises.detail.confirmCompletionHelper")}
-                    </p>
-                  </div>
+                  <ActionButton
+                    label={t("promises.detail.confirmCompletion")}
+                    variant="ok"
+                    loading={actionBusy === "confirm"}
+                    disabled={actionBusy !== null}
+                    onClick={() => setShowCounterpartyConfirmModal(true)}
+                  />
                 )}
 
                 {canMarkNotDelivered && (
@@ -1311,6 +1307,41 @@ export default function PromisePage() {
                 className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("promises.notDeliveredModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCounterpartyConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.confirmModal.title")}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              {t("promises.confirmModal.counterpartyBody", {
+                entityLower: promiseLabels.entityLower,
+              })}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowCounterpartyConfirmModal(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("promises.confirmModal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowCounterpartyConfirmModal(false);
+                  await confirmCompletion();
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("promises.confirmModal.confirm")}
               </button>
             </div>
           </div>

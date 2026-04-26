@@ -152,6 +152,7 @@
     "confirmModal": {
       "title": "Confirm completion?",
       "body": "You’re asking the other side to confirm you delivered this {entityLower}",
+      "counterpartyBody": "Confirm if this {entityLower} is fulfilled, even if the executor hasn’t marked it as completed yet",
       "cancel": "Not yet",
       "confirm": "Yes, confirm completion"
     },
@@ -239,7 +240,6 @@
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
       "confirmCompletion": "Confirm completion",
-      "confirmCompletionHelper": "Even if the executor hasn’t marked it as completed",
       "shareInvite": "Share the invite and wait for acceptance before confirming",
       "reviewConfirm": "Review & confirm",
       "awaitingExecutor": "Waiting for the {executorRole} to mark this complete",
