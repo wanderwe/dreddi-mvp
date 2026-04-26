@@ -75,6 +75,50 @@ type PublicPromise = {
   cancelled_at: string | null;
 };
 
+const PUBLIC_DEALS_PAGE_SIZE = 12;
+
+const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =>
+  rows.flatMap((row) => {
+    if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
+    const uiStatus = getPromiseUiStatus({
+      status: row.status,
+      invite_status: row.invite_status,
+      accepted_at: row.accepted_at,
+      counterparty_accepted_at: row.counterparty_accepted_at,
+      declined_at: row.declined_at,
+      ignored_at: row.ignored_at,
+      expires_at: row.expires_at,
+      cancelled_at: row.cancelled_at,
+    });
+
+    if (
+      uiStatus === "awaiting_acceptance" ||
+      uiStatus === "cancelled_by_creator" ||
+      uiStatus === "expired"
+    ) {
+      return [];
+    }
+
+    return [
+      {
+        title: row.title,
+        status: row.status,
+        uiStatus,
+        created_at: row.created_at,
+        due_at: row.due_at,
+        confirmed_at: row.confirmed_at,
+        disputed_at: row.disputed_at,
+        declined_at: row.declined_at,
+        invite_status: row.invite_status,
+        accepted_at: row.accepted_at,
+        counterparty_accepted_at: row.counterparty_accepted_at,
+        ignored_at: row.ignored_at,
+        expires_at: row.expires_at,
+        cancelled_at: row.cancelled_at,
+      },
+    ];
+  });
+
 
 const getPublicProfileStats = async (handle: string) => {
   if (!supabase) {
@@ -121,6 +165,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
   const [promises, setPromises] = useState<PublicPromise[]>([]);
+  const [visiblePublicDealsCount, setVisiblePublicDealsCount] = useState(PUBLIC_DEALS_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
@@ -194,61 +239,21 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
         });
       }
 
-      const { data, error: promisesErr } = await supabase.rpc(
-        "public_get_profile_public_promises",
-        {
-          p_handle: profileRow.handle,
-          p_limit: 200,
-        }
-      );
+      const { data, error: promisesErr } = await supabase.rpc("public_get_profile_public_promises", {
+        p_handle: profileRow.handle,
+        p_limit: 200,
+      });
       const promiseRows = (data ?? []) as PublicPromiseRow[];
 
       if (!active) return;
 
       if (promisesErr) {
         setPromises([]);
+        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
       } else {
-        const normalized: PublicPromise[] = promiseRows.flatMap((row) => {
-          if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
-          const uiStatus = getPromiseUiStatus({
-            status: row.status,
-            invite_status: row.invite_status,
-            accepted_at: row.accepted_at,
-            counterparty_accepted_at: row.counterparty_accepted_at,
-            declined_at: row.declined_at,
-            ignored_at: row.ignored_at,
-            expires_at: row.expires_at,
-            cancelled_at: row.cancelled_at,
-          });
-
-          if (
-            uiStatus === "awaiting_acceptance" ||
-            uiStatus === "cancelled_by_creator" ||
-            uiStatus === "expired"
-          ) {
-            return [];
-          }
-
-          return [
-            {
-              title: row.title,
-              status: row.status,
-              uiStatus,
-              created_at: row.created_at,
-              due_at: row.due_at,
-              confirmed_at: row.confirmed_at,
-              disputed_at: row.disputed_at,
-              declined_at: row.declined_at,
-              invite_status: row.invite_status,
-              accepted_at: row.accepted_at,
-              counterparty_accepted_at: row.counterparty_accepted_at,
-              ignored_at: row.ignored_at,
-              expires_at: row.expires_at,
-              cancelled_at: row.cancelled_at,
-            },
-          ];
-        });
+        const normalized = normalizePublicPromiseRows(promiseRows);
         setPromises(normalized);
+        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
 
         if (
           process.env.NODE_ENV !== "production" &&
@@ -271,6 +276,9 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       active = false;
     };
   }, [handle, t]);
+
+  const handleLoadMorePublicDeals = () =>
+    setVisiblePublicDealsCount((prev) => prev + PUBLIC_DEALS_PAGE_SIZE);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -389,6 +397,11 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   };
 
   const publicDealsEmpty = promises.length === 0;
+  const visiblePromises = useMemo(
+    () => promises.slice(0, visiblePublicDealsCount),
+    [promises, visiblePublicDealsCount]
+  );
+  const hasMorePublicDeals = promises.length > visiblePublicDealsCount;
   const streakCount = useMemo(() => {
     const finalizedDeals = promises
       .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
@@ -989,25 +1002,38 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               {publicDealsEmpty ? (
                 <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
               ) : (
-                <div className="flex flex-col gap-4">
-                  {promises.map((promise) => (
-                    <div
-                      key={`${promise.title}-${promise.created_at}`}
-                      className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-white">{promise.title}</p>
-                        <p className="text-xs text-white/50">
-                          {formatDealMeta(promise, locale, dealMetaLabels)}
-                        </p>
+                <>
+                  <div className="flex flex-col gap-4">
+                    {visiblePromises.map((promise) => (
+                      <div
+                        key={`${promise.title}-${promise.created_at}`}
+                        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-white">{promise.title}</p>
+                          <p className="text-xs text-white/50">
+                            {formatDealMeta(promise, locale, dealMetaLabels)}
+                          </p>
+                        </div>
+                        <StatusPill
+                          label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
+                          tone={statusTones[promise.uiStatus] ?? "neutral"}
+                        />
                       </div>
-                      <StatusPill
-                        label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
-                        tone={statusTones[promise.uiStatus] ?? "neutral"}
-                      />
+                    ))}
+                  </div>
+                  {hasMorePublicDeals ? (
+                    <div className="mt-4 flex justify-center pt-2">
+                      <button
+                        type="button"
+                        onClick={handleLoadMorePublicDeals}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
+                      >
+                        {t("promises.list.loadMore")}
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  ) : null}
+                </>
               )}
               </section>
             ) : null}
