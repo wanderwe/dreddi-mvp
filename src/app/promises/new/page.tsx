@@ -1349,26 +1349,33 @@ export default function NewPromisePage() {
             </div>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <div className="flex items-center gap-3">
-                <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isImportant}
-                    onChange={(event) => setIsImportant(event.target.checked)}
-                    aria-label={t("promises.important.label")}
-                    className="h-4 w-4 rounded border border-white/30 bg-transparent accent-emerald-300"
-                  />
-                  <span className="text-sm font-semibold text-white">{t("promises.important.label")}</span>
-                </label>
-                <Tooltip label={t("promises.important.tooltip")} placement="top">
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                {t("promises.important.blockTitle")}
+              </p>
+              <div className="mt-2.5 flex items-center gap-3">
+                <span className="min-w-0 flex-1 text-sm font-semibold text-white">
+                  {t("promises.important.label")}
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isImportant}
+                  aria-label={t("promises.important.label")}
+                  onClick={() => setIsImportant((prev) => !prev)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                    isImportant
+                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                      : "border-white/20 bg-white/10 hover:bg-white/20"
+                  } hover:border-emerald-300/60`}
+                >
                   <span
-                    aria-label={t("promises.important.tooltip")}
-                    className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
-                  >
-                    <Info className="h-4 w-4" aria-hidden />
-                  </span>
-                </Tooltip>
+                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                      isImportant ? "translate-x-5" : "translate-x-1"
+                    }`}
+                  />
+                </button>
               </div>
+              <p className="mt-1.5 text-xs text-slate-400">{t("promises.important.helper")}</p>
             </div>
 
             <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
