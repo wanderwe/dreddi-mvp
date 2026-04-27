@@ -159,6 +159,20 @@ function pickReasons(modifiers: AppliedModifier[]) {
     tryPush(item);
   }
 
+  const publicCommitmentModifier = nonZero.find((item) => item.reasonKey === "public_commitment");
+  const hasPublicCommitmentReason = selected.some((item) => item.reasonKey === "public_commitment");
+  if (publicCommitmentModifier && !hasPublicCommitmentReason) {
+    const alreadyUsedTopic = selected.some((item) => REASON_TOPIC[item.reasonKey] === REASON_TOPIC.public_commitment);
+    if (!alreadyUsedTopic) {
+      if (selected.length < 4) {
+        selected.push(publicCommitmentModifier);
+      } else {
+        const replaceIndex = selected.findIndex((item) => item.delta <= publicCommitmentModifier.delta);
+        if (replaceIndex >= 0) selected[replaceIndex] = publicCommitmentModifier;
+      }
+    }
+  }
+
   if (selected.length < 2) {
     const fallback = modifiers.find((item) => item.reasonKey === "limited_history_uncertain");
     if (fallback) selected.push(fallback);
