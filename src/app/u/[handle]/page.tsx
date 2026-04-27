@@ -1073,7 +1073,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "execution"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
-                      : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
                   }`}
                 >
                   {t("publicProfile.publicDealsTabs.execution", {
@@ -1086,7 +1086,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "reaction"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
-                      : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
                   }`}
                 >
                   {t("publicProfile.publicDealsTabs.reaction", {
