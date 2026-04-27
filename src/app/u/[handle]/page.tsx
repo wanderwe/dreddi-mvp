@@ -16,7 +16,6 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
 
 type PublicProfileRow = {
@@ -129,6 +128,50 @@ const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =
       },
     ];
   });
+
+const inferProfileIdFromPromiseRows = (rows: PublicPromiseRow[]): string | null => {
+  if (rows.length === 0) return null;
+
+  const presenceById = new Map<string, number>();
+
+  for (const row of rows) {
+    const ids = new Set(
+      [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].filter(
+        (value): value is string => Boolean(value)
+      )
+    );
+
+    for (const id of ids) {
+      presenceById.set(id, (presenceById.get(id) ?? 0) + 1);
+    }
+  }
+
+  let inferredId: string | null = null;
+  let inferredPresence = 0;
+
+  for (const [id, presence] of presenceById.entries()) {
+    if (presence > inferredPresence) {
+      inferredId = id;
+      inferredPresence = presence;
+    }
+  }
+
+  if (!inferredId || inferredPresence < rows.length) return null;
+  return inferredId;
+};
+
+const resolvePublicExecutorId = (row: PublicPromiseRow): string | null => {
+  if (row.promisor_id) return row.promisor_id;
+
+  if (row.promisee_id) {
+    if (row.counterparty_id && row.counterparty_id !== row.promisee_id) {
+      return row.counterparty_id;
+    }
+    return null;
+  }
+
+  return row.creator_id ?? null;
+};
 
 
 const getPublicProfileStats = async (handle: string) => {
@@ -282,17 +325,14 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
         });
       } else {
         const normalized = normalizePublicPromiseRows(promiseRows);
+        const profileId = profileIdentity?.id ?? inferProfileIdFromPromiseRows(promiseRows);
+
         const execution = normalized.filter((promise) => {
           const source = promiseRows[promise.sourceIndex];
-          if (!source || !profileIdentity?.id || !source.creator_id) return true;
-          const executorId = resolveExecutorId({
-            creator_id: source.creator_id,
-            promisor_id: source.promisor_id ?? null,
-            promisee_id: source.promisee_id ?? null,
-            counterparty_id: source.counterparty_id ?? null,
-          });
+          if (!source || !profileId) return true;
+          const executorId = resolvePublicExecutorId(source);
           if (!executorId) return true;
-          return executorId === profileIdentity.id;
+          return executorId === profileId;
         });
         const executionIds = new Set(execution.map((promise) => promise.id));
         const reaction = normalized.filter((promise) => !executionIds.has(promise.id));
