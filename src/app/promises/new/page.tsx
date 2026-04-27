@@ -145,6 +145,7 @@ export default function NewPromisePage() {
         low_completion_history: t("promises.new.prediction.reasons.lowCompletionHistory"),
         high_dispute_rate: t("promises.new.prediction.reasons.highDisputeRate"),
         limited_history_uncertain: t("promises.new.prediction.reasons.limitedHistory"),
+        positive_but_limited_history: t("promises.new.prediction.reasons.positiveButLimitedHistory"),
         deep_shared_history: t("promises.new.prediction.reasons.deepSharedHistory"),
         some_shared_history: t("promises.new.prediction.reasons.someSharedHistory"),
         new_counterparty: t("promises.new.prediction.reasons.newCounterparty"),
