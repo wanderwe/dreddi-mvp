@@ -1350,71 +1350,81 @@ export default function NewPromisePage() {
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
               <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
-                {t("promises.important.blockTitle")}
+                {t("promises.new.settings.title")}
               </p>
-              <div className="mt-2.5 flex items-center gap-3">
-                <span className="min-w-0 flex-1 text-sm font-semibold text-white">
-                  {t("promises.important.label")}
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isImportant}
-                  aria-label={t("promises.important.label")}
-                  onClick={() => setIsImportant((prev) => !prev)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
-                    isImportant
-                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                      : "border-white/20 bg-white/10 hover:bg-white/20"
-                  } hover:border-emerald-300/60`}
-                >
-                  <span
-                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                      isImportant ? "translate-x-5" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-              <p className="mt-1.5 text-xs text-slate-400">{t("promises.important.helper")}</p>
-            </div>
 
-            <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <div className="flex items-center gap-3">
-                <div className="min-w-0 flex-1 space-y-1">
-                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
-                    {t("promises.new.visibility.label")}
+              <div className="mt-3.5 space-y-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.12em] text-slate-400">
+                    {t("promises.new.settings.importance.title")}
                   </p>
-                  <div className="text-sm font-semibold text-white">
-                    {visibility === "public"
-                      ? t("promises.new.visibility.public.label")
-                      : t("promises.new.visibility.private.label")}
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    {visibility === "public"
-                      ? t("promises.new.visibility.public.helper")
-                      : t("promises.new.visibility.private.helper")}
+                  <button
+                    type="button"
+                    onClick={() => setIsImportant((prev) => !prev)}
+                    className="mt-2 flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:border-emerald-300/40"
+                  >
+                    <span className="min-w-0 flex-1 text-sm font-semibold text-white">
+                      {t("promises.new.settings.importance.toggle")}
+                    </span>
+                    <span
+                      role="switch"
+                      aria-checked={isImportant}
+                      aria-label={t("promises.new.settings.importance.toggle")}
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition ${
+                        isImportant
+                          ? "border-emerald-300/50 bg-emerald-400/70"
+                          : "border-white/20 bg-white/10"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                          isImportant ? "translate-x-5" : "translate-x-1"
+                        }`}
+                      />
+                    </span>
+                  </button>
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    {t("promises.new.settings.importance.helper")}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={visibility === "public"}
-                  aria-label={t("promises.new.visibility.label")}
-                  onClick={() =>
-                    setVisibility((prev) => (prev === "public" ? "private" : "public"))
-                  }
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
-                    visibility === "public"
-                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                      : "border-white/20 bg-white/10 hover:bg-white/20"
-                  } hover:border-emerald-300/60`}
-                >
-                  <span
-                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                      visibility === "public" ? "translate-x-5" : "translate-x-1"
-                    }`}
-                  />
-                </button>
+
+                <div className="border-t border-white/10 pt-4">
+                  <p className="text-xs uppercase tracking-[0.12em] text-slate-400">
+                    {t("promises.new.settings.visibility.title")}
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
+                      <input
+                        type="radio"
+                        name="visibility"
+                        value="private"
+                        checked={visibility === "private"}
+                        onChange={() => setVisibility("private")}
+                        className="h-4 w-4 accent-emerald-300"
+                      />
+                      <span className="text-sm font-semibold text-white">
+                        {t("promises.new.visibility.private.label")}
+                      </span>
+                    </label>
+
+                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
+                      <input
+                        type="radio"
+                        name="visibility"
+                        value="public"
+                        checked={visibility === "public"}
+                        onChange={() => setVisibility("public")}
+                        className="h-4 w-4 accent-emerald-300"
+                      />
+                      <span className="text-sm font-semibold text-white">
+                        {t("promises.new.visibility.public.label")}
+                      </span>
+                    </label>
+                  </div>
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    {t("promises.new.settings.visibility.helper")}
+                  </p>
+                </div>
               </div>
             </div>
 

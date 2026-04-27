@@ -447,6 +447,18 @@
           "helper": "Visible on your public profile, demonstrating transparency and reliability."
         }
       },
+      "settings": {
+        "title": "Agreement settings",
+        "importance": {
+          "title": "Importance",
+          "toggle": "Important",
+          "helper": "Use only for agreements that really matter"
+        },
+        "visibility": {
+          "title": "Visibility",
+          "helper": "Added to your public track record"
+        }
+      },
       "search": {
         "searching": "Searching users…",
         "noResults": "User not found",
