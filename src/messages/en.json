@@ -151,7 +151,8 @@
     },
     "important": {
       "label": "Important",
-      "helper": "Stronger impact on reputation"
+      "helper": "Stronger impact on reputation",
+      "tooltip": "Important deals have a stronger impact on reputation after confirmation or dispute."
     },
     "confirmModal": {
       "title": "Confirm completion?",
