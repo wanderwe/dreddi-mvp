@@ -726,8 +726,8 @@
     "emptyPublicDeals": "No public deals yet",
     "emptyPublicDealsByRole": "No public agreements in this role",
     "publicDealsTabs": {
-      "execution": "Execution ({count})",
-      "reaction": "Reaction ({count})"
+      "execution": "I deliver ({count})",
+      "reaction": "Delivered to me ({count})"
     },
     "errors": {
       "supabase": "Supabase is not configured",

@@ -761,8 +761,8 @@
     "emptyPublicDeals": "Публічних угод ще немає",
     "emptyPublicDealsByRole": "Немає публічних угод у цій ролі",
     "publicDealsTabs": {
-      "execution": "Виконання ({count})",
-      "reaction": "Реакція ({count})"
+      "execution": "Я виконую ({count})",
+      "reaction": "Мені виконують ({count})"
     },
     "errors": {
       "supabase": "Supabase не налаштовано.",
