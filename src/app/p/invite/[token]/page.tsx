@@ -18,6 +18,7 @@ import { getPromiseLabels } from "@/lib/promiseLabels";
 type InviteInfo = {
   id: string;
   title: string;
+  is_important: boolean;
   details: string | null;
   condition_text: string | null;
   condition_met_at: string | null;
@@ -338,6 +339,11 @@ export default function InvitePage() {
             </h1>
 
             <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
+            {info.is_important && (
+              <div className="mt-2 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                {t("promises.important.label")}
+              </div>
+            )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
               <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">

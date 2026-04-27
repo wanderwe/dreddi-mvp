@@ -149,6 +149,12 @@
       "needsReview": "Needs your review",
       "awaitingInviteAcceptance": "Pending acceptance"
     },
+    "important": {
+      "blockTitle": "Agreement weight",
+      "label": "Important",
+      "helper": "Stronger impact on reputation",
+      "tooltip": "Important deals have a stronger impact on reputation after confirmation or dispute."
+    },
     "confirmModal": {
       "title": "Confirm completion?",
       "body": "You’re asking the other side to confirm you delivered this {entityLower}",
@@ -406,7 +412,8 @@
         "rewardHelper": "Add an amount + currency or describe the reward in text",
         "rewardText": "Reward details (optional)",
         "paymentTerms": "Payment terms (optional)",
-        "group": "Group"
+        "group": "Group",
+        "settings": "Settings"
       },
       "executor": {
         "me": "Me",
@@ -432,9 +439,28 @@
         "selectTime": "Select time",
         "closeTimePicker": "Close time picker"
       },
-      "publicDeal": {
-        "label": "{publicEntity}",
-        "helper": "Visible on your profile to other users"
+      "visibility": {
+        "label": "Visibility",
+        "private": {
+          "label": "Private",
+          "helper": "Only participants can see this deal"
+        },
+        "public": {
+          "label": "Public deal",
+          "helper": "Visible on your public profile, demonstrating transparency and reliability."
+        }
+      },
+      "settings": {
+        "title": "Agreement settings",
+        "importance": {
+          "title": "Importance",
+          "toggle": "Important deal",
+          "helper": "Has a stronger impact on reputation after confirmation or dispute"
+        },
+        "visibility": {
+          "title": "Visibility",
+          "helper": "Shown on your public profile"
+        }
       },
       "search": {
         "searching": "Searching users…",
