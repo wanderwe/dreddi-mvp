@@ -6,6 +6,7 @@ import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import {
   canCounterpartyRespond,
   getPromiseInviteStatus,
@@ -395,17 +396,29 @@ export default function InvitePage() {
 
             <div className="mt-6">
               {inviteAccepted ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100 sm:flex-1">
+                <div className="flex">
+                  <div className="flex w-full items-center justify-between rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
                     {t("invite.acceptedStateMessage")}
+                    <Tooltip label={openDealLabel} placement="top-right">
+                      <button
+                        type="button"
+                        aria-label={openDealLabel}
+                        onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-emerald-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
+                          <path
+                            d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                        </svg>
+                      </button>
+                    </Tooltip>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 sm:shrink-0"
-                  >
-                    {openDealLabel}
-                  </button>
                 </div>
               ) : canAccept ? (
                 <div className="flex flex-wrap gap-2">
