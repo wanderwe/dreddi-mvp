@@ -1375,42 +1375,43 @@ export default function NewPromisePage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <div className="text-sm font-semibold text-white/90">{t("promises.new.visibility.label")}</div>
-              <div className="mt-2.5 space-y-2.5">
-                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    value="private"
-                    checked={visibility === "private"}
-                    onChange={() => setVisibility("private")}
-                    className="mt-1 h-4 w-4 accent-emerald-300"
+            <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                    {t("promises.new.visibility.label")}
+                  </p>
+                  <div className="text-sm font-semibold text-white">
+                    {visibility === "public"
+                      ? t("promises.new.visibility.public.label")
+                      : t("promises.new.visibility.private.label")}
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {visibility === "public"
+                      ? t("promises.new.visibility.public.helper")
+                      : t("promises.new.visibility.private.helper")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={visibility === "public"}
+                  aria-label={t("promises.new.visibility.label")}
+                  onClick={() =>
+                    setVisibility((prev) => (prev === "public" ? "private" : "public"))
+                  }
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                    visibility === "public"
+                      ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                      : "border-white/20 bg-white/10 hover:bg-white/20"
+                  } hover:border-emerald-300/60`}
+                >
+                  <span
+                    className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                      visibility === "public" ? "translate-x-5" : "translate-x-1"
+                    }`}
                   />
-                  <span className="min-w-0">
-                    <span className="block font-semibold text-white">{t("promises.new.visibility.private.label")}</span>
-                    <span className="block text-xs text-slate-400">
-                      {t("promises.new.visibility.private.helper")}
-                    </span>
-                  </span>
-                </label>
-
-                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    value="public"
-                    checked={visibility === "public"}
-                    onChange={() => setVisibility("public")}
-                    className="mt-1 h-4 w-4 accent-emerald-300"
-                  />
-                  <span className="min-w-0">
-                    <span className="block font-semibold text-white">{t("promises.new.visibility.public.label")}</span>
-                    <span className="block text-xs text-slate-400">
-                      {t("promises.new.visibility.public.helper")}
-                    </span>
-                  </span>
-                </label>
+                </button>
               </div>
             </div>
 
