@@ -4,6 +4,7 @@ import type { InviteStatus } from "@/lib/promiseAcceptance";
 export type PromiseRowMin = {
   id: string;
   title: string;
+  is_important: boolean;
   status: PromiseStatus;
   due_at: string | null;
   completed_at: string | null;

@@ -10,6 +10,7 @@ function getEnv(name: string) {
 type PromiseInviteRow = {
   id: string;
   title: string;
+  is_important: boolean;
   details: string | null;
   condition_text: string | null;
   condition_met_at: string | null;
@@ -47,7 +48,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
     const { data: p, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,due_at,status,created_at,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,invite_token,counterparty_contact,visibility,promisor_id,promisee_id"
+        "id,title,is_important,details,condition_text,condition_met_at,due_at,status,created_at,creator_id,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,invite_token,counterparty_contact,visibility,promisor_id,promisee_id"
       )
       .eq("invite_token", token)
       .maybeSingle<PromiseInviteRow>(); // ✅ якщо TS не любить — прибери generic
@@ -94,6 +95,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       {
         id: p.id,
         title: p.title,
+        is_important: p.is_important === true,
         details: p.details ?? null,
         condition_text: p.condition_text ?? null,
         condition_met_at: p.condition_met_at ?? null,

@@ -14,6 +14,7 @@ type CreatePromisePayload = {
   executor?: "me" | "other";
   visibility?: "private" | "public";
   groupId?: string | null;
+  isImportant?: boolean;
 };
 
 export async function POST(req: Request) {
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
     const admin = getAdminClient();
     const requestedVisibility = body?.visibility === "private" ? "private" : "public";
     const groupId = body?.groupId?.trim() || null;
+    const isImportant = body?.isImportant === true;
 
     const { data: profileRow } = await admin
       .from("profiles")
@@ -104,6 +106,7 @@ export async function POST(req: Request) {
       visibility,
       promise_mode: "deal",
       group_id: groupId,
+      is_important: isImportant,
     };
 
     const { data: insertData, error: insertError } = await admin
