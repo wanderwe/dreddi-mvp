@@ -8,6 +8,7 @@ import { NewDealButton } from "@/app/components/NewDealButton";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { ImportantBadge } from "@/components/ImportantBadge";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -1048,17 +1049,20 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <LocalizedLink
-                          href={`/promises/${p.id}?from=deals`}
-                          className="block text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                        >
-                          {p.title}
-                        </LocalizedLink>
-                        {p.is_important && (
-                          <div className="mt-1 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-                            {t("promises.important.label")}
-                          </div>
-                        )}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <LocalizedLink
+                            href={`/promises/${p.id}?from=deals`}
+                            className="text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                          >
+                            {p.title}
+                          </LocalizedLink>
+                          {p.is_important && (
+                            <ImportantBadge
+                              className="px-2 py-0.5 text-[9px] leading-none shadow-none"
+                              label={t("promises.important.label")}
+                            />
+                          )}
+                        </div>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 

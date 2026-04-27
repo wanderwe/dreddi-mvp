@@ -14,6 +14,7 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseLabels } from "@/lib/promiseLabels";
+import { ImportantBadge } from "@/components/ImportantBadge";
 
 type InviteInfo = {
   id: string;
@@ -340,9 +341,7 @@ export default function InvitePage() {
 
             <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
             {info.is_important && (
-              <div className="mt-2 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-                {t("promises.important.label")}
-              </div>
+              <ImportantBadge className="mt-2" label={t("promises.important.label")} />
             )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
