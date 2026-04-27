@@ -451,8 +451,8 @@
         "title": "Agreement settings",
         "importance": {
           "title": "Importance",
-          "toggle": "Important",
-          "helper": "Use only for agreements that really matter"
+          "toggle": "Important deal",
+          "helper": "Has a stronger impact on reputation after confirmation or dispute"
         },
         "visibility": {
           "title": "Visibility",

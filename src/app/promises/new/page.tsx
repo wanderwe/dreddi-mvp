@@ -1349,19 +1349,12 @@ export default function NewPromisePage() {
             </div>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
-                {t("promises.new.settings.title")}
-              </p>
-
-              <div className="mt-3.5 space-y-4">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                    {t("promises.new.settings.importance.title")}
-                  </p>
                   <button
                     type="button"
                     onClick={() => setIsImportant((prev) => !prev)}
-                    className="mt-2 flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:border-emerald-300/40"
+                    className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:border-emerald-300/40"
                   >
                     <span className="min-w-0 flex-1 text-sm font-semibold text-white">
                       {t("promises.new.settings.importance.toggle")}
