@@ -1392,34 +1392,30 @@ export default function NewPromisePage() {
                   <p className="text-xs uppercase tracking-[0.12em] text-slate-400">
                     {t("promises.new.settings.visibility.title")}
                   </p>
-                  <div className="mt-2 space-y-2">
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
-                      <input
-                        type="radio"
-                        name="visibility"
-                        value="private"
-                        checked={visibility === "private"}
-                        onChange={() => setVisibility("private")}
-                        className="h-4 w-4 accent-emerald-300"
+                  <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                    <span className="min-w-0 flex-1 text-sm font-semibold text-white">
+                      {t("promises.new.visibility.public.label")}
+                    </span>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={visibility === "public"}
+                      aria-label={t("promises.new.settings.visibility.title")}
+                      onClick={() =>
+                        setVisibility((prev) => (prev === "public" ? "private" : "public"))
+                      }
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                        visibility === "public"
+                          ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                          : "border-white/20 bg-white/10 hover:bg-white/20"
+                      } hover:border-emerald-300/60`}
+                    >
+                      <span
+                        className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                          visibility === "public" ? "translate-x-5" : "translate-x-1"
+                        }`}
                       />
-                      <span className="text-sm font-semibold text-white">
-                        {t("promises.new.visibility.private.label")}
-                      </span>
-                    </label>
-
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition hover:border-emerald-300/40">
-                      <input
-                        type="radio"
-                        name="visibility"
-                        value="public"
-                        checked={visibility === "public"}
-                        onChange={() => setVisibility("public")}
-                        className="h-4 w-4 accent-emerald-300"
-                      />
-                      <span className="text-sm font-semibold text-white">
-                        {t("promises.new.visibility.public.label")}
-                      </span>
-                    </label>
+                    </button>
                   </div>
                   <p className="mt-1.5 text-xs text-slate-400">
                     {t("promises.new.settings.visibility.helper")}
