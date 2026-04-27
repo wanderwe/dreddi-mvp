@@ -130,6 +130,37 @@ const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =
     ];
   });
 
+const inferProfileIdFromPromiseRows = (rows: PublicPromiseRow[]): string | null => {
+  if (rows.length === 0) return null;
+
+  const presenceById = new Map<string, number>();
+
+  for (const row of rows) {
+    const ids = new Set(
+      [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].filter(
+        (value): value is string => Boolean(value)
+      )
+    );
+
+    for (const id of ids) {
+      presenceById.set(id, (presenceById.get(id) ?? 0) + 1);
+    }
+  }
+
+  let inferredId: string | null = null;
+  let inferredPresence = 0;
+
+  for (const [id, presence] of presenceById.entries()) {
+    if (presence > inferredPresence) {
+      inferredId = id;
+      inferredPresence = presence;
+    }
+  }
+
+  if (!inferredId || inferredPresence < rows.length) return null;
+  return inferredId;
+};
+
 
 const getPublicProfileStats = async (handle: string) => {
   if (!supabase) {
@@ -282,9 +313,11 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
         });
       } else {
         const normalized = normalizePublicPromiseRows(promiseRows);
+        const profileId = profileIdentity?.id ?? inferProfileIdFromPromiseRows(promiseRows);
+
         const execution = normalized.filter((promise) => {
           const source = promiseRows[promise.sourceIndex];
-          if (!source || !profileIdentity?.id || !source.creator_id) return true;
+          if (!source || !profileId || !source.creator_id) return true;
           const executorId = resolveExecutorId({
             creator_id: source.creator_id,
             promisor_id: source.promisor_id ?? null,
@@ -292,7 +325,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             counterparty_id: source.counterparty_id ?? null,
           });
           if (!executorId) return true;
-          return executorId === profileIdentity.id;
+          return executorId === profileId;
         });
         const executionIds = new Set(execution.map((promise) => promise.id));
         const reaction = normalized.filter((promise) => !executionIds.has(promise.id));
