@@ -329,6 +329,15 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       ...prev,
       [activePublicDealsTab]: prev[activePublicDealsTab] + PUBLIC_DEALS_PAGE_SIZE,
     }));
+  const handlePublicDealsTabChange = (nextTab: PublicDealsTab) => {
+    if (nextTab === activePublicDealsTab) return;
+    const previousScrollY = typeof window !== "undefined" ? window.scrollY : null;
+    setActivePublicDealsTab(nextTab);
+    if (previousScrollY === null) return;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: previousScrollY, behavior: "auto" });
+    });
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1060,7 +1069,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               <div className="mb-5 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setActivePublicDealsTab("execution")}
+                  onClick={() => handlePublicDealsTabChange("execution")}
                   className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "execution"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
@@ -1073,7 +1082,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActivePublicDealsTab("reaction")}
+                  onClick={() => handlePublicDealsTabChange("reaction")}
                   className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "reaction"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
