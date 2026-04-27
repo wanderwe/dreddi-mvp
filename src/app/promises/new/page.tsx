@@ -1378,18 +1378,25 @@ export default function NewPromisePage() {
             <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
               <div className="flex items-center gap-3">
                 <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                    {t("promises.new.visibility.label")}
+                  </p>
                   <div className="text-sm font-semibold text-white">
-                    {t("promises.new.visibility.public.label")}
+                    {visibility === "public"
+                      ? t("promises.new.visibility.public.label")
+                      : t("promises.new.visibility.private.label")}
                   </div>
                   <p className="text-xs text-slate-400">
-                    {t("promises.new.visibility.public.helper")}
+                    {visibility === "public"
+                      ? t("promises.new.visibility.public.helper")
+                      : t("promises.new.visibility.private.helper")}
                   </p>
                 </div>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={visibility === "public"}
-                  aria-label={t("promises.new.visibility.public.label")}
+                  aria-label={t("promises.new.visibility.label")}
                   onClick={() =>
                     setVisibility((prev) => (prev === "public" ? "private" : "public"))
                   }
