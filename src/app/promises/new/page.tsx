@@ -1348,8 +1348,13 @@ export default function NewPromisePage() {
                 </div>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
-              <div className="space-y-4">
+            <div className="mt-6 space-y-2">
+              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                {t("promises.new.fields.settings")}
+              </p>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+                <div className="space-y-4">
                 <div>
                   <button
                     type="button"
@@ -1382,10 +1387,7 @@ export default function NewPromisePage() {
                 </div>
 
                 <div className="border-t border-white/10 pt-4">
-                  <p className="text-xs uppercase tracking-[0.12em] text-slate-400">
-                    {t("promises.new.settings.visibility.title")}
-                  </p>
-                  <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                     <span className="min-w-0 flex-1 text-sm font-semibold text-white">
                       {t("promises.new.visibility.public.label")}
                     </span>
@@ -1415,6 +1417,7 @@ export default function NewPromisePage() {
                   </p>
                 </div>
               </div>
+            </div>
             </div>
 
             {predictionResult && (

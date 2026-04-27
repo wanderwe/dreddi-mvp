@@ -410,7 +410,8 @@
         "rewardHelper": "Add an amount + currency or describe the reward in text",
         "rewardText": "Reward details (optional)",
         "paymentTerms": "Payment terms (optional)",
-        "group": "Group"
+        "group": "Group",
+        "settings": "Settings"
       },
       "executor": {
         "me": "Me",
