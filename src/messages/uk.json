@@ -759,6 +759,11 @@
     "emptyOverdue": "Немає прострочених відповідальностей",
     "emptyHistory": "Поки немає історії",
     "emptyPublicDeals": "Публічних угод ще немає",
+    "emptyPublicDealsByRole": "Немає публічних угод у цій ролі",
+    "publicDealsTabs": {
+      "execution": "Виконання ({count})",
+      "reaction": "Реакція ({count})"
+    },
     "errors": {
       "supabase": "Supabase не налаштовано.",
       "missing": "Відсутній хендл профілю.",
