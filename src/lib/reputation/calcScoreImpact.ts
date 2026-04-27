@@ -4,6 +4,7 @@ type ScoreImpactInput = {
   status: PromiseStatus;
   due_at: string | null;
   completed_at: string | null;
+  is_important: boolean;
 };
 
 const isOnTime = (dueAt: string | null, completedAt: string | null) => {
@@ -16,13 +17,16 @@ const isLate = (dueAt: string | null, completedAt: string | null) => {
   return new Date(completedAt).getTime() > new Date(dueAt).getTime();
 };
 
-export const calc_score_impact = ({ status, due_at, completed_at }: ScoreImpactInput) => {
+const IMPORTANT_MULTIPLIER = 1.5;
+
+export const calc_score_impact = ({ status, due_at, completed_at, is_important }: ScoreImpactInput) => {
+  const multiplier = is_important ? IMPORTANT_MULTIPLIER : 1;
   if (status === "confirmed") {
-    return isOnTime(due_at, completed_at) ? 4 : 3;
+    return Math.round((isOnTime(due_at, completed_at) ? 4 : 3) * multiplier);
   }
 
   if (status === "disputed") {
-    return isLate(due_at, completed_at) ? -7 : -6;
+    return Math.round((isLate(due_at, completed_at) ? -7 : -6) * multiplier);
   }
 
   return 0;

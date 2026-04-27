@@ -27,6 +27,7 @@ import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 type PromiseRow = {
   id: string;
   title: string;
+  is_important: boolean;
   status: PromiseStatus;
   due_at: string | null;
   created_at: string;
@@ -294,7 +295,7 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
       )
       .or(buildBaseFilter(user.id));
 
@@ -354,7 +355,7 @@ export default function PromisesClient() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -1053,6 +1054,11 @@ export default function PromisesClient() {
                         >
                           {p.title}
                         </LocalizedLink>
+                        {p.is_important && (
+                          <div className="mt-1 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                            {t("promises.important.label")}
+                          </div>
+                        )}
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
 

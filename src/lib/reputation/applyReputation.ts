@@ -43,6 +43,7 @@ function computeDeltas(promise: PromiseRowMin): EventInput[] {
     status: promise.status,
     due_at: promise.due_at,
     completed_at: promise.completed_at,
+    is_important: promise.is_important,
   };
   const onTime = calcOnTime(impactInput);
   const late = calcLatePenalty(impactInput);

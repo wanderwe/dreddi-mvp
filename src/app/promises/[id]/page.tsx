@@ -26,6 +26,7 @@ import { Tooltip } from "@/app/components/ui/Tooltip";
 type PromiseRow = {
   id: string;
   title: string;
+  is_important: boolean;
   details: string | null;
   condition_text: string | null;
   condition_met_at: string | null;
@@ -251,7 +252,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .single();
@@ -938,6 +939,11 @@ export default function PromisePage() {
             <div className="space-y-3">
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
+                {p.is_important && (
+                  <div className="mt-2 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                    {t("promises.important.label")}
+                  </div>
+                )}
               </div>
 
               <div>
