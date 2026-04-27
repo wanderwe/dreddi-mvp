@@ -444,7 +444,7 @@
           "helper": "Only participants can see this deal"
         },
         "public": {
-          "label": "Public",
+          "label": "Public deal",
           "helper": "Visible on your public profile, demonstrating transparency and reliability."
         }
       },
