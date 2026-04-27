@@ -220,3 +220,42 @@ test("dispute rate below 20% does not trigger dispute risk reason", () => {
 
   assert.ok(!result.reasonKeys.includes("high_dispute_rate"));
 });
+
+test("includes public_commitment reason when public toggle increases score", () => {
+  const privateResult = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 92,
+      completionRate: 90,
+      disputeRate: 5,
+      finalizedDealsCount: 12,
+    },
+    counterpartyMetrics: {
+      priorFulfilledTogether: 0,
+    },
+    deal: {
+      hasDeadline: false,
+      isPublic: false,
+      detailsText: "Зробити дизайн оновлення профілю і передати всі макети до п'ятниці",
+    },
+  });
+
+  const publicResult = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 92,
+      completionRate: 90,
+      disputeRate: 5,
+      finalizedDealsCount: 12,
+    },
+    counterpartyMetrics: {
+      priorFulfilledTogether: 0,
+    },
+    deal: {
+      hasDeadline: false,
+      isPublic: true,
+      detailsText: "Зробити дизайн оновлення профілю і передати всі макети до п'ятниці",
+    },
+  });
+
+  assert.ok(publicResult.score > privateResult.score);
+  assert.ok(publicResult.reasonKeys.includes("public_commitment"));
+});
