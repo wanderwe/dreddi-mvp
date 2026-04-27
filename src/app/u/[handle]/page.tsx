@@ -16,6 +16,7 @@ import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
 import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
 
 type PublicProfileRow = {
@@ -43,6 +44,7 @@ type PublicProfileRow = {
 };
 
 type PublicPromiseRow = {
+  id?: string | null;
   title: string | null;
   status: string | null;
   invite_status: string | null;
@@ -56,9 +58,15 @@ type PublicPromiseRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  creator_id?: string | null;
+  promisor_id?: string | null;
+  promisee_id?: string | null;
+  counterparty_id?: string | null;
 };
 
 type PublicPromise = {
+  id: string;
+  sourceIndex: number;
   title: string;
   status: PromiseStatus;
   uiStatus: PromiseUiStatus;
@@ -76,9 +84,10 @@ type PublicPromise = {
 };
 
 const PUBLIC_DEALS_PAGE_SIZE = 12;
+type PublicDealsTab = "execution" | "reaction";
 
 const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =>
-  rows.flatMap((row) => {
+  rows.flatMap((row, index) => {
     if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return [];
     const uiStatus = getPromiseUiStatus({
       status: row.status,
@@ -101,6 +110,8 @@ const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =
 
     return [
       {
+        id: row.id ?? `${row.title}-${row.created_at}-${index}`,
+        sourceIndex: index,
         title: row.title,
         status: row.status,
         uiStatus,
@@ -164,8 +175,17 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const isEmbed = variant === "embed";
 
   const [profile, setProfile] = useState<PublicProfileRow | null>(null);
-  const [promises, setPromises] = useState<PublicPromise[]>([]);
-  const [visiblePublicDealsCount, setVisiblePublicDealsCount] = useState(PUBLIC_DEALS_PAGE_SIZE);
+  const [promisesByTab, setPromisesByTab] = useState<Record<PublicDealsTab, PublicPromise[]>>({
+    execution: [],
+    reaction: [],
+  });
+  const [activePublicDealsTab, setActivePublicDealsTab] = useState<PublicDealsTab>("execution");
+  const [visiblePublicDealsByTab, setVisiblePublicDealsByTab] = useState<
+    Record<PublicDealsTab, number>
+  >({
+    execution: PUBLIC_DEALS_PAGE_SIZE,
+    reaction: PUBLIC_DEALS_PAGE_SIZE,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
@@ -219,6 +239,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
       setLoading(true);
       setError(null);
+      setActivePublicDealsTab("execution");
 
       const { data: profileRow, error: profileErr } = await getPublicProfileStats(handle);
 
@@ -231,6 +252,12 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       }
 
       setProfile(profileRow as PublicProfileRow);
+      const { data: profileIdentity } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("handle", profileRow.handle)
+        .maybeSingle();
+      if (!active) return;
       if (process.env.NODE_ENV !== "production") {
         console.info("public profile on-time metrics", {
           handle: profileRow.handle,
@@ -248,12 +275,32 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       if (!active) return;
 
       if (promisesErr) {
-        setPromises([]);
-        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
+        setPromisesByTab({ execution: [], reaction: [] });
+        setVisiblePublicDealsByTab({
+          execution: PUBLIC_DEALS_PAGE_SIZE,
+          reaction: PUBLIC_DEALS_PAGE_SIZE,
+        });
       } else {
         const normalized = normalizePublicPromiseRows(promiseRows);
-        setPromises(normalized);
-        setVisiblePublicDealsCount(PUBLIC_DEALS_PAGE_SIZE);
+        const execution = normalized.filter((promise) => {
+          const source = promiseRows[promise.sourceIndex];
+          if (!source || !profileIdentity?.id || !source.creator_id) return true;
+          const executorId = resolveExecutorId({
+            creator_id: source.creator_id,
+            promisor_id: source.promisor_id ?? null,
+            promisee_id: source.promisee_id ?? null,
+            counterparty_id: source.counterparty_id ?? null,
+          });
+          if (!executorId) return true;
+          return executorId === profileIdentity.id;
+        });
+        const executionIds = new Set(execution.map((promise) => promise.id));
+        const reaction = normalized.filter((promise) => !executionIds.has(promise.id));
+        setPromisesByTab({ execution, reaction });
+        setVisiblePublicDealsByTab({
+          execution: PUBLIC_DEALS_PAGE_SIZE,
+          reaction: PUBLIC_DEALS_PAGE_SIZE,
+        });
 
         if (
           process.env.NODE_ENV !== "production" &&
@@ -278,7 +325,19 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   }, [handle, t]);
 
   const handleLoadMorePublicDeals = () =>
-    setVisiblePublicDealsCount((prev) => prev + PUBLIC_DEALS_PAGE_SIZE);
+    setVisiblePublicDealsByTab((prev) => ({
+      ...prev,
+      [activePublicDealsTab]: prev[activePublicDealsTab] + PUBLIC_DEALS_PAGE_SIZE,
+    }));
+  const handlePublicDealsTabChange = (nextTab: PublicDealsTab) => {
+    if (nextTab === activePublicDealsTab) return;
+    const previousScrollY = typeof window !== "undefined" ? window.scrollY : null;
+    setActivePublicDealsTab(nextTab);
+    if (previousScrollY === null) return;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: previousScrollY, behavior: "auto" });
+    });
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -305,8 +364,9 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     confirmedCount + disputedCount
   );
   const lastActivityFromPromises = useMemo(() => {
-    if (promises.length === 0) return null;
-    const latestStatusChange = promises.reduce<string | null>((currentLatest, promise) => {
+    const allPromises = [...promisesByTab.execution, ...promisesByTab.reaction];
+    if (allPromises.length === 0) return null;
+    const latestStatusChange = allPromises.reduce<string | null>((currentLatest, promise) => {
       const statusTimestamp = [promise.confirmed_at, promise.disputed_at].reduce<string | null>(
         (latest, timestamp) => {
           if (!timestamp) return latest;
@@ -324,14 +384,14 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
     if (latestStatusChange) return latestStatusChange;
 
-    return promises.reduce<string | null>((currentLatest, promise) => {
+    return allPromises.reduce<string | null>((currentLatest, promise) => {
       if (!promise.created_at) return currentLatest;
       if (!currentLatest) return promise.created_at;
       return new Date(promise.created_at).getTime() > new Date(currentLatest).getTime()
         ? promise.created_at
         : currentLatest;
     }, null);
-  }, [promises]);
+  }, [promisesByTab.execution, promisesByTab.reaction]);
   const lastActivityAt = profile?.last_activity_at ?? lastActivityFromPromises;
   const publicProfilePath = useMemo(
     () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
@@ -396,14 +456,17 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };
 
-  const publicDealsEmpty = promises.length === 0;
+  const activePromises = promisesByTab[activePublicDealsTab];
+  const executionCount = promisesByTab.execution.length;
+  const reactionCount = promisesByTab.reaction.length;
+  const publicDealsEmpty = activePromises.length === 0;
   const visiblePromises = useMemo(
-    () => promises.slice(0, visiblePublicDealsCount),
-    [promises, visiblePublicDealsCount]
+    () => activePromises.slice(0, visiblePublicDealsByTab[activePublicDealsTab]),
+    [activePromises, activePublicDealsTab, visiblePublicDealsByTab]
   );
-  const hasMorePublicDeals = promises.length > visiblePublicDealsCount;
+  const hasMorePublicDeals = activePromises.length > visiblePublicDealsByTab[activePublicDealsTab];
   const streakCount = useMemo(() => {
-    const finalizedDeals = promises
+    const finalizedDeals = [...promisesByTab.execution, ...promisesByTab.reaction]
       .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
       .map((promise) => ({
         status: promise.status,
@@ -423,7 +486,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     }
 
     return currentStreak;
-  }, [promises]);
+  }, [promisesByTab.execution, promisesByTab.reaction]);
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
@@ -454,7 +517,10 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     const onTimeCompletions = profile?.on_time_completion_count ?? null;
     const disputes = profile?.disputed_count ?? null;
     const disputeRate = profile?.dispute_rate ?? null;
-    const promisePaceMetrics = getLifetimePaceMetrics(promises);
+    const promisePaceMetrics = getLifetimePaceMetrics([
+      ...promisesByTab.execution,
+      ...promisesByTab.reaction,
+    ]);
     const profileActiveDays = profile?.reputation_age_days ?? null;
     const profileAvgDealsPerMonth = profile?.avg_deals_per_month;
     const hasProfilePace =
@@ -508,7 +574,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     profile?.on_time_completion_count,
     profile?.reputation_age_days,
     profile?.unique_counterparties_count,
-    promises,
+    promisesByTab.execution,
+    promisesByTab.reaction,
     totalFinalizedDeals,
   ]);
   const dealMetaLabels = useMemo(
@@ -999,8 +1066,36 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
+              <div className="mb-5 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePublicDealsTabChange("execution")}
+                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    activePublicDealsTab === "execution"
+                      ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
+                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
+                  }`}
+                >
+                  {t("publicProfile.publicDealsTabs.execution", {
+                    count: executionCount,
+                  })}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePublicDealsTabChange("reaction")}
+                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    activePublicDealsTab === "reaction"
+                      ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
+                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
+                  }`}
+                >
+                  {t("publicProfile.publicDealsTabs.reaction", {
+                    count: reactionCount,
+                  })}
+                </button>
+              </div>
               {publicDealsEmpty ? (
-                <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDeals")}</p>
+                <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDealsByRole")}</p>
               ) : (
                 <>
                   <div className="flex flex-col gap-4">

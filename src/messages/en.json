@@ -750,6 +750,11 @@
     "emptyOverdue": "No overdue responsibilities",
     "emptyHistory": "No history yet",
     "emptyPublicDeals": "No public deals yet",
+    "emptyPublicDealsByRole": "No public agreements in this role",
+    "publicDealsTabs": {
+      "execution": "I deliver ({count})",
+      "reaction": "For me ({count})"
+    },
     "errors": {
       "supabase": "Supabase is not configured",
       "missing": "Profile handle is missing",
