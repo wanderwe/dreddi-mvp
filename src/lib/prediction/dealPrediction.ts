@@ -27,6 +27,7 @@ export type PredictionReasonKey =
   | "low_completion_history"
   | "high_dispute_rate"
   | "limited_history_uncertain"
+  | "positive_but_limited_history"
   | "deep_shared_history"
   | "some_shared_history"
   | "new_counterparty"
@@ -64,6 +65,7 @@ const EN_REASONS: Record<PredictionReasonKey, string> = {
   low_completion_history: "low completion history increases risk",
   high_dispute_rate: "high dispute rate increases risk",
   limited_history_uncertain: "limited history makes this prediction less certain",
+  positive_but_limited_history: "you have positive history, but there is still limited data",
   deep_shared_history: "you have successful history with this person",
   some_shared_history: "you have fulfilled deals together",
   new_counterparty: "this is a new counterparty with no shared history",
@@ -84,6 +86,7 @@ const REASON_TOPIC: Record<PredictionReasonKey, string> = {
   low_completion_history: "actor_track_record",
   high_dispute_rate: "disputes",
   limited_history_uncertain: "certainty",
+  positive_but_limited_history: "certainty",
   deep_shared_history: "relationship",
   some_shared_history: "relationship",
   new_counterparty: "relationship",
@@ -254,6 +257,17 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
 
   if (hasSparseActorData && !modifiers.some((item) => item.reasonKey === "limited_history_uncertain")) {
     addModifier("insufficient_history", -4, "limited_history_uncertain");
+  }
+
+  const hasPositiveSharedHistory = modifiers.some(
+    (item) => item.reasonKey === "deep_shared_history" || item.reasonKey === "some_shared_history"
+  );
+  if (hasPositiveSharedHistory) {
+    for (const modifier of modifiers) {
+      if (modifier.reasonKey === "limited_history_uncertain") {
+        modifier.reasonKey = "positive_but_limited_history";
+      }
+    }
   }
 
   const totalDelta = modifiers.reduce((sum, item) => sum + item.delta, 0);

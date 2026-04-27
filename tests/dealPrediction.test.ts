@@ -102,6 +102,31 @@ test("shared fulfilled history with same counterparty increases score", () => {
   assert.ok(withHistory.score > withoutHistory.score);
 });
 
+test("uses combined certainty reason when history is positive but limited", () => {
+  const result = generateDealPrediction({
+    actorMetrics: {
+      fulfilledRate: 92,
+      completionRate: 90,
+      disputeRate: 6,
+      finalizedDealsCount: 2,
+    },
+    counterpartyMetrics: {
+      priorFulfilledTogether: 3,
+      isPublicProfile: true,
+      responseRate: 86,
+    },
+    deal: {
+      hasDeadline: true,
+      hoursToDeadline: 120,
+      isPublic: false,
+      detailsText: "Detailed scope and deliverables included here to avoid ambiguity",
+    },
+  });
+
+  assert.ok(result.reasonKeys.includes("positive_but_limited_history"));
+  assert.ok(!result.reasonKeys.includes("limited_history_uncertain"));
+});
+
 test("unknown counterparty gets stronger penalty than known new counterparty", () => {
   const unknownCounterparty = generateDealPrediction({
     actorMetrics: {
