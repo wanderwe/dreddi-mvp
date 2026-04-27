@@ -22,6 +22,7 @@ import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { ImportantBadge } from "@/components/ImportantBadge";
 
 type PromiseRow = {
   id: string;
@@ -983,9 +984,7 @@ export default function PromisePage() {
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 {p.is_important && (
-                  <div className="mt-2 inline-flex rounded-full border border-white/20 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-                    {t("promises.important.label")}
-                  </div>
+                  <ImportantBadge className="mt-2" label={t("promises.important.label")} />
                 )}
               </div>
 
