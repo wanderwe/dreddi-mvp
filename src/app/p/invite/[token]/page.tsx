@@ -430,7 +430,16 @@ export default function InvitePage() {
                   </div>
                 </div>
               ) : canAccept ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-end gap-2">
+                  {canDecline && (
+                    <button
+                      disabled={busy}
+                      onClick={() => void decline()}
+                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {busy ? t("invite.processing") : t("invite.decline")}
+                    </button>
+                  )}
                   <button
                     disabled={busy}
                     onClick={() => {
@@ -444,15 +453,6 @@ export default function InvitePage() {
                   >
                     {busy ? t("invite.processing") : t("invite.acceptDeal")}
                   </button>
-                  {canDecline && (
-                    <button
-                      disabled={busy}
-                      onClick={() => void decline()}
-                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {busy ? t("invite.processing") : t("invite.decline")}
-                    </button>
-                  )}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
