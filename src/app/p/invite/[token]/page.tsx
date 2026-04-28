@@ -2,7 +2,6 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Shield } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -359,11 +358,8 @@ export default function InvitePage() {
               )}
               {info.is_important && (
                 <Tooltip label={t("promises.important.tooltip")} placement="top">
-                  <span
-                    className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-2.5 py-1.5 text-slate-300"
-                    aria-label={t("promises.important.label")}
-                  >
-                    <Shield className="h-3.5 w-3.5" aria-hidden />
+                  <span className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-slate-200">
+                    {t("promises.important.label")}
                   </span>
                 </Tooltip>
               )}
