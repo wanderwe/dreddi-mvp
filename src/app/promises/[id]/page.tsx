@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Link2, MessageCircle, RefreshCw } from "lucide-react";
+import { Link2, MessageCircle, RefreshCw, Shield } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -22,7 +22,6 @@ import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
-import { ImportantBadge } from "@/components/ImportantBadge";
 
 type PromiseRow = {
   id: string;
@@ -982,10 +981,19 @@ export default function PromisePage() {
           <Card title={t("promises.detail.cardTitle", { entity: promiseLabels.entity })}>
             <div className="space-y-3">
               <div>
-                <div className="text-3xl font-semibold text-white">{p.title}</div>
-                {p.is_important && (
-                  <ImportantBadge className="mt-2" label={t("promises.important.label")} />
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="text-3xl font-semibold text-white">{p.title}</div>
+                  {p.is_important && (
+                    <Tooltip label={t("promises.important.tooltip")} placement="top">
+                      <span
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
+                        aria-label={t("promises.important.label")}
+                      >
+                        <Shield className="h-4 w-4" aria-hidden />
+                      </span>
+                    </Tooltip>
+                  )}
+                </div>
               </div>
 
               <div>

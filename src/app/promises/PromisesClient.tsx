@@ -1,14 +1,13 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Shield } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
-import { ImportantBadge } from "@/components/ImportantBadge";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -1057,10 +1056,14 @@ export default function PromisesClient() {
                             {p.title}
                           </LocalizedLink>
                           {p.is_important && (
-                            <ImportantBadge
-                              className="px-2 py-0.5 text-[9px] leading-none shadow-none"
-                              label={t("promises.important.label")}
-                            />
+                            <Tooltip label={t("promises.important.tooltip")} placement="top">
+                              <span
+                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
+                                aria-label={t("promises.important.label")}
+                              >
+                                <Shield className="h-3.5 w-3.5" aria-hidden />
+                              </span>
+                            </Tooltip>
                           )}
                         </div>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
