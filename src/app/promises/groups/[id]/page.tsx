@@ -450,11 +450,11 @@ export default function PromiseGroupDetailPage() {
         </p>
       ) : (
         <>
-          <header className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <header className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-sm font-semibold text-slate-300">{t("groups.detailEyebrow")}</p>
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+            <div className="mt-2 pr-14">
               <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
-              <div className="relative">
+              <div className="absolute right-5 top-5 z-10">
                 <button
                   type="button"
                   ref={actionsButtonRef}

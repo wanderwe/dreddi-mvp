@@ -14,7 +14,6 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseLabels } from "@/lib/promiseLabels";
-import { ImportantBadge } from "@/components/ImportantBadge";
 
 type InviteInfo = {
   id: string;
@@ -340,10 +339,6 @@ export default function InvitePage() {
             </h1>
 
             <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
-            {info.is_important && (
-              <ImportantBadge className="mt-2" label={t("promises.important.label")} />
-            )}
-
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
               <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">
                 <span className="mr-2" aria-hidden>
@@ -357,9 +352,18 @@ export default function InvitePage() {
                 </span>
               </span>
               {info.visibility === "public" && (
-                <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
-                  {t("invite.publicTag")}
-                </span>
+                <Tooltip label={t("invite.publicTooltip")} placement="top">
+                  <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
+                    {t("invite.publicTag")}
+                  </span>
+                </Tooltip>
+              )}
+              {info.is_important && (
+                <Tooltip label={t("invite.reputationStakeTooltip")} placement="top">
+                  <span className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-slate-200">
+                    {t("promises.important.label")}
+                  </span>
+                </Tooltip>
               )}
             </div>
 
@@ -426,7 +430,16 @@ export default function InvitePage() {
                   </div>
                 </div>
               ) : canAccept ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-end gap-2">
+                  {canDecline && (
+                    <button
+                      disabled={busy}
+                      onClick={() => void decline()}
+                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {busy ? t("invite.processing") : t("invite.decline")}
+                    </button>
+                  )}
                   <button
                     disabled={busy}
                     onClick={() => {
@@ -440,15 +453,6 @@ export default function InvitePage() {
                   >
                     {busy ? t("invite.processing") : t("invite.acceptDeal")}
                   </button>
-                  {canDecline && (
-                    <button
-                      disabled={busy}
-                      onClick={() => void decline()}
-                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {busy ? t("invite.processing") : t("invite.decline")}
-                    </button>
-                  )}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">

@@ -150,10 +150,10 @@
       "awaitingInviteAcceptance": "Pending acceptance"
     },
     "important": {
-      "blockTitle": "Agreement weight",
-      "label": "Important",
-      "helper": "Stronger impact on reputation",
-      "tooltip": "Important deals have a stronger impact on reputation after confirmation or dispute."
+      "blockTitle": "Reputation stake",
+      "label": "Reputation stake",
+      "helper": "Has a stronger impact on reputation after confirmation or dispute",
+      "tooltip": "Reputation stake\nHas a stronger impact on reputation"
     },
     "confirmModal": {
       "title": "Confirm completion?",
@@ -453,8 +453,8 @@
       "settings": {
         "title": "Agreement settings",
         "importance": {
-          "title": "Importance",
-          "toggle": "Important deal",
+          "title": "Reputation stake",
+          "toggle": "Reputation stake",
           "helper": "Has a stronger impact on reputation after confirmation or dispute"
         },
         "visibility": {
@@ -562,6 +562,8 @@
     "dealDetailsLabel": "Deal details",
     "deadline": "Deadline",
     "publicTag": "Public",
+    "publicTooltip": "Shown on public profile",
+    "reputationStakeTooltip": "Has a stronger impact on reputation",
     "counterCondition": "Counter-condition",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",
