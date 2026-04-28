@@ -339,19 +339,7 @@ export default function InvitePage() {
               {heading}
             </h1>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-semibold text-white">{info.title}</h2>
-              {info.is_important && (
-                <Tooltip label={t("promises.important.tooltip")} placement="top">
-                  <span
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
-                    aria-label={t("promises.important.label")}
-                  >
-                    <Shield className="h-4 w-4" aria-hidden />
-                  </span>
-                </Tooltip>
-              )}
-            </div>
+            <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
               <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">
                 <span className="mr-2" aria-hidden>
@@ -368,6 +356,16 @@ export default function InvitePage() {
                 <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
                   {t("invite.publicTag")}
                 </span>
+              )}
+              {info.is_important && (
+                <Tooltip label={t("promises.important.tooltip")} placement="top">
+                  <span
+                    className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-2.5 py-1.5 text-slate-300"
+                    aria-label={t("promises.important.label")}
+                  >
+                    <Shield className="h-3.5 w-3.5" aria-hidden />
+                  </span>
+                </Tooltip>
               )}
             </div>
 
