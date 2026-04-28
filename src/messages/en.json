@@ -563,6 +563,7 @@
     "deadline": "Deadline",
     "publicTag": "Public",
     "publicTooltip": "Shown on public profile",
+    "reputationStakeTooltip": "Has a stronger impact on reputation",
     "counterCondition": "Counter-condition",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",

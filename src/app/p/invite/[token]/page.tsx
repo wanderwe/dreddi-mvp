@@ -359,7 +359,7 @@ export default function InvitePage() {
                 </Tooltip>
               )}
               {info.is_important && (
-                <Tooltip label={t("promises.important.helper")} placement="top">
+                <Tooltip label={t("invite.reputationStakeTooltip")} placement="top">
                   <span className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-slate-200">
                     {t("promises.important.label")}
                   </span>

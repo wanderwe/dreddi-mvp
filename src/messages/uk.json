@@ -571,6 +571,7 @@
     "deadline": "Строк",
     "publicTag": "Публічна",
     "publicTooltip": "Відображається у публічному профілі",
+    "reputationStakeTooltip": "Має більший вплив на репутацію",
     "counterCondition": "Контрумова",
     "rewardLabel": "Винагорода",
     "rewardUnset": "Не вказано",
