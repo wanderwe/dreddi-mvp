@@ -994,14 +994,6 @@ export default function PromisePage() {
                     </Tooltip>
                   )}
                 </div>
-                {p.is_important && (
-                  <div className="mt-2 space-y-1">
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-                      {t("promises.important.label")}
-                    </p>
-                    <p className="text-xs text-slate-400">{t("promises.important.helper")}</p>
-                  </div>
-                )}
               </div>
 
               <div>

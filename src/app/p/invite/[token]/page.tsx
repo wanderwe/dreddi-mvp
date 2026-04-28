@@ -352,15 +352,6 @@ export default function InvitePage() {
                 </Tooltip>
               )}
             </div>
-            {info.is_important && (
-              <div className="mt-2 space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-                  {t("promises.important.label")}
-                </p>
-                <p className="text-xs text-slate-400">{t("promises.important.helper")}</p>
-              </div>
-            )}
-
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
               <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">
                 <span className="mr-2" aria-hidden>
