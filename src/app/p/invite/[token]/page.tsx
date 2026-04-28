@@ -2,6 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Shield } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -14,7 +15,6 @@ import {
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseLabels } from "@/lib/promiseLabels";
-import { ImportantBadge } from "@/components/ImportantBadge";
 
 type InviteInfo = {
   id: string;
@@ -339,9 +339,26 @@ export default function InvitePage() {
               {heading}
             </h1>
 
-            <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <h2 className="text-2xl font-semibold text-white">{info.title}</h2>
+              {info.is_important && (
+                <Tooltip label={t("promises.important.tooltip")} placement="top">
+                  <span
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
+                    aria-label={t("promises.important.label")}
+                  >
+                    <Shield className="h-4 w-4" aria-hidden />
+                  </span>
+                </Tooltip>
+              )}
+            </div>
             {info.is_important && (
-              <ImportantBadge className="mt-2" label={t("promises.important.label")} />
+              <div className="mt-2 space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+                  {t("promises.important.label")}
+                </p>
+                <p className="text-xs text-slate-400">{t("promises.important.helper")}</p>
+              </div>
             )}
 
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
