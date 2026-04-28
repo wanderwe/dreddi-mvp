@@ -570,6 +570,7 @@
     "dealDetailsLabel": "Деталі угоди",
     "deadline": "Строк",
     "publicTag": "Публічна",
+    "publicTooltip": "Відображається у публічному профілі",
     "counterCondition": "Контрумова",
     "rewardLabel": "Винагорода",
     "rewardUnset": "Не вказано",

@@ -352,12 +352,14 @@ export default function InvitePage() {
                 </span>
               </span>
               {info.visibility === "public" && (
-                <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
-                  {t("invite.publicTag")}
-                </span>
+                <Tooltip label={t("invite.publicTooltip")} placement="top">
+                  <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
+                    {t("invite.publicTag")}
+                  </span>
+                </Tooltip>
               )}
               {info.is_important && (
-                <Tooltip label={t("promises.important.tooltip")} placement="top">
+                <Tooltip label={t("promises.important.helper")} placement="top">
                   <span className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-slate-200">
                     {t("promises.important.label")}
                   </span>

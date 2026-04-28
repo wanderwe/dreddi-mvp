@@ -562,6 +562,7 @@
     "dealDetailsLabel": "Deal details",
     "deadline": "Deadline",
     "publicTag": "Public",
+    "publicTooltip": "Shown on public profile",
     "counterCondition": "Counter-condition",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",
