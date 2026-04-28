@@ -70,7 +70,9 @@ CREATE POLICY deal_invites_creator_delete
     )
   );
 
-CREATE OR REPLACE VIEW public_profile_stats AS
+DROP VIEW IF EXISTS public.public_profile_stats;
+
+CREATE VIEW public.public_profile_stats AS
 WITH raw_public_promises AS (
   SELECT
     p.id,
