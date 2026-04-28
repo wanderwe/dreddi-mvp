@@ -984,7 +984,10 @@ export default function PromisePage() {
               <div>
                 <div className="text-3xl font-semibold text-white">{p.title}</div>
                 {p.is_important && (
-                  <ImportantBadge className="mt-2" label={t("promises.important.label")} />
+                  <div className="mt-2 space-y-1.5">
+                    <ImportantBadge label={t("promises.important.label")} />
+                    <p className="text-xs text-slate-400">{t("promises.important.helper")}</p>
+                  </div>
                 )}
               </div>
 
