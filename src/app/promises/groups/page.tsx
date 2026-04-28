@@ -31,15 +31,6 @@ export default function PromiseGroupsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isCreateSectionOpen, setIsCreateSectionOpen] = useState(true);
-
-  useEffect(() => {
-    if (groups.length === 0) {
-      setIsCreateSectionOpen(true);
-      return;
-    }
-    setIsCreateSectionOpen(false);
-  }, [groups.length]);
-
   useEffect(() => {
     let active = true;
 
