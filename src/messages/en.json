@@ -93,6 +93,17 @@
     "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
     "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
+    "deleteAccount": {
+      "title": "Delete account",
+      "action": "Delete account",
+      "warning": "This action cannot be undone. Your profile will be deleted, but shared agreement history will remain visible to other participants.",
+      "confirmDescription": "Please confirm account deletion.",
+      "confirmAction": "Yes, delete account",
+      "cancel": "Cancel",
+      "pending": "Deleting account…",
+      "blockedMessage": "You have active agreements. Please complete or cancel them before deleting your account.",
+      "mockUnavailable": "Account deletion is unavailable in preview mode."
+    },
     "save": "Save"
   },
   "promises": {

@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, UserRound, X } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -37,6 +38,7 @@ type ProfileState = {
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
   const t = useT();
+  const locale = useLocale();
   const [authState, setAuthState] = useState<AuthState | null>(null);
   const [profile, setProfile] = useState<ProfileState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
     "identity"
   );
@@ -396,6 +401,43 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       { display_name: nextDisplayName, handle: nextHandle },
       { displayName: nextDisplayName, handle: nextHandle }
     );
+  };
+
+  const deleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeleteError(null);
+    setDeletingAccount(true);
+    try {
+      if (authState?.isMock) {
+        setDeleteError(t("profileSettings.deleteAccount.mockUnavailable"));
+        return;
+      }
+
+      const response = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+      if (!response.ok) {
+        if (response.status === 409 || payload.error === "active_agreements") {
+          setDeleteError(t("profileSettings.deleteAccount.blockedMessage"));
+          return;
+        }
+        setDeleteError(t("profileSettings.errors.saveFailed"));
+        return;
+      }
+
+      const supabase = requireSupabase();
+      await supabase.auth.signOut();
+      window.location.href = localizePath("/", locale);
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : t("profileSettings.errors.unavailable")
+      );
+    } finally {
+      setDeletingAccount(false);
+    }
   };
 
   return (
@@ -878,6 +920,61 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         )}
 
         <div className="mt-4 border-t border-white/10 pt-4 pb-3">
+          <div className="rounded-2xl border border-red-400/30 bg-red-500/5 p-3">
+            <div className="text-sm font-semibold text-red-100">
+              {t("profileSettings.deleteAccount.title")}
+            </div>
+            <HelperText className="mt-1 text-red-100/80">
+              {t("profileSettings.deleteAccount.warning")}
+            </HelperText>
+            {!showDeleteConfirm ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteError(null);
+                  setShowDeleteConfirm(true);
+                }}
+                className="mt-3 w-full cursor-pointer rounded-xl border border-red-300/40 px-3 py-2 text-sm font-semibold text-red-100 transition hover:border-red-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+              >
+                {t("profileSettings.deleteAccount.action")}
+              </button>
+            ) : (
+              <div className="mt-3 space-y-3 rounded-xl border border-red-300/30 bg-red-900/20 p-3">
+                <div className="text-xs text-red-100/90">
+                  {t("profileSettings.deleteAccount.confirmDescription")}
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={deleteAccount}
+                    disabled={deletingAccount}
+                    className="w-full cursor-pointer rounded-xl border border-red-300/50 bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-100 transition hover:border-red-200 hover:bg-red-500/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {deletingAccount
+                      ? t("profileSettings.deleteAccount.pending")
+                      : t("profileSettings.deleteAccount.confirmAction")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteError(null);
+                    }}
+                    disabled={deletingAccount}
+                    className="w-full cursor-pointer rounded-xl border border-white/20 px-3 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {t("profileSettings.deleteAccount.cancel")}
+                  </button>
+                </div>
+              </div>
+            )}
+            {deleteError && (
+              <div className="mt-2 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                {deleteError}
+              </div>
+            )}
+          </div>
+
           <FeedbackModalTrigger
             triggerClassName="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
           />
