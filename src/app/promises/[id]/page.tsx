@@ -988,7 +988,7 @@ export default function PromisePage() {
         </div>
       )}
 
-      {!p ? (
+      {!p && !error ? (
         <div className="text-neutral-400">{t("promises.detail.loading")}</div>
       ) : (
         <>
