@@ -52,11 +52,19 @@ export default function PublicProfilesDirectoryPage() {
   ) => {
     if (!normalizedSearch) return query;
 
-    const searchPattern = `%${normalizedSearch}%`;
-    const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
-    if (includeEmail) {
-      filters.push(`email.ilike.${searchPattern}`);
-    }
+    const raw = normalizedSearch.trim();
+    const localPart = raw.includes("@") ? raw.split("@")[0]?.trim() ?? "" : "";
+    const searchTerms = Array.from(new Set([raw, localPart].filter(Boolean)));
+
+    const filters = searchTerms.flatMap((term) => {
+      const searchPattern = `%${term}%`;
+      const baseFilters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+      if (includeEmail) {
+        baseFilters.push(`email.ilike.${searchPattern}`);
+      }
+
+      return baseFilters;
+    });
 
     return query.or(filters.join(","));
   };
