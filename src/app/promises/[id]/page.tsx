@@ -175,7 +175,9 @@ export default function PromisePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
-  const [participantNames, setParticipantNames] = useState<Record<string, string>>({});
+  const [participantProfiles, setParticipantProfiles] = useState<
+    Record<string, { label: string; handle: string | null }>
+  >({});
 
   // отдельные "busy" чтобы не ломать UX всего экрана
   const [actionBusy, setActionBusy] = useState<
@@ -833,11 +835,17 @@ export default function PromisePage() {
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
     if (!participantId) return t("promises.detail.counterpartyFallback");
-    const baseLabel = participantNames[participantId] ?? participantId.slice(0, 8);
+    const baseLabel = participantProfiles[participantId]?.label ?? participantId.slice(0, 8);
     if (userId && participantId === userId) {
       return `${baseLabel} (${t("promises.detail.you")})`;
     }
     return baseLabel;
+  };
+  const getParticipantHref = (participantId: string | null) => {
+    if (!participantId) return null;
+    const handle = participantProfiles[participantId]?.handle?.trim();
+    if (!handle) return null;
+    return localizePath(`/u/${handle}`, locale);
   };
   const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
   const responsibleLabel = getParticipantLabel(executorId);
@@ -864,7 +872,7 @@ export default function PromisePage() {
     );
 
     if (participantIds.length === 0) {
-      setParticipantNames({});
+      setParticipantProfiles({});
       return () => {
         active = false;
       };
@@ -880,16 +888,21 @@ export default function PromisePage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("id,display_name,email")
+        .select("id,display_name,email,handle")
         .in("id", participantIds);
 
       if (!active) return;
-      const names: Record<string, string> = {};
+      const profiles: Record<string, { label: string; handle: string | null }> = {};
       for (const profile of data ?? []) {
         const label = profile.display_name?.trim() || profile.email?.trim() || "";
-        if (label) names[profile.id] = label;
+        if (label) {
+          profiles[profile.id] = {
+            label,
+            handle: profile.handle?.trim() || null,
+          };
+        }
       }
-      setParticipantNames(names);
+      setParticipantProfiles(profiles);
     };
 
     void loadParticipantNames();
@@ -1006,21 +1019,54 @@ export default function PromisePage() {
                       {t("promises.detail.roles.createdBy")}
                       {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{createdByLabel}</dd>
+                    <dd className="inline font-medium text-white">
+                      {getParticipantHref(p?.creator_id ?? null) ? (
+                        <Link
+                          href={getParticipantHref(p?.creator_id ?? null)!}
+                          className="underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        >
+                          {createdByLabel}
+                        </Link>
+                      ) : (
+                        createdByLabel
+                      )}
+                    </dd>
                   </div>
                   <div>
                     <dt className="inline text-slate-400">
                       {t("promises.detail.roles.responsible")}
                       {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{responsibleLabel}</dd>
+                    <dd className="inline font-medium text-white">
+                      {getParticipantHref(executorId) ? (
+                        <Link
+                          href={getParticipantHref(executorId)!}
+                          className="underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        >
+                          {responsibleLabel}
+                        </Link>
+                      ) : (
+                        responsibleLabel
+                      )}
+                    </dd>
                   </div>
                   <div>
                     <dt className="inline text-slate-400">
                       {t("promises.detail.roles.madeTo")}
                       {": "}
                     </dt>
-                    <dd className="inline font-medium text-white">{promiseToLabel}</dd>
+                    <dd className="inline font-medium text-white">
+                      {getParticipantHref(promiseMadeToId) ? (
+                        <Link
+                          href={getParticipantHref(promiseMadeToId)!}
+                          className="underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        >
+                          {promiseToLabel}
+                        </Link>
+                      ) : (
+                        promiseToLabel
+                      )}
+                    </dd>
                   </div>
                 </dl>
               </div>
