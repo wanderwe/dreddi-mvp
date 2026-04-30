@@ -792,11 +792,12 @@
     "loadMore": "Load more",
     "noMore": "No more profiles",
     "empty": "No public profiles yet",
-    "searchLabel": "Search by username or name",
-    "searchPlaceholder": "Search by username or name",
+    "searchLabel": "Search by username, name, or email",
+    "searchPlaceholder": "Search by username, name, or email",
     "errors": {
       "supabase": "Supabase is not configured"
-    }
+    },
+    "emptySearch": "No profiles found for this query"
   },
   "notifications": {
     "header": {

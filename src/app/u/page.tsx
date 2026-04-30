@@ -33,6 +33,7 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [supportsEmailSearch, setSupportsEmailSearch] = useState(true);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -43,6 +44,33 @@ export default function PublicProfilesDirectoryPage() {
       window.clearTimeout(handle);
     };
   }, [searchTerm]);
+
+  const applySearchFilters = (
+    query: any,
+    normalizedSearch: string,
+    includeEmail: boolean
+  ) => {
+    if (!normalizedSearch) return query;
+
+    const raw = normalizedSearch.trim();
+    const localPart = raw.includes("@") ? raw.split("@")[0]?.trim() ?? "" : "";
+    const searchTerms = Array.from(new Set([raw, localPart].filter(Boolean)));
+
+    const filters = searchTerms.flatMap((term) => {
+      const searchPattern = `%${term}%`;
+      const baseFilters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+      if (includeEmail) {
+        baseFilters.push(`email.ilike.${searchPattern}`);
+      }
+
+      return baseFilters;
+    });
+
+    return query.or(filters.join(","));
+  };
+
+  const isMissingEmailColumnError = (message?: string | null) =>
+    Boolean(message && /public_profile_stats\.email does not exist/i.test(message));
 
   useEffect(() => {
     let active = true;
@@ -68,13 +96,25 @@ export default function PublicProfilesDirectoryPage() {
         .order("confirmed_count", { ascending: false })
         .order("handle", { ascending: true });
 
-      if (normalizedSearch) {
-        const searchPattern = `%${normalizedSearch}%`;
-        const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
-        query = query.or(filters.join(","));
-      }
+      query = applySearchFilters(query, normalizedSearch, supportsEmailSearch);
 
-      const { data, error: listError } = await query.range(0, pageSize);
+      let { data, error: listError } = await query.range(0, pageSize);
+
+      if (listError && supportsEmailSearch && isMissingEmailColumnError(listError.message)) {
+        setSupportsEmailSearch(false);
+        const fallbackQuery = applySearchFilters(
+          supabase
+            .from("public_profile_stats")
+            .select(publicProfileDirectorySelect)
+            .order("confirmed_count", { ascending: false })
+            .order("handle", { ascending: true }),
+          normalizedSearch,
+          false
+        );
+        const fallback = await fallbackQuery.range(0, pageSize);
+        data = fallback.data;
+        listError = fallback.error;
+      }
 
       if (!active) return;
 
@@ -97,7 +137,7 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [debouncedSearch, pageSize, t]);
+  }, [debouncedSearch, pageSize, supportsEmailSearch, t]);
 
   const loadMore = async () => {
     if (!supabase) {
@@ -120,13 +160,25 @@ export default function PublicProfilesDirectoryPage() {
       .order("confirmed_count", { ascending: false })
       .order("handle", { ascending: true });
 
-    if (normalizedSearch) {
-      const searchPattern = `%${normalizedSearch}%`;
-      const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
-      query = query.or(filters.join(","));
-    }
+    query = applySearchFilters(query, normalizedSearch, supportsEmailSearch);
 
-    const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
+    let { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
+
+    if (listError && supportsEmailSearch && isMissingEmailColumnError(listError.message)) {
+      setSupportsEmailSearch(false);
+      const fallbackQuery = applySearchFilters(
+        supabase
+          .from("public_profile_stats")
+          .select(publicProfileDirectorySelect)
+          .order("confirmed_count", { ascending: false })
+          .order("handle", { ascending: true }),
+        normalizedSearch,
+        false
+      );
+      const fallback = await fallbackQuery.range(startIndex, startIndex + pageSize);
+      data = fallback.data;
+      listError = fallback.error;
+    }
 
     if (listError) {
       setLoadMoreError(listError.message);
@@ -259,7 +311,7 @@ export default function PublicProfilesDirectoryPage() {
           </div>
         ) : profiles.length === 0 ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
-            {t("publicDirectory.empty")}
+            {debouncedSearch ? t("publicDirectory.emptySearch") : t("publicDirectory.empty")}
           </div>
         ) : (
           <div className="flex flex-col gap-6">
