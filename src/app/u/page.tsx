@@ -11,6 +11,7 @@ type PublicProfileDirectoryRow = {
   handle: string;
   display_name: string | null;
   avatar_url: string | null;
+  email: string | null;
   profile_tags: string[] | null;
   reputation_score: number | null;
   confirmed_count: number | null;
@@ -70,7 +71,11 @@ export default function PublicProfilesDirectoryPage() {
 
       if (normalizedSearch) {
         const searchPattern = `%${normalizedSearch}%`;
-        const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+        const filters = [
+          `handle.ilike.${searchPattern}`,
+          `display_name.ilike.${searchPattern}`,
+          `email.ilike.${searchPattern}`,
+        ];
         query = query.or(filters.join(","));
       }
 
@@ -122,7 +127,11 @@ export default function PublicProfilesDirectoryPage() {
 
     if (normalizedSearch) {
       const searchPattern = `%${normalizedSearch}%`;
-      const filters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
+      const filters = [
+          `handle.ilike.${searchPattern}`,
+          `display_name.ilike.${searchPattern}`,
+          `email.ilike.${searchPattern}`,
+        ];
       query = query.or(filters.join(","));
     }
 
@@ -259,7 +268,7 @@ export default function PublicProfilesDirectoryPage() {
           </div>
         ) : profiles.length === 0 ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
-            {t("publicDirectory.empty")}
+            {debouncedSearch ? t("publicDirectory.emptySearch") : t("publicDirectory.empty")}
           </div>
         ) : (
           <div className="flex flex-col gap-6">

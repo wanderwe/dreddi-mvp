@@ -821,12 +821,13 @@
     "loadingMore": "Завантаження…",
     "loadMore": "Завантажити ще",
     "noMore": "Більше немає",
-    "empty": "Публічних профілів поки немає.",
-    "searchLabel": "Пошук за нікнеймом або імʼям",
-    "searchPlaceholder": "Пошук за нікнеймом або імʼям",
+    "empty": "Публічних профілів ще немає",
+    "searchLabel": "Пошук за нікнеймом, імʼям або email",
+    "searchPlaceholder": "Пошук за нікнеймом, імʼям або email",
     "errors": {
-      "supabase": "Supabase не налаштовано."
-    }
+      "supabase": "Supabase не налаштовано"
+    },
+    "emptySearch": "Профілі за цим запитом не знайдено"
   },
   "notifications": {
     "header": {
