@@ -256,9 +256,10 @@ export default function PromisePage() {
         "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error) setError(error.message);
+    else if (!data) setError(t("promises.detail.errors.noAccess"));
     else {
       const status = (data as { status?: unknown }).status;
       if (!isPromiseStatus(status)) {

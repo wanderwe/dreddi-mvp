@@ -289,6 +289,7 @@
       "errors": {
         "unsupportedStatus": "{entity} has an unsupported status value",
         "updateStatus": "Could not update status",
+        "noAccess": "You don’t have access to this agreement or it does not exist",
         "copyClipboard": "Could not copy to clipboard"
       },
       "acceptAction": "Accept",
