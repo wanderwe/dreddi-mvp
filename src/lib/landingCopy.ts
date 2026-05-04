@@ -1,10 +1,18 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
+
 export type LandingCopy = {
   hero: {
     eyebrow: string;
     headline: string;
     description: string;
     whyLink: string;
+  };
+  whenToUse: {
+    title: string;
+    cards: {
+      title: string;
+      text: string;
+    }[];
   };
   useDreddi: {
     label: string;
@@ -86,6 +94,16 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
       whyLink: "Чому існує Dreddi →",
+    },
+    whenToUse: {
+      title: "Коли використовувати Dreddi",
+      cards: [
+        { title: "Робота і дедлайни", text: "Зафіксуй, хто що робить і до коли" },
+        { title: "Гроші і обіцянки", text: "Коли щось треба повернути або виконати" },
+        { title: "Друзі і плани", text: "Домовляйтесь так, щоб плани не губились" },
+        { title: "Командні домовленості", text: "Тримайте відповідальність прозорою" },
+        { title: "Коли щось може піти не так", text: "Зніми напругу до того, як почнеться конфлікт" },
+      ],
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -181,6 +199,16 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
       whyLink: "Why Dreddi exists →",
+    },
+    whenToUse: {
+      title: "When to use Dreddi",
+      cards: [
+        { title: "Work & deadlines", text: "Fix who does what and by when" },
+        { title: "Money & promises", text: "When something must be returned or delivered" },
+        { title: "Friends & plans", text: "Make plans that actually happen" },
+        { title: "Team commitments", text: "Keep responsibilities clear" },
+        { title: "When things might go wrong", text: "Prevent conflict before it starts" },
+      ],
     },
     useDreddi: {
       label: "Use cases",
