@@ -96,13 +96,13 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       whyLink: "Чому існує Dreddi →",
     },
     whenToUse: {
-      title: "Коли використовувати Dreddi",
+      title: "Коли Dreddi стає корисним",
       cards: [
-        { title: "Робота і дедлайни", text: "Зафіксуй, хто що робить і до коли" },
-        { title: "Гроші і обіцянки", text: "Коли щось треба повернути або виконати" },
-        { title: "Друзі і плани", text: "Домовляйтесь так, щоб плани не губились" },
-        { title: "Командні домовленості", text: "Тримайте відповідальність прозорою" },
-        { title: "Коли щось може піти не так", text: "Зніми напругу до того, як почнеться конфлікт" },
+        { title: "Робота і дедлайни", text: "Хто що робить і до коли" },
+        { title: "Гроші і обіцянки", text: "Коли потрібно повернути або виконати" },
+        { title: "Друзі і плани", text: "Щоб плани реально відбувались" },
+        { title: "Командні домовленості", text: "Хто за що відповідає" },
+        { title: "Коли щось може піти не так", text: "Щоб уникнути конфліктів" },
       ],
     },
     useDreddi: {
@@ -201,13 +201,13 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       whyLink: "Why Dreddi exists →",
     },
     whenToUse: {
-      title: "When to use Dreddi",
+      title: "When Dreddi becomes useful",
       cards: [
-        { title: "Work & deadlines", text: "Fix who does what and by when" },
-        { title: "Money & promises", text: "When something must be returned or delivered" },
-        { title: "Friends & plans", text: "Make plans that actually happen" },
-        { title: "Team commitments", text: "Keep responsibilities clear" },
-        { title: "When things might go wrong", text: "Prevent conflict before it starts" },
+        { title: "Work & deadlines", text: "Who does what, by when" },
+        { title: "Money & promises", text: "When something must be repaid or delivered" },
+        { title: "Friends & plans", text: "So plans actually happen" },
+        { title: "Team commitments", text: "Who owns what" },
+        { title: "When things might go wrong", text: "To avoid conflict" },
       ],
     },
     useDreddi: {

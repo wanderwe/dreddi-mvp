@@ -771,18 +771,19 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="relative mx-auto -mt-8 w-full max-w-6xl px-4 pb-8 sm:-mt-10 sm:px-6 sm:pb-10 md:pb-12">
+      <section className="relative mx-auto mt-2 w-full max-w-6xl px-4 pb-8 sm:mt-6 sm:px-6 sm:pb-10 md:mt-8 md:pb-12">
         <div className="glass-panel rounded-3xl border border-white/10 p-4 sm:p-6">
           <h2 className="text-xl font-semibold text-white sm:text-2xl">{copy.whenToUse.title}</h2>
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-7 grid grid-cols-1 gap-3 sm:mt-8 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {copy.whenToUse.cards.map((card) => (
-              <article
+              <LocalizedLink
                 key={card.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                href="/promises/new"
+                className="group rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 transition duration-200 hover:scale-[1.01] hover:border-emerald-300/35 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
               >
                 <h3 className="text-sm font-semibold text-slate-100 sm:text-base">{card.title}</h3>
-                <p className="mt-1 text-sm text-slate-300">{card.text}</p>
-              </article>
+                <p className="mt-1 max-w-[28ch] text-[13px] leading-snug text-slate-300/70 sm:text-sm">{card.text}</p>
+              </LocalizedLink>
             ))}
           </div>
         </div>
