@@ -98,11 +98,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     whenToUse: {
       title: "Коли Dreddi стає корисним",
       cards: [
-        { title: "Робота і дедлайни", text: "Щоб було зрозуміло, хто що робить і до коли" },
-        { title: "Гроші і обіцянки", text: "Коли потрібно щось повернути або виконати" },
-        { title: "Друзі і плани", text: "Щоб плани не залишались просто словами" },
-        { title: "Командні домовленості", text: "Щоб було зрозуміло, хто за що відповідає" },
-        { title: "Коли щось може піти не так", text: "Щоб уникнути непорозумінь і конфліктів" },
+        { title: "Сказали зроблю до пʼятниці", text: "І хочеться, щоб це не загубилось" },
+        { title: "Поверну через тиждень", text: "Коли мова вже про гроші або обіцянки" },
+        { title: "Давай реально зустрінемось", text: "А не “якось потім”" },
+        { title: "Хто за це відповідає?", text: "Коли домовленість не до кінця очевидна" },
+        { title: "Щоб потім не було “я такого не казав”", text: "Коли є ризик непорозуміння" },
       ],
     },
     useDreddi: {
@@ -203,11 +203,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     whenToUse: {
       title: "When Dreddi becomes useful",
       cards: [
-        { title: "Work & deadlines", text: "Who does what, by when" },
-        { title: "Money & promises", text: "When something must be repaid or delivered" },
-        { title: "Friends & plans", text: "So plans actually happen" },
-        { title: "Team commitments", text: "Who owns what" },
-        { title: "When things might go wrong", text: "To avoid conflict" },
+        { title: "“I’ll do it by Friday”", text: "And you want it not to be forgotten" },
+        { title: "“I’ll return it next week”", text: "When money or promises are involved" },
+        { title: "“Let’s actually meet”", text: "Not just “sometime later”" },
+        { title: "Who’s responsible for this?", text: "When roles are not fully clear" },
+        { title: "So there’s no “I never said that”", text: "When things might go wrong" },
       ],
     },
     useDreddi: {
