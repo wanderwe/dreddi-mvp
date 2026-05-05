@@ -559,7 +559,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     const hasProfilePace =
       typeof profileAvgDealsPerMonth === "number" && Number.isFinite(profileAvgDealsPerMonth);
     const completionRate = {
-      completed: profile?.completion_executor_marked_count ?? 0,
+      completed: profile?.confirmed_count ?? 0,
       total: profile?.completion_executor_total_count ?? 0,
     };
     const completionReview = {
@@ -595,7 +595,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       completionReviewPercent,
     };
   }, [
-    profile?.completion_executor_marked_count,
+    profile?.confirmed_count,
     profile?.completion_executor_total_count,
     profile?.completion_reviewer_responded_count,
     profile?.completion_reviewer_total_count,
