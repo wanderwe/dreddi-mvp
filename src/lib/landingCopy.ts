@@ -11,7 +11,6 @@ export type LandingCopy = {
     title: string;
     cards: {
       title: string;
-      text: string;
     }[];
   };
   useDreddi: {
@@ -98,11 +97,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     whenToUse: {
       title: "Коли Dreddi стає корисним",
       cards: [
-        { title: "Сказали зроблю до пʼятниці", text: "І хочеться, щоб це не загубилось" },
-        { title: "Поверну через тиждень", text: "Коли мова вже про гроші або обіцянки" },
-        { title: "Давай реально зустрінемось", text: "А не “якось потім”" },
-        { title: "Хто за це відповідає?", text: "Коли домовленість не до кінця очевидна" },
-        { title: "Щоб потім не було “я такого не казав”", text: "Коли є ризик непорозуміння" },
+        { title: "Сказали “зроблю до пʼятниці”" },
+        { title: "“Поверну через тиждень”" },
+        { title: "“Давай реально зустрінемось”" },
+        { title: "“Хто за це відповідає?”" },
+        { title: "Щоб потім не було “я такого не казав”" },
       ],
     },
     useDreddi: {
@@ -203,11 +202,11 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     whenToUse: {
       title: "When Dreddi becomes useful",
       cards: [
-        { title: "“I’ll do it by Friday”", text: "And you want it not to be forgotten" },
-        { title: "“I’ll return it next week”", text: "When money or promises are involved" },
-        { title: "“Let’s actually meet”", text: "Not just “sometime later”" },
-        { title: "Who’s responsible for this?", text: "When roles are not fully clear" },
-        { title: "So there’s no “I never said that”", text: "When things might go wrong" },
+        { title: "“I’ll do it by Friday”" },
+        { title: "“I’ll return it next week”" },
+        { title: "“Let’s actually meet”" },
+        { title: "“Who’s responsible for this?”" },
+        { title: "So there’s no “I never said that”" },
       ],
     },
     useDreddi: {

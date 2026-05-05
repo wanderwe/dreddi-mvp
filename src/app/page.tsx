@@ -781,8 +781,7 @@ export default function Home() {
                 href="/promises/new"
                 className="group rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 transition duration-200 hover:scale-[1.01] hover:border-emerald-300/35 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
               >
-                <h3 className="text-sm font-semibold text-slate-100 sm:text-base">{card.title}</h3>
-                <p className="mt-1 max-w-[28ch] text-[13px] leading-snug text-slate-300/70 sm:text-sm">{card.text}</p>
+                <h3 className="max-w-[28ch] text-sm font-semibold leading-relaxed text-slate-100 sm:text-base">{card.title}</h3>
               </LocalizedLink>
             ))}
           </div>
