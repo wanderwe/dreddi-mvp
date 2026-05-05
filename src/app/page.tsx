@@ -774,6 +774,7 @@ export default function Home() {
       <section className="relative mx-auto mt-2 w-full max-w-6xl px-4 pb-8 sm:mt-6 sm:px-6 sm:pb-10 md:mt-8 md:pb-12">
         <div className="glass-panel rounded-3xl border border-white/10 p-4 sm:p-6">
           <h2 className="text-xl font-semibold text-white sm:text-2xl">{copy.whenToUse.title}</h2>
+          <p className="mt-2 text-sm font-normal text-slate-400">{copy.whenToUse.subtitle}</p>
           <div className="mt-7 grid grid-cols-1 gap-3 sm:mt-8 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {copy.whenToUse.cards.map((card) => (
               <LocalizedLink

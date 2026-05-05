@@ -9,6 +9,7 @@ export type LandingCopy = {
   };
   whenToUse: {
     title: string;
+    subtitle: string;
     cards: {
       title: string;
     }[];
@@ -96,6 +97,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     whenToUse: {
       title: "Коли Dreddi стає корисним",
+      subtitle: "Коли чуєш щось подібне",
       cards: [
         { title: "Сказали “зроблю до пʼятниці”" },
         { title: "“Поверну через тиждень”" },
@@ -201,6 +203,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
     },
     whenToUse: {
       title: "When Dreddi becomes useful",
+      subtitle: "When you hear something like this",
       cards: [
         { title: "“I’ll do it by Friday”" },
         { title: "“I’ll return it next week”" },
