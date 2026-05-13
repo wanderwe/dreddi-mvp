@@ -1019,9 +1019,7 @@
       "createdBy": "Created by",
       "acceptedBy": "Responsible side",
       "creatorFallback": "Agreement creator",
-      "counterpartyFallback": "Responsible side",
-      "acknowledged": "Both sides are shown as the public parties to this commitment",
-      "awaitingAcceptance": "The responsible side has not accepted this public agreement yet"
+      "counterpartyFallback": "Responsible side"
     },
     "flow": {
       "created": "Created",
