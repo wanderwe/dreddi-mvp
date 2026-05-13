@@ -133,7 +133,7 @@ function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>) {
   const base = [
     { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
     { key: "accepted", label: t("publicAgreement.flow.accepted"), complete: Boolean(acceptedAt), current: agreement.uiStatus === "awaiting_acceptance" },
-    { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active" || agreement.uiStatus === "active", current: agreement.uiStatus === "active" },
+    { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active", current: agreement.uiStatus === "active" },
     { key: "completed", label: t("publicAgreement.flow.completed"), complete: Boolean(agreement.completed_at || agreement.confirmed_at || agreement.disputed_at), current: agreement.uiStatus === "completed_by_promisor" },
     { key: "confirmed", label: t("publicAgreement.flow.confirmed"), complete: agreement.status === "confirmed", current: agreement.status === "confirmed" },
   ];
@@ -468,13 +468,13 @@ export default function PublicAgreementPage() {
                 <div
                   className={[
                     "rounded-2xl border p-3 text-sm transition",
-                    state.current
-                      ? state.disputed
-                        ? "border-rose-300/45 bg-rose-300/12 text-rose-50"
-                        : "border-emerald-300/45 bg-emerald-300/12 text-emerald-50"
+                    state.current && state.disputed
+                      ? "border-rose-300/45 bg-rose-300/12 text-rose-50"
                       : state.complete
-                        ? "border-white/12 bg-white/[0.055] text-white/75"
-                        : "border-white/8 bg-black/20 text-white/35",
+                        ? "border-emerald-300/35 bg-emerald-300/10 text-emerald-50"
+                        : state.current
+                          ? "border-amber-300/45 bg-amber-300/10 text-amber-50"
+                          : "border-white/8 bg-black/20 text-white/35",
                   ].join(" ")}
                 >
                   <div className="mb-2 flex h-6 w-6 items-center justify-center rounded-full border border-current/30 text-[11px]">
