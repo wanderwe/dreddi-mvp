@@ -81,9 +81,13 @@ async function getOptionalUser(req: Request): Promise<User | null> {
   const token = getBearerToken(req);
   if (!token) return null;
 
-  const { data, error } = await getAuthClient().auth.getUser(token);
-  if (error || !data.user) return null;
-  return data.user;
+  try {
+    const { data, error } = await getAuthClient().auth.getUser(token);
+    if (error || !data.user) return null;
+    return data.user;
+  } catch {
+    return null;
+  }
 }
 
 function canUserPostUpdate(promise: PromisePublicAgreementRecord, userId: string | null) {
@@ -179,14 +183,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       .order("id", { ascending: true })
       .returns<AgreementUpdateRecord[]>();
 
-    const updatesTableMissing = Boolean(updatesError && isMissingAgreementUpdatesTable(updatesError));
-    const publicUpdates = updatesTableMissing ? [] : updates;
+    const updatesUnavailable = Boolean(updatesError);
+    const publicUpdates = updatesUnavailable ? [] : updates;
 
-    if (updatesError && !updatesTableMissing) {
-      return NextResponse.json(
-        { error: "Public agreement updates lookup failed", detail: updatesError.message },
-        { status: 500 }
-      );
+    if (updatesError) {
+      console.warn("Public agreement updates unavailable", {
+        agreementId: promise.id,
+        code: updatesError.code,
+        message: updatesError.message,
+        missingTable: isMissingAgreementUpdatesTable(updatesError),
+      });
     }
 
     const counterpartyId = resolveCounterpartyId(promise);
@@ -218,7 +224,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         profilesById,
         publicUpdates ?? [],
         canUserPostUpdate(promise, user?.id ?? null),
-        !updatesTableMissing
+        !updatesUnavailable
       )
     );
   } catch (error) {
