@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Link2, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
@@ -10,7 +10,16 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { isPromiseStatus } from "@/lib/promiseStatus";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
+import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
+
+type PublicAgreementUpdate = {
+  id: string;
+  content: string;
+  created_at: string;
+  author_display_name: string | null;
+  author_handle: string | null;
+};
 
 type PublicAgreementRow = {
   id: string;
@@ -36,6 +45,9 @@ type PublicAgreementRow = {
   counterparty_display_name: string | null;
   counterparty_handle: string | null;
   counterparty_contact: string | null;
+  viewer_can_update?: boolean | null;
+  updates_available?: boolean | null;
+  updates?: PublicAgreementUpdate[] | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -51,7 +63,8 @@ type TimelineItem = {
   actor: string;
   timestamp: string;
   description?: string;
-  tone?: "success" | "danger" | "attention" | "neutral";
+  tone?: "success" | "danger" | "attention" | "neutral" | "update";
+  kind?: "system" | "update";
 };
 
 type FlowState = {
@@ -92,6 +105,10 @@ function displayProfileName(displayName: string | null, handle: string | null, f
   const cleanHandle = handle?.trim();
   if (cleanHandle) return `@${cleanHandle}`;
   return fallback;
+}
+
+function displayUpdateAuthorName(update: PublicAgreementUpdate, fallback: string) {
+  return displayProfileName(update.author_display_name, update.author_handle, fallback);
 }
 
 function displayCounterpartyName(row: PublicAgreement, fallback: string) {
@@ -158,7 +175,7 @@ function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): 
 
 function buildTimeline(
   agreement: PublicAgreement,
-  labels: { creator: string; counterparty: string; system: string },
+  labels: { creator: string; counterparty: string; system: string; updateFallback: string },
   t: ReturnType<typeof useT>
 ): TimelineItem[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
@@ -236,6 +253,18 @@ function buildTimeline(
     });
   }
 
+  for (const update of agreement.updates ?? []) {
+    items.push({
+      key: `update-${update.id}`,
+      label: t("publicAgreement.timeline.update"),
+      actor: displayUpdateAuthorName(update, labels.updateFallback),
+      timestamp: update.created_at,
+      description: update.content,
+      tone: "update",
+      kind: "update",
+    });
+  }
+
   const isExpired = agreement.uiStatus === "expired" && agreement.expires_at;
   if (isExpired) {
     items.push({
@@ -259,6 +288,9 @@ export default function PublicAgreementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [updateContent, setUpdateContent] = useState("");
+  const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false);
+  const [updateSubmitState, setUpdateSubmitState] = useState<"idle" | "saving" | "error">("idle");
 
   useEffect(() => {
     let active = true;
@@ -269,8 +301,12 @@ export default function PublicAgreementPage() {
       setError(null);
 
       try {
+        const session = supabaseOptional ? (await supabaseOptional.auth.getSession()).data.session : null;
         const response = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
           cache: "no-store",
+          headers: session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : undefined,
         });
 
         if (!active) return;
@@ -332,7 +368,12 @@ export default function PublicAgreementPage() {
   const timeline = agreement
     ? buildTimeline(
         agreement,
-        { creator: creatorName, counterparty: counterpartyName, system: t("publicAgreement.timeline.system") },
+        {
+          creator: creatorName,
+          counterparty: counterpartyName,
+          system: t("publicAgreement.timeline.system"),
+          updateFallback: t("publicAgreement.timeline.updateAuthorFallback"),
+        },
         t
       )
     : [];
@@ -347,6 +388,57 @@ export default function PublicAgreementPage() {
   const dueText = agreement?.due_at
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
     : null;
+
+  const canAddUpdate = Boolean(agreement?.viewer_can_update && agreement.updates_available !== false);
+  const shouldShowUpdatesUnavailable = Boolean(
+    agreement?.viewer_can_update && agreement.updates_available === false
+  );
+  const remainingUpdateChars = 500 - updateContent.length;
+
+  const handleSubmitUpdate = async () => {
+    if (!agreement || !canAddUpdate || updateSubmitState === "saving") return;
+
+    const content = updateContent.trim();
+    if (!content || content.length > 500) {
+      setUpdateSubmitState("error");
+      return;
+    }
+
+    const session = supabaseOptional ? (await supabaseOptional.auth.getSession()).data.session : null;
+    if (!session?.access_token) {
+      setUpdateSubmitState("error");
+      return;
+    }
+
+    setUpdateSubmitState("saving");
+    try {
+      const response = await fetch(`/api/public/agreements/${encodeURIComponent(agreement.id)}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) throw new Error("Update failed");
+
+      const update = (await response.json()) as PublicAgreementUpdate;
+      setAgreement((current) =>
+        current
+          ? {
+              ...current,
+              updates: [...(current.updates ?? []), update],
+            }
+          : current
+      );
+      setUpdateContent("");
+      setIsUpdateFormOpen(false);
+      setUpdateSubmitState("idle");
+    } catch {
+      setUpdateSubmitState("error");
+    }
+  };
 
   const handleCopy = async () => {
     const url = publicUrl || window.location.href;
@@ -492,7 +584,79 @@ export default function PublicAgreementPage() {
         </section>
 
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
-          <h2 className="text-lg font-semibold">{t("publicAgreement.timeline.title")}</h2>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold">{t("publicAgreement.timeline.title")}</h2>
+            {canAddUpdate ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsUpdateFormOpen((open) => !open);
+                  setUpdateSubmitState("idle");
+                }}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/82 transition hover:border-emerald-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+              >
+                <MessageSquareText className="h-4 w-4" aria-hidden="true" />
+                {t("publicAgreement.updates.add")}
+              </button>
+            ) : null}
+          </div>
+
+          {shouldShowUpdatesUnavailable ? (
+            <p className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-50/80">
+              {t("publicAgreement.updates.unavailable")}
+            </p>
+          ) : null}
+
+          {isUpdateFormOpen ? (
+            <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
+              <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
+                {t("publicAgreement.updates.label")}
+              </label>
+              <textarea
+                id="agreement-update"
+                value={updateContent}
+                onChange={(event) => {
+                  setUpdateContent(event.target.value.slice(0, 500));
+                  setUpdateSubmitState("idle");
+                }}
+                maxLength={500}
+                rows={4}
+                className="mt-3 w-full resize-none rounded-2xl border border-white/10 bg-black/25 p-3 text-sm leading-6 text-white outline-none placeholder:text-white/30 focus:border-emerald-300/45 focus:ring-2 focus:ring-emerald-300/15"
+                placeholder={t("publicAgreement.updates.placeholder")}
+              />
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-white/45">
+                  {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsUpdateFormOpen(false);
+                      setUpdateSubmitState("idle");
+                    }}
+                    className="rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/65 transition hover:bg-white/10"
+                  >
+                    {t("publicAgreement.updates.cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleSubmitUpdate()}
+                    disabled={!updateContent.trim() || updateSubmitState === "saving"}
+                    className="rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {updateSubmitState === "saving"
+                      ? t("publicAgreement.updates.saving")
+                      : t("publicAgreement.updates.publish")}
+                  </button>
+                </div>
+              </div>
+              {updateSubmitState === "error" ? (
+                <p className="mt-3 text-sm text-rose-200">{t("publicAgreement.updates.error")}</p>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="mt-6 space-y-4">
             {timeline.map((item) => (
               <div key={item.key} className="grid gap-3 sm:grid-cols-[1rem_1fr]">
@@ -506,14 +670,28 @@ export default function PublicAgreementPage() {
                           ? "bg-rose-300 ring-rose-300/10"
                           : item.tone === "attention"
                             ? "bg-amber-300 ring-amber-300/10"
-                            : "bg-white/45 ring-white/10",
+                            : item.tone === "update"
+                              ? "bg-sky-200 ring-sky-200/10"
+                              : "bg-white/45 ring-white/10",
                     ].join(" ")}
                   />
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div
+                  className={[
+                    "rounded-2xl border p-4",
+                    item.kind === "update"
+                      ? "border-sky-200/10 bg-sky-200/[0.035]"
+                      : "border-white/10 bg-black/20",
+                  ].join(" ")}
+                >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="font-medium text-white">{item.label}</p>
+                      <p className="flex items-center gap-2 font-medium text-white">
+                        {item.kind === "update" ? (
+                          <MessageSquareText className="h-4 w-4 text-sky-100/70" aria-hidden="true" />
+                        ) : null}
+                        {item.label}
+                      </p>
                       <p className="mt-1 text-sm text-white/55">{item.actor}</p>
                     </div>
                     <time className="text-sm text-white/50" dateTime={item.timestamp}>
@@ -521,7 +699,14 @@ export default function PublicAgreementPage() {
                     </time>
                   </div>
                   {item.description ? (
-                    <p className="mt-3 text-sm leading-6 text-white/60">{item.description}</p>
+                    <p
+                      className={[
+                        "mt-3 whitespace-pre-wrap text-sm leading-6",
+                        item.kind === "update" ? "text-white/72" : "text-white/60",
+                      ].join(" ")}
+                    >
+                      {item.description}
+                    </p>
                   ) : null}
                 </div>
               </div>
