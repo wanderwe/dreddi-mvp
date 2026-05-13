@@ -408,7 +408,7 @@ export default function PublicAgreementPage() {
                   </p>
                 ) : null}
                 {!isAccepted ? (
-                  <p className="mt-4 max-w-2xl rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-50/90">
+                  <p className="mt-4 w-fit max-w-full rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-50/90 sm:whitespace-nowrap">
                     {t("publicAgreement.awaitingAcceptanceNote")}
                   </p>
                 ) : null}
