@@ -243,6 +243,11 @@
       "conditionMet": "Condition met",
       "conditionMark": "Mark condition met",
       "statusActions": "Status actions",
+      "toolsTitle": "Agreement tools",
+      "progressTitle": "Progress",
+      "historyTitle": "Agreement history",
+      "participantCreatorState": "Created this agreement",
+      "participantResponsibleState": "Responsible for completion",
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
       "confirmCompletion": "Confirm completion",
@@ -284,8 +289,7 @@
         "creatorConsent": "I agree to show this fulfilled {entityLower} publicly",
         "counterpartyConsent": "I agree to show this fulfilled {entityLower} publicly",
         "confirmedOnly": "Only fulfilled responsibilities can be shown publicly",
-        "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public",
-        "private": "Private cockpit. Public observer page is hidden unless visibility is enabled."
+        "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public"
       },
       "errors": {
         "unsupportedStatus": "{entity} has an unsupported status value",
