@@ -531,10 +531,22 @@ export default function PromisePage() {
 
   const promiseLink = useMemo(() => {
     if (!id) return null;
-    if (appUrl) return `${appUrl}/promises/${id}`;
+    if (appUrl) return `${appUrl}${localizePath(`/promises/${id}`, locale)}`;
     if (typeof window === "undefined") return null;
-    return `${window.location.origin}/promises/${id}`;
-  }, [appUrl, id]);
+    return `${window.location.origin}${localizePath(`/promises/${id}`, locale)}`;
+  }, [appUrl, id, locale]);
+
+  const publicAgreementPath = useMemo(() => {
+    if (!id) return null;
+    return localizePath(`/p/agreements/${id}`, locale);
+  }, [id, locale]);
+
+  const publicAgreementLink = useMemo(() => {
+    if (!publicAgreementPath) return null;
+    if (appUrl) return `${appUrl}${publicAgreementPath}`;
+    if (typeof window === "undefined") return null;
+    return `${window.location.origin}${publicAgreementPath}`;
+  }, [appUrl, publicAgreementPath]);
 
   useEffect(() => {
     return () => {
@@ -652,6 +664,35 @@ export default function PromisePage() {
 
     setToastTone("error");
     setToast(t("promises.detail.linkCopy.copyFailed"));
+  }
+
+  async function copyPublicAgreementLink() {
+    if (!publicAgreementLink) {
+      setToastTone("error");
+      setToast(t("promises.detail.publicAgreementLink.copyFailed"));
+      return;
+    }
+
+    let didCopy = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(publicAgreementLink);
+        didCopy = true;
+      } else {
+        didCopy = fallbackCopy(publicAgreementLink);
+      }
+    } catch {
+      didCopy = fallbackCopy(publicAgreementLink);
+    }
+
+    if (didCopy) {
+      setToastTone("success");
+      setToast(t("promises.detail.publicAgreementLink.copied"));
+      return;
+    }
+
+    setToastTone("error");
+    setToast(t("promises.detail.publicAgreementLink.copyFailed"));
   }
 
   async function copyInvite() {
@@ -832,6 +873,7 @@ export default function PromisePage() {
   const publicStatusText = showPublicStatus
     ? t("promises.detail.publicStatus.public", { publicEntity: promiseLabels.publicEntity })
     : "";
+  const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -988,9 +1030,7 @@ export default function PromisePage() {
         </div>
       )}
 
-      {!p && !error ? (
-        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
-      ) : (
+      {p ? (
         <>
           <Card title={t("promises.detail.cardTitle", { entity: promiseLabels.entity })}>
             <div className="space-y-3">
@@ -1073,13 +1113,49 @@ export default function PromisePage() {
               </div>
 
               {showPublicStatus && (
-                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-200">
-                  <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
-                    {t("promises.detail.publicStatus.label")}
-                  </span>
-                  <span className="text-emerald-200">
-                    {publicStatusText}
-                  </span>
+                <div className="space-y-3 rounded-xl border border-emerald-300/15 bg-emerald-300/[0.06] p-3 text-sm text-neutral-200">
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
+                      {t("promises.detail.publicStatus.label")}
+                    </span>
+                    <span className="text-emerald-200">
+                      {publicStatusText}
+                    </span>
+                  </div>
+
+                  {canSharePublicAgreement && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100/80">
+                          {t("promises.detail.publicAgreementLink.title")}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-neutral-300">
+                          {t("promises.detail.publicAgreementLink.helper")}
+                        </p>
+                      </div>
+
+                      <div className="break-all rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs text-neutral-200">
+                        {publicAgreementLink}
+                      </div>
+
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <button
+                          type="button"
+                          onClick={() => void copyPublicAgreementLink()}
+                          className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        >
+                          <Link2 className="h-4 w-4" aria-hidden />
+                          {t("promises.detail.publicAgreementLink.copy")}
+                        </button>
+                        <Link
+                          href={publicAgreementPath!}
+                          className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        >
+                          {t("promises.detail.publicAgreementLink.open")}
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1305,7 +1381,9 @@ export default function PromisePage() {
             </Card>
           )}
         </>
-      )}
+      ) : !error ? (
+        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
+      ) : null}
 
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
