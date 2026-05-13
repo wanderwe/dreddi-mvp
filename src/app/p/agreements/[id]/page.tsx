@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
-import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { isPromiseStatus } from "@/lib/promiseStatus";
@@ -261,30 +260,39 @@ export default function PublicAgreementPage() {
       setLoading(true);
       setError(null);
 
-      if (!supabase) {
-        setError(t("publicAgreement.errors.supabase"));
-        setLoading(false);
-        return;
-      }
+      try {
+        const response = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
+          cache: "no-store",
+        });
 
-      const { data, error: rpcError } = await supabase.rpc("public_get_public_agreement", {
-        p_id: id,
-      });
+        if (!active) return;
 
-      if (!active) return;
+        if (response.status === 404) {
+          setError(t("publicAgreement.errors.notPublic"));
+          setAgreement(null);
+          setLoading(false);
+          return;
+        }
 
-      if (rpcError) {
-        setError(t("publicAgreement.errors.load"));
-        setAgreement(null);
-      } else {
-        const row = Array.isArray(data) ? data[0] : data;
-        const normalized = row ? normalizeAgreement(row as PublicAgreementRow) : null;
+        if (!response.ok) {
+          setError(t("publicAgreement.errors.load"));
+          setAgreement(null);
+          setLoading(false);
+          return;
+        }
+
+        const row = (await response.json()) as PublicAgreementRow;
+        const normalized = normalizeAgreement(row);
         if (!normalized) {
           setError(t("publicAgreement.errors.notPublic"));
           setAgreement(null);
         } else {
           setAgreement(normalized);
         }
+      } catch {
+        if (!active) return;
+        setError(t("publicAgreement.errors.load"));
+        setAgreement(null);
       }
 
       setLoading(false);
@@ -321,6 +329,12 @@ export default function PublicAgreementPage() {
       )
     : [];
 
+  const isAccepted = Boolean(
+    agreement &&
+      (agreement.invite_status === "accepted" ||
+        agreement.accepted_at ||
+        agreement.counterparty_accepted_at)
+  );
   const flowStates = agreement ? getFlowStates(agreement, t) : [];
   const dueText = agreement?.due_at
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
@@ -430,7 +444,9 @@ export default function PublicAgreementPage() {
               </div>
               <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.06] px-3 py-2 text-xs text-emerald-50/80">
                 <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
-                {t("publicAgreement.participants.acknowledged")}
+                {isAccepted
+                  ? t("publicAgreement.participants.acknowledged")
+                  : t("publicAgreement.participants.awaitingAcceptance")}
               </div>
             </div>
           </div>
