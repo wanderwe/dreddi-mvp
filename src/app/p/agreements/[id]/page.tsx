@@ -390,6 +390,9 @@ export default function PublicAgreementPage() {
     : null;
 
   const canAddUpdate = Boolean(agreement?.viewer_can_update && agreement.updates_available !== false);
+  const shouldShowUpdatesUnavailable = Boolean(
+    agreement?.viewer_can_update && agreement.updates_available === false
+  );
   const remainingUpdateChars = 500 - updateContent.length;
 
   const handleSubmitUpdate = async () => {
@@ -597,6 +600,12 @@ export default function PublicAgreementPage() {
               </button>
             ) : null}
           </div>
+
+          {shouldShowUpdatesUnavailable ? (
+            <p className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-50/80">
+              {t("publicAgreement.updates.unavailable")}
+            </p>
+          ) : null}
 
           {isUpdateFormOpen ? (
             <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
