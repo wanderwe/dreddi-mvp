@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Link2, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Check, Clipboard, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
@@ -450,12 +450,6 @@ export default function PublicAgreementPage() {
                 <ParticipantCard label={t("publicAgreement.participants.createdBy")} name={creatorName} />
                 <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
                 <ParticipantCard label={t("publicAgreement.participants.acceptedBy")} name={counterpartyName} />
-              </div>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.06] px-3 py-2 text-xs text-emerald-50/80">
-                <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
-                {isAccepted
-                  ? t("publicAgreement.participants.acknowledged")
-                  : t("publicAgreement.participants.awaitingAcceptance")}
               </div>
             </div>
           </div>
