@@ -324,6 +324,14 @@
           "invitedSideExecutes": "{responsible} is expected to complete this deal for {recipient}",
           "invitedSideReceives": "This deal is a promise made by {responsible} to {recipient}"
         }
+      },
+      "publicAgreementLink": {
+        "title": "Public agreement link",
+        "helper": "This standalone page is visible to anyone with the link",
+        "copy": "Copy public link",
+        "open": "Open public page",
+        "copied": "Public agreement link copied",
+        "copyFailed": "Failed to copy public link"
       }
     },
     "inviteStatus": {

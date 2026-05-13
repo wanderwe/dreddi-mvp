@@ -332,6 +332,14 @@
           "invitedSideExecutes": "{responsible} має виконати цю угоду для {recipient}",
           "invitedSideReceives": "Ця угода — обіцянка від {responsible} для {recipient}"
         }
+      },
+      "publicAgreementLink": {
+        "title": "Посилання на публічну угоду",
+        "helper": "Ця окрема сторінка доступна всім, хто має посилання",
+        "copy": "Скопіювати публічне посилання",
+        "open": "Відкрити публічну сторінку",
+        "copied": "Посилання на публічну угоду скопійовано",
+        "copyFailed": "Не вдалося скопіювати публічне посилання"
       }
     },
     "inviteStatus": {
