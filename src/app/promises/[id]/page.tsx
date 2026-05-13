@@ -1030,9 +1030,7 @@ export default function PromisePage() {
         </div>
       )}
 
-      {!p && !error ? (
-        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
-      ) : (
+      {p ? (
         <>
           <Card title={t("promises.detail.cardTitle", { entity: promiseLabels.entity })}>
             <div className="space-y-3">
@@ -1383,7 +1381,9 @@ export default function PromisePage() {
             </Card>
           )}
         </>
-      )}
+      ) : !error ? (
+        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
+      ) : null}
 
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
