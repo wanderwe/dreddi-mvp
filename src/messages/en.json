@@ -284,7 +284,8 @@
         "creatorConsent": "I agree to show this fulfilled {entityLower} publicly",
         "counterpartyConsent": "I agree to show this fulfilled {entityLower} publicly",
         "confirmedOnly": "Only fulfilled responsibilities can be shown publicly",
-        "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public"
+        "awaitingAcceptance": "The other side must accept the {entityLower} before it can be made public",
+        "private": "Private cockpit. Public observer page is hidden unless visibility is enabled."
       },
       "errors": {
         "unsupportedStatus": "{entity} has an unsupported status value",
