@@ -66,6 +66,7 @@ type PublicPromiseRow = {
 
 type PublicPromise = {
   id: string;
+  publicAgreementId: string | null;
   sourceIndex: number;
   title: string;
   status: PromiseStatus;
@@ -111,6 +112,7 @@ const normalizePublicPromiseRows = (rows: PublicPromiseRow[]): PublicPromise[] =
     return [
       {
         id: row.id ?? `${row.title}-${row.created_at}-${index}`,
+        publicAgreementId: row.id ?? null,
         sourceIndex: index,
         title: row.title,
         status: row.status,
@@ -1132,23 +1134,43 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               ) : (
                 <>
                   <div className="flex flex-col gap-4">
-                    {visiblePromises.map((promise) => (
-                      <div
-                        key={`${promise.title}-${promise.created_at}`}
-                        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-white">{promise.title}</p>
-                          <p className="text-xs text-white/50">
-                            {formatDealMeta(promise, locale, dealMetaLabels)}
-                          </p>
-                        </div>
-                        <StatusPill
-                          label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
-                          tone={statusTones[promise.uiStatus] ?? "neutral"}
-                        />
-                      </div>
-                    ))}
+                    {visiblePromises.map((promise) => {
+                      const content = (
+                        <>
+                          <div>
+                            <p className="text-sm font-medium text-white">{promise.title}</p>
+                            <p className="text-xs text-white/50">
+                              {formatDealMeta(promise, locale, dealMetaLabels)}
+                            </p>
+                          </div>
+                          <StatusPill
+                            label={statusLabels[promise.uiStatus] ?? promise.uiStatus}
+                            tone={statusTones[promise.uiStatus] ?? "neutral"}
+                          />
+                        </>
+                      );
+
+                      if (!promise.publicAgreementId) {
+                        return (
+                          <div
+                            key={`${promise.title}-${promise.created_at}`}
+                            className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                          >
+                            {content}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <LocalizedLink
+                          key={`${promise.title}-${promise.created_at}`}
+                          href={`/p/agreements/${promise.publicAgreementId}`}
+                          className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20 hover:bg-white/[0.06] md:flex-row md:items-center md:justify-between"
+                        >
+                          {content}
+                        </LocalizedLink>
+                      );
+                    })}
                   </div>
                   {hasMorePublicDeals ? (
                     <div className="mt-4 flex justify-center pt-2">
