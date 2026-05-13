@@ -1049,9 +1049,7 @@
       "createdBy": "Створив/-ла",
       "acceptedBy": "Відповідальна сторона",
       "creatorFallback": "Автор угоди",
-      "counterpartyFallback": "Відповідальна сторона",
-      "acknowledged": "Обидві сторони показані як публічні учасники цієї домовленості",
-      "awaitingAcceptance": "Відповідальна сторона ще не прийняла цю публічну угоду"
+      "counterpartyFallback": "Відповідальна сторона"
     },
     "flow": {
       "created": "Створено",
