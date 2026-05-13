@@ -593,7 +593,7 @@ export default function PublicAgreementPage() {
                   setIsUpdateFormOpen((open) => !open);
                   setUpdateSubmitState("idle");
                 }}
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/82 transition hover:border-emerald-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/82 transition hover:border-emerald-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
               >
                 <MessageSquareText className="h-4 w-4" aria-hidden="true" />
                 {t("publicAgreement.updates.add")}
@@ -635,7 +635,7 @@ export default function PublicAgreementPage() {
                       setIsUpdateFormOpen(false);
                       setUpdateSubmitState("idle");
                     }}
-                    className="rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/65 transition hover:bg-white/10"
+                    className="cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/65 transition hover:bg-white/10"
                   >
                     {t("publicAgreement.updates.cancel")}
                   </button>
@@ -643,7 +643,7 @@ export default function PublicAgreementPage() {
                     type="button"
                     onClick={() => void handleSubmitUpdate()}
                     disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                    className="rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="cursor-pointer rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {updateSubmitState === "saving"
                       ? t("publicAgreement.updates.saving")
