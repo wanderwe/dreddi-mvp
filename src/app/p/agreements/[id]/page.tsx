@@ -54,6 +54,14 @@ type TimelineItem = {
   tone?: "success" | "danger" | "attention" | "neutral";
 };
 
+type FlowState = {
+  key: string;
+  label: string;
+  complete: boolean;
+  current: boolean;
+  disputed?: boolean;
+};
+
 const statusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
   active: "neutral",
   completed_by_promisor: "attention",
@@ -128,9 +136,9 @@ function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
   };
 }
 
-function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>) {
+function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): FlowState[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
-  const base = [
+  const base: FlowState[] = [
     { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
     { key: "accepted", label: t("publicAgreement.flow.accepted"), complete: Boolean(acceptedAt), current: agreement.uiStatus === "awaiting_acceptance" },
     { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active", current: agreement.uiStatus === "active" },
