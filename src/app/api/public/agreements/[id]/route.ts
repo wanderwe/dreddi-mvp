@@ -96,7 +96,8 @@ function serializePublicAgreement(
   promise: PromisePublicAgreementRecord,
   profilesById: Map<string, PublicProfileRecord>,
   updates: AgreementUpdateRecord[],
-  viewerCanUpdate: boolean
+  viewerCanUpdate: boolean,
+  updatesAvailable = true
 ) {
   const counterpartyId = resolveCounterpartyId(promise);
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
@@ -131,6 +132,7 @@ function serializePublicAgreement(
         ? counterpartyContact
         : null,
     viewer_can_update: viewerCanUpdate,
+    updates_available: updatesAvailable,
     updates: updates.map((update) => {
       const author = profilesById.get(update.author_id) ?? null;
       return {
@@ -177,9 +179,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       .order("id", { ascending: true })
       .returns<AgreementUpdateRecord[]>();
 
-    const publicUpdates = updatesError && isMissingAgreementUpdatesTable(updatesError) ? [] : updates;
+    const updatesTableMissing = Boolean(updatesError && isMissingAgreementUpdatesTable(updatesError));
+    const publicUpdates = updatesTableMissing ? [] : updates;
 
-    if (updatesError && !isMissingAgreementUpdatesTable(updatesError)) {
+    if (updatesError && !updatesTableMissing) {
       return NextResponse.json(
         { error: "Public agreement updates lookup failed", detail: updatesError.message },
         { status: 500 }
@@ -210,7 +213,13 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
     const user = await getOptionalUser(req);
     return NextResponse.json(
-      serializePublicAgreement(promise, profilesById, publicUpdates ?? [], canUserPostUpdate(promise, user?.id ?? null))
+      serializePublicAgreement(
+        promise,
+        profilesById,
+        publicUpdates ?? [],
+        canUserPostUpdate(promise, user?.id ?? null),
+        !updatesTableMissing
+      )
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

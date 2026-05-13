@@ -46,6 +46,7 @@ type PublicAgreementRow = {
   counterparty_handle: string | null;
   counterparty_contact: string | null;
   viewer_can_update?: boolean | null;
+  updates_available?: boolean | null;
   updates?: PublicAgreementUpdate[] | null;
 };
 
@@ -388,7 +389,7 @@ export default function PublicAgreementPage() {
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
     : null;
 
-  const canAddUpdate = Boolean(agreement?.viewer_can_update);
+  const canAddUpdate = Boolean(agreement?.viewer_can_update && agreement.updates_available !== false);
   const remainingUpdateChars = 500 - updateContent.length;
 
   const handleSubmitUpdate = async () => {
