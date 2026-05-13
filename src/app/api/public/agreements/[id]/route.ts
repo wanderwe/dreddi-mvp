@@ -63,6 +63,14 @@ type AgreementUpdateRecord = {
 
 const isLikelyPrivateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
+function isMissingAgreementUpdatesTable(error: { code?: string; message?: string }) {
+  return (
+    error.code === "42P01" ||
+    (/agreement_updates/i.test(error.message ?? "") &&
+      /does not exist|schema cache/i.test(error.message ?? ""))
+  );
+}
+
 function getBearerToken(req: Request) {
   const auth = req.headers.get("authorization");
   if (!auth) return null;
@@ -169,7 +177,9 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       .order("id", { ascending: true })
       .returns<AgreementUpdateRecord[]>();
 
-    if (updatesError) {
+    const publicUpdates = updatesError && isMissingAgreementUpdatesTable(updatesError) ? [] : updates;
+
+    if (updatesError && !isMissingAgreementUpdatesTable(updatesError)) {
       return NextResponse.json(
         { error: "Public agreement updates lookup failed", detail: updatesError.message },
         { status: 500 }
@@ -179,7 +189,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const counterpartyId = resolveCounterpartyId(promise);
     const profileIds = Array.from(
       new Set(
-        [promise.creator_id, counterpartyId, ...(updates ?? []).map((update) => update.author_id)].filter(
+        [promise.creator_id, counterpartyId, ...(publicUpdates ?? []).map((update) => update.author_id)].filter(
           (value): value is string => Boolean(value)
         )
       )
@@ -200,7 +210,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
     const user = await getOptionalUser(req);
     return NextResponse.json(
-      serializePublicAgreement(promise, profilesById, updates ?? [], canUserPostUpdate(promise, user?.id ?? null))
+      serializePublicAgreement(promise, profilesById, publicUpdates ?? [], canUserPostUpdate(promise, user?.id ?? null))
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -253,6 +263,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .single<AgreementUpdateRecord>();
 
     if (insertError) {
+      if (isMissingAgreementUpdatesTable(insertError)) {
+        return NextResponse.json(
+          { error: "Agreement updates are not configured yet", detail: insertError.message },
+          { status: 503 }
+        );
+      }
+
       return NextResponse.json(
         { error: "Could not create agreement update", detail: insertError.message },
         { status: 500 }
