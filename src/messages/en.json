@@ -984,5 +984,66 @@
       "createFailed": "Could not create group",
       "notFound": "Group not found or unavailable"
     }
+  },
+  "publicAgreement": {
+    "loading": "Loading public agreement…",
+    "notPublicTitle": "Agreement is not public",
+    "publicBadge": "Public agreement",
+    "reputationStake": "Reputation stake",
+    "deadline": "Deadline: {date}",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "copyFailed": "Copy failed",
+    "whatAgreed": "What was agreed",
+    "noDetails": "The agreement text is captured in the title",
+    "flowTitle": "Status flow",
+    "status": {
+      "active": "Active",
+      "completed_by_promisor": "Marked completed",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed",
+      "awaiting_acceptance": "Awaiting acceptance",
+      "declined": "Declined",
+      "expired": "Expired",
+      "cancelled_by_creator": "Cancelled"
+    },
+    "participants": {
+      "title": "Participants",
+      "createdBy": "Created by",
+      "acceptedBy": "Responsible side",
+      "creatorFallback": "Agreement creator",
+      "counterpartyFallback": "Responsible side",
+      "acknowledged": "Both sides are shown as the public parties to this commitment"
+    },
+    "flow": {
+      "created": "Created",
+      "accepted": "Accepted",
+      "active": "Active",
+      "completed": "Completed",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed"
+    },
+    "timeline": {
+      "title": "Public timeline",
+      "system": "Dreddi",
+      "created": "Agreement created",
+      "createdDescription": "The commitment was recorded as a public agreement",
+      "accepted": "Agreement accepted",
+      "acceptedDescription": "The responsible side acknowledged the agreement",
+      "completed": "Marked as completed",
+      "completedDescription": "The responsible side reported that the commitment was fulfilled",
+      "confirmed": "Completion confirmed",
+      "confirmedDescription": "The creator confirmed the outcome",
+      "disputed": "Agreement disputed",
+      "disputedDescription": "The outcome was publicly marked as disputed",
+      "declined": "Agreement declined",
+      "cancelled": "Agreement cancelled",
+      "expired": "Invitation expired"
+    },
+    "errors": {
+      "supabase": "Supabase is not configured in this preview",
+      "load": "Could not load this public agreement",
+      "notPublic": "This agreement is not public or does not exist"
+    }
   }
 }

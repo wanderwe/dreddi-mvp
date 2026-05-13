@@ -1014,5 +1014,66 @@
       "createFailed": "Не вдалося створити групу",
       "notFound": "Групу не знайдено або вона недоступна"
     }
+  },
+  "publicAgreement": {
+    "loading": "Завантажуємо публічну угоду…",
+    "notPublicTitle": "Угода не є публічною",
+    "publicBadge": "Публічна угода",
+    "reputationStake": "Репутаційна ставка",
+    "deadline": "До: {date}",
+    "copyLink": "Скопіювати посилання",
+    "copied": "Посилання скопійовано",
+    "copyFailed": "Не вдалося скопіювати",
+    "whatAgreed": "Про що домовились",
+    "noDetails": "Суть домовленості зафіксована в назві",
+    "flowTitle": "Хід статусу",
+    "status": {
+      "active": "Активна",
+      "completed_by_promisor": "Позначено виконаною",
+      "confirmed": "Підтверджено",
+      "disputed": "Оскаржено",
+      "awaiting_acceptance": "Очікує прийняття",
+      "declined": "Відхилено",
+      "expired": "Прострочено",
+      "cancelled_by_creator": "Скасовано"
+    },
+    "participants": {
+      "title": "Учасники",
+      "createdBy": "Створив/-ла",
+      "acceptedBy": "Відповідальна сторона",
+      "creatorFallback": "Автор угоди",
+      "counterpartyFallback": "Відповідальна сторона",
+      "acknowledged": "Обидві сторони показані як публічні учасники цієї домовленості"
+    },
+    "flow": {
+      "created": "Створено",
+      "accepted": "Прийнято",
+      "active": "Активна",
+      "completed": "Виконано",
+      "confirmed": "Підтверджено",
+      "disputed": "Оскаржено"
+    },
+    "timeline": {
+      "title": "Публічна хронологія",
+      "system": "Dreddi",
+      "created": "Угоду створено",
+      "createdDescription": "Домовленість зафіксовано як публічну угоду",
+      "accepted": "Домовленість прийнято",
+      "acceptedDescription": "Відповідальна сторона підтвердила домовленість",
+      "completed": "Позначено як виконану",
+      "completedDescription": "Відповідальна сторона повідомила, що зобовʼязання виконано",
+      "confirmed": "Виконання підтверджено",
+      "confirmedDescription": "Автор угоди підтвердив результат",
+      "disputed": "Угоду оскаржено",
+      "disputedDescription": "Результат публічно позначено як спірний",
+      "declined": "Угоду відхилено",
+      "cancelled": "Угоду скасовано",
+      "expired": "Запрошення прострочено"
+    },
+    "errors": {
+      "supabase": "Supabase не налаштовано в цьому превʼю",
+      "load": "Не вдалося завантажити цю публічну угоду",
+      "notPublic": "Ця угода не є публічною або не існує"
+    }
   }
 }
