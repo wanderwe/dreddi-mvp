@@ -81,10 +81,10 @@ export type LandingCopy = {
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
-      eyebrow: "Легкий трекер домовленостей",
-      headline: "Домовленість починається з підтвердження",
+      eyebrow: "Dreddi knows",
+      headline: "Домовленість стає реальною тільки після підтвердження",
       description:
-        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
+        "Фіксуйте домовленості з друзями, партнерами чи клієнтами.\nПублічно або приватно. Без контрактів і без тиску.",
       whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
@@ -176,10 +176,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
   en: {
     hero: {
-      eyebrow: "A lightweight deal tracker",
-      headline: "An agreement starts with confirmation",
+      eyebrow: "Dreddi knows",
+      headline: "A commitment only becomes real after confirmation",
       description:
-        "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
+        "Record commitments with friends, partners or clients.\nPublic or private. No contracts. No pressure.",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {

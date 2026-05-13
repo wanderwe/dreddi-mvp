@@ -563,26 +563,17 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-12 pt-16 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex flex-1 flex-col gap-4 md:gap-7">
-          <div className="order-1 space-y-3 sm:space-y-4">
-            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
-              {copy.hero.headline}
-            </p>
-            <div className="flex items-center gap-4 sm:gap-5">
-              <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
-              <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
-                  Dreddi
-                </span>
-                <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
-                  {t("landing.hero.brandSuffix")}
-                </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
-                />
-              </div>
+          <div className="order-1 space-y-4 sm:space-y-5">
+            <div className="flex items-center gap-3 text-slate-300/85">
+              <DreddiLogoMark className="h-8 w-8 drop-shadow-[0_0_18px_rgba(52,211,153,0.3)] sm:h-9 sm:w-9" />
+              <p className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text pr-1 text-sm font-semibold leading-none tracking-[-0.01em] text-transparent [text-shadow:0_0_16px_rgba(52,211,153,0.16)] sm:text-base">
+                {copy.hero.eyebrow}
+              </p>
             </div>
-            <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
+            <h1 className="max-w-3xl text-[2.65rem] font-semibold leading-[0.95] tracking-[-0.045em] text-white [text-wrap:balance] sm:text-6xl md:text-[4.25rem]">
+              {copy.hero.headline}
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-slate-300/88 sm:max-w-xl sm:text-[1.06rem]">
               {renderMultiline(copy.hero.description)}
             </p>
             <LocalizedLink
