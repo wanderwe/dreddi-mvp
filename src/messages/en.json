@@ -1053,6 +1053,7 @@
       "supabase": "Supabase is not configured in this preview",
       "load": "Could not load this public agreement",
       "notPublic": "This agreement is not public or does not exist"
-    }
+    },
+    "awaitingAcceptanceNote": "This public agreement is visible now, but the responsible side has not accepted it yet"
   }
 }

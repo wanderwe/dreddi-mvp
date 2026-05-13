@@ -131,8 +131,8 @@ function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
 function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>) {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
   const base = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: agreement.uiStatus === "awaiting_acceptance" },
-    { key: "accepted", label: t("publicAgreement.flow.accepted"), complete: Boolean(acceptedAt), current: false },
+    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
+    { key: "accepted", label: t("publicAgreement.flow.accepted"), complete: Boolean(acceptedAt), current: agreement.uiStatus === "awaiting_acceptance" },
     { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active" || agreement.uiStatus === "active", current: agreement.uiStatus === "active" },
     { key: "completed", label: t("publicAgreement.flow.completed"), complete: Boolean(agreement.completed_at || agreement.confirmed_at || agreement.disputed_at), current: agreement.uiStatus === "completed_by_promisor" },
     { key: "confirmed", label: t("publicAgreement.flow.confirmed"), complete: agreement.status === "confirmed", current: agreement.status === "confirmed" },
@@ -405,6 +405,11 @@ export default function PublicAgreementPage() {
                 {dueText ? (
                   <p className="mt-4 text-sm font-medium text-white/70">
                     {t("publicAgreement.deadline", { date: dueText })}
+                  </p>
+                ) : null}
+                {!isAccepted ? (
+                  <p className="mt-4 max-w-2xl rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-50/90">
+                    {t("publicAgreement.awaitingAcceptanceNote")}
                   </p>
                 ) : null}
               </div>
