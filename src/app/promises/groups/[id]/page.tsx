@@ -133,7 +133,6 @@ export default function PromiseGroupDetailPage() {
           "id,title,status,due_at,created_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at"
         )
         .eq("group_id", groupId)
-        .eq("creator_id", session.user.id)
         .order("created_at", { ascending: false });
 
       if (!active) return;
@@ -158,7 +157,6 @@ export default function PromiseGroupDetailPage() {
       const { data: candidateRows, error: candidateError } = await supabase
         .from("promises")
         .select("id,title")
-        .eq("creator_id", session.user.id)
         .or(`group_id.is.null,group_id.neq.${groupId}`)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -203,8 +201,7 @@ export default function PromiseGroupDetailPage() {
     const { error: updateError } = await supabase
       .from("promises")
       .update({ group_id: groupId })
-      .eq("id", selectedAttachDealId)
-      .eq("creator_id", session.user.id);
+      .eq("id", selectedAttachDealId);
 
     setAttaching(false);
 
@@ -318,8 +315,7 @@ export default function PromiseGroupDetailPage() {
     const { error: unlinkError } = await supabase
       .from("promises")
       .update({ group_id: null })
-      .eq("group_id", groupId)
-      .eq("creator_id", session.user.id);
+      .eq("group_id", groupId);
 
     if (unlinkError) {
       setDeletingGroup(false);
@@ -371,7 +367,6 @@ export default function PromiseGroupDetailPage() {
       .from("promises")
       .update({ group_id: null })
       .eq("id", dealId)
-      .eq("creator_id", session.user.id)
       .eq("group_id", groupId);
 
     setUnlinkingDealId(null);
