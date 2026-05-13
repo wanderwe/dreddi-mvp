@@ -72,7 +72,6 @@ export default function PromiseGroupsPage() {
           const { data: groupedDeals, error: countsError } = await supabase
             .from("promises")
             .select("group_id")
-            .eq("creator_id", session.user.id)
             .in("group_id", groupIds);
 
           if (countsError) {
