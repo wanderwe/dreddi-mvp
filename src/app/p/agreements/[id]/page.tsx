@@ -396,10 +396,6 @@ export default function PublicAgreementPage() {
                     icon={statusIconMap[agreement.uiStatus] ?? "clock"}
                     marker="icon"
                   />
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-300/10 px-2.5 py-1.5 text-[13px] font-medium text-emerald-100">
-                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t("publicAgreement.publicBadge")}
-                  </span>
                   {agreement.is_important ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/10 px-2.5 py-1.5 text-[13px] font-medium text-amber-100">
                       <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
