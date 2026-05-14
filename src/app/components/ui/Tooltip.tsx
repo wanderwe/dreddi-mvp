@@ -7,7 +7,9 @@ type TooltipProps = {
   label: string;
   children: ReactNode;
   className?: string;
+  disabled?: boolean;
   placement?: "bottom" | "bottom-right" | "top" | "top-right";
+  shouldOpen?: () => boolean;
 };
 
 const baseTooltipClasses =
@@ -26,7 +28,9 @@ export function Tooltip({
   label,
   children,
   className = "",
+  disabled = false,
   placement = "bottom",
+  shouldOpen,
 }: TooltipProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const tooltipRef = useRef<HTMLSpanElement | null>(null);
@@ -43,6 +47,12 @@ export function Tooltip({
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (disabled && isOpen) {
+      setIsOpen(false);
+    }
+  }, [disabled, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -120,17 +130,23 @@ export function Tooltip({
     };
   }, [isOpen, placementConfig]);
 
+  const openTooltip = () => {
+    if (disabled) return;
+    if (shouldOpen && !shouldOpen()) return;
+    setIsOpen(true);
+  };
+
   return (
     <span
       ref={triggerRef}
       className={`relative inline-flex ${className}`}
-      onMouseEnter={() => setIsOpen(true)}
+      onMouseEnter={openTooltip}
       onMouseLeave={() => setIsOpen(false)}
-      onFocus={() => setIsOpen(true)}
+      onFocus={openTooltip}
       onBlur={() => setIsOpen(false)}
     >
       {children}
-      {isClient && isOpen
+      {isClient && isOpen && !disabled
         ? createPortal(
             <span
               ref={tooltipRef}
