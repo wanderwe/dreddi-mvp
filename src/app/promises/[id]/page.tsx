@@ -1467,9 +1467,10 @@ export default function PromisePage() {
             <details className="group rounded-2xl border border-white/10 bg-neutral-900/30 p-4">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
                 <span>{t("promises.detail.toolsTitle")}</span>
-                <span className="text-xs text-white/40 transition group-open:rotate-180" aria-hidden>
-                  ⌄
-                </span>
+                <ChevronDown
+                  className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                  aria-hidden
+                />
               </summary>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
 
