@@ -143,11 +143,29 @@
       "active": "Active",
       "pendingConfirmation": "Awaiting review",
       "waitingConfirmation": "Awaiting review",
-      "confirmed": "Fulfilled",
+      "confirmed": "Closed",
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
       "needsReview": "Needs your review",
       "awaitingInviteAcceptance": "Pending acceptance"
+    },
+    "history": {
+      "title": "Agreement history",
+      "flow": {
+        "created": "Created",
+        "accepted": "Accepted",
+        "active": "Active",
+        "completed": "Completed",
+        "confirmed": "Closed",
+        "disputed": "Disputed"
+      },
+      "timeline": {
+        "created": "Deal created",
+        "accepted": "Agreement accepted",
+        "completed": "Marked as completed",
+        "confirmed": "Agreement closed",
+        "disputed": "Agreement disputed"
+      }
     },
     "important": {
       "blockTitle": "Reputation stake",
@@ -175,7 +193,7 @@
           "overdue": "Overdue",
           "awaitingAcceptance": "Awaiting acceptance",
           "needsReview": "Needs review",
-          "confirmed": "Fulfilled",
+          "confirmed": "Closed",
           "disputed": "Disputed",
           "withdrawn": "Withdrawn",
           "closed": "Closed invites"
@@ -1010,7 +1028,7 @@
     "status": {
       "active": "Active",
       "completed_by_promisor": "Marked completed",
-      "confirmed": "Confirmed",
+      "confirmed": "Closed",
       "disputed": "Disputed",
       "awaiting_acceptance": "Awaiting acceptance",
       "declined": "Declined",
@@ -1029,7 +1047,7 @@
       "accepted": "Accepted",
       "active": "Active",
       "completed": "Completed",
-      "confirmed": "Confirmed",
+      "confirmed": "Closed",
       "disputed": "Disputed"
     },
     "timeline": {
@@ -1041,8 +1059,8 @@
       "acceptedDescription": "The responsible side acknowledged the agreement",
       "completed": "Marked as completed",
       "completedDescription": "The responsible side reported that the commitment was fulfilled",
-      "confirmed": "Completion confirmed",
-      "confirmedDescription": "The creator confirmed the outcome",
+      "confirmed": "Agreement closed",
+      "confirmedDescription": "The agreement process was resolved and closed",
       "disputed": "Agreement disputed",
       "disputedDescription": "The outcome was publicly marked as disputed",
       "declined": "Agreement declined",
