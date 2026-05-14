@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -85,41 +85,27 @@ function TruncatedDealTitle({
   className: string;
 }) {
   const titleRef = useRef<HTMLSpanElement | null>(null);
-  const [isTruncated, setIsTruncated] = useState(false);
 
-  useEffect(() => {
+  const isTitleTruncated = useCallback(() => {
     const titleElement = titleRef.current;
-    if (!titleElement) return;
+    if (!titleElement) return false;
 
-    const updateTruncationState = () => {
-      setIsTruncated(titleElement.scrollWidth > titleElement.clientWidth + 1);
-    };
-
-    updateTruncationState();
-
-    const resizeObserver = new ResizeObserver(updateTruncationState);
-    resizeObserver.observe(titleElement);
-    window.addEventListener("resize", updateTruncationState);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("resize", updateTruncationState);
-    };
-  }, [title]);
-
-  const titleNode = (
-    <span ref={titleRef} className={className}>
-      {title}
-    </span>
-  );
-
-  if (!isTruncated) {
-    return titleNode;
-  }
+    return titleElement.scrollWidth > titleElement.clientWidth + 1;
+  }, []);
 
   return (
-    <Tooltip label={title} className="w-full min-w-0" placement="top">
-      {titleNode}
+    <Tooltip
+      label={title}
+      className="w-full min-w-0"
+      placement="top"
+      shouldOpen={isTitleTruncated}
+    >
+      <span
+        ref={titleRef}
+        className={className}
+      >
+        {title}
+      </span>
     </Tooltip>
   );
 }
