@@ -1010,7 +1010,7 @@
     "status": {
       "active": "Active",
       "completed_by_promisor": "Marked completed",
-      "confirmed": "Confirmed",
+      "confirmed": "Fulfilled",
       "disputed": "Disputed",
       "awaiting_acceptance": "Awaiting acceptance",
       "declined": "Declined",
@@ -1029,7 +1029,7 @@
       "accepted": "Accepted",
       "active": "Active",
       "completed": "Completed",
-      "confirmed": "Confirmed",
+      "confirmed": "Fulfilled",
       "disputed": "Disputed"
     },
     "timeline": {
@@ -1041,8 +1041,8 @@
       "acceptedDescription": "The responsible side acknowledged the agreement",
       "completed": "Marked as completed",
       "completedDescription": "The responsible side reported that the commitment was fulfilled",
-      "confirmed": "Completion confirmed",
-      "confirmedDescription": "The creator confirmed the outcome",
+      "confirmed": "Agreement fulfilled",
+      "confirmedDescription": "The outcome was recorded as a fulfilled agreement",
       "disputed": "Agreement disputed",
       "disputedDescription": "The outcome was publicly marked as disputed",
       "declined": "Agreement declined",
@@ -1056,7 +1056,7 @@
       "load": "Could not load this public agreement",
       "notPublic": "This agreement is not public or does not exist"
     },
-    "awaitingAcceptanceNote": "The responsible side has not confirmed the agreement yet",
+    "awaitingAcceptanceNote": "The responsible side has not accepted the agreement yet",
     "updates": {
       "add": "Add update",
       "label": "Official progress update",
