@@ -751,8 +751,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               className={`flex flex-col rounded-3xl border border-white/10 bg-white/5 ${isEmbed ? "gap-4 p-5" : "gap-6 p-8"}`}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex min-w-0 items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {profile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -766,13 +766,13 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       </span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold truncate">{primaryLabel}</h1>
+                  <div className="w-full min-w-0">
+                    <h1 className="truncate text-2xl font-semibold">{primaryLabel}</h1>
                     {identity.subtitle && (
-                      <p className="text-sm text-white/60 truncate">{identity.subtitle}</p>
+                      <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
                     )}
                     {profileTags.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
+                      <div className="mt-3 flex w-full flex-wrap justify-center gap-2 sm:justify-start">
                         {profileTags.map((tag) => (
                           <span
                             key={tag}
@@ -787,7 +787,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   </div>
                 </div>
                 {!isEmbed ? (
-                  <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+                  <div className="flex w-full items-center justify-center gap-2 sm:w-auto sm:justify-end">
                     <Tooltip
                       label={copiedLink ? t("profileSettings.copySuccess") : t("publicProfile.copyLink")}
                       placement="top"
