@@ -149,6 +149,24 @@
       "needsReview": "Needs your review",
       "awaitingInviteAcceptance": "Pending acceptance"
     },
+    "history": {
+      "title": "Agreement history",
+      "flow": {
+        "created": "Created",
+        "accepted": "Accepted",
+        "active": "Active",
+        "completed": "Completed",
+        "confirmed": "Closed",
+        "disputed": "Disputed"
+      },
+      "timeline": {
+        "created": "Deal created",
+        "accepted": "Agreement accepted",
+        "completed": "Marked as completed",
+        "confirmed": "Agreement closed",
+        "disputed": "Agreement disputed"
+      }
+    },
     "important": {
       "blockTitle": "Reputation stake",
       "label": "Reputation stake",

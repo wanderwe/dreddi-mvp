@@ -157,6 +157,24 @@
       "needsReview": "Потрібен ваш перегляд",
       "awaitingInviteAcceptance": "Очікує прийняття"
     },
+    "history": {
+      "title": "Історія угоди",
+      "flow": {
+        "created": "Створено",
+        "accepted": "Прийнято",
+        "active": "Активна",
+        "completed": "Виконано",
+        "confirmed": "Закрито",
+        "disputed": "Оскаржено"
+      },
+      "timeline": {
+        "created": "Угоду створено",
+        "accepted": "Домовленість прийнято",
+        "completed": "Позначено як виконану",
+        "confirmed": "Угоду закрито",
+        "disputed": "Угоду оскаржено"
+      }
+    },
     "important": {
       "blockTitle": "Ставка на репутацію",
       "label": "Ставка на репутацію",
