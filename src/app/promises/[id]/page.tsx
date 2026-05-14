@@ -27,6 +27,7 @@ import {
 } from "@/lib/promiseAcceptance";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 
@@ -1029,9 +1030,7 @@ export default function PromisePage() {
   );
   const showPublicStatus = p?.visibility === "public";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
-  const hasToolCards = Boolean(
-    shouldShowInviteBlock || canSharePublicAgreement || canCopyPromiseLink
-  );
+  const hasToolCards = Boolean(shouldShowInviteBlock || canSharePublicAgreement);
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -1161,32 +1160,62 @@ export default function PromisePage() {
       {p ? (
         <>
           <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/25 backdrop-blur sm:p-7">
-            <div className="flex flex-wrap items-center gap-2">
-              {uiStatus && (
-                <StatusPill
-                  label={statusLabel}
-                  tone={promiseStatusToneMap[uiStatus]}
-                  icon={promiseStatusIconMap[uiStatus]}
-                  className="py-1.5"
-                />
-              )}
-              {p.is_important && (
-                <Tooltip label={t("promises.important.tooltip")} placement="top">
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-amber-100"
-                    aria-label={t("promises.important.label")}
-                  >
-                    <Shield className="h-3.5 w-3.5" aria-hidden />
-                    {t("publicAgreement.reputationStake")}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {uiStatus && (
+                  <StatusPill
+                    label={statusLabel}
+                    tone={promiseStatusToneMap[uiStatus]}
+                    icon={promiseStatusIconMap[uiStatus]}
+                    className="py-1.5"
+                  />
+                )}
+                {p.is_important && (
+                  <Tooltip label={t("promises.important.tooltip")} placement="top">
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-amber-100"
+                      aria-label={t("promises.important.label")}
+                    >
+                      <Shield className="h-3.5 w-3.5" aria-hidden />
+                      {t("publicAgreement.reputationStake")}
+                    </span>
+                  </Tooltip>
+                )}
+                {p.visibility === "public" && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                    <Eye className="h-3.5 w-3.5" aria-hidden />
+                    {t("promises.detail.publicStatus.label")}
                   </span>
-                </Tooltip>
-              )}
-              {p.visibility === "public" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
-                  <Eye className="h-3.5 w-3.5" aria-hidden />
-                  {t("promises.detail.publicStatus.label")}
-                </span>
-              )}
+                )}
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2">
+                {canCopyPromiseLink && (
+                  <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
+                    <span>
+                      <IconButton
+                        icon={<Link2 className="h-4 w-4" />}
+                        ariaLabel={t("promises.detail.linkCopy.label")}
+                        className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
+                        onClick={() => void copyPromiseLink()}
+                      />
+                    </span>
+                  </Tooltip>
+                )}
+                {canShareReminder && (
+                  <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
+                    <span>
+                      <IconButton
+                        icon={<MessageCircle className="h-4 w-4" />}
+                        ariaLabel={t("promises.detail.reminderCopy.label")}
+                        className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                        disabled={!userId || !promiseLink}
+                        onClick={() => void copyReminder()}
+                      />
+                    </span>
+                  </Tooltip>
+                )}
+              </div>
             </div>
 
             <h1 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">
@@ -1278,7 +1307,7 @@ export default function PromisePage() {
               )}
             </div>
 
-            {(hasStatusActions || shouldShowInviteBlock || canShareReminder || canRecreateDeal) && (
+            {(hasStatusActions || shouldShowInviteBlock || canRecreateDeal) && (
               <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
                   {t("promises.detail.primaryActionTitle")}
@@ -1371,17 +1400,6 @@ export default function PromisePage() {
                     />
                   )}
 
-                  {canShareReminder && (
-                    <button
-                      type="button"
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-2 text-sm font-medium text-sky-50 transition hover:border-sky-300/40 hover:bg-sky-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                      disabled={!userId || !promiseLink}
-                      onClick={() => void copyReminder()}
-                    >
-                      <MessageCircle className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.reminderCopy.label")}
-                    </button>
-                  )}
 
                   {canRecreateDeal && (
                     <button
@@ -1451,16 +1469,6 @@ export default function PromisePage() {
                 </span>
               </summary>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                {canCopyPromiseLink && (
-                  <button
-                    type="button"
-                    onClick={() => void copyPromiseLink()}
-                    className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                  >
-                    <Link2 className="h-4 w-4" aria-hidden />
-                    {t("promises.detail.linkCopy.label")}
-                  </button>
-                )}
 
                 {shouldShowInviteBlock && p.invite_token && inviteLink && (
                   <Link
