@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
     const visibility =
       requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
-    const expiresAtIso = getInviteExpiryIso(new Date(nowIso), { visibility });
+    const expiresAtIso = getInviteExpiryIso(new Date(nowIso), visibility);
 
     if (groupId) {
       const { data: groupRow } = await admin

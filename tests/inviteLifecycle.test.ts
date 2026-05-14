@@ -25,6 +25,16 @@ test("expiry helper marks invites expired once threshold is passed", () => {
   assert.equal(hasInviteExpired(expiresAt, new Date("2026-01-08T00:00:00.000Z")), true);
 });
 
+test("public agreement invites use 180-day expiry", () => {
+  const createdAt = new Date("2026-01-01T00:00:00.000Z");
+  const expiresAt = getInviteExpiryIso(createdAt, "public");
+
+  assert.equal(expiresAt, "2026-06-30T00:00:00.000Z");
+  assert.equal(getInviteTtlHours("public"), 180 * 24);
+  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-29T23:59:59.000Z")), false);
+  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-30T00:00:00.000Z")), true);
+});
+
 test("terminal invite statuses block later acceptance", () => {
   assert.equal(isTerminalInviteStatus("accepted"), true);
   assert.equal(isTerminalInviteStatus("declined"), true);
