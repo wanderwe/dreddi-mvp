@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
-import { resolveExecutorId, resolveCounterpartyId } from "@/lib/promiseParticipants";
+import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { requireUser } from "@/lib/auth/requireUser";
 
 function getEnv(name: string) {
@@ -104,10 +104,18 @@ function serializePublicAgreement(
   viewerCanUpdate: boolean,
   updatesAvailable = true
 ) {
-  const counterpartyId = resolveCounterpartyId(promise);
+  const responsibleId = resolveExecutorId(promise);
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
-  const counterpartyProfile = counterpartyId ? profilesById.get(counterpartyId) ?? null : null;
+  const responsibleProfile = responsibleId ? profilesById.get(responsibleId) ?? null : null;
   const counterpartyContact = promise.counterparty_contact?.trim() ?? "";
+  const canUseCounterpartyContact = responsibleId === promise.counterparty_id;
+  const publicCounterpartyContact =
+    canUseCounterpartyContact &&
+    !responsibleProfile &&
+    counterpartyContact &&
+    !isLikelyPrivateEmail(counterpartyContact)
+      ? counterpartyContact
+      : null;
 
   return {
     id: promise.id,
@@ -131,13 +139,10 @@ function serializePublicAgreement(
     creator_display_name: creatorProfile?.display_name ?? null,
     creator_handle: creatorProfile?.is_public_profile ? creatorProfile.handle : null,
     creator_is_public_profile: creatorProfile?.is_public_profile ?? false,
-    counterparty_display_name: counterpartyProfile?.display_name ?? null,
-    counterparty_handle: counterpartyProfile?.is_public_profile ? counterpartyProfile.handle : null,
-    counterparty_is_public_profile: counterpartyProfile?.is_public_profile ?? false,
-    counterparty_contact:
-      !counterpartyProfile && counterpartyContact && !isLikelyPrivateEmail(counterpartyContact)
-        ? counterpartyContact
-        : null,
+    counterparty_display_name: responsibleProfile?.display_name ?? null,
+    counterparty_handle: responsibleProfile?.is_public_profile ? responsibleProfile.handle : null,
+    counterparty_is_public_profile: responsibleProfile?.is_public_profile ?? false,
+    counterparty_contact: publicCounterpartyContact,
     viewer_can_update: viewerCanUpdate,
     updates_available: updatesAvailable,
     updates: updates.map((update) => {
@@ -198,10 +203,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       });
     }
 
-    const counterpartyId = resolveCounterpartyId(promise);
+    const responsibleId = resolveExecutorId(promise);
     const profileIds = Array.from(
       new Set(
-        [promise.creator_id, counterpartyId, ...(publicUpdates ?? []).map((update) => update.author_id)].filter(
+        [promise.creator_id, responsibleId, ...(publicUpdates ?? []).map((update) => update.author_id)].filter(
           (value): value is string => Boolean(value)
         )
       )
