@@ -151,7 +151,7 @@
       "active": "Активна",
       "pendingConfirmation": "Очікує перегляду",
       "waitingConfirmation": "Очікує перегляду",
-      "confirmed": "Дотримано",
+      "confirmed": "Закрито",
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
       "needsReview": "Потрібен ваш перегляд",
@@ -183,7 +183,7 @@
           "overdue": "Прострочені",
           "awaitingAcceptance": "Очікує прийняття",
           "needsReview": "Очікує перегляду",
-          "confirmed": "Дотримано",
+          "confirmed": "Закрито",
           "disputed": "Оскаржено",
           "withdrawn": "Відкликані",
           "closed": "Закриті запрошення"
@@ -1037,7 +1037,7 @@
     "status": {
       "active": "Активна",
       "completed_by_promisor": "Позначено виконаною",
-      "confirmed": "Підтверджено",
+      "confirmed": "Закрито",
       "disputed": "Оскаржено",
       "awaiting_acceptance": "Очікує прийняття",
       "declined": "Відхилено",
@@ -1056,7 +1056,7 @@
       "accepted": "Прийнято",
       "active": "Активна",
       "completed": "Виконано",
-      "confirmed": "Підтверджено",
+      "confirmed": "Закрито",
       "disputed": "Оскаржено"
     },
     "timeline": {
@@ -1068,8 +1068,8 @@
       "acceptedDescription": "Відповідальна сторона підтвердила домовленість",
       "completed": "Позначено як виконану",
       "completedDescription": "Відповідальна сторона повідомила, що зобовʼязання виконано",
-      "confirmed": "Виконання підтверджено",
-      "confirmedDescription": "Автор угоди підтвердив результат",
+      "confirmed": "Угоду закрито",
+      "confirmedDescription": "Процес угоди вирішено та закрито",
       "disputed": "Угоду оскаржено",
       "disputedDescription": "Результат публічно позначено як спірний",
       "declined": "Угоду відхилено",
