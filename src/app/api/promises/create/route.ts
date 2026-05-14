@@ -42,7 +42,6 @@ export async function POST(req: Request) {
     const inviteToken =
       crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const nowIso = new Date().toISOString();
-    const expiresAtIso = getInviteExpiryIso(new Date(nowIso));
 
     const admin = getAdminClient();
     const requestedVisibility = body?.visibility === "private" ? "private" : "public";
@@ -57,6 +56,7 @@ export async function POST(req: Request) {
 
     const visibility =
       requestedVisibility === "public" && profileRow?.is_public_profile ? "public" : "private";
+    const expiresAtIso = getInviteExpiryIso(new Date(nowIso), { visibility });
 
     if (groupId) {
       const { data: groupRow } = await admin
