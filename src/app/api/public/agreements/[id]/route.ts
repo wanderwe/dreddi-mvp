@@ -51,6 +51,7 @@ type PublicProfileRecord = {
   id: string;
   display_name: string | null;
   handle: string | null;
+  is_public_profile: boolean | null;
 };
 
 type AgreementUpdateRecord = {
@@ -128,9 +129,11 @@ function serializePublicAgreement(
     expires_at: promise.expires_at,
     cancelled_at: promise.cancelled_at,
     creator_display_name: creatorProfile?.display_name ?? null,
-    creator_handle: creatorProfile?.handle ?? null,
+    creator_handle: creatorProfile?.is_public_profile ? creatorProfile.handle : null,
+    creator_is_public_profile: creatorProfile?.is_public_profile ?? false,
     counterparty_display_name: counterpartyProfile?.display_name ?? null,
-    counterparty_handle: counterpartyProfile?.handle ?? null,
+    counterparty_handle: counterpartyProfile?.is_public_profile ? counterpartyProfile.handle : null,
+    counterparty_is_public_profile: counterpartyProfile?.is_public_profile ?? false,
     counterparty_contact:
       !counterpartyProfile && counterpartyContact && !isLikelyPrivateEmail(counterpartyContact)
         ? counterpartyContact
@@ -144,7 +147,7 @@ function serializePublicAgreement(
         content: update.content,
         created_at: update.created_at,
         author_display_name: author?.display_name ?? null,
-        author_handle: author?.handle ?? null,
+        author_handle: author?.is_public_profile ? author.handle : null,
       };
     }),
   };
@@ -208,7 +211,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     if (profileIds.length > 0) {
       const { data: profiles } = await admin
         .from("profiles")
-        .select("id,display_name,handle")
+        .select("id,display_name,handle,is_public_profile")
         .in("id", profileIds)
         .returns<PublicProfileRecord[]>();
 
@@ -293,7 +296,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     const { data: author } = await admin
       .from("profiles")
-      .select("id,display_name,handle")
+      .select("id,display_name,handle,is_public_profile")
       .eq("id", user.id)
       .maybeSingle<PublicProfileRecord>();
 
@@ -303,7 +306,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         content: update.content,
         created_at: update.created_at,
         author_display_name: author?.display_name ?? null,
-        author_handle: author?.handle ?? null,
+        author_handle: author?.is_public_profile ? author.handle : null,
       },
       { status: 201 }
     );

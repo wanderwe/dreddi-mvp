@@ -1,12 +1,15 @@
 "use client";
 
 import { Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
+import type { Locale } from "@/lib/i18n/locales";
 import { isPromiseStatus } from "@/lib/promiseStatus";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
@@ -42,8 +45,10 @@ type PublicAgreementRow = {
   cancelled_at: string | null;
   creator_display_name: string | null;
   creator_handle: string | null;
+  creator_is_public_profile?: boolean | null;
   counterparty_display_name: string | null;
   counterparty_handle: string | null;
+  counterparty_is_public_profile?: boolean | null;
   counterparty_contact: string | null;
   viewer_can_update?: boolean | null;
   updates_available?: boolean | null;
@@ -121,6 +126,16 @@ function displayCounterpartyName(row: PublicAgreement, fallback: string) {
   const contact = row.counterparty_contact?.trim();
   if (contact && !isLikelyPrivateEmail(contact)) return contact;
   return fallback;
+}
+
+function getPublicProfileHref(
+  handle: string | null,
+  isPublicProfile: boolean | null | undefined,
+  locale: Locale
+) {
+  const cleanHandle = handle?.trim();
+  if (!cleanHandle || !isPublicProfile) return null;
+  return localizePath(`/u/${cleanHandle}`, locale);
 }
 
 function formatTimestamp(value: string, locale: string) {
@@ -365,6 +380,13 @@ export default function PublicAgreementPage() {
     ? displayCounterpartyName(agreement, t("publicAgreement.participants.counterpartyFallback"))
     : "";
 
+  const creatorHref = agreement
+    ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
+    : null;
+  const counterpartyHref = agreement
+    ? getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale)
+    : null;
+
   const timeline = agreement
     ? buildTimeline(
         agreement,
@@ -543,9 +565,17 @@ export default function PublicAgreementPage() {
                 {t("publicAgreement.participants.title")}
               </p>
               <div className="mt-5 grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr] lg:grid-cols-1 xl:grid-cols-[1fr_auto_1fr]">
-                <ParticipantCard label={t("publicAgreement.participants.createdBy")} name={creatorName} />
+                <ParticipantCard
+                  label={t("publicAgreement.participants.createdBy")}
+                  name={creatorName}
+                  href={creatorHref}
+                />
                 <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
-                <ParticipantCard label={t("publicAgreement.participants.acceptedBy")} name={counterpartyName} />
+                <ParticipantCard
+                  label={t("publicAgreement.participants.acceptedBy")}
+                  name={counterpartyName}
+                  href={counterpartyHref}
+                />
               </div>
             </div>
           </div>
@@ -716,14 +746,33 @@ export default function PublicAgreementPage() {
   );
 }
 
-function ParticipantCard({ label, name }: { label: string; name: string }) {
-  return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80">
+function ParticipantCard({ label, name, href }: { label: string; name: string; href?: string | null }) {
+  const className = [
+    "group block h-full min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition",
+    href
+      ? "cursor-pointer hover:border-emerald-300/40 hover:bg-emerald-300/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45"
+      : "",
+  ].join(" ");
+  const content = (
+    <>
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition group-hover:bg-emerald-300/15 group-hover:text-emerald-100">
         <UserRound className="h-5 w-5" aria-hidden="true" />
       </div>
       <p className="text-xs uppercase tracking-[0.16em] text-white/40">{label}</p>
-      <p className="mt-1 truncate text-sm font-semibold text-white">{name}</p>
-    </div>
+      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
+        <span className="truncate">{name}</span>
+        {href ? <Link2 className="h-3.5 w-3.5 shrink-0 text-emerald-100/65" aria-hidden="true" /> : null}
+      </p>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
 }
