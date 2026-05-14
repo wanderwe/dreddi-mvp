@@ -4,6 +4,7 @@ import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -83,9 +84,9 @@ function DealRow({
   metaText,
   statusLabels,
 }: DealRowProps) {
-  const baseClass = "flex items-start justify-between gap-3 py-2.5 text-slate-200";
+  const baseClass = "flex w-full min-w-0 items-start justify-between gap-3 py-2.5 text-slate-200";
   const interactiveClass = isClickable ? "transition hover:text-white" : "cursor-default";
-  const titleClass = "truncate text-sm font-medium text-slate-100";
+  const titleClass = "block w-full truncate text-sm font-medium text-slate-100";
   const metaClass = "mt-1 truncate text-xs text-slate-400";
   const statusPillToneMap: Record<PromiseUiStatus, StatusPillTone> = {
     active: "neutral",
@@ -101,7 +102,9 @@ function DealRow({
   const content = (
     <>
       <div className="min-w-0 flex-1">
-        <div className={titleClass}>{item.title}</div>
+        <Tooltip label={item.title} className="w-full min-w-0" placement="top">
+          <span className={titleClass}>{item.title}</span>
+        </Tooltip>
         {metaText ? <div className={metaClass}>{metaText}</div> : null}
       </div>
       <StatusPill
@@ -627,7 +630,7 @@ export default function Home() {
 
         </div>
 
-        <div className="w-full flex-1">
+        <div className="w-full min-w-0 md:w-[34rem] md:flex-none lg:w-[40rem]">
           <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
