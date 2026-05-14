@@ -50,7 +50,7 @@ export function MobileMenu({
       </SheetTrigger>
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent id="mobile-menu" className="md:hidden">
+        <SheetContent id="mobile-menu" className="w-[calc(100vw-1rem)] max-w-sm p-4 md:hidden">
           <nav className="flex flex-col gap-4 text-sm font-medium text-slate-200">
             {isAuthenticated ? (
               <>
