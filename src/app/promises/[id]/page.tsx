@@ -1,7 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Link2, MessageCircle, RefreshCw, Shield } from "lucide-react";
+import {
+  ChevronDown,
+  Clipboard,
+  ExternalLink,
+  Eye,
+  Link2,
+  MessageCircle,
+  RefreshCw,
+  Shield,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -35,6 +44,8 @@ type PromiseRow = {
   due_at: string | null;
   status: PromiseStatus;
   completed_at: string | null;
+  confirmed_at: string | null;
+  disputed_at: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
   created_at: string;
@@ -55,27 +66,176 @@ type PromiseRow = {
   visibility: "private" | "public";
 };
 
-function Card({
-  title,
-  children,
-  right,
-}: {
-  title: string;
-  children: React.ReactNode;
-  right?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="text-sm font-semibold text-neutral-200">{title}</div>
-        {right}
-      </div>
-      <div className="mt-4">{children}</div>
-    </div>
-  );
+type LifecycleState = {
+  key: string;
+  label: string;
+  complete: boolean;
+  current: boolean;
+  disputed?: boolean;
+};
+
+type AgreementTimelineItem = {
+  key: string;
+  label: string;
+  actor: string;
+  timestamp: string;
+  description?: string;
+  tone?: "success" | "danger" | "attention" | "neutral";
+};
+
+function formatTimestamp(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
+function getLifecycleStates(
+  promise: PromiseRow,
+  uiStatus: PromiseUiStatus,
+  t: ReturnType<typeof useT>
+): LifecycleState[] {
+  const acceptedAt = promise.accepted_at ?? promise.counterparty_accepted_at;
+  const base: LifecycleState[] = [
+    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
+    {
+      key: "accepted",
+      label: t("publicAgreement.flow.accepted"),
+      complete: Boolean(acceptedAt),
+      current: uiStatus === "awaiting_acceptance",
+    },
+    {
+      key: "active",
+      label: t("publicAgreement.flow.active"),
+      complete: promise.status !== "active",
+      current: uiStatus === "active",
+    },
+    {
+      key: "completed",
+      label: t("publicAgreement.flow.completed"),
+      complete: Boolean(promise.completed_at || promise.confirmed_at || promise.disputed_at),
+      current: uiStatus === "completed_by_promisor",
+    },
+    {
+      key: "confirmed",
+      label: t("publicAgreement.flow.confirmed"),
+      complete: promise.status === "confirmed",
+      current: promise.status === "confirmed",
+    },
+  ];
 
+  if (promise.status === "disputed") {
+    return [
+      ...base.slice(0, 4),
+      {
+        key: "disputed",
+        label: t("publicAgreement.flow.disputed"),
+        complete: true,
+        current: true,
+        disputed: true,
+      },
+    ];
+  }
+
+  return base;
+}
+
+function buildAgreementTimeline(
+  promise: PromiseRow,
+  labels: { creator: string; counterparty: string; system: string },
+  uiStatus: PromiseUiStatus,
+  t: ReturnType<typeof useT>
+): AgreementTimelineItem[] {
+  const acceptedAt = promise.accepted_at ?? promise.counterparty_accepted_at;
+  const items: AgreementTimelineItem[] = [
+    {
+      key: "created",
+      label: t("publicAgreement.timeline.created"),
+      actor: labels.creator,
+      timestamp: promise.created_at,
+      description: t("publicAgreement.timeline.createdDescription"),
+    },
+  ];
+
+  if (acceptedAt) {
+    items.push({
+      key: "accepted",
+      label: t("publicAgreement.timeline.accepted"),
+      actor: labels.counterparty,
+      timestamp: acceptedAt,
+      description: t("publicAgreement.timeline.acceptedDescription"),
+      tone: "success",
+    });
+  }
+
+  if (promise.completed_at) {
+    items.push({
+      key: "completed",
+      label: t("publicAgreement.timeline.completed"),
+      actor: labels.counterparty,
+      timestamp: promise.completed_at,
+      description: t("publicAgreement.timeline.completedDescription"),
+      tone: "attention",
+    });
+  }
+
+  if (promise.confirmed_at) {
+    items.push({
+      key: "confirmed",
+      label: t("publicAgreement.timeline.confirmed"),
+      actor: labels.creator,
+      timestamp: promise.confirmed_at,
+      description: t("publicAgreement.timeline.confirmedDescription"),
+      tone: "success",
+    });
+  }
+
+  if (promise.disputed_at) {
+    items.push({
+      key: "disputed",
+      label: t("publicAgreement.timeline.disputed"),
+      actor: labels.creator,
+      timestamp: promise.disputed_at,
+      description: t("publicAgreement.timeline.disputedDescription"),
+      tone: "danger",
+    });
+  }
+
+  if (promise.declined_at) {
+    items.push({
+      key: "declined",
+      label: t("publicAgreement.timeline.declined"),
+      actor: labels.counterparty,
+      timestamp: promise.declined_at,
+      tone: "danger",
+    });
+  }
+
+  if (promise.cancelled_at) {
+    items.push({
+      key: "cancelled",
+      label: t("publicAgreement.timeline.cancelled"),
+      actor: labels.creator,
+      timestamp: promise.cancelled_at,
+      tone: "danger",
+    });
+  }
+
+  if (uiStatus === "expired" && promise.expires_at) {
+    items.push({
+      key: "expired",
+      label: t("publicAgreement.timeline.expired"),
+      actor: labels.system,
+      timestamp: promise.expires_at,
+      tone: "attention",
+    });
+  }
+
+  return items;
+}
 
 
 const promiseStatusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
@@ -255,7 +415,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .maybeSingle();
@@ -870,10 +1030,8 @@ export default function PromisePage() {
       (canRespondToInvite && p?.status === "active")
   );
   const showPublicStatus = p?.visibility === "public";
-  const publicStatusText = showPublicStatus
-    ? t("promises.detail.publicStatus.public", { publicEntity: promiseLabels.publicEntity })
-    : "";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
+  const hasToolCards = Boolean(shouldShowInviteBlock || canSharePublicAgreement);
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -903,6 +1061,24 @@ export default function PromisePage() {
   const inviteMetaText = inviteStatus === "accepted"
     ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
     : t(`promises.inviteStatus.${inviteStatus}`);
+  const lifecycleStates = p && uiStatus ? getLifecycleStates(p, uiStatus, t) : [];
+  const timeline = p && uiStatus
+    ? buildAgreementTimeline(
+        p,
+        {
+          creator: createdByLabel,
+          counterparty: responsibleLabel,
+          system: t("publicAgreement.timeline.system"),
+        },
+        uiStatus,
+        t
+      )
+    : [];
+  const detailsText = p?.details?.trim() ?? "";
+  const hasDetails = detailsText.length > 0;
+  const creatorHref = getParticipantHref(p?.creator_id ?? null);
+  const responsibleHref = getParticipantHref(executorId);
+  const promiseToHref = getParticipantHref(promiseMadeToId);
 
   useEffect(() => {
     let active = true;
@@ -958,61 +1134,13 @@ export default function PromisePage() {
   }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-0 sm:py-10">
-      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          href={backLink.href}
-          className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-        >
-          {backLink.label}
-        </Link>
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          {p && (
-            <>
-              {canCopyPromiseLink && (
-                <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
-                  <span>
-                    <IconButton
-                      icon={<Link2 className="h-4 w-4" />}
-                      ariaLabel={t("promises.detail.linkCopy.label")}
-                      className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
-                      onClick={() => void copyPromiseLink()}
-                    />
-                  </span>
-                </Tooltip>
-              )}
-              {canShareReminder && (
-                <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
-                  <span>
-                    <IconButton
-                      icon={<MessageCircle className="h-4 w-4" />}
-                      ariaLabel={t("promises.detail.reminderCopy.label")}
-                      className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
-                      disabled={!userId || !promiseLink}
-                      onClick={() => void copyReminder()}
-                    />
-                  </span>
-                </Tooltip>
-              )}
-              {!canShareReminder && canRecreateDeal && (
-                <Tooltip label={t("promises.detail.recreate.tooltip")} placement="bottom-right">
-                  <span>
-                    <IconButton
-                      icon={<RefreshCw className="h-4 w-4" />}
-                      ariaLabel={t("promises.detail.recreate.label")}
-                      className="h-10 w-10 border-emerald-400/30 text-emerald-200 hover:border-emerald-300/50 hover:bg-emerald-500/10 hover:text-emerald-100"
-                      onClick={() =>
-                        router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))
-                      }
-                    />
-                  </span>
-                </Tooltip>
-              )}
-            </>
-          )}
-          {uiStatus && <StatusPill label={statusLabel} tone={promiseStatusToneMap[uiStatus]} icon={promiseStatusIconMap[uiStatus]} className="py-1.5" />}
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-6 sm:py-10">
+      <Link
+        href={backLink.href}
+        className="inline-flex text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      >
+        {backLink.label}
+      </Link>
 
       {error && (
         <div className="rounded-2xl border border-red-900/40 bg-red-950/20 p-4 text-red-300">
@@ -1034,354 +1162,426 @@ export default function PromisePage() {
 
       {p ? (
         <>
-          <Card title={t("promises.detail.cardTitle", { entity: promiseLabels.entity })}>
-            <div className="space-y-3">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="text-3xl font-semibold text-white">{p.title}</div>
-                  {p.is_important && (
-                    <Tooltip label={t("promises.important.tooltip")} placement="top">
-                      <span
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
-                        aria-label={t("promises.important.label")}
-                      >
-                        <Shield className="h-4 w-4" aria-hidden />
-                      </span>
-                    </Tooltip>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">
-                  {t("promises.detail.roles.title")}
-                </p>
-                <dl className="mt-3 space-y-2 text-sm">
-                  <div>
-                    <dt className="inline text-slate-400">
-                      {t("promises.detail.roles.createdBy")}
-                      {": "}
-                    </dt>
-                    <dd className="inline font-medium text-white">
-                      {getParticipantHref(p?.creator_id ?? null) ? (
-                        <Link
-                          href={getParticipantHref(p?.creator_id ?? null)!}
-                          className="cursor-pointer underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
-                        >
-                          {createdByLabel}
-                        </Link>
-                      ) : (
-                        createdByLabel
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="inline text-slate-400">
-                      {t("promises.detail.roles.responsible")}
-                      {": "}
-                    </dt>
-                    <dd className="inline font-medium text-white">
-                      {getParticipantHref(executorId) ? (
-                        <Link
-                          href={getParticipantHref(executorId)!}
-                          className="cursor-pointer underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
-                        >
-                          {responsibleLabel}
-                        </Link>
-                      ) : (
-                        responsibleLabel
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="inline text-slate-400">
-                      {t("promises.detail.roles.madeTo")}
-                      {": "}
-                    </dt>
-                    <dd className="inline font-medium text-white">
-                      {getParticipantHref(promiseMadeToId) ? (
-                        <Link
-                          href={getParticipantHref(promiseMadeToId)!}
-                          className="cursor-pointer underline decoration-white/30 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
-                        >
-                          {promiseToLabel}
-                        </Link>
-                      ) : (
-                        promiseToLabel
-                      )}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              {showPublicStatus && (
-                <div className="space-y-3 rounded-xl border border-emerald-300/15 bg-emerald-300/[0.06] p-3 text-sm text-neutral-200">
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-300">
-                      {t("promises.detail.publicStatus.label")}
+          <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/25 backdrop-blur sm:p-7">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {uiStatus && (
+                  <StatusPill
+                    label={statusLabel}
+                    tone={promiseStatusToneMap[uiStatus]}
+                    icon={promiseStatusIconMap[uiStatus]}
+                    className="py-1.5"
+                  />
+                )}
+                {p.is_important && (
+                  <Tooltip label={t("promises.important.tooltip")} placement="top">
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-amber-100"
+                      aria-label={t("promises.important.label")}
+                    >
+                      <Shield className="h-3.5 w-3.5" aria-hidden />
+                      {t("publicAgreement.reputationStake")}
                     </span>
-                    <span className="text-emerald-200">
-                      {publicStatusText}
-                    </span>
-                  </div>
-
-                  {canSharePublicAgreement && (
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100/80">
-                          {t("promises.detail.publicAgreementLink.title")}
-                        </p>
-                        <p className="mt-1 text-xs leading-5 text-neutral-300">
-                          {t("promises.detail.publicAgreementLink.helper")}
-                        </p>
-                      </div>
-
-                      <div className="break-all rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs text-neutral-200">
-                        {publicAgreementLink}
-                      </div>
-
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        <button
-                          type="button"
-                          onClick={() => void copyPublicAgreementLink()}
-                          className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                        >
-                          <Link2 className="h-4 w-4" aria-hidden />
-                          {t("promises.detail.publicAgreementLink.copy")}
-                        </button>
-                        <Link
-                          href={publicAgreementPath!}
-                          className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                        >
-                          {t("promises.detail.publicAgreementLink.open")}
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="text-sm text-slate-400">
-                <span>{t("promises.detail.deadline")}</span>
-                {": "}
-                <span className="font-medium text-white">{dueText}</span>
-              </div>
-              {p.status === "disputed" && p.disputed_code === "not_delivered" && (
-                <div className="text-sm text-amber-200">{t("promises.detail.notDeliveredHint")}</div>
-              )}
-              {p.status === "disputed" && p.dispute_reason && (
-                <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
-                  <p className="text-xs uppercase tracking-[0.14em] text-amber-200">
-                    {t("promises.detail.disputeExplanationLabel")}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap">{p.dispute_reason}</p>
-                </div>
-              )}
-
-              <div className="text-sm text-slate-400">
-                <span>{t("promises.detail.inviteLabel")}</span>
-                {": "}
-                <span
-                  className={
-                    "font-medium " +
-                    (inviteStatus === "accepted" ? "text-emerald-300" : "text-white")
-                  }
-                >
-                  {inviteMetaText}
-                </span>
+                  </Tooltip>
+                )}
+                {p.visibility === "public" && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                    <Eye className="h-3.5 w-3.5" aria-hidden />
+                    {t("promises.detail.publicStatus.label")}
+                  </span>
+                )}
               </div>
 
-              {p.counterparty_contact && (
-                <div className="text-sm text-slate-400">
-                  <span>{t("promises.detail.counterparty")}</span>
-                  {": "}
-                  <span className="font-medium text-white">{p.counterparty_contact}</span>
-                </div>
-              )}
-
-              {p.details ? (
-                <div className="pt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-100">
-                  {p.details}
-                </div>
-              ) : (
-                <div className="pt-2 text-sm text-slate-400">{t("promises.detail.noDetails")}</div>
-              )}
-
-              {hasCondition && (
-                <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
-                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                    {t("promises.detail.conditionLabel")}
-                  </p>
-                  <div className="mt-2 whitespace-pre-wrap text-slate-100">
-                    {p?.condition_text}
-                  </div>
-                  <div className="mt-3 text-xs text-slate-400">
-                    {conditionMet
-                      ? t("promises.detail.conditionMet")
-                      : t("promises.detail.conditionWaiting")}
-                  </div>
-                  {isCounterparty && !conditionMet && (
-                    <div className="mt-3">
-                      <ActionButton
-                        label={t("promises.detail.conditionMark")}
-                        variant="ok"
-                        loading={conditionBusy}
-                        disabled={conditionBusy}
-                        onClick={markConditionMet}
+              <div className="flex shrink-0 items-center gap-2">
+                {canCopyPromiseLink && (
+                  <Tooltip label={t("promises.detail.linkCopy.tooltip")} placement="bottom-right">
+                    <span>
+                      <IconButton
+                        icon={<Link2 className="h-4 w-4" />}
+                        ariaLabel={t("promises.detail.linkCopy.label")}
+                        className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
+                        onClick={() => void copyPromiseLink()}
                       />
-                    </div>
-                  )}
+                    </span>
+                  </Tooltip>
+                )}
+                {canShareReminder && (
+                  <Tooltip label={t("promises.detail.reminderCopy.tooltip")} placement="bottom-right">
+                    <span>
+                      <IconButton
+                        icon={<MessageCircle className="h-4 w-4" />}
+                        ariaLabel={t("promises.detail.reminderCopy.label")}
+                        className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                        disabled={!userId || !promiseLink}
+                        onClick={() => void copyReminder()}
+                      />
+                    </span>
+                  </Tooltip>
+                )}
+              </div>
+            </div>
+
+            <h1 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              {p.title}
+            </h1>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
+                {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-white">{dueText}</span>
+              </span>
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
+                {inviteMetaText}
+              </span>
+            </div>
+
+            {hasDetails && (
+              <p className="mt-5 whitespace-pre-wrap break-words text-base leading-7 text-slate-100/85">
+                {detailsText}
+              </p>
+            )}
+
+            <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                {t("promises.detail.roles.title")}
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {t("promises.detail.roles.createdBy")}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-medium text-white">
+                    {creatorHref ? (
+                      <Link
+                        href={creatorHref}
+                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                      >
+                        {createdByLabel}
+                      </Link>
+                    ) : (
+                      createdByLabel
+                    )}
+                  </p>
                 </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {t("promises.detail.roles.responsible")}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-medium text-white">
+                    {responsibleHref ? (
+                      <Link
+                        href={responsibleHref}
+                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                      >
+                        {responsibleLabel}
+                      </Link>
+                    ) : (
+                      responsibleLabel
+                    )}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {t("promises.detail.roles.madeTo")}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-medium text-white">
+                    {promiseToHref ? (
+                      <Link
+                        href={promiseToHref}
+                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                      >
+                        {promiseToLabel}
+                      </Link>
+                    ) : (
+                      promiseToLabel
+                    )}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {t("promises.detail.inviteLabel")}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-medium text-white">{inviteMetaText}</p>
+                </div>
+              </div>
+              {p.counterparty_contact && (
+                <p className="mt-3 text-xs leading-5 text-white/50">
+                  {t("promises.detail.counterparty")}: <span className="text-white/75">{p.counterparty_contact}</span>
+                </p>
               )}
             </div>
-          </Card>
 
-          {hasStatusActions && (
-            <Card title={t("promises.detail.statusActions")}>
-              <div className="space-y-3">
-                {isExecutor && p.status === "active" && (
-                  isInviteAccepted ? (
-                    <ActionButton
-                      label={t("promises.detail.markCompleted")}
-                      variant="ok"
-                      loading={actionBusy === "complete"}
-                      disabled={actionBusy !== null}
-                      onClick={() => setShowConfirmModal(true)}
-                    />
-                  ) : (
-                    !canRespondToInvite && (
-                      <div className="text-sm text-neutral-400">
-                        {inviteStatus === "awaiting_acceptance"
-                          ? stripTrailingPeriod(t("promises.detail.shareInvite"))
-                          : t(`promises.inviteStatus.${inviteStatus}`)}
-                      </div>
+            {(hasStatusActions || shouldShowInviteBlock || canRecreateDeal) && (
+              <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
+                  {t("promises.detail.primaryActionTitle")}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  {isExecutor && p.status === "active" && (
+                    isInviteAccepted ? (
+                      <ActionButton
+                        label={t("promises.detail.markCompleted")}
+                        variant="ok"
+                        loading={actionBusy === "complete"}
+                        disabled={actionBusy !== null}
+                        onClick={() => setShowConfirmModal(true)}
+                      />
+                    ) : (
+                      !canRespondToInvite && (
+                        <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">
+                          {inviteStatus === "awaiting_acceptance"
+                            ? stripTrailingPeriod(t("promises.detail.shareInvite"))
+                            : t(`promises.inviteStatus.${inviteStatus}`)}
+                        </div>
+                      )
                     )
-                  )
-                )}
+                  )}
 
-                {canReview && p.status === "completed_by_promisor" && (
-                  <Link
-                    href={`/promises/${p.id}/confirm`}
-                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-amber-900/30 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                  >
-                    {t("promises.detail.reviewConfirm")}
-                  </Link>
-                )}
+                  {canReview && p.status === "completed_by_promisor" && (
+                    <Link
+                      href={`/promises/${p.id}/confirm`}
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                    >
+                      {t("promises.detail.reviewConfirm")}
+                    </Link>
+                  )}
 
-                {canConfirmWithoutExecutorCompletion && (
-                  <ActionButton
-                    label={t("promises.detail.confirmCompletion")}
-                    variant="ok"
-                    loading={actionBusy === "confirm"}
-                    disabled={actionBusy !== null}
-                    onClick={() => setShowCounterpartyConfirmModal(true)}
-                  />
-                )}
-
-                {canMarkNotDelivered && (
-                  <ActionButton
-                    label={t("promises.detail.notDelivered")}
-                    variant="ghost"
-                    loading={actionBusy === "notDelivered"}
-                    disabled={actionBusy !== null}
-                    onClick={() => setShowNotDeliveredModal(true)}
-                  />
-                )}
-
-                {canRespondToInvite && p.status === "active" && (
-                  <div className="flex flex-col gap-3 sm:flex-row">
+                  {canConfirmWithoutExecutorCompletion && (
                     <ActionButton
-                      label={t("promises.detail.acceptAction")}
+                      label={t("promises.detail.confirmCompletion")}
                       variant="ok"
-                      loading={actionBusy === "accept"}
+                      loading={actionBusy === "confirm"}
                       disabled={actionBusy !== null}
-                      onClick={() => void respondToDeal("accept")}
+                      onClick={() => setShowCounterpartyConfirmModal(true)}
                     />
+                  )}
+
+                  {canMarkNotDelivered && (
                     <ActionButton
-                      label={t("promises.detail.declineAction")}
-                      variant="danger"
-                      loading={actionBusy === "decline"}
+                      label={t("promises.detail.notDelivered")}
+                      variant="ghost"
+                      loading={actionBusy === "notDelivered"}
                       disabled={actionBusy !== null}
-                      onClick={() => void respondToDeal("decline")}
+                      onClick={() => setShowNotDeliveredModal(true)}
                     />
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
+                  )}
 
-          {shouldShowInviteBlock && (
-            <Card title={t("promises.detail.inviteLinkTitle")}>
-              {!p.invite_token ? (
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-sm text-neutral-400">
-                    {t("promises.detail.noInviteToken")}
-                  </div>
+                  {canRespondToInvite && p.status === "active" && (
+                    <>
+                      <ActionButton
+                        label={t("promises.detail.acceptAction")}
+                        variant="ok"
+                        loading={actionBusy === "accept"}
+                        disabled={actionBusy !== null}
+                        onClick={() => void respondToDeal("accept")}
+                      />
+                      <ActionButton
+                        label={t("promises.detail.declineAction")}
+                        variant="danger"
+                        loading={actionBusy === "decline"}
+                        disabled={actionBusy !== null}
+                        onClick={() => void respondToDeal("decline")}
+                      />
+                    </>
+                  )}
 
-                  <ActionButton
-                    label={t("promises.detail.generate")}
-                    variant="primary"
-                    loading={inviteBusy === "generate"}
-                    disabled={inviteBusy !== null}
-                    onClick={generateInvite}
-                  />
-                </div>
-              ) : (
-                <div className="relative space-y-3">
-                  <span
-                    aria-live="polite"
-                    className={`pointer-events-none absolute right-3 top-3 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] shadow-lg backdrop-blur transition ${
-                      copyStatus === "success"
-                        ? "border-emerald-400/50 bg-emerald-500/30 text-emerald-100 opacity-100"
-                        : copyStatus === "error"
-                        ? "border-red-400/50 bg-red-500/30 text-red-100 opacity-100"
-                        : "border-transparent bg-transparent text-transparent opacity-0"
-                    }`}
-                  >
-                    {copyStatus === "success"
-                      ? t("promises.detail.copySuccess")
-                      : copyStatus === "error"
-                      ? t("promises.detail.copyFailed")
-                      : t("promises.detail.copySuccess")}
-                  </span>
+                  {shouldShowInviteBlock && !p.invite_token && (
+                    <ActionButton
+                      label={t("promises.detail.generate")}
+                      variant="primary"
+                      loading={inviteBusy === "generate"}
+                      disabled={inviteBusy !== null}
+                      onClick={generateInvite}
+                    />
+                  )}
 
-                  <div className="rounded-xl border border-neutral-800 bg-black/30 px-4 py-3 text-sm text-neutral-200 break-all">
-                    {inviteLink ?? t("promises.detail.inviteFallback")}
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  {shouldShowInviteBlock && p.invite_token && (
                     <ActionButton
                       label={t("promises.detail.copyLink")}
                       variant="primary"
                       disabled={inviteBusy !== null || !inviteLink}
                       onClick={copyInvite}
                     />
+                  )}
 
-                    {inviteLink && (
-                      <Link
-                        href={`/p/invite/${p.invite_token}`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm font-medium text-neutral-200 transition hover:bg-white/5 hover:border-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                      >
-                        {t("promises.detail.openInvite")}
-                      </Link>
-                    )}
 
-                    {isCreator && inviteStatus === "awaiting_acceptance" && (
-                      <ActionButton
-                        label={t("promises.detail.withdrawInvite")}
-                        variant="danger"
-                        loading={inviteBusy === "cancel"}
-                        disabled={inviteBusy !== null}
-                        onClick={cancelInvite}
-                      />
-                    )}
-
-                  </div>
-
+                  {canRecreateDeal && (
+                    <button
+                      type="button"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      onClick={() => router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))}
+                    >
+                      <RefreshCw className="h-4 w-4" aria-hidden />
+                      {t("promises.detail.recreate.label")}
+                    </button>
+                  )}
                 </div>
-              )}
-            </Card>
+              </div>
+            )}
+
+            {(hasCondition || p.status === "disputed") && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+                {hasCondition && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                      {t("promises.detail.conditionLabel")}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
+                      {p.condition_text}
+                    </p>
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-xs text-white/50">
+                        {conditionMet
+                          ? t("promises.detail.conditionMet")
+                          : t("promises.detail.conditionWaiting")}
+                      </p>
+                      {isCounterparty && !conditionMet && (
+                        <ActionButton
+                          label={t("promises.detail.conditionMark")}
+                          variant="ok"
+                          loading={conditionBusy}
+                          disabled={conditionBusy}
+                          onClick={markConditionMet}
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
+                {p.status === "disputed" && p.disputed_code === "not_delivered" && (
+                  <p className="mt-3 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-sm text-amber-100">
+                    {t("promises.detail.notDeliveredHint")}
+                  </p>
+                )}
+                {p.status === "disputed" && p.dispute_reason && (
+                  <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+                    <p className="text-xs uppercase tracking-[0.14em] text-amber-200">
+                      {t("promises.detail.disputeExplanationLabel")}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap">{p.dispute_reason}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+
+          {hasToolCards && (
+            <details className="group rounded-2xl border border-white/10 bg-neutral-900/30 p-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
+                <span>{t("promises.detail.toolsTitle")}</span>
+                <span className="text-xs text-white/40 transition group-open:rotate-180" aria-hidden>
+                  ⌄
+                </span>
+              </summary>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+
+                {shouldShowInviteBlock && p.invite_token && inviteLink && (
+                  <Link
+                    href={`/p/invite/${p.invite_token}`}
+                    className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                  >
+                    <ExternalLink className="h-4 w-4" aria-hidden />
+                    {t("promises.detail.openInvite")}
+                  </Link>
+                )}
+
+                {isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && (
+                  <button
+                    type="button"
+                    className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-red-300/20 bg-transparent px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={inviteBusy !== null}
+                    onClick={cancelInvite}
+                  >
+                    {inviteBusy === "cancel"
+                      ? t("promises.detail.saving")
+                      : t("promises.detail.withdrawInvite")}
+                  </button>
+                )}
+
+                {canSharePublicAgreement && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void copyPublicAgreementLink()}
+                      className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/35 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    >
+                      <Clipboard className="h-4 w-4" aria-hidden />
+                      {t("promises.detail.publicAgreementLink.copy")}
+                    </button>
+                    <Link
+                      href={publicAgreementPath!}
+                      className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    >
+                      <ExternalLink className="h-4 w-4" aria-hidden />
+                      {t("promises.detail.publicAgreementLink.open")}
+                    </Link>
+                  </>
+                )}
+              </div>
+            </details>
           )}
+
+          <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
+              <span>{t("promises.detail.historyTitle")}</span>
+              <ChevronDown
+                className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                aria-hidden
+              />
+            </summary>
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-2 sm:grid-cols-5">
+                {lifecycleStates.map((state, index) => (
+                  <div
+                    key={state.key}
+                    className={[
+                      "rounded-xl border px-3 py-2 text-xs transition",
+                      state.current && state.disputed
+                        ? "border-rose-300/35 bg-rose-300/10 text-rose-50"
+                        : state.complete
+                          ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
+                          : state.current
+                            ? "border-amber-300/35 bg-amber-300/10 text-amber-50"
+                            : "border-white/10 bg-black/15 text-white/35",
+                    ].join(" ")}
+                  >
+                    <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/25 text-[10px]">
+                      {state.complete ? "✓" : index + 1}
+                    </span>
+                    {state.label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                {timeline.map((item) => (
+                  <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
+                    <span
+                      className={[
+                        "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                        item.tone === "success"
+                          ? "bg-emerald-300"
+                          : item.tone === "danger"
+                            ? "bg-rose-300"
+                            : item.tone === "attention"
+                              ? "bg-amber-300"
+                              : "bg-white/45",
+                      ].join(" ")}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-white">{item.label}</p>
+                          <p className="mt-0.5 text-xs text-white/50">{item.actor}</p>
+                        </div>
+                        <time className="text-xs text-white/45" dateTime={item.timestamp}>
+                          {formatTimestamp(item.timestamp, locale)}
+                        </time>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </details>
         </>
       ) : !error ? (
         <div className="text-neutral-400">{t("promises.detail.loading")}</div>
