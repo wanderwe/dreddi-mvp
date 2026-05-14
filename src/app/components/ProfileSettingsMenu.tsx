@@ -410,12 +410,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       )}
 
       <div className="mt-4 flex min-h-0 flex-col gap-4">
-        <div className="rounded-2xl border border-white/10 bg-white/5">
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("identity")}
             aria-expanded={openSection === "identity"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
           >
             <div className="space-y-1">
               <div className="text-sm font-semibold text-white">
@@ -435,12 +435,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             }`}
           >
             <div
-              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
                 openSection === "identity" ? "opacity-100" : "opacity-0"
               }`}
             >
               <div className="space-y-3 pt-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label
@@ -518,7 +518,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
                         <div className="text-sm font-medium text-white">
@@ -565,7 +565,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             : t("profileSettings.publicLinkDescription")}
                         </HelperText>
                       </div>
-                    <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                    <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
                       <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <div className="space-y-1">
                           <div className="text-sm font-semibold text-white">
@@ -610,12 +610,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5">
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("domains")}
             aria-expanded={openSection === "domains"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
           >
             <div className="space-y-1">
               <div className="text-sm font-semibold text-white">
@@ -635,12 +635,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             }`}
           >
             <div
-              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
                 openSection === "domains" ? "opacity-100" : "opacity-0"
               }`}
             >
               <div className="space-y-3 pt-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium text-white">
@@ -731,12 +731,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5">
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("notifications")}
             aria-expanded={openSection === "notifications"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
           >
             <div className="space-y-1">
               <div className="text-sm font-semibold text-white">
@@ -756,12 +756,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             }`}
           >
             <div
-              className={`overflow-hidden px-4 pb-4 transition-opacity duration-300 ${
+              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
                 openSection === "notifications" ? "opacity-100" : "opacity-0"
               }`}
             >
               <div className="space-y-4 pt-3">
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
                       <div className="text-sm font-medium text-white">
@@ -796,7 +796,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
                       <div className="text-sm font-medium text-white">
@@ -831,7 +831,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
                       <div className="text-sm font-medium text-white">

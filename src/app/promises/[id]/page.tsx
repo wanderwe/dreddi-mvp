@@ -336,7 +336,7 @@ export default function PromisePage() {
   const [error, setError] = useState<string | null>(null);
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
   const [participantProfiles, setParticipantProfiles] = useState<
-    Record<string, { label: string; handle: string | null }>
+    Record<string, { label: string; handle: string | null; isPublicProfile: boolean }>
   >({});
 
   // отдельные "busy" чтобы не ломать UX всего экрана
@@ -1044,8 +1044,9 @@ export default function PromisePage() {
   };
   const getParticipantHref = (participantId: string | null) => {
     if (!participantId) return null;
-    const handle = participantProfiles[participantId]?.handle?.trim();
-    if (!handle) return null;
+    const profile = participantProfiles[participantId];
+    const handle = profile?.handle?.trim();
+    if (!handle || !profile?.isPublicProfile) return null;
     return localizePath(`/u/${handle}`, locale);
   };
   const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
@@ -1107,17 +1108,18 @@ export default function PromisePage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("id,display_name,email,handle")
+        .select("id,display_name,email,handle,is_public_profile")
         .in("id", participantIds);
 
       if (!active) return;
-      const profiles: Record<string, { label: string; handle: string | null }> = {};
+      const profiles: Record<string, { label: string; handle: string | null; isPublicProfile: boolean }> = {};
       for (const profile of data ?? []) {
         const label = profile.display_name?.trim() || profile.email?.trim() || "";
         if (label) {
           profiles[profile.id] = {
             label,
             handle: profile.handle?.trim() || null,
+            isPublicProfile: Boolean(profile.is_public_profile),
           };
         }
       }

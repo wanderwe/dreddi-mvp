@@ -1047,13 +1047,26 @@
       "disputedDescription": "The outcome was publicly marked as disputed",
       "declined": "Agreement declined",
       "cancelled": "Agreement cancelled",
-      "expired": "Invitation expired"
+      "expired": "Invitation expired",
+      "update": "Update",
+      "updateAuthorFallback": "Agreement participant"
     },
     "errors": {
       "supabase": "Supabase is not configured in this preview",
       "load": "Could not load this public agreement",
       "notPublic": "This agreement is not public or does not exist"
     },
-    "awaitingAcceptanceNote": "The responsible side has not confirmed the agreement yet"
+    "awaitingAcceptanceNote": "The responsible side has not confirmed the agreement yet",
+    "updates": {
+      "add": "Add update",
+      "label": "Official progress update",
+      "placeholder": "Equipment has been ordered. Delivery expected on May 18.",
+      "helper": "Text only · {count} characters left",
+      "cancel": "Cancel",
+      "publish": "Publish update",
+      "saving": "Publishing…",
+      "error": "Could not publish this update. Only agreement participants can add official updates.",
+      "unavailable": "Updates are temporarily unavailable until the latest database migration is applied"
+    }
   }
 }
