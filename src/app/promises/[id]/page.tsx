@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  ChevronDown,
   Clipboard,
   ExternalLink,
   Eye,
@@ -1516,9 +1517,13 @@ export default function PromisePage() {
             </details>
           )}
 
-          <details className="rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
-            <summary className="cursor-pointer list-none text-sm font-medium text-white marker:hidden">
-              {t("promises.detail.historyTitle")}
+          <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
+              <span>{t("promises.detail.historyTitle")}</span>
+              <ChevronDown
+                className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                aria-hidden
+              />
             </summary>
             <div className="mt-4 space-y-4">
               <div className="grid gap-2 sm:grid-cols-5">
