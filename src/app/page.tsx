@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -77,6 +77,53 @@ type DealRowProps = {
 
 const BETA_BANNER_DISMISSED_KEY = "dreddi_banner_beta_v1_dismissed";
 
+function TruncatedDealTitle({
+  title,
+  className,
+}: {
+  title: string;
+  className: string;
+}) {
+  const titleRef = useRef<HTMLSpanElement | null>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const titleElement = titleRef.current;
+    if (!titleElement) return;
+
+    const updateTruncationState = () => {
+      setIsTruncated(titleElement.scrollWidth > titleElement.clientWidth + 1);
+    };
+
+    updateTruncationState();
+
+    const resizeObserver = new ResizeObserver(updateTruncationState);
+    resizeObserver.observe(titleElement);
+    window.addEventListener("resize", updateTruncationState);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateTruncationState);
+    };
+  }, [title]);
+
+  const titleNode = (
+    <span ref={titleRef} className={className}>
+      {title}
+    </span>
+  );
+
+  if (!isTruncated) {
+    return titleNode;
+  }
+
+  return (
+    <Tooltip label={title} className="w-full min-w-0" placement="top">
+      {titleNode}
+    </Tooltip>
+  );
+}
+
 function DealRow({
   item,
   href,
@@ -102,9 +149,7 @@ function DealRow({
   const content = (
     <>
       <div className="min-w-0 flex-1">
-        <Tooltip label={item.title} className="w-full min-w-0" placement="top">
-          <span className={titleClass}>{item.title}</span>
-        </Tooltip>
+        <TruncatedDealTitle title={item.title} className={titleClass} />
         {metaText ? <div className={metaClass}>{metaText}</div> : null}
       </div>
       <StatusPill
@@ -630,7 +675,7 @@ export default function Home() {
 
         </div>
 
-        <div className="w-full min-w-0 md:w-[34rem] md:flex-none lg:w-[40rem]">
+        <div className="w-full min-w-0 md:w-[32rem] md:flex-none lg:w-[34rem]">
           <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
