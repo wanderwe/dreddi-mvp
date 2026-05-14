@@ -1,6 +1,5 @@
--- Public agreements are meant to remain useful as observable commitments even
--- when the invited side needs much longer to respond. Keep private invite
--- behavior unchanged, but extend pending public agreement invitations to 180 days.
+-- Extend pending public agreement invitations to 180 days while keeping private
+-- agreement invitations on the standard 7-day window.
 
 UPDATE public.promises
 SET expires_at = COALESCE(invited_at, created_at) + interval '180 days'
