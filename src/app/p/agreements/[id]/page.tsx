@@ -1,28 +1,16 @@
 "use client";
 
-import { Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
-import Link from "next/link";
+import { Check, Clipboard, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { localizePath } from "@/lib/i18n/routing";
-import type { Locale } from "@/lib/i18n/locales";
 import { isPromiseStatus } from "@/lib/promiseStatus";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
-import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
-
-type PublicAgreementUpdate = {
-  id: string;
-  content: string;
-  created_at: string;
-  author_display_name: string | null;
-  author_handle: string | null;
-};
 
 type PublicAgreementRow = {
   id: string;
@@ -45,14 +33,9 @@ type PublicAgreementRow = {
   cancelled_at: string | null;
   creator_display_name: string | null;
   creator_handle: string | null;
-  creator_is_public_profile?: boolean | null;
   counterparty_display_name: string | null;
   counterparty_handle: string | null;
-  counterparty_is_public_profile?: boolean | null;
   counterparty_contact: string | null;
-  viewer_can_update?: boolean | null;
-  updates_available?: boolean | null;
-  updates?: PublicAgreementUpdate[] | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -68,8 +51,7 @@ type TimelineItem = {
   actor: string;
   timestamp: string;
   description?: string;
-  tone?: "success" | "danger" | "attention" | "neutral" | "update";
-  kind?: "system" | "update";
+  tone?: "success" | "danger" | "attention" | "neutral";
 };
 
 type FlowState = {
@@ -112,10 +94,6 @@ function displayProfileName(displayName: string | null, handle: string | null, f
   return fallback;
 }
 
-function displayUpdateAuthorName(update: PublicAgreementUpdate, fallback: string) {
-  return displayProfileName(update.author_display_name, update.author_handle, fallback);
-}
-
 function displayCounterpartyName(row: PublicAgreement, fallback: string) {
   const profileName = displayProfileName(
     row.counterparty_display_name,
@@ -126,16 +104,6 @@ function displayCounterpartyName(row: PublicAgreement, fallback: string) {
   const contact = row.counterparty_contact?.trim();
   if (contact && !isLikelyPrivateEmail(contact)) return contact;
   return fallback;
-}
-
-function getPublicProfileHref(
-  handle: string | null,
-  isPublicProfile: boolean | null | undefined,
-  locale: Locale
-) {
-  const cleanHandle = handle?.trim();
-  if (!cleanHandle || !isPublicProfile) return null;
-  return localizePath(`/u/${cleanHandle}`, locale);
 }
 
 function formatTimestamp(value: string, locale: string) {
@@ -190,7 +158,7 @@ function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): 
 
 function buildTimeline(
   agreement: PublicAgreement,
-  labels: { creator: string; counterparty: string; system: string; updateFallback: string },
+  labels: { creator: string; counterparty: string; system: string },
   t: ReturnType<typeof useT>
 ): TimelineItem[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
@@ -268,18 +236,6 @@ function buildTimeline(
     });
   }
 
-  for (const update of agreement.updates ?? []) {
-    items.push({
-      key: `update-${update.id}`,
-      label: t("publicAgreement.timeline.update"),
-      actor: displayUpdateAuthorName(update, labels.updateFallback),
-      timestamp: update.created_at,
-      description: update.content,
-      tone: "update",
-      kind: "update",
-    });
-  }
-
   const isExpired = agreement.uiStatus === "expired" && agreement.expires_at;
   if (isExpired) {
     items.push({
@@ -303,9 +259,6 @@ export default function PublicAgreementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const [updateContent, setUpdateContent] = useState("");
-  const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false);
-  const [updateSubmitState, setUpdateSubmitState] = useState<"idle" | "saving" | "error">("idle");
 
   useEffect(() => {
     let active = true;
@@ -316,12 +269,8 @@ export default function PublicAgreementPage() {
       setError(null);
 
       try {
-        const session = supabaseOptional ? (await supabaseOptional.auth.getSession()).data.session : null;
         const response = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
           cache: "no-store",
-          headers: session?.access_token
-            ? { Authorization: `Bearer ${session.access_token}` }
-            : undefined,
         });
 
         if (!active) return;
@@ -380,22 +329,10 @@ export default function PublicAgreementPage() {
     ? displayCounterpartyName(agreement, t("publicAgreement.participants.counterpartyFallback"))
     : "";
 
-  const creatorHref = agreement
-    ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
-    : null;
-  const counterpartyHref = agreement
-    ? getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale)
-    : null;
-
   const timeline = agreement
     ? buildTimeline(
         agreement,
-        {
-          creator: creatorName,
-          counterparty: counterpartyName,
-          system: t("publicAgreement.timeline.system"),
-          updateFallback: t("publicAgreement.timeline.updateAuthorFallback"),
-        },
+        { creator: creatorName, counterparty: counterpartyName, system: t("publicAgreement.timeline.system") },
         t
       )
     : [];
@@ -410,57 +347,6 @@ export default function PublicAgreementPage() {
   const dueText = agreement?.due_at
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
     : null;
-
-  const canAddUpdate = Boolean(agreement?.viewer_can_update && agreement.updates_available !== false);
-  const shouldShowUpdatesUnavailable = Boolean(
-    agreement?.viewer_can_update && agreement.updates_available === false
-  );
-  const remainingUpdateChars = 500 - updateContent.length;
-
-  const handleSubmitUpdate = async () => {
-    if (!agreement || !canAddUpdate || updateSubmitState === "saving") return;
-
-    const content = updateContent.trim();
-    if (!content || content.length > 500) {
-      setUpdateSubmitState("error");
-      return;
-    }
-
-    const session = supabaseOptional ? (await supabaseOptional.auth.getSession()).data.session : null;
-    if (!session?.access_token) {
-      setUpdateSubmitState("error");
-      return;
-    }
-
-    setUpdateSubmitState("saving");
-    try {
-      const response = await fetch(`/api/public/agreements/${encodeURIComponent(agreement.id)}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
-      });
-
-      if (!response.ok) throw new Error("Update failed");
-
-      const update = (await response.json()) as PublicAgreementUpdate;
-      setAgreement((current) =>
-        current
-          ? {
-              ...current,
-              updates: [...(current.updates ?? []), update],
-            }
-          : current
-      );
-      setUpdateContent("");
-      setIsUpdateFormOpen(false);
-      setUpdateSubmitState("idle");
-    } catch {
-      setUpdateSubmitState("error");
-    }
-  };
 
   const handleCopy = async () => {
     const url = publicUrl || window.location.href;
@@ -534,18 +420,14 @@ export default function PublicAgreementPage() {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-transparent px-4 py-2 text-sm font-semibold leading-none text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
-                  {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                </span>
-                <span className="leading-none">
-                  {copyState === "copied"
-                    ? t("publicAgreement.copied")
-                    : copyState === "error"
-                      ? t("publicAgreement.copyFailed")
-                      : t("publicAgreement.copyLink")}
-                </span>
+                {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                {copyState === "copied"
+                  ? t("publicAgreement.copied")
+                  : copyState === "error"
+                    ? t("publicAgreement.copyFailed")
+                    : t("publicAgreement.copyLink")}
               </button>
             </div>
           </div>
@@ -565,17 +447,9 @@ export default function PublicAgreementPage() {
                 {t("publicAgreement.participants.title")}
               </p>
               <div className="mt-5 grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr] lg:grid-cols-1 xl:grid-cols-[1fr_auto_1fr]">
-                <ParticipantCard
-                  label={t("publicAgreement.participants.createdBy")}
-                  name={creatorName}
-                  href={creatorHref}
-                />
+                <ParticipantCard label={t("publicAgreement.participants.createdBy")} name={creatorName} />
                 <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
-                <ParticipantCard
-                  label={t("publicAgreement.participants.acceptedBy")}
-                  name={counterpartyName}
-                  href={counterpartyHref}
-                />
+                <ParticipantCard label={t("publicAgreement.participants.acceptedBy")} name={counterpartyName} />
               </div>
             </div>
           </div>
@@ -612,79 +486,7 @@ export default function PublicAgreementPage() {
         </section>
 
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-lg font-semibold">{t("publicAgreement.timeline.title")}</h2>
-            {canAddUpdate ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsUpdateFormOpen((open) => !open);
-                  setUpdateSubmitState("idle");
-                }}
-                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/82 transition hover:border-emerald-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
-              >
-                <MessageSquareText className="h-4 w-4" aria-hidden="true" />
-                {t("publicAgreement.updates.add")}
-              </button>
-            ) : null}
-          </div>
-
-          {shouldShowUpdatesUnavailable ? (
-            <p className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-50/80">
-              {t("publicAgreement.updates.unavailable")}
-            </p>
-          ) : null}
-
-          {isUpdateFormOpen ? (
-            <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
-              <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
-                {t("publicAgreement.updates.label")}
-              </label>
-              <textarea
-                id="agreement-update"
-                value={updateContent}
-                onChange={(event) => {
-                  setUpdateContent(event.target.value.slice(0, 500));
-                  setUpdateSubmitState("idle");
-                }}
-                maxLength={500}
-                rows={4}
-                className="mt-3 w-full resize-none rounded-2xl border border-white/10 bg-black/25 p-3 text-sm leading-6 text-white outline-none placeholder:text-white/30 focus:border-emerald-300/45 focus:ring-2 focus:ring-emerald-300/15"
-                placeholder={t("publicAgreement.updates.placeholder")}
-              />
-              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-white/45">
-                  {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsUpdateFormOpen(false);
-                      setUpdateSubmitState("idle");
-                    }}
-                    className="cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/65 transition hover:bg-white/10"
-                  >
-                    {t("publicAgreement.updates.cancel")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleSubmitUpdate()}
-                    disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                    className="cursor-pointer rounded-xl bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {updateSubmitState === "saving"
-                      ? t("publicAgreement.updates.saving")
-                      : t("publicAgreement.updates.publish")}
-                  </button>
-                </div>
-              </div>
-              {updateSubmitState === "error" ? (
-                <p className="mt-3 text-sm text-rose-200">{t("publicAgreement.updates.error")}</p>
-              ) : null}
-            </div>
-          ) : null}
-
+          <h2 className="text-lg font-semibold">{t("publicAgreement.timeline.title")}</h2>
           <div className="mt-6 space-y-4">
             {timeline.map((item) => (
               <div key={item.key} className="grid gap-3 sm:grid-cols-[1rem_1fr]">
@@ -698,28 +500,14 @@ export default function PublicAgreementPage() {
                           ? "bg-rose-300 ring-rose-300/10"
                           : item.tone === "attention"
                             ? "bg-amber-300 ring-amber-300/10"
-                            : item.tone === "update"
-                              ? "bg-sky-200 ring-sky-200/10"
-                              : "bg-white/45 ring-white/10",
+                            : "bg-white/45 ring-white/10",
                     ].join(" ")}
                   />
                 </div>
-                <div
-                  className={[
-                    "rounded-2xl border p-4",
-                    item.kind === "update"
-                      ? "border-sky-200/10 bg-sky-200/[0.035]"
-                      : "border-white/10 bg-black/20",
-                  ].join(" ")}
-                >
+                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="flex items-center gap-2 font-medium text-white">
-                        {item.kind === "update" ? (
-                          <MessageSquareText className="h-4 w-4 text-sky-100/70" aria-hidden="true" />
-                        ) : null}
-                        {item.label}
-                      </p>
+                      <p className="font-medium text-white">{item.label}</p>
                       <p className="mt-1 text-sm text-white/55">{item.actor}</p>
                     </div>
                     <time className="text-sm text-white/50" dateTime={item.timestamp}>
@@ -727,14 +515,7 @@ export default function PublicAgreementPage() {
                     </time>
                   </div>
                   {item.description ? (
-                    <p
-                      className={[
-                        "mt-3 whitespace-pre-wrap text-sm leading-6",
-                        item.kind === "update" ? "text-white/72" : "text-white/60",
-                      ].join(" ")}
-                    >
-                      {item.description}
-                    </p>
+                    <p className="mt-3 text-sm leading-6 text-white/60">{item.description}</p>
                   ) : null}
                 </div>
               </div>
@@ -746,33 +527,14 @@ export default function PublicAgreementPage() {
   );
 }
 
-function ParticipantCard({ label, name, href }: { label: string; name: string; href?: string | null }) {
-  const className = [
-    "group block h-full min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition",
-    href
-      ? "cursor-pointer hover:border-emerald-300/40 hover:bg-emerald-300/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45"
-      : "",
-  ].join(" ");
-  const content = (
-    <>
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition group-hover:bg-emerald-300/15 group-hover:text-emerald-100">
+function ParticipantCard({ label, name }: { label: string; name: string }) {
+  return (
+    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80">
         <UserRound className="h-5 w-5" aria-hidden="true" />
       </div>
       <p className="text-xs uppercase tracking-[0.16em] text-white/40">{label}</p>
-      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
-        <span className="truncate">{name}</span>
-        {href ? <Link2 className="h-3.5 w-3.5 shrink-0 text-emerald-100/65" aria-hidden="true" /> : null}
-      </p>
-    </>
+      <p className="mt-1 truncate text-sm font-semibold text-white">{name}</p>
+    </div>
   );
-
-  if (href) {
-    return (
-      <Link href={href} className={className}>
-        {content}
-      </Link>
-    );
-  }
-
-  return <div className={className}>{content}</div>;
 }
