@@ -329,13 +329,14 @@
         }
       },
       "publicAgreementLink": {
-        "title": "Public agreement link",
-        "helper": "This standalone page is visible to anyone with the link",
+        "title": "Public page",
+        "helper": "A page for monitoring this agreement",
         "copy": "Copy public link",
         "open": "Open public page",
         "copied": "Public agreement link copied",
         "copyFailed": "Failed to copy public link"
-      }
+      },
+      "copyInviteLink": "Copy invite link"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Invitation awaiting response",

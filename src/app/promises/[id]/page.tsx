@@ -284,7 +284,7 @@ function ActionButton({
     "border-neutral-800 bg-transparent text-neutral-200 hover:bg-white/5 hover:border-neutral-700";
 
   const primary =
-    "border-white/10 bg-white text-neutral-950 hover:bg-white/90 hover:border-white/20";
+    "border-emerald-400/35 bg-emerald-400/15 text-emerald-50 shadow-lg shadow-emerald-950/20 hover:border-emerald-300/45 hover:bg-emerald-400/20";
 
   // мягкая активная подсветка (не “белая заливка на весь экран”)
   const activeNeutral =
@@ -1032,6 +1032,7 @@ export default function PromisePage() {
   const showPublicStatus = p?.visibility === "public";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
   const hasToolCards = Boolean(shouldShowInviteBlock || canSharePublicAgreement);
+  const hasLifecycleActions = Boolean(hasStatusActions || canRecreateDeal);
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -1310,10 +1311,10 @@ export default function PromisePage() {
               )}
             </div>
 
-            {(hasStatusActions || shouldShowInviteBlock || canRecreateDeal) && (
+            {hasLifecycleActions && (
               <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
-                  {t("promises.detail.primaryActionTitle")}
+                  {t("promises.detail.statusActions")}
                 </p>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   {isExecutor && p.status === "active" && (
@@ -1384,26 +1385,6 @@ export default function PromisePage() {
                     </>
                   )}
 
-                  {shouldShowInviteBlock && !p.invite_token && (
-                    <ActionButton
-                      label={t("promises.detail.generate")}
-                      variant="primary"
-                      loading={inviteBusy === "generate"}
-                      disabled={inviteBusy !== null}
-                      onClick={generateInvite}
-                    />
-                  )}
-
-                  {shouldShowInviteBlock && p.invite_token && (
-                    <ActionButton
-                      label={t("promises.detail.copyLink")}
-                      variant="primary"
-                      disabled={inviteBusy !== null || !inviteLink}
-                      onClick={copyInvite}
-                    />
-                  )}
-
-
                   {canRecreateDeal && (
                     <button
                       type="button"
@@ -1471,49 +1452,91 @@ export default function PromisePage() {
                   ⌄
                 </span>
               </summary>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-
-                {shouldShowInviteBlock && p.invite_token && inviteLink && (
-                  <Link
-                    href={`/p/invite/${p.invite_token}`}
-                    className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                  >
-                    <ExternalLink className="h-4 w-4" aria-hidden />
-                    {t("promises.detail.openInvite")}
-                  </Link>
-                )}
-
-                {isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && (
-                  <button
-                    type="button"
-                    className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-red-300/20 bg-transparent px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={inviteBusy !== null}
-                    onClick={cancelInvite}
-                  >
-                    {inviteBusy === "cancel"
-                      ? t("promises.detail.saving")
-                      : t("promises.detail.withdrawInvite")}
-                  </button>
-                )}
-
+              <div className="mt-4 space-y-3">
                 {canSharePublicAgreement && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => void copyPublicAgreementLink()}
-                      className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/20 bg-emerald-300/10 px-3 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/35 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                    >
-                      <Clipboard className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.publicAgreementLink.copy")}
-                    </button>
-                    <Link
-                      href={publicAgreementPath!}
-                      className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                    >
-                      <ExternalLink className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.publicAgreementLink.open")}
-                    </Link>
-                  </>
+                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-semibold text-white">
+                        {t("promises.detail.publicAgreementLink.title")}
+                      </p>
+                      <p className="text-xs text-white/50">
+                        {t("promises.detail.publicAgreementLink.helper")}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => void copyPublicAgreementLink()}
+                        className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                      >
+                        <Clipboard className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.publicAgreementLink.copy")}
+                      </button>
+                      <Link
+                        href={publicAgreementPath!}
+                        className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                      >
+                        <ExternalLink className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.publicAgreementLink.open")}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {shouldShowInviteBlock && (
+                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-semibold text-white">
+                        {t("promises.detail.inviteTitle")}
+                      </p>
+                      <p className="text-xs text-white/50">{inviteMetaText}</p>
+                    </div>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      {!p.invite_token && (
+                        <ActionButton
+                          label={t("promises.detail.generate")}
+                          variant="primary"
+                          loading={inviteBusy === "generate"}
+                          disabled={inviteBusy !== null}
+                          onClick={generateInvite}
+                        />
+                      )}
+
+                      {p.invite_token && (
+                        <ActionButton
+                          label={t("promises.detail.copyInviteLink")}
+                          variant="ghost"
+                          disabled={inviteBusy !== null || !inviteLink}
+                          onClick={copyInvite}
+                        />
+                      )}
+
+                      {p.invite_token && inviteLink && (
+                        <Link
+                          href={`/p/invite/${p.invite_token}`}
+                          className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        >
+                          <ExternalLink className="h-4 w-4" aria-hidden />
+                          {t("promises.detail.openInvite")}
+                        </Link>
+                      )}
+                    </div>
+
+                    {isCreator && inviteStatus === "awaiting_acceptance" && p.invite_token && (
+                      <div className="mt-4 border-t border-white/10 pt-3">
+                        <button
+                          type="button"
+                          className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 bg-red-950/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={inviteBusy !== null}
+                          onClick={cancelInvite}
+                        >
+                          {inviteBusy === "cancel"
+                            ? t("promises.detail.saving")
+                            : t("promises.detail.withdrawInvite")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </details>
