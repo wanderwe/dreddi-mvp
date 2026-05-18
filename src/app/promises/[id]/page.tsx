@@ -19,7 +19,6 @@ import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
-import { stripTrailingPeriod } from "@/lib/text";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import {
   getPromiseInviteStatus,
@@ -1032,11 +1031,14 @@ export default function PromisePage() {
   const showPublicStatus = p?.visibility === "public";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
   const canShowInviteLinks = Boolean(shouldShowInviteBlock && p?.invite_token && inviteLink);
+  const canPrioritizeInviteActions = Boolean(
+    canShowInviteLinks && isCreator && inviteStatus === "awaiting_acceptance"
+  );
   const canGenerateInvite = Boolean(shouldShowInviteBlock && !p?.invite_token);
   const canWithdrawInvite = Boolean(
     isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && p?.invite_token
   );
-  const hasToolCards = Boolean(canShowInviteLinks || canSharePublicAgreement);
+  const hasToolCards = Boolean((canShowInviteLinks && !canPrioritizeInviteActions) || canSharePublicAgreement);
   const hasLifecycleActions = Boolean(
     hasStatusActions || canRecreateDeal || canGenerateInvite || canWithdrawInvite
   );
@@ -1323,24 +1325,32 @@ export default function PromisePage() {
                   {t("promises.detail.statusActions")}
                 </p>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                  {isExecutor && p.status === "active" && (
-                    isInviteAccepted ? (
+                  {isExecutor && p.status === "active" && isInviteAccepted && (
+                    <ActionButton
+                      label={t("promises.detail.markCompleted")}
+                      variant="ok"
+                      loading={actionBusy === "complete"}
+                      disabled={actionBusy !== null}
+                      onClick={() => setShowConfirmModal(true)}
+                    />
+                  )}
+
+                  {canPrioritizeInviteActions && p?.invite_token && (
+                    <>
                       <ActionButton
-                        label={t("promises.detail.markCompleted")}
-                        variant="ok"
-                        loading={actionBusy === "complete"}
-                        disabled={actionBusy !== null}
-                        onClick={() => setShowConfirmModal(true)}
+                        label={t("promises.detail.copyInviteLink")}
+                        variant="primary"
+                        disabled={inviteBusy !== null || !inviteLink}
+                        onClick={() => void copyInvite()}
                       />
-                    ) : (
-                      !canRespondToInvite && (
-                        <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">
-                          {inviteStatus === "awaiting_acceptance"
-                            ? stripTrailingPeriod(t("promises.detail.shareInvite"))
-                            : t(`promises.inviteStatus.${inviteStatus}`)}
-                        </div>
-                      )
-                    )
+                      <Link
+                        href={`/p/invite/${p.invite_token}`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        <ExternalLink className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.openInvite")}
+                      </Link>
+                    </>
                   )}
 
                   {canReview && p.status === "completed_by_promisor" && (
@@ -1404,7 +1414,7 @@ export default function PromisePage() {
                   {canWithdrawInvite && (
                     <ActionButton
                       label={t("promises.detail.withdrawInvite")}
-                      variant="danger"
+                      variant="ghost"
                       loading={inviteBusy === "cancel"}
                       disabled={inviteBusy !== null}
                       onClick={cancelInvite}
