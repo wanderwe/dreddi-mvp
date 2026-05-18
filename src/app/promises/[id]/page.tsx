@@ -1195,9 +1195,9 @@ export default function PromisePage() {
                   </Tooltip>
                 )}
                 {p.visibility === "public" && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
                     <Eye className="h-3.5 w-3.5" aria-hidden />
-                    {t("promises.detail.publicStatus.label")}
+                    {t("promises.detail.publicStatus.public")}
                   </span>
                 )}
               </div>
