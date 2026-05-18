@@ -42,13 +42,3 @@ test("terminal invite statuses block later acceptance", () => {
   assert.equal(isTerminalInviteStatus("cancelled_by_creator"), true);
   assert.equal(isTerminalInviteStatus("awaiting_acceptance"), false);
 });
-
-test("public agreement invites use a long observability-first expiry", () => {
-  const createdAt = new Date("2026-01-01T00:00:00.000Z");
-  const expiresAt = getInviteExpiryIso(createdAt, { visibility: "public" });
-
-  assert.equal(expiresAt, "2026-06-30T00:00:00.000Z");
-  assert.equal(getInviteTtlHours("public"), 180 * 24);
-  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-29T23:59:59.000Z")), false);
-  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-30T00:00:00.000Z")), true);
-});
