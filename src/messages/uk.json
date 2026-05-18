@@ -344,7 +344,8 @@
         "copied": "Посилання на публічну угоду скопійовано",
         "copyFailed": "Не вдалося скопіювати публічне посилання"
       },
-      "copyInviteLink": "Скопіювати запрошення"
+      "copyInviteLink": "Скопіювати запрошення",
+      "agreementActionsTitle": "Дії з угодою"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Запрошення очікує відповіді",

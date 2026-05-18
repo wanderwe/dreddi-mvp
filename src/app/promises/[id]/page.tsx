@@ -1031,8 +1031,16 @@ export default function PromisePage() {
   );
   const showPublicStatus = p?.visibility === "public";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
-  const hasToolCards = Boolean(shouldShowInviteBlock || canSharePublicAgreement);
+  const canShowInviteLinks = Boolean(shouldShowInviteBlock && p?.invite_token && inviteLink);
+  const canGenerateInvite = Boolean(shouldShowInviteBlock && !p?.invite_token);
+  const canWithdrawInvite = Boolean(
+    isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && p?.invite_token
+  );
+  const hasToolCards = Boolean(canShowInviteLinks || canSharePublicAgreement);
   const hasLifecycleActions = Boolean(hasStatusActions || canRecreateDeal);
+  const hasAgreementActions = Boolean(canGenerateInvite || canWithdrawInvite);
+  const linkUtilityButtonClass =
+    "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -1399,6 +1407,38 @@ export default function PromisePage() {
               </div>
             )}
 
+            {hasAgreementActions && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                  {t("promises.detail.agreementActionsTitle")}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  {canGenerateInvite && (
+                    <ActionButton
+                      label={t("promises.detail.generate")}
+                      variant="primary"
+                      loading={inviteBusy === "generate"}
+                      disabled={inviteBusy !== null}
+                      onClick={generateInvite}
+                    />
+                  )}
+
+                  {canWithdrawInvite && (
+                    <button
+                      type="button"
+                      className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center rounded-xl border border-red-400/20 bg-red-950/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                      disabled={inviteBusy !== null}
+                      onClick={cancelInvite}
+                    >
+                      {inviteBusy === "cancel"
+                        ? t("promises.detail.saving")
+                        : t("promises.detail.withdrawInvite")}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {(hasCondition || p.status === "disputed") && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
                 {hasCondition && (
@@ -1467,14 +1507,14 @@ export default function PromisePage() {
                       <button
                         type="button"
                         onClick={() => void copyPublicAgreementLink()}
-                        className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className={linkUtilityButtonClass}
                       >
                         <Clipboard className="h-4 w-4" aria-hidden />
                         {t("promises.detail.publicAgreementLink.copy")}
                       </button>
                       <Link
                         href={publicAgreementPath!}
-                        className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className={linkUtilityButtonClass}
                       >
                         <ExternalLink className="h-4 w-4" aria-hidden />
                         {t("promises.detail.publicAgreementLink.open")}
@@ -1483,7 +1523,7 @@ export default function PromisePage() {
                   </div>
                 )}
 
-                {shouldShowInviteBlock && (
+                {canShowInviteLinks && (
                   <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-semibold text-white">
@@ -1492,50 +1532,24 @@ export default function PromisePage() {
                       <p className="text-xs text-white/50">{inviteMetaText}</p>
                     </div>
                     <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      {!p.invite_token && (
-                        <ActionButton
-                          label={t("promises.detail.generate")}
-                          variant="primary"
-                          loading={inviteBusy === "generate"}
-                          disabled={inviteBusy !== null}
-                          onClick={generateInvite}
-                        />
-                      )}
+                      <button
+                        type="button"
+                        className={linkUtilityButtonClass}
+                        disabled={inviteBusy !== null || !inviteLink}
+                        onClick={copyInvite}
+                      >
+                        <Clipboard className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.copyInviteLink")}
+                      </button>
 
-                      {p.invite_token && (
-                        <ActionButton
-                          label={t("promises.detail.copyInviteLink")}
-                          variant="ghost"
-                          disabled={inviteBusy !== null || !inviteLink}
-                          onClick={copyInvite}
-                        />
-                      )}
-
-                      {p.invite_token && inviteLink && (
-                        <Link
-                          href={`/p/invite/${p.invite_token}`}
-                          className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                        >
-                          <ExternalLink className="h-4 w-4" aria-hidden />
-                          {t("promises.detail.openInvite")}
-                        </Link>
-                      )}
+                      <Link
+                        href={`/p/invite/${p.invite_token}`}
+                        className={linkUtilityButtonClass}
+                      >
+                        <ExternalLink className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.openInvite")}
+                      </Link>
                     </div>
-
-                    {isCreator && inviteStatus === "awaiting_acceptance" && p.invite_token && (
-                      <div className="mt-4 border-t border-white/10 pt-3">
-                        <button
-                          type="button"
-                          className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 bg-red-950/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
-                          disabled={inviteBusy !== null}
-                          onClick={cancelInvite}
-                        >
-                          {inviteBusy === "cancel"
-                            ? t("promises.detail.saving")
-                            : t("promises.detail.withdrawInvite")}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
