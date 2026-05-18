@@ -276,7 +276,7 @@
       "saving": "Saving…",
       "publicStatus": {
         "label": "Visibility",
-        "public": "{publicEntity}",
+        "public": "Public",
         "waitingOtherSide": "Public proposed — waiting for other side",
         "waitingConfirmation": "Public proposed — waiting for confirmation",
         "privateAfterProposal": "Private (public was proposed)"
