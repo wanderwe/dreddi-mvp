@@ -336,8 +336,7 @@
         "copied": "Public agreement link copied",
         "copyFailed": "Failed to copy public link"
       },
-      "copyInviteLink": "Copy invite link",
-      "agreementActionsTitle": "Agreement actions"
+      "copyInviteLink": "Copy invite link"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Invitation awaiting response",

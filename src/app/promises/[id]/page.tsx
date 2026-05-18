@@ -1037,8 +1037,9 @@ export default function PromisePage() {
     isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && p?.invite_token
   );
   const hasToolCards = Boolean(canShowInviteLinks || canSharePublicAgreement);
-  const hasLifecycleActions = Boolean(hasStatusActions || canRecreateDeal);
-  const hasAgreementActions = Boolean(canGenerateInvite || canWithdrawInvite);
+  const hasLifecycleActions = Boolean(
+    hasStatusActions || canRecreateDeal || canGenerateInvite || canWithdrawInvite
+  );
   const linkUtilityButtonClass =
     "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
   const hasCondition = Boolean(p?.condition_text?.trim());
@@ -1393,26 +1394,6 @@ export default function PromisePage() {
                     </>
                   )}
 
-                  {canRecreateDeal && (
-                    <button
-                      type="button"
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                      onClick={() => router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))}
-                    >
-                      <RefreshCw className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.recreate.label")}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {hasAgreementActions && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                  {t("promises.detail.agreementActionsTitle")}
-                </p>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   {canGenerateInvite && (
                     <ActionButton
                       label={t("promises.detail.generate")}
@@ -1424,15 +1405,23 @@ export default function PromisePage() {
                   )}
 
                   {canWithdrawInvite && (
-                    <button
-                      type="button"
-                      className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center rounded-xl border border-red-400/20 bg-red-950/10 px-3 py-2 text-sm font-medium text-red-200 transition hover:border-red-300/35 hover:bg-red-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    <ActionButton
+                      label={t("promises.detail.withdrawInvite")}
+                      variant="danger"
+                      loading={inviteBusy === "cancel"}
                       disabled={inviteBusy !== null}
                       onClick={cancelInvite}
+                    />
+                  )}
+
+                  {canRecreateDeal && (
+                    <button
+                      type="button"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      onClick={() => router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))}
                     >
-                      {inviteBusy === "cancel"
-                        ? t("promises.detail.saving")
-                        : t("promises.detail.withdrawInvite")}
+                      <RefreshCw className="h-4 w-4" aria-hidden />
+                      {t("promises.detail.recreate.label")}
                     </button>
                   )}
                 </div>
