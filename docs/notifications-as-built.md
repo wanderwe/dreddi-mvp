@@ -93,7 +93,7 @@
 | Deal created with existing counterparty | `POST /api/promises/create` | counterparty email matches existing profile | Counterparty user | `invite` | `/p/invite/:token` | Only fires if counterparty profile already exists. |
 | Invite accepted | `POST /api/invite/[token]/accept` | token valid, counterparty accepts | Creator + executor | `invite_followup` | `/promises/:id` | Uses role-specific copy overrides for creator. |
 | Invite declined | `POST /api/invite/[token]/decline` | token valid, invite not accepted | Creator | `invite_declined` | `/promises/:id` | Title/body provided from invite response copy. |
-| Invite ignored (timeout) | `POST /api/notifications/cron` | invite pending > IGNORE_AFTER_HOURS (default 72) | Creator | `invite_ignored` | `/promises/:id` | Also marks promise as declined. |
+| Invite ignored (timeout) | `POST /api/notifications/cron` | `expires_at <= now` | Creator | `invite_ignored` | `/promises/:id` | Also marks promise as declined. |
 | Invite follow-up | `POST /api/notifications/cron` | 24h after initial invite notification | Counterparty | `invite` | `/p/invite/:token` | Uses a special follow-up body. |
 | Due soon | `POST /api/notifications/cron` | `due_at` within 24h; accepted | Executor | `due_soon` | `/promises/:id` | Requires reminders enabled. |
 | Overdue (executor) | `POST /api/notifications/cron` | `due_at` past; accepted | Executor | `overdue` | `/promises/:id` | Every 72h. |

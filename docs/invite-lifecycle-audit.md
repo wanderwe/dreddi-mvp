@@ -17,7 +17,7 @@
 
 | Event | Resulting statuses | Notifications | UI result |
 |---|---|---|---|
-| Creator creates deal invite | `promises.status=active`, `promises.invite_status=awaiting_acceptance`, `deal_invites.status=created`, `expires_at=created+72h` | Counterparty gets `invite` (`invite:{promiseId}:{counterpartyId}`) | Creator sees pending + share/withdraw actions; invitee sees Accept/Decline |
+| Creator creates deal invite | `promises.status=active`, `promises.invite_status=awaiting_acceptance`, `deal_invites.status=created`, `expires_at=created+7d` for private invites or `created+180d` for public invites | Counterparty gets `invite` (`invite:{promiseId}:{counterpartyId}`) | Creator sees pending + share/withdraw actions; invitee sees Accept/Decline |
 | Invite link opened, no action | No status change | None | Invite page remains `Awaiting acceptance` |
 | Invite opened by non-registered user | No status change until auth + accept/decline | None | Prompt/login flow; state unchanged |
 | Invite accepted | `promises.invite_status=accepted`, `counterparty_accepted_at/accepted_at` set, `deal_invites.status=accepted` | Creator gets `accepted` | Both sides see active accepted deal |
