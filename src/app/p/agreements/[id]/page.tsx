@@ -174,11 +174,9 @@ function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): 
     { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
     {
       key: "accepted",
-      label: acceptedAt
-        ? t("publicAgreement.flow.accepted")
-        : t("publicAgreement.flow.participation"),
+      label: t("publicAgreement.flow.accepted"),
       complete: Boolean(acceptedAt),
-      current: agreement.uiStatus === "awaiting_acceptance" || agreement.uiStatus === "expired",
+      current: agreement.uiStatus === "awaiting_acceptance",
     },
     { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active", current: agreement.uiStatus === "active" },
     { key: "completed", label: t("publicAgreement.flow.completed"), complete: Boolean(agreement.completed_at || agreement.confirmed_at || agreement.disputed_at), current: agreement.uiStatus === "completed_by_promisor" },
@@ -407,17 +405,6 @@ export default function PublicAgreementPage() {
       )
     : [];
 
-  const isAccepted = Boolean(
-    agreement &&
-      (agreement.invite_status === "accepted" ||
-        agreement.accepted_at ||
-        agreement.counterparty_accepted_at)
-  );
-  const participationNoteKey = agreement?.uiStatus === "expired"
-    ? "publicAgreement.participation.expiredBody"
-    : isAccepted
-      ? "publicAgreement.participation.acceptedBody"
-      : "publicAgreement.participation.pendingBody";
   const flowStates = agreement ? getFlowStates(agreement, t) : [];
   const dueText = agreement?.due_at
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
@@ -537,12 +524,6 @@ export default function PublicAgreementPage() {
                     {t("publicAgreement.deadline", { date: dueText })}
                   </p>
                 ) : null}
-                <div className="mt-5 max-w-2xl rounded-2xl border border-emerald-200/15 bg-emerald-200/[0.06] px-4 py-3 text-sm leading-6 text-emerald-50/90">
-                  <p className="font-semibold text-emerald-50">
-                    {t("publicAgreement.participation.title")}
-                  </p>
-                  <p className="mt-1 text-emerald-50/72">{t(participationNoteKey)}</p>
-                </div>
               </div>
               <button
                 type="button"
@@ -595,15 +576,7 @@ export default function PublicAgreementPage() {
         </section>
 
         <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/60">
-            {t("publicAgreement.observability.eyebrow")}
-          </p>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <h2 className="text-lg font-semibold">{t("publicAgreement.flowTitle")}</h2>
-            <p className="max-w-2xl text-sm leading-6 text-white/55">
-              {t("publicAgreement.observability.body")}
-            </p>
-          </div>
+          <h2 className="text-lg font-semibold">{t("publicAgreement.flowTitle")}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-5">
             {flowStates.map((state, index) => (
               <div key={state.key} className="relative">

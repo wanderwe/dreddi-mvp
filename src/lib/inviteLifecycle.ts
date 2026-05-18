@@ -1,17 +1,10 @@
 import { InviteStatus } from "@/lib/promiseAcceptance";
 
 export const INVITE_TTL_DAYS = 7;
-export const PUBLIC_INVITE_TTL_DAYS = 180;
 export const INVITE_TTL_HOURS = INVITE_TTL_DAYS * 24;
-export const PUBLIC_INVITE_TTL_HOURS = PUBLIC_INVITE_TTL_DAYS * 24;
 
-type InviteVisibility = "private" | "public" | null | undefined;
-
-export const getInviteTtlHours = (visibility?: InviteVisibility) =>
-  visibility === "public" ? PUBLIC_INVITE_TTL_HOURS : INVITE_TTL_HOURS;
-
-export const getInviteExpiryIso = (from = new Date(), visibility?: InviteVisibility) =>
-  new Date(from.getTime() + getInviteTtlHours(visibility) * 60 * 60 * 1000).toISOString();
+export const getInviteExpiryIso = (from = new Date()) =>
+  new Date(from.getTime() + INVITE_TTL_HOURS * 60 * 60 * 1000).toISOString();
 
 export const isTerminalInviteStatus = (status: string | null | undefined) =>
   status === "accepted" ||

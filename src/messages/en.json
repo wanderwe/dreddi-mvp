@@ -147,7 +147,7 @@
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
       "needsReview": "Needs your review",
-      "awaitingInviteAcceptance": "Invitation awaiting response"
+      "awaitingInviteAcceptance": "Pending acceptance"
     },
     "important": {
       "blockTitle": "Reputation stake",
@@ -338,10 +338,10 @@
       }
     },
     "inviteStatus": {
-      "awaiting_acceptance": "Invitation awaiting response",
+      "awaiting_acceptance": "Awaiting acceptance",
       "accepted": "Accepted",
       "declined": "Declined",
-      "expired": "Participation not confirmed",
+      "expired": "Expired",
       "cancelled_by_creator": "Withdrawn"
     },
     "confirm": {
@@ -553,7 +553,7 @@
     "guestMode": "Guest mode",
     "eyebrow": "Invitation",
     "heading": {
-      "pending": "Invitation awaiting response",
+      "pending": "Deal invitation",
       "accepted": "This invite has been accepted",
       "acceptedByYou": "Invitation status"
     },
@@ -583,33 +583,33 @@
     "paymentTermsUnset": "Not specified",
     "statusLabel": "Status",
     "statusAccepted": "Already accepted",
-    "statusAwaiting": "Invitation awaiting response",
+    "statusAwaiting": "Awaiting acceptance",
     "statusAcceptedBody": "This {entityLower} is ready—jump into your dashboard to follow progress",
-    "statusAwaitingBody": "You can confirm participation to add the deal to your dashboard. If this is public, its page remains observable either way.",
+    "statusAwaitingBody": "Accept to join the {entityLower} and it will appear in your dashboard",
     "statusClosedBody": "This invite is no longer active",
     "status": {
-      "awaiting_acceptance": "Invitation awaiting response",
+      "awaiting_acceptance": "Awaiting acceptance",
       "accepted": "Accepted",
       "declined": "Declined",
-      "expired": "Participation not confirmed",
+      "expired": "Expired",
       "cancelled_by_creator": "Withdrawn"
     },
     "nextStep": "Next step",
-    "nextStepHint": "By confirming participation, you show that you understand this {entityLower}",
+    "nextStepHint": "By accepting, you confirm you understand this {entityLower}",
     "processing": "Processing...",
     "accept": "Accept {entityLower}",
     "decline": "Decline",
     "declinedMessage": "You declined this invite",
-    "ignoredMessage": "Participation was not confirmed — no response was received",
+    "ignoredMessage": "This invite expired without a response",
     "withdrawnMessage": "This agreement was withdrawn by the creator",
-    "awaitingCounterparty": "Invitation awaiting response from the other side",
+    "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {
       "title": "This {entityLower} is PUBLIC",
-      "body": "The public agreement page is available for monitoring. If you confirm participation, that confirmation will be visible in the public context."
+      "body": "If you accept, the {entityLower} details will be visible on public profiles"
     },
     "publicModal": {
       "title": "Accept public {entityLower}?",
-      "body": "This agreement is public. If you continue, your participation confirmation will be visible in the public context.",
+      "body": "This {entityLower} is public. If you proceed, its details will be visible on public profiles after confirmation",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
@@ -625,8 +625,8 @@
       "executor": "You are expected to complete this deal",
       "receiver": "This deal is a promise made to you"
     },
-    "acceptCta": "Confirm participation",
-    "acceptDeal": "Confirm participation",
+    "acceptCta": "Accept and take responsibility",
+    "acceptDeal": "Accept deal",
     "goToDeal": "Open deal",
     "viewDeal": "View deal"
   },
@@ -746,11 +746,11 @@
     },
     "status": {
       "active": "Active",
-      "pendingAcceptance": "Participation pending",
+      "pendingAcceptance": "Pending acceptance",
       "overdue": "Overdue",
       "inProgress": "In progress",
       "awaitingOutcome": "Awaiting outcome",
-      "awaitingAcceptance": "Awaiting participation"
+      "awaitingAcceptance": "Awaiting acceptance"
     },
     "meta": {
       "created": "Created {date}",
@@ -1006,15 +1006,15 @@
     "copyFailed": "Copy failed",
     "whatAgreed": "What was agreed",
     "noDetails": "The agreement text is captured in the title",
-    "flowTitle": "Transparent agreement flow",
+    "flowTitle": "Status flow",
     "status": {
       "active": "Active",
       "completed_by_promisor": "Marked completed",
       "confirmed": "Fulfilled",
       "disputed": "Disputed",
-      "awaiting_acceptance": "Awaiting participation",
+      "awaiting_acceptance": "Awaiting acceptance",
       "declined": "Declined",
-      "expired": "Participation not confirmed",
+      "expired": "Expired",
       "cancelled_by_creator": "Cancelled"
     },
     "participants": {
@@ -1026,20 +1026,19 @@
     },
     "flow": {
       "created": "Created",
-      "accepted": "Participation confirmed",
+      "accepted": "Accepted",
       "active": "Active",
       "completed": "Completed",
-      "confirmed": "Confirmed",
-      "disputed": "Disputed",
-      "participation": "Participation"
+      "confirmed": "Fulfilled",
+      "disputed": "Disputed"
     },
     "timeline": {
       "title": "Public timeline",
       "system": "Dreddi",
       "created": "Agreement created",
       "createdDescription": "The commitment was recorded as a public agreement",
-      "accepted": "Participation confirmed",
-      "acceptedDescription": "The participant confirmed involvement in the agreement",
+      "accepted": "Agreement accepted",
+      "acceptedDescription": "The responsible side acknowledged the agreement",
       "completed": "Marked as completed",
       "completedDescription": "The responsible side reported that the commitment was fulfilled",
       "confirmed": "Agreement fulfilled",
@@ -1048,7 +1047,7 @@
       "disputedDescription": "The outcome was publicly marked as disputed",
       "declined": "Agreement declined",
       "cancelled": "Agreement cancelled",
-      "expired": "Invitation ended without a response",
+      "expired": "Invitation expired",
       "update": "Update",
       "updateAuthorFallback": "Agreement participant"
     },
@@ -1057,7 +1056,7 @@
       "load": "Could not load this public agreement",
       "notPublic": "This agreement is not public or does not exist"
     },
-    "awaitingAcceptanceNote": "Participation has not been confirmed yet",
+    "awaitingAcceptanceNote": "The responsible side has not confirmed the agreement yet",
     "updates": {
       "add": "Add update",
       "label": "Official progress update",
@@ -1068,16 +1067,6 @@
       "saving": "Publishing…",
       "error": "Could not publish this update. Only agreement participants can add official updates.",
       "unavailable": "Updates are temporarily unavailable until the latest database migration is applied"
-    },
-    "observability": {
-      "eyebrow": "Public observability",
-      "body": "This page stays available so people can review the commitment, timeline, and updates regardless of whether the invitation receives a response."
-    },
-    "participation": {
-      "title": "Agreement open for monitoring",
-      "pendingBody": "The invitation is awaiting a response. The public page already records the commitment, deadlines, and updates without pressuring participants.",
-      "expiredBody": "Participation was not confirmed through the invitation, but the agreement, timeline, and updates remain visible for public monitoring.",
-      "acceptedBody": "Participation is confirmed. That makes the agreement more trustworthy while this page continues to show progress and updates."
     }
   }
 }
