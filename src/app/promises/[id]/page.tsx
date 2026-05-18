@@ -1239,9 +1239,6 @@ export default function PromisePage() {
               <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
                 {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-white">{dueText}</span>
               </span>
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
-                {inviteMetaText}
-              </span>
             </div>
 
             {hasDetails && (
