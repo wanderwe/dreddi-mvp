@@ -281,7 +281,7 @@ function ActionButton({
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
   const ghost =
-    "border-neutral-800 bg-transparent text-neutral-200 hover:bg-white/5 hover:border-neutral-700";
+    "border-white/20 bg-white/[0.035] text-neutral-100 hover:border-white/25 hover:bg-white/[0.07]";
 
   const primary =
     "border-emerald-400/35 bg-emerald-400/15 text-emerald-50 shadow-lg shadow-emerald-950/20 hover:border-emerald-300/45 hover:bg-emerald-400/20";
@@ -1477,9 +1477,10 @@ export default function PromisePage() {
             <details className="group rounded-2xl border border-white/10 bg-neutral-900/30 p-4">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
                 <span>{t("promises.detail.toolsTitle")}</span>
-                <span className="text-xs text-white/40 transition group-open:rotate-180" aria-hidden>
-                  ⌄
-                </span>
+                <ChevronDown
+                  className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                  aria-hidden
+                />
               </summary>
               <div className="mt-4 space-y-3">
                 {canSharePublicAgreement && (
