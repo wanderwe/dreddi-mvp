@@ -16,12 +16,21 @@ test("creator can withdraw only while awaiting acceptance", () => {
   assert.equal(canCreatorWithdrawInvite("cancelled_by_creator"), false);
 });
 
-test("expiry helper marks invites expired once threshold is passed", () => {
+test("expiry helper marks private invites expired once the 7-day threshold is passed", () => {
   const createdAt = new Date("2026-01-01T00:00:00.000Z");
   const expiresAt = getInviteExpiryIso(createdAt);
 
   assert.equal(hasInviteExpired(expiresAt, new Date("2026-01-07T23:59:59.000Z")), false);
   assert.equal(hasInviteExpired(expiresAt, new Date("2026-01-08T00:00:00.000Z")), true);
+});
+
+test("expiry helper gives public invites 180 days to be accepted", () => {
+  const createdAt = new Date("2026-01-01T00:00:00.000Z");
+  const expiresAt = getInviteExpiryIso(createdAt, "public");
+
+  assert.equal(expiresAt, "2026-06-30T00:00:00.000Z");
+  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-29T23:59:59.000Z")), false);
+  assert.equal(hasInviteExpired(expiresAt, new Date("2026-06-30T00:00:00.000Z")), true);
 });
 
 test("terminal invite statuses block later acceptance", () => {

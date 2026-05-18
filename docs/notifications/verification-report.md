@@ -39,7 +39,7 @@
 ## Reminder timing rules (clarified)
 
 - **Invite followup:** fires after 24h from `promise_notification_state.invite_notified_at`.
-- **Invite ignored:** fires after `IGNORE_AFTER_HOURS` (default 72h) from `invited_at` (or `created_at`), and auto-declines the promise.
+- **Invite ignored:** fires when `expires_at` has passed (7 days for private invites, 180 days for public invites), and auto-declines the promise.
 - **Due soon:** fires once when `due_at` is within the next 24h, only for accepted promises with reminders enabled.
 - **Overdue:**
   - Executor: at most once every 72h (`overdue_notified_at`).

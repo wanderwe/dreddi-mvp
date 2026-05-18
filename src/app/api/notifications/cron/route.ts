@@ -5,7 +5,6 @@ import { createNotification, mapPriorityForType } from "@/lib/notifications/serv
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
-import { INVITE_TTL_HOURS } from "@/lib/inviteLifecycle";
 
 const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 const HOURS_24 = 24 * 60 * 60 * 1000;
@@ -117,9 +116,7 @@ const runCron = async (req: Request) => {
   const dryRun = url.searchParams.get("dryRun") === "1";
   const inviteIgnoreMinutesOverride = parseInviteIgnoreMinutesOverride(url);
   const inviteIgnoreTimeoutMs =
-    inviteIgnoreMinutesOverride !== null
-      ? inviteIgnoreMinutesOverride * 60 * 1000
-      : INVITE_TTL_HOURS * 60 * 60 * 1000;
+    inviteIgnoreMinutesOverride !== null ? inviteIgnoreMinutesOverride * 60 * 1000 : null;
 
   const response: CronSuccessResponse = {
     processed: 0,
@@ -147,7 +144,8 @@ const runCron = async (req: Request) => {
     const now = new Date();
     const nowIso = now.toISOString();
     const dueSoonCutoff = new Date(now.getTime() + HOURS_24).toISOString();
-    const inviteIgnoreCutoffIso = new Date(now.getTime() - inviteIgnoreTimeoutMs).toISOString();
+    const inviteIgnoreCutoffIso =
+      inviteIgnoreTimeoutMs !== null ? new Date(now.getTime() - inviteIgnoreTimeoutMs).toISOString() : null;
     const triggeredTypes = new Set<string>();
 
     const { data: dueSoonRows, error: dueSoonFetchError } = await admin
@@ -193,7 +191,7 @@ const runCron = async (req: Request) => {
       });
     }
     const completionCandidates = (completionRows ?? []) as PromiseRow[];
-    const { data: inviteIgnoredRows, error: inviteIgnoredFetchError } = await admin
+    let inviteIgnoredQuery = admin
       .from("promises")
       .select(
         "id,title,status,creator_id,invite_status,created_at,invited_at,expires_at,ignored_at,counterparty_accepted_at,accepted_at"
@@ -202,8 +200,13 @@ const runCron = async (req: Request) => {
       .eq("invite_status", "awaiting_acceptance")
       .is("counterparty_accepted_at", null)
       .is("accepted_at", null)
-      .is("ignored_at", null)
-      .lte("created_at", inviteIgnoreCutoffIso);
+      .is("ignored_at", null);
+
+    inviteIgnoredQuery = inviteIgnoreCutoffIso
+      ? inviteIgnoredQuery.lte("created_at", inviteIgnoreCutoffIso)
+      : inviteIgnoredQuery.not("expires_at", "is", null).lte("expires_at", nowIso);
+
+    const { data: inviteIgnoredRows, error: inviteIgnoredFetchError } = await inviteIgnoredQuery;
 
     if (inviteIgnoredFetchError) {
       response.errors.push("invite_ignored_fetch_failed");
