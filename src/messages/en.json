@@ -335,6 +335,30 @@
         "open": "Open public page",
         "copied": "Public agreement link copied",
         "copyFailed": "Failed to copy public link"
+      },
+      "lifecycle": {
+        "created": "Created",
+        "accepted": "Accepted",
+        "active": "Active",
+        "completed": "Completed",
+        "confirmed": "Fulfilled",
+        "disputed": "Disputed"
+      },
+      "timeline": {
+        "created": "Agreement created",
+        "createdDescription": "The commitment was recorded as an agreement",
+        "accepted": "Agreement accepted",
+        "acceptedDescription": "The responsible side acknowledged the agreement",
+        "completed": "Marked as completed",
+        "completedDescription": "The responsible side reported that the commitment was fulfilled",
+        "confirmed": "Agreement fulfilled",
+        "confirmedDescription": "The outcome was recorded as a fulfilled agreement",
+        "disputed": "Agreement disputed",
+        "disputedDescription": "The outcome was marked as disputed",
+        "declined": "Agreement declined",
+        "cancelled": "Agreement cancelled",
+        "expired": "Invitation expired",
+        "system": "Dreddi"
       }
     },
     "inviteStatus": {

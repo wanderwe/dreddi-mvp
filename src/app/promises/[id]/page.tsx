@@ -100,28 +100,28 @@ function getLifecycleStates(
 ): LifecycleState[] {
   const acceptedAt = promise.accepted_at ?? promise.counterparty_accepted_at;
   const base: LifecycleState[] = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
+    { key: "created", label: t("promises.detail.lifecycle.created"), complete: true, current: false },
     {
       key: "accepted",
-      label: t("publicAgreement.flow.accepted"),
+      label: t("promises.detail.lifecycle.accepted"),
       complete: Boolean(acceptedAt),
       current: uiStatus === "awaiting_acceptance",
     },
     {
       key: "active",
-      label: t("publicAgreement.flow.active"),
+      label: t("promises.detail.lifecycle.active"),
       complete: promise.status !== "active",
       current: uiStatus === "active",
     },
     {
       key: "completed",
-      label: t("publicAgreement.flow.completed"),
+      label: t("promises.detail.lifecycle.completed"),
       complete: Boolean(promise.completed_at || promise.confirmed_at || promise.disputed_at),
       current: uiStatus === "completed_by_promisor",
     },
     {
       key: "confirmed",
-      label: t("publicAgreement.flow.confirmed"),
+      label: t("promises.detail.lifecycle.confirmed"),
       complete: promise.status === "confirmed",
       current: promise.status === "confirmed",
     },
@@ -132,7 +132,7 @@ function getLifecycleStates(
       ...base.slice(0, 4),
       {
         key: "disputed",
-        label: t("publicAgreement.flow.disputed"),
+        label: t("promises.detail.lifecycle.disputed"),
         complete: true,
         current: true,
         disputed: true,
@@ -153,20 +153,20 @@ function buildAgreementTimeline(
   const items: AgreementTimelineItem[] = [
     {
       key: "created",
-      label: t("publicAgreement.timeline.created"),
+      label: t("promises.detail.timeline.created"),
       actor: labels.creator,
       timestamp: promise.created_at,
-      description: t("publicAgreement.timeline.createdDescription"),
+      description: t("promises.detail.timeline.createdDescription"),
     },
   ];
 
   if (acceptedAt) {
     items.push({
       key: "accepted",
-      label: t("publicAgreement.timeline.accepted"),
+      label: t("promises.detail.timeline.accepted"),
       actor: labels.counterparty,
       timestamp: acceptedAt,
-      description: t("publicAgreement.timeline.acceptedDescription"),
+      description: t("promises.detail.timeline.acceptedDescription"),
       tone: "success",
     });
   }
@@ -174,10 +174,10 @@ function buildAgreementTimeline(
   if (promise.completed_at) {
     items.push({
       key: "completed",
-      label: t("publicAgreement.timeline.completed"),
+      label: t("promises.detail.timeline.completed"),
       actor: labels.counterparty,
       timestamp: promise.completed_at,
-      description: t("publicAgreement.timeline.completedDescription"),
+      description: t("promises.detail.timeline.completedDescription"),
       tone: "attention",
     });
   }
@@ -185,10 +185,10 @@ function buildAgreementTimeline(
   if (promise.confirmed_at) {
     items.push({
       key: "confirmed",
-      label: t("publicAgreement.timeline.confirmed"),
+      label: t("promises.detail.timeline.confirmed"),
       actor: labels.creator,
       timestamp: promise.confirmed_at,
-      description: t("publicAgreement.timeline.confirmedDescription"),
+      description: t("promises.detail.timeline.confirmedDescription"),
       tone: "success",
     });
   }
@@ -196,10 +196,10 @@ function buildAgreementTimeline(
   if (promise.disputed_at) {
     items.push({
       key: "disputed",
-      label: t("publicAgreement.timeline.disputed"),
+      label: t("promises.detail.timeline.disputed"),
       actor: labels.creator,
       timestamp: promise.disputed_at,
-      description: t("publicAgreement.timeline.disputedDescription"),
+      description: t("promises.detail.timeline.disputedDescription"),
       tone: "danger",
     });
   }
@@ -207,7 +207,7 @@ function buildAgreementTimeline(
   if (promise.declined_at) {
     items.push({
       key: "declined",
-      label: t("publicAgreement.timeline.declined"),
+      label: t("promises.detail.timeline.declined"),
       actor: labels.counterparty,
       timestamp: promise.declined_at,
       tone: "danger",
@@ -217,7 +217,7 @@ function buildAgreementTimeline(
   if (promise.cancelled_at) {
     items.push({
       key: "cancelled",
-      label: t("publicAgreement.timeline.cancelled"),
+      label: t("promises.detail.timeline.cancelled"),
       actor: labels.creator,
       timestamp: promise.cancelled_at,
       tone: "danger",
@@ -227,7 +227,7 @@ function buildAgreementTimeline(
   if (uiStatus === "expired" && promise.expires_at) {
     items.push({
       key: "expired",
-      label: t("publicAgreement.timeline.expired"),
+      label: t("promises.detail.timeline.expired"),
       actor: labels.system,
       timestamp: promise.expires_at,
       tone: "attention",
@@ -1068,7 +1068,7 @@ export default function PromisePage() {
         {
           creator: createdByLabel,
           counterparty: responsibleLabel,
-          system: t("publicAgreement.timeline.system"),
+          system: t("promises.detail.timeline.system"),
         },
         uiStatus,
         t
