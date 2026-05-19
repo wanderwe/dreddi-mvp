@@ -1472,11 +1472,11 @@ export default function PromisePage() {
             )}
 
             {isAwaitingInviteResponse && (
-              <div className="mt-5 rounded-2xl border border-emerald-300/25 bg-emerald-300/[0.08] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/80">
-                  {t("promises.detail.sendInviteTitle")}
+              <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
+                  {t("promises.detail.inviteTitle")}
                 </p>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
                   {canGenerateInvite ? (
                     <ActionButton
                       label={t("promises.detail.generate")}
@@ -1489,29 +1489,32 @@ export default function PromisePage() {
                     <>
                       <button
                         type="button"
-                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/45 bg-emerald-400/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         disabled={inviteBusy !== null || !inviteLink}
                         onClick={copyInvite}
                       >
                         <Clipboard className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.copyInvitePrimary")}
+                      {t("promises.detail.copyInvitePrimary")}
                       </button>
-                      <Link href={`/p/invite/${p.invite_token}`} className={linkUtilityButtonClass}>
+                      <Link href={`/p/invite/${p.invite_token}`} className={`${linkUtilityButtonClass} sm:w-auto`}>
                         <ExternalLink className="h-4 w-4" aria-hidden />
                         {t("promises.detail.openInvite")}
                       </Link>
-                      {canWithdrawInvite && (
-                        <ActionButton
-                          label={t("promises.detail.withdrawInvite")}
-                          variant="danger"
-                          loading={inviteBusy === "cancel"}
-                          disabled={inviteBusy !== null}
-                          onClick={cancelInvite}
-                        />
-                      )}
                     </>
                   )}
                 </div>
+                {!canGenerateInvite && canWithdrawInvite && (
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      className="inline-flex min-h-9 items-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={inviteBusy !== null}
+                      onClick={cancelInvite}
+                    >
+                      {inviteBusy === "cancel" ? t("promises.detail.saving") : t("promises.detail.withdrawInvite")}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </section>
