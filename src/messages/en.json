@@ -336,7 +336,9 @@
         "copied": "Public agreement link copied",
         "copyFailed": "Failed to copy public link"
       },
-      "copyInviteLink": "Copy invite link"
+      "copyInviteLink": "Copy invite link",
+      "sendInviteTitle": "Send invite",
+      "copyInvitePrimary": "Copy invite link"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",

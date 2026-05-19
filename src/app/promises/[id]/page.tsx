@@ -1031,14 +1031,16 @@ export default function PromisePage() {
   );
   const showPublicStatus = p?.visibility === "public";
   const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
-  const canShowInviteLinks = Boolean(shouldShowInviteBlock && p?.invite_token && inviteLink);
   const canGenerateInvite = Boolean(shouldShowInviteBlock && !p?.invite_token);
   const canWithdrawInvite = Boolean(
     isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && p?.invite_token
   );
-  const hasToolCards = Boolean(canShowInviteLinks || canSharePublicAgreement);
+  const isAwaitingInviteResponse = Boolean(
+    shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
+  );
+  const hasToolCards = Boolean(canSharePublicAgreement);
   const hasLifecycleActions = Boolean(
-    hasStatusActions || canRecreateDeal || canGenerateInvite || canWithdrawInvite
+    hasStatusActions || canRecreateDeal
   );
   const linkUtilityButtonClass =
     "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
@@ -1468,6 +1470,50 @@ export default function PromisePage() {
                 )}
               </div>
             )}
+
+            {isAwaitingInviteResponse && (
+              <div className="mt-5 rounded-2xl border border-emerald-300/25 bg-emerald-300/[0.08] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/80">
+                  {t("promises.detail.sendInviteTitle")}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  {canGenerateInvite ? (
+                    <ActionButton
+                      label={t("promises.detail.generate")}
+                      variant="primary"
+                      loading={inviteBusy === "generate"}
+                      disabled={inviteBusy !== null}
+                      onClick={generateInvite}
+                    />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/45 bg-emerald-400/20 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        disabled={inviteBusy !== null || !inviteLink}
+                        onClick={copyInvite}
+                      >
+                        <Clipboard className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.copyInvitePrimary")}
+                      </button>
+                      <Link href={`/p/invite/${p.invite_token}`} className={linkUtilityButtonClass}>
+                        <ExternalLink className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.openInvite")}
+                      </Link>
+                      {canWithdrawInvite && (
+                        <ActionButton
+                          label={t("promises.detail.withdrawInvite")}
+                          variant="danger"
+                          loading={inviteBusy === "cancel"}
+                          disabled={inviteBusy !== null}
+                          onClick={cancelInvite}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </section>
 
           {hasToolCards && (
@@ -1485,9 +1531,6 @@ export default function PromisePage() {
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-semibold text-white">
                         {t("promises.detail.publicAgreementLink.title")}
-                      </p>
-                      <p className="text-xs text-white/50">
-                        {t("promises.detail.publicAgreementLink.helper")}
                       </p>
                     </div>
                     <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -1510,35 +1553,6 @@ export default function PromisePage() {
                   </div>
                 )}
 
-                {canShowInviteLinks && (
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-semibold text-white">
-                        {t("promises.detail.inviteTitle")}
-                      </p>
-                      <p className="text-xs text-white/50">{inviteMetaText}</p>
-                    </div>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <button
-                        type="button"
-                        className={linkUtilityButtonClass}
-                        disabled={inviteBusy !== null || !inviteLink}
-                        onClick={copyInvite}
-                      >
-                        <Clipboard className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.copyInviteLink")}
-                      </button>
-
-                      <Link
-                        href={`/p/invite/${p.invite_token}`}
-                        className={linkUtilityButtonClass}
-                      >
-                        <ExternalLink className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.openInvite")}
-                      </Link>
-                    </div>
-                  </div>
-                )}
               </div>
             </details>
           )}
