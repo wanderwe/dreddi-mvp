@@ -873,8 +873,12 @@ export default function PromisePage() {
 
     if (didCopy) {
       setCopyFeedback("success");
+      setToastTone("success");
+      setToast(t("promises.detail.copySuccess"));
     } else {
       setCopyFeedback("error");
+      setToastTone("error");
+      setToast(t("promises.detail.copyFailed"));
     }
   }
 
@@ -1504,10 +1508,10 @@ export default function PromisePage() {
                   )}
                 </div>
                 {!canGenerateInvite && canWithdrawInvite && (
-                  <div className="mt-2">
+                  <div className="mt-2 flex justify-end">
                     <button
                       type="button"
-                      className="inline-flex min-h-9 items-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex min-h-9 cursor-pointer items-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={inviteBusy !== null}
                       onClick={cancelInvite}
                     >

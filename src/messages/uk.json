@@ -345,7 +345,7 @@
         "copyFailed": "Не вдалося скопіювати публічне посилання"
       },
       "copyInviteLink": "Скопіювати запрошення",
-      "copyInvitePrimary": "Скопіювати запрошення"
+      "copyInvitePrimary": "Скопіювати посилання"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",

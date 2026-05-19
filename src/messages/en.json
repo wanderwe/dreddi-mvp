@@ -337,7 +337,7 @@
         "copyFailed": "Failed to copy public link"
       },
       "copyInviteLink": "Copy invite link",
-      "copyInvitePrimary": "Copy invite link"
+      "copyInvitePrimary": "Copy link"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
