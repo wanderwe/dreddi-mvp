@@ -344,7 +344,10 @@
         "copied": "Посилання на публічну угоду скопійовано",
         "copyFailed": "Не вдалося скопіювати публічне посилання"
       },
-      "copyInviteLink": "Скопіювати запрошення"
+      "copyInviteLink": "Скопіювати запрошення",
+      "copyInvitePrimary": "Скопіювати посилання",
+      "openInviteShort": "Відкрити сторінку",
+      "withdrawInviteShort": "Відкликати"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",
