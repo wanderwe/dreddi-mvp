@@ -345,8 +345,8 @@
         "copyFailed": "Не вдалося скопіювати публічне посилання"
       },
       "copyInviteLink": "Скопіювати запрошення",
-      "copyInvitePrimary": "Скопіювати",
-      "openInviteShort": "Відкрити",
+      "copyInvitePrimary": "Скопіювати посилання",
+      "openInviteShort": "Відкрити сторінку",
       "withdrawInviteShort": "Відкликати"
     },
     "inviteStatus": {

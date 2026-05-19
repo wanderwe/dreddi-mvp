@@ -337,8 +337,8 @@
         "copyFailed": "Failed to copy public link"
       },
       "copyInviteLink": "Copy invite link",
-      "copyInvitePrimary": "Copy",
-      "openInviteShort": "Open",
+      "copyInvitePrimary": "Copy link",
+      "openInviteShort": "Open page",
       "withdrawInviteShort": "Withdraw"
     },
     "inviteStatus": {
