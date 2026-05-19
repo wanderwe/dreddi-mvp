@@ -1480,7 +1480,7 @@ export default function PromisePage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
                   {t("promises.detail.inviteTitle")}
                 </p>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
                   {canGenerateInvite ? (
                     <ActionButton
                       label={t("promises.detail.generate")}
@@ -1493,32 +1493,32 @@ export default function PromisePage() {
                     <>
                       <button
                         type="button"
-                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-3 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         disabled={inviteBusy !== null || !inviteLink}
                         onClick={copyInvite}
                       >
                         <Clipboard className="h-4 w-4" aria-hidden />
                       {t("promises.detail.copyInvitePrimary")}
                       </button>
-                      <Link href={`/p/invite/${p.invite_token}`} className={`${linkUtilityButtonClass} sm:w-auto`}>
+                      <Link href={`/p/invite/${p.invite_token}`} className={`${linkUtilityButtonClass} px-2.5 sm:w-auto`}>
                         <ExternalLink className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.openInvite")}
+                        {t("promises.detail.openInviteShort")}
                       </Link>
+                      {canWithdrawInvite && (
+                        <button
+                          type="button"
+                          className="inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
+                          disabled={inviteBusy !== null}
+                          onClick={cancelInvite}
+                        >
+                          {inviteBusy === "cancel"
+                            ? t("promises.detail.saving")
+                            : t("promises.detail.withdrawInviteShort")}
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
-                {!canGenerateInvite && canWithdrawInvite && (
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      type="button"
-                      className="inline-flex min-h-9 cursor-pointer items-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
-                      disabled={inviteBusy !== null}
-                      onClick={cancelInvite}
-                    >
-                      {inviteBusy === "cancel" ? t("promises.detail.saving") : t("promises.detail.withdrawInvite")}
-                    </button>
-                  </div>
-                )}
               </div>
             )}
           </section>
