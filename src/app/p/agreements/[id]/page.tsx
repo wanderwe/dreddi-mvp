@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -585,17 +586,33 @@ export default function PublicAgreementPage() {
                 ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-end justify-end gap-2 sm:max-w-[22rem]">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  title={copyState === "copied" ? t("publicAgreement.copied") : t("publicAgreement.copyLink")}
-                  aria-label={copyState === "copied" ? t("publicAgreement.copied") : t("publicAgreement.copyLink")}
-                  className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                <Tooltip
+                  label={
+                    copyState === "copied"
+                      ? t("publicAgreement.copied")
+                      : copyState === "error"
+                        ? t("publicAgreement.copyFailed")
+                        : t("publicAgreement.copyLink")
+                  }
+                  placement="top"
                 >
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
-                    {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    aria-label={
+                      copyState === "copied"
+                        ? t("publicAgreement.copied")
+                        : copyState === "error"
+                          ? t("publicAgreement.copyFailed")
+                          : t("publicAgreement.copyLink")
+                    }
+                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                  >
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
+                      {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                    </span>
+                  </button>
+                </Tooltip>
                 <button
                   type="button"
                   title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
