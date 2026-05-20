@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { removeAgreementFollower } from "@/lib/agreements/followers";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -128,6 +129,15 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
 
     if (upErr) {
       return NextResponse.json({ error: "Accept failed", detail: upErr.message }, { status: 500 });
+    }
+
+    const { error: followerRemoveError } = await removeAgreementFollower(admin, p.id, userId);
+    if (followerRemoveError) {
+      console.error("[invite.accept] failed to remove follower for participant", {
+        agreementId: p.id,
+        userId,
+        error: followerRemoveError.message,
+      });
     }
 
     await admin
