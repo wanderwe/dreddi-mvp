@@ -8,6 +8,20 @@ function env(name: string) {
   return value;
 }
 
+
+function resolveParticipantIds(agreement: {
+  creator_id: string;
+  counterparty_id: string | null;
+  promisor_id: string | null;
+  promisee_id: string | null;
+}) {
+  return new Set(
+    [agreement.creator_id, agreement.counterparty_id, agreement.promisor_id, agreement.promisee_id].filter(
+      (value): value is string => Boolean(value)
+    )
+  );
+}
+
 function adminClient() {
   return createClient(env("NEXT_PUBLIC_SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -22,12 +36,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   const { data: agreement } = await admin
     .from("promises")
-    .select("id")
+    .select("id,creator_id,counterparty_id,promisor_id,promisee_id")
     .eq("id", id)
     .eq("visibility", "public")
     .maybeSingle();
 
   if (!agreement) return NextResponse.json({ error: "Agreement not public" }, { status: 404 });
+
+  if (resolveParticipantIds(agreement).has(user.id)) {
+    return NextResponse.json({ error: "Participants cannot follow this agreement" }, { status: 403 });
+  }
 
   const { error } = await admin
     .from("agreement_followers")

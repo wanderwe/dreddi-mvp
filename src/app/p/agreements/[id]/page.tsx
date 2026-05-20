@@ -56,6 +56,7 @@ type PublicAgreementRow = {
   updates?: PublicAgreementUpdate[] | null;
   viewer_following?: boolean | null;
   followers_count?: number | null;
+  viewer_can_follow?: boolean | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -613,6 +614,7 @@ export default function PublicAgreementPage() {
                     </span>
                   </button>
                 </Tooltip>
+                {agreement.viewer_can_follow !== false ? (
                 <button
                   type="button"
                   title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
@@ -627,6 +629,7 @@ export default function PublicAgreementPage() {
                   {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                   <span>{followLabel}</span>
                 </button>
+                ) : null}
               </div>
             </div>
           </div>
