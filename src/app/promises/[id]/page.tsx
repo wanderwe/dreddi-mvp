@@ -1043,7 +1043,7 @@ export default function PromisePage() {
     shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
   );
   const hasLifecycleActions = Boolean(
-    hasStatusActions || canRecreateDeal || canSharePublicAgreement
+    hasStatusActions || canRecreateDeal
   );
   const linkUtilityButtonClass =
     "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
@@ -1386,7 +1386,7 @@ export default function PromisePage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
                     {t("promises.detail.statusActions")}
                   </p>
-                  {canSharePublicAgreement && (
+                  {canSharePublicAgreement && !isAwaitingInviteResponse && (
                     <div className="flex shrink-0 items-center gap-1.5">
                       <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="bottom-right">
                         <span>
@@ -1491,7 +1491,7 @@ export default function PromisePage() {
                     />
                   )}
 
-                  {canWithdrawInvite && (
+                  {canWithdrawInvite && !isAwaitingInviteResponse && (
                     <ActionButton
                       label={t("promises.detail.withdrawInvite")}
                       variant="danger"
@@ -1561,9 +1561,36 @@ export default function PromisePage() {
 
             {isAwaitingInviteResponse && (
               <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
-                  {t("promises.detail.inviteTitle")}
-                </p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
+                    {t("promises.detail.inviteTitle")}
+                  </p>
+                  {canSharePublicAgreement && (
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="bottom-right">
+                        <span>
+                          <IconButton
+                            icon={<Clipboard className="h-4 w-4" />}
+                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
+                            className="h-9 w-9 border-emerald-300/35 text-emerald-100 hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50"
+                            onClick={() => void copyPublicAgreementLink()}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip label={t("promises.detail.publicAgreementLink.open")} placement="bottom-right">
+                        <span>
+                          <Link
+                            href={publicAgreementPath!}
+                            aria-label={t("promises.detail.publicAgreementLink.open")}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300/35 text-emerald-100 transition hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                          >
+                            <ExternalLink className="h-4 w-4" aria-hidden />
+                          </Link>
+                        </span>
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
                   {canGenerateInvite ? (
                     <ActionButton
