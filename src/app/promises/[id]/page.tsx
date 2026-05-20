@@ -1042,7 +1042,6 @@ export default function PromisePage() {
   const isAwaitingInviteResponse = Boolean(
     shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
   );
-  const hasToolCards = Boolean(canSharePublicAgreement);
   const hasLifecycleActions = Boolean(
     hasStatusActions || canRecreateDeal
   );
@@ -1383,9 +1382,36 @@ export default function PromisePage() {
 
             {hasLifecycleActions && (
               <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
-                  {t("promises.detail.statusActions")}
-                </p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
+                    {t("promises.detail.statusActions")}
+                  </p>
+                  {canSharePublicAgreement && (
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="bottom-right">
+                        <span>
+                          <IconButton
+                            icon={<Clipboard className="h-4 w-4" />}
+                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
+                            className="h-9 w-9 border-emerald-300/35 text-emerald-100 hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50"
+                            onClick={() => void copyPublicAgreementLink()}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip label={t("promises.detail.publicAgreementLink.open")} placement="bottom-right">
+                        <span>
+                          <Link
+                            href={publicAgreementPath!}
+                            aria-label={t("promises.detail.publicAgreementLink.open")}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300/35 text-emerald-100 transition hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                          >
+                            <ExternalLink className="h-4 w-4" aria-hidden />
+                          </Link>
+                        </span>
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   {isExecutor && p.status === "active" && (
                     isInviteAccepted ? (
@@ -1580,47 +1606,6 @@ export default function PromisePage() {
               </div>
             )}
           </section>
-
-          {hasToolCards && (
-            <details className="group rounded-2xl border border-white/10 bg-neutral-900/30 p-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
-                <span>{t("promises.detail.toolsTitle")}</span>
-                <ChevronDown
-                  className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
-                  aria-hidden
-                />
-              </summary>
-              <div className="mt-4 space-y-3">
-                {canSharePublicAgreement && (
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-semibold text-white">
-                        {t("promises.detail.publicAgreementLink.title")}
-                      </p>
-                    </div>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => void copyPublicAgreementLink()}
-                        className={linkUtilityButtonClass}
-                      >
-                        <Clipboard className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.publicAgreementLink.copy")}
-                      </button>
-                      <Link
-                        href={publicAgreementPath!}
-                        className={linkUtilityButtonClass}
-                      >
-                        <ExternalLink className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.publicAgreementLink.open")}
-                      </Link>
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            </details>
-          )}
 
           <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4 lg:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
