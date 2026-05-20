@@ -501,7 +501,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   );
   const hasMorePublicDeals = activePromises.length > visiblePublicDealsByTab[activePublicDealsTab];
   const streakCount = useMemo(() => {
-    const finalizedDeals = [...promisesByTab.execution, ...promisesByTab.reaction]
+    const finalizedDeals = promisesByTab.execution
       .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
       .map((promise) => ({
         status: promise.status,
@@ -521,7 +521,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     }
 
     return currentStreak;
-  }, [promisesByTab.execution, promisesByTab.reaction]);
+  }, [promisesByTab.execution]);
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })

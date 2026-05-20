@@ -34,14 +34,14 @@ export const formatStreakLine = (count: number, locale: Locale) => {
       few: "угоди",
       many: "угод",
     });
-    const confirmationWord = pluralizeUk(count, {
-      one: "підтверджена",
-      few: "підтверджені",
-      many: "підтверджені",
+    const fulfillmentWord = pluralizeUk(count, {
+      one: "дотримана",
+      few: "дотримані",
+      many: "дотримані",
     });
 
-    return `${formattedCount} ${dealWord} поспіль ${confirmationWord} без спорів`;
+    return `${formattedCount} ${dealWord} поспіль ${fulfillmentWord} як виконавець`;
   }
 
-  return `${formattedCount} ${pluralizeEn(count, "deal", "deals")} in a row confirmed without disputes`;
+  return `${formattedCount} ${pluralizeEn(count, "agreement", "agreements")} fulfilled in a row as responsible side`;
 };

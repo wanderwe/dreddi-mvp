@@ -6,21 +6,21 @@ const cases = [0, 1, 2, 3, 4, 5, 11, 12, 14, 15, 21, 22, 25, 101, 111];
 
 test("formatStreakLine returns correct Ukrainian forms", () => {
   const expected = new Map<number, string>([
-    [0, "0 угод поспіль дотримані без спорів"],
-    [1, "1 угода поспіль дотримана без спорів"],
-    [2, "2 угоди поспіль дотримані без спорів"],
-    [3, "3 угоди поспіль дотримані без спорів"],
-    [4, "4 угоди поспіль дотримані без спорів"],
-    [5, "5 угод поспіль дотримані без спорів"],
-    [11, "11 угод поспіль дотримані без спорів"],
-    [12, "12 угод поспіль дотримані без спорів"],
-    [14, "14 угод поспіль дотримані без спорів"],
-    [15, "15 угод поспіль дотримані без спорів"],
-    [21, "21 угода поспіль дотримана без спорів"],
-    [22, "22 угоди поспіль дотримані без спорів"],
-    [25, "25 угод поспіль дотримані без спорів"],
-    [101, "101 угода поспіль дотримана без спорів"],
-    [111, "111 угод поспіль дотримані без спорів"],
+    [0, "0 угод поспіль дотримані як виконавець"],
+    [1, "1 угода поспіль дотримана як виконавець"],
+    [2, "2 угоди поспіль дотримані як виконавець"],
+    [3, "3 угоди поспіль дотримані як виконавець"],
+    [4, "4 угоди поспіль дотримані як виконавець"],
+    [5, "5 угод поспіль дотримані як виконавець"],
+    [11, "11 угод поспіль дотримані як виконавець"],
+    [12, "12 угод поспіль дотримані як виконавець"],
+    [14, "14 угод поспіль дотримані як виконавець"],
+    [15, "15 угод поспіль дотримані як виконавець"],
+    [21, "21 угода поспіль дотримана як виконавець"],
+    [22, "22 угоди поспіль дотримані як виконавець"],
+    [25, "25 угод поспіль дотримані як виконавець"],
+    [101, "101 угода поспіль дотримана як виконавець"],
+    [111, "111 угод поспіль дотримані як виконавець"],
   ]);
 
   for (const count of cases) {
@@ -30,21 +30,21 @@ test("formatStreakLine returns correct Ukrainian forms", () => {
 
 test("formatStreakLine returns correct English forms", () => {
   const expected = new Map<number, string>([
-    [0, "0 deals in a row fulfilled without disputes"],
-    [1, "1 deal in a row fulfilled without disputes"],
-    [2, "2 deals in a row fulfilled without disputes"],
-    [3, "3 deals in a row fulfilled without disputes"],
-    [4, "4 deals in a row fulfilled without disputes"],
-    [5, "5 deals in a row fulfilled without disputes"],
-    [11, "11 deals in a row fulfilled without disputes"],
-    [12, "12 deals in a row fulfilled without disputes"],
-    [14, "14 deals in a row fulfilled without disputes"],
-    [15, "15 deals in a row fulfilled without disputes"],
-    [21, "21 deals in a row fulfilled without disputes"],
-    [22, "22 deals in a row fulfilled without disputes"],
-    [25, "25 deals in a row fulfilled without disputes"],
-    [101, "101 deals in a row fulfilled without disputes"],
-    [111, "111 deals in a row fulfilled without disputes"],
+    [0, "0 agreements fulfilled in a row as responsible side"],
+    [1, "1 agreement fulfilled in a row as responsible side"],
+    [2, "2 agreements fulfilled in a row as responsible side"],
+    [3, "3 agreements fulfilled in a row as responsible side"],
+    [4, "4 agreements fulfilled in a row as responsible side"],
+    [5, "5 agreements fulfilled in a row as responsible side"],
+    [11, "11 agreements fulfilled in a row as responsible side"],
+    [12, "12 agreements fulfilled in a row as responsible side"],
+    [14, "14 agreements fulfilled in a row as responsible side"],
+    [15, "15 agreements fulfilled in a row as responsible side"],
+    [21, "21 agreements fulfilled in a row as responsible side"],
+    [22, "22 agreements fulfilled in a row as responsible side"],
+    [25, "25 agreements fulfilled in a row as responsible side"],
+    [101, "101 agreements fulfilled in a row as responsible side"],
+    [111, "111 agreements fulfilled in a row as responsible side"],
   ]);
 
   for (const count of cases) {

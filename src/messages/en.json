@@ -786,8 +786,8 @@
     },
     "streak": {
       "title": "Streak: {count}",
-      "zero": "Start confirming deals in a row to launch your streak",
-      "nonZero": "{count} deals in a row fulfilled without disputes"
+      "zero": "Start fulfilling agreements in a row as responsible side to launch your streak",
+      "nonZero": "{count} agreements fulfilled in a row as responsible side"
     },
     "copyEmbedCode": "Copy embed code",
     "embed": {
