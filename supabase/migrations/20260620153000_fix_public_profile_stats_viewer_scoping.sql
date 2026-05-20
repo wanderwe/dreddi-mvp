@@ -1,6 +1,7 @@
 -- Fix public profile stats to be owner-scoped and viewer-independent.
 -- Root cause: security_invoker + reading promises caused RLS to scope aggregates to auth.uid().
--- This view computes metrics from public-visible deals only and runs with definer semantics.
+-- This view computes aggregate metrics from all finalized reputation-bearing deals
+-- (public + private) and runs with definer semantics.
 
 DROP VIEW IF EXISTS public.public_profile_stats;
 
@@ -45,7 +46,6 @@ WITH profile_promises AS (
       OR p.counterparty_accepted_at IS NOT NULL
     ) AS is_accepted
   FROM public.promises p
-  WHERE p.visibility = 'public'
 ),
 stats AS (
   SELECT

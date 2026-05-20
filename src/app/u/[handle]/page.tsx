@@ -849,6 +849,9 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
                 </div>
               </div>
+              {!isEmbed ? (
+                <p className="mt-3 text-xs text-white/55">{t("publicProfile.privacyNote.metrics")}</p>
+              ) : null}
               {streakCount > 0 ? (
                 <div className="mt-4">
                   <div className="flex items-baseline gap-2">
@@ -1101,6 +1104,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
+              <p className="mb-5 text-xs text-white/55">{t("publicProfile.privacyNote.publicDeals")}</p>
               <div className="mb-5 flex gap-2">
                 <button
                   type="button"
