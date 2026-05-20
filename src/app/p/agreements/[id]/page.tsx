@@ -588,17 +588,12 @@ export default function PublicAgreementPage() {
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-transparent px-4 py-2 text-sm font-semibold leading-none text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                  title={copyState === "copied" ? t("publicAgreement.copied") : t("publicAgreement.copyLink")}
+                  aria-label={copyState === "copied" ? t("publicAgreement.copied") : t("publicAgreement.copyLink")}
+                  className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
                 >
                   <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
                     {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                  </span>
-                  <span className="leading-none">
-                    {copyState === "copied"
-                      ? t("publicAgreement.copied")
-                      : copyState === "error"
-                        ? t("publicAgreement.copyFailed")
-                        : t("publicAgreement.copyLink")}
                   </span>
                 </button>
                 <button
@@ -606,7 +601,7 @@ export default function PublicAgreementPage() {
                   title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
                   onClick={handleToggleFollow}
                   className={[
-                    "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                    "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
                     agreement.viewer_following
                       ? "border border-white/15 bg-white/[0.045] text-white/70 hover:border-white/25 hover:bg-white/[0.07] hover:text-white/82"
                       : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
