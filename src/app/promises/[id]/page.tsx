@@ -1351,11 +1351,6 @@ export default function PromisePage() {
                   <p className="mt-1 truncate text-sm font-medium text-white">{inviteMetaText}</p>
                 </div>
               </div>
-              {p.counterparty_contact && (
-                <p className="mt-3 text-xs leading-5 text-white/50">
-                  {t("promises.detail.counterparty")}: <span className="text-white/75">{p.counterparty_contact}</span>
-                </p>
-              )}
             </div>
 
             {hasLifecycleActions && (
