@@ -1043,7 +1043,7 @@ export default function PromisePage() {
     shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
   );
   const hasLifecycleActions = Boolean(
-    hasStatusActions || canRecreateDeal
+    hasStatusActions || canRecreateDeal || canSharePublicAgreement
   );
   const linkUtilityButtonClass =
     "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
