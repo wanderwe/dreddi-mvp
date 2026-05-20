@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Check, Clipboard, Eye, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -54,6 +54,7 @@ type PublicAgreementRow = {
   updates_available?: boolean | null;
   updates?: PublicAgreementUpdate[] | null;
   viewer_following?: boolean | null;
+  followers_count?: number | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -479,7 +480,7 @@ export default function PublicAgreementPage() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (response.ok) {
-        setAgreement((cur) => (cur ? { ...cur, viewer_following: true } : cur));
+        setAgreement((cur) => (cur ? { ...cur, viewer_following: true, followers_count: (cur.followers_count ?? 0) + 1 } : cur));
         const url = new URL(window.location.href);
         url.searchParams.delete("follow");
         window.history.replaceState({}, "", url.toString());
@@ -506,7 +507,7 @@ export default function PublicAgreementPage() {
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
     if (response.ok) {
-      setAgreement((cur) => (cur ? { ...cur, viewer_following: !following } : cur));
+      setAgreement((cur) => (cur ? { ...cur, viewer_following: !following, followers_count: Math.max(0, (cur.followers_count ?? 0) + (following ? -1 : 1)) } : cur));
       setFollowState("idle");
       return;
     }
@@ -577,29 +578,41 @@ export default function PublicAgreementPage() {
                   </p>
                 ) : null}
               </div>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-transparent px-4 py-2 text-sm font-semibold leading-none text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
-              >
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
-                  {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                </span>
-                <span className="leading-none">
-                  {copyState === "copied"
-                    ? t("publicAgreement.copied")
-                    : copyState === "error"
-                      ? t("publicAgreement.copyFailed")
-                      : t("publicAgreement.copyLink")}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={handleToggleFollow}
-                className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-emerald-300/35 bg-emerald-300/10 px-4 py-2 text-sm font-semibold leading-none text-emerald-50 transition hover:border-emerald-300/60"
-              >
-                {agreement.viewer_following ? t("publicAgreement.following") : t("publicAgreement.follow")}
-              </button>
+              <div className="flex shrink-0 flex-wrap items-end justify-end gap-2 sm:max-w-[22rem]">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-transparent px-4 py-2 text-sm font-semibold leading-none text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                >
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
+                    {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                  </span>
+                  <span className="leading-none">
+                    {copyState === "copied"
+                      ? t("publicAgreement.copied")
+                      : copyState === "error"
+                        ? t("publicAgreement.copyFailed")
+                        : t("publicAgreement.copyLink")}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
+                  onClick={handleToggleFollow}
+                  className={[
+                    "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold leading-none transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                    agreement.viewer_following
+                      ? "border border-white/15 bg-white/[0.045] text-white/70 hover:border-white/25 hover:bg-white/[0.07] hover:text-white/82"
+                      : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
+                  ].join(" ")}
+                >
+                  {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                  <span>{agreement.viewer_following ? t("publicAgreement.following") : t("publicAgreement.follow")}</span>
+                </button>
+                <p className="w-full pr-1 text-right text-xs text-white/55">
+                  {t("publicAgreement.followersCount", { count: String(agreement.followers_count ?? 0) })}
+                </p>
+              </div>
             </div>
           </div>
 

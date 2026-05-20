@@ -103,7 +103,8 @@ function serializePublicAgreement(
   updates: AgreementUpdateRecord[],
   viewerCanUpdate: boolean,
   updatesAvailable = true,
-  viewerFollowing = false
+  viewerFollowing = false,
+  followersCount = 0
 ) {
   const responsibleId = resolveExecutorId(promise);
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
@@ -147,6 +148,7 @@ function serializePublicAgreement(
     viewer_can_update: viewerCanUpdate,
     updates_available: updatesAvailable,
     viewer_following: viewerFollowing,
+    followers_count: followersCount,
     updates: updates.map((update) => {
       const author = profilesById.get(update.author_id) ?? null;
       return {
@@ -239,6 +241,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       viewerFollowing = Boolean(follow?.id);
     }
 
+    const { count: followersCount } = await admin
+      .from("agreement_followers")
+      .select("id", { count: "exact", head: true })
+      .eq("agreement_id", promise.id);
+
     return NextResponse.json(
       serializePublicAgreement(
         promise,
@@ -246,7 +253,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         publicUpdates ?? [],
         canUserPostUpdate(promise, user?.id ?? null),
         !updatesUnavailable,
-        viewerFollowing
+        viewerFollowing,
+        followersCount ?? 0
       )
     );
   } catch (error) {
