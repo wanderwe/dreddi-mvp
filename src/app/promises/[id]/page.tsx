@@ -1149,8 +1149,65 @@ export default function PromisePage() {
     };
   }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
+  const historyPanelContent = (
+    <div className="mt-4 space-y-3">
+      <div className="grid gap-2 sm:grid-cols-5 lg:grid-cols-1">
+        {lifecycleStates.map((state, index) => (
+          <div
+            key={state.key}
+            className={[
+              "rounded-xl border px-3 py-2 text-xs transition",
+              state.current && state.disputed
+                ? "border-rose-300/35 bg-rose-300/10 text-rose-50"
+                : state.complete
+                  ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
+                  : state.current
+                    ? "border-amber-300/35 bg-amber-300/10 text-amber-50"
+                    : "border-white/10 bg-black/15 text-white/35",
+            ].join(" ")}
+          >
+            <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/25 text-[10px]">
+              {state.complete ? "✓" : index + 1}
+            </span>
+            {state.label}
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {timeline.map((item) => (
+          <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
+            <span
+              className={[
+                "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                item.tone === "success"
+                  ? "bg-emerald-300"
+                  : item.tone === "danger"
+                    ? "bg-rose-300"
+                    : item.tone === "attention"
+                      ? "bg-amber-300"
+                      : "bg-white/45",
+              ].join(" ")}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between lg:flex-col lg:gap-0.5">
+                <div>
+                  <p className="text-sm font-medium text-white">{item.label}</p>
+                  <p className="mt-0.5 text-xs text-white/50">{item.actor}</p>
+                </div>
+                <time className="text-xs text-white/45" dateTime={item.timestamp}>
+                  {formatTimestamp(item.timestamp, locale)}
+                </time>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-8 sm:px-6 sm:py-10">
       <Link
         href={backLink.href}
         className="inline-flex text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -1177,7 +1234,8 @@ export default function PromisePage() {
       )}
 
       {p ? (
-        <>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
+          <div className="space-y-5">
           <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/25 backdrop-blur sm:p-7">
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
@@ -1564,7 +1622,7 @@ export default function PromisePage() {
             </details>
           )}
 
-          <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
+          <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4 lg:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
               <span>{t("promises.detail.historyTitle")}</span>
               <ChevronDown
@@ -1572,62 +1630,17 @@ export default function PromisePage() {
                 aria-hidden
               />
             </summary>
-            <div className="mt-4 space-y-4">
-              <div className="grid gap-2 sm:grid-cols-5">
-                {lifecycleStates.map((state, index) => (
-                  <div
-                    key={state.key}
-                    className={[
-                      "rounded-xl border px-3 py-2 text-xs transition",
-                      state.current && state.disputed
-                        ? "border-rose-300/35 bg-rose-300/10 text-rose-50"
-                        : state.complete
-                          ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
-                          : state.current
-                            ? "border-amber-300/35 bg-amber-300/10 text-amber-50"
-                            : "border-white/10 bg-black/15 text-white/35",
-                    ].join(" ")}
-                  >
-                    <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/25 text-[10px]">
-                      {state.complete ? "✓" : index + 1}
-                    </span>
-                    {state.label}
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2">
-                {timeline.map((item) => (
-                  <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
-                    <span
-                      className={[
-                        "mt-1.5 h-2 w-2 shrink-0 rounded-full",
-                        item.tone === "success"
-                          ? "bg-emerald-300"
-                          : item.tone === "danger"
-                            ? "bg-rose-300"
-                            : item.tone === "attention"
-                              ? "bg-amber-300"
-                              : "bg-white/45",
-                      ].join(" ")}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-white">{item.label}</p>
-                          <p className="mt-0.5 text-xs text-white/50">{item.actor}</p>
-                        </div>
-                        <time className="text-xs text-white/45" dateTime={item.timestamp}>
-                          {formatTimestamp(item.timestamp, locale)}
-                        </time>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {historyPanelContent}
           </details>
-        </>
+          </div>
+
+          <aside className="hidden lg:block lg:sticky lg:top-6">
+            <section className="rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
+              <h2 className="text-sm font-medium text-white">{t("promises.detail.historyTitle")}</h2>
+              {historyPanelContent}
+            </section>
+          </aside>
+        </div>
       ) : !error ? (
         <div className="text-neutral-400">{t("promises.detail.loading")}</div>
       ) : null}
