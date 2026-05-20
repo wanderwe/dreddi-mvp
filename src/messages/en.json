@@ -1071,6 +1071,8 @@
       "saving": "Publishing…",
       "error": "Could not publish this update. Only agreement participants can add official updates.",
       "unavailable": "Updates are temporarily unavailable until the latest database migration is applied"
-    }
+    },
+    "follow": "Follow agreement",
+    "following": "Following"
   }
 }

@@ -3,7 +3,7 @@
 import { Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDueDate } from "@/lib/formatDueDate";
@@ -53,6 +53,7 @@ type PublicAgreementRow = {
   viewer_can_update?: boolean | null;
   updates_available?: boolean | null;
   updates?: PublicAgreementUpdate[] | null;
+  viewer_following?: boolean | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -311,6 +312,8 @@ export default function PublicAgreementPage() {
   const [updateContent, setUpdateContent] = useState("");
   const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false);
   const [updateSubmitState, setUpdateSubmitState] = useState<"idle" | "saving" | "error">("idle");
+  const [followState, setFollowState] = useState<"idle" | "saving" | "error">("idle");
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     let active = true;
@@ -461,6 +464,55 @@ export default function PublicAgreementPage() {
     }
   };
 
+
+
+  useEffect(() => {
+    const shouldAutoFollow = searchParams.get("follow") === "1";
+    if (!agreement?.id || !shouldAutoFollow || agreement.viewer_following) return;
+
+    const run = async () => {
+      if (!supabaseOptional) return;
+      const session = (await supabaseOptional.auth.getSession()).data.session;
+      if (!session?.access_token) return;
+      const response = await fetch(`/api/public/agreements/${encodeURIComponent(agreement.id)}/follow`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (response.ok) {
+        setAgreement((cur) => (cur ? { ...cur, viewer_following: true } : cur));
+        const url = new URL(window.location.href);
+        url.searchParams.delete("follow");
+        window.history.replaceState({}, "", url.toString());
+      }
+    };
+
+    void run();
+  }, [agreement?.id, agreement?.viewer_following, searchParams]);
+
+  const handleToggleFollow = async () => {
+    if (!agreement || followState === "saving") return;
+    if (!supabaseOptional) return;
+    const session = (await supabaseOptional.auth.getSession()).data.session;
+    if (!session?.access_token) {
+      const nextPath = `${window.location.pathname}${window.location.search || ""}`;
+      window.location.assign(localizePath(`/login?next=${encodeURIComponent(nextPath + (nextPath.includes("?") ? "&" : "?") + "follow=1")}`, locale));
+      return;
+    }
+
+    setFollowState("saving");
+    const following = Boolean(agreement.viewer_following);
+    const response = await fetch(`/api/public/agreements/${encodeURIComponent(agreement.id)}/follow`, {
+      method: following ? "DELETE" : "POST",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    if (response.ok) {
+      setAgreement((cur) => (cur ? { ...cur, viewer_following: !following } : cur));
+      setFollowState("idle");
+      return;
+    }
+    setFollowState("error");
+  };
+
   const handleCopy = async () => {
     const url = publicUrl || window.location.href;
     try {
@@ -540,6 +592,13 @@ export default function PublicAgreementPage() {
                       ? t("publicAgreement.copyFailed")
                       : t("publicAgreement.copyLink")}
                 </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleToggleFollow}
+                className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-emerald-300/35 bg-emerald-300/10 px-4 py-2 text-sm font-semibold leading-none text-emerald-50 transition hover:border-emerald-300/60"
+              >
+                {agreement.viewer_following ? t("publicAgreement.following") : t("publicAgreement.follow")}
               </button>
             </div>
           </div>
