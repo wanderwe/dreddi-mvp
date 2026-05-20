@@ -1258,10 +1258,35 @@ export default function PromisePage() {
                   </Tooltip>
                 )}
                 {p.visibility === "public" && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
-                    <Eye className="h-3.5 w-3.5" aria-hidden />
-                    {t("promises.detail.publicStatus.public")}
-                  </span>
+                  <>
+                    {publicAgreementPath ? (
+                      <Link
+                        href={publicAgreementPath}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                      >
+                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        {t("promises.detail.publicStatus.public")}
+                        <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
+                      </Link>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
+                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        {t("promises.detail.publicStatus.public")}
+                      </span>
+                    )}
+                    {canSharePublicAgreement && (
+                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="top">
+                        <span>
+                          <IconButton
+                            icon={<Clipboard className="h-3.5 w-3.5" />}
+                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
+                            className="h-8 w-8 border-amber-300/30 text-amber-100 hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50"
+                            onClick={() => void copyPublicAgreementLink()}
+                          />
+                        </span>
+                      </Tooltip>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -1386,31 +1411,6 @@ export default function PromisePage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
                     {t("promises.detail.statusActions")}
                   </p>
-                  {canSharePublicAgreement && !isAwaitingInviteResponse && (
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="bottom-right">
-                        <span>
-                          <IconButton
-                            icon={<Clipboard className="h-4 w-4" />}
-                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
-                            className="h-9 w-9 border-emerald-300/35 text-emerald-100 hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50"
-                            onClick={() => void copyPublicAgreementLink()}
-                          />
-                        </span>
-                      </Tooltip>
-                      <Tooltip label={t("promises.detail.publicAgreementLink.open")} placement="bottom-right">
-                        <span>
-                          <Link
-                            href={publicAgreementPath!}
-                            aria-label={t("promises.detail.publicAgreementLink.open")}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300/35 text-emerald-100 transition hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                          >
-                            <ExternalLink className="h-4 w-4" aria-hidden />
-                          </Link>
-                        </span>
-                      </Tooltip>
-                    </div>
-                  )}
                 </div>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   {isExecutor && p.status === "active" && (
@@ -1561,36 +1561,9 @@ export default function PromisePage() {
 
             {isAwaitingInviteResponse && (
               <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
-                    {t("promises.detail.inviteTitle")}
-                  </p>
-                  {canSharePublicAgreement && (
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="bottom-right">
-                        <span>
-                          <IconButton
-                            icon={<Clipboard className="h-4 w-4" />}
-                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
-                            className="h-9 w-9 border-emerald-300/35 text-emerald-100 hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50"
-                            onClick={() => void copyPublicAgreementLink()}
-                          />
-                        </span>
-                      </Tooltip>
-                      <Tooltip label={t("promises.detail.publicAgreementLink.open")} placement="bottom-right">
-                        <span>
-                          <Link
-                            href={publicAgreementPath!}
-                            aria-label={t("promises.detail.publicAgreementLink.open")}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-300/35 text-emerald-100 transition hover:border-emerald-300/55 hover:bg-emerald-300/15 hover:text-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                          >
-                            <ExternalLink className="h-4 w-4" aria-hidden />
-                          </Link>
-                        </span>
-                      </Tooltip>
-                    </div>
-                  )}
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
+                  {t("promises.detail.inviteTitle")}
+                </p>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
                   {canGenerateInvite ? (
                     <ActionButton
