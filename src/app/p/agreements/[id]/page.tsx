@@ -420,6 +420,12 @@ export default function PublicAgreementPage() {
   );
   const remainingUpdateChars = 500 - updateContent.length;
 
+  const followersCount = Math.max(0, agreement?.followers_count ?? 0);
+  const shouldShowFollowersCount = followersCount > 0;
+  const followLabel = agreement?.viewer_following
+    ? `${t("publicAgreement.following")}${shouldShowFollowersCount ? ` · ${followersCount}` : ""}`
+    : `${t("publicAgreement.follow")}${shouldShowFollowersCount ? ` · ${followersCount}` : ""}`;
+
   const handleSubmitUpdate = async () => {
     if (!agreement || !canAddUpdate || updateSubmitState === "saving") return;
 
@@ -607,11 +613,8 @@ export default function PublicAgreementPage() {
                   ].join(" ")}
                 >
                   {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
-                  <span>{agreement.viewer_following ? t("publicAgreement.following") : t("publicAgreement.follow")}</span>
+                  <span>{followLabel}</span>
                 </button>
-                <p className="w-full pr-1 text-right text-xs text-white/55">
-                  {t("publicAgreement.followersCount", { count: String(agreement.followers_count ?? 0) })}
-                </p>
               </div>
             </div>
           </div>
