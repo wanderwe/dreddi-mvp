@@ -1025,6 +1025,7 @@
       "title": "Participants",
       "createdBy": "Created by",
       "acceptedBy": "Responsible side",
+      "acceptedByCounterparty": "Agreement accepted by",
       "creatorFallback": "Agreement creator",
       "counterpartyFallback": "Responsible side"
     },

@@ -44,6 +44,9 @@ type PublicAgreementRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  creator_id?: string | null;
+  responsible_side_id?: string | null;
+  counterparty_id?: string | null;
   creator_display_name: string | null;
   creator_handle: string | null;
   creator_is_public_profile?: boolean | null;
@@ -51,6 +54,9 @@ type PublicAgreementRow = {
   counterparty_handle: string | null;
   counterparty_is_public_profile?: boolean | null;
   counterparty_contact: string | null;
+  accepted_by_display_name?: string | null;
+  accepted_by_handle?: string | null;
+  accepted_by_is_public_profile?: boolean | null;
   viewer_can_update?: boolean | null;
   updates_available?: boolean | null;
   updates?: PublicAgreementUpdate[] | null;
@@ -132,6 +138,18 @@ function displayCounterpartyName(row: PublicAgreement, fallback: string) {
   return fallback;
 }
 
+
+function displayAcceptedByName(row: PublicAgreement, fallback: string) {
+  const profileName = displayProfileName(
+    row.accepted_by_display_name ?? null,
+    row.accepted_by_handle ?? null,
+    ""
+  );
+  if (profileName) return profileName;
+  const contact = row.counterparty_contact?.trim();
+  if (contact && !isLikelyPrivateEmail(contact)) return contact;
+  return fallback;
+}
 function getPublicProfileHref(
   handle: string | null,
   isPublicProfile: boolean | null | undefined,
@@ -390,12 +408,23 @@ export default function PublicAgreementPage() {
   const counterpartyName = agreement
     ? displayCounterpartyName(agreement, t("publicAgreement.participants.counterpartyFallback"))
     : "";
+  const acceptedByName = agreement
+    ? displayAcceptedByName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+    : "";
+  const isSelfResponsible = Boolean(
+    agreement?.creator_id &&
+      agreement?.responsible_side_id &&
+      agreement.creator_id === agreement.responsible_side_id
+  );
 
   const creatorHref = agreement
     ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
     : null;
   const counterpartyHref = agreement
     ? getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale)
+    : null;
+  const acceptedByHref = agreement
+    ? getPublicProfileHref(agreement.accepted_by_handle ?? null, agreement.accepted_by_is_public_profile, locale)
     : null;
 
   const timeline = agreement
@@ -661,9 +690,9 @@ export default function PublicAgreementPage() {
                 />
                 <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
                 <ParticipantCard
-                  label={t("publicAgreement.participants.acceptedBy")}
-                  name={counterpartyName}
-                  href={counterpartyHref}
+                  label={t(isSelfResponsible ? "publicAgreement.participants.acceptedByCounterparty" : "publicAgreement.participants.acceptedBy")}
+                  name={isSelfResponsible ? acceptedByName : counterpartyName}
+                  href={isSelfResponsible ? acceptedByHref : counterpartyHref}
                 />
               </div>
             </div>

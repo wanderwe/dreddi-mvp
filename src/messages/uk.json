@@ -1055,6 +1055,7 @@
       "title": "Учасники",
       "createdBy": "Створив/-ла",
       "acceptedBy": "Відповідальна сторона",
+      "acceptedByCounterparty": "Домовленість прийняв",
       "creatorFallback": "Автор угоди",
       "counterpartyFallback": "Відповідальна сторона"
     },

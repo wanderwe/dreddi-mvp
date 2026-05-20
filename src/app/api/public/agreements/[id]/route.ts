@@ -122,6 +122,7 @@ function serializePublicAgreement(
   const responsibleId = resolveExecutorId(promise);
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
   const responsibleProfile = responsibleId ? profilesById.get(responsibleId) ?? null : null;
+  const acceptedByProfile = promise.counterparty_id ? profilesById.get(promise.counterparty_id) ?? null : null;
   const counterpartyContact = promise.counterparty_contact?.trim() ?? "";
   const canUseCounterpartyContact = responsibleId === promise.counterparty_id;
   const publicCounterpartyContact =
@@ -151,12 +152,18 @@ function serializePublicAgreement(
     ignored_at: promise.ignored_at,
     expires_at: promise.expires_at,
     cancelled_at: promise.cancelled_at,
+    creator_id: promise.creator_id,
+    responsible_side_id: responsibleId,
+    counterparty_id: promise.counterparty_id,
     creator_display_name: creatorProfile?.display_name ?? null,
     creator_handle: creatorProfile?.is_public_profile ? creatorProfile.handle : null,
     creator_is_public_profile: creatorProfile?.is_public_profile ?? false,
     counterparty_display_name: responsibleProfile?.display_name ?? null,
     counterparty_handle: responsibleProfile?.is_public_profile ? responsibleProfile.handle : null,
     counterparty_is_public_profile: responsibleProfile?.is_public_profile ?? false,
+    accepted_by_display_name: acceptedByProfile?.display_name ?? null,
+    accepted_by_handle: acceptedByProfile?.is_public_profile ? acceptedByProfile.handle : null,
+    accepted_by_is_public_profile: acceptedByProfile?.is_public_profile ?? false,
     counterparty_contact: publicCounterpartyContact,
     viewer_can_update: viewerCanUpdate,
     updates_available: updatesAvailable,
