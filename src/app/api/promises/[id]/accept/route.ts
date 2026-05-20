@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
+import { removeAgreementFollower } from "@/lib/agreements/followers";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { getAdminClient, loadPromiseForUser } from "../common";
 
@@ -69,6 +70,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         { error: "Accept failed", detail: updateError.message },
         { status: 500 }
       );
+    }
+
+    const { error: followerRemoveError } = await removeAgreementFollower(admin, id, user.id);
+    if (followerRemoveError) {
+      console.error("[promises.accept] failed to remove follower for participant", {
+        agreementId: id,
+        userId: user.id,
+        error: followerRemoveError.message,
+      });
     }
 
     await admin

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
+import { getAgreementParticipantIds } from "@/lib/agreements/followers";
 
 function env(name: string) {
   const value = process.env[name];
@@ -8,19 +9,6 @@ function env(name: string) {
   return value;
 }
 
-
-function resolveParticipantIds(agreement: {
-  creator_id: string;
-  counterparty_id: string | null;
-  promisor_id: string | null;
-  promisee_id: string | null;
-}) {
-  return new Set(
-    [agreement.creator_id, agreement.counterparty_id, agreement.promisor_id, agreement.promisee_id].filter(
-      (value): value is string => Boolean(value)
-    )
-  );
-}
 
 function adminClient() {
   return createClient(env("NEXT_PUBLIC_SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"), {
@@ -43,7 +31,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   if (!agreement) return NextResponse.json({ error: "Agreement not public" }, { status: 404 });
 
-  if (resolveParticipantIds(agreement).has(user.id)) {
+  if (getAgreementParticipantIds(agreement).has(user.id)) {
     return NextResponse.json({ error: "Participants cannot follow this agreement" }, { status: 403 });
   }
 
