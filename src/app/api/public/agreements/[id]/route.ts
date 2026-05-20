@@ -91,6 +91,18 @@ async function getOptionalUser(req: Request): Promise<User | null> {
   }
 }
 
+function getParticipantIds(promise: PromisePublicAgreementRecord) {
+  return new Set(
+    [
+      promise.creator_id,
+      promise.counterparty_id,
+      promise.promisor_id,
+      promise.promisee_id,
+      resolveExecutorId(promise),
+    ].filter((value): value is string => Boolean(value))
+  );
+}
+
 function canUserPostUpdate(promise: PromisePublicAgreementRecord, userId: string | null) {
   if (!userId) return false;
   const executorId = resolveExecutorId(promise);
@@ -102,7 +114,10 @@ function serializePublicAgreement(
   profilesById: Map<string, PublicProfileRecord>,
   updates: AgreementUpdateRecord[],
   viewerCanUpdate: boolean,
-  updatesAvailable = true
+  updatesAvailable = true,
+  viewerFollowing = false,
+  followersCount = 0,
+  viewerCanFollow = true
 ) {
   const responsibleId = resolveExecutorId(promise);
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
@@ -145,6 +160,9 @@ function serializePublicAgreement(
     counterparty_contact: publicCounterpartyContact,
     viewer_can_update: viewerCanUpdate,
     updates_available: updatesAvailable,
+    viewer_following: viewerFollowing,
+    followers_count: followersCount,
+    viewer_can_follow: viewerCanFollow,
     updates: updates.map((update) => {
       const author = profilesById.get(update.author_id) ?? null;
       return {
@@ -225,14 +243,43 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       }
     }
 
+    const participantIds = getParticipantIds(promise);
+    const participantIdList = Array.from(participantIds);
+
     const user = await getOptionalUser(req);
+    const viewerIsParticipant = Boolean(user?.id && participantIds.has(user.id));
+    let viewerFollowing = false;
+    if (user?.id) {
+      const { data: follow } = await admin
+        .from("agreement_followers")
+        .select("id")
+        .eq("agreement_id", promise.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      viewerFollowing = Boolean(follow?.id) && !viewerIsParticipant;
+    }
+
+    let followerCountQuery = admin
+      .from("agreement_followers")
+      .select("id", { count: "exact", head: true })
+      .eq("agreement_id", promise.id);
+
+    if (participantIdList.length > 0) {
+      followerCountQuery = followerCountQuery.not("user_id", "in", `(${participantIdList.join(",")})`);
+    }
+
+    const { count: followersCount } = await followerCountQuery;
+
     return NextResponse.json(
       serializePublicAgreement(
         promise,
         profilesById,
         publicUpdates ?? [],
         canUserPostUpdate(promise, user?.id ?? null),
-        !updatesUnavailable
+        !updatesUnavailable,
+        viewerFollowing,
+        followersCount ?? 0,
+        !viewerIsParticipant
       )
     );
   } catch (error) {
