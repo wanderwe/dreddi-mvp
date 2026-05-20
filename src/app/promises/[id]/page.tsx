@@ -701,12 +701,6 @@ export default function PromisePage() {
     return localizePath(`/p/agreements/${id}`, locale);
   }, [id, locale]);
 
-  const publicAgreementLink = useMemo(() => {
-    if (!publicAgreementPath) return null;
-    if (appUrl) return `${appUrl}${publicAgreementPath}`;
-    if (typeof window === "undefined") return null;
-    return `${window.location.origin}${publicAgreementPath}`;
-  }, [appUrl, publicAgreementPath]);
 
   useEffect(() => {
     return () => {
@@ -826,34 +820,6 @@ export default function PromisePage() {
     setToast(t("promises.detail.linkCopy.copyFailed"));
   }
 
-  async function copyPublicAgreementLink() {
-    if (!publicAgreementLink) {
-      setToastTone("error");
-      setToast(t("promises.detail.publicAgreementLink.copyFailed"));
-      return;
-    }
-
-    let didCopy = false;
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(publicAgreementLink);
-        didCopy = true;
-      } else {
-        didCopy = fallbackCopy(publicAgreementLink);
-      }
-    } catch {
-      didCopy = fallbackCopy(publicAgreementLink);
-    }
-
-    if (didCopy) {
-      setToastTone("success");
-      setToast(t("promises.detail.publicAgreementLink.copied"));
-      return;
-    }
-
-    setToastTone("error");
-    setToast(t("promises.detail.publicAgreementLink.copyFailed"));
-  }
 
   async function copyInvite() {
     if (!inviteLink || !canManageInvite || isInviteAccepted || isFinal) return;
@@ -1034,7 +1000,6 @@ export default function PromisePage() {
       (canRespondToInvite && p?.status === "active")
   );
   const showPublicStatus = p?.visibility === "public";
-  const canSharePublicAgreement = Boolean(showPublicStatus && publicAgreementPath && publicAgreementLink);
   const canGenerateInvite = Boolean(shouldShowInviteBlock && !p?.invite_token);
   const canWithdrawInvite = Boolean(
     isCreator && inviteStatus === "awaiting_acceptance" && shouldShowInviteBlock && p?.invite_token
@@ -1273,18 +1238,6 @@ export default function PromisePage() {
                         <Eye className="h-3.5 w-3.5" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                       </span>
-                    )}
-                    {canSharePublicAgreement && (
-                      <Tooltip label={t("promises.detail.publicAgreementLink.copy")} placement="top">
-                        <span>
-                          <IconButton
-                            icon={<Clipboard className="h-3.5 w-3.5" />}
-                            ariaLabel={t("promises.detail.publicAgreementLink.copy")}
-                            className="h-8 w-8 border-amber-300/30 text-amber-100 hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50"
-                            onClick={() => void copyPublicAgreementLink()}
-                          />
-                        </span>
-                      </Tooltip>
                     )}
                   </>
                 )}
