@@ -671,8 +671,7 @@
       "lastActivityEmpty": "No activity yet"
     },
     "privacyNote": {
-      "metrics": "Metrics include all finalized agreements. Private agreement details are not shown.",
-      "publicDeals": "The list below shows only public agreements."
+      "metrics": "Metrics include all finalized agreements. Private agreement details are not shown."
     },
     "reputationDetails": {
       "title": "Reputation details",
