@@ -22,9 +22,7 @@ export type NotificationType =
 
 export const normalizeNotificationType = (type: NotificationType): NotificationType => {
   if (type === "manual_reminder") return "reminder_manual";
-  if (type === "deadline_passed" || type === "reminder_due_24h" || type === "reminder_overdue") {
-    return "reminder_deadline";
-  }
+  if (type === "reminder_deadline") return "deadline_passed";
   return type;
 };
 
