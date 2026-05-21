@@ -65,10 +65,12 @@ export default async function LocalizedLayout({
 
   return (
     <I18nProvider locale={locale} messages={messages}>
-      <DocumentLanguageSync locale={locale} />
-      <AppHeader />
-      {children}
-      <AppFooter />
+      <div className="flex min-h-screen flex-col">
+        <DocumentLanguageSync locale={locale} />
+        <AppHeader />
+        <div className="flex-1">{children}</div>
+        <AppFooter />
+      </div>
     </I18nProvider>
   );
 }

@@ -62,7 +62,7 @@ export default function WatchingPage() {
   }, [locale]);
 
   return (
-    <main className="relative min-h-[calc(100vh-220px)] py-6">
+    <main className="relative py-6">
       <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
         <div className="px-1 py-1">
           <h1 className="text-2xl font-semibold text-white">{t("watching.title")}</h1>
