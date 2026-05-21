@@ -150,6 +150,39 @@ const normalizeStatusParam = (value: string | null): StatusFilter => {
   if (value === "needs_review") return toUiStatusFilterValue("completed_by_promisor");
   return toUiStatusFilterValue(value as PromiseUiStatus);
 };
+
+function DealTitleLink({ id, title }: { id: string; title: string }) {
+  const titleRef = useRef<HTMLSpanElement | null>(null);
+
+  const isCurrentlyTruncated = () => {
+    const container = titleRef.current;
+    if (!container) return false;
+    const link = container.querySelector("a");
+    if (!link) return false;
+    return link.scrollWidth > link.clientWidth;
+  };
+
+  return (
+    <Tooltip
+      label={title}
+      placement="top"
+      className="block w-full"
+      shouldOpen={isCurrentlyTruncated}
+      tooltipClassName="max-w-[min(460px,calc(100vw-16px))]"
+    >
+      <span ref={titleRef} className="block min-w-0 w-full">
+        <LocalizedLink
+          href={`/promises/${id}?from=deals`}
+          title={undefined}
+          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        >
+          {title}
+        </LocalizedLink>
+      </span>
+    </Tooltip>
+  );
+}
+
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -1048,13 +1081,15 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <LocalizedLink
-                            href={`/promises/${p.id}?from=deals`}
-                            className="text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div
+                            className={[
+                              "min-w-0",
+                              p.is_important ? "max-w-[calc(100%-1.75rem)]" : "flex-1",
+                            ].join(" ")}
                           >
-                            {p.title}
-                          </LocalizedLink>
+                            <DealTitleLink id={p.id} title={p.title} />
+                          </div>
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
                               <span

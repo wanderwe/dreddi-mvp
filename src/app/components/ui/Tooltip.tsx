@@ -7,6 +7,7 @@ type TooltipProps = {
   label: string;
   children: ReactNode;
   className?: string;
+  tooltipClassName?: string;
   disabled?: boolean;
   placement?: "bottom" | "bottom-right" | "top" | "top-right";
   shouldOpen?: () => boolean;
@@ -28,6 +29,7 @@ export function Tooltip({
   label,
   children,
   className = "",
+  tooltipClassName = "",
   disabled = false,
   placement = "bottom",
   shouldOpen,
@@ -150,7 +152,7 @@ export function Tooltip({
         ? createPortal(
             <span
               ref={tooltipRef}
-              className={`${baseTooltipClasses} ${
+              className={`${baseTooltipClasses} ${tooltipClassName} ${
                 isOpen ? "opacity-100" : "opacity-0"
               }`}
               style={{
