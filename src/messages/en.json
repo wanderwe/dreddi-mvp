@@ -16,7 +16,8 @@
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
     "groups": "Groups",
-    "allGroups": "All groups"
+    "allGroups": "All groups",
+    "watching": "Watching"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -167,8 +168,7 @@
     "list": {
       "tabs": {
         "executorMe": "I'm the executor ({count})",
-        "executorOther": "Other executor ({count})",
-        "watching": "Watching ({count})"
+        "executorOther": "Other executor ({count})"
       },
       "statusFilter": {
         "label": "Filter by status",
@@ -1082,5 +1082,11 @@
     "following": "Following",
     "unfollowHint": "Unfollow",
     "followersCount": "{count} following"
+  },
+  "watching": {
+    "title": "Watching",
+    "subtitle": "Public agreements you follow",
+    "status": "Status",
+    "deadline": "Deadline"
   }
 }

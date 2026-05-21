@@ -233,6 +233,9 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
+                  <LocalizedLink className={linkBaseClasses} href="/watching">
+                    {t("nav.watching")}
+                  </LocalizedLink>
                   <div
                     className="relative"
                     onMouseEnter={() => setIsGroupsMenuOpen(true)}

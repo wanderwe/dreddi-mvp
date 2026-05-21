@@ -16,7 +16,8 @@
     "actionQueueBadge": "Потрібні дії",
     "sendFeedback": "Надіслати фідбек",
     "groups": "Групи",
-    "allGroups": "Усі групи"
+    "allGroups": "Усі групи",
+    "watching": "Стежу"
   },
   "legal": {
     "sectionEyebrow": "ЮРИДИЧНЕ",
@@ -175,8 +176,7 @@
     "list": {
       "tabs": {
         "executorMe": "Я виконавець ({count})",
-        "executorOther": "Інший виконавець ({count})",
-        "watching": "Стежу ({count})"
+        "executorOther": "Інший виконавець ({count})"
       },
       "statusFilter": {
         "label": "Фільтр за статусом",
@@ -1112,5 +1112,11 @@
     "following": "Ви стежите",
     "unfollowHint": "Перестати стежити",
     "followersCount": "{count} стежать"
+  },
+  "watching": {
+    "title": "Стежу",
+    "subtitle": "Публічні угоди, за якими ви стежите",
+    "status": "Статус",
+    "deadline": "Термін"
   }
 }

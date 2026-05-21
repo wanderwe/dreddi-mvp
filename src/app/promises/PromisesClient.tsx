@@ -50,9 +50,9 @@ type PromiseRow = {
   promisee_id: string | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me" | "watching";
+type TabKey = "i-promised" | "promised-to-me";
 const isTabKey = (value: string | null): value is TabKey =>
-  value === "i-promised" || value === "promised-to-me" || value === "watching";
+  value === "i-promised" || value === "promised-to-me";
 
 const normalizeTabParam = (value: string | null): TabKey => {
   if (value === "i-am-executor") return "i-promised";
@@ -190,6 +190,7 @@ export default function PromisesClient() {
   const searchParams = useSearchParams();
 
   const tab = normalizeTabParam(searchParams.get("tab"));
+  const tabParam = searchParams.get("tab");
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
   const metricFromSearch: MetricFilter =
@@ -208,6 +209,11 @@ export default function PromisesClient() {
   );
 
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
+
+  useEffect(() => {
+    if (tabParam !== "watching") return;
+    router.replace(localizePath("/watching", locale));
+  }, [locale, router, tabParam]);
 
   const statusLabelForRole = (
     status: PromiseStatus,
@@ -250,17 +256,14 @@ export default function PromisesClient() {
   const [listRowsByTab, setListRowsByTab] = useState<Record<TabKey, PromiseWithRole[]>>({
     "i-promised": [],
     "promised-to-me": [],
-    watching: [],
   });
   const [pageByTab, setPageByTab] = useState<Record<TabKey, number>>({
     "i-promised": 0,
     "promised-to-me": 0,
-    watching: 0,
   });
   const [hasMoreByTab, setHasMoreByTab] = useState<Record<TabKey, boolean>>({
     "i-promised": true,
     "promised-to-me": true,
-    watching: true,
   });
   const [listLoading, setListLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -386,23 +389,18 @@ export default function PromisesClient() {
     const roleFilter =
       tabKey === "i-promised"
         ? buildPromisorFilter(userId)
-        : tabKey === "promised-to-me"
-          ? buildCounterpartyFilter(userId)
-          : null;
+        : buildCounterpartyFilter(userId);
 
     const baseQuery = supabase
       .from("promises")
       .select(
-        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,agreement_followers!inner(user_id)"
+        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, rangeEnd);
 
-    const { data, error } =
-      tabKey === "watching"
-        ? await baseQuery.eq("visibility", "public").eq("agreement_followers.user_id", userId)
-        : await baseQuery.or(roleFilter as string);
+    const { data, error } = await baseQuery.or(roleFilter);
 
     if (error) {
       setError(error.message);
@@ -412,18 +410,8 @@ export default function PromisesClient() {
     const parsed: PromiseWithRole[] = (data ?? [])
       .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
       .map((row) => withRole(row as PromiseRow, userId));
-    const participantExcluded = tabKey === "watching"
-      ? parsed.filter((row) => {
-          const participantIds = new Set(
-            [row.creator_id, row.counterparty_id, row.promisor_id, row.promisee_id].filter(
-              (value): value is string => Boolean(value)
-            )
-          );
-          return !participantIds.has(userId);
-        })
-      : parsed;
-    const nextHasMore = participantExcluded.length > PAGE_SIZE;
-    const pageRows = nextHasMore ? participantExcluded.slice(0, PAGE_SIZE) : participantExcluded;
+    const nextHasMore = parsed.length > PAGE_SIZE;
+    const pageRows = nextHasMore ? parsed.slice(0, PAGE_SIZE) : parsed;
 
     setListRowsByTab((prev) => ({
       ...prev,
@@ -657,7 +645,6 @@ export default function PromisesClient() {
     () => ({
       "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
       "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
-      watching: listRowsByTab.watching,
     }),
     [listRowsByTab, activeMetricFilter]
   );
@@ -666,21 +653,19 @@ export default function PromisesClient() {
     () => ({
       "i-promised": applyStatusFilter(metricFilteredListRowsByTab["i-promised"]),
       "promised-to-me": applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]),
-      watching: metricFilteredListRowsByTab.watching,
     }),
     [metricFilteredListRowsByTab, activeStatusFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
-  const countWatching = filteredListRowsByTab.watching.length;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
   const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
       filteredSummaryRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : tab === "promised-to-me" ? row.role === "counterparty" : false
+        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
       ),
     [filteredSummaryRows, tab]
   );
@@ -688,11 +673,9 @@ export default function PromisesClient() {
     () => applyStatusFilter(metricSummaryRowsForCurrentTab),
     [metricSummaryRowsForCurrentTab, activeStatusFilter]
   );
-  const rows = tab === "watching"
-    ? filteredListRowsByTab.watching
-    : hasAnyFilter
-      ? (summaryRowsForCurrentTab as PromiseWithRole[])
-      : filteredListRowsByTab[tab];
+  const rows = hasAnyFilter
+    ? (summaryRowsForCurrentTab as PromiseWithRole[])
+    : filteredListRowsByTab[tab];
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -709,23 +692,19 @@ export default function PromisesClient() {
     return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
   const canLoadMore = !hasAnyFilter && hasMoreByTab[tab];
-  const totalPromises = tab === "watching" ? countWatching : summaryRows.length;
+  const totalPromises = summaryRows.length;
   const isListEmpty = !listLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
   const isFilteredEmpty = isListEmpty && totalPromises > 0 && !isAwaitingMyActionEmpty;
   const showAllActionWithFilters = isListEmpty && totalPromises > 0 && hasAnyFilter;
-  const emptyTitle = tab === "watching" && isGlobalEmpty
-    ? t("promises.empty.watchingTitle")
-    : isGlobalEmpty
+  const emptyTitle = isGlobalEmpty
     ? t("promises.empty.title")
     : isAwaitingMyActionEmpty
       ? t("promises.empty.awaitingYourActionTitle")
       : t("promises.empty.filteredTitle");
-  const emptyDescription = tab === "watching" && isGlobalEmpty
-    ? t("promises.empty.watchingDescription")
-    : isGlobalEmpty
+  const emptyDescription = isGlobalEmpty
     ? t("promises.empty.globalDescription")
     : isAwaitingMyActionEmpty
       ? t("promises.empty.awaitingYourActionDescription")
@@ -999,18 +978,6 @@ export default function PromisesClient() {
             >
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
-            <button
-              type="button"
-              onClick={() => setTab("watching")}
-              className={[
-                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
-                tab === "watching"
-                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.watching", { count: countWatching })}
-            </button>
 
             <div className="relative sm:ml-auto" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
@@ -1128,11 +1095,7 @@ export default function PromisesClient() {
                               p.is_important ? "max-w-[calc(100%-1.75rem)]" : "flex-1",
                             ].join(" ")}
                           >
-                            <DealTitleLink
-                              id={p.id}
-                              title={p.title}
-                              href={tab === "watching" ? `/p/agreements/${p.id}` : undefined}
-                            />
+                            <DealTitleLink id={p.id} title={p.title} />
                           </div>
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
