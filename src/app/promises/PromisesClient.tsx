@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Shield } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Globe2, Lock, Shield } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -48,6 +48,7 @@ type PromiseRow = {
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
+  visibility: "public" | "private" | null;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -62,6 +63,7 @@ const normalizeTabParam = (value: string | null): TabKey => {
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
 type StatusFilter = string;
+type VisibilityFilter = "all" | "public" | "private";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -82,6 +84,7 @@ type PromiseRoleBase = Pick<
   | "promisor_id"
   | "promisee_id"
   | "counterparty_id"
+  | "visibility"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -106,6 +109,12 @@ const PAGE_SIZE = 12;
 const STATUS_FILTER_ALL = "all";
 const STATUS_FILTER_OVERDUE = "overdue";
 const STATUS_FILTER_UI_PREFIX = "ui:";
+const VISIBILITY_FILTER_ALL: VisibilityFilter = "all";
+
+const normalizeVisibilityParam = (value: string | null): VisibilityFilter => {
+  if (value === "public" || value === "private") return value;
+  return VISIBILITY_FILTER_ALL;
+};
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
@@ -159,11 +168,13 @@ export default function PromisesClient() {
   const tab = normalizeTabParam(searchParams.get("tab"));
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
+  const visibilityParam = searchParams.get("visibility");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
   const statusFromSearch: StatusFilter = normalizeStatusParam(statusParam);
+  const visibilityFromSearch: VisibilityFilter = normalizeVisibilityParam(visibilityParam);
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -237,6 +248,8 @@ export default function PromisesClient() {
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
+  const [activeVisibilityFilter, setActiveVisibilityFilter] =
+    useState<VisibilityFilter>(visibilityFromSearch);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
@@ -296,6 +309,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        + ",visibility"
       )
       .or(buildBaseFilter(user.id));
 
@@ -356,6 +370,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        + ",visibility"
       )
       .or(roleFilter)
       .order("created_at", { ascending: false })
@@ -469,6 +484,9 @@ export default function PromisesClient() {
   useEffect(() => {
     setActiveStatusFilter(statusFromSearch);
   }, [statusFromSearch]);
+  useEffect(() => {
+    setActiveVisibilityFilter(visibilityFromSearch);
+  }, [visibilityFromSearch]);
 
   useEffect(() => {
     if (listLoading) return;
@@ -476,13 +494,15 @@ export default function PromisesClient() {
       tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
     );
     const hasAnyActiveFilter =
-      activeMetricFilter !== "total" || activeStatusFilter !== STATUS_FILTER_ALL;
+      activeMetricFilter !== "total" ||
+      activeStatusFilter !== STATUS_FILTER_ALL ||
+      activeVisibilityFilter !== VISIBILITY_FILTER_ALL;
     const filteredRows = hasAnyActiveFilter
       ? applyStatusFilter(summaryRowsForCurrentTab)
       : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeVisibilityFilter, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -578,13 +598,18 @@ export default function PromisesClient() {
     return filtered;
   };
 
+  const applyVisibilityFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
+    if (activeVisibilityFilter === VISIBILITY_FILTER_ALL) return rows;
+    return rows.filter((row) => (row.visibility ?? "private") === activeVisibilityFilter);
+  };
+
   const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
-  ): T[] => applyStatusFilter(applyMetricFilter(rows));
+  ): T[] => applyVisibilityFilter(applyStatusFilter(applyMetricFilter(rows)));
 
   const filteredSummaryRows = useMemo(
-    () => applyMetricFilter(summaryRows),
-    [summaryRows, activeMetricFilter]
+    () => applyVisibilityFilter(applyMetricFilter(summaryRows)),
+    [summaryRows, activeMetricFilter, activeVisibilityFilter]
   );
 
   const roleCounts = useMemo(
@@ -611,16 +636,17 @@ export default function PromisesClient() {
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyStatusFilter(metricFilteredListRowsByTab["i-promised"]),
-      "promised-to-me": applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]),
+      "i-promised": applyVisibilityFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"])),
+      "promised-to-me": applyVisibilityFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"])),
     }),
-    [metricFilteredListRowsByTab, activeStatusFilter]
+    [metricFilteredListRowsByTab, activeStatusFilter, activeVisibilityFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const hasVisibilityFilter = activeVisibilityFilter !== VISIBILITY_FILTER_ALL;
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasVisibilityFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
@@ -630,8 +656,8 @@ export default function PromisesClient() {
     [filteredSummaryRows, tab]
   );
   const summaryRowsForCurrentTab = useMemo(
-    () => applyStatusFilter(metricSummaryRowsForCurrentTab),
-    [metricSummaryRowsForCurrentTab, activeStatusFilter]
+    () => applyVisibilityFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
+    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeVisibilityFilter]
   );
   const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
@@ -663,6 +689,10 @@ export default function PromisesClient() {
     ? t("promises.empty.title")
     : isAwaitingMyActionEmpty
       ? t("promises.empty.awaitingYourActionTitle")
+      : activeVisibilityFilter === "public"
+        ? t("promises.empty.publicFilteredTitle")
+        : activeVisibilityFilter === "private"
+          ? t("promises.empty.privateFilteredTitle")
       : t("promises.empty.filteredTitle");
   const emptyDescription = isGlobalEmpty
     ? t("promises.empty.globalDescription")
@@ -811,6 +841,13 @@ export default function PromisesClient() {
     else sp.set("status", next);
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
+  const handleVisibilityFilterChange = (next: VisibilityFilter) => {
+    setActiveVisibilityFilter(next);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (next === VISIBILITY_FILTER_ALL) sp.delete("visibility");
+    else sp.set("visibility", next);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  };
 
   useEffect(() => {
     if (activeStatusFilter === STATUS_FILTER_ALL) return;
@@ -828,6 +865,11 @@ export default function PromisesClient() {
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
     t("promises.list.statusFilter.options.all");
+  const visibilityOptions: Array<{ value: VisibilityFilter; label: string; icon: "public" | "private" | "all" }> = [
+    { value: "all", label: t("promises.list.visibilityFilter.options.all"), icon: "all" },
+    { value: "public", label: t("promises.list.visibilityFilter.options.public"), icon: "public" },
+    { value: "private", label: t("promises.list.visibilityFilter.options.private"), icon: "private" },
+  ];
 
   return (
     <main className="relative py-10">
@@ -939,7 +981,31 @@ export default function PromisesClient() {
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
 
-            <div className="relative sm:ml-auto" ref={statusMenuRef}>
+            <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center">
+              <span className="sr-only">{t("promises.list.visibilityFilter.label")}</span>
+              <div className="flex min-h-11 w-full items-center gap-1 rounded-xl border border-white/15 bg-white/[0.04] p-1 sm:w-auto">
+                {visibilityOptions.map((option) => {
+                  const selected = option.value === activeVisibilityFilter;
+                  const Icon = option.icon === "public" ? Globe2 : option.icon === "private" ? Lock : null;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleVisibilityFilterChange(option.value)}
+                      className={[
+                        "inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                        selected
+                          ? "bg-emerald-400/90 text-slate-950"
+                          : "text-slate-100 hover:bg-white/10",
+                      ].join(" ")}
+                    >
+                      {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden /> : null}
+                      <span className="truncate">{option.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            <div className="relative" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
               <button
                 type="button"
@@ -985,6 +1051,7 @@ export default function PromisesClient() {
                   })}
                 </div>
               )}
+            </div>
             </div>
           </div>
 
@@ -1138,9 +1205,11 @@ export default function PromisesClient() {
                       onClick={() => {
                         setActiveMetricFilter("total");
                         setActiveStatusFilter("all");
+                        setActiveVisibilityFilter("all");
                         const sp = new URLSearchParams(searchParams.toString());
                         sp.delete("filter");
                         sp.delete("status");
+                        sp.delete("visibility");
                         router.push(localizePath(`/promises?${sp.toString()}`, locale));
                       }}
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"

@@ -133,6 +133,8 @@
       "title": "Nothing here yet",
       "globalDescription": "You don’t have any deals yet",
       "filteredTitle": "No deals match this filter",
+      "publicFilteredTitle": "No public deals in this filter",
+      "privateFilteredTitle": "No private deals in this filter",
       "filteredDescription": "Try a different filter to see your deals",
       "awaitingYourActionTitle": "You’re all caught up",
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
@@ -179,6 +181,14 @@
           "disputed": "Disputed",
           "withdrawn": "Withdrawn",
           "closed": "Closed invites"
+        }
+      },
+      "visibilityFilter": {
+        "label": "Filter by visibility",
+        "options": {
+          "all": "All deals",
+          "public": "Public",
+          "private": "Private"
         }
       },
       "cardLabel": "Deal",
