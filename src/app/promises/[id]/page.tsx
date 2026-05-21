@@ -5,7 +5,6 @@ import {
   ChevronDown,
   Clipboard,
   ExternalLink,
-  Eye,
   Link2,
   MessageCircle,
   RefreshCw,
@@ -1229,13 +1228,13 @@ export default function PromisePage() {
                         href={publicAgreementPath}
                         className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                       >
-                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                         <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                       </Link>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
-                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                       </span>
                     )}
