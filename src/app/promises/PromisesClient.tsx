@@ -166,15 +166,15 @@ function DealTitleLink({ id, title }: { id: string; title: string }) {
     <Tooltip
       label={title}
       placement="top"
-      className="min-w-0"
+      className="w-full"
       shouldOpen={isCurrentlyTruncated}
-      tooltipClassName="max-w-[min(520px,calc(100vw-16px))] px-3 py-2 text-xs leading-relaxed whitespace-normal"
+      tooltipClassName="max-w-[min(460px,calc(100vw-16px))]"
     >
-      <span ref={titleRef} className="block min-w-0 max-w-full">
+      <span ref={titleRef} className="block min-w-0 w-full">
         <LocalizedLink
           href={`/promises/${id}?from=deals`}
           title={title}
-          className="block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {title}
         </LocalizedLink>
@@ -1081,8 +1081,8 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex min-w-0 flex-wrap items-center gap-2">
-                          <div className="min-w-0 max-w-full">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div className="min-w-0 flex-1">
                             <DealTitleLink id={p.id} title={p.title} />
                           </div>
                           {p.is_important && (
