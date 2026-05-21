@@ -2,7 +2,7 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
-import { Layers3, Radar, UsersRound } from "lucide-react";
+import { Bookmark, Layers3, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
@@ -206,7 +206,7 @@ export function AppHeader() {
                     <IconButton
                       href={localizePath("/watching", locale)}
                       ariaLabel={t("nav.watching")}
-                      icon={<Radar className="h-4 w-4" aria-hidden />}
+                      icon={<Bookmark className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.groups")} placement="top">

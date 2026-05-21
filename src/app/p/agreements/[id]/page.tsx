@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Link2, MessageSquareText, Radar, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Bookmark, Check, Clipboard, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -626,12 +626,12 @@ export default function PublicAgreementPage() {
                         : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
                     ].join(" ")}
                   >
-                    {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Radar className="h-4 w-4" aria-hidden="true" />}
+                    {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Bookmark className="h-4 w-4" aria-hidden="true" />}
                     <span>{followLabel}</span>
                   </button>
                 ) : (
                   <div className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-white/70 sm:px-4 sm:text-sm">
-                    <Radar className="h-4 w-4" aria-hidden="true" />
+                    <Bookmark className="h-4 w-4" aria-hidden="true" />
                     <span>{t("publicAgreement.followersCount", { count: followersCount })}</span>
                   </div>
                 )}
