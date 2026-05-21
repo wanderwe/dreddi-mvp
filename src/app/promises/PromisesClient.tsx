@@ -155,27 +155,26 @@ function DealTitleLink({ id, title }: { id: string; title: string }) {
   const titleRef = useRef<HTMLSpanElement | null>(null);
 
   const isCurrentlyTruncated = () => {
-    const element = titleRef.current;
-    if (!element) return false;
-    return element.scrollWidth > element.clientWidth;
+    const container = titleRef.current;
+    if (!container) return false;
+    const link = container.querySelector("a");
+    if (!link) return false;
+    return link.scrollWidth > link.clientWidth;
   };
 
   return (
     <Tooltip
       label={title}
       placement="top"
-      className="min-w-0 flex-1"
+      className="min-w-0"
       shouldOpen={isCurrentlyTruncated}
       tooltipClassName="max-w-[min(520px,calc(100vw-16px))] px-3 py-2 text-xs leading-relaxed whitespace-normal"
     >
-      <span
-        ref={titleRef}
-        className="block min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-      >
+      <span ref={titleRef} className="block min-w-0 max-w-full">
         <LocalizedLink
           href={`/promises/${id}?from=deals`}
-          title={isCurrentlyTruncated() ? title : undefined}
-          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          title={title}
+          className="block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {title}
         </LocalizedLink>
@@ -1082,8 +1081,10 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <DealTitleLink id={p.id} title={p.title} />
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <div className="min-w-0 max-w-full">
+                            <DealTitleLink id={p.id} title={p.title} />
+                          </div>
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
                               <span
