@@ -1382,12 +1382,20 @@ export default function PromisePage() {
                   )}
 
                   {canReview && p.status === "completed_by_promisor" && (
-                    <Link
-                      href={`/promises/${p.id}/confirm`}
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                    >
-                      {t("promises.detail.reviewConfirm")}
-                    </Link>
+                    <>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=confirm`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.confirm")}
+                      </Link>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=dispute`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-transparent px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.dispute")}
+                      </Link>
+                    </>
                   )}
 
                   {canConfirmWithoutExecutorCompletion && (
