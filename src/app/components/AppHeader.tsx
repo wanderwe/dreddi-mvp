@@ -209,18 +209,18 @@ export function AppHeader() {
                       icon={<Radar className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
-                  <Tooltip label={t("nav.publicProfiles")} placement="top">
-                    <IconButton
-                      href={localizePath("/u", locale)}
-                      ariaLabel={t("nav.publicProfiles")}
-                      icon={<UsersRound className="h-4 w-4" aria-hidden />}
-                    />
-                  </Tooltip>
                   <Tooltip label={t("nav.groups")} placement="top">
                     <IconButton
                       href={localizePath("/promises/groups", locale)}
                       ariaLabel={t("nav.groups")}
                       icon={<Layers3 className="h-4 w-4" aria-hidden />}
+                    />
+                  </Tooltip>
+                  <Tooltip label={t("nav.publicProfiles")} placement="top">
+                    <IconButton
+                      href={localizePath("/u", locale)}
+                      ariaLabel={t("nav.publicProfiles")}
+                      icon={<UsersRound className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.notifications")} placement="top">
