@@ -1049,12 +1049,15 @@ export default function PromisesClient() {
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <LocalizedLink
-                            href={`/promises/${p.id}?from=deals`}
-                            className="text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                          >
-                            {p.title}
-                          </LocalizedLink>
+                          <Tooltip label={p.title} placement="top">
+                            <LocalizedLink
+                              href={`/promises/${p.id}?from=deals`}
+                              title={p.title}
+                              className="max-w-full text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden break-words text-ellipsis"
+                            >
+                              {p.title}
+                            </LocalizedLink>
+                          </Tooltip>
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
                               <span
