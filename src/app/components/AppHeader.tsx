@@ -2,7 +2,7 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
-import { UsersRound } from "lucide-react";
+import { Eye, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
@@ -233,9 +233,6 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <LocalizedLink className={linkBaseClasses} href="/watching">
-                    {t("nav.watching")}
-                  </LocalizedLink>
                   <div
                     className="relative"
                     onMouseEnter={() => setIsGroupsMenuOpen(true)}
@@ -305,6 +302,13 @@ export function AppHeader() {
                       href={localizePath("/u", locale)}
                       ariaLabel={t("nav.publicProfiles")}
                       icon={<UsersRound className="h-4 w-4" aria-hidden />}
+                    />
+                  </Tooltip>
+                  <Tooltip label={t("nav.watching")} placement="top">
+                    <IconButton
+                      href={localizePath("/watching", locale)}
+                      ariaLabel={t("nav.watching")}
+                      icon={<Eye className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.notifications")} placement="top">
