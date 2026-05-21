@@ -166,15 +166,15 @@ function DealTitleLink({ id, title }: { id: string; title: string }) {
     <Tooltip
       label={title}
       placement="top"
-      className="inline-block min-w-0 max-w-full align-middle"
+      className="block w-full"
       shouldOpen={isCurrentlyTruncated}
       tooltipClassName="max-w-[min(460px,calc(100vw-16px))]"
     >
-      <span ref={titleRef} className="inline-block min-w-0 max-w-full align-middle">
+      <span ref={titleRef} className="block min-w-0 w-full">
         <LocalizedLink
           href={`/promises/${id}?from=deals`}
           title={undefined}
-          className="inline-block max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-middle text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {title}
         </LocalizedLink>
@@ -1082,7 +1082,12 @@ export default function PromisesClient() {
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex min-w-0 items-center gap-2">
-                          <div className="min-w-0 flex-1">
+                          <div
+                            className={[
+                              "min-w-0",
+                              p.is_important ? "max-w-[calc(100%-1.75rem)]" : "flex-1",
+                            ].join(" ")}
+                          >
                             <DealTitleLink id={p.id} title={p.title} />
                           </div>
                           {p.is_important && (
