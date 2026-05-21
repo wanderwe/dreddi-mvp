@@ -166,15 +166,15 @@ function DealTitleLink({ id, title }: { id: string; title: string }) {
     <Tooltip
       label={title}
       placement="top"
-      className="block w-full"
+      className="inline-block min-w-0 max-w-full align-middle"
       shouldOpen={isCurrentlyTruncated}
       tooltipClassName="max-w-[min(460px,calc(100vw-16px))]"
     >
-      <span ref={titleRef} className="block min-w-0 w-full">
+      <span ref={titleRef} className="inline-block min-w-0 max-w-full align-middle">
         <LocalizedLink
           href={`/promises/${id}?from=deals`}
           title={undefined}
-          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          className="inline-block max-w-full overflow-hidden text-ellipsis whitespace-nowrap align-middle text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
           {title}
         </LocalizedLink>
