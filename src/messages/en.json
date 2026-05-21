@@ -17,7 +17,7 @@
     "sendFeedback": "Send feedback",
     "groups": "Groups",
     "allGroups": "All groups",
-    "watching": "Watching"
+    "watching": "Following"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -139,7 +139,7 @@
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
       "cta": "Create deal",
       "showAll": "Show all deals",
-      "watchingTitle": "You are not watching any agreements yet",
+      "watchingTitle": "You are not following any agreements yet",
       "watchingDescription": "Public agreements you follow will appear here"
     },
     "status": {
@@ -1084,7 +1084,7 @@
     "followersCount": "{count} following"
   },
   "watching": {
-    "title": "Watching",
+    "title": "Following",
     "subtitle": "Public agreements you follow",
     "status": "Status",
     "deadline": "Deadline"

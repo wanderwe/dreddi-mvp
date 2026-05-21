@@ -62,10 +62,10 @@ export default function WatchingPage() {
   }, [locale]);
 
   return (
-    <main className="relative min-h-[calc(100vh-220px)] py-10">
-      <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
-        <div className="rounded-3xl border border-white/10 bg-black/40 p-4 shadow-2xl shadow-black/40 backdrop-blur sm:p-6">
-          <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("watching.title")}</h1>
+    <main className="relative min-h-[calc(100vh-220px)] py-6">
+      <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
+        <div className="px-1 py-1">
+          <h1 className="text-2xl font-semibold text-white">{t("watching.title")}</h1>
           <p className="mt-1 text-sm text-slate-300">{t("watching.subtitle")}</p>
         </div>
         {error && <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}

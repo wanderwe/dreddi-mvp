@@ -17,7 +17,6 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { isAwaitingYourAction } from "@/lib/promiseActions";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
-import { subscribeToGroupsChanged } from "@/lib/groupsEvents";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import {
   buildAuthState,
@@ -26,10 +25,6 @@ import {
   type AuthState,
 } from "@/lib/auth/getAuthState";
 
-type HeaderGroupShortcut = {
-  id: string;
-  title: string;
-};
 
 export function AppHeader() {
   const t = useT();
@@ -40,8 +35,6 @@ export function AppHeader() {
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
-  const [groupShortcuts, setGroupShortcuts] = useState<HeaderGroupShortcut[]>([]);
-  const [isGroupsMenuOpen, setIsGroupsMenuOpen] = useState(false);
   const isAuthenticated = authState.isLoggedIn;
   const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
@@ -166,44 +159,6 @@ export function AppHeader() {
     };
   }, [authState.isLoggedIn, authState.user]);
 
-  useEffect(() => {
-    setIsGroupsMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const client = supabase;
-    const userId = authState.user?.id;
-
-    if (!authState.isLoggedIn || !userId || !client) {
-      setGroupShortcuts([]);
-      return;
-    }
-
-    let active = true;
-
-    const loadGroupShortcuts = async () => {
-      const { data, error } = await client
-        .from("promise_groups")
-        .select("id,title")
-        .eq("owner_user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(8);
-
-      if (!active || error) return;
-      setGroupShortcuts((data ?? []) as HeaderGroupShortcut[]);
-    };
-
-    void loadGroupShortcuts();
-    const unsubscribe = subscribeToGroupsChanged(() => {
-      void loadGroupShortcuts();
-    });
-
-    return () => {
-      active = false;
-      unsubscribe();
-    };
-  }, [authState.isLoggedIn, authState.user]);
-
   if (isEmbedPath) return null;
 
   return (
@@ -233,56 +188,6 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <div
-                    className="relative"
-                    onMouseEnter={() => setIsGroupsMenuOpen(true)}
-                    onMouseLeave={() => setIsGroupsMenuOpen(false)}
-                    onFocusCapture={() => setIsGroupsMenuOpen(true)}
-                    onBlurCapture={(event) => {
-                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                        setIsGroupsMenuOpen(false);
-                      }
-                    }}
-                  >
-                    <LocalizedLink
-                      className={`${linkBaseClasses} relative z-10`}
-                      href="/promises/groups"
-                      aria-haspopup={groupShortcuts.length > 0 ? "menu" : undefined}
-                      aria-expanded={groupShortcuts.length > 0 ? isGroupsMenuOpen : undefined}
-                    >
-                      {t("nav.groups")}
-                    </LocalizedLink>
-                    {groupShortcuts.length > 0 && (
-                      <div
-                        className={`absolute left-0 top-full z-[60] mt-1 w-60 rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/50 backdrop-blur transition duration-150 ${
-                          isGroupsMenuOpen ? "visible opacity-100" : "invisible opacity-0"
-                        }`}
-                        role="menu"
-                      >
-                        <ul className="space-y-1">
-                          {groupShortcuts.map((group) => (
-                            <li key={group.id}>
-                              <LocalizedLink
-                                href={`/promises/groups/${group.id}`}
-                                className="block truncate rounded-lg px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 hover:text-emerald-100"
-                                title={group.title}
-                              >
-                                {group.title}
-                              </LocalizedLink>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="mt-1 border-t border-white/10 pt-1">
-                          <LocalizedLink
-                            href="/promises/groups"
-                            className="block rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-slate-100"
-                          >
-                            {t("nav.allGroups")}
-                          </LocalizedLink>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
@@ -297,18 +202,18 @@ export function AppHeader() {
                   <Tooltip label={t("nav.newPromise")} placement="top">
                     <NewDealButton label={t("nav.newPromise")} variant="icon" />
                   </Tooltip>
-                  <Tooltip label={t("nav.publicProfiles")} placement="top">
-                    <IconButton
-                      href={localizePath("/u", locale)}
-                      ariaLabel={t("nav.publicProfiles")}
-                      icon={<UsersRound className="h-4 w-4" aria-hidden />}
-                    />
-                  </Tooltip>
                   <Tooltip label={t("nav.watching")} placement="top">
                     <IconButton
                       href={localizePath("/watching", locale)}
                       ariaLabel={t("nav.watching")}
                       icon={<Eye className="h-4 w-4" aria-hidden />}
+                    />
+                  </Tooltip>
+                  <Tooltip label={t("nav.groups")} placement="top">
+                    <IconButton
+                      href={localizePath("/promises/groups", locale)}
+                      ariaLabel={t("nav.groups")}
+                      icon={<UsersRound className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.notifications")} placement="top">
