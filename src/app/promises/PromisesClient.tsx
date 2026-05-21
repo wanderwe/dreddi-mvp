@@ -150,6 +150,54 @@ const normalizeStatusParam = (value: string | null): StatusFilter => {
   if (value === "needs_review") return toUiStatusFilterValue("completed_by_promisor");
   return toUiStatusFilterValue(value as PromiseUiStatus);
 };
+
+function DealTitleLink({ id, title }: { id: string; title: string }) {
+  const titleRef = useRef<HTMLSpanElement | null>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const element = titleRef.current;
+    if (!element) return;
+
+    const updateTruncatedState = () => {
+      setIsTruncated(element.scrollWidth > element.clientWidth);
+    };
+
+    updateTruncatedState();
+    const resizeObserver = new ResizeObserver(updateTruncatedState);
+    resizeObserver.observe(element);
+    window.addEventListener("resize", updateTruncatedState);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateTruncatedState);
+    };
+  }, [title]);
+
+  const link = (
+    <span ref={titleRef} className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+      <LocalizedLink
+        href={`/promises/${id}?from=deals`}
+        className="text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      >
+        {title}
+      </LocalizedLink>
+    </span>
+  );
+
+  if (!isTruncated) return link;
+
+  return (
+    <Tooltip
+      label={title}
+      placement="top"
+      tooltipClassName="max-w-[min(520px,calc(100vw-16px))] px-3 py-2 text-xs leading-relaxed whitespace-normal"
+    >
+      {link}
+    </Tooltip>
+  );
+}
+
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -1049,15 +1097,7 @@ export default function PromisesClient() {
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Tooltip label={p.title} placement="top">
-                            <LocalizedLink
-                              href={`/promises/${p.id}?from=deals`}
-                              title={p.title}
-                              className="max-w-full text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden break-words text-ellipsis"
-                            >
-                              {p.title}
-                            </LocalizedLink>
-                          </Tooltip>
+                          <DealTitleLink id={p.id} title={p.title} />
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
                               <span
