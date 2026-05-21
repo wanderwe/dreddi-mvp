@@ -137,7 +137,9 @@
       "awaitingYourActionTitle": "You’re all caught up",
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
       "cta": "Create deal",
-      "showAll": "Show all deals"
+      "showAll": "Show all deals",
+      "watchingTitle": "You are not watching any agreements yet",
+      "watchingDescription": "Public agreements you follow will appear here"
     },
     "status": {
       "active": "Active",
@@ -165,7 +167,8 @@
     "list": {
       "tabs": {
         "executorMe": "I'm the executor ({count})",
-        "executorOther": "Other executor ({count})"
+        "executorOther": "Other executor ({count})",
+        "watching": "Watching ({count})"
       },
       "statusFilter": {
         "label": "Filter by status",
