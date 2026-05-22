@@ -385,7 +385,9 @@ export default function PromisesClient() {
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
         + ",visibility"
       )
-      .or(buildBaseFilter(user.id));
+      .or(buildBaseFilter(user.id))
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false });
 
       if (cancelled) return;
 
