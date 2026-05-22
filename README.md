@@ -114,3 +114,5 @@ and track fulfillment or breach over time.
 
 ## Status
 Early MVP / in active development.
+
+Before implementing new product features or UX flows, review `/docs/PRODUCT_SYSTEM.md`.
