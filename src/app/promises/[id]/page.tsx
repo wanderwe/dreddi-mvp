@@ -1616,52 +1616,48 @@ export default function PromisePage() {
               </div>
             )}
 
-            {(() => {
-              const hasDisputeDetails =
-                p.status === "disputed" &&
-                (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()));
-              return hasCondition || hasDisputeDetails;
-            })() && (
+            {hasCondition && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-                {hasCondition && (
-                  <>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
-                      {t("promises.detail.conditionLabel")}
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                  {t("promises.detail.conditionLabel")}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
+                  {p.condition_text}
+                </p>
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                      {t("promises.detail.conditionStatusLabel")}
                     </p>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
-                      {p.condition_text}
+                    <p className="mt-1 text-xs text-white/50">
+                      {conditionMet
+                        ? t("promises.detail.conditionMet")
+                        : t("promises.detail.conditionWaiting")}
                     </p>
-                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-xs text-white/50">
-                        {conditionMet
-                          ? t("promises.detail.conditionMet")
-                          : t("promises.detail.conditionWaiting")}
-                      </p>
-                      {isCounterparty && !conditionMet && (
-                        <ActionButton
-                          label={t("promises.detail.conditionMark")}
-                          variant="ok"
-                          loading={conditionBusy}
-                          disabled={conditionBusy}
-                          onClick={markConditionMet}
-                        />
-                      )}
-                    </div>
-                  </>
-                )}
-                {p.status === "disputed" && p.disputed_code === "not_delivered" && (
-                  <p className="mt-3 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-sm text-amber-100">
-                    {t("promises.detail.notDeliveredHint")}
-                  </p>
-                )}
-                {p.status === "disputed" && p.dispute_reason && (
-                  <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
-                    <p className="text-xs uppercase tracking-[0.14em] text-amber-200">
-                      {t("promises.detail.disputeExplanationLabel")}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap">{p.dispute_reason}</p>
                   </div>
-                )}
+                  {isCounterparty && !conditionMet && (
+                    <ActionButton
+                      label={t("promises.detail.conditionMark")}
+                      variant="ok"
+                      loading={conditionBusy}
+                      disabled={conditionBusy}
+                      onClick={markConditionMet}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {(p.status === "disputed" &&
+              (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
+              <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">
+                  {t("promises.detail.disputeReasonLabel")}
+                </p>
+                <div className="mt-2 space-y-2 text-sm leading-6">
+                  {p.disputed_code === "not_delivered" && <p>{t("promises.detail.notDeliveredHint")}</p>}
+                  {p.dispute_reason && <p className="whitespace-pre-wrap">{p.dispute_reason}</p>}
+                </div>
               </div>
             )}
 

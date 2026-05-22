@@ -368,7 +368,9 @@
       "copyInviteLink": "Скопіювати запрошення",
       "copyInvitePrimary": "Скопіювати посилання",
       "openInviteShort": "Відкрити сторінку",
-      "withdrawInviteShort": "Відкликати"
+      "withdrawInviteShort": "Відкликати",
+      "conditionStatusLabel": "Статус контрумови",
+      "disputeReasonLabel": "Причина оскарження"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",
