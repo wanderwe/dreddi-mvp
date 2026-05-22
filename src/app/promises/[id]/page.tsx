@@ -27,6 +27,7 @@ import {
 } from "@/lib/promiseAcceptance";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { buildAgreementFlowState } from "@/lib/agreementFlowState";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -98,48 +99,18 @@ function getLifecycleStates(
   t: ReturnType<typeof useT>
 ): LifecycleState[] {
   const acceptedAt = promise.accepted_at ?? promise.counterparty_accepted_at;
-  const base: LifecycleState[] = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
-    {
-      key: "accepted",
-      label: t("publicAgreement.flow.accepted"),
-      complete: Boolean(acceptedAt),
-      current: uiStatus === "awaiting_acceptance",
-    },
-    {
-      key: "active",
-      label: t("publicAgreement.flow.active"),
-      complete: promise.status !== "active",
-      current: uiStatus === "active",
-    },
-    {
-      key: "completed",
-      label: t("publicAgreement.flow.completed"),
-      complete: Boolean(promise.completed_at || promise.confirmed_at || promise.disputed_at),
-      current: uiStatus === "completed_by_promisor",
-    },
-    {
-      key: "confirmed",
-      label: t("publicAgreement.flow.confirmed"),
-      complete: promise.status === "confirmed",
-      current: promise.status === "confirmed",
-    },
-  ];
 
-  if (promise.status === "disputed") {
-    return [
-      ...base.slice(0, 4),
-      {
-        key: "disputed",
-        label: t("publicAgreement.flow.disputed"),
-        complete: true,
-        current: true,
-        disputed: true,
-      },
-    ];
-  }
-
-  return base;
+  return buildAgreementFlowState({
+    status: promise.status,
+    uiStatus,
+    acceptedAt,
+    completedAt: promise.completed_at,
+    confirmedAt: promise.confirmed_at,
+    disputedAt: promise.disputed_at,
+  }).map((state) => ({
+    ...state,
+    label: t(`publicAgreement.flow.${state.key}`),
+  }));
 }
 
 function buildAgreementTimeline(
@@ -1125,12 +1096,19 @@ export default function PromisePage() {
                 : state.complete
                   ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
                   : state.current
-                    ? "border-amber-300/35 bg-amber-300/10 text-amber-50"
+                    ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
                     : "border-white/10 bg-black/15 text-white/35",
             ].join(" ")}
           >
-            <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/25 text-[10px]">
-              {state.complete ? "✓" : index + 1}
+            <span
+              className={[
+                "mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
+                state.current && !state.disputed && !state.complete
+                  ? "border-amber-300/80 bg-black/35 text-amber-100"
+                  : "border-current/25",
+              ].join(" ")}
+            >
+              {state.complete ? "✓" : state.current && !state.disputed ? "•" : index + 1}
             </span>
             {state.label}
           </div>

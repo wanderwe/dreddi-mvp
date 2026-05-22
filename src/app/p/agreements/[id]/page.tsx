@@ -174,27 +174,18 @@ function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
 
 function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): FlowState[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
-  const base: FlowState[] = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
-    {
-      key: "accepted",
-      label: t("publicAgreement.flow.accepted"),
-      complete: Boolean(acceptedAt),
-      current: agreement.uiStatus === "awaiting_acceptance",
-    },
-    { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active", current: agreement.uiStatus === "active" },
-    { key: "completed", label: t("publicAgreement.flow.completed"), complete: Boolean(agreement.completed_at || agreement.confirmed_at || agreement.disputed_at), current: agreement.uiStatus === "completed_by_promisor" },
-    { key: "confirmed", label: t("publicAgreement.flow.confirmed"), complete: agreement.status === "confirmed", current: agreement.status === "confirmed" },
-  ];
 
-  if (agreement.status === "disputed") {
-    return [
-      ...base.slice(0, 4),
-      { key: "disputed", label: t("publicAgreement.flow.disputed"), complete: true, current: true, disputed: true },
-    ];
-  }
-
-  return base;
+  return buildAgreementFlowState({
+    status: agreement.status,
+    uiStatus: agreement.uiStatus,
+    acceptedAt,
+    completedAt: agreement.completed_at,
+    confirmedAt: agreement.confirmed_at,
+    disputedAt: agreement.disputed_at,
+  }).map((state) => ({
+    ...state,
+    label: t(`publicAgreement.flow.${state.key}`),
+  }));
 }
 
 function buildTimeline(
@@ -686,12 +677,19 @@ export default function PublicAgreementPage() {
                       : state.complete
                         ? "border-emerald-300/35 bg-emerald-300/10 text-emerald-50"
                         : state.current
-                          ? "border-amber-300/45 bg-amber-300/10 text-amber-50"
+                          ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
                           : "border-white/8 bg-black/20 text-white/35",
                   ].join(" ")}
                 >
-                  <div className="mb-2 flex h-6 w-6 items-center justify-center rounded-full border border-current/30 text-[11px]">
-                    {state.complete ? "✓" : index + 1}
+                  <div
+                    className={[
+                      "mb-2 flex h-6 w-6 items-center justify-center rounded-full border text-[11px]",
+                      state.current && !state.disputed && !state.complete
+                        ? "border-amber-300/80 bg-black/35 text-amber-100"
+                        : "border-current/30",
+                    ].join(" ")}
+                  >
+                    {state.complete ? "✓" : state.current && !state.disputed ? "•" : index + 1}
                   </div>
                   {state.label}
                 </div>
