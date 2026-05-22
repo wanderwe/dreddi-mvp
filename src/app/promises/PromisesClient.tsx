@@ -80,6 +80,7 @@ type PromiseRoleBase = Pick<
   | "ignored_at"
   | "due_at"
   | "title"
+  | "is_important"
   | "creator_id"
   | "promisor_id"
   | "promisee_id"
@@ -125,6 +126,7 @@ const isPromiseRoleBase = (row: unknown): row is PromiseRoleBase => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
+    && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && isPromiseStatus(candidate.status)
   );
@@ -138,6 +140,7 @@ const isPromiseRow = (row: unknown): row is PromiseRow => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
+    && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && typeof candidate.is_important === "boolean"
     && isPromiseStatus(candidate.status)
