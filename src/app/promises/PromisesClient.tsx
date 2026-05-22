@@ -162,6 +162,63 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   };
 };
 
+
+const getLatestLifecycleTimestamp = (
+  row: Pick<
+    PromiseRow,
+    | "created_at"
+    | "completed_at"
+    | "confirmed_at"
+    | "disputed_at"
+    | "condition_met_at"
+    | "counterparty_accepted_at"
+    | "accepted_at"
+    | "declined_at"
+    | "ignored_at"
+    | "cancelled_at"
+  >
+) => {
+  const timestamps = [
+    row.completed_at,
+    row.confirmed_at,
+    row.disputed_at,
+    row.condition_met_at,
+    row.counterparty_accepted_at,
+    row.accepted_at,
+    row.declined_at,
+    row.ignored_at,
+    row.cancelled_at,
+    row.created_at,
+  ]
+    .map((value) => (value ? new Date(value).getTime() : Number.NaN))
+    .filter((value) => Number.isFinite(value));
+
+  if (!timestamps.length) return Number.NEGATIVE_INFINITY;
+  return Math.max(...timestamps);
+};
+
+const sortByRecencyDesc = <
+  T extends Pick<
+    PromiseRow,
+    | "id"
+    | "created_at"
+    | "completed_at"
+    | "confirmed_at"
+    | "disputed_at"
+    | "condition_met_at"
+    | "counterparty_accepted_at"
+    | "accepted_at"
+    | "declined_at"
+    | "ignored_at"
+    | "cancelled_at"
+  >,
+>(rows: T[]): T[] =>
+  [...rows].sort((a, b) => {
+    const diff = getLatestLifecycleTimestamp(b) - getLatestLifecycleTimestamp(a);
+    if (diff !== 0) return diff;
+    return b.id.localeCompare(a.id);
+  });
+
 const buildBaseFilter = (id: string) =>
   `promisor_id.eq.${id},promisee_id.eq.${id},creator_id.eq.${id},counterparty_id.eq.${id}`;
 
@@ -385,6 +442,8 @@ export default function PromisesClient() {
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
         + ",visibility"
       )
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
       .or(buildBaseFilter(user.id));
 
       if (cancelled) return;
@@ -748,9 +807,14 @@ export default function PromisesClient() {
     () => applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
     [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter]
   );
-  const rows = hasAnyFilter
-    ? (summaryRowsForCurrentTab as PromiseWithRole[])
-    : filteredListRowsByTab[tab];
+  const rows = useMemo(
+    () => sortByRecencyDesc(
+      hasAnyFilter
+        ? (summaryRowsForCurrentTab as PromiseWithRole[])
+        : filteredListRowsByTab[tab]
+    ),
+    [hasAnyFilter, summaryRowsForCurrentTab, filteredListRowsByTab, tab]
+  );
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
