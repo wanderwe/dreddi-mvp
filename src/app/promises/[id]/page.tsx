@@ -27,6 +27,7 @@ import {
 } from "@/lib/promiseAcceptance";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { buildAgreementFlowState } from "@/lib/agreementFlowState";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -98,48 +99,18 @@ function getLifecycleStates(
   t: ReturnType<typeof useT>
 ): LifecycleState[] {
   const acceptedAt = promise.accepted_at ?? promise.counterparty_accepted_at;
-  const base: LifecycleState[] = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
-    {
-      key: "accepted",
-      label: t("publicAgreement.flow.accepted"),
-      complete: Boolean(acceptedAt),
-      current: uiStatus === "awaiting_acceptance",
-    },
-    {
-      key: "active",
-      label: t("publicAgreement.flow.active"),
-      complete: promise.status !== "active",
-      current: uiStatus === "active",
-    },
-    {
-      key: "completed",
-      label: t("publicAgreement.flow.completed"),
-      complete: Boolean(promise.completed_at || promise.confirmed_at || promise.disputed_at),
-      current: uiStatus === "completed_by_promisor",
-    },
-    {
-      key: "confirmed",
-      label: t("publicAgreement.flow.confirmed"),
-      complete: promise.status === "confirmed",
-      current: promise.status === "confirmed",
-    },
-  ];
 
-  if (promise.status === "disputed") {
-    return [
-      ...base.slice(0, 4),
-      {
-        key: "disputed",
-        label: t("publicAgreement.flow.disputed"),
-        complete: true,
-        current: true,
-        disputed: true,
-      },
-    ];
-  }
-
-  return base;
+  return buildAgreementFlowState({
+    status: promise.status,
+    uiStatus,
+    acceptedAt,
+    completedAt: promise.completed_at,
+    confirmedAt: promise.confirmed_at,
+    disputedAt: promise.disputed_at,
+  }).map((state) => ({
+    ...state,
+    label: t(`publicAgreement.flow.${state.key}`),
+  }));
 }
 
 function buildAgreementTimeline(

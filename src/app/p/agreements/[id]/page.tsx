@@ -174,27 +174,18 @@ function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
 
 function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): FlowState[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
-  const base: FlowState[] = [
-    { key: "created", label: t("publicAgreement.flow.created"), complete: true, current: false },
-    {
-      key: "accepted",
-      label: t("publicAgreement.flow.accepted"),
-      complete: Boolean(acceptedAt),
-      current: agreement.uiStatus === "awaiting_acceptance",
-    },
-    { key: "active", label: t("publicAgreement.flow.active"), complete: agreement.status !== "active", current: agreement.uiStatus === "active" },
-    { key: "completed", label: t("publicAgreement.flow.completed"), complete: Boolean(agreement.completed_at || agreement.confirmed_at || agreement.disputed_at), current: agreement.uiStatus === "completed_by_promisor" },
-    { key: "confirmed", label: t("publicAgreement.flow.confirmed"), complete: agreement.status === "confirmed", current: agreement.status === "confirmed" },
-  ];
 
-  if (agreement.status === "disputed") {
-    return [
-      ...base.slice(0, 4),
-      { key: "disputed", label: t("publicAgreement.flow.disputed"), complete: true, current: true, disputed: true },
-    ];
-  }
-
-  return base;
+  return buildAgreementFlowState({
+    status: agreement.status,
+    uiStatus: agreement.uiStatus,
+    acceptedAt,
+    completedAt: agreement.completed_at,
+    confirmedAt: agreement.confirmed_at,
+    disputedAt: agreement.disputed_at,
+  }).map((state) => ({
+    ...state,
+    label: t(`publicAgreement.flow.${state.key}`),
+  }));
 }
 
 function buildTimeline(
