@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
-import { isPromiseStatus } from "@/lib/promiseStatus";
 
 type Watched = { id: string; title: string; status: string; due_at: string | null; creator_id: string; counterparty_id: string | null; promisor_id: string | null; promisee_id: string | null };
 
@@ -21,35 +19,19 @@ export default function WatchingPage() {
       setLoading(true);
       setError(null);
       try {
-        const supabase = requireSupabase();
-        const { data: sessionData } = await supabase.auth.getSession();
-        const session = sessionData.session;
-        if (!session) {
+        const response = await fetch("/api/watching", { method: "GET", credentials: "include" });
+        if (response.status === 401) {
           window.location.href = localizeLoginPath(localizePath("/watching", locale), locale);
           return;
         }
-        const userId = session.user.id;
-        const { data, error: queryError } = await supabase
-          .from("promises")
-          .select("id,title,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,agreement_followers!inner(user_id)")
-          .eq("visibility", "public")
-          .eq("agreement_followers.user_id", userId)
-          .order("created_at", { ascending: false });
+
+        const payload = await response.json().catch(() => ({}));
         if (cancelled) return;
-        if (queryError) {
-          setError(queryError.message);
+        if (!response.ok) {
+          setError(typeof payload?.error === "string" ? payload.error : "Unexpected error");
           return;
         }
-        const watched = (data ?? []).filter((row) => {
-          if (!isPromiseStatus((row as { status?: unknown }).status)) return false;
-          const participantIds = new Set(
-            [row.creator_id, row.counterparty_id, row.promisor_id, row.promisee_id].filter(
-              (value): value is string => Boolean(value)
-            )
-          );
-          return !participantIds.has(userId);
-        }) as Watched[];
-        setRows(watched);
+        setRows(Array.isArray(payload?.rows) ? (payload.rows as Watched[]) : []);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Unexpected error");
       } finally {
