@@ -677,12 +677,19 @@ export default function PublicAgreementPage() {
                       : state.complete
                         ? "border-emerald-300/35 bg-emerald-300/10 text-emerald-50"
                         : state.current
-                          ? "border-amber-300/45 bg-amber-300/10 text-amber-50"
+                          ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
                           : "border-white/8 bg-black/20 text-white/35",
                   ].join(" ")}
                 >
-                  <div className="mb-2 flex h-6 w-6 items-center justify-center rounded-full border border-current/30 text-[11px]">
-                    {state.complete ? "✓" : index + 1}
+                  <div
+                    className={[
+                      "mb-2 flex h-6 w-6 items-center justify-center rounded-full border text-[11px]",
+                      state.current && !state.disputed && !state.complete
+                        ? "border-amber-300/80 bg-black/35 text-amber-100"
+                        : "border-current/30",
+                    ].join(" ")}
+                  >
+                    {state.complete ? "✓" : state.current && !state.disputed ? "•" : index + 1}
                   </div>
                   {state.label}
                 </div>

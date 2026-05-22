@@ -1096,12 +1096,19 @@ export default function PromisePage() {
                 : state.complete
                   ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
                   : state.current
-                    ? "border-amber-300/35 bg-amber-300/10 text-amber-50"
+                    ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
                     : "border-white/10 bg-black/15 text-white/35",
             ].join(" ")}
           >
-            <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/25 text-[10px]">
-              {state.complete ? "✓" : index + 1}
+            <span
+              className={[
+                "mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
+                state.current && !state.disputed && !state.complete
+                  ? "border-amber-300/80 bg-black/35 text-amber-100"
+                  : "border-current/25",
+              ].join(" ")}
+            >
+              {state.complete ? "✓" : state.current && !state.disputed ? "•" : index + 1}
             </span>
             {state.label}
           </div>
