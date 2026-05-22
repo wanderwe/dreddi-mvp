@@ -269,6 +269,11 @@
       "primaryActionTitle": "Основна дія",
       "toolsTitle": "Посилання",
       "historyTitle": "Історія угоди",
+      "updates": {
+        "title": "Оновлення угоди",
+        "add": "Додати оновлення",
+        "labelPrivate": "Оновлення прогресу (видиме лише учасникам)"
+      },
       "currentStatus": "Поточний статус",
       "markCompleted": "Позначити як виконану",
       "confirmCompletion": "Підтвердити виконання",

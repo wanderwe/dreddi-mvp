@@ -1178,61 +1178,6 @@ export default function PromisePage() {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-white/80">{t("publicAgreement.timeline.title")}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setShowUpdateComposer((current) => !current);
-              setUpdateSubmitState("idle");
-            }}
-            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
-          >
-            {t("publicAgreement.updates.add")}
-          </button>
-        </div>
-        {showUpdateComposer ? (
-          <div className="rounded-xl border border-emerald-300/25 bg-emerald-400/8 p-3">
-            <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
-              {t("publicAgreement.updates.label")}
-            </label>
-            <textarea
-              id="agreement-update"
-              value={updateContent}
-              onChange={(event) => {
-                setUpdateContent(event.target.value.slice(0, 500));
-                if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
-              }}
-              placeholder={t("publicAgreement.updates.placeholder")}
-              className="mt-2 h-28 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60"
-            />
-            <div className="mt-2 flex items-center justify-between text-xs text-white/60">
-              <span>{t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}</span>
-            </div>
-            <div className="mt-3 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowUpdateComposer(false);
-                  setUpdateContent("");
-                  setUpdateSubmitState("idle");
-                }}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
-              >
-                {t("publicAgreement.updates.cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={() => void submitUpdate()}
-                disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-emerald-300/35 bg-emerald-400/15 px-3 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/25 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {updateSubmitState === "saving" ? t("publicAgreement.updates.saving") : t("publicAgreement.updates.publish")}
-              </button>
-            </div>
-            {updateSubmitState === "error" ? <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p> : null}
-          </div>
-        ) : null}
         {timeline.map((item) => (
           <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
             <span
@@ -1450,6 +1395,72 @@ export default function PromisePage() {
                   <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">{inviteMetaText}</p>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
+                  {t("promises.detail.updates.title")}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUpdateComposer((current) => !current);
+                    setUpdateSubmitState("idle");
+                  }}
+                  className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
+                >
+                  {t("promises.detail.updates.add")}
+                </button>
+              </div>
+              {showUpdateComposer ? (
+                <div className="mt-3 rounded-xl border border-cyan-300/25 bg-black/20 p-3">
+                  <label className="text-sm font-semibold text-cyan-50" htmlFor="agreement-update">
+                    {p.visibility === "public"
+                      ? t("publicAgreement.updates.label")
+                      : t("promises.detail.updates.labelPrivate")}
+                  </label>
+                  <textarea
+                    id="agreement-update"
+                    value={updateContent}
+                    onChange={(event) => {
+                      setUpdateContent(event.target.value.slice(0, 500));
+                      if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
+                    }}
+                    placeholder={t("publicAgreement.updates.placeholder")}
+                    className="mt-2 h-28 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/60"
+                  />
+                  <div className="mt-2 text-xs text-white/60">
+                    {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
+                  </div>
+                  <div className="mt-3 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowUpdateComposer(false);
+                        setUpdateContent("");
+                        setUpdateSubmitState("idle");
+                      }}
+                      className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
+                    >
+                      {t("publicAgreement.updates.cancel")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void submitUpdate()}
+                      disabled={!updateContent.trim() || updateSubmitState === "saving"}
+                      className="inline-flex min-h-10 items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {updateSubmitState === "saving"
+                        ? t("publicAgreement.updates.saving")
+                        : t("publicAgreement.updates.publish")}
+                    </button>
+                  </div>
+                  {updateSubmitState === "error" ? (
+                    <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             {hasLifecycleActions && (

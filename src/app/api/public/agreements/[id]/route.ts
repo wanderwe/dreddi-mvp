@@ -308,17 +308,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact"
       )
       .eq("id", id)
+      .eq("visibility", "public")
       .maybeSingle<PromisePublicAgreementRecord>();
 
     if (error) {
       return NextResponse.json(
-        { error: "Agreement lookup failed", detail: error.message },
+        { error: "Public agreement lookup failed", detail: error.message },
         { status: 500 }
       );
     }
 
     if (!promise) {
-      return NextResponse.json({ error: "Agreement not found" }, { status: 404 });
+      return NextResponse.json({ error: "Public agreement not found" }, { status: 404 });
     }
 
     if (!canUserPostUpdate(promise, user.id)) {
