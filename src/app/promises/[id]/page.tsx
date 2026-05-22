@@ -1024,6 +1024,7 @@ export default function PromisePage() {
     ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
     : t(`promises.inviteStatus.${inviteStatus}`);
   const lifecycleStates = p && uiStatus ? getLifecycleStates(p, uiStatus, t) : [];
+  const isPrivateAgreement = p?.visibility === "private";
   const timeline = p && uiStatus
     ? buildAgreementTimeline(
         p,
@@ -1036,16 +1037,18 @@ export default function PromisePage() {
         t
       )
     : [];
-  for (const update of updates) {
-    timeline.push({
-      key: `update-${update.id}`,
-      label: t("publicAgreement.timeline.update"),
-      actor: update.author_display_name?.trim() || update.author_handle?.trim() || t("publicAgreement.timeline.updateAuthorFallback"),
-      timestamp: update.created_at,
-      description: update.content,
-      tone: "neutral",
-      kind: "update",
-    });
+  if (isPrivateAgreement) {
+    for (const update of updates) {
+      timeline.push({
+        key: `update-${update.id}`,
+        label: t("publicAgreement.timeline.update"),
+        actor: update.author_display_name?.trim() || update.author_handle?.trim() || t("publicAgreement.timeline.updateAuthorFallback"),
+        timestamp: update.created_at,
+        description: update.content,
+        tone: "neutral",
+        kind: "update",
+      });
+    }
   }
   timeline.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   const remainingUpdateChars = 500 - updateContent.length;
@@ -1109,7 +1112,7 @@ export default function PromisePage() {
   }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
   useEffect(() => {
-    if (!p?.id) return;
+    if (!p?.id || !isPrivateAgreement) return;
     let active = true;
     const loadUpdates = async () => {
       const response = await fetch(`/api/promises/${p.id}/updates`, { cache: "no-store" });
@@ -1122,7 +1125,7 @@ export default function PromisePage() {
     return () => {
       active = false;
     };
-  }, [p?.id]);
+  }, [isPrivateAgreement, p?.id]);
 
   async function submitUpdate() {
     if (!p || updateSubmitState === "saving") return;
@@ -1397,7 +1400,8 @@ export default function PromisePage() {
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
+            {isPrivateAgreement ? (
+              <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
                   {t("promises.detail.updates.title")}
@@ -1408,7 +1412,7 @@ export default function PromisePage() {
                     setShowUpdateComposer((current) => !current);
                     setUpdateSubmitState("idle");
                   }}
-                  className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
+                  className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
                 >
                   {t("promises.detail.updates.add")}
                 </button>
@@ -1427,7 +1431,7 @@ export default function PromisePage() {
                       setUpdateContent(event.target.value.slice(0, 500));
                       if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
                     }}
-                    placeholder={t("publicAgreement.updates.placeholder")}
+                    placeholder={t("promises.detail.updates.placeholder")}
                     className="mt-2 h-28 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/60"
                   />
                   <div className="mt-2 text-xs text-white/60">
@@ -1441,7 +1445,7 @@ export default function PromisePage() {
                         setUpdateContent("");
                         setUpdateSubmitState("idle");
                       }}
-                      className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
+                      className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
                     >
                       {t("publicAgreement.updates.cancel")}
                     </button>
@@ -1449,7 +1453,7 @@ export default function PromisePage() {
                       type="button"
                       onClick={() => void submitUpdate()}
                       disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                      className="inline-flex min-h-10 items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {updateSubmitState === "saving"
                         ? t("publicAgreement.updates.saving")
@@ -1461,7 +1465,8 @@ export default function PromisePage() {
                   ) : null}
                 </div>
               ) : null}
-            </div>
+              </div>
+            ) : null}
 
             {hasLifecycleActions && (
               <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
