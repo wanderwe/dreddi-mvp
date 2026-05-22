@@ -5,7 +5,6 @@ import {
   ChevronDown,
   Clipboard,
   ExternalLink,
-  Eye,
   Link2,
   MessageCircle,
   RefreshCw,
@@ -1229,13 +1228,13 @@ export default function PromisePage() {
                         href={publicAgreementPath}
                         className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                       >
-                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                         <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                       </Link>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
-                        <Eye className="h-3.5 w-3.5" aria-hidden />
+                        <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                       </span>
                     )}
@@ -1382,12 +1381,20 @@ export default function PromisePage() {
                   )}
 
                   {canReview && p.status === "completed_by_promisor" && (
-                    <Link
-                      href={`/promises/${p.id}/confirm`}
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-amber-300/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
-                    >
-                      {t("promises.detail.reviewConfirm")}
-                    </Link>
+                    <>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=confirm`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.confirm")}
+                      </Link>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=dispute`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-transparent px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.dispute")}
+                      </Link>
+                    </>
                   )}
 
                   {canConfirmWithoutExecutorCompletion && (

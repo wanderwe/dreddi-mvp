@@ -105,8 +105,9 @@ export const mapEventToNotificationType = (event: NotificationEvent): Notificati
     case "disputed":
       return "disputed";
     case "reminder_due_24h":
+      return "reminder_due_24h";
     case "deadline_passed":
-      return "reminder_deadline";
+      return "deadline_passed";
     default:
       return "accepted";
   }

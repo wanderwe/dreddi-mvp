@@ -16,7 +16,8 @@
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
     "groups": "Groups",
-    "allGroups": "All groups"
+    "allGroups": "All groups",
+    "watching": "Watchlist"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -644,7 +645,14 @@
     "acceptCta": "Accept and take responsibility",
     "acceptDeal": "Accept deal",
     "goToDeal": "Open deal",
-    "viewDeal": "View deal"
+    "viewDeal": "View deal",
+    "creatorShare": {
+      "copyInviteLink": "Copy invite link",
+      "copySuccess": "Invite link copied",
+      "copyFailed": "Could not copy invite link",
+      "inviteAccepted": "Invite already accepted",
+      "inviteExpired": "Invite expired"
+    }
   },
   "auth": {
     "login": {
@@ -1087,9 +1095,17 @@
       "error": "Could not publish this update. Only agreement participants can add official updates.",
       "unavailable": "Updates are temporarily unavailable until the latest database migration is applied"
     },
-    "follow": "Follow",
-    "following": "Following",
+    "follow": "Watch",
+    "following": "Watching",
     "unfollowHint": "Unfollow",
     "followersCount": "{count} following"
+  },
+  "watching": {
+    "title": "Watchlist",
+    "subtitle": "Public agreements you track",
+    "status": "Status",
+    "deadline": "Deadline",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…"
   }
 }

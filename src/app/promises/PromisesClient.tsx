@@ -160,6 +160,39 @@ const normalizeStatusParam = (value: string | null): StatusFilter => {
   if (value === "needs_review") return toUiStatusFilterValue("completed_by_promisor");
   return toUiStatusFilterValue(value as PromiseUiStatus);
 };
+
+function DealTitleLink({ id, title, href }: { id: string; title: string; href?: string }) {
+  const titleRef = useRef<HTMLSpanElement | null>(null);
+
+  const isCurrentlyTruncated = () => {
+    const container = titleRef.current;
+    if (!container) return false;
+    const link = container.querySelector("a");
+    if (!link) return false;
+    return link.scrollWidth > link.clientWidth;
+  };
+
+  return (
+    <Tooltip
+      label={title}
+      placement="top"
+      className="block w-full"
+      shouldOpen={isCurrentlyTruncated}
+      tooltipClassName="max-w-[min(460px,calc(100vw-16px))]"
+    >
+      <span ref={titleRef} className="block min-w-0 w-full">
+        <LocalizedLink
+          href={href ?? `/promises/${id}?from=deals`}
+          title={undefined}
+          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        >
+          {title}
+        </LocalizedLink>
+      </span>
+    </Tooltip>
+  );
+}
+
 export default function PromisesClient() {
   const t = useT();
   const locale = useLocale();
@@ -167,6 +200,7 @@ export default function PromisesClient() {
   const searchParams = useSearchParams();
 
   const tab = normalizeTabParam(searchParams.get("tab"));
+  const tabParam = searchParams.get("tab");
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
   const visibilityParam = searchParams.get("visibility");
@@ -188,6 +222,11 @@ export default function PromisesClient() {
   );
 
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
+
+  useEffect(() => {
+    if (tabParam !== "watching") return;
+    router.replace(localizePath("/watching", locale));
+  }, [locale, router, tabParam]);
 
   const statusLabelForRole = (
     status: PromiseStatus,
@@ -371,16 +410,17 @@ export default function PromisesClient() {
         ? buildPromisorFilter(userId)
         : buildCounterpartyFilter(userId);
 
-    const { data, error } = await supabase
+    const baseQuery = supabase
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
         + ",visibility"
       )
-      .or(roleFilter)
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, rangeEnd);
+
+    const { data, error } = await baseQuery.or(roleFilter);
 
     if (error) {
       setError(error.message);
@@ -1161,13 +1201,15 @@ export default function PromisesClient() {
                   >
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <LocalizedLink
-                            href={`/promises/${p.id}?from=deals`}
-                            className="text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div
+                            className={[
+                              "min-w-0",
+                              p.is_important ? "max-w-[calc(100%-1.75rem)]" : "flex-1",
+                            ].join(" ")}
                           >
-                            {p.title}
-                          </LocalizedLink>
+                            <DealTitleLink id={p.id} title={p.title} />
+                          </div>
                           {p.is_important && (
                             <Tooltip label={t("promises.important.tooltip")} placement="top">
                               <span

@@ -64,6 +64,11 @@ export function MobileMenu({
                     {t("nav.groups")}
                   </LocalizedLink>
                 </SheetClose>
+                <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/watching">
+                    {t("nav.watching")}
+                  </LocalizedLink>
+                </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
                     <LocalizedLink className={baseLinkClasses} href={actionQueueHref}>

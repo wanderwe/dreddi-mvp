@@ -16,7 +16,8 @@
     "actionQueueBadge": "Потрібні дії",
     "sendFeedback": "Надіслати фідбек",
     "groups": "Групи",
-    "allGroups": "Усі групи"
+    "allGroups": "Усі групи",
+    "watching": "Стеження"
   },
   "legal": {
     "sectionEyebrow": "ЮРИДИЧНЕ",
@@ -652,7 +653,14 @@
     "acceptCta": "Прийняти та виконати",
     "acceptDeal": "Прийняти угоду",
     "goToDeal": "Відкрити угоду",
-    "viewDeal": "Переглянути угоду"
+    "viewDeal": "Переглянути угоду",
+    "creatorShare": {
+      "copyInviteLink": "Скопіювати посилання",
+      "copySuccess": "Посилання скопійовано",
+      "copyFailed": "Не вдалося скопіювати посилання",
+      "inviteAccepted": "Запрошення вже прийнято",
+      "inviteExpired": "Термін дії запрошення завершився"
+    }
   },
   "auth": {
     "login": {
@@ -1121,5 +1129,13 @@
     "following": "Ви стежите",
     "unfollowHint": "Перестати стежити",
     "followersCount": "{count} стежать"
+  },
+  "watching": {
+    "title": "Стеження",
+    "subtitle": "Публічні угоди, за якими ви стежите",
+    "status": "Статус",
+    "deadline": "Термін",
+    "loadMore": "Завантажити ще",
+    "loadingMore": "Завантаження…"
   }
 }
