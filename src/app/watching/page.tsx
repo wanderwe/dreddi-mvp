@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
+import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
 type Watched = { id: string; title: string; status: string; due_at: string | null; creator_id: string; counterparty_id: string | null; promisor_id: string | null; promisee_id: string | null };
 
@@ -19,7 +20,16 @@ export default function WatchingPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/watching", { method: "GET", credentials: "include" });
+        const token = await supabase?.auth
+          .getSession()
+          .then(({ data }) => data.session?.access_token ?? null)
+          .catch(() => null);
+
+        const response = await fetch("/api/watching", {
+          method: "GET",
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
         if (response.status === 401) {
           window.location.href = localizeLoginPath(localizePath("/watching", locale), locale);
           return;
