@@ -1292,11 +1292,11 @@ export default function PromisePage() {
                 {t("promises.detail.roles.title")}
               </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
                     {t("promises.detail.roles.createdBy")}
                   </p>
-                  <p className="mt-1 truncate text-sm font-medium text-white">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
                     {creatorHref ? (
                       <Link
                         href={creatorHref}
@@ -1309,11 +1309,11 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
                     {t("promises.detail.roles.responsible")}
                   </p>
-                  <p className="mt-1 truncate text-sm font-medium text-white">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
                     {responsibleHref ? (
                       <Link
                         href={responsibleHref}
@@ -1326,11 +1326,11 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
                     {t("promises.detail.roles.madeTo")}
                   </p>
-                  <p className="mt-1 truncate text-sm font-medium text-white">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
                     {promiseToHref ? (
                       <Link
                         href={promiseToHref}
@@ -1343,11 +1343,11 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
+                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
                     {t("promises.detail.inviteLabel")}
                   </p>
-                  <p className="mt-1 truncate text-sm font-medium text-white">{inviteMetaText}</p>
+                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">{inviteMetaText}</p>
                 </div>
               </div>
             </div>
