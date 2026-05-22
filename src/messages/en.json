@@ -133,6 +133,8 @@
     "empty": {
       "title": "Nothing here yet",
       "globalDescription": "You don’t have any deals yet",
+      "watchingTitle": "You are not tracking agreements from other users yet",
+      "watchingDescription": "Public agreements you follow will appear here",
       "filteredTitle": "No deals match this filter",
       "publicFilteredTitle": "No public deals in this filter",
       "privateFilteredTitle": "No private deals in this filter",
@@ -1102,7 +1104,7 @@
   },
   "watching": {
     "title": "Watchlist",
-    "subtitle": "Public agreements you track",
+    "subtitle": "Public agreements from other users you follow",
     "status": "Status",
     "deadline": "Deadline",
     "loadMore": "Load more",
