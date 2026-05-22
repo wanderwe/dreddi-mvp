@@ -48,6 +48,7 @@ type PromiseRow = {
   creator_id: string; // ✅ was optional; selected in query, so make it required for correct role typing
   promisor_id: string | null;
   promisee_id: string | null;
+  visibility: "public" | "private" | null;
 };
 
 type TabKey = "i-promised" | "promised-to-me";
@@ -62,6 +63,7 @@ const normalizeTabParam = (value: string | null): TabKey => {
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
 type StatusFilter = string;
+type DealTypeFilter = "all" | "public" | "private" | "reputation_stake";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -82,6 +84,7 @@ type PromiseRoleBase = Pick<
   | "promisor_id"
   | "promisee_id"
   | "counterparty_id"
+  | "visibility"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -106,6 +109,13 @@ const PAGE_SIZE = 12;
 const STATUS_FILTER_ALL = "all";
 const STATUS_FILTER_OVERDUE = "overdue";
 const STATUS_FILTER_UI_PREFIX = "ui:";
+const DEAL_TYPE_FILTER_ALL: DealTypeFilter = "all";
+
+const normalizeDealTypeParam = (typeValue: string | null, visibilityValue: string | null): DealTypeFilter => {
+  if (typeValue === "public" || typeValue === "private" || typeValue === "reputation_stake") return typeValue;
+  if (visibilityValue === "public" || visibilityValue === "private") return visibilityValue;
+  return DEAL_TYPE_FILTER_ALL;
+};
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
   const executorId = resolveExecutorId(row);
@@ -193,11 +203,14 @@ export default function PromisesClient() {
   const tabParam = searchParams.get("tab");
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
+  const visibilityParam = searchParams.get("visibility");
+  const typeParam = searchParams.get("type");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
   const statusFromSearch: StatusFilter = normalizeStatusParam(statusParam);
+  const dealTypeFromSearch: DealTypeFilter = normalizeDealTypeParam(typeParam, visibilityParam);
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -276,12 +289,17 @@ export default function PromisesClient() {
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
+  const [activeDealTypeFilter, setActiveDealTypeFilter] =
+    useState<DealTypeFilter>(dealTypeFromSearch);
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const statusButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [isDealTypeMenuOpen, setIsDealTypeMenuOpen] = useState(false);
+  const dealTypeMenuRef = useRef<HTMLDivElement | null>(null);
+  const dealTypeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -335,6 +353,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        + ",visibility"
       )
       .or(buildBaseFilter(user.id));
 
@@ -395,6 +414,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        + ",visibility"
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
@@ -480,17 +500,24 @@ export default function PromisesClient() {
   }, [toast]);
 
   useEffect(() => {
-    if (!isStatusMenuOpen) return;
+    if (!isStatusMenuOpen && !isDealTypeMenuOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (statusMenuRef.current?.contains(target)) return;
-      if (statusButtonRef.current?.contains(target)) return;
+      const inStatusMenu =
+        statusMenuRef.current?.contains(target) || statusButtonRef.current?.contains(target);
+      const inDealTypeMenu =
+        dealTypeMenuRef.current?.contains(target) || dealTypeButtonRef.current?.contains(target);
+      if (inStatusMenu || inDealTypeMenu) return;
       setIsStatusMenuOpen(false);
+      setIsDealTypeMenuOpen(false);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsStatusMenuOpen(false);
+      if (event.key === "Escape") {
+        setIsStatusMenuOpen(false);
+        setIsDealTypeMenuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -500,7 +527,7 @@ export default function PromisesClient() {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isStatusMenuOpen]);
+  }, [isStatusMenuOpen, isDealTypeMenuOpen]);
 
   useEffect(() => {
     setActiveMetricFilter(metricFromSearch);
@@ -509,6 +536,9 @@ export default function PromisesClient() {
   useEffect(() => {
     setActiveStatusFilter(statusFromSearch);
   }, [statusFromSearch]);
+  useEffect(() => {
+    setActiveDealTypeFilter(dealTypeFromSearch);
+  }, [dealTypeFromSearch]);
 
   useEffect(() => {
     if (listLoading) return;
@@ -516,13 +546,15 @@ export default function PromisesClient() {
       tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
     );
     const hasAnyActiveFilter =
-      activeMetricFilter !== "total" || activeStatusFilter !== STATUS_FILTER_ALL;
+      activeMetricFilter !== "total" ||
+      activeStatusFilter !== STATUS_FILTER_ALL ||
+      activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
     const filteredRows = hasAnyActiveFilter
       ? applyStatusFilter(summaryRowsForCurrentTab)
       : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -618,13 +650,21 @@ export default function PromisesClient() {
     return filtered;
   };
 
+  const applyDealTypeFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
+    if (activeDealTypeFilter === DEAL_TYPE_FILTER_ALL) return rows;
+    if (activeDealTypeFilter === "reputation_stake") {
+      return rows.filter((row) => row.is_important);
+    }
+    return rows.filter((row) => (row.visibility ?? "private") === activeDealTypeFilter);
+  };
+
   const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
-  ): T[] => applyStatusFilter(applyMetricFilter(rows));
+  ): T[] => applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows)));
 
   const filteredSummaryRows = useMemo(
-    () => applyMetricFilter(summaryRows),
-    [summaryRows, activeMetricFilter]
+    () => applyDealTypeFilter(applyMetricFilter(summaryRows)),
+    [summaryRows, activeMetricFilter, activeDealTypeFilter]
   );
 
   const roleCounts = useMemo(
@@ -651,16 +691,17 @@ export default function PromisesClient() {
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyStatusFilter(metricFilteredListRowsByTab["i-promised"]),
-      "promised-to-me": applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]),
+      "i-promised": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"])),
+      "promised-to-me": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"])),
     }),
-    [metricFilteredListRowsByTab, activeStatusFilter]
+    [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const hasDealTypeFilter = activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasDealTypeFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
@@ -670,8 +711,8 @@ export default function PromisesClient() {
     [filteredSummaryRows, tab]
   );
   const summaryRowsForCurrentTab = useMemo(
-    () => applyStatusFilter(metricSummaryRowsForCurrentTab),
-    [metricSummaryRowsForCurrentTab, activeStatusFilter]
+    () => applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
+    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter]
   );
   const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
@@ -703,7 +744,13 @@ export default function PromisesClient() {
     ? t("promises.empty.title")
     : isAwaitingMyActionEmpty
       ? t("promises.empty.awaitingYourActionTitle")
-      : t("promises.empty.filteredTitle");
+      : activeDealTypeFilter === "public"
+        ? t("promises.empty.publicFilteredTitle")
+        : activeDealTypeFilter === "private"
+          ? t("promises.empty.privateFilteredTitle")
+          : activeDealTypeFilter === "reputation_stake"
+            ? t("promises.empty.reputationStakeFilteredTitle")
+            : t("promises.empty.filteredTitle");
   const emptyDescription = isGlobalEmpty
     ? t("promises.empty.globalDescription")
     : isAwaitingMyActionEmpty
@@ -851,6 +898,15 @@ export default function PromisesClient() {
     else sp.set("status", next);
     router.push(localizePath(`/promises?${sp.toString()}`, locale));
   };
+  const handleDealTypeFilterChange = (next: DealTypeFilter) => {
+    setActiveDealTypeFilter(next);
+    setIsDealTypeMenuOpen(false);
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.delete("visibility");
+    if (next === DEAL_TYPE_FILTER_ALL) sp.delete("type");
+    else sp.set("type", next);
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  };
 
   useEffect(() => {
     if (activeStatusFilter === STATUS_FILTER_ALL) return;
@@ -865,9 +921,18 @@ export default function PromisesClient() {
       ...availableStatusOptions,
     ];
   }, [availableStatusOptions, t]);
+  const dealTypeOptions: Array<{ value: DealTypeFilter; label: string }> = [
+    { value: "all", label: t("promises.list.dealTypeFilter.options.all") },
+    { value: "public", label: t("promises.list.dealTypeFilter.options.public") },
+    { value: "private", label: t("promises.list.dealTypeFilter.options.private") },
+    { value: "reputation_stake", label: t("promises.list.dealTypeFilter.options.reputationStake") },
+  ];
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
     t("promises.list.statusFilter.options.all");
+  const activeDealTypeLabel =
+    dealTypeOptions.find((option) => option.value === activeDealTypeFilter)?.label ??
+    t("promises.list.dealTypeFilter.options.all");
 
   return (
     <main className="relative py-10">
@@ -979,7 +1044,54 @@ export default function PromisesClient() {
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
 
-            <div className="relative sm:ml-auto" ref={statusMenuRef}>
+            <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center">
+              <div className="relative" ref={dealTypeMenuRef}>
+                <span className="sr-only">{t("promises.list.dealTypeFilter.label")}</span>
+                <button
+                  type="button"
+                  ref={dealTypeButtonRef}
+                  onClick={() => setIsDealTypeMenuOpen((open) => !open)}
+                  aria-haspopup="listbox"
+                  aria-expanded={isDealTypeMenuOpen}
+                  aria-label={t("promises.list.dealTypeFilter.label")}
+                  className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
+                >
+                  <span className="truncate">{activeDealTypeLabel}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 text-slate-300 transition-transform ${isDealTypeMenuOpen ? "rotate-180" : ""}`}
+                    aria-hidden
+                  />
+                </button>
+                {isDealTypeMenuOpen && (
+                  <div
+                    role="listbox"
+                    aria-label={t("promises.list.dealTypeFilter.label")}
+                    className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                  >
+                    {dealTypeOptions.map((option) => {
+                      const selected = option.value === activeDealTypeFilter;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          role="option"
+                          aria-selected={selected}
+                          onClick={() => handleDealTypeFilterChange(option.value)}
+                          className={[
+                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                            selected
+                              ? "bg-emerald-400/90 text-slate-950"
+                              : "text-slate-100 hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="relative" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
               <button
                 type="button"
@@ -1025,6 +1137,7 @@ export default function PromisesClient() {
                   })}
                 </div>
               )}
+              </div>
             </div>
           </div>
 
@@ -1180,9 +1293,12 @@ export default function PromisesClient() {
                       onClick={() => {
                         setActiveMetricFilter("total");
                         setActiveStatusFilter("all");
+                        setActiveDealTypeFilter("all");
                         const sp = new URLSearchParams(searchParams.toString());
                         sp.delete("filter");
                         sp.delete("status");
+                        sp.delete("visibility");
+                        sp.delete("type");
                         router.push(localizePath(`/promises?${sp.toString()}`, locale));
                       }}
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"

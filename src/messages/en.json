@@ -134,13 +134,14 @@
       "title": "Nothing here yet",
       "globalDescription": "You don’t have any deals yet",
       "filteredTitle": "No deals match this filter",
+      "publicFilteredTitle": "No public deals in this filter",
+      "privateFilteredTitle": "No private deals in this filter",
       "filteredDescription": "Try a different filter to see your deals",
       "awaitingYourActionTitle": "You’re all caught up",
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
       "cta": "Create deal",
       "showAll": "Show all deals",
-      "watchingTitle": "You are not watching any agreements yet",
-      "watchingDescription": "Public agreements you track will appear here"
+      "reputationStakeFilteredTitle": "No reputation stake deals in this filter"
     },
     "status": {
       "active": "Active",
@@ -220,6 +221,15 @@
       "errors": {
         "markComplete": "Could not mark complete",
         "updateFailed": "Failed to update"
+      },
+      "dealTypeFilter": {
+        "label": "Deal type",
+        "options": {
+          "all": "All deals",
+          "public": "Public",
+          "private": "Private",
+          "reputationStake": "Reputation stake"
+        }
       }
     },
     "detail": {

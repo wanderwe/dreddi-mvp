@@ -142,13 +142,14 @@
       "title": "Поки що порожньо",
       "globalDescription": "У вас ще немає угод",
       "filteredTitle": "Немає угод за цим фільтром",
+      "publicFilteredTitle": "Немає публічних угод у цьому фільтрі",
+      "privateFilteredTitle": "Немає приватних угод у цьому фільтрі",
       "filteredDescription": "Спробуйте інший фільтр, щоб побачити угоди",
       "awaitingYourActionTitle": "Усе під контролем",
       "awaitingYourActionDescription": "Зараз немає угод, що очікують ваших дій",
       "cta": "Створити угоду",
       "showAll": "Показати всі угоди",
-      "watchingTitle": "Ви ще не стежите за угодами",
-      "watchingDescription": "Публічні угоди, за якими ви стежите, зʼявляться тут"
+      "reputationStakeFilteredTitle": "Немає угод з репутаційною ставкою"
     },
     "status": {
       "active": "Активна",
@@ -228,6 +229,15 @@
       "errors": {
         "markComplete": "Не вдалося позначити як виконану",
         "updateFailed": "Не вдалося оновити"
+      },
+      "dealTypeFilter": {
+        "label": "Тип угоди",
+        "options": {
+          "all": "Усі угоди",
+          "public": "Публічні",
+          "private": "Приватні",
+          "reputationStake": "З репутаційною ставкою"
+        }
       }
     },
     "detail": {
