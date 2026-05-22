@@ -1027,28 +1027,7 @@ export default function PromisesClient() {
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
 
-            <div className="relative w-full sm:ml-auto sm:max-w-sm">
-              <input
-                type="search"
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-                placeholder={t("promises.list.search.placeholder")}
-                aria-label={t("promises.list.search.placeholder")}
-                className="min-h-11 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 pr-10 text-sm text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50"
-              />
-              {searchInput && (
-                <button
-                  type="button"
-                  onClick={() => setSearchInput("")}
-                  aria-label={t("promises.list.search.clear")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            <div className="relative" ref={statusMenuRef}>
+            <div className="relative sm:ml-auto" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
               <button
                 type="button"
@@ -1093,6 +1072,29 @@ export default function PromisesClient() {
                     );
                   })}
                 </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <div className="relative w-full sm:max-w-sm">
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t("promises.list.search.placeholder")}
+                aria-label={t("promises.list.search.placeholder")}
+                className="min-h-11 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 pr-10 text-sm text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50"
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput("")}
+                  aria-label={t("promises.list.search.clear")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
+                >
+                  ✕
+                </button>
               )}
             </div>
           </div>
