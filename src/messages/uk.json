@@ -17,7 +17,7 @@
     "sendFeedback": "Надіслати фідбек",
     "groups": "Групи",
     "allGroups": "Усі групи",
-    "watching": "Стежу"
+    "watching": "Стеження"
   },
   "legal": {
     "sectionEyebrow": "ЮРИДИЧНЕ",
@@ -1114,7 +1114,7 @@
     "followersCount": "{count} стежать"
   },
   "watching": {
-    "title": "Стежу",
+    "title": "Стеження",
     "subtitle": "Публічні угоди, за якими ви стежите",
     "status": "Статус",
     "deadline": "Термін"
