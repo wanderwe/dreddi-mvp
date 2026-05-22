@@ -217,6 +217,10 @@
       "errors": {
         "markComplete": "Could not mark complete",
         "updateFailed": "Failed to update"
+      },
+      "search": {
+        "placeholder": "Search deals",
+        "clear": "Clear search"
       }
     },
     "detail": {

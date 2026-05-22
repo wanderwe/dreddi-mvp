@@ -89,6 +89,11 @@ type PromiseWithRole = PromiseRow & {
   uiStatus: PromiseUiStatus;
   isReviewer: boolean;
 };
+type CounterpartyProfile = {
+  displayName: string | null;
+  email: string | null;
+  handle: string | null;
+};
 
 type PromiseSummary = PromiseRoleBase & {
   role: PromiseRole;
@@ -159,11 +164,13 @@ export default function PromisesClient() {
   const tab = normalizeTabParam(searchParams.get("tab"));
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
+  const searchParam = searchParams.get("q");
   const metricFromSearch: MetricFilter =
     filterParam === "awaiting_my_action" || filterParam === "awaiting_others"
       ? filterParam
       : "total";
   const statusFromSearch: StatusFilter = normalizeStatusParam(statusParam);
+  const searchFromSearch = searchParam?.trim() ?? "";
 
   const dealMetaLabels = useMemo(
     () => ({
@@ -237,6 +244,9 @@ export default function PromisesClient() {
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
+  const [searchInput, setSearchInput] = useState(searchFromSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchFromSearch);
+  const [counterpartyProfiles, setCounterpartyProfiles] = useState<Record<string, CounterpartyProfile>>({});
   const [summaryLoaded, setSummaryLoaded] = useState(false);
   const lastFilterRef = useRef<MetricFilter | null>(null);
   const autoSwitchHandledForFilterRef = useRef(false);
@@ -471,6 +481,16 @@ export default function PromisesClient() {
   }, [statusFromSearch]);
 
   useEffect(() => {
+    setSearchInput(searchFromSearch);
+    setDebouncedSearch(searchFromSearch);
+  }, [searchFromSearch]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
     if (listLoading) return;
     const summaryRowsForCurrentTab = applyMetricFilter(summaryRows).filter((row) =>
       tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
@@ -483,6 +503,51 @@ export default function PromisesClient() {
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMetricFilter, activeStatusFilter, listLoading, listRowsByTab, summaryRows, tab]);
+
+  useEffect(() => {
+    if (!userId) return;
+    const ids = new Set<string>();
+    for (const row of summaryRows) {
+      if (row.counterparty_id && row.counterparty_id !== userId) ids.add(row.counterparty_id);
+    }
+    if (!ids.size) return;
+
+    let cancelled = false;
+    (async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+      const { data } = await supabase
+        .from("profiles")
+        .select("id,display_name,email,handle")
+        .in("id", [...ids]);
+      if (cancelled || !data) return;
+      const mapped: Record<string, CounterpartyProfile> = {};
+      for (const profile of data as Array<{ id: string; display_name: string | null; email: string | null; handle: string | null }>) {
+        mapped[profile.id] = {
+          displayName: profile.display_name?.trim() ?? null,
+          email: profile.email?.trim() ?? null,
+          handle: profile.handle?.trim() ?? null,
+        };
+      }
+      setCounterpartyProfiles(mapped);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [summaryRows, userId]);
+
+  useEffect(() => {
+    if (debouncedSearch === searchFromSearch) return;
+    const sp = new URLSearchParams(searchParams.toString());
+    if (debouncedSearch) sp.set("q", debouncedSearch);
+    else sp.delete("q");
+    router.push(localizePath(`/promises?${sp.toString()}`, locale));
+  }, [debouncedSearch, locale, router, searchFromSearch, searchParams]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -582,6 +647,24 @@ export default function PromisesClient() {
     rows: T[]
   ): T[] => applyStatusFilter(applyMetricFilter(rows));
 
+  const applySearchFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
+    const query = debouncedSearch.toLocaleLowerCase();
+    if (!query) return rows;
+    return rows.filter((row) => {
+      const profile = row.counterparty_id ? counterpartyProfiles[row.counterparty_id] : null;
+      const haystack = [
+        row.title,
+        row.condition_text ?? "",
+        profile?.displayName ?? "",
+        profile?.email ?? "",
+        profile?.handle ?? "",
+      ]
+        .join(" ")
+        .toLocaleLowerCase();
+      return haystack.includes(query);
+    });
+  };
+
   const filteredSummaryRows = useMemo(
     () => applyMetricFilter(summaryRows),
     [summaryRows, activeMetricFilter]
@@ -620,7 +703,8 @@ export default function PromisesClient() {
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter;
+  const hasSearchFilter = debouncedSearch.length > 0;
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasSearchFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
@@ -633,9 +717,13 @@ export default function PromisesClient() {
     () => applyStatusFilter(metricSummaryRowsForCurrentTab),
     [metricSummaryRowsForCurrentTab, activeStatusFilter]
   );
-  const rows = hasAnyFilter
+  const preSearchRows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
     : filteredListRowsByTab[tab];
+  const rows = useMemo(
+    () => applySearchFilter(preSearchRows),
+    [preSearchRows, debouncedSearch, counterpartyProfiles]
+  );
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -939,7 +1027,28 @@ export default function PromisesClient() {
               {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
             </button>
 
-            <div className="relative sm:ml-auto" ref={statusMenuRef}>
+            <div className="relative w-full sm:ml-auto sm:max-w-sm">
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t("promises.list.search.placeholder")}
+                aria-label={t("promises.list.search.placeholder")}
+                className="min-h-11 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 pr-10 text-sm text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50"
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput("")}
+                  aria-label={t("promises.list.search.clear")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="relative" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
               <button
                 type="button"

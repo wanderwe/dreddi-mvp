@@ -225,6 +225,10 @@
       "errors": {
         "markComplete": "Не вдалося позначити як виконану",
         "updateFailed": "Не вдалося оновити"
+      },
+      "search": {
+        "placeholder": "Пошук угод",
+        "clear": "Очистити пошук"
       }
     },
     "detail": {
