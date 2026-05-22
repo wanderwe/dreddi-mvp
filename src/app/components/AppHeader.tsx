@@ -2,7 +2,7 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
-import { Eye, Layers3, UsersRound } from "lucide-react";
+import { Eye, Folder, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
@@ -213,7 +213,7 @@ export function AppHeader() {
                     <IconButton
                       href={localizePath("/promises/groups", locale)}
                       ariaLabel={t("nav.groups")}
-                      icon={<Layers3 className="h-4 w-4" aria-hidden />}
+                      icon={<Folder className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.publicProfiles")} placement="top">
