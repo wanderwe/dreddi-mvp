@@ -348,36 +348,7 @@ export default function InvitePage() {
       />
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
-        <div className="flex items-center justify-end gap-2 sm:gap-3">
-          {isCreatorViewer && (
-            <div className="flex items-center gap-2">
-              {canManageShare && (
-                <>
-                  <Tooltip label={t("invite.creatorShare.copyInviteLink")} placement="top">
-                    <button
-                      type="button"
-                      onClick={() => void copyInviteLink()}
-                      aria-label={t("invite.creatorShare.copyInviteLink")}
-                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                    >
-                      <Copy className="h-4 w-4" aria-hidden />
-                    </button>
-                  </Tooltip>
-                  <Tooltip label={t("invite.creatorShare.shareInvitePage")} placement="top">
-                    <button
-                      type="button"
-                      onClick={() => void shareInvitePage()}
-                      aria-label={t("invite.creatorShare.shareInvitePage")}
-                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                    >
-                      <Share2 className="h-4 w-4" aria-hidden />
-                    </button>
-                  </Tooltip>
-                </>
-              )}
-              {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
-            </div>
-          )}
+        <div className="flex items-center justify-end">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
@@ -390,10 +361,6 @@ export default function InvitePage() {
             )}
           </div>
         </div>
-        {shareMessage && isCreatorViewer && (
-          <p className="-mt-5 text-right text-xs text-slate-300">{shareMessage}</p>
-        )}
-
         {error && (
           <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
             {error}
@@ -410,7 +377,39 @@ export default function InvitePage() {
 
         {info && (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-7">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+              {isCreatorViewer && (
+                <div className="flex flex-col items-end gap-1">
+                  {canManageShare && (
+                    <div className="flex items-center gap-2">
+                      <Tooltip label={t("invite.creatorShare.copyInviteLink")} placement="top">
+                        <button
+                          type="button"
+                          onClick={() => void copyInviteLink()}
+                          aria-label={t("invite.creatorShare.copyInviteLink")}
+                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        >
+                          <Copy className="h-4 w-4" aria-hidden />
+                        </button>
+                      </Tooltip>
+                      <Tooltip label={t("invite.creatorShare.shareInvitePage")} placement="top">
+                        <button
+                          type="button"
+                          onClick={() => void shareInvitePage()}
+                          aria-label={t("invite.creatorShare.shareInvitePage")}
+                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        >
+                          <Share2 className="h-4 w-4" aria-hidden />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  )}
+                  {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
+                  {shareMessage && <p className="text-xs text-slate-300">{shareMessage}</p>}
+                </div>
+              )}
+            </div>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
               {heading}
             </h1>
