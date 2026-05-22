@@ -1115,7 +1115,20 @@ export default function PromisePage() {
     if (!p?.id || !isPrivateAgreement) return;
     let active = true;
     const loadUpdates = async () => {
-      const response = await fetch(`/api/promises/${p.id}/updates`, { cache: "no-store" });
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+      const session = await requireSessionOrRedirect(`/promises/${p.id}`, supabase);
+      if (!session) return;
+      const response = await fetch(`/api/promises/${p.id}/updates`, {
+        cache: "no-store",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
       if (!response.ok) return;
       const data = (await response.json()) as AgreementUpdate[];
       if (!active) return;
@@ -1132,9 +1145,26 @@ export default function PromisePage() {
     const content = updateContent.trim();
     if (!content) return;
     setUpdateSubmitState("saving");
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch {
+      setUpdateSubmitState("error");
+      return;
+    }
+    const session = await requireSessionOrRedirect(`/promises/${p.id}`, supabase);
+    if (!session) {
+      setUpdateSubmitState("error");
+      return;
+    }
+
     const response = await fetch(`/api/promises/${p.id}/updates`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: JSON.stringify({ content }),
     });
     if (!response.ok) {
