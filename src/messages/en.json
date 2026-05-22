@@ -1094,6 +1094,8 @@
     "title": "Watchlist",
     "subtitle": "Public agreements you track",
     "status": "Status",
-    "deadline": "Deadline"
+    "deadline": "Deadline",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…"
   }
 }

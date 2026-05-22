@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
 import { isPromiseStatus } from "@/lib/promiseStatus";
@@ -17,8 +18,16 @@ function adminClient() {
 }
 
 export async function GET(req: Request) {
-  const user = await requireUser(req);
+  const cookieStore = await cookies();
+  const user = await requireUser(req, cookieStore);
   if (user instanceof NextResponse) return user;
+
+  const url = new URL(req.url);
+  const limitParam = Number.parseInt(url.searchParams.get("limit") ?? "12", 10);
+  const offsetParam = Number.parseInt(url.searchParams.get("offset") ?? "0", 10);
+  const limit = Number.isNaN(limitParam) ? 12 : Math.min(Math.max(limitParam, 1), 50);
+  const offset = Number.isNaN(offsetParam) ? 0 : Math.max(offsetParam, 0);
+  const rangeEnd = offset + limit;
 
   const admin = adminClient();
   const { data, error } = await admin
@@ -28,7 +37,8 @@ export async function GET(req: Request) {
     )
     .eq("user_id", user.id)
     .eq("promises.visibility", "public")
-    .order("created_at", { ascending: false, referencedTable: "promises" });
+    .order("created_at", { ascending: false, referencedTable: "promises" })
+    .range(offset, rangeEnd);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
