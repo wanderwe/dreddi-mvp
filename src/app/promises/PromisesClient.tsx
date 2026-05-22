@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Shield } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -1233,24 +1233,9 @@ export default function PromisesClient() {
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex min-w-0 items-center gap-2">
-                          <div
-                            className={[
-                              "min-w-0",
-                              p.is_important ? "max-w-[calc(100%-1.75rem)]" : "flex-1",
-                            ].join(" ")}
-                          >
+                          <div className="min-w-0 flex-1">
                             <DealTitleLink id={p.id} title={p.title} />
                           </div>
-                          {p.is_important && (
-                            <Tooltip label={t("promises.important.tooltip")} placement="top">
-                              <span
-                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-300"
-                                aria-label={t("promises.important.label")}
-                              >
-                                <Shield className="h-3.5 w-3.5" aria-hidden />
-                              </span>
-                            </Tooltip>
-                          )}
                         </div>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
                       </div>
