@@ -2,7 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Copy, ExternalLink, Share2 } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -59,7 +59,8 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   async function load() {
@@ -313,26 +314,15 @@ export default function InvitePage() {
     } catch {
       didCopy = false;
     }
-    setShareMessage(didCopy ? t("invite.creatorShare.copySuccess") : t("invite.creatorShare.copyFailed"));
+    setToastTone(didCopy ? "success" : "error");
+    setToast(didCopy ? t("invite.creatorShare.copySuccess") : t("invite.creatorShare.copyFailed"));
   }
 
-  async function shareInvitePage() {
-    if (!canManageShare || !inviteLink) return;
-    if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
-      setShareMessage(t("invite.creatorShare.shareUnsupported"));
-      return;
-    }
-    try {
-      await navigator.share({
-        title: info?.title ?? t("invite.heading.pending"),
-        text: t("invite.creatorShare.shareText"),
-        url: inviteLink,
-      });
-      setShareMessage(t("invite.creatorShare.shareSuccess"));
-    } catch {
-      setShareMessage(t("invite.creatorShare.shareFailed"));
-    }
-  }
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -393,20 +383,9 @@ export default function InvitePage() {
                           <Copy className="h-4 w-4" aria-hidden />
                         </button>
                       </Tooltip>
-                      <Tooltip label={t("invite.creatorShare.shareInvitePage")} placement="top">
-                        <button
-                          type="button"
-                          onClick={() => void shareInvitePage()}
-                          aria-label={t("invite.creatorShare.shareInvitePage")}
-                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
-                        >
-                          <Share2 className="h-4 w-4" aria-hidden />
-                        </button>
-                      </Tooltip>
                     </div>
                   )}
                   {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
-                  {shareMessage && <p className="text-xs text-slate-300">{shareMessage}</p>}
                 </div>
               )}
             </div>
@@ -566,6 +545,19 @@ export default function InvitePage() {
                 {t("invite.publicModal.confirm")}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {toast && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
+          <div
+            className={`rounded-full border px-4 py-2 text-sm font-semibold shadow-xl backdrop-blur ${
+              toastTone === "success"
+                ? "border-emerald-300/40 bg-emerald-500/15 text-emerald-100"
+                : "border-red-300/40 bg-red-500/15 text-red-100"
+            }`}
+          >
+            {toast}
           </div>
         </div>
       )}
