@@ -31,6 +31,7 @@ type PromiseRow = {
   status: PromiseStatus;
   due_at: string | null;
   created_at: string;
+  updated_at: string | null;
   completed_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
@@ -69,6 +70,7 @@ type PromiseRoleBase = Pick<
   | "id"
   | "status"
   | "created_at"
+  | "updated_at"
   | "completed_at"
   | "confirmed_at"
   | "disputed_at"
@@ -126,6 +128,7 @@ const isPromiseRoleBase = (row: unknown): row is PromiseRoleBase => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
+    && (candidate.updated_at === null || typeof candidate.updated_at === "string")
     && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && isPromiseStatus(candidate.status)
@@ -140,6 +143,7 @@ const isPromiseRow = (row: unknown): row is PromiseRow => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
+    && (candidate.updated_at === null || typeof candidate.updated_at === "string")
     && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && typeof candidate.is_important === "boolean"
@@ -161,6 +165,21 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
     isReviewer,
   };
 };
+
+
+const getRecencyTimestamp = (row: Pick<PromiseRow, "updated_at" | "created_at">) => {
+  const updatedAt = row.updated_at ? new Date(row.updated_at).getTime() : Number.NaN;
+  if (Number.isFinite(updatedAt)) return updatedAt;
+  const createdAt = new Date(row.created_at).getTime();
+  return Number.isFinite(createdAt) ? createdAt : Number.NEGATIVE_INFINITY;
+};
+
+const sortByRecencyDesc = <T extends Pick<PromiseRow, "updated_at" | "created_at" | "id">>(rows: T[]): T[] =>
+  [...rows].sort((a, b) => {
+    const diff = getRecencyTimestamp(b) - getRecencyTimestamp(a);
+    if (diff !== 0) return diff;
+    return b.id.localeCompare(a.id);
+  });
 
 const buildBaseFilter = (id: string) =>
   `promisor_id.eq.${id},promisee_id.eq.${id},creator_id.eq.${id},counterparty_id.eq.${id}`;
@@ -382,9 +401,12 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,is_important,status,due_at,created_at,updated_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
         + ",visibility"
       )
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
       .or(buildBaseFilter(user.id));
 
       if (cancelled) return;
@@ -445,9 +467,10 @@ export default function PromisesClient() {
     const baseQuery = supabase
       .from("promises")
       .select(
-        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        "id,title,is_important,status,due_at,created_at,updated_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
         + ",visibility"
       )
+      .order("updated_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, rangeEnd);
@@ -748,9 +771,14 @@ export default function PromisesClient() {
     () => applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
     [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter]
   );
-  const rows = hasAnyFilter
-    ? (summaryRowsForCurrentTab as PromiseWithRole[])
-    : filteredListRowsByTab[tab];
+  const rows = useMemo(
+    () => sortByRecencyDesc(
+      hasAnyFilter
+        ? (summaryRowsForCurrentTab as PromiseWithRole[])
+        : filteredListRowsByTab[tab]
+    ),
+    [hasAnyFilter, summaryRowsForCurrentTab, filteredListRowsByTab, tab]
+  );
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
