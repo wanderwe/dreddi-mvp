@@ -265,7 +265,7 @@
         "title": "Agreement updates",
         "add": "Add update",
         "labelPrivate": "Progress update (visible only to participants)",
-        "placeholder": "Share a short update on progress, blockers, or next steps."
+        "placeholder": "Share a short update on progress, blockers, or next steps"
       },
       "currentStatus": "Current status",
       "markCompleted": "Mark as completed",
