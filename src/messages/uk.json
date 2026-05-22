@@ -16,7 +16,8 @@
     "actionQueueBadge": "Потрібні дії",
     "sendFeedback": "Надіслати фідбек",
     "groups": "Групи",
-    "allGroups": "Усі групи"
+    "allGroups": "Усі групи",
+    "watching": "Стежу"
   },
   "legal": {
     "sectionEyebrow": "ЮРИДИЧНЕ",
@@ -145,7 +146,9 @@
       "awaitingYourActionTitle": "Усе під контролем",
       "awaitingYourActionDescription": "Зараз немає угод, що очікують ваших дій",
       "cta": "Створити угоду",
-      "showAll": "Показати всі угоди"
+      "showAll": "Показати всі угоди",
+      "watchingTitle": "Ви ще не стежите за угодами",
+      "watchingDescription": "Публічні угоди, за якими ви стежите, зʼявляться тут"
     },
     "status": {
       "active": "Активна",
@@ -1109,5 +1112,11 @@
     "following": "Ви стежите",
     "unfollowHint": "Перестати стежити",
     "followersCount": "{count} стежать"
+  },
+  "watching": {
+    "title": "Стежу",
+    "subtitle": "Публічні угоди, за якими ви стежите",
+    "status": "Статус",
+    "deadline": "Термін"
   }
 }

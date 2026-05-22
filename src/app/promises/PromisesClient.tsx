@@ -151,7 +151,7 @@ const normalizeStatusParam = (value: string | null): StatusFilter => {
   return toUiStatusFilterValue(value as PromiseUiStatus);
 };
 
-function DealTitleLink({ id, title }: { id: string; title: string }) {
+function DealTitleLink({ id, title, href }: { id: string; title: string; href?: string }) {
   const titleRef = useRef<HTMLSpanElement | null>(null);
 
   const isCurrentlyTruncated = () => {
@@ -172,7 +172,7 @@ function DealTitleLink({ id, title }: { id: string; title: string }) {
     >
       <span ref={titleRef} className="block min-w-0 w-full">
         <LocalizedLink
-          href={`/promises/${id}?from=deals`}
+          href={href ?? `/promises/${id}?from=deals`}
           title={undefined}
           className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
         >
@@ -190,6 +190,7 @@ export default function PromisesClient() {
   const searchParams = useSearchParams();
 
   const tab = normalizeTabParam(searchParams.get("tab"));
+  const tabParam = searchParams.get("tab");
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
   const metricFromSearch: MetricFilter =
@@ -208,6 +209,11 @@ export default function PromisesClient() {
   );
 
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
+
+  useEffect(() => {
+    if (tabParam !== "watching") return;
+    router.replace(localizePath("/watching", locale));
+  }, [locale, router, tabParam]);
 
   const statusLabelForRole = (
     status: PromiseStatus,
@@ -385,15 +391,16 @@ export default function PromisesClient() {
         ? buildPromisorFilter(userId)
         : buildCounterpartyFilter(userId);
 
-    const { data, error } = await supabase
+    const baseQuery = supabase
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
       )
-      .or(roleFilter)
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, rangeEnd);
+
+    const { data, error } = await baseQuery.or(roleFilter);
 
     if (error) {
       setError(error.message);

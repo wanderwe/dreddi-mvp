@@ -2,6 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -415,16 +416,7 @@ export default function InvitePage() {
                         onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
                         className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-emerald-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                       >
-                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
-                          <path
-                            d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                        </svg>
+                        <ExternalLink className="h-5 w-5" aria-hidden />
                       </button>
                     </Tooltip>
                   </div>

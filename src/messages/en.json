@@ -16,7 +16,8 @@
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
     "groups": "Groups",
-    "allGroups": "All groups"
+    "allGroups": "All groups",
+    "watching": "Watchlist"
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -137,7 +138,9 @@
       "awaitingYourActionTitle": "You’re all caught up",
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
       "cta": "Create deal",
-      "showAll": "Show all deals"
+      "showAll": "Show all deals",
+      "watchingTitle": "You are not watching any agreements yet",
+      "watchingDescription": "Public agreements you track will appear here"
     },
     "status": {
       "active": "Active",
@@ -1075,9 +1078,15 @@
       "error": "Could not publish this update. Only agreement participants can add official updates.",
       "unavailable": "Updates are temporarily unavailable until the latest database migration is applied"
     },
-    "follow": "Follow",
-    "following": "Following",
+    "follow": "Watch",
+    "following": "Watching",
     "unfollowHint": "Unfollow",
     "followersCount": "{count} following"
+  },
+  "watching": {
+    "title": "Watchlist",
+    "subtitle": "Public agreements you track",
+    "status": "Status",
+    "deadline": "Deadline"
   }
 }
