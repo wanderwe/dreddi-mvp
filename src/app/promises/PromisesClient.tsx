@@ -31,7 +31,6 @@ type PromiseRow = {
   status: PromiseStatus;
   due_at: string | null;
   created_at: string;
-  updated_at: string | null;
   completed_at: string | null;
   confirmed_at: string | null;
   disputed_at: string | null;
@@ -70,7 +69,6 @@ type PromiseRoleBase = Pick<
   | "id"
   | "status"
   | "created_at"
-  | "updated_at"
   | "completed_at"
   | "confirmed_at"
   | "disputed_at"
@@ -128,7 +126,6 @@ const isPromiseRoleBase = (row: unknown): row is PromiseRoleBase => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
-    && (candidate.updated_at === null || typeof candidate.updated_at === "string")
     && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && isPromiseStatus(candidate.status)
@@ -143,7 +140,6 @@ const isPromiseRow = (row: unknown): row is PromiseRow => {
     typeof candidate.id === "string"
     && typeof candidate.title === "string"
     && typeof candidate.created_at === "string"
-    && (candidate.updated_at === null || typeof candidate.updated_at === "string")
     && typeof candidate.is_important === "boolean"
     && typeof candidate.creator_id === "string"
     && typeof candidate.is_important === "boolean"
@@ -167,16 +163,58 @@ const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
 };
 
 
-const getRecencyTimestamp = (row: Pick<PromiseRow, "updated_at" | "created_at">) => {
-  const updatedAt = row.updated_at ? new Date(row.updated_at).getTime() : Number.NaN;
-  if (Number.isFinite(updatedAt)) return updatedAt;
-  const createdAt = new Date(row.created_at).getTime();
-  return Number.isFinite(createdAt) ? createdAt : Number.NEGATIVE_INFINITY;
+const getLatestLifecycleTimestamp = (
+  row: Pick<
+    PromiseRow,
+    | "created_at"
+    | "completed_at"
+    | "confirmed_at"
+    | "disputed_at"
+    | "condition_met_at"
+    | "counterparty_accepted_at"
+    | "accepted_at"
+    | "declined_at"
+    | "ignored_at"
+    | "cancelled_at"
+  >
+) => {
+  const timestamps = [
+    row.completed_at,
+    row.confirmed_at,
+    row.disputed_at,
+    row.condition_met_at,
+    row.counterparty_accepted_at,
+    row.accepted_at,
+    row.declined_at,
+    row.ignored_at,
+    row.cancelled_at,
+    row.created_at,
+  ]
+    .map((value) => (value ? new Date(value).getTime() : Number.NaN))
+    .filter((value) => Number.isFinite(value));
+
+  if (!timestamps.length) return Number.NEGATIVE_INFINITY;
+  return Math.max(...timestamps);
 };
 
-const sortByRecencyDesc = <T extends Pick<PromiseRow, "updated_at" | "created_at" | "id">>(rows: T[]): T[] =>
+const sortByRecencyDesc = <
+  T extends Pick<
+    PromiseRow,
+    | "id"
+    | "created_at"
+    | "completed_at"
+    | "confirmed_at"
+    | "disputed_at"
+    | "condition_met_at"
+    | "counterparty_accepted_at"
+    | "accepted_at"
+    | "declined_at"
+    | "ignored_at"
+    | "cancelled_at"
+  >,
+>(rows: T[]): T[] =>
   [...rows].sort((a, b) => {
-    const diff = getRecencyTimestamp(b) - getRecencyTimestamp(a);
+    const diff = getLatestLifecycleTimestamp(b) - getLatestLifecycleTimestamp(a);
     if (diff !== 0) return diff;
     return b.id.localeCompare(a.id);
   });
@@ -401,10 +439,9 @@ export default function PromisesClient() {
       const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,status,due_at,created_at,updated_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
+        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
         + ",visibility"
       )
-      .order("updated_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .or(buildBaseFilter(user.id));
@@ -467,10 +504,9 @@ export default function PromisesClient() {
     const baseQuery = supabase
       .from("promises")
       .select(
-        "id,title,is_important,status,due_at,created_at,updated_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
+        "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
         + ",visibility"
       )
-      .order("updated_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(offset, rangeEnd);
