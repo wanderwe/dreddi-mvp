@@ -1079,7 +1079,7 @@
       "confirmed": "Agreement fulfilled",
       "confirmedDescription": "The outcome was recorded as a fulfilled agreement",
       "disputed": "Agreement disputed",
-      "disputedDescription": "The outcome was publicly marked as disputed",
+      "disputedDescription": "The outcome was marked as disputed",
       "declined": "Agreement declined",
       "cancelled": "Agreement cancelled",
       "expired": "Invitation expired",
