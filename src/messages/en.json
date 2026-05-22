@@ -139,7 +139,8 @@
       "awaitingYourActionTitle": "You’re all caught up",
       "awaitingYourActionDescription": "There are no deals waiting for your action right now",
       "cta": "Create deal",
-      "showAll": "Show all deals"
+      "showAll": "Show all deals",
+      "reputationStakeFilteredTitle": "No reputation stake deals in this filter"
     },
     "status": {
       "active": "Active",
@@ -183,14 +184,6 @@
           "closed": "Closed invites"
         }
       },
-      "visibilityFilter": {
-        "label": "Filter by visibility",
-        "options": {
-          "all": "All deals",
-          "public": "Public",
-          "private": "Private"
-        }
-      },
       "cardLabel": "Deal",
       "dueLabel": "Due",
       "noDeadline": "No deadline",
@@ -227,6 +220,15 @@
       "errors": {
         "markComplete": "Could not mark complete",
         "updateFailed": "Failed to update"
+      },
+      "dealTypeFilter": {
+        "label": "Deal type",
+        "options": {
+          "all": "All deals",
+          "public": "Public",
+          "private": "Private",
+          "reputationStake": "Reputation stake"
+        }
       }
     },
     "detail": {

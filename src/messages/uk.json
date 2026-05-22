@@ -147,7 +147,8 @@
       "awaitingYourActionTitle": "Усе під контролем",
       "awaitingYourActionDescription": "Зараз немає угод, що очікують ваших дій",
       "cta": "Створити угоду",
-      "showAll": "Показати всі угоди"
+      "showAll": "Показати всі угоди",
+      "reputationStakeFilteredTitle": "Немає угод з репутаційною ставкою"
     },
     "status": {
       "active": "Активна",
@@ -191,14 +192,6 @@
           "closed": "Закриті запрошення"
         }
       },
-      "visibilityFilter": {
-        "label": "Фільтр за видимістю",
-        "options": {
-          "all": "Усі угоди",
-          "public": "Публічні",
-          "private": "Приватні"
-        }
-      },
       "cardLabel": "Угода",
       "dueLabel": "Строк",
       "noDeadline": "Без строку",
@@ -235,6 +228,15 @@
       "errors": {
         "markComplete": "Не вдалося позначити як виконану",
         "updateFailed": "Не вдалося оновити"
+      },
+      "dealTypeFilter": {
+        "label": "Тип угоди",
+        "options": {
+          "all": "Усі угоди",
+          "public": "Публічні",
+          "private": "Приватні",
+          "reputationStake": "З репутаційною ставкою"
+        }
       }
     },
     "detail": {
