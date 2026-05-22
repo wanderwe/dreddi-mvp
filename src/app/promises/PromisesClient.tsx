@@ -80,6 +80,7 @@ type PromiseRoleBase = Pick<
   | "ignored_at"
   | "due_at"
   | "title"
+  | "is_important"
   | "creator_id"
   | "promisor_id"
   | "promisee_id"
@@ -115,6 +116,35 @@ const normalizeDealTypeParam = (typeValue: string | null, visibilityValue: strin
   if (typeValue === "public" || typeValue === "private" || typeValue === "reputation_stake") return typeValue;
   if (visibilityValue === "public" || visibilityValue === "private") return visibilityValue;
   return DEAL_TYPE_FILTER_ALL;
+};
+
+
+const isPromiseRoleBase = (row: unknown): row is PromiseRoleBase => {
+  if (!row || typeof row !== "object") return false;
+  const candidate = row as Record<string, unknown>;
+  return (
+    typeof candidate.id === "string"
+    && typeof candidate.title === "string"
+    && typeof candidate.created_at === "string"
+    && typeof candidate.is_important === "boolean"
+    && typeof candidate.creator_id === "string"
+    && isPromiseStatus(candidate.status)
+  );
+};
+
+
+const isPromiseRow = (row: unknown): row is PromiseRow => {
+  if (!row || typeof row !== "object") return false;
+  const candidate = row as Record<string, unknown>;
+  return (
+    typeof candidate.id === "string"
+    && typeof candidate.title === "string"
+    && typeof candidate.created_at === "string"
+    && typeof candidate.is_important === "boolean"
+    && typeof candidate.creator_id === "string"
+    && typeof candidate.is_important === "boolean"
+    && isPromiseStatus(candidate.status)
+  );
 };
 
 const withRole = <T extends PromiseRoleBase>(row: T, userId: string) => {
@@ -361,9 +391,11 @@ export default function PromisesClient() {
 
       if (error) setError(error.message);
       else {
-        const filtered: PromiseSummary[] = (data ?? [])
-          .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
-          .map((row) => withRole(row as PromiseRoleBase, user.id));
+        const filtered: PromiseSummary[] = [];
+        for (const row of data ?? []) {
+          if (!isPromiseRoleBase(row)) continue;
+          filtered.push(withRole(row, user.id));
+        }
 
         setSummaryRows(filtered);
       }
@@ -427,9 +459,11 @@ export default function PromisesClient() {
       return;
     }
 
-    const parsed: PromiseWithRole[] = (data ?? [])
-      .filter((row) => isPromiseStatus((row as { status?: unknown }).status))
-      .map((row) => withRole(row as PromiseRow, userId));
+    const parsed: PromiseWithRole[] = [];
+    for (const row of data ?? []) {
+      if (!isPromiseRow(row)) continue;
+      parsed.push(withRole(row, userId));
+    }
     const nextHasMore = parsed.length > PAGE_SIZE;
     const pageRows = nextHasMore ? parsed.slice(0, PAGE_SIZE) : parsed;
 
