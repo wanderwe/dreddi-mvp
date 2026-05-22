@@ -113,7 +113,6 @@ export default function WatchingPage() {
           {!loading && rows.length === 0 && (
             <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
               <p className="text-lg font-semibold text-white">{t("promises.empty.watchingTitle")}</p>
-              <p className="text-sm text-slate-400">{t("promises.empty.watchingDescription")}</p>
             </div>
           )}
           {!loading && rows.length > 0 && hasMore && (
