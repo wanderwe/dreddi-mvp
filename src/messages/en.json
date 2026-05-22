@@ -635,7 +635,19 @@
     "acceptCta": "Accept and take responsibility",
     "acceptDeal": "Accept deal",
     "goToDeal": "Open deal",
-    "viewDeal": "View deal"
+    "viewDeal": "View deal",
+    "creatorShare": {
+      "copyInviteLink": "Copy invite link",
+      "shareInvitePage": "Share invite page",
+      "copySuccess": "Invite link copied",
+      "copyFailed": "Could not copy invite link",
+      "shareSuccess": "Invite page shared",
+      "shareFailed": "Unable to share invite page",
+      "shareUnsupported": "Sharing is not supported on this device",
+      "shareText": "You can review and accept this deal via the invite page.",
+      "inviteAccepted": "Invite already accepted",
+      "inviteExpired": "Invite expired"
+    }
   },
   "auth": {
     "login": {

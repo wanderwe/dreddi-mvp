@@ -2,7 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, Share2 } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -59,6 +59,7 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   async function load() {
@@ -289,6 +290,49 @@ export default function InvitePage() {
     (!userId ||
       (info?.creator_id !== userId &&
         (!info?.counterparty_id || info.counterparty_id === userId)));
+  const inviteLink = useMemo(() => {
+    if (!token) return null;
+    if (typeof window === "undefined") return null;
+    return `${window.location.origin}${localizePath(`/p/invite/${token}`, locale)}`;
+  }, [locale, token]);
+  const canManageShare = Boolean(isCreatorViewer && inviteStatus === "awaiting_acceptance" && inviteLink);
+  const shareStatusLabel = inviteStatus === "accepted"
+    ? t("invite.creatorShare.inviteAccepted")
+    : inviteStatus === "expired"
+    ? t("invite.creatorShare.inviteExpired")
+    : null;
+
+  async function copyInviteLink() {
+    if (!canManageShare || !inviteLink) return;
+    let didCopy = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteLink);
+        didCopy = true;
+      }
+    } catch {
+      didCopy = false;
+    }
+    setShareMessage(didCopy ? t("invite.creatorShare.copySuccess") : t("invite.creatorShare.copyFailed"));
+  }
+
+  async function shareInvitePage() {
+    if (!canManageShare || !inviteLink) return;
+    if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+      setShareMessage(t("invite.creatorShare.shareUnsupported"));
+      return;
+    }
+    try {
+      await navigator.share({
+        title: info?.title ?? t("invite.heading.pending"),
+        text: t("invite.creatorShare.shareText"),
+        url: inviteLink,
+      });
+      setShareMessage(t("invite.creatorShare.shareSuccess"));
+    } catch {
+      setShareMessage(t("invite.creatorShare.shareFailed"));
+    }
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -405,6 +449,34 @@ export default function InvitePage() {
             )}
 
             <div className="mt-6">
+              {isCreatorViewer && (
+                <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+                  {canManageShare && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => void copyInviteLink()}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-100 transition hover:bg-white/10"
+                      >
+                        <Copy className="h-3.5 w-3.5" aria-hidden />
+                        {t("invite.creatorShare.copyInviteLink")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void shareInvitePage()}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-100 transition hover:bg-white/10"
+                      >
+                        <Share2 className="h-3.5 w-3.5" aria-hidden />
+                        {t("invite.creatorShare.shareInvitePage")}
+                      </button>
+                    </>
+                  )}
+                  {!canManageShare && shareStatusLabel && (
+                    <p className="text-xs text-slate-300">{shareStatusLabel}</p>
+                  )}
+                  {shareMessage && <p className="w-full text-right text-xs text-slate-300">{shareMessage}</p>}
+                </div>
+              )}
               {inviteAccepted ? (
                 <div className="flex">
                   <div className="flex w-full items-center justify-between rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
