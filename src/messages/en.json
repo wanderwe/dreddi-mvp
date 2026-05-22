@@ -360,7 +360,9 @@
       "copyInviteLink": "Copy invite link",
       "copyInvitePrimary": "Copy link",
       "openInviteShort": "Open page",
-      "withdrawInviteShort": "Withdraw"
+      "withdrawInviteShort": "Withdraw",
+      "conditionStatusLabel": "Counter-condition status",
+      "disputeReasonLabel": "Dispute reason"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
