@@ -1616,7 +1616,12 @@ export default function PromisePage() {
               </div>
             )}
 
-            {(hasCondition || p.status === "disputed") && (
+            {(() => {
+              const hasDisputeDetails =
+                p.status === "disputed" &&
+                (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()));
+              return hasCondition || hasDisputeDetails;
+            })() && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
                 {hasCondition && (
                   <>
