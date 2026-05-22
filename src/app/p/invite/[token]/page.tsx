@@ -348,7 +348,36 @@ export default function InvitePage() {
       />
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2 sm:gap-3">
+          {isCreatorViewer && (
+            <div className="flex items-center gap-2">
+              {canManageShare && (
+                <>
+                  <Tooltip label={t("invite.creatorShare.copyInviteLink")} placement="top">
+                    <button
+                      type="button"
+                      onClick={() => void copyInviteLink()}
+                      aria-label={t("invite.creatorShare.copyInviteLink")}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    >
+                      <Copy className="h-4 w-4" aria-hidden />
+                    </button>
+                  </Tooltip>
+                  <Tooltip label={t("invite.creatorShare.shareInvitePage")} placement="top">
+                    <button
+                      type="button"
+                      onClick={() => void shareInvitePage()}
+                      aria-label={t("invite.creatorShare.shareInvitePage")}
+                      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                    >
+                      <Share2 className="h-4 w-4" aria-hidden />
+                    </button>
+                  </Tooltip>
+                </>
+              )}
+              {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
+            </div>
+          )}
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
@@ -361,6 +390,9 @@ export default function InvitePage() {
             )}
           </div>
         </div>
+        {shareMessage && isCreatorViewer && (
+          <p className="-mt-5 text-right text-xs text-slate-300">{shareMessage}</p>
+        )}
 
         {error && (
           <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
@@ -449,34 +481,6 @@ export default function InvitePage() {
             )}
 
             <div className="mt-6">
-              {isCreatorViewer && (
-                <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
-                  {canManageShare && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => void copyInviteLink()}
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-100 transition hover:bg-white/10"
-                      >
-                        <Copy className="h-3.5 w-3.5" aria-hidden />
-                        {t("invite.creatorShare.copyInviteLink")}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void shareInvitePage()}
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-100 transition hover:bg-white/10"
-                      >
-                        <Share2 className="h-3.5 w-3.5" aria-hidden />
-                        {t("invite.creatorShare.shareInvitePage")}
-                      </button>
-                    </>
-                  )}
-                  {!canManageShare && shareStatusLabel && (
-                    <p className="text-xs text-slate-300">{shareStatusLabel}</p>
-                  )}
-                  {shareMessage && <p className="w-full text-right text-xs text-slate-300">{shareMessage}</p>}
-                </div>
-              )}
               {inviteAccepted ? (
                 <div className="flex">
                   <div className="flex w-full items-center justify-between rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
