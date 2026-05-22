@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { StatusPill } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import type { StatusPillTone } from "@/app/components/ui/StatusPill";
+import { buildAgreementFlowState } from "@/lib/agreementFlowState";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
