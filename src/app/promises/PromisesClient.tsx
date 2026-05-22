@@ -258,6 +258,9 @@ export default function PromisesClient() {
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const statusButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [isDealTypeMenuOpen, setIsDealTypeMenuOpen] = useState(false);
+  const dealTypeMenuRef = useRef<HTMLDivElement | null>(null);
+  const dealTypeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -457,17 +460,24 @@ export default function PromisesClient() {
   }, [toast]);
 
   useEffect(() => {
-    if (!isStatusMenuOpen) return;
+    if (!isStatusMenuOpen && !isDealTypeMenuOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (statusMenuRef.current?.contains(target)) return;
-      if (statusButtonRef.current?.contains(target)) return;
+      const inStatusMenu =
+        statusMenuRef.current?.contains(target) || statusButtonRef.current?.contains(target);
+      const inDealTypeMenu =
+        dealTypeMenuRef.current?.contains(target) || dealTypeButtonRef.current?.contains(target);
+      if (inStatusMenu || inDealTypeMenu) return;
       setIsStatusMenuOpen(false);
+      setIsDealTypeMenuOpen(false);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsStatusMenuOpen(false);
+      if (event.key === "Escape") {
+        setIsStatusMenuOpen(false);
+        setIsDealTypeMenuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -477,7 +487,7 @@ export default function PromisesClient() {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isStatusMenuOpen]);
+  }, [isStatusMenuOpen, isDealTypeMenuOpen]);
 
   useEffect(() => {
     setActiveMetricFilter(metricFromSearch);
@@ -850,6 +860,7 @@ export default function PromisesClient() {
   };
   const handleDealTypeFilterChange = (next: DealTypeFilter) => {
     setActiveDealTypeFilter(next);
+    setIsDealTypeMenuOpen(false);
     const sp = new URLSearchParams(searchParams.toString());
     sp.delete("visibility");
     if (next === DEAL_TYPE_FILTER_ALL) sp.delete("type");
@@ -870,15 +881,18 @@ export default function PromisesClient() {
       ...availableStatusOptions,
     ];
   }, [availableStatusOptions, t]);
-  const activeStatusLabel =
-    statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
-    t("promises.list.statusFilter.options.all");
   const dealTypeOptions: Array<{ value: DealTypeFilter; label: string }> = [
     { value: "all", label: t("promises.list.dealTypeFilter.options.all") },
     { value: "public", label: t("promises.list.dealTypeFilter.options.public") },
     { value: "private", label: t("promises.list.dealTypeFilter.options.private") },
     { value: "reputation_stake", label: t("promises.list.dealTypeFilter.options.reputationStake") },
   ];
+  const activeStatusLabel =
+    statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
+    t("promises.list.statusFilter.options.all");
+  const activeDealTypeLabel =
+    dealTypeOptions.find((option) => option.value === activeDealTypeFilter)?.label ??
+    t("promises.list.dealTypeFilter.options.all");
 
   return (
     <main className="relative py-10">
@@ -991,21 +1005,51 @@ export default function PromisesClient() {
             </button>
 
             <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center">
-              <div className="relative">
+              <div className="relative" ref={dealTypeMenuRef}>
                 <span className="sr-only">{t("promises.list.dealTypeFilter.label")}</span>
-                <select
-                  value={activeDealTypeFilter}
-                  onChange={(event) => handleDealTypeFilterChange(event.target.value as DealTypeFilter)}
+                <button
+                  type="button"
+                  ref={dealTypeButtonRef}
+                  onClick={() => setIsDealTypeMenuOpen((open) => !open)}
+                  aria-haspopup="listbox"
+                  aria-expanded={isDealTypeMenuOpen}
                   aria-label={t("promises.list.dealTypeFilter.label")}
-                  className="min-h-11 w-full appearance-none rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 pr-9 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px]"
+                  className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
                 >
-                  {dealTypeOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-slate-950 text-slate-100">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300" aria-hidden />
+                  <span className="truncate">{activeDealTypeLabel}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 text-slate-300 transition-transform ${isDealTypeMenuOpen ? "rotate-180" : ""}`}
+                    aria-hidden
+                  />
+                </button>
+                {isDealTypeMenuOpen && (
+                  <div
+                    role="listbox"
+                    aria-label={t("promises.list.dealTypeFilter.label")}
+                    className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                  >
+                    {dealTypeOptions.map((option) => {
+                      const selected = option.value === activeDealTypeFilter;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          role="option"
+                          aria-selected={selected}
+                          onClick={() => handleDealTypeFilterChange(option.value)}
+                          className={[
+                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                            selected
+                              ? "bg-emerald-400/90 text-slate-950"
+                              : "text-slate-100 hover:bg-white/10",
+                          ].join(" ")}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <div className="relative" ref={statusMenuRef}>
               <span className="sr-only">{t("promises.list.statusFilter.label")}</span>
