@@ -388,9 +388,11 @@ export default function PromisesClient() {
 
       if (error) setError(error.message);
       else {
-        const filtered: PromiseSummary[] = (data ?? [])
-          .filter(isPromiseRoleBase)
-          .map((row) => withRole(row, user.id));
+        const filtered: PromiseSummary[] = [];
+        for (const row of data ?? []) {
+          if (!isPromiseRoleBase(row)) continue;
+          filtered.push(withRole(row, user.id));
+        }
 
         setSummaryRows(filtered);
       }
@@ -454,9 +456,11 @@ export default function PromisesClient() {
       return;
     }
 
-    const parsed: PromiseWithRole[] = (data ?? [])
-      .filter(isPromiseRow)
-      .map((row) => withRole(row, userId));
+    const parsed: PromiseWithRole[] = [];
+    for (const row of data ?? []) {
+      if (!isPromiseRow(row)) continue;
+      parsed.push(withRole(row, userId));
+    }
     const nextHasMore = parsed.length > PAGE_SIZE;
     const pageRows = nextHasMore ? parsed.slice(0, PAGE_SIZE) : parsed;
 
