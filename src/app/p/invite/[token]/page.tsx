@@ -2,7 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -59,6 +59,8 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   async function load() {
@@ -289,6 +291,38 @@ export default function InvitePage() {
     (!userId ||
       (info?.creator_id !== userId &&
         (!info?.counterparty_id || info.counterparty_id === userId)));
+  const inviteLink = useMemo(() => {
+    if (!token) return null;
+    if (typeof window === "undefined") return null;
+    return `${window.location.origin}${localizePath(`/p/invite/${token}`, locale)}`;
+  }, [locale, token]);
+  const canManageShare = Boolean(isCreatorViewer && inviteStatus === "awaiting_acceptance" && inviteLink);
+  const shareStatusLabel = inviteStatus === "accepted"
+    ? t("invite.creatorShare.inviteAccepted")
+    : inviteStatus === "expired"
+    ? t("invite.creatorShare.inviteExpired")
+    : null;
+
+  async function copyInviteLink() {
+    if (!canManageShare || !inviteLink) return;
+    let didCopy = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(inviteLink);
+        didCopy = true;
+      }
+    } catch {
+      didCopy = false;
+    }
+    setToastTone(didCopy ? "success" : "error");
+    setToast(didCopy ? t("invite.creatorShare.copySuccess") : t("invite.creatorShare.copyFailed"));
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 1800);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -304,7 +338,7 @@ export default function InvitePage() {
       />
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             {signedIn ? (
               <>
@@ -317,7 +351,6 @@ export default function InvitePage() {
             )}
           </div>
         </div>
-
         {error && (
           <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
             {error}
@@ -334,7 +367,28 @@ export default function InvitePage() {
 
         {info && (
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-7">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+              {isCreatorViewer && (
+                <div className="flex flex-col items-end gap-1">
+                  {canManageShare && (
+                    <div className="flex items-center gap-2">
+                      <Tooltip label={t("invite.creatorShare.copyInviteLink")} placement="top">
+                        <button
+                          type="button"
+                          onClick={() => void copyInviteLink()}
+                          aria-label={t("invite.creatorShare.copyInviteLink")}
+                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        >
+                          <Copy className="h-4 w-4" aria-hidden />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  )}
+                  {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
+                </div>
+              )}
+            </div>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
               {heading}
             </h1>
@@ -491,6 +545,19 @@ export default function InvitePage() {
                 {t("invite.publicModal.confirm")}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {toast && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
+          <div
+            className={`rounded-full border px-4 py-2 text-sm font-semibold shadow-xl backdrop-blur ${
+              toastTone === "success"
+                ? "border-emerald-300/40 bg-emerald-500/15 text-emerald-100"
+                : "border-red-300/40 bg-red-500/15 text-red-100"
+            }`}
+          >
+            {toast}
           </div>
         </div>
       )}

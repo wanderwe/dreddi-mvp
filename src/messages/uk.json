@@ -643,7 +643,14 @@
     "acceptCta": "Прийняти та виконати",
     "acceptDeal": "Прийняти угоду",
     "goToDeal": "Відкрити угоду",
-    "viewDeal": "Переглянути угоду"
+    "viewDeal": "Переглянути угоду",
+    "creatorShare": {
+      "copyInviteLink": "Скопіювати посилання",
+      "copySuccess": "Посилання скопійовано",
+      "copyFailed": "Не вдалося скопіювати посилання",
+      "inviteAccepted": "Запрошення вже прийнято",
+      "inviteExpired": "Термін дії запрошення завершився"
+    }
   },
   "auth": {
     "login": {
