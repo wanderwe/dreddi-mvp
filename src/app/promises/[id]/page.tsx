@@ -81,6 +81,14 @@ type AgreementTimelineItem = {
   timestamp: string;
   description?: string;
   tone?: "success" | "danger" | "attention" | "neutral";
+  kind?: "system" | "update";
+};
+type AgreementUpdate = {
+  id: string;
+  content: string;
+  created_at: string;
+  author_display_name?: string | null;
+  author_handle?: string | null;
 };
 
 function formatTimestamp(value: string, locale: string) {
@@ -322,6 +330,10 @@ export default function PromisePage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCounterpartyConfirmModal, setShowCounterpartyConfirmModal] = useState(false);
   const [showNotDeliveredModal, setShowNotDeliveredModal] = useState(false);
+  const [updates, setUpdates] = useState<AgreementUpdate[]>([]);
+  const [showUpdateComposer, setShowUpdateComposer] = useState(false);
+  const [updateContent, setUpdateContent] = useState("");
+  const [updateSubmitState, setUpdateSubmitState] = useState<"idle" | "saving" | "error">("idle");
 
   const supabaseErrorMessage = (err: unknown) =>
     err instanceof Error ? err.message : "Authentication is unavailable in this preview.";
@@ -1024,6 +1036,19 @@ export default function PromisePage() {
         t
       )
     : [];
+  for (const update of updates) {
+    timeline.push({
+      key: `update-${update.id}`,
+      label: t("publicAgreement.timeline.update"),
+      actor: update.author_display_name?.trim() || update.author_handle?.trim() || t("publicAgreement.timeline.updateAuthorFallback"),
+      timestamp: update.created_at,
+      description: update.content,
+      tone: "neutral",
+      kind: "update",
+    });
+  }
+  timeline.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  const remainingUpdateChars = 500 - updateContent.length;
   const detailsText = p?.details?.trim() ?? "";
   const hasDetails = detailsText.length > 0;
   const creatorHref = getParticipantHref(p?.creator_id ?? null);
@@ -1083,6 +1108,43 @@ export default function PromisePage() {
     };
   }, [p?.counterparty_id, p?.creator_id, p?.promisee_id, p?.promisor_id]);
 
+  useEffect(() => {
+    if (!p?.id) return;
+    let active = true;
+    const loadUpdates = async () => {
+      const response = await fetch(`/api/promises/${p.id}/updates`, { cache: "no-store" });
+      if (!response.ok) return;
+      const data = (await response.json()) as AgreementUpdate[];
+      if (!active) return;
+      setUpdates(data);
+    };
+    void loadUpdates();
+    return () => {
+      active = false;
+    };
+  }, [p?.id]);
+
+  async function submitUpdate() {
+    if (!p || updateSubmitState === "saving") return;
+    const content = updateContent.trim();
+    if (!content) return;
+    setUpdateSubmitState("saving");
+    const response = await fetch(`/api/promises/${p.id}/updates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    if (!response.ok) {
+      setUpdateSubmitState("error");
+      return;
+    }
+    const update = (await response.json()) as AgreementUpdate;
+    setUpdates((current) => [...current, update]);
+    setUpdateContent("");
+    setShowUpdateComposer(false);
+    setUpdateSubmitState("idle");
+  }
+
   const historyPanelContent = (
     <div className="mt-4 space-y-3">
       <div className="grid gap-2 sm:grid-cols-5 lg:grid-cols-1">
@@ -1116,6 +1178,61 @@ export default function PromisePage() {
       </div>
 
       <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-white/80">{t("publicAgreement.timeline.title")}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setShowUpdateComposer((current) => !current);
+              setUpdateSubmitState("idle");
+            }}
+            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
+          >
+            {t("publicAgreement.updates.add")}
+          </button>
+        </div>
+        {showUpdateComposer ? (
+          <div className="rounded-xl border border-emerald-300/25 bg-emerald-400/8 p-3">
+            <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
+              {t("publicAgreement.updates.label")}
+            </label>
+            <textarea
+              id="agreement-update"
+              value={updateContent}
+              onChange={(event) => {
+                setUpdateContent(event.target.value.slice(0, 500));
+                if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
+              }}
+              placeholder={t("publicAgreement.updates.placeholder")}
+              className="mt-2 h-28 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60"
+            />
+            <div className="mt-2 flex items-center justify-between text-xs text-white/60">
+              <span>{t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}</span>
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUpdateComposer(false);
+                  setUpdateContent("");
+                  setUpdateSubmitState("idle");
+                }}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
+              >
+                {t("publicAgreement.updates.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitUpdate()}
+                disabled={!updateContent.trim() || updateSubmitState === "saving"}
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-emerald-300/35 bg-emerald-400/15 px-3 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/25 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {updateSubmitState === "saving" ? t("publicAgreement.updates.saving") : t("publicAgreement.updates.publish")}
+              </button>
+            </div>
+            {updateSubmitState === "error" ? <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p> : null}
+          </div>
+        ) : null}
         {timeline.map((item) => (
           <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
             <span
@@ -1135,6 +1252,11 @@ export default function PromisePage() {
                 <div>
                   <p className="text-sm font-medium text-white">{item.label}</p>
                   <p className="mt-0.5 text-xs text-white/50">{item.actor}</p>
+                  {item.description ? (
+                    <p className={item.kind === "update" ? "mt-1.5 text-sm text-white/85" : "mt-1.5 text-sm text-white/65"}>
+                      {item.description}
+                    </p>
+                  ) : null}
                 </div>
                 <time className="text-xs text-white/45" dateTime={item.timestamp}>
                   {formatTimestamp(item.timestamp, locale)}
