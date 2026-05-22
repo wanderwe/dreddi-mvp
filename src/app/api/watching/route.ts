@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
 import { isPromiseStatus } from "@/lib/promiseStatus";
@@ -17,7 +18,8 @@ function adminClient() {
 }
 
 export async function GET(req: Request) {
-  const user = await requireUser(req);
+  const cookieStore = await cookies();
+  const user = await requireUser(req, cookieStore);
   if (user instanceof NextResponse) return user;
 
   const admin = adminClient();
