@@ -48,10 +48,13 @@ type PublicAgreementRow = {
   creator_display_name: string | null;
   creator_handle: string | null;
   creator_is_public_profile?: boolean | null;
-  counterparty_display_name: string | null;
-  counterparty_handle: string | null;
-  counterparty_is_public_profile?: boolean | null;
-  counterparty_contact: string | null;
+  executor_display_name: string | null;
+  executor_handle: string | null;
+  executor_is_public_profile?: boolean | null;
+  accepter_display_name?: string | null;
+  accepter_handle?: string | null;
+  accepter_is_public_profile?: boolean | null;
+  accepter_contact?: string | null;
   reviewer_display_name?: string | null;
   reviewer_handle?: string | null;
   reviewer_is_public_profile?: boolean | null;
@@ -125,14 +128,22 @@ function displayUpdateAuthorName(update: PublicAgreementUpdate, fallback: string
   return displayProfileName(update.author_display_name, update.author_handle, fallback);
 }
 
-function displayCounterpartyName(row: PublicAgreement, fallback: string) {
+function displayAccepterName(row: PublicAgreement, fallback: string) {
+  const profileName = displayProfileName(row.accepter_display_name ?? null, row.accepter_handle ?? null, "");
+  if (profileName) return profileName;
+  const contact = row.accepter_contact?.trim();
+  if (contact && !isLikelyPrivateEmail(contact)) return contact;
+  return fallback;
+}
+
+function displayExecutorName(row: PublicAgreement, fallback: string) {
   const profileName = displayProfileName(
-    row.counterparty_display_name,
-    row.counterparty_handle,
+    row.executor_display_name,
+    row.executor_handle,
     ""
   );
   if (profileName) return profileName;
-  const contact = row.counterparty_contact?.trim();
+  const contact = row.accepter_contact?.trim();
   if (contact && !isLikelyPrivateEmail(contact)) return contact;
   return fallback;
 }
@@ -390,8 +401,11 @@ export default function PublicAgreementPage() {
         t("publicAgreement.participants.creatorFallback")
       )
     : "";
-  const counterpartyName = agreement
-    ? displayCounterpartyName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+  const accepterName = agreement
+    ? displayAccepterName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+    : "";
+  const executorName = agreement
+    ? displayExecutorName(agreement, t("publicAgreement.participants.counterpartyFallback"))
     : "";
   const reviewerName = agreement
     ? displayProfileName(
@@ -405,7 +419,7 @@ export default function PublicAgreementPage() {
     ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
     : null;
   const counterpartyHref = agreement
-    ? getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale)
+    ? getPublicProfileHref(agreement.executor_handle, agreement.executor_is_public_profile, locale)
     : null;
 
   const timeline = agreement
@@ -413,8 +427,8 @@ export default function PublicAgreementPage() {
         agreement,
         {
           creator: creatorName,
-          accepter: counterpartyName,
-          executor: counterpartyName,
+          accepter: accepterName || executorName || creatorName,
+          executor: executorName || accepterName || creatorName,
           reviewer: reviewerName || creatorName,
           system: t("publicAgreement.timeline.system"),
           updateFallback: t("publicAgreement.timeline.updateAuthorFallback"),
