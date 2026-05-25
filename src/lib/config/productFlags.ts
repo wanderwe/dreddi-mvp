@@ -9,5 +9,5 @@ const parseBooleanFlag = (value: string | undefined, defaultValue: boolean): boo
 };
 
 export const productFlags = {
-  showBetaUi: parseBooleanFlag(envFlag, true),
+  showBetaUi: parseBooleanFlag(envFlag, false),
 } as const;
