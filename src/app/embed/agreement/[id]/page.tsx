@@ -215,11 +215,11 @@ export default function EmbedAgreementPage() {
 
           {/* ── Header card — title, details, deadline, brand ── */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <h1 className="line-clamp-3 text-[16px] font-semibold leading-snug text-white">
+            <h1 className="text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
             {details ? (
-              <p className="mt-1 line-clamp-1 text-xs text-white/45">{details}</p>
+              <p className="mt-1 text-xs text-white/45">{details}</p>
             ) : null}
             {deadlineLabel ? (
               <p className="mt-2 text-xs text-white/45">
