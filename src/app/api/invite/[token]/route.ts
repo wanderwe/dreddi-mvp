@@ -67,11 +67,15 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       );
     }
 
-    // Resolve creator label (MVP: email via admin API)
+    // Resolve creator label from profiles (never expose email)
     let creator_display_name: string | null = null;
     try {
-      const { data: u } = await admin.auth.admin.getUserById(p.creator_id);
-      creator_display_name = u.user?.email ?? null;
+      const { data: creatorProfile } = await admin
+        .from("profiles")
+        .select("display_name,handle")
+        .eq("id", p.creator_id)
+        .maybeSingle();
+      creator_display_name = creatorProfile?.display_name?.trim() || creatorProfile?.handle?.trim() || null;
     } catch {
       creator_display_name = null;
     }

@@ -6,7 +6,10 @@ export async function POST(req: Request) {
   const secret = process.env.INVITES_CRON_SECRET;
   const auth = req.headers.get("authorization")?.replace(/Bearer\s+/i, "");
 
-  if (secret && auth !== secret) {
+  if (!secret) {
+    return NextResponse.json({ error: "Server misconfigured: INVITES_CRON_SECRET is not set" }, { status: 500 });
+  }
+  if (auth !== secret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
