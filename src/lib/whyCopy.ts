@@ -13,7 +13,10 @@ export type WhyCopy = {
     kind: WhySectionKind;
     paragraphs: string[];
   }[];
-  cta: string;
+  cta: {
+    primary: string;
+    secondary: string;
+  };
 };
 
 export const whyCopy: Record<Locale, WhyCopy> = {
@@ -55,9 +58,51 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       },
       { kind: "body", paragraphs: ["It’s what you actually do"] },
       { kind: "body", paragraphs: ["Over time, it becomes obvious", "Who delivers", "And who doesn’t"] },
+      {
+        kind: "body",
+        paragraphs: ["Not every agreement has to be public", "But some deserve visibility"],
+      },
+      {
+        kind: "list",
+        paragraphs: [
+          "Public initiatives",
+          "Partnerships",
+          "Deadlines",
+          "Commitments made in front of an audience",
+          "Projects other people want to follow",
+        ],
+      },
+      {
+        kind: "body",
+        paragraphs: [
+          "In Dreddi, people can observe a public agreement without becoming participants",
+          "Not to interfere",
+          "Not to rate",
+          "Not to pressure",
+        ],
+      },
+      {
+        kind: "body",
+        paragraphs: [
+          "Just to see:",
+          "what was agreed",
+          "what the deadline was",
+          "and what outcome happened in the end",
+        ],
+      },
+      { kind: "turn", paragraphs: ["No likes", "No popularity", "No noise"] },
+      { kind: "body", paragraphs: ["Just execution history"] },
+      {
+        kind: "turn",
+        paragraphs: ["When agreements become visible", "reputation stops being an impression"],
+      },
+      { kind: "body", paragraphs: ["It becomes a history of outcomes"] },
       { kind: "list", paragraphs: ["No contracts", "No pressure", "Just clarity — and consequences"] },
     ],
-    cta: "Create your first deal",
+    cta: {
+      primary: "Create your first agreement",
+      secondary: "View public agreements",
+    },
   },
   uk: {
     seo: {
@@ -97,9 +142,51 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       },
       { kind: "body", paragraphs: ["Це те, що ви реально робите"] },
       { kind: "body", paragraphs: ["З часом це стає очевидно", "Хто виконує", "А хто ні"] },
+      {
+        kind: "body",
+        paragraphs: ["Не всі домовленості мають бути публічними", "Але деякі заслуговують на видимість"],
+      },
+      {
+        kind: "list",
+        paragraphs: [
+          "Публічні ініціативи",
+          "Партнерства",
+          "Дедлайни",
+          "Зобов’язання перед аудиторією",
+          "Проєкти, за якими інші хочуть стежити",
+        ],
+      },
+      {
+        kind: "body",
+        paragraphs: [
+          "У Dreddi люди можуть спостерігати за публічною угодою, не стаючи її учасниками",
+          "Не втручатися",
+          "Не оцінювати",
+          "Не тиснути",
+        ],
+      },
+      {
+        kind: "body",
+        paragraphs: [
+          "Просто бачити:",
+          "про що домовилися",
+          "який був дедлайн",
+          "і який результат настав у фіналі",
+        ],
+      },
+      { kind: "turn", paragraphs: ["Без лайків", "Без популярності", "Без шуму"] },
+      { kind: "body", paragraphs: ["Лише історія виконання"] },
+      {
+        kind: "turn",
+        paragraphs: ["Бо коли домовленості стають видимими", "репутація перестає бути враженням"],
+      },
+      { kind: "body", paragraphs: ["Вона стає історією результатів"] },
       { kind: "list", paragraphs: ["Без контрактів", "Без тиску", "Лише ясність — і наслідки"] },
     ],
-    cta: "Створити першу угоду",
+    cta: {
+      primary: "Створити першу угоду",
+      secondary: "Переглянути публічні угоди",
+    },
   },
 };
 

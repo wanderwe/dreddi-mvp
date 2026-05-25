@@ -7,10 +7,11 @@ import { useLocale } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 
 type WhyCtaProps = {
-  label: string;
+  primaryLabel: string;
+  secondaryLabel: string;
 };
 
-export function WhyCta({ label }: WhyCtaProps) {
+export function WhyCta({ primaryLabel, secondaryLabel }: WhyCtaProps) {
   const locale = useLocale();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -46,12 +47,22 @@ export function WhyCta({ label }: WhyCtaProps) {
     return localizeLoginPath(createDealPath, locale);
   }, [isAuthenticated, locale]);
 
+  const publicAgreementsHref = useMemo(() => localizePath("/promises", locale), [locale]);
+
   return (
-    <LocalizedLink
-      href={href}
-      className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
-    >
-      {label}
-    </LocalizedLink>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <LocalizedLink
+        href={href}
+        className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+      >
+        {primaryLabel}
+      </LocalizedLink>
+      <LocalizedLink
+        href={publicAgreementsHref}
+        className="inline-flex rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200"
+      >
+        {secondaryLabel}
+      </LocalizedLink>
+    </div>
   );
 }
