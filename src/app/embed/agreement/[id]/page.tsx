@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Dot } from "lucide-react";
-import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { StatusPill } from "@/app/components/ui/StatusPill";
-import type { StatusPillTone } from "@/app/components/ui/StatusPill";
+import { ExternalLink } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import type { Locale } from "@/lib/i18n/locales";
@@ -37,58 +35,133 @@ type PublicAgreementRow = {
   followers_count?: number | null;
 };
 
-type PublicAgreement = PublicAgreementRow & { title: string; created_at: string; uiStatus: PromiseUiStatus };
+type PublicAgreement = PublicAgreementRow & {
+  title: string;
+  created_at: string;
+  uiStatus: PromiseUiStatus;
+};
 
-const statusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
-  active: "attention",
-  completed_by_promisor: "attention",
-  confirmed: "success",
-  disputed: "danger",
-  awaiting_acceptance: "neutral",
-  declined: "danger",
-  expired: "neutral",
-  cancelled_by_creator: "danger",
+// Status card styles — mirrors profile embed's emerald/amber card language
+type StatusCardStyle = {
+  card: string;   // border + bg
+  label: string;  // small caps label color
+  dot: string;    // indicator dot (+ animate-pulse for live statuses)
+};
+
+const statusCardStyles: Record<PromiseUiStatus, StatusCardStyle> = {
+  confirmed: {
+    card: "border-emerald-500/15 bg-emerald-500/10",
+    label: "text-emerald-200",
+    dot: "bg-emerald-400",
+  },
+  // active = "attention" tone in the product → amber, same as the status flow step
+  active: {
+    card: "border-amber-400/20 bg-amber-400/10",
+    label: "text-amber-200",
+    dot: "bg-amber-400 animate-pulse",
+  },
+  completed_by_promisor: {
+    card: "border-amber-400/20 bg-amber-400/10",
+    label: "text-amber-200",
+    dot: "bg-amber-400 animate-pulse",
+  },
+  // disputed = "danger" tone → red
+  disputed: {
+    card: "border-red-500/15 bg-red-500/10",
+    label: "text-red-300",
+    dot: "bg-red-400",
+  },
+  declined: {
+    card: "border-red-500/15 bg-red-500/10",
+    label: "text-red-300",
+    dot: "bg-red-400",
+  },
+  awaiting_acceptance: {
+    card: "border-white/10 bg-black/30",
+    label: "text-white/55",
+    dot: "bg-white/30",
+  },
+  expired: {
+    card: "border-white/8 bg-black/20",
+    label: "text-white/40",
+    dot: "bg-white/20",
+  },
+  cancelled_by_creator: {
+    card: "border-white/8 bg-black/20",
+    label: "text-white/40",
+    dot: "bg-white/20",
+  },
 };
 
 function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
-  if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return null;
-  const normalizedRow = { ...row, status: row.status };
+  const { status } = row;
+  if (!row.title || !row.created_at || !isPromiseStatus(status)) return null;
   return {
-    ...normalizedRow,
+    ...row,
     title: row.title,
     created_at: row.created_at,
-    uiStatus: getPromiseUiStatus(normalizedRow),
+    uiStatus: getPromiseUiStatus({ ...row, status }),
   };
 }
 
-function getPublicProfileHref(handle: string | null, isPublicProfile: boolean | null | undefined, locale: Locale) {
-  const cleanHandle = handle?.trim();
-  if (!cleanHandle || !isPublicProfile) return null;
-  return localizePath(`/u/${cleanHandle}`, locale);
+function getPublicProfileHref(
+  handle: string | null,
+  isPublicProfile: boolean | null | undefined,
+  locale: Locale
+) {
+  const h = handle?.trim();
+  if (!h || !isPublicProfile) return null;
+  return localizePath(`/u/${h}`, locale);
 }
 
-function displayName(name: string | null, handle: string | null, fallback: string) {
+function participantLabel(name: string | null, handle: string | null): string | null {
   if (name?.trim()) return name.trim();
   if (handle?.trim()) return `@${handle.trim()}`;
-  return fallback;
+  return null;
 }
 
 export default function EmbedAgreementPage() {
   const t = useT();
   const locale = useLocale();
   const params = useParams<{ id: string }>();
-  const searchParams = useSearchParams();
   const id = typeof params?.id === "string" ? params.id : "";
-  const theme = searchParams.get("theme") === "light" ? "light" : "dark";
+
   const [agreement, setAgreement] = useState<PublicAgreement | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "empty">("loading");
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") setOrigin(window.location.origin);
+  }, []);
+
+  // Auto-resize for iframe embedding
+  useEffect(() => {
+    const postHeight = () =>
+      window.parent.postMessage(
+        { type: "dreddi:embed:resize", height: Math.ceil(document.documentElement.scrollHeight) },
+        "*"
+      );
+    postHeight();
+    window.addEventListener("load", postHeight);
+    window.addEventListener("resize", postHeight);
+    const ro = new ResizeObserver(postHeight);
+    ro.observe(document.documentElement);
+    if (document.body) ro.observe(document.body);
+    return () => {
+      window.removeEventListener("load", postHeight);
+      window.removeEventListener("resize", postHeight);
+      ro.disconnect();
+    };
+  }, [loadState]);
 
   useEffect(() => {
     if (!id) return setLoadState("empty");
     let active = true;
     const load = async () => {
       setLoadState("loading");
-      const res = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, { cache: "no-store" });
+      const res = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
+        cache: "no-store",
+      });
       if (!active) return;
       if (!res.ok) return setLoadState("empty");
       const normalized = normalizeAgreement((await res.json()) as PublicAgreementRow);
@@ -96,109 +169,115 @@ export default function EmbedAgreementPage() {
       setLoadState(normalized ? "ready" : "empty");
     };
     void load();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [id]);
-
-  const cardClass = useMemo(
-    () =>
-      theme === "light"
-        ? "border-slate-200 bg-white text-slate-900"
-        : "border-white/10 bg-slate-950 text-slate-100",
-    [theme]
-  );
-
-  const chipClass = theme === "light" ? "border-slate-200 bg-slate-50/90" : "border-white/10 bg-white/5";
 
   if (loadState !== "ready" || !agreement) {
     return (
-      <main className="m-0 p-1.5">
-        <div className={`mx-auto w-full max-w-xl rounded-2xl border px-4 py-4 text-sm ${cardClass}`}>
-          {t("agreementEmbed.unavailable")}
-        </div>
+      <main className="w-full bg-transparent text-white">
+        <section className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/50">
+            {loadState === "loading" ? "…" : t("agreementEmbed.unavailable")}
+          </div>
+        </section>
       </main>
     );
   }
 
-  const creator = displayName(
-    agreement.creator_display_name,
-    agreement.creator_handle,
-    t("publicAgreement.participants.creatorFallback")
-  );
-  const counterparty = displayName(
-    agreement.counterparty_display_name,
-    agreement.counterparty_handle,
-    t("publicAgreement.participants.counterpartyFallback")
-  );
-  const creatorHref = getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale);
-  const counterpartyHref = getPublicProfileHref(
-    agreement.counterparty_handle,
-    agreement.counterparty_is_public_profile,
-    locale
-  );
+  // ── Derived data ──────────────────────────────────────────────────────────
+  const cardStyle = statusCardStyles[agreement.uiStatus];
+  const statusLabel = t(`publicAgreement.status.${agreement.uiStatus}`);
+  const agreementPath = localizePath(`/p/agreements/${agreement.id}`, locale);
+  const agreementUrl = origin ? `${origin}${agreementPath}` : agreementPath;
+
   const details = agreement.details?.trim() || agreement.condition_text?.trim();
+  const deadlineLabel = agreement.due_at
+    ? formatDueDate(agreement.due_at, locale, { includeYear: true })
+    : null;
+  const watchersCount = Math.max(0, agreement.followers_count ?? 0);
 
+  const creatorLabel = participantLabel(agreement.creator_display_name, agreement.creator_handle);
+  // Show real name/handle if known; fall back to placeholder when counterparty
+  // hasn't accepted yet — widget updates automatically on next load when they do
+  // Always show both sides — fall back to placeholder if counterparty unknown/pending
+  const counterpartyLabel =
+    participantLabel(agreement.counterparty_display_name, agreement.counterparty_handle) ??
+    t("publicAgreement.participants.counterpartyFallback");
+  const creatorHref = getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale);
+  const counterpartyHref = getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale);
+  const showParticipants = Boolean(creatorLabel || counterpartyLabel);
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <main className="m-0 p-1.5">
-      <article className={`mx-auto w-full max-w-xl rounded-2xl border p-4 shadow-sm ${cardClass}`}>
-        <div className="flex items-center justify-between gap-2 text-[11px]">
-          <span className="inline-flex items-center gap-1.5 font-semibold tracking-wide opacity-80">
-            <Dot className="h-4 w-4" aria-hidden="true" />
-            Dreddi
-          </span>
-          <span className={`rounded-full border px-2 py-0.5 ${chipClass}`}>{t("agreementEmbed.badge")}</span>
+    <main className="w-full bg-transparent text-white">
+      <section className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
+        <div className="space-y-3">
+
+          {/* ── Header card — title, details, deadline, brand ── */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <h1 className="line-clamp-3 text-[16px] font-semibold leading-snug text-white">
+              {agreement.title}
+            </h1>
+            {details ? (
+              <p className="mt-1 line-clamp-1 text-xs text-white/45">{details}</p>
+            ) : null}
+            {deadlineLabel ? (
+              <p className="mt-2 text-xs text-white/45">
+                {t("agreementEmbed.deadline")}:{" "}
+                <span className="text-white/65">{deadlineLabel}</span>
+              </p>
+            ) : null}
+
+            {/* Brand label */}
+            <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65">
+              {t("agreementEmbed.badge")} · Dreddi
+            </p>
+          </div>
+
+{/* ── Stat cards — status + watching, compact ── */}
+          <div className="grid grid-cols-2 gap-3">
+
+            {/* Status — color-coded */}
+            <div className={`rounded-2xl border px-3 py-2.5 ${cardStyle.card}`}>
+              <div className="flex items-center gap-1.5">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${cardStyle.dot}`} />
+                <p className={`text-[10px] uppercase tracking-[0.15em] ${cardStyle.label}`}>
+                  {t("agreementEmbed.status")}
+                </p>
+              </div>
+              <p className="mt-1.5 text-base font-semibold leading-tight text-white">
+                {statusLabel}
+              </p>
+            </div>
+
+            {/* Watching */}
+            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2.5">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
+                {t("agreementEmbed.watching")}
+              </p>
+              <p className="mt-1.5 text-2xl font-semibold text-white">
+                {watchersCount}
+              </p>
+            </div>
+          </div>
+
+          {/* ── Footer ── */}
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs text-white/40">
+              {t("publicProfile.embed.poweredBy")}
+            </p>
+            <a
+              href={agreementUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-white/35 transition hover:text-white/70"
+            >
+              View <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+
         </div>
-
-        <h1 className="mt-2 line-clamp-2 text-[16px] font-semibold leading-tight sm:text-[17px]">{agreement.title}</h1>
-
-        {details ? <p className="mt-1 line-clamp-1 text-[12px] opacity-75">{details}</p> : null}
-
-        <div className="mt-2.5 flex items-center gap-1 text-[12px] opacity-90">
-          {creatorHref ? (
-            <Link href={creatorHref} className="truncate underline-offset-2 transition hover:underline">
-              {creator}
-            </Link>
-          ) : (
-            <span className="truncate">{creator}</span>
-          )}
-          <span className="opacity-60">↔</span>
-          {counterpartyHref ? (
-            <Link href={counterpartyHref} className="truncate underline-offset-2 transition hover:underline">
-              {counterparty}
-            </Link>
-          ) : (
-            <span className="truncate">{counterparty}</span>
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px]">
-          <StatusPill
-            label={t(`publicAgreement.status.${agreement.uiStatus}`).toUpperCase()}
-            tone={statusToneMap[agreement.uiStatus] ?? "neutral"}
-            icon="clock"
-          />
-          {agreement.due_at ? (
-            <span className={`rounded-full border px-2 py-1 ${chipClass}`}>
-              {t("agreementEmbed.deadline")}: {formatDueDate(agreement.due_at, locale, { includeYear: true })}
-            </span>
-          ) : null}
-          <span className={`rounded-full border px-2 py-1 ${chipClass}`}>
-            {Math.max(0, agreement.followers_count ?? 0)} {t("agreementEmbed.watching")}
-          </span>
-        </div>
-
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-[11px] opacity-65">{t("agreementEmbed.liveNote")}</p>
-          <Link
-            href={localizePath(`/p/agreements/${agreement.id}`, locale)}
-            className={`inline-flex shrink-0 items-center gap-1 rounded-md border px-2.5 py-1.5 text-[12px] font-medium transition hover:opacity-85 ${chipClass}`}
-          >
-            {t("agreementEmbed.cta")}
-            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-        </div>
-      </article>
+      </section>
     </main>
   );
 }
