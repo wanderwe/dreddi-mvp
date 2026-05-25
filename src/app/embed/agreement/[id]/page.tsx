@@ -159,14 +159,18 @@ export default function EmbedAgreementPage() {
     let active = true;
     const load = async () => {
       setLoadState("loading");
-      const res = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
-        cache: "no-store",
-      });
-      if (!active) return;
-      if (!res.ok) return setLoadState("empty");
-      const normalized = normalizeAgreement((await res.json()) as PublicAgreementRow);
-      setAgreement(normalized);
-      setLoadState(normalized ? "ready" : "empty");
+      try {
+        const res = await fetch(`/api/public/agreements/${encodeURIComponent(id)}`, {
+          cache: "no-store",
+        });
+        if (!active) return;
+        if (!res.ok) return setLoadState("empty");
+        const normalized = normalizeAgreement((await res.json()) as PublicAgreementRow);
+        setAgreement(normalized);
+        setLoadState(normalized ? "ready" : "empty");
+      } catch {
+        if (active) setLoadState("empty");
+      }
     };
     void load();
     return () => { active = false; };
@@ -176,9 +180,22 @@ export default function EmbedAgreementPage() {
     return (
       <main className="w-full bg-transparent text-white">
         <section className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/50">
-            {loadState === "loading" ? "…" : t("agreementEmbed.unavailable")}
-          </div>
+          {loadState === "loading" ? (
+            <div className="space-y-3 animate-pulse">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                <div className="h-4 w-3/4 rounded bg-white/10" />
+                <div className="h-3 w-1/2 rounded bg-white/8" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 h-16" />
+                <div className="rounded-2xl border border-white/10 bg-white/5 h-16" />
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/50">
+              {t("agreementEmbed.unavailable")}
+            </div>
+          )}
         </section>
       </main>
     );
