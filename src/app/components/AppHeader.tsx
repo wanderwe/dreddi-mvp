@@ -16,6 +16,7 @@ import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { isAwaitingYourAction } from "@/lib/promiseActions";
+import { productFlags } from "@/lib/config/productFlags";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import {
@@ -170,9 +171,11 @@ export function AppHeader() {
             markClassName="h-11 w-11"
             titleClassName="text-lg"
           />
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-200/70">
-            beta
-          </span>
+          {productFlags.showBetaUi ? (
+            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-200/70">
+              beta
+            </span>
+          ) : null}
         </LocalizedLink>
 
         <div className="flex items-center gap-3">
