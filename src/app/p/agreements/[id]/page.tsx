@@ -448,9 +448,6 @@ export default function PublicAgreementPage() {
       && agreement.updates_available !== false
       && isAgreementLiveStatus(agreement.uiStatus)
   );
-  const shouldShowUpdatesUnavailable = Boolean(
-    agreement?.viewer_can_update && agreement.updates_available === false
-  );
   const remainingUpdateChars = 500 - updateContent.length;
 
   const followersCount = Math.max(0, agreement?.followers_count ?? 0);
@@ -756,11 +753,6 @@ export default function PublicAgreementPage() {
             ) : null}
           </div>
 
-          {shouldShowUpdatesUnavailable ? (
-            <p className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-50/80">
-              {t("publicAgreement.updates.unavailable")}
-            </p>
-          ) : null}
 
           {canAddUpdate && isUpdateFormOpen ? (
             <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
