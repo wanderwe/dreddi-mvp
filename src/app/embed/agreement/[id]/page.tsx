@@ -134,13 +134,21 @@ export default function EmbedAgreementPage() {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
   }, []);
 
-  // Prevent body scroll so the iframe never shows a scrollbar
+  // Strip body styles inherited from globals.css so the iframe is
+  // transparent outside the widget card and never shows a scrollbar
   useEffect(() => {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
+    const { documentElement: html, body } = document;
+    html.style.overflow = "hidden";
+    html.style.background = "transparent";
+    body.style.overflow = "hidden";
+    body.style.background = "transparent";
+    body.style.minHeight = "auto";
     return () => {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
+      html.style.overflow = "";
+      html.style.background = "";
+      body.style.overflow = "";
+      body.style.background = "";
+      body.style.minHeight = "";
     };
   }, []);
 
