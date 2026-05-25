@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { requireUser } from "@/lib/auth/requireUser";
+import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
+import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
+import { isPromiseStatus } from "@/lib/promiseStatus";
 
 function getEnv(name: string) {
   const value = process.env[name];
@@ -101,6 +104,20 @@ function getParticipantIds(promise: PromisePublicAgreementRecord) {
       resolveExecutorId(promise),
     ].filter((value): value is string => Boolean(value))
   );
+}
+
+function isAgreementLive(promise: PromisePublicAgreementRecord) {
+  const uiStatus = getPromiseUiStatus({
+    status: isPromiseStatus(promise.status) ? promise.status : "active",
+    invite_status: promise.invite_status,
+    accepted_at: promise.accepted_at,
+    counterparty_accepted_at: promise.counterparty_accepted_at,
+    declined_at: promise.declined_at,
+    ignored_at: promise.ignored_at,
+    expires_at: promise.expires_at,
+    cancelled_at: promise.cancelled_at,
+  });
+  return isAgreementLiveStatus(uiStatus);
 }
 
 function canUserPostUpdate(promise: PromisePublicAgreementRecord, userId: string | null) {
@@ -270,13 +287,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
     const { count: followersCount } = await followerCountQuery;
 
+    const agreementLive = isAgreementLive(promise);
+
     return NextResponse.json(
       serializePublicAgreement(
         promise,
         profilesById,
         publicUpdates ?? [],
         canUserPostUpdate(promise, user?.id ?? null),
-        !updatesUnavailable,
+        !updatesUnavailable && agreementLive,
         viewerFollowing,
         followersCount ?? 0,
         !viewerIsParticipant
@@ -324,6 +343,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     if (!canUserPostUpdate(promise, user.id)) {
       return NextResponse.json({ error: "Only agreement participants can add updates" }, { status: 403 });
+    }
+
+    if (!isAgreementLive(promise)) {
+      return NextResponse.json({ error: "Agreement is no longer live" }, { status: 409 });
     }
 
     const { data: update, error: insertError } = await admin
