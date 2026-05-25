@@ -697,20 +697,27 @@ export default function PublicAgreementPage() {
                   </button>
                 </Tooltip>
                 {agreement.viewer_can_follow !== false ? (
-                  <button
-                    type="button"
-                    title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
-                    onClick={handleToggleFollow}
-                    className={[
-                      "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
-                      agreement.viewer_following
-                        ? "border border-white/15 bg-white/[0.045] text-white/70 hover:border-white/25 hover:bg-white/[0.07] hover:text-white/82"
-                        : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
-                    ].join(" ")}
+                  <Tooltip
+                    label={t("publicAgreement.followTooltip")}
+                    placement="top"
+                    tooltipClassName="max-w-[240px]"
                   >
-                    {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
-                    <span>{followLabel}</span>
-                  </button>
+                    <button
+                      type="button"
+                      title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
+                      onClick={handleToggleFollow}
+                      aria-label={`${followLabel} · ${t("publicAgreement.followTooltip")}`}
+                      className={[
+                        "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                        agreement.viewer_following
+                          ? "border border-white/15 bg-white/[0.045] text-white/70 hover:border-white/25 hover:bg-white/[0.07] hover:text-white/82"
+                          : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
+                      ].join(" ")}
+                    >
+                      {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                      <span>{followLabel}</span>
+                    </button>
+                  </Tooltip>
                 ) : (
                   <div className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-white/70 sm:px-4 sm:text-sm">
                     <Eye className="h-4 w-4" aria-hidden="true" />
