@@ -123,7 +123,7 @@ function getLifecycleStates(
 
 function buildAgreementTimeline(
   promise: PromiseRow,
-  labels: { creator: string; counterparty: string; system: string },
+  labels: { creator: string; accepter: string; executor: string; reviewer: string; system: string },
   uiStatus: PromiseUiStatus,
   t: ReturnType<typeof useT>
 ): AgreementTimelineItem[] {
@@ -142,7 +142,7 @@ function buildAgreementTimeline(
     items.push({
       key: "accepted",
       label: t("publicAgreement.timeline.accepted"),
-      actor: labels.counterparty,
+      actor: labels.accepter,
       timestamp: acceptedAt,
       description: t("publicAgreement.timeline.acceptedDescription"),
       tone: "success",
@@ -153,7 +153,7 @@ function buildAgreementTimeline(
     items.push({
       key: "completed",
       label: t("publicAgreement.timeline.completed"),
-      actor: labels.counterparty,
+      actor: labels.executor,
       timestamp: promise.completed_at,
       description: t("publicAgreement.timeline.completedDescription"),
       tone: "attention",
@@ -164,7 +164,7 @@ function buildAgreementTimeline(
     items.push({
       key: "confirmed",
       label: t("publicAgreement.timeline.confirmed"),
-      actor: labels.creator,
+      actor: labels.reviewer,
       timestamp: promise.confirmed_at,
       description: t("publicAgreement.timeline.confirmedDescription"),
       tone: "success",
@@ -175,7 +175,7 @@ function buildAgreementTimeline(
     items.push({
       key: "disputed",
       label: t("publicAgreement.timeline.disputed"),
-      actor: labels.creator,
+      actor: labels.reviewer,
       timestamp: promise.disputed_at,
       description: t("publicAgreement.timeline.disputedDescription"),
       tone: "danger",
@@ -186,7 +186,7 @@ function buildAgreementTimeline(
     items.push({
       key: "declined",
       label: t("publicAgreement.timeline.declined"),
-      actor: labels.counterparty,
+      actor: labels.accepter,
       timestamp: promise.declined_at,
       tone: "danger",
     });
@@ -1012,6 +1012,11 @@ export default function PromisePage() {
     return localizePath(`/u/${handle}`, locale);
   };
   const createdByLabel = getParticipantLabel(p?.creator_id ?? null);
+  const accepterId = p?.counterparty_id ?? null;
+  const reviewerId =
+    p?.promisor_id && p?.promisee_id && p.promisor_id === executorId ? p.promisee_id : p?.promisor_id ?? null;
+  const accepterLabel = getParticipantLabel(accepterId);
+  const reviewerLabel = getParticipantLabel(reviewerId);
   const responsibleLabel = getParticipantLabel(executorId);
   const promiseToLabel = getParticipantLabel(promiseMadeToId);
   const acceptingUserName = useMemo(() => {
@@ -1030,7 +1035,9 @@ export default function PromisePage() {
         p,
         {
           creator: createdByLabel,
-          counterparty: responsibleLabel,
+          accepter: accepterLabel,
+          executor: responsibleLabel,
+          reviewer: reviewerLabel,
           system: t("publicAgreement.timeline.system"),
         },
         uiStatus,
