@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Eye, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Check, Clipboard, Code2, Eye, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -695,7 +695,7 @@ export default function PublicAgreementPage() {
                     className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
-                      {copyEmbedState === "copied" ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+                      {copyEmbedState === "copied" ? <Check className="h-4 w-4" /> : <Code2 className="h-4 w-4" />}
                     </span>
                   </button>
                 </Tooltip>
