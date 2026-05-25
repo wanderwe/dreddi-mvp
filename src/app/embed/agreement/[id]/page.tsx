@@ -156,15 +156,20 @@ export default function EmbedAgreementPage() {
   }, []);
 
   // Auto-resize for iframe embedding.
-  // Measure <main> directly — body/html height equals the viewport in iframes
-  // regardless of content size, making scrollHeight unreliable.
+  // Measure <main> after the browser has painted (double-RAF) so fonts and
+  // layout are stable. body/html expand to viewport height in iframes, so
+  // we measure the content element directly.
   useEffect(() => {
     const postHeight = () => {
-      const main = document.querySelector("main");
-      const height = main
-        ? Math.ceil(main.getBoundingClientRect().height)
-        : Math.ceil(document.body.scrollHeight);
-      window.parent.postMessage({ type: "dreddi:embed:resize", height }, "*");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const main = document.querySelector("main");
+          const height = main
+            ? Math.ceil(main.getBoundingClientRect().height)
+            : Math.ceil(document.body.scrollHeight);
+          window.parent.postMessage({ type: "dreddi:embed:resize", height }, "*");
+        });
+      });
     };
     postHeight();
     window.addEventListener("load", postHeight);
@@ -263,12 +268,12 @@ export default function EmbedAgreementPage() {
             {details ? (
               <p className="mt-1 line-clamp-3 text-xs text-white/45">{details}</p>
             ) : null}
-            {deadlineLabel ? (
-              <p className="mt-2 text-xs text-white/45">
-                {t("agreementEmbed.deadline")}:{" "}
-                <span className="text-white/65">{deadlineLabel}</span>
-              </p>
-            ) : null}
+            <p className="mt-2 text-xs text-white/45">
+              {t("agreementEmbed.deadline")}:{" "}
+              <span className="text-white/65">
+                {deadlineLabel ?? t("agreementEmbed.noDeadline")}
+              </span>
+            </p>
 
             {/* Brand label */}
             <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65">

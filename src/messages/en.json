@@ -1127,6 +1127,7 @@
     "unavailable": "This public agreement is unavailable",
     "watching": "watching",
     "deadline": "Deadline",
+    "noDeadline": "No deadline",
     "status": "Status",
     "updated": "Updated",
     "liveNote": "Public status updates in Dreddi"
