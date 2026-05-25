@@ -49,10 +49,17 @@ type PublicAgreementRow = {
   creator_display_name: string | null;
   creator_handle: string | null;
   creator_is_public_profile?: boolean | null;
-  counterparty_display_name: string | null;
-  counterparty_handle: string | null;
-  counterparty_is_public_profile?: boolean | null;
-  counterparty_contact: string | null;
+  executor_display_name: string | null;
+  executor_handle: string | null;
+  executor_is_public_profile?: boolean | null;
+  accepter_display_name?: string | null;
+  accepter_handle?: string | null;
+  accepter_is_public_profile?: boolean | null;
+  accepter_contact?: string | null;
+  reviewer_display_name?: string | null;
+  reviewer_handle?: string | null;
+  reviewer_is_public_profile?: boolean | null;
+  reviewer_id?: string | null;
   viewer_can_update?: boolean | null;
   updates_available?: boolean | null;
   updates?: PublicAgreementUpdate[] | null;
@@ -122,14 +129,22 @@ function displayUpdateAuthorName(update: PublicAgreementUpdate, fallback: string
   return displayProfileName(update.author_display_name, update.author_handle, fallback);
 }
 
-function displayCounterpartyName(row: PublicAgreement, fallback: string) {
+function displayAccepterName(row: PublicAgreement, fallback: string) {
+  const profileName = displayProfileName(row.accepter_display_name ?? null, row.accepter_handle ?? null, "");
+  if (profileName) return profileName;
+  const contact = row.accepter_contact?.trim();
+  if (contact && !isLikelyPrivateEmail(contact)) return contact;
+  return fallback;
+}
+
+function displayExecutorName(row: PublicAgreement, fallback: string) {
   const profileName = displayProfileName(
-    row.counterparty_display_name,
-    row.counterparty_handle,
+    row.executor_display_name,
+    row.executor_handle,
     ""
   );
   if (profileName) return profileName;
-  const contact = row.counterparty_contact?.trim();
+  const contact = row.accepter_contact?.trim();
   if (contact && !isLikelyPrivateEmail(contact)) return contact;
   return fallback;
 }
@@ -192,7 +207,14 @@ function getFlowStates(agreement: PublicAgreement, t: ReturnType<typeof useT>): 
 
 function buildTimeline(
   agreement: PublicAgreement,
-  labels: { creator: string; counterparty: string; system: string; updateFallback: string },
+  labels: {
+    creator: string;
+    accepter: string;
+    executor: string;
+    reviewer: string;
+    system: string;
+    updateFallback: string;
+  },
   t: ReturnType<typeof useT>
 ): TimelineItem[] {
   const acceptedAt = agreement.accepted_at ?? agreement.counterparty_accepted_at;
@@ -210,7 +232,7 @@ function buildTimeline(
     items.push({
       key: "accepted",
       label: t("publicAgreement.timeline.accepted"),
-      actor: labels.counterparty,
+      actor: labels.accepter,
       timestamp: acceptedAt,
       description: t("publicAgreement.timeline.acceptedDescription"),
       tone: "success",
@@ -221,7 +243,7 @@ function buildTimeline(
     items.push({
       key: "completed",
       label: t("publicAgreement.timeline.completed"),
-      actor: labels.counterparty,
+      actor: labels.executor,
       timestamp: agreement.completed_at,
       description: t("publicAgreement.timeline.completedDescription"),
       tone: "attention",
@@ -232,7 +254,7 @@ function buildTimeline(
     items.push({
       key: "confirmed",
       label: t("publicAgreement.timeline.confirmed"),
-      actor: labels.creator,
+      actor: labels.reviewer,
       timestamp: agreement.confirmed_at,
       description: t("publicAgreement.timeline.confirmedDescription"),
       tone: "success",
@@ -243,7 +265,7 @@ function buildTimeline(
     items.push({
       key: "disputed",
       label: t("publicAgreement.timeline.disputed"),
-      actor: labels.creator,
+      actor: labels.reviewer,
       timestamp: agreement.disputed_at,
       description: t("publicAgreement.timeline.disputedDescription"),
       tone: "danger",
@@ -254,7 +276,7 @@ function buildTimeline(
     items.push({
       key: "declined",
       label: t("publicAgreement.timeline.declined"),
-      actor: labels.counterparty,
+      actor: labels.accepter,
       timestamp: agreement.declined_at,
       tone: "danger",
     });
@@ -380,15 +402,25 @@ export default function PublicAgreementPage() {
         t("publicAgreement.participants.creatorFallback")
       )
     : "";
-  const counterpartyName = agreement
-    ? displayCounterpartyName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+  const accepterName = agreement
+    ? displayAccepterName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+    : "";
+  const executorName = agreement
+    ? displayExecutorName(agreement, t("publicAgreement.participants.counterpartyFallback"))
+    : "";
+  const reviewerName = agreement
+    ? displayProfileName(
+        agreement.reviewer_display_name ?? null,
+        agreement.reviewer_handle ?? null,
+        t("publicAgreement.participants.counterpartyFallback")
+      )
     : "";
 
   const creatorHref = agreement
     ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
     : null;
   const counterpartyHref = agreement
-    ? getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale)
+    ? getPublicProfileHref(agreement.executor_handle, agreement.executor_is_public_profile, locale)
     : null;
 
   const timeline = agreement
@@ -396,7 +428,9 @@ export default function PublicAgreementPage() {
         agreement,
         {
           creator: creatorName,
-          counterparty: counterpartyName,
+          accepter: accepterName || executorName || creatorName,
+          executor: executorName || accepterName || creatorName,
+          reviewer: reviewerName || creatorName,
           system: t("publicAgreement.timeline.system"),
           updateFallback: t("publicAgreement.timeline.updateAuthorFallback"),
         },

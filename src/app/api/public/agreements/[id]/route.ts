@@ -48,6 +48,7 @@ type PromisePublicAgreementRecord = {
   promisor_id: string | null;
   promisee_id: string | null;
   counterparty_contact: string | null;
+  reviewer_id: string | null;
 };
 
 type PublicProfileRecord = {
@@ -137,8 +138,14 @@ function serializePublicAgreement(
   viewerCanFollow = true
 ) {
   const responsibleId = resolveExecutorId(promise);
+  const reviewerId =
+    promise.promisor_id && promise.promisee_id && promise.promisor_id === responsibleId
+      ? promise.promisee_id
+      : promise.promisor_id;
   const creatorProfile = profilesById.get(promise.creator_id) ?? null;
   const responsibleProfile = responsibleId ? profilesById.get(responsibleId) ?? null : null;
+  const accepterProfile = promise.counterparty_id ? profilesById.get(promise.counterparty_id) ?? null : null;
+  const reviewerProfile = reviewerId ? profilesById.get(reviewerId) ?? null : null;
   const counterpartyContact = promise.counterparty_contact?.trim() ?? "";
   const canUseCounterpartyContact = responsibleId === promise.counterparty_id;
   const publicCounterpartyContact =
@@ -171,10 +178,17 @@ function serializePublicAgreement(
     creator_display_name: creatorProfile?.display_name ?? null,
     creator_handle: creatorProfile?.is_public_profile ? creatorProfile.handle : null,
     creator_is_public_profile: creatorProfile?.is_public_profile ?? false,
-    counterparty_display_name: responsibleProfile?.display_name ?? null,
-    counterparty_handle: responsibleProfile?.is_public_profile ? responsibleProfile.handle : null,
-    counterparty_is_public_profile: responsibleProfile?.is_public_profile ?? false,
-    counterparty_contact: publicCounterpartyContact,
+    executor_display_name: responsibleProfile?.display_name ?? null,
+    executor_handle: responsibleProfile?.is_public_profile ? responsibleProfile.handle : null,
+    executor_is_public_profile: responsibleProfile?.is_public_profile ?? false,
+    accepter_display_name: accepterProfile?.display_name ?? null,
+    accepter_handle: accepterProfile?.is_public_profile ? accepterProfile.handle : null,
+    accepter_is_public_profile: accepterProfile?.is_public_profile ?? false,
+    accepter_contact: promise.counterparty_contact,
+    reviewer_display_name: reviewerProfile?.display_name ?? null,
+    reviewer_handle: reviewerProfile?.is_public_profile ? reviewerProfile.handle : null,
+    reviewer_is_public_profile: reviewerProfile?.is_public_profile ?? false,
+    reviewer_id: reviewerId ?? null,
     viewer_can_update: viewerCanUpdate,
     updates_available: updatesAvailable,
     viewer_following: viewerFollowing,
@@ -239,9 +253,13 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     }
 
     const responsibleId = resolveExecutorId(promise);
+    const reviewerId =
+      promise.promisor_id && promise.promisee_id && promise.promisor_id === responsibleId
+        ? promise.promisee_id
+        : promise.promisor_id;
     const profileIds = Array.from(
       new Set(
-        [promise.creator_id, responsibleId, ...(publicUpdates ?? []).map((update) => update.author_id)].filter(
+        [promise.creator_id, promise.counterparty_id, responsibleId, reviewerId, ...(publicUpdates ?? []).map((update) => update.author_id)].filter(
           (value): value is string => Boolean(value)
         )
       )
