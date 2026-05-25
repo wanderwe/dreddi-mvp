@@ -134,37 +134,44 @@ export default function EmbedAgreementPage() {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
   }, []);
 
-  // Strip body styles inherited from globals.css so the iframe is
-  // transparent outside the widget card and never shows a scrollbar
+  // Strip body styles from globals.css so the iframe is transparent
+  // outside the widget card. Hide scrollbar via CSS — NOT overflow:hidden
+  // on <html>, which would break scrollHeight measurement in iframes.
   useEffect(() => {
     const { documentElement: html, body } = document;
-    html.style.overflow = "hidden";
     html.style.background = "transparent";
-    body.style.overflow = "hidden";
     body.style.background = "transparent";
     body.style.minHeight = "auto";
+    // Hide scrollbar visually without affecting layout
+    const style = document.createElement("style");
+    style.textContent =
+      "html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}";
+    document.head.appendChild(style);
     return () => {
-      html.style.overflow = "";
       html.style.background = "";
-      body.style.overflow = "";
       body.style.background = "";
       body.style.minHeight = "";
+      document.head.removeChild(style);
     };
   }, []);
 
-  // Auto-resize for iframe embedding
+  // Auto-resize for iframe embedding.
+  // Measure <main> directly — body/html height equals the viewport in iframes
+  // regardless of content size, making scrollHeight unreliable.
   useEffect(() => {
-    const postHeight = () =>
-      window.parent.postMessage(
-        { type: "dreddi:embed:resize", height: Math.ceil(document.documentElement.scrollHeight) },
-        "*"
-      );
+    const postHeight = () => {
+      const main = document.querySelector("main");
+      const height = main
+        ? Math.ceil(main.getBoundingClientRect().height)
+        : Math.ceil(document.body.scrollHeight);
+      window.parent.postMessage({ type: "dreddi:embed:resize", height }, "*");
+    };
     postHeight();
     window.addEventListener("load", postHeight);
     window.addEventListener("resize", postHeight);
+    const main = document.querySelector("main");
     const ro = new ResizeObserver(postHeight);
-    ro.observe(document.documentElement);
-    if (document.body) ro.observe(document.body);
+    if (main) ro.observe(main); else ro.observe(document.body);
     return () => {
       window.removeEventListener("load", postHeight);
       window.removeEventListener("resize", postHeight);
