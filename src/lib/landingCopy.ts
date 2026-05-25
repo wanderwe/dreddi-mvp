@@ -27,34 +27,22 @@ export type LandingCopy = {
     label: string;
     title: string;
     description: string;
-    cards: {
-      publicCommitments: {
-        title: string;
-        body: string;
-      };
-      observing: {
-        title: string;
-        body: string;
-      };
-      outcomes: {
-        title: string;
-        body: string;
-      };
-    };
-    microcopy: {
-      commitments: string;
-      observers: string;
-      privacy: string;
-    };
+    supporting: string;
+    principles: string[];
     mockCard: {
+      title: string;
       badge: string;
       watchers: string;
-      timelineLabel: string;
-      timelineValue: string;
+      statusLabel: string;
+      statusValue: string;
+      deadlineLabel: string;
+      deadlineValue: string;
+      updateLabel: string;
+      updateValue: string;
       outcomeLabel: string;
       outcomeValue: string;
       viewCta: string;
-      watchCta: string;
+      observerHint: string;
     };
   };
   cta: {
@@ -158,35 +146,26 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       label: "Публічна відповідальність",
       title: "Публічні угоди роблять відповідальність видимою",
       description:
-        "Перетворюйте важливі домовленості на публічні зобовʼязання, за якими можуть стежити інші. Прогрес, дедлайни та фінальний результат стають частиною репутації.",
-      cards: {
-        publicCommitments: {
-          title: "Публічні домовленості",
-          body: "Окремі угоди можна зробити видимими та поділитися ними як публічною сторінкою.",
-        },
-        observing: {
-          title: "Стеження без участі",
-          body: "Інші користувачі можуть стежити за угодою, не стаючи її учасниками.",
-        },
-        outcomes: {
-          title: "Репутація з результатів",
-          body: "Виконані або оскаржені угоди формують репутацію. Без лайків і популярності.",
-        },
-      },
-      microcopy: {
-        commitments: "Публічні угоди — це не пости. Це зобовʼязання з результатом.",
-        observers: "Люди можуть стежити за угодою, але не втручатися в неї.",
-        privacy: "Приватні деталі залишаються приватними. Репутація все одно відображає реальні результати.",
-      },
+        "Перетворюйте важливі домовленості на публічні зобовʼязання, за якими можуть стежити інші",
+      supporting: "Прогрес, дедлайни та фінальний результат стають частиною репутації",
+      principles: [
+        "Люди можуть стежити, не стаючи учасниками",
+        "Публічні угоди — це зобовʼязання з видимим результатом",
+      ],
       mockCard: {
+        title: "Відкрити Space Out VR Bar до серпня",
         badge: "Публічна",
         watchers: "Стежать",
-        timelineLabel: "Статус",
-        timelineValue: "У процесі • дедлайн 12 серпня",
+        statusLabel: "Статус",
+        statusValue: "У процесі",
+        deadlineLabel: "Дедлайн",
+        deadlineValue: "1 серпня 2026",
+        updateLabel: "Останнє оновлення",
+        updateValue: "Локацію підтверджено, триває підписання оренди",
         outcomeLabel: "Результат",
-        outcomeValue: "Після завершення: «Виконано» або «Оскаржено»",
+        outcomeValue: "Після завершення угода переходить у «Виконано» або «Оскаржено»",
         viewCta: "Переглянути публічну угоду",
-        watchCta: "Стежити за угодою",
+        observerHint: "Спостерігачі бачать прогрес, але не втручаються",
       },
     },
     cta: {
@@ -288,35 +267,26 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       label: "Public accountability",
       title: "Public agreements make accountability visible",
       description:
-        "Turn important agreements into public commitments people can follow. Share the agreement, let others observe progress, and let the final outcome become part of reputation.",
-      cards: {
-        publicCommitments: {
-          title: "Public commitments",
-          body: "Selected agreements can be made visible and shared as a public page.",
-        },
-        observing: {
-          title: "Watching without joining",
-          body: "Other users can follow a public agreement without becoming participants.",
-        },
-        outcomes: {
-          title: "Reputation from outcomes",
-          body: "Fulfilled and disputed outcomes shape reputation. No likes. No popularity score.",
-        },
-      },
-      microcopy: {
-        commitments: "Public agreements are not posts. They are commitments with outcomes.",
-        observers: "People can watch the agreement, not interfere with it.",
-        privacy: "Private details stay private. Reputation still reflects real outcomes.",
-      },
+        "Turn important agreements into public commitments other people can follow",
+      supporting: "Progress, deadlines and final outcomes become part of reputation",
+      principles: [
+        "People can follow without becoming participants",
+        "Public agreements are commitments with visible outcomes",
+      ],
       mockCard: {
+        title: "Launch Space Out VR Bar by August",
         badge: "Public",
         watchers: "Watching",
-        timelineLabel: "Timeline",
-        timelineValue: "In progress • due Aug 12",
+        statusLabel: "Status",
+        statusValue: "In progress",
+        deadlineLabel: "Deadline",
+        deadlineValue: "August 1, 2026",
+        updateLabel: "Latest update",
+        updateValue: "Venue confirmed, lease signing in progress",
         outcomeLabel: "Outcome",
-        outcomeValue: "After completion: “Fulfilled” or “Disputed”",
+        outcomeValue: "After completion this agreement resolves as “Fulfilled” or “Disputed”",
         viewCta: "View public agreement",
-        watchCta: "Watch agreement",
+        observerHint: "Observers can follow progress without interfering",
       },
     },
     cta: {
