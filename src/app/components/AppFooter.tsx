@@ -12,7 +12,7 @@ export function AppFooter() {
   const t = useT();
   const pathname = usePathname();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
-  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale);
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale));
   const [canSendFeedback, setCanSendFeedback] = useState(false);
   const year = new Date().getFullYear();
   const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA;
