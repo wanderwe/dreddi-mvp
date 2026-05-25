@@ -700,7 +700,7 @@ export default function PublicAgreementPage() {
                   <Tooltip
                     label={t("publicAgreement.followTooltip")}
                     placement="top"
-                    tooltipClassName="max-w-[240px] text-center"
+                    tooltipClassName="max-w-[240px]"
                   >
                     <button
                       type="button"
