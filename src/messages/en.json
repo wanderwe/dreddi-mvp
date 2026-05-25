@@ -1110,7 +1110,8 @@
     "follow": "Watch",
     "following": "Watching",
     "unfollowHint": "Unfollow",
-    "followersCount": "{count} following"
+    "followersCount": "{count} following",
+    "followTooltip": "Follow status changes and final outcomes of this public agreement"
   },
   "watching": {
     "title": "Watchlist",
