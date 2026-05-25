@@ -952,6 +952,7 @@ export default function PromisePage() {
   };
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
+  const isPrivateAgreement = p?.visibility === "private";
   const canAddAgreementUpdate = Boolean(isPrivateAgreement && uiStatus && isAgreementLiveStatus(uiStatus));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
@@ -1031,7 +1032,6 @@ export default function PromisePage() {
     ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
     : t(`promises.inviteStatus.${inviteStatus}`);
   const lifecycleStates = p && uiStatus ? getLifecycleStates(p, uiStatus, t) : [];
-  const isPrivateAgreement = p?.visibility === "private";
   const timeline = p && uiStatus
     ? buildAgreementTimeline(
         p,
