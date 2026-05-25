@@ -31,7 +31,7 @@ export function AppHeader() {
   const locale = useLocale();
   const pathname = usePathname();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
-  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || /^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale);
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale));
   const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
