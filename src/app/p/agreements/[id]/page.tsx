@@ -697,7 +697,11 @@ export default function PublicAgreementPage() {
                   </button>
                 </Tooltip>
                 {agreement.viewer_can_follow !== false ? (
-                  <Tooltip label={t("publicAgreement.followTooltip")} placement="top">
+                  <Tooltip
+                    label={t("publicAgreement.followTooltip")}
+                    placement="top"
+                    tooltipClassName="max-w-[240px] text-center"
+                  >
                     <button
                       type="button"
                       title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}

@@ -1111,7 +1111,7 @@
     "following": "Watching",
     "unfollowHint": "Unfollow",
     "followersCount": "{count} following",
-    "followTooltip": "Follow status changes and final outcomes of this public agreement"
+    "followTooltip": "Watch this public agreement to monitor status changes and the final outcome"
   },
   "watching": {
     "title": "Watchlist",
