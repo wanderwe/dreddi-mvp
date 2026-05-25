@@ -693,7 +693,7 @@ export default function PublicAgreementPage() {
                 <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
                 <ParticipantCard
                   label={t("publicAgreement.participants.acceptedBy")}
-                  name={counterpartyName}
+                  name={accepterName || executorName || creatorName}
                   href={counterpartyHref}
                 />
               </div>
