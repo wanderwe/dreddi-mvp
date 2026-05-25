@@ -13,6 +13,7 @@ import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { productFlags } from "@/lib/config/productFlags";
 
 type DealRow = {
   id: string;
@@ -198,7 +199,7 @@ export default function Home() {
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
   const showAuthenticatedCta = ready && isAuthenticated;
-  const isBeta = process.env.NEXT_PUBLIC_BETA !== "false";
+  const showBetaUi = productFlags.showBetaUi;
   const demoDealsSource: DemoDealSource[] = useMemo(
     () => [
       {
@@ -282,7 +283,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (!isBeta) {
+    if (!showBetaUi) {
       setIsBannerDismissed(true);
       setIsBannerStateReady(true);
       return;
@@ -299,7 +300,7 @@ export default function Home() {
     } finally {
       setIsBannerStateReady(true);
     }
-  }, [isBeta]);
+  }, [showBetaUi]);
 
   const dismissBetaBanner = () => {
     setIsBannerDismissed(true);
@@ -557,7 +558,7 @@ export default function Home() {
   const recentDealsHref = isAuthenticated ? "/promises" : "/login";
   const recentDealsLimited = recentDeals.slice(0, 3);
   const recentDealsTitle = copy.recentDeals.title;
-  const showBetaBanner = isBeta && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
+  const showBetaBanner = showBetaUi && ready && isAuthenticated && isBannerStateReady && !isBannerDismissed;
 
   const renderMultiline = (text: string) =>
     text.split("\n").map((line, index) => (
