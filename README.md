@@ -1,16 +1,229 @@
-# Dreddi Knows (MVP)
+# Dreddi
 
-Dreddi is a trust & promise tracking app.
-It allows people to fix intentions, invite counterparties,
-and track fulfillment or breach over time.
+> Promises tracked. Reputation earned.
 
-## MVP features
-- Email magic link auth (Supabase)
-- Google SSO (Supabase OAuth) with magic link fallback
-- Create promises
-- Invite second party via link
-- Accept promises
-- Track status (active / fulfilled / broken)
+Dreddi is a lightweight accountability and reputation layer for real agreements between people.
+
+It exists between:
+- verbal promises
+- and formal contracts
+
+Dreddi helps people:
+- record agreements
+- confirm outcomes
+- resolve disputes
+- build observable reputation through real execution history
+
+---
+
+# What Dreddi Is
+
+Dreddi is not:
+- a task manager
+- a CRM
+- a freelance marketplace
+- a social network
+- a legal contract platform
+
+It is a system for making agreements:
+- visible
+- trackable
+- reputation-aware
+
+---
+
+# Core Idea
+
+Most agreements disappear.
+
+People agree to:
+- deadlines
+- deliverables
+- payments
+- collaborations
+- launches
+- responsibilities
+
+But later:
+- nobody remembers the exact terms
+- there is no confirmation
+- there is no shared history
+- reputation becomes subjective
+
+Dreddi creates a structured agreement lifecycle:
+
+1. Agreement created
+2. Agreement accepted
+3. Agreement active
+4. Work marked completed
+5. Final outcome confirmed or disputed
+
+Only finalized outcomes affect reputation.
+
+---
+
+# Public Agreements
+
+One of Dreddi’s core product directions is Public Agreements.
+
+Some agreements deserve visibility.
+
+Public agreements allow:
+- public commitments
+- observable accountability
+- execution transparency
+- follow/watch mechanics
+- public execution history
+
+People can:
+- follow public agreements
+- observe status changes
+- track deadlines
+- see fulfilled or disputed outcomes
+
+Without:
+- likes
+- comments
+- popularity systems
+- social media mechanics
+
+Public agreements are not posts.
+
+They are commitments with visible outcomes.
+
+---
+
+# Reputation Philosophy
+
+Dreddi reputation is based on:
+- fulfilled agreements
+- disputed agreements
+- consistency over time
+- observable outcomes
+
+Not:
+- likes
+- followers
+- popularity
+- engagement
+
+Reputation reflects:
+> what people repeatedly do.
+
+---
+
+# Public Profiles
+
+Each user has a public reputation profile.
+
+Profiles may include:
+- reputation score
+- fulfilled agreements
+- disputed agreements
+- execution history
+- accountability metrics
+- public agreements
+
+Private agreement details remain hidden.
+
+But finalized outcomes may still affect reputation.
+
+---
+
+# Watchlist
+
+Users can follow public agreements created by other people.
+
+The watchlist system is designed for:
+- observing commitments
+- monitoring public execution
+- tracking important initiatives
+
+Watchers are not participants.
+
+This is not a social feed.
+
+It is lightweight public accountability monitoring.
+
+---
+
+# Embeddable Public Agreements
+
+Dreddi public agreements can be embedded outside the platform.
+
+Potential use cases:
+- media articles
+- startup public roadmaps
+- NGO/public transparency pages
+- public fundraising initiatives
+- community commitments
+- build-in-public workflows
+
+Embeds are designed as:
+- public trust objects
+- live commitment snapshots
+- canonical references for agreement status
+
+---
+
+# Product Principles
+
+Dreddi should feel:
+- calm
+- premium
+- objective
+- structured
+- transparent
+
+Avoid:
+- gamification
+- outrage mechanics
+- public shaming
+- noisy social systems
+- moralizing tone
+
+---
+
+# Tech Stack
+
+Current stack:
+- Next.js
+- TypeScript
+- Supabase
+- PostgreSQL
+- Vercel
+- Resend
+
+---
+
+# Status
+
+Dreddi is currently in beta.
+
+The product is actively evolving around:
+- agreement lifecycle UX
+- public agreements
+- reputation systems
+- public accountability
+- embeddable trust objects
+- watchlist/following mechanics
+- public profiles
+
+---
+
+# Philosophy
+
+Words disappear.
+
+Reputation remembers.
+
+Dreddi exists to preserve:
+- what people agreed to
+- and what actually happened.
+
+---
+
+# Developer Setup & Operations
 
 ## Supabase Google OAuth setup
 1) Enable the Google provider in **Supabase → Authentication → Providers**.
@@ -23,7 +236,7 @@ and track fulfillment or breach over time.
    - Add the authorized redirect URI pointing to Supabase’s callback endpoint:  
      `https://<your-project-ref>.supabase.co/auth/v1/callback`
 
-## Confirm / dispute flow (MVP)
+## Confirm / dispute flow (MVP foundation)
 - A promisor can mark a promise as completed, moving it to a pending state.
 - The counterparty reviews the completion and either confirms or files a dispute.
 
@@ -36,7 +249,7 @@ and track fulfillment or breach over time.
 3) As the counterparty, open the "Promised to me" tab and click **Review & confirm**.
 4) Confirm or dispute in the review screen. Reputation updates will be recorded for the promisor and counterparty.
 
-## Reputation model (MVP)
+## Reputation model
 - Tables: `user_reputation` (aggregate) and `reputation_events` (append-only). Default score is 50.
 - Run `docs/migrations_reputation.sql` to create the tables, indexes, and simple RLS policies.
 - Reputation updates on final outcomes: confirm/dispute routes call `applyReputationForPromiseFinalization` to append unique events and adjust aggregates.
@@ -65,11 +278,6 @@ and track fulfillment or breach over time.
 - **reputation_age_days**: Days since the first confirmed/disputed deal.
 - **avg_deals_per_month**: Average completed deals per month since the first deal, normalized since the first deal date (without a minimum 30-day floor).
 
-## Tech stack
-- Next.js (App Router)
-- Supabase (Auth + DB + RLS)
-- Tailwind CSS
-
 ## Playwright UI tests (notifications)
 1) Ensure the app is running locally (`npm run dev`).
 2) Export required env vars:
@@ -79,7 +287,6 @@ and track fulfillment or breach over time.
    - `DREDDI_BASE_URL` (defaults to `http://localhost:3000` if omitted)
 3) Install Playwright (first time only): `npm install -D @playwright/test` then `npx playwright install`.
 4) Run UI tests: `npm run test:ui`.
-
 
 ## Manual reminder email diagnostics
 - Use this when sender sees “Last reminder” but recipient says no email arrived.
@@ -111,8 +318,5 @@ and track fulfillment or breach over time.
   - `curl -i -H "Authorization: Bearer <CRON_SECRET>" "https://www.dreddi.com/api/notifications/cron?dryRun=1&inviteIgnoreMinutes=2"`
 - Optional connectivity check endpoint:
   - `curl -i -H "Authorization: Bearer <CRON_SECRET>" https://www.dreddi.com/api/notifications/cron-smoke`
-
-## Status
-Early MVP / in active development.
 
 Before implementing new product features or UX flows, review `/docs/PRODUCT_SYSTEM.md`.
