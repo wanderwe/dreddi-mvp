@@ -9,6 +9,7 @@ import type { StatusPillTone } from "@/app/components/ui/StatusPill";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
+import type { Locale } from "@/lib/i18n/locales";
 import { isPromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus, type PromiseUiStatus } from "@/lib/promiseUiStatus";
 
@@ -29,8 +30,10 @@ type PublicAgreementRow = {
   cancelled_at: string | null;
   creator_display_name: string | null;
   creator_handle: string | null;
+  creator_is_public_profile?: boolean | null;
   counterparty_display_name: string | null;
   counterparty_handle: string | null;
+  counterparty_is_public_profile?: boolean | null;
   followers_count?: number | null;
   updated_at?: string | null;
 };
@@ -51,6 +54,12 @@ const statusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
 function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
   if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return null;
   return { ...row, title: row.title, created_at: row.created_at, uiStatus: getPromiseUiStatus(row) };
+}
+
+function getPublicProfileHref(handle: string | null, isPublicProfile: boolean | null | undefined, locale: Locale) {
+  const cleanHandle = handle?.trim();
+  if (!cleanHandle || !isPublicProfile) return null;
+  return localizePath(`/u/${cleanHandle}`, locale);
 }
 
 function displayName(name: string | null, handle: string | null, fallback: string) {
@@ -111,13 +120,15 @@ export default function EmbedAgreementPage() {
   const counterparty = displayName(agreement.counterparty_display_name, agreement.counterparty_handle, t("publicAgreement.participants.counterpartyFallback"));
   const details = agreement.details?.trim() || agreement.condition_text?.trim();
   const updatedAt = agreement.updated_at || agreement.created_at;
+  const creatorHref = getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale);
+  const counterpartyHref = getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale);
   const hasAccepted = Boolean(agreement.accepted_at ?? agreement.counterparty_accepted_at);
   const isConfirmed = agreement.uiStatus === "confirmed";
   const isDisputed = agreement.uiStatus === "disputed";
 
   return (
     <main className="m-0 p-1">
-      <article className={`w-full rounded-xl border p-3 shadow-sm ${themeClass}`}>
+      <article className={`mx-auto w-full max-w-2xl rounded-2xl border p-3.5 shadow-sm ${themeClass}`}>
         <div className="flex items-center justify-between gap-2 text-[11px]">
           <div className="inline-flex items-center gap-1.5 font-semibold tracking-wide opacity-85">
             <Dot className="h-4 w-4" />Dreddi
@@ -130,7 +141,11 @@ export default function EmbedAgreementPage() {
 
         <h1 className="mt-2 text-[15px] font-semibold leading-tight sm:text-base">{agreement.title}</h1>
         {details ? <p className="mt-1 line-clamp-2 text-[12px] opacity-80">{details}</p> : null}
-        <p className="mt-2 text-[12px] opacity-80">{creator} ↔ {counterparty}</p>
+        <p className="mt-2 flex flex-wrap items-center gap-1 text-[12px] opacity-90">
+          {creatorHref ? <Link href={creatorHref} className="underline-offset-2 transition hover:underline">{creator}</Link> : <span>{creator}</span>}
+          <span className="opacity-60">↔</span>
+          {counterpartyHref ? <Link href={counterpartyHref} className="underline-offset-2 transition hover:underline">{counterparty}</Link> : <span>{counterparty}</span>}
+        </p>
 
         <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
           <StatusPill label={t(`publicAgreement.status.${agreement.uiStatus}`)} tone={statusToneMap[agreement.uiStatus] ?? "neutral"} icon="clock" />
@@ -138,17 +153,32 @@ export default function EmbedAgreementPage() {
           <span className={`rounded-full border px-2 py-1 ${chipClass}`}>{Math.max(0, agreement.followers_count ?? 0)} {t("agreementEmbed.watching")}</span>
         </div>
 
-        <div className="mt-2 grid grid-cols-4 gap-1 text-[10px]">
-          {flowKeys.map((key, index) => {
-            const complete = key === "created" || (key === "accepted" && hasAccepted) || (key === "active" && hasAccepted);
-            const current = (key === "active" && !isConfirmed && !isDisputed) || (key === "confirmed" && (isConfirmed || isDisputed));
-            const tone = key === "confirmed" ? (isDisputed ? "border-red-400/50 bg-red-500/20" : isConfirmed ? "border-emerald-400/50 bg-emerald-500/20" : "") : "";
-            return (
-              <div key={key} className={`rounded-md border px-1.5 py-1 text-center ${chipClass} ${complete ? "opacity-100" : "opacity-45"} ${current ? "ring-1 ring-amber-300/60" : ""} ${tone}`}>
-                {index === flowKeys.length - 1 && isDisputed ? t("publicAgreement.status.disputed") : t(`publicAgreement.flow.${key}`)}
-              </div>
-            );
-          })}
+        <div className="mt-2.5 rounded-lg border border-white/10 px-2.5 py-2">
+          <div className="flex items-center gap-1.5">
+            {flowKeys.map((key, index) => {
+              const complete = key === "created" || (key === "accepted" && hasAccepted) || (key === "active" && hasAccepted);
+              const current = (key === "active" && !isConfirmed && !isDisputed) || (key === "confirmed" && (isConfirmed || isDisputed));
+              const isLast = index === flowKeys.length - 1;
+              const dotTone = isLast
+                ? isDisputed
+                  ? "bg-red-400"
+                  : isConfirmed
+                    ? "bg-emerald-400"
+                    : "bg-white/35"
+                : complete
+                  ? "bg-amber-300"
+                  : "bg-white/25";
+              return (
+                <div key={key} className="flex min-w-0 flex-1 items-center gap-1.5">
+                  <div className={`h-2 w-2 shrink-0 rounded-full ${dotTone} ${current ? "ring-2 ring-amber-300/40" : ""}`} />
+                  <span className={`truncate text-[10px] ${complete || current ? "opacity-90" : "opacity-55"}`}>
+                    {isLast && isDisputed ? t("publicAgreement.status.disputed") : t(`publicAgreement.flow.${key}`)}
+                  </span>
+                  {!isLast ? <div className="h-px flex-1 bg-white/15" /> : null}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-2 flex items-center justify-between gap-2">
