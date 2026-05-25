@@ -15,6 +15,7 @@ import type { Locale } from "@/lib/i18n/locales";
 import { isPromiseStatus } from "@/lib/promiseStatus";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
+import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
 
@@ -408,7 +409,11 @@ export default function PublicAgreementPage() {
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
     : null;
 
-  const canAddUpdate = Boolean(agreement?.viewer_can_update && agreement.updates_available !== false);
+  const canAddUpdate = Boolean(
+    agreement?.viewer_can_update
+      && agreement.updates_available !== false
+      && isAgreementLiveStatus(agreement.uiStatus)
+  );
   const shouldShowUpdatesUnavailable = Boolean(
     agreement?.viewer_can_update && agreement.updates_available === false
   );
@@ -723,7 +728,7 @@ export default function PublicAgreementPage() {
             </p>
           ) : null}
 
-          {isUpdateFormOpen ? (
+          {canAddUpdate && isUpdateFormOpen ? (
             <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
               <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
                 {t("publicAgreement.updates.label")}

@@ -27,6 +27,7 @@ import {
 } from "@/lib/promiseAcceptance";
 import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
+import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { buildAgreementFlowState } from "@/lib/agreementFlowState";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
@@ -951,6 +952,7 @@ export default function PromisePage() {
   };
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
+  const canAddAgreementUpdate = Boolean(isPrivateAgreement && uiStatus && isAgreementLiveStatus(uiStatus));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
@@ -1430,7 +1432,7 @@ export default function PromisePage() {
               </div>
             </div>
 
-            {isPrivateAgreement ? (
+            {canAddAgreementUpdate ? (
               <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
