@@ -2,7 +2,7 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { ArrowUpRight, Eye, Globe2, ShieldCheck, X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
@@ -804,6 +804,110 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <section className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 md:pb-24">
+        <div className="rounded-3xl border border-white/10 bg-slate-950/35 p-5 shadow-[0_20px_50px_rgba(3,10,18,0.45)] backdrop-blur md:p-8">
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-emerald-200/75">
+                  {copy.publicAgreements.label}
+                </p>
+                <h2 className="max-w-2xl text-2xl font-semibold tracking-[-0.02em] text-white sm:text-3xl">
+                  {copy.publicAgreements.title}
+                </h2>
+                <p className="max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                  {copy.publicAgreements.description}
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <Globe2 className="h-4 w-4 text-emerald-200" aria-hidden />
+                  <h3 className="mt-3 text-sm font-semibold text-white">
+                    {copy.publicAgreements.cards.publicCommitments.title}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400 sm:text-sm">
+                    {copy.publicAgreements.cards.publicCommitments.body}
+                  </p>
+                </article>
+                <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <Eye className="h-4 w-4 text-sky-200" aria-hidden />
+                  <h3 className="mt-3 text-sm font-semibold text-white">
+                    {copy.publicAgreements.cards.observing.title}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400 sm:text-sm">
+                    {copy.publicAgreements.cards.observing.body}
+                  </p>
+                </article>
+                <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <ShieldCheck className="h-4 w-4 text-violet-200" aria-hidden />
+                  <h3 className="mt-3 text-sm font-semibold text-white">
+                    {copy.publicAgreements.cards.outcomes.title}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400 sm:text-sm">
+                    {copy.publicAgreements.cards.outcomes.body}
+                  </p>
+                </article>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-300">
+                <ul className="space-y-2">
+                  <li>{copy.publicAgreements.microcopy.commitments}</li>
+                  <li>{copy.publicAgreements.microcopy.observers}</li>
+                  <li>{copy.publicAgreements.microcopy.privacy}</li>
+                </ul>
+              </div>
+            </div>
+
+            <aside className="rounded-2xl border border-white/12 bg-gradient-to-br from-[#0d1526] to-[#0a1220] p-4 shadow-inner shadow-black/25 sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">Quarterly Marketing Milestone</p>
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-2 py-0.5 text-[11px] text-emerald-100">
+                    {copy.publicAgreements.mockCard.badge}
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-1 text-xs text-slate-300">
+                  <Eye className="h-3.5 w-3.5" aria-hidden />
+                  184 {copy.publicAgreements.mockCard.watchers}
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3 text-sm">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                    {copy.publicAgreements.mockCard.timelineLabel}
+                  </p>
+                  <p className="mt-1 text-slate-200">{copy.publicAgreements.mockCard.timelineValue}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                    {copy.publicAgreements.mockCard.outcomeLabel}
+                  </p>
+                  <p className="mt-1 text-slate-200">{copy.publicAgreements.mockCard.outcomeValue}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-1 rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                >
+                  {copy.publicAgreements.mockCard.viewCta}
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-slate-100 transition hover:bg-white/15"
+                >
+                  <Eye className="h-3.5 w-3.5" aria-hidden />
+                  {copy.publicAgreements.mockCard.watchCta}
+                </button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

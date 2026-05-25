@@ -23,6 +23,40 @@ export type LandingCopy = {
     outcomeDescription: string;
     cta: string;
   };
+  publicAgreements: {
+    label: string;
+    title: string;
+    description: string;
+    cards: {
+      publicCommitments: {
+        title: string;
+        body: string;
+      };
+      observing: {
+        title: string;
+        body: string;
+      };
+      outcomes: {
+        title: string;
+        body: string;
+      };
+    };
+    microcopy: {
+      commitments: string;
+      observers: string;
+      privacy: string;
+    };
+    mockCard: {
+      badge: string;
+      watchers: string;
+      timelineLabel: string;
+      timelineValue: string;
+      outcomeLabel: string;
+      outcomeValue: string;
+      viewCta: string;
+      watchCta: string;
+    };
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -120,6 +154,41 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       outcomeDescription: "Відображає дотримані та оскаржені угоди",
       cta: "Переглянути приклад профілю",
     },
+    publicAgreements: {
+      label: "Публічна відповідальність",
+      title: "Публічні угоди роблять відповідальність видимою",
+      description:
+        "Перетворюйте важливі домовленості на публічні зобовʼязання, за якими можуть стежити інші. Прогрес, дедлайни та фінальний результат стають частиною репутації.",
+      cards: {
+        publicCommitments: {
+          title: "Публічні домовленості",
+          body: "Окремі угоди можна зробити видимими та поділитися ними як публічною сторінкою.",
+        },
+        observing: {
+          title: "Стеження без участі",
+          body: "Інші користувачі можуть стежити за угодою, не стаючи її учасниками.",
+        },
+        outcomes: {
+          title: "Репутація з результатів",
+          body: "Виконані або оскаржені угоди формують репутацію. Без лайків і популярності.",
+        },
+      },
+      microcopy: {
+        commitments: "Публічні угоди — це не пости. Це зобовʼязання з результатом.",
+        observers: "Люди можуть стежити за угодою, але не втручатися в неї.",
+        privacy: "Приватні деталі залишаються приватними. Репутація все одно відображає реальні результати.",
+      },
+      mockCard: {
+        badge: "Публічна",
+        watchers: "Стежать",
+        timelineLabel: "Статус",
+        timelineValue: "У процесі • дедлайн 12 серпня",
+        outcomeLabel: "Результат",
+        outcomeValue: "Після завершення: «Виконано» або «Оскаржено»",
+        viewCta: "Переглянути публічну угоду",
+        watchCta: "Стежити за угодою",
+      },
+    },
     cta: {
       getStarted: "Створити угоду",
       publicProfiles: "Переглянути профілі",
@@ -214,6 +283,41 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       outcomeTitle: "Public profile",
       outcomeDescription: "Shows fulfilled and disputed deals",
       cta: "View example profile",
+    },
+    publicAgreements: {
+      label: "Public accountability",
+      title: "Public agreements make accountability visible",
+      description:
+        "Turn important agreements into public commitments people can follow. Share the agreement, let others observe progress, and let the final outcome become part of reputation.",
+      cards: {
+        publicCommitments: {
+          title: "Public commitments",
+          body: "Selected agreements can be made visible and shared as a public page.",
+        },
+        observing: {
+          title: "Watching without joining",
+          body: "Other users can follow a public agreement without becoming participants.",
+        },
+        outcomes: {
+          title: "Reputation from outcomes",
+          body: "Fulfilled and disputed outcomes shape reputation. No likes. No popularity score.",
+        },
+      },
+      microcopy: {
+        commitments: "Public agreements are not posts. They are commitments with outcomes.",
+        observers: "People can watch the agreement, not interfere with it.",
+        privacy: "Private details stay private. Reputation still reflects real outcomes.",
+      },
+      mockCard: {
+        badge: "Public",
+        watchers: "Watching",
+        timelineLabel: "Timeline",
+        timelineValue: "In progress • due Aug 12",
+        outcomeLabel: "Outcome",
+        outcomeValue: "After completion: “Fulfilled” or “Disputed”",
+        viewCta: "View public agreement",
+        watchCta: "Watch agreement",
+      },
     },
     cta: {
       getStarted: "Create a deal",
