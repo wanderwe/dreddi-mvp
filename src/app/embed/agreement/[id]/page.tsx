@@ -134,6 +134,16 @@ export default function EmbedAgreementPage() {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
   }, []);
 
+  // Prevent body scroll so the iframe never shows a scrollbar
+  useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   // Auto-resize for iframe embedding
   useEffect(() => {
     const postHeight = () =>
