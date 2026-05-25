@@ -52,7 +52,13 @@ const statusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
 
 function normalizeAgreement(row: PublicAgreementRow): PublicAgreement | null {
   if (!row.title || !row.created_at || !isPromiseStatus(row.status)) return null;
-  return { ...row, title: row.title, created_at: row.created_at, uiStatus: getPromiseUiStatus(row) };
+  const normalizedRow = { ...row, status: row.status };
+  return {
+    ...normalizedRow,
+    title: row.title,
+    created_at: row.created_at,
+    uiStatus: getPromiseUiStatus(normalizedRow),
+  };
 }
 
 function getPublicProfileHref(handle: string | null, isPublicProfile: boolean | null | undefined, locale: Locale) {
