@@ -1121,9 +1121,11 @@
   "agreementEmbed": {
     "badge": "Public agreement",
     "cta": "View agreement",
-    "unavailable": "This public agreement is unavailable.",
+    "unavailable": "This public agreement is unavailable",
     "watching": "watching",
     "deadline": "Deadline",
-    "status": "Status"
+    "status": "Status",
+    "updated": "Updated",
+    "liveNote": "Public status updates in Dreddi"
   }
 }
