@@ -1110,6 +1110,7 @@
     "follow": "Watch",
     "following": "Watching",
     "unfollowHint": "Unfollow",
+    "unfollowTooltip": "Stop watching this public agreement",
     "followersCount": "{count} following",
     "followTooltip": "Watch this public agreement to monitor status changes and the final outcome"
   },

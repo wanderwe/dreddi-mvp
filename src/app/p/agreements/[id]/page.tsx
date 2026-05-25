@@ -698,15 +698,14 @@ export default function PublicAgreementPage() {
                 </Tooltip>
                 {agreement.viewer_can_follow !== false ? (
                   <Tooltip
-                    label={t("publicAgreement.followTooltip")}
+                    label={agreement.viewer_following ? t("publicAgreement.unfollowTooltip") : t("publicAgreement.followTooltip")}
                     placement="top"
                     tooltipClassName="max-w-[240px]"
                   >
                     <button
                       type="button"
-                      title={agreement.viewer_following ? t("publicAgreement.unfollowHint") : undefined}
                       onClick={handleToggleFollow}
-                      aria-label={`${followLabel} · ${t("publicAgreement.followTooltip")}`}
+                      aria-label={`${followLabel} · ${agreement.viewer_following ? t("publicAgreement.unfollowTooltip") : t("publicAgreement.followTooltip")}`}
                       className={[
                         "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
                         agreement.viewer_following
