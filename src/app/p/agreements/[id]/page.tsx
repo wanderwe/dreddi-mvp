@@ -327,6 +327,7 @@ export default function PublicAgreementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyEmbedState, setCopyEmbedState] = useState<"idle" | "copied" | "error">("idle");
   const [updateContent, setUpdateContent] = useState("");
   const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false);
   const [updateSubmitState, setUpdateSubmitState] = useState<"idle" | "saving" | "error">("idle");
@@ -394,6 +395,21 @@ export default function PublicAgreementPage() {
     if (typeof window === "undefined") return "";
     return window.location.href;
   }, [agreement?.id]);
+  const embedUrl = useMemo(() => {
+    if (!agreement?.id || typeof window === "undefined") return "";
+    const path = localizePath(`/embed/agreement/${encodeURIComponent(agreement.id)}`, locale);
+    return `${window.location.origin}${path}`;
+  }, [agreement?.id, locale]);
+  const embedCode = useMemo(() => {
+    if (!embedUrl) return "";
+    return `<iframe
+  src="${embedUrl}"
+  width="100%"
+  height="260"
+  style="border:0;border-radius:16px;overflow:hidden"
+  loading="lazy"
+></iframe>`;
+  }, [embedUrl]);
 
   const creatorName = agreement
     ? displayProfileName(
@@ -564,6 +580,17 @@ export default function PublicAgreementPage() {
       window.setTimeout(() => setCopyState("idle"), 2400);
     }
   };
+  const handleCopyEmbed = async () => {
+    if (!embedCode) return;
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      setCopyEmbedState("copied");
+      window.setTimeout(() => setCopyEmbedState("idle"), 1800);
+    } catch {
+      setCopyEmbedState("error");
+      window.setTimeout(() => setCopyEmbedState("idle"), 2400);
+    }
+  };
 
   if (loading) {
     return (
@@ -642,6 +669,33 @@ export default function PublicAgreementPage() {
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
                       {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                    </span>
+                  </button>
+                </Tooltip>
+                <Tooltip
+                  label={
+                    copyEmbedState === "copied"
+                      ? t("publicAgreement.embedCodeCopied")
+                      : copyEmbedState === "error"
+                        ? t("publicAgreement.copyFailed")
+                        : t("publicAgreement.copyEmbed")
+                  }
+                  placement="top"
+                >
+                  <button
+                    type="button"
+                    onClick={handleCopyEmbed}
+                    aria-label={
+                      copyEmbedState === "copied"
+                        ? t("publicAgreement.embedCodeCopied")
+                        : copyEmbedState === "error"
+                          ? t("publicAgreement.copyFailed")
+                          : t("publicAgreement.copyEmbed")
+                    }
+                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                  >
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
+                      {copyEmbedState === "copied" ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
                     </span>
                   </button>
                 </Tooltip>
