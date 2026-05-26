@@ -91,6 +91,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The agreement deadline has been reached",
       ctaLabel: "Open",
     },
+    agreement_updated: {
+      title: "New agreement update",
+      body: "The other side added an update to this agreement",
+      ctaLabel: "Open",
+    },
     reminder_due_24h: {
       title: "Deadline approaching",
       body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
@@ -216,6 +221,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     public_agreement_deadline: {
       title: "Дедлайн угоди досягнуто",
       body: "Дедлайн угоди досягнуто",
+      ctaLabel: "Відкрити",
+    },
+    agreement_updated: {
+      title: "Нове оновлення угоди",
+      body: "Інша сторона додала оновлення до цієї угоди",
       ctaLabel: "Відкрити",
     },
     reminder_due_24h: {

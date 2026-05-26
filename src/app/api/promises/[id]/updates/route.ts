@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
+import { buildDedupeKey, createNotification, mapPriorityForType } from "@/lib/notifications/service";
+import { getAgreementParticipantIds } from "@/lib/agreements/followers";
 
 type AgreementUpdateRecord = {
   id: string;
@@ -104,6 +106,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       await notifyAgreementWatchers(admin, promise, "public_agreement_updated", {
         actorId: user.id,
         eventId: update.id,
+      });
+    }
+
+    const participantIds = Array.from(getAgreementParticipantIds(promise)).filter((id) => id !== user.id);
+    for (const participantId of participantIds) {
+      await createNotification(admin, {
+        userId: participantId,
+        promiseId: promise.id,
+        type: "agreement_updated",
+        dedupeKey: buildDedupeKey(["agreement_updated", promise.id, participantId, update.id]),
+        ctaUrl: `/promises/${promise.id}`,
+        priority: mapPriorityForType("agreement_updated"),
       });
     }
 
