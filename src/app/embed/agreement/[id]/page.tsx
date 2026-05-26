@@ -140,7 +140,7 @@ export default function EmbedAgreementPage() {
   // Neutralise globals.css body styles for iframe context:
   // — transparent background (widget card provides its own bg)
   // — overflow:hidden on body prevents any scroll inside the iframe
-  //   (safe now that height is fixed at 380px; does NOT affect
+  //   (safe now that height is fixed at 340px; does NOT affect
   //    getBoundingClientRect used by postHeight)
   useEffect(() => {
     const { documentElement: html, body } = document;
@@ -210,7 +210,7 @@ export default function EmbedAgreementPage() {
   if (loadState !== "ready" || !agreement) {
     return (
       <main className="w-full bg-transparent text-white">
-        <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
+        <section className="w-full max-w-[480px] h-[340px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
           {loadState === "loading" ? (
             <>
               <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 animate-pulse">
@@ -264,10 +264,10 @@ export default function EmbedAgreementPage() {
   return (
     <main className="w-full bg-transparent text-white">
       {/* Fixed 380px — stat cards always at bottom, header card sized to content */}
-      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
+      <section className="w-full max-w-[480px] h-[340px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
 
           {/* ── Header card — content-sized, caps at max-h so all stat rows fit ── */}
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "168px"}}>
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "148px"}}>
             <h1 className="line-clamp-3 text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
