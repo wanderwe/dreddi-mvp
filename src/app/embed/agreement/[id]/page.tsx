@@ -32,6 +32,9 @@ type PublicAgreementRow = {
   counterparty_display_name: string | null;
   counterparty_handle: string | null;
   counterparty_is_public_profile?: boolean | null;
+  executor_display_name: string | null;
+  executor_handle: string | null;
+  executor_is_public_profile?: boolean | null;
   followers_count?: number | null;
 };
 
@@ -253,6 +256,10 @@ export default function EmbedAgreementPage() {
   const counterpartyHref = getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale);
   const showParticipants = Boolean(creatorLabel || counterpartyLabel);
 
+  // Responsible party = executor (the one who fulfils the agreement)
+  const executorLabel = participantLabel(agreement.executor_display_name, agreement.executor_handle);
+  const executorHref = getPublicProfileHref(agreement.executor_handle, agreement.executor_is_public_profile, locale);
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <main className="w-full bg-transparent text-white">
@@ -295,19 +302,19 @@ export default function EmbedAgreementPage() {
               <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
                 {t("agreementEmbed.party")}
               </p>
-              {counterpartyHref ? (
+              {executorHref ? (
                 <a
-                  href={counterpartyHref}
+                  href={executorHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-1.5 flex items-center gap-1 text-sm font-semibold text-white transition hover:text-emerald-300"
                 >
-                  <span className="truncate">{counterpartyLabel}</span>
+                  <span className="truncate">{executorLabel}</span>
                   <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
                 </a>
               ) : (
                 <p className="mt-1.5 truncate text-sm font-semibold leading-tight text-white">
-                  {counterpartyLabel}
+                  {executorLabel ?? t("publicAgreement.participants.counterpartyFallback")}
                 </p>
               )}
             </div>
