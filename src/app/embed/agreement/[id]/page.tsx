@@ -251,7 +251,7 @@ export default function EmbedAgreementPage() {
   // Always show both sides — fall back to placeholder if counterparty unknown/pending
   const counterpartyLabel =
     participantLabel(agreement.counterparty_display_name, agreement.counterparty_handle) ??
-    t("publicAgreement.participants.counterpartyFallback");
+    t("agreementEmbed.partyUnknown");
   const creatorHref = getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale);
   const counterpartyHref = getPublicProfileHref(agreement.counterparty_handle, agreement.counterparty_is_public_profile, locale);
   const showParticipants = Boolean(creatorLabel || counterpartyLabel);
@@ -314,7 +314,7 @@ export default function EmbedAgreementPage() {
                 </a>
               ) : (
                 <p className="mt-1.5 truncate text-sm font-semibold leading-tight text-white">
-                  {executorLabel ?? t("publicAgreement.participants.counterpartyFallback")}
+                  {executorLabel ?? t("agreementEmbed.partyUnknown")}
                 </p>
               )}
             </div>

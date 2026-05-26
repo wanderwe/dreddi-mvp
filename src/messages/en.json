@@ -1129,6 +1129,7 @@
     "deadline": "Deadline",
     "noDeadline": "No deadline",
     "party": "Responsible",
+    "partyUnknown": "Not yet determined",
     "status": "Status",
     "updated": "Updated",
     "liveNote": "Public status updates in Dreddi"
