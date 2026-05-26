@@ -68,8 +68,9 @@ function DiamondWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
           <stop offset="1" stopColor="#111318" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="diamond-witness-stroke" x1="34" y1="28" x2="166" y2="170" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#65FFD4" />
-          <stop offset="1" stopColor="#7DB9FF" />
+          <stop stopColor="#64FFD5" />
+          <stop offset="0.72" stopColor="#29E7C0" />
+          <stop offset="1" stopColor="#11CFAF" />
         </linearGradient>
       </defs>
       <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="url(#diamond-witness-shell)" />
@@ -81,12 +82,25 @@ function DiamondWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
   );
 }
 
+
+function SharpWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-label="Sharp witness symbol">
+      <rect x="4" y="4" width="56" height="56" rx="14" fill="#070D18" />
+      <path d="M12 32 32 20 52 32 32 44 12 32Z" fill="none" stroke="#12DEC0" strokeWidth="3.2" strokeLinejoin="round" />
+      <circle cx="32" cy="32" r="7.5" fill="none" stroke="#12DEC0" strokeWidth="3" />
+      <path d="M29.5 32.5 31.6 34.6 35.2 30.8" fill="none" stroke="#12DEC0" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 const candidates = [
   { key: "current", name: "Current / utility-arrow", glyph: <DreddiLogo showText={false} markClassName="h-14 w-14" /> },
   { key: "witness", name: "Witness / observable state", glyph: <WitnessGlyph /> },
   { key: "convergence", name: "Agreement convergence", glyph: <ConvergenceGlyph /> },
   { key: "timeline", name: "Timeline / live-state", glyph: <TimelineGlyph /> },
   { key: "diamond-witness", name: "Diamond witness (user concept)", glyph: <DiamondWitnessGlyph /> },
+  { key: "sharp-witness", name: "Sharp witness / tech diamond", glyph: <SharpWitnessGlyph /> },
 ];
 
 export default function LogoExplorationPage() {
@@ -102,7 +116,7 @@ export default function LogoExplorationPage() {
           </p>
         </header>
 
-        <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
           {candidates.map((candidate) => (
             <Frame key={candidate.key} className="space-y-4">
               <div className="text-sm text-slate-200">{candidate.name}</div>
