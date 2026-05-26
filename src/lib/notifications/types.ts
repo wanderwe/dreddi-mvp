@@ -18,7 +18,13 @@ export type NotificationType =
   | "overdue"
   | "completion_waiting"
   | "completion_followup"
-  | "dispute";
+  | "dispute"
+  | "public_agreement_accepted"
+  | "public_agreement_completed"
+  | "public_agreement_fulfilled"
+  | "public_agreement_disputed"
+  | "public_agreement_updated"
+  | "public_agreement_deadline";
 
 export const normalizeNotificationType = (type: NotificationType): NotificationType => {
   if (type === "manual_reminder") return "reminder_manual";

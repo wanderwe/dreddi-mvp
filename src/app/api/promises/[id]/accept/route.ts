@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
 import { removeAgreementFollower } from "@/lib/agreements/followers";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { getAdminClient, loadPromiseForUser } from "../common";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -93,6 +94,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       promise,
       actorId: user.id,
     });
+
+    await notifyAgreementWatchers(admin, promise, "public_agreement_accepted", { actorId: user.id });
 
     return NextResponse.json({ ok: true, status: "accepted" }, { status: 200 });
   } catch (e) {
