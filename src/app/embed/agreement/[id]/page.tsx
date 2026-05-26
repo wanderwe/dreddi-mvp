@@ -321,7 +321,7 @@ export default function EmbedAgreementPage() {
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-xs text-white/35 transition hover:text-white/70"
             >
-              View <ExternalLink className="h-3 w-3" />
+              {t("agreementEmbed.cta")} <ExternalLink className="h-3 w-3" />
             </a>
           </div>
 
