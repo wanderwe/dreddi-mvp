@@ -405,7 +405,7 @@ export default function PublicAgreementPage() {
     return `<iframe
   src="${embedUrl}"
   width="100%"
-  height="340"
+  height="320"
   style="border:0;border-radius:24px;overflow:hidden"
   loading="lazy"
   scrolling="no"

@@ -210,7 +210,7 @@ export default function EmbedAgreementPage() {
   if (loadState !== "ready" || !agreement) {
     return (
       <main className="w-full bg-transparent text-white">
-        <section className="w-full max-w-[480px] h-[340px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
+        <section className="w-full max-w-[480px] h-[320px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
           {loadState === "loading" ? (
             <>
               <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 animate-pulse">
@@ -264,7 +264,7 @@ export default function EmbedAgreementPage() {
   return (
     <main className="w-full bg-transparent text-white">
       {/* Fixed 380px — stat cards always at bottom, header card sized to content */}
-      <section className="w-full max-w-[480px] h-[340px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
+      <section className="w-full max-w-[480px] h-[320px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
 
           {/* ── Header card — content-sized, caps at max-h so all stat rows fit ── */}
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "148px"}}>
@@ -275,10 +275,16 @@ export default function EmbedAgreementPage() {
               <p className="mt-1 line-clamp-2 text-xs text-white/45">{details}</p>
             ) : null}
 
-            {/* Brand label */}
-            <p className="mt-2 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65">
+            {/* Brand label — links to public agreement page */}
+            <a
+              href={agreementUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65 transition hover:text-emerald-100/90"
+            >
               {t("agreementEmbed.badge")} · Dreddi
-            </p>
+              <ExternalLink className="h-2.5 w-2.5 opacity-70" />
+            </a>
           </div>
 
           {/* Spacer — absorbs leftover space transparently between header and stat rows */}
@@ -343,20 +349,6 @@ export default function EmbedAgreementPage() {
             </div>
           </div>
 
-          {/* ── Footer ── */}
-          <div className="mt-2 flex items-center justify-between px-1">
-            <p className="text-xs text-white/40">
-              {t("publicProfile.embed.poweredBy")}
-            </p>
-            <a
-              href={agreementUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-white/35 transition hover:text-white/70"
-            >
-              {t("agreementEmbed.cta")} <ExternalLink className="h-3 w-3" />
-            </a>
-          </div>
 
       </section>
     </main>
