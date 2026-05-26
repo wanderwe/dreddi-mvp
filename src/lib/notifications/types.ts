@@ -24,7 +24,8 @@ export type NotificationType =
   | "public_agreement_fulfilled"
   | "public_agreement_disputed"
   | "public_agreement_updated"
-  | "public_agreement_deadline";
+  | "public_agreement_deadline"
+  | "agreement_updated";
 
 export const normalizeNotificationType = (type: NotificationType): NotificationType => {
   if (type === "manual_reminder") return "reminder_manual";
