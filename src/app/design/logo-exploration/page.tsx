@@ -61,10 +61,22 @@ function TimelineGlyph({ className = "h-14 w-14" }: IconProps) {
 function DiamondWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
   return (
     <svg viewBox="0 0 200 200" className={className} aria-label="Diamond witness direction">
+      <defs>
+        <linearGradient id="diamond-witness-shell" x1="26" y1="18" x2="176" y2="186" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3EF6C2" stopOpacity="0.86" />
+          <stop offset="0.52" stopColor="#53A6FF" stopOpacity="0.8" />
+          <stop offset="1" stopColor="#111318" stopOpacity="0.95" />
+        </linearGradient>
+        <linearGradient id="diamond-witness-stroke" x1="34" y1="28" x2="166" y2="170" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#65FFD4" />
+          <stop offset="1" stopColor="#7DB9FF" />
+        </linearGradient>
+      </defs>
       <rect width="200" height="200" rx="44" fill="#111318" />
-      <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="none" stroke="#00d4aa" strokeWidth="7" strokeLinejoin="round" />
-      <path d="M62 100 Q100 72 138 100 Q100 128 62 100 Z" fill="none" stroke="#00d4aa" strokeWidth="6" strokeLinejoin="round" />
-      <circle cx="100" cy="100" r="16" fill="none" stroke="#00d4aa" strokeWidth="6" />
+      <rect width="200" height="200" rx="44" fill="url(#diamond-witness-shell)" opacity="0.72" />
+      <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="7" strokeLinejoin="round" />
+      <path d="M62 100 Q100 72 138 100 Q100 128 62 100 Z" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="6" strokeLinejoin="round" />
+      <circle cx="100" cy="100" r="16" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="6" />
       <circle cx="100" cy="100" r="7" fill="#f0b429" />
     </svg>
   );
