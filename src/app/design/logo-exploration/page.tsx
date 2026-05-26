@@ -57,11 +57,25 @@ function TimelineGlyph({ className = "h-14 w-14" }: IconProps) {
   );
 }
 
+
+function DiamondWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
+  return (
+    <svg viewBox="0 0 200 200" className={className} aria-label="Diamond witness direction">
+      <rect width="200" height="200" rx="44" fill="#111318" />
+      <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="none" stroke="#00d4aa" strokeWidth="7" strokeLinejoin="round" />
+      <path d="M62 100 Q100 72 138 100 Q100 128 62 100 Z" fill="none" stroke="#00d4aa" strokeWidth="6" strokeLinejoin="round" />
+      <circle cx="100" cy="100" r="16" fill="none" stroke="#00d4aa" strokeWidth="6" />
+      <circle cx="100" cy="100" r="7" fill="#f0b429" />
+    </svg>
+  );
+}
+
 const candidates = [
   { key: "current", name: "Current / utility-arrow", glyph: <DreddiLogo showText={false} markClassName="h-14 w-14" /> },
   { key: "witness", name: "Witness / observable state", glyph: <WitnessGlyph /> },
   { key: "convergence", name: "Agreement convergence", glyph: <ConvergenceGlyph /> },
   { key: "timeline", name: "Timeline / live-state", glyph: <TimelineGlyph /> },
+  { key: "diamond-witness", name: "Diamond witness (user concept)", glyph: <DiamondWitnessGlyph /> },
 ];
 
 export default function LogoExplorationPage() {
