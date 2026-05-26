@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { isPromiseStatus } from "@/lib/promiseStatus";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 
 function getEnv(name: string) {
   const value = process.env[name];
