@@ -256,11 +256,11 @@ export default function EmbedAgreementPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <main className="w-full bg-transparent text-white">
-      {/* Fixed 380px height — predictable iframe size, no JS resize needed */}
-      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
+      {/* Fixed 380px — stat cards always at bottom, header card sized to content */}
+      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
 
-          {/* ── Header card — flex-1 fills remaining height, overflow clips long content ── */}
-          <div className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4">
+          {/* ── Header card — content-sized, caps at max-h so stats always fit ── */}
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "232px"}}>
             <h1 className="line-clamp-4 text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
@@ -280,8 +280,11 @@ export default function EmbedAgreementPage() {
             </p>
           </div>
 
+          {/* Spacer — absorbs leftover space transparently between header and stats */}
+          <div className="flex-1" />
+
           {/* ── Stat cards — status + watching, compact ── */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3">
 
             {/* Status — color-coded */}
             <div className={`rounded-2xl border px-3 py-2.5 ${cardStyle.card}`}>
@@ -308,7 +311,7 @@ export default function EmbedAgreementPage() {
           </div>
 
           {/* ── Footer ── */}
-          <div className="flex items-center justify-between px-1">
+          <div className="mt-3 flex items-center justify-between px-1">
             <p className="text-xs text-white/40">
               {t("publicProfile.embed.poweredBy")}
             </p>
