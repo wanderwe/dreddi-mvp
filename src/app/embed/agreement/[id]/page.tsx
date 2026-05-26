@@ -134,24 +134,22 @@ export default function EmbedAgreementPage() {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
   }, []);
 
-  // Strip body styles from globals.css so the iframe is transparent
-  // outside the widget card. Hide scrollbar via CSS — NOT overflow:hidden
-  // on <html>, which would break scrollHeight measurement in iframes.
+  // Neutralise globals.css body styles for iframe context:
+  // — transparent background (widget card provides its own bg)
+  // — overflow:hidden on body prevents any scroll inside the iframe
+  //   (safe now that height is fixed at 380px; does NOT affect
+  //    getBoundingClientRect used by postHeight)
   useEffect(() => {
     const { documentElement: html, body } = document;
     html.style.background = "transparent";
     body.style.background = "transparent";
     body.style.minHeight = "auto";
-    // Hide scrollbar visually without affecting layout
-    const style = document.createElement("style");
-    style.textContent =
-      "html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}";
-    document.head.appendChild(style);
+    body.style.overflow = "hidden";
     return () => {
       html.style.background = "";
       body.style.background = "";
       body.style.minHeight = "";
-      document.head.removeChild(style);
+      body.style.overflow = "";
     };
   }, []);
 
@@ -258,11 +256,11 @@ export default function EmbedAgreementPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <main className="w-full bg-transparent text-white">
-      {/* Fixed 380px height — predictable iframe size, no JS resize needed */}
-      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
+      {/* Fixed 380px — stat cards always at bottom, header card sized to content */}
+      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
 
-          {/* ── Header card — flex-1 fills remaining height, overflow clips long content ── */}
-          <div className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4">
+          {/* ── Header card — content-sized, caps at max-h so stats always fit ── */}
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "232px"}}>
             <h1 className="line-clamp-4 text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
@@ -282,8 +280,11 @@ export default function EmbedAgreementPage() {
             </p>
           </div>
 
+          {/* Spacer — absorbs leftover space transparently between header and stats */}
+          <div className="flex-1" />
+
           {/* ── Stat cards — status + watching, compact ── */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3">
 
             {/* Status — color-coded */}
             <div className={`rounded-2xl border px-3 py-2.5 ${cardStyle.card}`}>
@@ -310,7 +311,7 @@ export default function EmbedAgreementPage() {
           </div>
 
           {/* ── Footer ── */}
-          <div className="flex items-center justify-between px-1">
+          <div className="mt-3 flex items-center justify-between px-1">
             <p className="text-xs text-white/40">
               {t("publicProfile.embed.poweredBy")}
             </p>
