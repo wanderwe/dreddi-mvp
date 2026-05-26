@@ -290,9 +290,9 @@ export default function EmbedAgreementPage() {
               </p>
             </div>
 
-            {/* Counterparty */}
+            {/* Responsible party */}
             <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
-              <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
+              <p className="truncate text-[10px] uppercase tracking-[0.05em] text-white/55">
                 {t("agreementEmbed.party")}
               </p>
               {counterpartyHref ? (
