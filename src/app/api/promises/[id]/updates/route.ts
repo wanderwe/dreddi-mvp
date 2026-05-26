@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 
 type AgreementUpdateRecord = {
   id: string;
@@ -91,6 +92,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     if (error) {
       return NextResponse.json({ error: "Could not create agreement update", detail: error.message }, { status: 500 });
+    }
+
+    const { data: visibilityRow } = await admin
+      .from("promises")
+      .select("visibility")
+      .eq("id", promise.id)
+      .maybeSingle<{ visibility: string | null }>();
+
+    if (visibilityRow?.visibility === "public") {
+      await notifyAgreementWatchers(admin, promise, "public_agreement_updated", {
+        actorId: user.id,
+        eventId: update.id,
+      });
     }
 
     const { data: author } = await admin

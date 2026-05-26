@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -89,6 +90,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       promise: updatedPromise,
       actorId: user.id,
     });
+
+    await notifyAgreementWatchers(admin, updatedPromise, "public_agreement_fulfilled", { actorId: user.id });
 
     return NextResponse.json({ ok: true });
   } catch (e) {

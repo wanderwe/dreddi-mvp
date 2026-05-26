@@ -387,6 +387,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
+    await notifyAgreementWatchers(admin, promise, "public_agreement_updated", {
+      actorId: user.id,
+      eventId: update.id,
+    });
+
     const { data: author } = await admin
       .from("profiles")
       .select("id,display_name,handle,is_public_profile")

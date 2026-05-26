@@ -61,6 +61,36 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The deal was marked as not delivered",
       ctaLabel: "View",
     },
+    public_agreement_accepted: {
+      title: "Public agreement accepted",
+      body: "The public agreement was accepted by the responsible side",
+      ctaLabel: "Open",
+    },
+    public_agreement_completed: {
+      title: "Agreement marked as completed",
+      body: "The responsible side marked the agreement as completed",
+      ctaLabel: "Open",
+    },
+    public_agreement_fulfilled: {
+      title: "Agreement fulfilled",
+      body: "The agreement was fulfilled",
+      ctaLabel: "Open",
+    },
+    public_agreement_disputed: {
+      title: "Agreement disputed",
+      body: "The agreement was disputed",
+      ctaLabel: "Open",
+    },
+    public_agreement_updated: {
+      title: "New public update added",
+      body: "New public update added to the agreement",
+      ctaLabel: "Open",
+    },
+    public_agreement_deadline: {
+      title: "Agreement deadline reached",
+      body: "The agreement deadline has been reached",
+      ctaLabel: "Open",
+    },
     reminder_due_24h: {
       title: "Deadline approaching",
       body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
@@ -157,6 +187,36 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       title: "Результат оскаржено",
       body: "Угоду позначено як не виконану",
       ctaLabel: "Переглянути",
+    },
+    public_agreement_accepted: {
+      title: "Публічну угоду прийнято",
+      body: "Публічну угоду прийнято відповідальною стороною",
+      ctaLabel: "Відкрити",
+    },
+    public_agreement_completed: {
+      title: "Угоду позначено як виконану",
+      body: "Відповідальна сторона позначила угоду як виконану",
+      ctaLabel: "Відкрити",
+    },
+    public_agreement_fulfilled: {
+      title: "Угоду дотримано",
+      body: "Угоду дотримано",
+      ctaLabel: "Відкрити",
+    },
+    public_agreement_disputed: {
+      title: "Угоду оскаржено",
+      body: "Угоду оскаржено",
+      ctaLabel: "Відкрити",
+    },
+    public_agreement_updated: {
+      title: "Додано нове публічне оновлення",
+      body: "Додано нове публічне оновлення до угоди",
+      ctaLabel: "Відкрити",
+    },
+    public_agreement_deadline: {
+      title: "Дедлайн угоди досягнуто",
+      body: "Дедлайн угоди досягнуто",
+      ctaLabel: "Відкрити",
     },
     reminder_due_24h: {
       title: "Наближається дедлайн",

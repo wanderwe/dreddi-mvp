@@ -11,6 +11,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { getNotificationDedupeKey } from "@/lib/notifications/recipients";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 
@@ -130,6 +131,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       promise: updatedPromise,
       actorId: user.id,
     });
+    await notifyAgreementWatchers(admin, updatedPromise, "public_agreement_disputed", { actorId: user.id });
+
     if (process.env.NODE_ENV !== "production") {
       console.info("[notifications] dispute_dispatch_debug", {
         event: "disputed",

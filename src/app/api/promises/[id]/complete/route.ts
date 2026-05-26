@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { getAdminClient, loadPromiseForUser } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
 
@@ -75,6 +76,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       actorId: user.id,
       ctaUrl: `/promises/${id}/confirm`,
     });
+
+    await notifyAgreementWatchers(admin, promise, "public_agreement_completed", { actorId: user.id });
 
     return NextResponse.json({ ok: true });
   } catch (e) {

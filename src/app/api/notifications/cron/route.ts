@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
+import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
@@ -357,6 +358,7 @@ const runCron = async (req: Request) => {
         }
 
         if (createdCount > 0 && reminderType === "deadline_passed") {
+          await notifyAgreementWatchers(admin, row, "public_agreement_deadline");
           const { error: upsertError } = await admin.from("promise_notification_state").upsert({
             promise_id: row.id,
             overdue_notified_at: nowIso,
