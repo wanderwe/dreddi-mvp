@@ -209,20 +209,21 @@ export default function EmbedAgreementPage() {
   if (loadState !== "ready" || !agreement) {
     return (
       <main className="w-full bg-transparent text-white">
-        <section className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
+        <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
           {loadState === "loading" ? (
-            <div className="space-y-3 animate-pulse">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+            <>
+              <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 animate-pulse">
                 <div className="h-4 w-3/4 rounded bg-white/10" />
                 <div className="h-3 w-1/2 rounded bg-white/8" />
+                <div className="h-3 w-2/3 rounded bg-white/8 mt-2" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 animate-pulse">
                 <div className="rounded-2xl border border-white/10 bg-white/5 h-16" />
                 <div className="rounded-2xl border border-white/10 bg-white/5 h-16" />
               </div>
-            </div>
+            </>
           ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/50">
+            <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-6 flex items-center justify-center text-xs text-white/50">
               {t("agreementEmbed.unavailable")}
             </div>
           )}
@@ -257,11 +258,11 @@ export default function EmbedAgreementPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <main className="w-full bg-transparent text-white">
-      <section className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
-        <div className="space-y-3">
+      {/* Fixed 380px height — predictable iframe size, no JS resize needed */}
+      <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col gap-3">
 
-          {/* ── Header card — title, details, deadline, brand ── */}
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          {/* ── Header card — flex-1 fills remaining height, overflow clips long content ── */}
+          <div className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4">
             <h1 className="line-clamp-4 text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
@@ -281,7 +282,7 @@ export default function EmbedAgreementPage() {
             </p>
           </div>
 
-{/* ── Stat cards — status + watching, compact ── */}
+          {/* ── Stat cards — status + watching, compact ── */}
           <div className="grid grid-cols-2 gap-3">
 
             {/* Status — color-coded */}
@@ -323,7 +324,6 @@ export default function EmbedAgreementPage() {
             </a>
           </div>
 
-        </div>
       </section>
     </main>
   );
