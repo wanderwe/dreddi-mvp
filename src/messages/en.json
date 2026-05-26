@@ -1129,6 +1129,7 @@
     "watching": "watching",
     "deadline": "Deadline",
     "noDeadline": "No deadline",
+    "party": "Responsible",
     "status": "Status",
     "updated": "Updated",
     "liveNote": "Public status updates in Dreddi"
