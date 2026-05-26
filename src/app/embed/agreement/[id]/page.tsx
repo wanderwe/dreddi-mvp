@@ -134,24 +134,22 @@ export default function EmbedAgreementPage() {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
   }, []);
 
-  // Strip body styles from globals.css so the iframe is transparent
-  // outside the widget card. Hide scrollbar via CSS — NOT overflow:hidden
-  // on <html>, which would break scrollHeight measurement in iframes.
+  // Neutralise globals.css body styles for iframe context:
+  // — transparent background (widget card provides its own bg)
+  // — overflow:hidden on body prevents any scroll inside the iframe
+  //   (safe now that height is fixed at 380px; does NOT affect
+  //    getBoundingClientRect used by postHeight)
   useEffect(() => {
     const { documentElement: html, body } = document;
     html.style.background = "transparent";
     body.style.background = "transparent";
     body.style.minHeight = "auto";
-    // Hide scrollbar visually without affecting layout
-    const style = document.createElement("style");
-    style.textContent =
-      "html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}";
-    document.head.appendChild(style);
+    body.style.overflow = "hidden";
     return () => {
       html.style.background = "";
       body.style.background = "";
       body.style.minHeight = "";
-      document.head.removeChild(style);
+      body.style.overflow = "";
     };
   }, []);
 
