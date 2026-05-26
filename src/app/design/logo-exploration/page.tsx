@@ -63,17 +63,16 @@ function DiamondWitnessGlyph({ className = "h-14 w-14" }: IconProps) {
     <svg viewBox="0 0 200 200" className={className} aria-label="Diamond witness direction">
       <defs>
         <linearGradient id="diamond-witness-shell" x1="26" y1="18" x2="176" y2="186" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#3EF6C2" stopOpacity="0.86" />
-          <stop offset="0.52" stopColor="#53A6FF" stopOpacity="0.8" />
-          <stop offset="1" stopColor="#111318" stopOpacity="0.95" />
+          <stop stopColor="#3EF6C2" stopOpacity="0.22" />
+          <stop offset="0.52" stopColor="#53A6FF" stopOpacity="0.2" />
+          <stop offset="1" stopColor="#111318" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="diamond-witness-stroke" x1="34" y1="28" x2="166" y2="170" gradientUnits="userSpaceOnUse">
           <stop stopColor="#65FFD4" />
           <stop offset="1" stopColor="#7DB9FF" />
         </linearGradient>
       </defs>
-      <rect width="200" height="200" rx="44" fill="#111318" />
-      <rect width="200" height="200" rx="44" fill="url(#diamond-witness-shell)" opacity="0.72" />
+      <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="url(#diamond-witness-shell)" />
       <path d="M100 20 L178 100 L100 180 L22 100 Z" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="7" strokeLinejoin="round" />
       <path d="M62 100 Q100 72 138 100 Q100 128 62 100 Z" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="6" strokeLinejoin="round" />
       <circle cx="100" cy="100" r="16" fill="none" stroke="url(#diamond-witness-stroke)" strokeWidth="6" />
@@ -128,7 +127,7 @@ export default function LogoExplorationPage() {
             <div className="rounded-2xl border border-white/10 bg-[#0B1220] p-5">
               <div className="flex items-center justify-between">
                 <DreddiLogo markClassName="h-11 w-11" />
-                <WitnessGlyph className="h-11 w-11" />
+                <DiamondWitnessGlyph className="h-11 w-11" />
               </div>
             </div>
           </Frame>
