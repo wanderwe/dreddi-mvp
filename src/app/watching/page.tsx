@@ -5,7 +5,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
-type Watched = { id: string; title: string; status: string; due_at: string | null; creator_id: string; counterparty_id: string | null; promisor_id: string | null; promisee_id: string | null };
+type Watched = { id: string; title: string; status: string; ui_status?: string | null; due_at: string | null; creator_id: string; counterparty_id: string | null; promisor_id: string | null; promisee_id: string | null };
 const PAGE_SIZE = 12;
 
 export default function WatchingPage() {
@@ -65,6 +65,17 @@ export default function WatchingPage() {
     };
   }, [locale]);
 
+
+  const statusLabel = (row: Watched) => {
+    const uiStatus = row.ui_status ?? row.status;
+    if (uiStatus === "awaiting_acceptance") return t("promises.status.awaitingInviteAcceptance");
+    if (uiStatus === "active") return t("promises.status.active");
+    if (uiStatus === "completed_by_promisor") return t("promises.status.pendingConfirmation");
+    if (uiStatus === "confirmed") return t("promises.status.confirmed");
+    if (uiStatus === "disputed") return t("promises.status.disputed");
+    return uiStatus;
+  };
+
   const handleLoadMore = async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
@@ -106,7 +117,7 @@ export default function WatchingPage() {
           {!loading && rows.map((p) => (
             <LocalizedLink key={p.id} href={`/p/agreements/${p.id}`} className="block rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5">
               <div className="text-lg font-semibold text-white">{p.title}</div>
-              <div className="mt-1 text-xs text-slate-400">{t("watching.status")}: {p.status}</div>
+              <div className="mt-1 text-xs text-slate-400">{t("watching.status")}: {statusLabel(p)}</div>
               {p.due_at && <div className="mt-1 text-xs text-slate-400">{t("watching.deadline")}: {new Date(p.due_at).toLocaleDateString(locale)}</div>}
             </LocalizedLink>
           ))}
