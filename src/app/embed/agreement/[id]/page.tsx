@@ -259,59 +259,85 @@ export default function EmbedAgreementPage() {
       {/* Fixed 380px — stat cards always at bottom, header card sized to content */}
       <section className="w-full max-w-[480px] h-[380px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40 flex flex-col">
 
-          {/* ── Header card — content-sized, caps at max-h so stats always fit ── */}
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "232px"}}>
-            <h1 className="line-clamp-4 text-[16px] font-semibold leading-snug text-white">
+          {/* ── Header card — content-sized, caps at max-h so all stat rows fit ── */}
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4" style={{maxHeight: "168px"}}>
+            <h1 className="line-clamp-3 text-[16px] font-semibold leading-snug text-white">
               {agreement.title}
             </h1>
             {details ? (
-              <p className="mt-1 line-clamp-3 text-xs text-white/45">{details}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-white/45">{details}</p>
             ) : null}
-            <p className="mt-2 text-xs text-white/45">
-              {t("agreementEmbed.deadline")}:{" "}
-              <span className="text-white/65">
-                {deadlineLabel ?? t("agreementEmbed.noDeadline")}
-              </span>
-            </p>
 
             {/* Brand label */}
-            <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65">
+            <p className="mt-2 text-[11px] uppercase tracking-[0.15em] text-emerald-100/65">
               {t("agreementEmbed.badge")} · Dreddi
             </p>
           </div>
 
-          {/* Spacer — absorbs leftover space transparently between header and stats */}
+          {/* Spacer — absorbs leftover space transparently between header and stat rows */}
           <div className="flex-1" />
 
-          {/* ── Stat cards — status + watching, compact ── */}
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          {/* ── Stat cards — 2×2 grid ── */}
+          <div className="mt-2 grid grid-cols-2 gap-2">
+
+            {/* Deadline */}
+            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
+                {t("agreementEmbed.deadline")}
+              </p>
+              <p className="mt-1.5 truncate text-sm font-semibold leading-tight text-white">
+                {deadlineLabel ?? t("agreementEmbed.noDeadline")}
+              </p>
+            </div>
+
+            {/* Counterparty */}
+            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
+                {t("agreementEmbed.party")}
+              </p>
+              {counterpartyHref ? (
+                <a
+                  href={counterpartyHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1.5 flex items-center gap-1 text-sm font-semibold text-white transition hover:text-emerald-300"
+                >
+                  <span className="truncate">{counterpartyLabel}</span>
+                  <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
+                </a>
+              ) : (
+                <p className="mt-1.5 truncate text-sm font-semibold leading-tight text-white">
+                  {counterpartyLabel}
+                </p>
+              )}
+            </div>
 
             {/* Status — color-coded */}
-            <div className={`rounded-2xl border px-3 py-2.5 ${cardStyle.card}`}>
+            <div className={`rounded-2xl border px-3 py-2 ${cardStyle.card}`}>
               <div className="flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${cardStyle.dot}`} />
                 <p className={`text-[10px] uppercase tracking-[0.15em] ${cardStyle.label}`}>
                   {t("agreementEmbed.status")}
                 </p>
               </div>
-              <p className="mt-1.5 text-base font-semibold leading-tight text-white">
+              <p className="mt-1.5 truncate text-sm font-semibold leading-tight text-white">
                 {statusLabel}
               </p>
             </div>
 
             {/* Watching */}
-            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2.5">
+            <div className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2">
               <p className="text-[10px] uppercase tracking-[0.15em] text-white/55">
                 {t("agreementEmbed.watching")}
               </p>
-              <p className="mt-1.5 text-2xl font-semibold text-white">
+              <p className="mt-1.5 text-xl font-semibold text-white">
                 {watchersCount}
               </p>
             </div>
           </div>
 
           {/* ── Footer ── */}
-          <div className="mt-3 flex items-center justify-between px-1">
+          <div className="mt-2 flex items-center justify-between px-1">
             <p className="text-xs text-white/40">
               {t("publicProfile.embed.poweredBy")}
             </p>
