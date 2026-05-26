@@ -1160,6 +1160,7 @@
     "deadline": "Дедлайн",
     "noDeadline": "Без дедлайну",
     "party": "Відповідає",
+    "partyUnknown": "Ще не визначено",
     "status": "Статус",
     "updated": "Оновлено",
     "liveNote": "Публічний статус оновлюється в Dreddi"
