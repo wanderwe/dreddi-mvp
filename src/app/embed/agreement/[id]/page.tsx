@@ -80,9 +80,9 @@ const statusCardStyles: Record<PromiseUiStatus, StatusCardStyle> = {
     dot: "bg-red-400",
   },
   awaiting_acceptance: {
-    card: "border-white/10 bg-black/30",
-    label: "text-white/55",
-    dot: "bg-white/30",
+    card: "border-sky-400/20 bg-sky-400/10",
+    label: "text-sky-200",
+    dot: "bg-sky-300 animate-pulse",
   },
   expired: {
     card: "border-white/8 bg-black/20",
