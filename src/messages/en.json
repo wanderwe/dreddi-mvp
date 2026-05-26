@@ -937,6 +937,41 @@
         "title": "Outcome disputed",
         "description": "The deal was disputed, check details",
         "cta": "View"
+      },
+      "public_agreement_accepted": {
+        "title": "Public agreement accepted",
+        "description": "The public agreement was accepted by the responsible side",
+        "cta": "Open"
+      },
+      "public_agreement_completed": {
+        "title": "Completion reported",
+        "description": "The responsible side marked the agreement as completed",
+        "cta": "Review"
+      },
+      "public_agreement_fulfilled": {
+        "title": "Agreement fulfilled",
+        "description": "The agreement was fulfilled",
+        "cta": "Open"
+      },
+      "public_agreement_disputed": {
+        "title": "Agreement disputed",
+        "description": "The agreement was disputed",
+        "cta": "Review"
+      },
+      "public_agreement_updated": {
+        "title": "New public update added",
+        "description": "New public update added to the agreement",
+        "cta": "Open"
+      },
+      "public_agreement_deadline": {
+        "title": "Public agreement deadline reached",
+        "description": "The agreement deadline has been reached",
+        "cta": "Open"
+      },
+      "agreement_updated": {
+        "title": "New agreement update",
+        "description": "The other side added an update to this agreement",
+        "cta": "Open"
       }
     }
   },
