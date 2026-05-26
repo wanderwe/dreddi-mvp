@@ -349,6 +349,10 @@ export default function EmbedAgreementPage() {
             </div>
           </div>
 
+          {/* ── Footer ── */}
+          <div className="mt-2 px-1">
+            <p className="text-xs text-white/40">{t("publicProfile.embed.poweredBy")}</p>
+          </div>
 
       </section>
     </main>
