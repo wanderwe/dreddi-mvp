@@ -571,9 +571,8 @@ export default function Home() {
     ));
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
 
       {showBetaBanner ? (
         <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
@@ -605,16 +604,12 @@ export default function Home() {
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="bg-gradient-to-r from-emerald-200 via-emerald-300 to-sky-200 bg-clip-text font-semibold text-transparent [text-shadow:0_0_22px_rgba(52,211,153,0.18)]">
+                <span className="font-semibold text-white">
                   Dreddi
                 </span>
-                <span className="font-medium text-white/92 [text-shadow:0_0_18px_rgba(148,163,184,0.22)]">
+                <span className="font-medium text-emerald-300">
                   {t("landing.hero.brandSuffix")}
                 </span>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-2 left-0 h-px w-full bg-gradient-to-r from-emerald-300/0 via-emerald-300/55 to-sky-300/0"
-                />
               </div>
             </div>
             <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
