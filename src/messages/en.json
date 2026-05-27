@@ -900,7 +900,7 @@
       },
       "reminder_deadline": {
         "title": "Deadline passed",
-        "description": "The deadline has passed. Review the agreement and complete the needed actions",
+        "description": "The deadline has passed. Review the agreement and complete the needed actions.",
         "cta": "Open"
       },
       "reminder_manual": {
@@ -971,6 +971,11 @@
       "agreement_updated": {
         "title": "New agreement update",
         "description": "The other side added an update to this agreement",
+        "cta": "Open"
+      },
+      "deadline_passed": {
+        "title": "Deadline passed",
+        "description": "The deadline has passed. Review the agreement and complete the needed actions.",
         "cta": "Open"
       }
     }
