@@ -18,6 +18,7 @@ import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
+import PublicProfileGraph, { PublicParty, PublicDeal } from "@/components/PublicProfileGraph";
 
 type PublicProfileRow = {
   handle: string;
@@ -224,6 +225,9 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedEmbed, setCopiedEmbed] = useState(false);
+  const [graphParties, setGraphParties] = useState<PublicParty[]>([]);
+  const [graphDeals, setGraphDeals] = useState<PublicDeal[]>([]);
+  const [graphProfileId, setGraphProfileId] = useState("");
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(true);
   const streakFireGradientId = useId();
 
@@ -336,6 +340,63 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           execution: PUBLIC_DEALS_PAGE_SIZE,
           reaction: PUBLIC_DEALS_PAGE_SIZE,
         });
+
+        // ── Build agreement network graph ──────────────────────────────
+        const resolvedProfileId = profileId ?? "";
+        setGraphProfileId(resolvedProfileId);
+
+        const cpIdSet = new Set<string>();
+        for (const row of promiseRows) {
+          for (const id of [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id]) {
+            if (id && id !== resolvedProfileId) cpIdSet.add(id);
+          }
+        }
+        const cpIds = [...cpIdSet].slice(0, 15);
+
+        if (cpIds.length > 0) {
+          const { data: cpRows } = await supabase
+            .from("profiles")
+            .select("id, handle, display_name, is_public_profile")
+            .in("id", cpIds);
+          if (!active) return;
+
+          const cpMap = new Map(
+            (cpRows ?? []).map((cp) => [
+              cp.id as string,
+              {
+                name: ((cp.display_name ?? cp.handle) as string | null) || null,
+                isPublic: Boolean(cp.is_public_profile),
+              },
+            ])
+          );
+
+          setGraphParties(
+            cpIds.map((id) => ({
+              id,
+              name: cpMap.get(id)?.name ?? null,
+              isPublic: cpMap.get(id)?.isPublic ?? false,
+            }))
+          );
+
+          setGraphDeals(
+            normalized
+              .map((promise) => {
+                const row = promiseRows[promise.sourceIndex];
+                const to =
+                  [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].find(
+                    (id) => id && id !== resolvedProfileId
+                  ) ?? "";
+                const status: PublicDeal["status"] =
+                  promise.uiStatus === "confirmed"
+                    ? "fulfilled"
+                    : promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor"
+                      ? "active"
+                      : null;
+                return { id: promise.id, from: resolvedProfileId || "me", to, status, label: promise.title, isPublic: Boolean(promise.publicAgreementId) };
+              })
+              .filter((d) => d.to !== "")
+          );
+        }
 
         if (
           process.env.NODE_ENV !== "production" &&
@@ -1096,6 +1157,20 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   )}
                 </div>
               </div>
+              </section>
+            ) : null}
+
+            {!isEmbed && graphParties.length > 0 ? (
+              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+                <h2 className="mb-5 text-lg font-semibold">
+                  {t("publicProfile.sections.network")}
+                </h2>
+                <PublicProfileGraph
+                  userId={graphProfileId}
+                  userName={primaryLabel}
+                  parties={graphParties}
+                  deals={graphDeals}
+                />
               </section>
             ) : null}
 

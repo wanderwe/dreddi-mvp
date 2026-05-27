@@ -816,7 +816,8 @@
     "sections": {
       "responsibilityStatus": "Статус відповідальностей",
       "trackRecord": "Історія",
-      "publicDeals": "Публічні угоди"
+      "publicDeals": "Публічні угоди",
+      "network": "Мережа угод"
     },
     "status": {
       "active": "Активні",

@@ -779,7 +779,8 @@
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
-      "publicDeals": "Public deals"
+      "publicDeals": "Public deals",
+      "network": "Agreement network"
     },
     "status": {
       "active": "Active",
