@@ -18,7 +18,7 @@ import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
-import PublicProfileGraph, { PublicParty, PublicDeal } from "@/components/PublicProfileGraph";
+import PublicProfileGraph, { GraphParty, GraphEdge } from "@/components/PublicProfileGraph";
 
 type PublicProfileRow = {
   handle: string;
@@ -225,9 +225,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedEmbed, setCopiedEmbed] = useState(false);
-  const [graphParties, setGraphParties] = useState<PublicParty[]>([]);
-  const [graphDeals, setGraphDeals] = useState<PublicDeal[]>([]);
-  const [graphProfileId, setGraphProfileId] = useState("");
+  const [graphParties, setGraphParties] = useState<GraphParty[]>([]);
+  const [graphEdges, setGraphEdges] = useState<GraphEdge[]>([]);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(true);
   const streakFireGradientId = useId();
 
@@ -343,7 +342,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
         // ── Build agreement network graph ──────────────────────────────
         const resolvedProfileId = profileId ?? "";
-        setGraphProfileId(resolvedProfileId);
 
         const cpIdSet = new Set<string>();
         for (const row of promiseRows) {
@@ -364,40 +362,96 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             (cpRows ?? []).map((cp) => [
               cp.id as string,
               {
-                name: ((cp.display_name ?? cp.handle) as string | null) || null,
+                handle: (cp.handle as string | null) ?? "",
+                display_name: (cp.display_name as string | null) ?? null,
                 isPublic: Boolean(cp.is_public_profile),
               },
             ])
           );
 
-          setGraphParties(
-            cpIds.map((id) => ({
-              id,
-              name: cpMap.get(id)?.name ?? null,
-              isPublic: cpMap.get(id)?.isPublic ?? false,
-            }))
-          );
+          // Aggregate per-counterparty stats
+          type CpAgg = {
+            dealCount: number; fulfilled: number; disputed: number;
+            publicDeals: number; privateDeals: number; recentActivity: boolean;
+            hasDispute: boolean; disputedBy: "me" | "counterparty" | null;
+          };
+          const cpAgg = new Map<string, CpAgg>();
+          for (const promise of normalized) {
+            const row = promiseRows[promise.sourceIndex];
+            const cpId = [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].find(
+              (id) => id && id !== resolvedProfileId && cpIds.includes(id)
+            );
+            if (!cpId) continue;
+            const agg = cpAgg.get(cpId) ?? {
+              dealCount: 0, fulfilled: 0, disputed: 0,
+              publicDeals: 0, privateDeals: 0, recentActivity: false,
+              hasDispute: false, disputedBy: null,
+            };
+            agg.dealCount++;
+            if (promise.uiStatus === "confirmed") agg.fulfilled++;
+            if (promise.uiStatus === "disputed") {
+              agg.disputed++;
+              agg.hasDispute = true;
+              if (!agg.disputedBy) {
+                const executorId = row.creator_id
+                  ? resolveExecutorId({
+                      creator_id: row.creator_id,
+                      promisor_id: row.promisor_id ?? null,
+                      promisee_id: row.promisee_id ?? null,
+                      counterparty_id: row.counterparty_id ?? null,
+                    })
+                  : null;
+                agg.disputedBy = executorId === resolvedProfileId ? "counterparty" : "me";
+              }
+            }
+            if (promise.publicAgreementId) agg.publicDeals++;
+            else agg.privateDeals++;
+            if (promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor") {
+              agg.recentActivity = true;
+            }
+            cpAgg.set(cpId, agg);
+          }
 
-          setGraphDeals(
-            normalized
-              .map((promise) => {
-                const row = promiseRows[promise.sourceIndex];
-                const to =
-                  [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].find(
-                    (id) => id && id !== resolvedProfileId
-                  ) ?? "";
-                const status: PublicDeal["status"] =
-                  promise.uiStatus === "confirmed"
-                    ? "fulfilled"
-                    : promise.uiStatus === "disputed"
-                      ? "disputed"
-                      : promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor"
-                        ? "active"
-                        : null;
-                return { id: promise.id, from: resolvedProfileId || "me", to, status, label: promise.title, isPublic: Boolean(promise.publicAgreementId) };
-              })
-              .filter((d) => d.to !== "")
-          );
+          const sortedCpIds = cpIds.filter((id) => cpAgg.has(id));
+          const n = sortedCpIds.length;
+
+          const newGraphParties: GraphParty[] = sortedCpIds.map((id, i) => {
+            const agg = cpAgg.get(id)!;
+            const cp = cpMap.get(id);
+            const handle = cp?.handle ?? "";
+            const display_name = cp?.display_name ?? null;
+            const nameSrc = display_name ?? handle ?? id;
+            const initials = nameSrc.split(/\s+/).map((w: string) => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
+            return {
+              id, username: handle, display_name, initials,
+              isPublic: cp?.isPublic ?? false,
+              dealCount: agg.dealCount, fulfilled: agg.fulfilled,
+              disputed: agg.disputed, publicDeals: agg.publicDeals,
+              privateDeals: agg.privateDeals, recentActivity: agg.recentActivity,
+              angle: n > 0 ? (i / n) * 2 * Math.PI - Math.PI / 2 : 0,
+            };
+          });
+
+          const newGraphEdges: GraphEdge[] = [];
+          for (const id of sortedCpIds) {
+            const agg = cpAgg.get(id)!;
+            newGraphEdges.push({
+              partyId: id, type: "collab",
+              count: agg.dealCount, fulfilled: agg.fulfilled,
+              pubRatio: agg.dealCount > 0 ? agg.publicDeals / agg.dealCount : 0,
+              recentActivity: agg.recentActivity, disputedBy: null,
+            });
+            if (agg.hasDispute) {
+              newGraphEdges.push({
+                partyId: id, type: "dispute",
+                count: agg.disputed, fulfilled: 0, pubRatio: 0,
+                recentActivity: false, disputedBy: agg.disputedBy,
+              });
+            }
+          }
+
+          setGraphParties(newGraphParties);
+          setGraphEdges(newGraphEdges);
         }
 
         if (
@@ -1168,10 +1222,10 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   {t("publicProfile.sections.network")}
                 </h2>
                 <PublicProfileGraph
-                  userId={graphProfileId}
                   userName={primaryLabel}
                   parties={graphParties}
-                  deals={graphDeals}
+                  edges={graphEdges}
+                  locale={locale}
                 />
               </section>
             ) : null}
