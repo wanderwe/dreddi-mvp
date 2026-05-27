@@ -389,9 +389,11 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 const status: PublicDeal["status"] =
                   promise.uiStatus === "confirmed"
                     ? "fulfilled"
-                    : promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor"
-                      ? "active"
-                      : null;
+                    : promise.uiStatus === "disputed"
+                      ? "disputed"
+                      : promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor"
+                        ? "active"
+                        : null;
                 return { id: promise.id, from: resolvedProfileId || "me", to, status, label: promise.title, isPublic: Boolean(promise.publicAgreementId) };
               })
               .filter((d) => d.to !== "")
