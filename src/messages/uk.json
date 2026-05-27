@@ -990,7 +990,7 @@
       },
       "public_agreement_updated": {
         "title": "Додано нове публічне оновлення",
-        "description": "До угоди додано нове публічне оновлення",
+        "description": "Перегляньте останнє публічне оновлення в цій угоді",
         "cta": "Відкрити"
       },
       "public_agreement_deadline": {

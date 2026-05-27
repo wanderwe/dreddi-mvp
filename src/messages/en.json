@@ -960,7 +960,7 @@
       },
       "public_agreement_updated": {
         "title": "New public update added",
-        "description": "New public update added to the agreement",
+        "description": "Check the latest public update in this agreement",
         "cta": "Open"
       },
       "public_agreement_deadline": {
