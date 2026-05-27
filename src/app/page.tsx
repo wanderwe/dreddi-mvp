@@ -15,6 +15,7 @@ import { formatDealMeta } from "@/lib/formatDealMeta";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { productFlags } from "@/lib/config/productFlags";
 import { LiveAgreementNetwork } from "@/app/components/landing/LiveAgreementNetwork";
+import AgreementNetworkBackground from "@/components/AgreementNetworkBackground";
 
 type DealRow = {
   id: string;
@@ -573,6 +574,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <AgreementNetworkBackground />
       <div className="absolute inset-0 hero-grid" aria-hidden />
 
       {showBetaBanner ? (
