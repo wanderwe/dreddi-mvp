@@ -83,7 +83,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     public_agreement_updated: {
       title: "New public update added",
-      body: "New public update added to the agreement",
+      body: "Check the latest public update in this agreement",
       ctaLabel: "Open",
     },
     public_agreement_deadline: {
@@ -215,7 +215,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     public_agreement_updated: {
       title: "Додано нове публічне оновлення",
-      body: "Додано нове публічне оновлення до угоди",
+      body: "Перегляньте останнє публічне оновлення в цій угоді",
       ctaLabel: "Відкрити",
     },
     public_agreement_deadline: {
