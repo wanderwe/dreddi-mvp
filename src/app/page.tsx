@@ -14,6 +14,7 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { productFlags } from "@/lib/config/productFlags";
+import { LiveAgreementNetwork } from "@/app/components/landing/LiveAgreementNetwork";
 
 type DealRow = {
   id: string;
@@ -658,6 +659,7 @@ export default function Home() {
         </div>
 
         <div className="w-full min-w-0 md:w-[32rem] md:flex-none lg:w-[34rem]">
+          {showAuthenticatedCta ? (
           <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
             <div
@@ -798,6 +800,9 @@ export default function Home() {
                 </div>
             </div>
           </div>
+          ) : (
+            <LiveAgreementNetwork />
+          )}
         </div>
       </div>
     </main>
