@@ -604,7 +604,7 @@ export default function Home() {
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="font-semibold text-emerald-300">
+                <span className="font-semibold uppercase tracking-[0.12em] text-emerald-300">
                   Dreddi
                 </span>
                 <span className="font-medium text-white">
