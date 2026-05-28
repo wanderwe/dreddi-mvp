@@ -46,6 +46,7 @@ export default function PublicProfilesDirectoryPage() {
   }, [searchTerm]);
 
   const applySearchFilters = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: any,
     normalizedSearch: string,
     includeEmail: boolean

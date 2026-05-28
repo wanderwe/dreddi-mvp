@@ -176,7 +176,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const defaultHandle = useMemo(() => {
     if (!profile) return "";
     return profile.email?.split("@")[0].toLowerCase() ?? `user_${profile.userId.slice(0, 6)}`;
-  }, [profile?.email, profile?.userId]);
+  }, [profile]);
 
   useEffect(() => {
     if (!profile) return;

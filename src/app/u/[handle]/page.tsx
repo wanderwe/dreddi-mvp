@@ -18,6 +18,7 @@ import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
+import PublicProfileGraph, { GraphParty, GraphEdge } from "@/components/PublicProfileGraph";
 
 type PublicProfileRow = {
   handle: string;
@@ -224,7 +225,9 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedEmbed, setCopiedEmbed] = useState(false);
-  const [reputationDetailsOpen, setReputationDetailsOpen] = useState(true);
+  const [graphParties, setGraphParties] = useState<GraphParty[]>([]);
+  const [graphEdges, setGraphEdges] = useState<GraphEdge[]>([]);
+  const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
   const streakFireGradientId = useId();
 
   const formatRelativeTime = useMemo(() => {
@@ -336,6 +339,108 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           execution: PUBLIC_DEALS_PAGE_SIZE,
           reaction: PUBLIC_DEALS_PAGE_SIZE,
         });
+
+        // ── Build agreement network graph ──────────────────────────────
+        const resolvedProfileId = profileId ?? "";
+
+        const cpIdSet = new Set<string>();
+        for (const row of promiseRows) {
+          for (const id of [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id]) {
+            if (id && id !== resolvedProfileId) cpIdSet.add(id);
+          }
+        }
+        const cpIds = [...cpIdSet].slice(0, 15);
+
+        if (cpIds.length > 0) {
+          const { data: cpRows } = await supabase
+            .from("profiles")
+            .select("id, handle, display_name, is_public_profile")
+            .in("id", cpIds);
+          if (!active) return;
+
+          const cpMap = new Map(
+            (cpRows ?? []).map((cp) => [
+              cp.id as string,
+              {
+                handle: (cp.handle as string | null) ?? "",
+                display_name: (cp.display_name as string | null) ?? null,
+                isPublic: Boolean(cp.is_public_profile),
+              },
+            ])
+          );
+
+          // Aggregate per-counterparty stats
+          type CpAgg = {
+            dealCount: number; fulfilled: number; disputed: number; active: number;
+            recentActivity: boolean; disputedBy: "me" | "counterparty" | null;
+          };
+          const cpAgg = new Map<string, CpAgg>();
+          for (const promise of normalized) {
+            const row = promiseRows[promise.sourceIndex];
+            const cpId = [row.creator_id, row.promisor_id, row.promisee_id, row.counterparty_id].find(
+              (id) => id && id !== resolvedProfileId && cpIds.includes(id)
+            );
+            if (!cpId) continue;
+            const agg = cpAgg.get(cpId) ?? {
+              dealCount: 0, fulfilled: 0, disputed: 0, active: 0,
+              recentActivity: false, disputedBy: null,
+            };
+            agg.dealCount++;
+            if (promise.uiStatus === "confirmed") agg.fulfilled++;
+            if (promise.uiStatus === "disputed") {
+              agg.disputed++;
+              if (!agg.disputedBy) {
+                const executorId = row.creator_id
+                  ? resolveExecutorId({
+                      creator_id: row.creator_id,
+                      promisor_id: row.promisor_id ?? null,
+                      promisee_id: row.promisee_id ?? null,
+                      counterparty_id: row.counterparty_id ?? null,
+                    })
+                  : null;
+                agg.disputedBy = executorId === resolvedProfileId ? "counterparty" : "me";
+              }
+            }
+            if (promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor") {
+              agg.active++;
+              agg.recentActivity = true;
+            }
+            cpAgg.set(cpId, agg);
+          }
+
+          const sortedCpIds = cpIds.filter((id) => cpAgg.has(id));
+          const n = sortedCpIds.length;
+
+          const newGraphParties: GraphParty[] = sortedCpIds.map((id, i) => {
+            const agg = cpAgg.get(id)!;
+            const cp = cpMap.get(id);
+            const handle = cp?.handle ?? "";
+            const display_name = cp?.display_name ?? null;
+            const nameSrc = display_name ?? handle ?? id;
+            const initials = nameSrc.split(/\s+/).map((w: string) => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
+            return {
+              id, username: handle, display_name, initials,
+              isPublic: cp?.isPublic ?? false,
+              dealCount: agg.dealCount, fulfilled: agg.fulfilled,
+              disputed: agg.disputed, recentActivity: agg.recentActivity,
+              angle: n > 0 ? (i / n) * 2 * Math.PI - Math.PI / 2 : 0,
+            };
+          });
+
+          // One edge per counterparty — color encodes dispute ratio
+          const newGraphEdges: GraphEdge[] = sortedCpIds.map((id) => {
+            const agg = cpAgg.get(id)!;
+            return {
+              partyId: id,
+              count: agg.dealCount, fulfilled: agg.fulfilled,
+              disputed: agg.disputed, active: agg.active,
+              disputedBy: agg.disputedBy,
+            };
+          });
+
+          setGraphParties(newGraphParties);
+          setGraphEdges(newGraphEdges);
+        }
 
         if (
           process.env.NODE_ENV !== "production" &&
@@ -1096,6 +1201,20 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   )}
                 </div>
               </div>
+              </section>
+            ) : null}
+
+            {!isEmbed && graphParties.length > 0 ? (
+              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+                <h2 className="mb-5 text-lg font-semibold">
+                  {t("publicProfile.sections.network")}
+                </h2>
+                <PublicProfileGraph
+                  userName={primaryLabel}
+                  parties={graphParties}
+                  edges={graphEdges}
+                  locale={locale}
+                />
               </section>
             ) : null}
 

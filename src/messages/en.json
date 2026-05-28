@@ -779,7 +779,23 @@
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
-      "publicDeals": "Public deals"
+      "publicDeals": "Public deals",
+      "network": "Agreement network"
+    },
+    "graph": {
+      "legend": {
+        "fulfilled": "Fulfilled deals",
+        "disputed": "Disputed",
+        "nodeSize": "Node size = deal count"
+      },
+      "tooltip": {
+        "dealsTotal": "deals total",
+        "active": "active",
+        "fulfilled": "fulfilled",
+        "disputed": "disputed",
+        "dispute": "Dispute",
+        "disputedBy": "{name} challenged the outcome"
+      }
     },
     "status": {
       "active": "Active",
