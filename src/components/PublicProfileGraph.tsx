@@ -54,7 +54,8 @@ function trunc(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
 }
 function mkInitials(name: string) {
-  return name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const stripped = name.replace(/^@+/, "");
+  return stripped.split(/\s+/).map(w => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
 }
 function nodeR(dealCount: number) {
   return 9 + Math.min(dealCount, 5) * 1.4;
@@ -435,7 +436,7 @@ function HoverTooltip({
     const active   = edge?.active   ?? Math.max(0, p.dealCount - p.fulfilled - p.disputed);
     const disputed = edge?.disputed ?? p.disputed;
     const whoDisp  = disputed > 0 && edge?.disputedBy
-      ? (edge.disputedBy === "me" ? trunc(userName, 12) : trunc(name, 12))
+      ? (edge.disputedBy === "me" ? trunc(userName.replace(/^@+/, ""), 12) : trunc(name, 12))
       : null;
     content = (
       <>

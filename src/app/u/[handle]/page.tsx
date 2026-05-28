@@ -417,7 +417,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             const handle = cp?.handle ?? "";
             const display_name = cp?.display_name ?? null;
             const nameSrc = display_name ?? handle ?? id;
-            const initials = nameSrc.split(/\s+/).map((w: string) => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
+            const initials = nameSrc.replace(/^@+/, "").split(/\s+/).map((w: string) => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase();
             return {
               id, username: handle, display_name, initials,
               isPublic: cp?.isPublic ?? false,
