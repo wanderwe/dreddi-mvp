@@ -196,6 +196,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       const placed = placedRef.current;
       const hov    = hovRef.current;
       const compact = cw < 480;
+      const userR   = compact ? 20 : 26;
 
       ctx.clearRect(0, 0, cw, ch);
 
@@ -211,6 +212,18 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         const party = placed.find(p => p.id === edge.partyId);
         if (!party) continue;
 
+        // Unit vector center → party
+        const dx = party.x - cx, dy = party.y - cy;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len < 1) continue;
+        const ux = dx / len, uy = dy / len;
+
+        // Start at edge of center node, end at edge of party node
+        const sx0 = cx     + ux * (userR  + 2);
+        const sy0 = cy     + uy * (userR  + 2);
+        const ex0 = party.x - ux * (party.r + 2);
+        const ey0 = party.y - uy * (party.r + 2);
+
         const isHov = Boolean(
           (hov?.kind === "collab"   && hov.edge.partyId === edge.partyId && edge.type === "collab") ||
           (hov?.kind === "dispute"  && hov.edge.partyId === edge.partyId && edge.type === "dispute") ||
@@ -218,14 +231,11 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         );
 
         if (edge.type === "collab") {
-          drawCollabEdge(ctx, cx, cy, party.x, party.y, edge, isHov, tick);
+          drawCollabEdge(ctx, sx0, sy0, ex0, ey0, edge, isHov, tick);
         } else {
-          // Dispute arrow offset 5px parallel
-          const dx = party.x - cx, dy = party.y - cy;
-          const len = Math.sqrt(dx * dx + dy * dy);
-          const ux = dx / len, uy = dy / len;
-          const ox = -uy * 5, oy =  ux * 5;
-          let [sx, sy, ex, ey] = [cx + ox, cy + oy, party.x + ox, party.y + oy];
+          // Dispute arrow offset 5px perpendicular to the edge direction
+          const ox = -uy * 5, oy = ux * 5;
+          let [sx, sy, ex, ey] = [sx0 + ox, sy0 + oy, ex0 + ox, ey0 + oy];
           if (edge.disputedBy === "counterparty") {
             [sx, sy, ex, ey] = [ex, ey, sx, sy];
           }
@@ -301,7 +311,6 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       }
 
       // ── Center user node ────────────────────────────────────────────────────
-      const userR = compact ? 20 : 26;
       const cg = ctx.createRadialGradient(cx, cy, userR * 0.4, cx, cy, userR + 14);
       cg.addColorStop(0, `rgba(${TEAL},0.08)`); cg.addColorStop(1, "transparent");
       ctx.fillStyle = cg;
