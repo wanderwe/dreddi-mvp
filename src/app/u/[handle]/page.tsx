@@ -227,7 +227,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const [copiedEmbed, setCopiedEmbed] = useState(false);
   const [graphParties, setGraphParties] = useState<GraphParty[]>([]);
   const [graphEdges, setGraphEdges] = useState<GraphEdge[]>([]);
-  const [reputationDetailsOpen, setReputationDetailsOpen] = useState(true);
+  const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
   const streakFireGradientId = useId();
 
   const formatRelativeTime = useMemo(() => {
@@ -371,9 +371,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
           // Aggregate per-counterparty stats
           type CpAgg = {
-            dealCount: number; fulfilled: number; disputed: number;
-            recentActivity: boolean;
-            hasDispute: boolean; disputedBy: "me" | "counterparty" | null;
+            dealCount: number; fulfilled: number; disputed: number; active: number;
+            recentActivity: boolean; disputedBy: "me" | "counterparty" | null;
           };
           const cpAgg = new Map<string, CpAgg>();
           for (const promise of normalized) {
@@ -383,14 +382,13 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             );
             if (!cpId) continue;
             const agg = cpAgg.get(cpId) ?? {
-              dealCount: 0, fulfilled: 0, disputed: 0,
-              recentActivity: false, hasDispute: false, disputedBy: null,
+              dealCount: 0, fulfilled: 0, disputed: 0, active: 0,
+              recentActivity: false, disputedBy: null,
             };
             agg.dealCount++;
             if (promise.uiStatus === "confirmed") agg.fulfilled++;
             if (promise.uiStatus === "disputed") {
               agg.disputed++;
-              agg.hasDispute = true;
               if (!agg.disputedBy) {
                 const executorId = row.creator_id
                   ? resolveExecutorId({
@@ -404,6 +402,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               }
             }
             if (promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor") {
+              agg.active++;
               agg.recentActivity = true;
             }
             cpAgg.set(cpId, agg);
@@ -428,22 +427,16 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             };
           });
 
-          const newGraphEdges: GraphEdge[] = [];
-          for (const id of sortedCpIds) {
+          // One edge per counterparty — color encodes dispute ratio
+          const newGraphEdges: GraphEdge[] = sortedCpIds.map((id) => {
             const agg = cpAgg.get(id)!;
-            newGraphEdges.push({
-              partyId: id, type: "collab",
+            return {
+              partyId: id,
               count: agg.dealCount, fulfilled: agg.fulfilled,
-              recentActivity: agg.recentActivity, disputedBy: null,
-            });
-            if (agg.hasDispute) {
-              newGraphEdges.push({
-                partyId: id, type: "dispute",
-                count: agg.disputed, fulfilled: 0,
-                recentActivity: false, disputedBy: agg.disputedBy,
-              });
-            }
-          }
+              disputed: agg.disputed, active: agg.active,
+              disputedBy: agg.disputedBy,
+            };
+          });
 
           setGraphParties(newGraphParties);
           setGraphEdges(newGraphEdges);

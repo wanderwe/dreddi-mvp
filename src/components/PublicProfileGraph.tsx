@@ -22,10 +22,11 @@ export interface GraphParty {
 
 export interface GraphEdge {
   partyId: string;
-  type: "collab" | "dispute";
   count: number;
   fulfilled: number;
-  recentActivity: boolean;
+  disputed: number;
+  /** Deals in progress (active + completed_by_promisor) */
+  active: number;
   /** Whose perspective: "me" = profile user filed it; "counterparty" = they filed it */
   disputedBy: "me" | "counterparty" | null;
 }
@@ -40,10 +41,7 @@ type Props = {
 // ── Internal types ─────────────────────────────────────────────────────────────
 type Placed = GraphParty & { x: number; y: number; r: number };
 
-type HoverInfo =
-  | { kind: "party"; party: Placed }
-  | { kind: "dispute"; edge: GraphEdge; party: Placed }
-  | null;
+type HoverInfo = { kind: "party"; party: Placed; edge: GraphEdge | null } | null;
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const TEAL  = "0,212,170";
@@ -73,59 +71,53 @@ function distToSeg(
 }
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
-function drawArrow(
-  ctx: CanvasRenderingContext2D,
-  x1: number, y1: number, x2: number, y2: number,
-  color: string, alpha: number, width: number,
-) {
-  const dx = x2 - x1, dy = y2 - y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  if (len < 1) return;
-  const ux = dx / len, uy = dy / len;
-  const ex = x2 - ux * 9, ey = y2 - uy * 9;
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(ex, ey);
-  ctx.strokeStyle = `rgba(${color},${alpha})`;
-  ctx.lineWidth = width;
-  ctx.setLineDash([]);
-  ctx.stroke();
-  // Arrowhead
-  const ax = ex - ux * 8 + uy * 4, ay = ey - uy * 8 - ux * 4;
-  const bx = ex - ux * 8 - uy * 4, by = ey - uy * 8 + ux * 4;
-  ctx.beginPath();
-  ctx.moveTo(x2 - ux * 5, y2 - uy * 5);
-  ctx.lineTo(ax, ay);
-  ctx.lineTo(bx, by);
-  ctx.closePath();
-  ctx.fillStyle = `rgba(${color},${alpha})`;
-  ctx.fill();
+function edgeColor(edge: GraphEdge): string {
+  // Blend teal→amber as dispute ratio increases
+  const dr = edge.count > 0 ? edge.disputed / edge.count : 0;
+  const r  = Math.round(240 * dr);
+  const g  = Math.round(212 - 32  * dr);
+  const b  = Math.round(170 - 129 * dr);
+  return `${r},${g},${b}`;
 }
 
-function drawCollabEdge(
+function drawEdge(
   ctx: CanvasRenderingContext2D,
   sx: number, sy: number, ex: number, ey: number,
   edge: GraphEdge, isHov: boolean, tick: number,
 ) {
   const thick  = 0.8 + Math.min(edge.count, 5) * 0.55;
-  const bright = 0.25 + (edge.fulfilled / Math.max(edge.count, 1)) * 0.45;
-  const shimmer = edge.recentActivity
-    ? Math.sin(tick * 0.06) * 0.12 + bright
+  const bright = 0.3 + (edge.fulfilled / Math.max(edge.count, 1)) * 0.4;
+  const shimmer = edge.active > 0
+    ? Math.sin(tick * 0.06) * 0.1 + bright
     : bright;
   const alpha = isHov ? Math.min(shimmer + 0.3, 0.95) : shimmer;
+  const color = edgeColor(edge);
 
-  if (edge.recentActivity || isHov) {
+  // Glow
+  if (edge.active > 0 || isHov) {
     ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-    ctx.strokeStyle = `rgba(${TEAL},${isHov ? 0.08 : 0.04})`;
+    ctx.strokeStyle = `rgba(${color},${isHov ? 0.1 : 0.05})`;
     ctx.lineWidth = (thick + 0.8) * 4;
     ctx.setLineDash([]);
     ctx.stroke();
   }
+  // Line
   ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-  ctx.strokeStyle = `rgba(${TEAL},${alpha})`;
+  ctx.strokeStyle = `rgba(${color},${alpha})`;
   ctx.lineWidth = isHov ? thick + 0.8 : thick;
   ctx.setLineDash([]);
   ctx.stroke();
+
+  // Count label at midpoint
+  const mx = (sx + ex) / 2, my = (sy + ey) / 2;
+  const label = String(edge.count);
+  ctx.font = `600 9px ui-sans-serif,system-ui,sans-serif`;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.strokeStyle = "rgba(17,19,24,0.9)";
+  ctx.lineWidth = 3; ctx.lineJoin = "round";
+  ctx.strokeText(label, mx, my);
+  ctx.fillStyle = `rgba(${color},${isHov ? 1 : 0.85})`;
+  ctx.fillText(label, mx, my);
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -224,22 +216,8 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         const ex0 = party.x - ux * (party.r + 2);
         const ey0 = party.y - uy * (party.r + 2);
 
-        const isHov = Boolean(
-          (hov?.kind === "party"   && hov.party.id === edge.partyId) ||
-          (hov?.kind === "dispute" && hov.edge.partyId === edge.partyId)
-        );
-
-        if (edge.type === "collab") {
-          drawCollabEdge(ctx, sx0, sy0, ex0, ey0, edge, isHov, tick);
-        } else {
-          // Dispute arrow offset 5px perpendicular to the edge direction
-          const ox = -uy * 5, oy = ux * 5;
-          let [sx, sy, ex, ey] = [sx0 + ox, sy0 + oy, ex0 + ox, ey0 + oy];
-          if (edge.disputedBy === "counterparty") {
-            [sx, sy, ex, ey] = [ex, ey, sx, sy];
-          }
-          drawArrow(ctx, sx, sy, ex, ey, AMBER, isHov ? 0.9 : 0.55, isHov ? 2 : 1.2);
-        }
+        const isHov = hov?.kind === "party" && hov.party.id === edge.partyId;
+        drawEdge(ctx, sx0, sy0, ex0, ey0, edge, isHov, tick);
       }
 
       // ── Party nodes ────────────────────────────────────────────────────────
@@ -347,26 +325,24 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     const placed = placedRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return null;
-    const cx = canvas.clientWidth / 2, cy = canvas.clientHeight / 2;
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const cx = cw / 2, cy = ch / 2;
+    const deadR = (cw < 480 ? 20 : 26) + 6;
+
+    // Dead zone: center node area triggers nothing
+    if ((x - cx) ** 2 + (y - cy) ** 2 <= deadR ** 2) return null;
 
     for (const p of placed) {
       if ((x - p.x) ** 2 + (y - p.y) ** 2 <= (p.r + 6) ** 2) {
-        return { kind: "party", party: p };
+        const edge = edges.find(e => e.partyId === p.id) ?? null;
+        return { kind: "party", party: p, edge };
       }
     }
     for (const edge of edges) {
       const party = placed.find(p => p.id === edge.partyId);
       if (!party) continue;
-      if (edge.type === "dispute") {
-        const dx = party.x - cx, dy = party.y - cy;
-        const len = Math.sqrt(dx * dx + dy * dy);
-        const ox = -dy / len * 5, oy = dx / len * 5;
-        if (distToSeg(x, y, cx + ox, cy + oy, party.x + ox, party.y + oy) < 10)
-          return { kind: "dispute", edge, party };
-      } else {
-        if (distToSeg(x, y, cx, cy, party.x, party.y) < 12)
-          return { kind: "party", party };
-      }
+      if (distToSeg(x, y, cx, cy, party.x, party.y) < 12)
+        return { kind: "party", party, edge };
     }
     return null;
   }, [edges]);
@@ -452,9 +428,13 @@ function HoverTooltip({
   let content: React.ReactNode = null;
 
   if (info.kind === "party") {
-    const p = info.party;
-    const name   = p.display_name ?? p.username ?? "—";
-    const active = Math.max(0, p.dealCount - p.fulfilled - p.disputed);
+    const { party: p, edge } = info;
+    const name     = p.display_name ?? p.username ?? "—";
+    const active   = edge?.active   ?? Math.max(0, p.dealCount - p.fulfilled - p.disputed);
+    const disputed = edge?.disputed ?? p.disputed;
+    const whoDisp  = disputed > 0 && edge?.disputedBy
+      ? (edge.disputedBy === "me" ? trunc(userName, 12) : trunc(name, 12))
+      : null;
     content = (
       <>
         <p className="mb-2 truncate text-[11px] font-semibold text-white/90">{name}</p>
@@ -464,24 +444,13 @@ function HoverTooltip({
           {p.fulfilled > 0 && (
             <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
           )}
-          {p.disputed > 0 && (
-            <p style={{ color: `rgba(${AMBER},1)` }}>⚡ {p.disputed} {t("publicProfile.graph.tooltip.disputed")}</p>
+          {disputed > 0 && (
+            <p style={{ color: `rgba(${AMBER},1)` }}>
+              ⚡ {disputed} {t("publicProfile.graph.tooltip.disputed")}
+              {whoDisp ? ` · ${whoDisp}` : ""}
+            </p>
           )}
         </div>
-      </>
-    );
-  } else if (info.kind === "dispute") {
-    const { edge, party } = info;
-    const name    = party.display_name ?? party.username ?? "—";
-    const whoDisp = edge.disputedBy === "me" ? trunc(userName, 14) : trunc(name, 14);
-    content = (
-      <>
-        <p className="mb-1.5 text-[11px] font-semibold" style={{ color: `rgba(${AMBER},1)` }}>
-          ⚡ {t("publicProfile.graph.tooltip.dispute")}
-        </p>
-        <p className="text-[10px] text-white/55">
-          {t("publicProfile.graph.tooltip.disputedBy", { name: whoDisp })}
-        </p>
       </>
     );
   }
@@ -503,7 +472,6 @@ function Legend() {
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
       <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}   label={t("publicProfile.graph.legend.fulfilled")} />
       <LegendItem kind="arrow" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
-      <LegendItem kind="node"                                 label={t("publicProfile.graph.legend.nodeSize")} />
     </div>
   );
 }
