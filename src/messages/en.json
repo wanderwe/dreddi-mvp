@@ -440,7 +440,7 @@
         "title": "Title",
         "details": "Details",
         "condition": "Counter-condition",
-        "conditionHint": "Execution is possible provided that…",
+        "conditionHint": "What the other party requires",
         "executor": "{executorRole}",
         "executorHelper": "Choose who is responsible for execution",
         "counterparty": "Counterparty",
@@ -461,7 +461,7 @@
       "placeholders": {
         "title": "Short {entityLower} description, for example: “Shoot a video by Friday”",
         "details": "Clarify what is included in this deal (optional)",
-        "condition": "Execution is possible provided that… (optional)",
+        "condition": "What the other party requires (optional)",
         "counterpartyMe": "@username or name",
         "counterpartyOther": "@username or name",
         "dueDate": "Select date (optional)",
