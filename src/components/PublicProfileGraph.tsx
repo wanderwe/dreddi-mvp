@@ -471,7 +471,6 @@ function HoverTooltip({
   if (info.kind === "node") {
     const p = info.party;
     const name   = p.display_name ?? p.username ?? "—";
-    const pubPct = p.dealCount > 0 ? Math.round((p.publicDeals / p.dealCount) * 100) : 0;
     content = (
       <>
         <p className="mb-2 truncate text-[11px] font-semibold text-white/90">{name}</p>
@@ -479,7 +478,6 @@ function HoverTooltip({
           <p>{p.dealCount} угод разом</p>
           {p.fulfilled > 0 && <p className="text-emerald-300/80">✓ {p.fulfilled} виконано</p>}
           {p.disputed  > 0 && <p style={{ color: `rgba(${AMBER},1)` }}>⚡ {p.disputed} оскаржено</p>}
-          <p>{pubPct}% публічних угод</p>
           {p.recentActivity && <p style={{ color: `rgba(0,212,170,1)` }}>● активна нещодавно</p>}
         </div>
       </>
@@ -488,7 +486,6 @@ function HoverTooltip({
     const { edge, party } = info;
     const name   = party.display_name ?? party.username ?? "—";
     const donePct = edge.count > 0 ? Math.round((edge.fulfilled / edge.count) * 100) : 0;
-    const pubPct  = Math.round(edge.pubRatio * 100);
     content = (
       <>
         <p className="mb-1.5 text-[10px] text-white/35">{trunc(userName, 11)} ↔ {trunc(name, 11)}</p>
@@ -497,7 +494,6 @@ function HoverTooltip({
           {edge.fulfilled > 0 && (
             <p className="text-emerald-300/80">✓ {edge.fulfilled} виконано ({donePct}%)</p>
           )}
-          <p>{pubPct}% публічних</p>
           {edge.recentActivity && <p style={{ color: "rgba(0,212,170,1)" }}>● є активна угода</p>}
         </div>
       </>
