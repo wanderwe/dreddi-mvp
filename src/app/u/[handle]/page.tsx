@@ -1227,7 +1227,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 <button
                   type="button"
                   onClick={() => handlePublicDealsTabChange("execution")}
-                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
+                  className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "execution"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
                       : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
@@ -1240,7 +1240,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 <button
                   type="button"
                   onClick={() => handlePublicDealsTabChange("reaction")}
-                  className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition ${
+                  className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "reaction"
                       ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
                       : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
