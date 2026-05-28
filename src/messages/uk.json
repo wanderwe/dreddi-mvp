@@ -819,6 +819,21 @@
       "publicDeals": "Публічні угоди",
       "network": "Мережа угод"
     },
+    "graph": {
+      "legend": {
+        "fulfilled": "Виконані угоди",
+        "disputed": "Оскаржено",
+        "nodeSize": "Розмір = кількість угод"
+      },
+      "tooltip": {
+        "dealsTotal": "угод разом",
+        "active": "активних",
+        "fulfilled": "виконано",
+        "disputed": "оскаржено",
+        "dispute": "Спір",
+        "disputedBy": "{name} оскаржив результат"
+      }
+    },
     "status": {
       "active": "Активні",
       "pendingAcceptance": "Очікує прийняття",

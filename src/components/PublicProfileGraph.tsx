@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useT } from "@/lib/i18n/I18nProvider";
 
 // ── Public API types ───────────────────────────────────────────────────────────
 export interface GraphParty {
@@ -40,8 +41,7 @@ type Props = {
 type Placed = GraphParty & { x: number; y: number; r: number };
 
 type HoverInfo =
-  | { kind: "node"; party: Placed }
-  | { kind: "collab"; edge: GraphEdge; party: Placed }
+  | { kind: "party"; party: Placed }
   | { kind: "dispute"; edge: GraphEdge; party: Placed }
   | null;
 
@@ -225,9 +225,8 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         const ey0 = party.y - uy * (party.r + 2);
 
         const isHov = Boolean(
-          (hov?.kind === "collab"   && hov.edge.partyId === edge.partyId && edge.type === "collab") ||
-          (hov?.kind === "dispute"  && hov.edge.partyId === edge.partyId && edge.type === "dispute") ||
-          (hov?.kind === "node"     && hov.party.id === edge.partyId)
+          (hov?.kind === "party"   && hov.party.id === edge.partyId) ||
+          (hov?.kind === "dispute" && hov.edge.partyId === edge.partyId)
         );
 
         if (edge.type === "collab") {
@@ -322,12 +321,6 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       ctx.fillStyle = `rgba(${TEAL},1)`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(mkInitials(userName), cx, cy);
-      if (!compact) {
-        ctx.font = "10px ui-sans-serif,system-ui,sans-serif";
-        ctx.fillStyle = "rgba(255,255,255,0.4)";
-        ctx.textBaseline = "top";
-        ctx.fillText(trunc(userName, 20), cx, cy + userR + 7);
-      }
 
       // Empty state
       if (placed.length === 0) {
@@ -358,7 +351,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
     for (const p of placed) {
       if ((x - p.x) ** 2 + (y - p.y) ** 2 <= (p.r + 6) ** 2) {
-        return { kind: "node", party: p };
+        return { kind: "party", party: p };
       }
     }
     for (const edge of edges) {
@@ -372,7 +365,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
           return { kind: "dispute", edge, party };
       } else {
         if (distToSeg(x, y, cx, cy, party.x, party.y) < 12)
-          return { kind: "collab", edge, party };
+          return { kind: "party", party };
       }
     }
     return null;
@@ -388,7 +381,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     setTooltip(info);
     if (canvasRef.current) {
       canvasRef.current.style.cursor =
-        info?.kind === "node" && info.party.isPublic ? "pointer" : "default";
+        info?.kind === "party" && info.party.isPublic ? "pointer" : "default";
     }
   }, [toCanvasCoords, findHover]);
 
@@ -402,7 +395,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     const coords = toCanvasCoords(e);
     if (!coords) return;
     const info = findHover(coords.x, coords.y);
-    if (info?.kind === "node" && info.party.isPublic && info.party.username) {
+    if (info?.kind === "party" && info.party.isPublic && info.party.username) {
       window.open(`/${locale}/u/${info.party.username}`, "_blank");
     }
   }, [toCanvasCoords, findHover, locale]);
@@ -431,11 +424,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       )}
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
-        <LegendItem kind="solid"  color={`rgba(${TEAL},0.7)`}   label="Виконані угоди" />
-        <LegendItem kind="arrow"  color={`rgba(${AMBER},0.75)`} label="Оскаржено (напрямок важливий)" />
-        <LegendItem kind="node"                                  label="Розмір = кількість угод" />
-      </div>
+      <Legend />
     </div>
   );
 }
@@ -452,6 +441,7 @@ function HoverTooltip({
   containerW: number;
   userName: string;
 }) {
+  const t = useT();
   if (!info) return null;
   const W = 212;
   let left = mouse.x + 14;
@@ -461,51 +451,37 @@ function HoverTooltip({
 
   let content: React.ReactNode = null;
 
-  if (info.kind === "node") {
+  if (info.kind === "party") {
     const p = info.party;
     const name   = p.display_name ?? p.username ?? "—";
+    const active = Math.max(0, p.dealCount - p.fulfilled - p.disputed);
     content = (
       <>
         <p className="mb-2 truncate text-[11px] font-semibold text-white/90">{name}</p>
-        <div className="space-y-1 text-[10px] text-white/48">
-          <p>{p.dealCount} угод разом</p>
-          {p.fulfilled > 0 && <p className="text-emerald-300/80">✓ {p.fulfilled} виконано</p>}
-          {p.disputed  > 0 && <p style={{ color: `rgba(${AMBER},1)` }}>⚡ {p.disputed} оскаржено</p>}
-          {p.recentActivity && <p style={{ color: `rgba(0,212,170,1)` }}>● активна нещодавно</p>}
-        </div>
-      </>
-    );
-  } else if (info.kind === "collab") {
-    const { edge, party } = info;
-    const name   = party.display_name ?? party.username ?? "—";
-    const donePct = edge.count > 0 ? Math.round((edge.fulfilled / edge.count) * 100) : 0;
-    content = (
-      <>
-        <p className="mb-1.5 text-[10px] text-white/35">{trunc(userName, 11)} ↔ {trunc(name, 11)}</p>
-        <div className="space-y-1 text-[10px] text-white/48">
-          <p className="font-semibold text-white/80">{edge.count} угод</p>
-          {edge.fulfilled > 0 && (
-            <p className="text-emerald-300/80">✓ {edge.fulfilled} виконано ({donePct}%)</p>
+        <div className="space-y-1 text-[10px] text-white/55">
+          <p>{p.dealCount} {t("publicProfile.graph.tooltip.dealsTotal")}</p>
+          {active > 0 && <p>{active} {t("publicProfile.graph.tooltip.active")}</p>}
+          {p.fulfilled > 0 && (
+            <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
           )}
-          {edge.recentActivity && <p style={{ color: "rgba(0,212,170,1)" }}>● є активна угода</p>}
+          {p.disputed > 0 && (
+            <p style={{ color: `rgba(${AMBER},1)` }}>⚡ {p.disputed} {t("publicProfile.graph.tooltip.disputed")}</p>
+          )}
         </div>
       </>
     );
   } else if (info.kind === "dispute") {
     const { edge, party } = info;
     const name    = party.display_name ?? party.username ?? "—";
-    const whoDisp = edge.disputedBy === "me"
-      ? trunc(userName, 11)
-      : trunc(name, 11);
+    const whoDisp = edge.disputedBy === "me" ? trunc(userName, 14) : trunc(name, 14);
     content = (
       <>
         <p className="mb-1.5 text-[11px] font-semibold" style={{ color: `rgba(${AMBER},1)` }}>
-          ⚡ Спір
+          ⚡ {t("publicProfile.graph.tooltip.dispute")}
         </p>
-        <div className="space-y-1 text-[10px] text-white/48">
-          <p>{whoDisp} оскаржив результат угоди</p>
-          <p className="text-white/28">{trunc(userName, 11)} ↔ {trunc(name, 11)}</p>
-        </div>
+        <p className="text-[10px] text-white/55">
+          {t("publicProfile.graph.tooltip.disputedBy", { name: whoDisp })}
+        </p>
       </>
     );
   }
@@ -516,6 +492,18 @@ function HoverTooltip({
       style={{ left, top, width: W }}
     >
       {content}
+    </div>
+  );
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+function Legend() {
+  const t = useT();
+  return (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
+      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}   label={t("publicProfile.graph.legend.fulfilled")} />
+      <LegendItem kind="arrow" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
+      <LegendItem kind="node"                                 label={t("publicProfile.graph.legend.nodeSize")} />
     </div>
   );
 }
