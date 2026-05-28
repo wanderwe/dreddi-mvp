@@ -446,7 +446,7 @@ function HoverTooltip({
           )}
           {disputed > 0 && (
             <p style={{ color: `rgba(${AMBER},1)` }}>
-              ⚡ {disputed} {t("publicProfile.graph.tooltip.disputed")}
+              {disputed} {t("publicProfile.graph.tooltip.disputed")}
               {whoDisp ? ` · ${whoDisp}` : ""}
             </p>
           )}
@@ -471,7 +471,7 @@ function Legend() {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
       <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}   label={t("publicProfile.graph.legend.fulfilled")} />
-      <LegendItem kind="arrow" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
+      <LegendItem kind="solid" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
     </div>
   );
 }
