@@ -130,8 +130,9 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   const jittersRef = useRef<number[]>([]);
   const hovRef     = useRef<HoverInfo>(null);
 
-  const [tooltip,  setTooltip]  = useState<HoverInfo>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [tooltip,    setTooltip]    = useState<HoverInfo>(null);
+  const [mousePos,   setMousePos]   = useState({ x: 0, y: 0 });
+  const [containerW, setContainerW] = useState(640);
 
   // ── Compute placed nodes (responsive, stable jitter) ─────────────────────
   const computePlaced = useCallback((cw: number, ch: number): Placed[] => {
@@ -173,6 +174,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       canvas.height = ch * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       placedRef.current = computePlaced(cw, ch);
+      setContainerW(cw);
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -394,7 +396,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         <HoverTooltip
           info={tooltip}
           mouse={mousePos}
-          containerW={wrapRef.current?.clientWidth ?? 640}
+          containerW={containerW}
           userName={userName}
         />
       )}
