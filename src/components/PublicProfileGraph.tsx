@@ -438,8 +438,11 @@ function HoverTooltip({
     content = (
       <>
         <p className="mb-2 truncate text-[11px] font-semibold text-white/90">{name}</p>
+        <div className="mb-2 border-b border-white/10 pb-2">
+          <span className="text-[17px] font-semibold text-white">{p.dealCount}</span>
+          <span className="ml-1.5 text-[10px] text-white/40">{t("publicProfile.graph.tooltip.dealsTotal")}</span>
+        </div>
         <div className="space-y-1 text-[10px] text-white/55">
-          <p>{p.dealCount} {t("publicProfile.graph.tooltip.dealsTotal")}</p>
           {active > 0 && <p>{active} {t("publicProfile.graph.tooltip.active")}</p>}
           {p.fulfilled > 0 && (
             <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
