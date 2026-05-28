@@ -1627,7 +1627,7 @@ export default function PromisePage() {
 
             {hasCondition && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                   {t("promises.detail.conditionLabel")}
                 </p>
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
@@ -1638,7 +1638,7 @@ export default function PromisePage() {
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                       {t("promises.detail.conditionStatusLabel")}
                     </p>
-                    <p className="mt-1 text-xs text-white/50">
+                    <p className="mt-1 text-sm leading-6 text-white/75">
                       {conditionMet
                         ? t("promises.detail.conditionMet")
                         : t("promises.detail.conditionWaiting")}
