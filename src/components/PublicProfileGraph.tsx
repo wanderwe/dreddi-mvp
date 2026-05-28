@@ -113,10 +113,10 @@ function drawEdge(
   const label = String(edge.count);
   ctx.font = `600 9px ui-sans-serif,system-ui,sans-serif`;
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.strokeStyle = "rgba(17,19,24,0.9)";
+  ctx.strokeStyle = "rgba(17,19,24,0.95)";
   ctx.lineWidth = 3; ctx.lineJoin = "round";
   ctx.strokeText(label, mx, my);
-  ctx.fillStyle = `rgba(${color},${isHov ? 1 : 0.85})`;
+  ctx.fillStyle = isHov ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.75)";
   ctx.fillText(label, mx, my);
 }
 
@@ -259,9 +259,9 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Initials / dash
+        // Initials / dash — use fixed base radius so font size never jumps
         const lbl = isPriv ? "—" : party.initials;
-        ctx.font = `600 ${Math.round(r * 0.6)}px ui-sans-serif,system-ui,sans-serif`;
+        ctx.font = `600 ${Math.floor(party.r * 0.6)}px ui-sans-serif,system-ui,sans-serif`;
         ctx.fillStyle = isPriv
           ? `rgba(${GREY},0.5)`
           : `rgba(${TEAL},${isHov ? 1 : 0.8})`;
@@ -277,7 +277,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
             const dx = party.x - cx, dy = party.y - cy;
             const len = Math.sqrt(dx * dx + dy * dy);
             const nx = len > 0 ? dx / len : 0, ny = len > 0 ? dy / len : 1;
-            const lx = party.x + nx * (r + 11), ly = party.y + ny * (r + 11);
+            const lx = party.x + nx * (party.r + 11), ly = party.y + ny * (party.r + 11);
             ctx.font = "10px ui-sans-serif,system-ui,sans-serif";
             ctx.fillStyle = isHov ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.38)";
             ctx.textAlign = nx > 0.25 ? "left" : nx < -0.25 ? "right" : "center";
