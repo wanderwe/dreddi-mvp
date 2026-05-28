@@ -372,7 +372,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           // Aggregate per-counterparty stats
           type CpAgg = {
             dealCount: number; fulfilled: number; disputed: number;
-            publicDeals: number; privateDeals: number; recentActivity: boolean;
+            recentActivity: boolean;
             hasDispute: boolean; disputedBy: "me" | "counterparty" | null;
           };
           const cpAgg = new Map<string, CpAgg>();
@@ -384,8 +384,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             if (!cpId) continue;
             const agg = cpAgg.get(cpId) ?? {
               dealCount: 0, fulfilled: 0, disputed: 0,
-              publicDeals: 0, privateDeals: 0, recentActivity: false,
-              hasDispute: false, disputedBy: null,
+              recentActivity: false, hasDispute: false, disputedBy: null,
             };
             agg.dealCount++;
             if (promise.uiStatus === "confirmed") agg.fulfilled++;
@@ -404,8 +403,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 agg.disputedBy = executorId === resolvedProfileId ? "counterparty" : "me";
               }
             }
-            if (promise.publicAgreementId) agg.publicDeals++;
-            else agg.privateDeals++;
             if (promise.uiStatus === "active" || promise.uiStatus === "completed_by_promisor") {
               agg.recentActivity = true;
             }
@@ -426,8 +423,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               id, username: handle, display_name, initials,
               isPublic: cp?.isPublic ?? false,
               dealCount: agg.dealCount, fulfilled: agg.fulfilled,
-              disputed: agg.disputed, publicDeals: agg.publicDeals,
-              privateDeals: agg.privateDeals, recentActivity: agg.recentActivity,
+              disputed: agg.disputed, recentActivity: agg.recentActivity,
               angle: n > 0 ? (i / n) * 2 * Math.PI - Math.PI / 2 : 0,
             };
           });
@@ -438,13 +434,12 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             newGraphEdges.push({
               partyId: id, type: "collab",
               count: agg.dealCount, fulfilled: agg.fulfilled,
-              pubRatio: agg.dealCount > 0 ? agg.publicDeals / agg.dealCount : 0,
               recentActivity: agg.recentActivity, disputedBy: null,
             });
             if (agg.hasDispute) {
               newGraphEdges.push({
                 partyId: id, type: "dispute",
-                count: agg.disputed, fulfilled: 0, pubRatio: 0,
+                count: agg.disputed, fulfilled: 0,
                 recentActivity: false, disputedBy: agg.disputedBy,
               });
             }

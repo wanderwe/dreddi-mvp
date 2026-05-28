@@ -12,8 +12,6 @@ export interface GraphParty {
   dealCount: number;
   fulfilled: number;
   disputed: number;
-  publicDeals: number;
-  privateDeals: number;
   recentActivity: boolean;
   /** Pre-computed radians (0 = right, -π/2 = top) */
   angle: number;
@@ -26,8 +24,6 @@ export interface GraphEdge {
   type: "collab" | "dispute";
   count: number;
   fulfilled: number;
-  /** 0.0 – 1.0 fraction of public deals */
-  pubRatio: number;
   recentActivity: boolean;
   /** Whose perspective: "me" = profile user filed it; "counterparty" = they filed it */
   disputedBy: "me" | "counterparty" | null;
@@ -118,29 +114,18 @@ function drawCollabEdge(
     : bright;
   const alpha = isHov ? Math.min(shimmer + 0.3, 0.95) : shimmer;
 
-  if (edge.pubRatio > 0) {
-    if (edge.recentActivity || isHov) {
-      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-      ctx.strokeStyle = `rgba(${TEAL},${isHov ? 0.08 : 0.04})`;
-      ctx.lineWidth = (thick + 0.8) * 4;
-      ctx.setLineDash([]);
-      ctx.stroke();
-    }
+  if (edge.recentActivity || isHov) {
     ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-    ctx.strokeStyle = `rgba(${TEAL},${alpha * edge.pubRatio})`;
-    ctx.lineWidth = isHov ? thick + 0.8 : thick;
+    ctx.strokeStyle = `rgba(${TEAL},${isHov ? 0.08 : 0.04})`;
+    ctx.lineWidth = (thick + 0.8) * 4;
     ctx.setLineDash([]);
     ctx.stroke();
   }
-
-  if (edge.pubRatio < 1) {
-    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-    ctx.strokeStyle = `rgba(${GREY},${isHov ? 0.55 : 0.3})`;
-    ctx.lineWidth = 0.8;
-    ctx.setLineDash([3, 5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
+  ctx.strokeStyle = `rgba(${TEAL},${alpha})`;
+  ctx.lineWidth = isHov ? thick + 0.8 : thick;
+  ctx.setLineDash([]);
+  ctx.stroke();
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -438,8 +423,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
-        <LegendItem kind="solid"  color={`rgba(${TEAL},0.7)`}   label="Публічні / виконані" />
-        <LegendItem kind="dashed" color={`rgba(${GREY},0.5)`}   label="Приватні" />
+        <LegendItem kind="solid"  color={`rgba(${TEAL},0.7)`}   label="Виконані угоди" />
         <LegendItem kind="arrow"  color={`rgba(${AMBER},0.75)`} label="Оскаржено (напрямок важливий)" />
         <LegendItem kind="node"                                  label="Розмір = кількість угод" />
       </div>
