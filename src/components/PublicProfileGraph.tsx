@@ -446,7 +446,7 @@ function HoverTooltip({
           )}
           {disputed > 0 && (
             <p style={{ color: `rgba(${AMBER},1)` }}>
-              {disputed} {t("publicProfile.graph.tooltip.disputed")}
+              ⚠ {disputed} {t("publicProfile.graph.tooltip.disputed")}
               {whoDisp ? ` · ${whoDisp}` : ""}
             </p>
           )}
