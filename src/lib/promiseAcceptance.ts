@@ -1,5 +1,6 @@
 export const INVITE_STATUSES = [
   "awaiting_acceptance",
+  "awaiting_creator_confirmation",
   "accepted",
   "declined",
   "expired",
@@ -27,7 +28,16 @@ export const getPromiseInviteStatus = (
 ): InviteStatus => {
   if (!row) return "awaiting_acceptance";
 
-  if (isInviteStatus(row.invite_status)) return row.invite_status;
+  if (isInviteStatus(row.invite_status)) {
+    if (
+      row.invite_status === "awaiting_acceptance" &&
+      row.expires_at &&
+      new Date(row.expires_at).getTime() <= Date.now()
+    ) {
+      return "expired";
+    }
+    return row.invite_status;
+  }
   if (row.accepted_at || row.counterparty_accepted_at) return "accepted";
   if (row.declined_at) return "declined";
   if (row.cancelled_at) return "cancelled_by_creator";

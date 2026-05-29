@@ -41,6 +41,7 @@ type PromiseRow = {
   condition_text: string | null;
   condition_met_at: string | null;
   condition_met_by: string | null;
+  condition_proposed_by: string | null;
   counterparty_contact: string | null;
   due_at: string | null;
   status: PromiseStatus;
@@ -223,6 +224,7 @@ const promiseStatusToneMap: Record<PromiseUiStatus, StatusPillTone> = {
   confirmed: "success",
   disputed: "danger",
   awaiting_acceptance: "neutral",
+  awaiting_creator_confirmation: "attention",
   declined: "danger",
   expired: "attention",
   cancelled_by_creator: "danger",
@@ -234,6 +236,7 @@ const promiseStatusIconMap: Record<PromiseUiStatus, "check" | "clock" | "warning
   confirmed: "check",
   disputed: "warning",
   awaiting_acceptance: "clock",
+  awaiting_creator_confirmation: "clock",
   declined: "warning",
   expired: "warning",
   cancelled_by_creator: "warning",
@@ -325,6 +328,7 @@ export default function PromisePage() {
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const [conditionBusy, setConditionBusy] = useState(false);
+  const [confirmConditionBusy, setConfirmConditionBusy] = useState<"confirm" | "cancel" | null>(null);
   const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -398,7 +402,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .maybeSingle();
@@ -433,7 +437,7 @@ export default function PromisePage() {
     let active = true;
     const inviteStatus = p ? getPromiseInviteStatus(p) : null;
 
-    if (!p?.counterparty_id || inviteStatus !== "accepted") {
+    if (!p?.counterparty_id || (inviteStatus !== "accepted" && inviteStatus !== "awaiting_creator_confirmation")) {
       setCounterpartyDisplayName(null);
       return () => {
         active = false;
@@ -623,6 +627,46 @@ export default function PromisePage() {
     }
 
     await load();
+  }
+
+  async function confirmCondition(action: "confirm" | "cancel") {
+    if (!p) return;
+    setError(null);
+    setConfirmConditionBusy(action);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setConfirmConditionBusy(null);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setConfirmConditionBusy(null);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/confirm-condition`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ action }),
+    });
+
+    setConfirmConditionBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    load();
   }
 
   async function markConditionMet() {
@@ -946,6 +990,7 @@ export default function PromisePage() {
     confirmed: t("promises.status.confirmed"),
     disputed: t("promises.status.disputed"),
     awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    awaiting_creator_confirmation: t("promises.status.awaitingCreatorConfirmation"),
     declined: t("promises.inviteStatus.declined"),
     expired: t("promises.inviteStatus.expired"),
     cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
@@ -1625,7 +1670,46 @@ export default function PromisePage() {
               </div>
             )}
 
-            {hasCondition && (
+            {/* Creator banner: invitee proposed a condition change */}
+            {isCreator && inviteStatus === "awaiting_creator_confirmation" && p.condition_text && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  {t("promises.detail.conditionProposedBanner.title")}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-100">
+                  {p.condition_text}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {t("promises.detail.conditionProposedBanner.body")}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <ActionButton
+                    label={
+                      confirmConditionBusy === "confirm"
+                        ? t("promises.detail.conditionProposedBanner.confirming")
+                        : t("promises.detail.conditionProposedBanner.confirm")
+                    }
+                    variant="ok"
+                    loading={confirmConditionBusy === "confirm"}
+                    disabled={confirmConditionBusy !== null}
+                    onClick={() => void confirmCondition("confirm")}
+                  />
+                  <ActionButton
+                    label={
+                      confirmConditionBusy === "cancel"
+                        ? t("promises.detail.conditionProposedBanner.cancelling")
+                        : t("promises.detail.conditionProposedBanner.cancel")
+                    }
+                    variant="danger"
+                    loading={confirmConditionBusy === "cancel"}
+                    disabled={confirmConditionBusy !== null}
+                    onClick={() => void confirmCondition("cancel")}
+                  />
+                </div>
+              </div>
+            )}
+
+            {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
                   {t("promises.detail.conditionLabel")}

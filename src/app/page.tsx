@@ -130,6 +130,7 @@ function DealRow({
     disputed: "danger",
     declined: "danger",
     awaiting_acceptance: "neutral",
+    awaiting_creator_confirmation: "attention",
     expired: "attention",
     cancelled_by_creator: "danger",
   };
@@ -250,6 +251,7 @@ export default function Home() {
     disputed: copy.recentDeals.status.disputed,
     declined: copy.recentDeals.status.declined,
     awaiting_acceptance: t("promises.status.awaitingInviteAcceptance"),
+    awaiting_creator_confirmation: t("promises.status.awaitingCreatorConfirmation"),
     expired: t("promises.inviteStatus.expired"),
     cancelled_by_creator: t("promises.inviteStatus.cancelled_by_creator"),
   };

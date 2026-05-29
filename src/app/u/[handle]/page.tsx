@@ -187,6 +187,7 @@ const statusTones: Record<PromiseUiStatus, StatusPillTone> = {
   disputed: "danger",
   declined: "danger",
   awaiting_acceptance: "neutral",
+  awaiting_creator_confirmation: "attention",
   expired: "attention",
   cancelled_by_creator: "danger",
 };

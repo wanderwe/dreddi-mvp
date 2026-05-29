@@ -161,7 +161,8 @@
       "disputed": "Оскаржено",
       "pendingCompletion": "Очікує виконання",
       "needsReview": "Потрібен ваш перегляд",
-      "awaitingInviteAcceptance": "Очікує прийняття"
+      "awaitingInviteAcceptance": "Очікує прийняття",
+      "awaitingCreatorConfirmation": "Очікує підтвердження умови"
     },
     "important": {
       "blockTitle": "Ставка на репутацію",
@@ -265,6 +266,14 @@
       "conditionWaiting": "Очікує виконання умови другою стороною",
       "conditionMet": "Умову виконано",
       "conditionMark": "Умову виконано",
+      "conditionProposedBanner": {
+        "title": "Запрошена сторона запропонувала зустрічне зобов'язання",
+        "body": "Перегляньте запропоноване зустрічне зобов'язання та підтвердіть для активації угоди або скасуйте її.",
+        "confirm": "Підтвердити та активувати",
+        "cancel": "Скасувати угоду",
+        "confirming": "Підтвердження...",
+        "cancelling": "Скасування..."
+      },
       "statusActions": "Дії зі статусом",
       "primaryActionTitle": "Основна дія",
       "toolsTitle": "Посилання",
@@ -374,6 +383,7 @@
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",
+      "awaiting_creator_confirmation": "Очікує підтвердження",
       "accepted": "Прийнято",
       "declined": "Відхилено",
       "expired": "Прострочено",
@@ -624,10 +634,22 @@
     "statusClosedBody": "Це запрошення більше неактивне",
     "status": {
       "awaiting_acceptance": "Очікує прийняття",
+      "awaiting_creator_confirmation": "Очікує підтвердження",
       "accepted": "Прийнято",
       "declined": "Відхилено",
       "expired": "Прострочено",
       "cancelled_by_creator": "Відкликано"
+    },
+    "condition": {
+      "sectionTitle": "Зустрічне зобов'язання",
+      "proposedByCreator": "Запропоноване зустрічне зобов'язання",
+      "acceptAsIs": "Прийняти як є",
+      "suggestEdit": "Запропонувати правку",
+      "editPlaceholder": "Ваша редакція зустрічного зобов'язання...",
+      "acceptWithout": "Прийняти без зустрічного зобов'язання",
+      "addOwn": "Додати зустрічне зобов'язання",
+      "addPlaceholder": "Введіть ваше зустрічне зобов'язання...",
+      "awaitingConfirmation": "Ваше запропоноване зустрічне зобов'язання очікує підтвердження від ініціатора"
     },
     "nextStep": "Наступний крок",
     "nextStepHint": "Приймаючи, ви підтверджуєте, що розумієте цю {entityLower}",
@@ -662,6 +684,7 @@
     },
     "acceptCta": "Прийняти та виконати",
     "acceptDeal": "Прийняти угоду",
+    "proposeCondition": "Надіслати пропозицію",
     "goToDeal": "Відкрити угоду",
     "viewDeal": "Переглянути угоду",
     "creatorShare": {
