@@ -9,7 +9,6 @@ import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import {
-  canCounterpartyRespond,
   getPromiseInviteStatus,
   isPromiseAccepted,
   InviteStatus,
@@ -324,12 +323,6 @@ export default function InvitePage() {
   const openDealLabel = isCreatorViewer ? t("invite.viewDeal") : t("invite.goToDeal");
   const detailsText = info?.details?.trim() ?? "";
   const hasDetails = detailsText.length > 0;
-  const canDecline = canCounterpartyRespond({
-    userId,
-    creatorId: info?.creator_id ?? "",
-    counterpartyId: info?.counterparty_id ?? null,
-    inviteStatus,
-  });
   const canAccept =
     inviteStatus === "awaiting_acceptance" &&
     (!userId ||
@@ -632,7 +625,7 @@ export default function InvitePage() {
                 </div>
               ) : canAccept ? (
                 <div className="flex flex-wrap justify-end gap-2">
-                  {canDecline && (
+                  {canAccept && (
                     <button
                       disabled={busy}
                       onClick={() => setShowDeclineModal(true)}
