@@ -255,7 +255,7 @@ function ActionButton({
   onClick: () => void;
 }) {
   const base =
-    "inline-flex min-h-12 w-full sm:w-auto items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium " +
+    "inline-flex min-h-12 w-full sm:w-auto items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-medium leading-tight " +
     "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
@@ -294,7 +294,9 @@ function ActionButton({
 
   return (
     <button type="button" disabled={disabled} onClick={onClick} className={cls}>
-      {loading ? t("promises.detail.saving") : label}
+      <span className="flex w-full items-center justify-center text-center">
+        {loading ? t("promises.detail.saving") : label}
+      </span>
     </button>
   );
 }
@@ -1617,8 +1619,8 @@ export default function PromisePage() {
                       className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                       onClick={() => router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))}
                     >
-                      <RefreshCw className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.recreate.label")}
+                      <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
+                      <span className="text-center">{t("promises.detail.recreate.label")}</span>
                     </button>
                   )}
                 </div>
