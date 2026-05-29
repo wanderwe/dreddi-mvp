@@ -43,6 +43,8 @@ type InviteInfo = {
   promisee_id: string | null;
 };
 
+type ConditionChoice = "accept" | "edit" | "add" | null;
+
 export default function InvitePage() {
   const t = useT();
   const locale = useLocale();
@@ -59,8 +61,14 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
+
+  // Condition negotiation state
+  const [conditionChoice, setConditionChoice] = useState<ConditionChoice>(null);
+  const [conditionEditText, setConditionEditText] = useState("");
+
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
 
   async function load() {
@@ -68,7 +76,6 @@ export default function InvitePage() {
 
     setError(null);
 
-    // просто перевіряємо чи є сесія (для UI)
     if (!supabase) {
       setSignedIn(false);
       setUserId(null);
@@ -78,7 +85,6 @@ export default function InvitePage() {
       setUserId(s.session?.user?.id ?? null);
     }
 
-    // Дістаємо дані інвайту через API (server-side safe)
     const res = await fetch(`/api/invite/${token}`, { cache: "no-store" });
     const j = await res.json();
 
@@ -95,6 +101,14 @@ export default function InvitePage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Reset condition choice when info loads
+  useEffect(() => {
+    if (info) {
+      setConditionChoice(info.condition_text ? "accept" : null);
+      setConditionEditText("");
+    }
+  }, [info?.id]);
 
   useEffect(() => {
     const shouldAutoAccept = searchParams.get("accept") === "1";
@@ -119,7 +133,27 @@ export default function InvitePage() {
     }
   }, [autoAcceptAttempted, info, router, searchParams, signedIn, userId]);
 
-  async function accept() {
+  function resolveConditionPayload(): string | undefined {
+    if (!info) return undefined;
+    if (info.condition_text) {
+      // creator had a condition
+      if (conditionChoice === "accept") return undefined; // accept as-is, no payload
+      if (conditionChoice === "edit") {
+        const text = conditionEditText.trim();
+        return text && text !== info.condition_text.trim() ? text : undefined;
+      }
+      return undefined;
+    } else {
+      // creator had no condition
+      if (conditionChoice === "add") {
+        const text = conditionEditText.trim();
+        return text || undefined;
+      }
+      return undefined;
+    }
+  }
+
+  async function accept(conditionTextOverride?: string | undefined) {
     if (!token) return;
 
     setBusy(true);
@@ -133,7 +167,6 @@ export default function InvitePage() {
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
-      // відправляємо на логін і повертаємо назад сюди
       const nextPath = localizePath(`/p/invite/${token}?accept=1`, locale);
       router.push(localizeLoginPath(nextPath, locale));
       setBusy(false);
@@ -142,12 +175,19 @@ export default function InvitePage() {
 
     const accessToken = s.session.access_token;
 
+    const conditionText =
+      conditionTextOverride !== undefined ? conditionTextOverride : resolveConditionPayload();
+
+    const body: Record<string, unknown> = {};
+    if (conditionText !== undefined) body.conditionText = conditionText;
+
     const res = await fetch(`/api/invite/${token}/accept`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify(body),
     });
 
     const j = await res.json();
@@ -163,9 +203,10 @@ export default function InvitePage() {
       return;
     }
 
-    // успіх: перезавантажимо дані і перекинемо на promises
     await load();
-    router.push(localizePath("/promises", locale));
+    if (!j.awaitingConfirmation) {
+      router.push(localizePath("/promises", locale));
+    }
   }
 
   async function decline() {
@@ -229,7 +270,6 @@ export default function InvitePage() {
     if (inviteRole === "executor") {
       return t("invite.roleLine.executor");
     }
-
     return t("invite.roleLine.receiver");
   }, [inviteRole, t]);
 
@@ -271,6 +311,10 @@ export default function InvitePage() {
   const isCreatorViewer = Boolean(info?.creator_id && userId && info.creator_id === userId);
   const isAcceptedInviteeViewer = Boolean(
     inviteAccepted && info?.counterparty_id && userId && info.counterparty_id === userId
+  );
+  const isAwaitingConfirmation = inviteStatus === "awaiting_creator_confirmation";
+  const isInviteeAwaitingConfirmation = Boolean(
+    isAwaitingConfirmation && info?.counterparty_id && userId === info.counterparty_id
   );
   const heading = inviteAccepted
     ? isAcceptedInviteeViewer
@@ -323,6 +367,17 @@ export default function InvitePage() {
     const timer = setTimeout(() => setToast(null), 1800);
     return () => clearTimeout(timer);
   }, [toast]);
+
+  const hasCreatorCondition = Boolean(info?.condition_text?.trim());
+
+  // CTA is blocked when user opened a text field but has fewer than 5 chars
+  const conditionTextRequired =
+    (conditionChoice === "edit" || conditionChoice === "add") &&
+    conditionEditText.trim().length < 5;
+
+  // Label switches to "Send proposal" as soon as add/edit radio is selected
+  const willProposeCondition =
+    canAccept && (conditionChoice === "edit" || conditionChoice === "add");
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -458,6 +513,102 @@ export default function InvitePage() {
               </section>
             )}
 
+            {/* Counter-condition section — shown when invitee can respond */}
+            {canAccept && (
+              <section className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  {t("invite.condition.sectionTitle")}
+                </h3>
+
+                {hasCreatorCondition ? (
+                  <>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {t("invite.condition.proposedByCreator")}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap break-words rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm leading-6 text-slate-100">
+                      {info.condition_text}
+                    </p>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-emerald-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-emerald-100">
+                        <input
+                          type="radio"
+                          name="conditionChoice"
+                          value="accept"
+                          checked={conditionChoice === "accept"}
+                          onChange={() => setConditionChoice("accept")}
+                          className="cursor-pointer accent-emerald-400"
+                        />
+                        {t("invite.condition.acceptAsIs")}
+                      </label>
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-white/20 has-[:checked]:bg-white/10 has-[:checked]:text-white">
+                        <input
+                          type="radio"
+                          name="conditionChoice"
+                          value="edit"
+                          checked={conditionChoice === "edit"}
+                          onChange={() => setConditionChoice("edit")}
+                          className="cursor-pointer accent-white"
+                        />
+                        {t("invite.condition.suggestEdit")}
+                      </label>
+                    </div>
+                    {conditionChoice === "edit" && (
+                      <textarea
+                        value={conditionEditText}
+                        onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
+                        placeholder={t("invite.condition.editPlaceholder")}
+                        rows={3}
+                        className="mt-3 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-white/40 placeholder:text-white/30"
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-emerald-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-emerald-100">
+                        <input
+                          type="radio"
+                          name="conditionChoice"
+                          value="none"
+                          checked={conditionChoice === null || conditionChoice === "accept"}
+                          onChange={() => setConditionChoice("accept")}
+                          className="cursor-pointer accent-emerald-400"
+                        />
+                        {t("invite.condition.acceptWithout")}
+                      </label>
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-white/20 has-[:checked]:bg-white/10 has-[:checked]:text-white">
+                        <input
+                          type="radio"
+                          name="conditionChoice"
+                          value="add"
+                          checked={conditionChoice === "add"}
+                          onChange={() => setConditionChoice("add")}
+                          className="cursor-pointer accent-white"
+                        />
+                        {t("invite.condition.addOwn")}
+                      </label>
+                    </div>
+                    {conditionChoice === "add" && (
+                      <textarea
+                        value={conditionEditText}
+                        onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
+                        placeholder={t("invite.condition.addPlaceholder")}
+                        rows={3}
+                        className="mt-3 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-white/40 placeholder:text-white/30"
+                      />
+                    )}
+                  </>
+                )}
+              </section>
+            )}
+
+            {/* Awaiting confirmation state for invitee */}
+            {isInviteeAwaitingConfirmation && (
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-300">
+                {t("invite.condition.awaitingConfirmation")}
+              </div>
+            )}
+
             <div className="mt-6">
               {inviteAccepted ? (
                 <div className="flex">
@@ -475,19 +626,23 @@ export default function InvitePage() {
                     </Tooltip>
                   </div>
                 </div>
+              ) : isAwaitingConfirmation && !isInviteeAwaitingConfirmation ? (
+                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
+                  {t("invite.awaitingCounterparty")}
+                </div>
               ) : canAccept ? (
                 <div className="flex flex-wrap justify-end gap-2">
                   {canDecline && (
                     <button
                       disabled={busy}
-                      onClick={() => void decline()}
+                      onClick={() => setShowDeclineModal(true)}
                       className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {busy ? t("invite.processing") : t("invite.decline")}
                     </button>
                   )}
                   <button
-                    disabled={busy}
+                    disabled={busy || conditionTextRequired}
                     onClick={() => {
                       if (info.visibility === "public") {
                         setShowAcceptModal(true);
@@ -497,7 +652,11 @@ export default function InvitePage() {
                     }}
                     className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                   >
-                    {busy ? t("invite.processing") : t("invite.acceptDeal")}
+                    {busy
+                      ? t("invite.processing")
+                      : willProposeCondition
+                      ? t("invite.proposeCondition")
+                      : t("invite.acceptDeal")}
                   </button>
                 </div>
               ) : (
@@ -516,8 +675,40 @@ export default function InvitePage() {
         )}
       </div>
 
-      {showAcceptModal && info && !inviteAccepted && (
+      {showDeclineModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("invite.declineModal.title")}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              {t("invite.declineModal.body")}
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeclineModal(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("invite.declineModal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeclineModal(false);
+                  void decline();
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("invite.declineModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAcceptModal && info && !inviteAccepted && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p4">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-white">
               {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}

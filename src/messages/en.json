@@ -153,7 +153,8 @@
       "disputed": "Disputed",
       "pendingCompletion": "Pending completion",
       "needsReview": "Needs your review",
-      "awaitingInviteAcceptance": "Pending acceptance"
+      "awaitingInviteAcceptance": "Pending acceptance",
+      "awaitingCreatorConfirmation": "Pending condition confirmation"
     },
     "important": {
       "blockTitle": "Reputation stake",
@@ -257,6 +258,14 @@
       "conditionWaiting": "Waiting for the other side to meet the condition",
       "conditionMet": "Condition met",
       "conditionMark": "Mark condition met",
+      "conditionProposedBanner": {
+        "title": "Invitee proposed a counter-condition",
+        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel.",
+        "confirm": "Confirm & activate",
+        "cancel": "Cancel deal",
+        "confirming": "Confirming...",
+        "cancelling": "Cancelling..."
+      },
       "statusActions": "Status actions",
       "primaryActionTitle": "Primary action",
       "toolsTitle": "Links",
@@ -366,6 +375,7 @@
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
+      "awaiting_creator_confirmation": "Awaiting confirmation",
       "accepted": "Accepted",
       "declined": "Declined",
       "expired": "Expired",
@@ -616,10 +626,22 @@
     "statusClosedBody": "This invite is no longer active",
     "status": {
       "awaiting_acceptance": "Awaiting acceptance",
+      "awaiting_creator_confirmation": "Awaiting confirmation",
       "accepted": "Accepted",
       "declined": "Declined",
       "expired": "Expired",
       "cancelled_by_creator": "Withdrawn"
+    },
+    "condition": {
+      "sectionTitle": "Counter-condition",
+      "proposedByCreator": "Proposed counter-condition",
+      "acceptAsIs": "Accept as-is",
+      "suggestEdit": "Suggest changes",
+      "editPlaceholder": "Your version of the counter-condition...",
+      "acceptWithout": "Accept without a counter-condition",
+      "addOwn": "Add a counter-condition",
+      "addPlaceholder": "Enter your counter-condition...",
+      "awaitingConfirmation": "Your proposed counter-condition is awaiting the creator's confirmation"
     },
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this {entityLower}",
@@ -640,6 +662,12 @@
       "cancel": "Cancel",
       "confirm": "Continue"
     },
+    "declineModal": {
+      "title": "Decline invite?",
+      "body": "This will permanently decline the invite. You won't be able to accept it afterwards.",
+      "cancel": "Go back",
+      "confirm": "Decline"
+    },
     "unknown": "Unknown",
     "noDeadline": "No deadline",
     "errors": {
@@ -654,6 +682,7 @@
     },
     "acceptCta": "Accept and take responsibility",
     "acceptDeal": "Accept deal",
+    "proposeCondition": "Send proposal",
     "goToDeal": "Open deal",
     "viewDeal": "View deal",
     "creatorShare": {
