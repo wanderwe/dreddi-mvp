@@ -1319,14 +1319,18 @@ export default function PromisePage() {
       )}
 
       {toast && (
-        <div
-          className={`rounded-2xl border p-4 ${
-            toastTone === "success"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-100"
-              : "border-red-500/30 bg-red-500/10 text-red-100"
-          }`}
-        >
-          {toast}
+        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
+          <div
+            role={toastTone === "success" ? "status" : "alert"}
+            aria-live={toastTone === "success" ? "polite" : "assertive"}
+            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md ${
+              toastTone === "success"
+                ? "border-emerald-300/35 bg-emerald-500/20 text-emerald-50"
+                : "border-red-300/35 bg-red-500/20 text-red-50"
+            }`}
+          >
+            {toast}
+          </div>
         </div>
       )}
 
