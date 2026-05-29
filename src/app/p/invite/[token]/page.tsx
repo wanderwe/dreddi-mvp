@@ -61,6 +61,7 @@ export default function InvitePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [autoAcceptAttempted, setAutoAcceptAttempted] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
 
@@ -634,7 +635,7 @@ export default function InvitePage() {
                   {canDecline && (
                     <button
                       disabled={busy}
-                      onClick={() => void decline()}
+                      onClick={() => setShowDeclineModal(true)}
                       className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {busy ? t("invite.processing") : t("invite.decline")}
@@ -673,6 +674,38 @@ export default function InvitePage() {
           </div>
         )}
       </div>
+
+      {showDeclineModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("invite.declineModal.title")}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-200">
+              {t("invite.declineModal.body")}
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeclineModal(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("invite.declineModal.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeclineModal(false);
+                  void decline();
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("invite.declineModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAcceptModal && info && !inviteAccepted && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p4">

@@ -662,6 +662,12 @@
       "cancel": "Cancel",
       "confirm": "Continue"
     },
+    "declineModal": {
+      "title": "Decline invite?",
+      "body": "This will permanently decline the invite. You won't be able to accept it afterwards.",
+      "cancel": "Go back",
+      "confirm": "Decline"
+    },
     "unknown": "Unknown",
     "noDeadline": "No deadline",
     "errors": {
