@@ -973,8 +973,14 @@ export default function PromisesClient() {
   return (
     <main className="relative py-10">
       {toast && (
-        <div className="fixed right-4 top-4 z-50 rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-100 shadow-lg shadow-emerald-900/40">
-          {toast}
+        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
+          <div
+            role="status"
+            aria-live="polite"
+            className="max-w-sm rounded-2xl border border-emerald-300/35 bg-emerald-500/20 px-4 py-3 text-sm font-semibold text-emerald-50 shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md"
+          >
+            {toast}
+          </div>
         </div>
       )}
 
