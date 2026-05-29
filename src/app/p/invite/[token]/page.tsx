@@ -741,12 +741,14 @@ export default function InvitePage() {
         </div>
       )}
       {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
+        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
           <div
-            className={`rounded-full border px-4 py-2 text-sm font-semibold shadow-xl backdrop-blur ${
+            role={toastTone === "success" ? "status" : "alert"}
+            aria-live={toastTone === "success" ? "polite" : "assertive"}
+            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md ${
               toastTone === "success"
-                ? "border-emerald-300/40 bg-emerald-500/15 text-emerald-100"
-                : "border-red-300/40 bg-red-500/15 text-red-100"
+                ? "border-emerald-300/35 bg-emerald-500/20 text-emerald-50"
+                : "border-red-300/35 bg-red-500/20 text-red-50"
             }`}
           >
             {toast}
