@@ -155,14 +155,18 @@ export default function InvitePage() {
   async function accept(conditionTextOverride?: string | undefined) {
     if (!token) return;
 
-    setBusy(true);
-    setError(null);
-
     if (!supabase) {
-      setBusy(false);
       setError("Authentication is unavailable in this preview.");
       return;
     }
+
+    if (!signedIn) {
+      router.push(localizeLoginPath(localizePath(`/p/invite/${token}?accept=1`, locale), locale));
+      return;
+    }
+
+    setBusy(true);
+    setError(null);
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
@@ -211,14 +215,18 @@ export default function InvitePage() {
   async function decline() {
     if (!token) return;
 
-    setBusy(true);
-    setError(null);
-
     if (!supabase) {
-      setBusy(false);
       setError("Authentication is unavailable in this preview.");
       return;
     }
+
+    if (!signedIn) {
+      router.push(localizeLoginPath(localizePath(`/p/invite/${token}`, locale), locale));
+      return;
+    }
+
+    setBusy(true);
+    setError(null);
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
