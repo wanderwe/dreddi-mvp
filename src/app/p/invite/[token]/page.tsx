@@ -628,7 +628,7 @@ export default function InvitePage() {
                   {canAccept && (
                     <button
                       disabled={busy}
-                      onClick={() => setShowDeclineModal(true)}
+                      onClick={() => signedIn ? setShowDeclineModal(true) : void decline()}
                       className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {busy ? t("invite.processing") : t("invite.decline")}
