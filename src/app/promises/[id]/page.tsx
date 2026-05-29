@@ -1528,7 +1528,7 @@ export default function PromisePage() {
                       />
                     ) : (
                       !canRespondToInvite && (
-                        <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">
+                        <div className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-center text-sm font-medium leading-tight text-white/65 sm:w-auto">
                           {inviteStatus === "awaiting_acceptance"
                             ? stripTrailingPeriod(t("promises.detail.shareInvite"))
                             : t(`promises.inviteStatus.${inviteStatus}`)}
