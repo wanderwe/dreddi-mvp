@@ -128,7 +128,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   const computePlaced = useCallback((cw: number, ch: number): Placed[] => {
     const cx = cw / 2, cy = ch / 2;
     const compact = cw < 480;
-    const visibleParties = compact ? parties.slice(0, 7) : parties;
+    const visibleParties = compact ? parties.slice(0, 9) : parties;
     const baseDist = Math.min(cw, ch) * (compact ? 0.42 : 0.38);
     return visibleParties.map((party, i) => {
       const jitter = jittersRef.current[i] ?? 0;
@@ -413,10 +413,11 @@ function HoverTooltip({
 }) {
   const t = useT();
   if (!info) return null;
-  const W = 212;
+  const W = Math.min(212, containerW - 8);
   let left = mouse.x + 14;
   let top  = mouse.y - 28;
   if (left + W > containerW - 4) left = mouse.x - W - 14;
+  left = Math.max(4, left);
   if (top < 4) top = mouse.y + 10;
 
   let content: React.ReactNode = null;
