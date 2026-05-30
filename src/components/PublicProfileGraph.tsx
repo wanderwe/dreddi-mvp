@@ -73,10 +73,8 @@ function distToSeg(
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
 function edgeColor(edge: GraphEdge): string {
-  // Blend teal→rose-300 by ratio AND absolute count (need 3+ disputed for full rose)
-  const ratio = edge.count > 0 ? edge.disputed / edge.count : 0;
-  const dr    = ratio * Math.min(edge.disputed / 3, 1);
-  // teal(0,212,170) → rose-300(253,164,175)
+  // Blend teal(0,212,170) → rose-300(253,164,175) by dispute ratio
+  const dr = edge.count > 0 ? edge.disputed / edge.count : 0;
   const r  = Math.round(253 * dr);
   const g  = Math.round(212 - 48 * dr);
   const b  = Math.round(170 + 5  * dr);
