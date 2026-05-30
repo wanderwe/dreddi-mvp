@@ -73,8 +73,9 @@ function distToSeg(
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
 function edgeColor(edge: GraphEdge): string {
-  // Blend teal→amber as dispute ratio increases
-  const dr = edge.count > 0 ? edge.disputed / edge.count : 0;
+  // Blend teal→amber by ratio AND absolute count (need 3+ disputed for full amber)
+  const ratio = edge.count > 0 ? edge.disputed / edge.count : 0;
+  const dr    = ratio * Math.min(edge.disputed / 3, 1);
   const r  = Math.round(240 * dr);
   const g  = Math.round(212 - 32  * dr);
   const b  = Math.round(170 - 129 * dr);
@@ -112,13 +113,14 @@ function drawEdge(
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function PublicProfileGraph({ userName, parties, edges, locale = "uk" }: Props) {
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
-  const wrapRef    = useRef<HTMLDivElement>(null);
-  const rafRef     = useRef<number>(0);
-  const tickRef    = useRef<number>(0);
-  const placedRef  = useRef<Placed[]>([]);
-  const jittersRef = useRef<number[]>([]);
-  const hovRef     = useRef<HoverInfo>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const wrapRef      = useRef<HTMLDivElement>(null);
+  const rafRef       = useRef<number>(0);
+  const tickRef      = useRef<number>(0);
+  const placedRef    = useRef<Placed[]>([]);
+  const jittersRef   = useRef<number[]>([]);
+  const hovRef       = useRef<HoverInfo>(null);
+  const lastTouchRef = useRef<number>(0); // suppress synthesized click after touch
 
   const [tooltip,      setTooltip]      = useState<HoverInfo>(null);
   const [mousePos,     setMousePos]     = useState({ x: 0, y: 0 });
@@ -365,6 +367,8 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   }, []);
 
   const onClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    // Ignore click synthesized from touchstart (DevTools simulation / real mobile)
+    if (Date.now() - lastTouchRef.current < 500) return;
     const coords = toCanvasCoords(e);
     if (!coords) return;
     const info = findHover(coords.x, coords.y);
@@ -387,6 +391,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   }, [toCanvasCoords, findHover, pinnedInfo, locale]);
 
   const onTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    lastTouchRef.current = Date.now(); // mark touch so onClick is suppressed
     const touch = e.touches[0];
     if (!touch) return;
     const rect = canvasRef.current?.getBoundingClientRect();
