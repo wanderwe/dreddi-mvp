@@ -542,7 +542,7 @@ function HoverTooltip({
           href={`/${locale}/u/${encodeURIComponent((info as { party: { username: string } }).party.username)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-300/60 transition hover:text-emerald-300"
+          className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-300/60 transition hover:text-emerald-300 md:hidden"
         >
           → {t("publicProfile.graph.tooltip.openProfile")}
         </a>
