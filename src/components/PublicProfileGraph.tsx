@@ -368,28 +368,17 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   }, []);
 
   const onClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Ignore click synthesized from touchstart (DevTools simulation / real mobile)
+    // Ignore synthesized click that follows touchstart (handled by onTouchStart)
     if (Date.now() - lastTouchRef.current < 500) return;
     const coords = toCanvasCoords(e);
     if (!coords) return;
     const info = findHover(coords.x, coords.y);
-
-    if (!info) { setPinnedInfo(null); return; }
-
-    // Second click on same pinned node → navigate
-    if (pinnedInfo?.kind === "party" && info.kind === "party" && pinnedInfo.party.id === info.party.id) {
-      if (info.party.isPublic && info.party.username) {
-        window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
-      }
-      setPinnedInfo(null);
-      return;
+    if (!info) return;
+    // Desktop: single click → open profile directly
+    if (info.kind === "party" && info.party.isPublic && info.party.username) {
+      window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
     }
-
-    // First click → pin tooltip
-    const wRect = wrapRef.current?.getBoundingClientRect();
-    if (wRect) setPinnedMouse({ x: e.clientX - wRect.left, y: e.clientY - wRect.top });
-    setPinnedInfo(info);
-  }, [toCanvasCoords, findHover, pinnedInfo, locale]);
+  }, [toCanvasCoords, findHover, locale]);
 
   const onTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     lastTouchRef.current = Date.now(); // mark touch so onClick is suppressed
