@@ -108,17 +108,6 @@ function drawEdge(
   ctx.lineWidth = isHov ? thick + 0.8 : thick;
   ctx.setLineDash([]);
   ctx.stroke();
-
-  // Count label at midpoint
-  const mx = (sx + ex) / 2, my = (sy + ey) / 2;
-  const label = String(edge.count);
-  ctx.font = `600 9px ui-sans-serif,system-ui,sans-serif`;
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.strokeStyle = "rgba(17,19,24,0.95)";
-  ctx.lineWidth = 3; ctx.lineJoin = "round";
-  ctx.strokeText(label, mx, my);
-  ctx.fillStyle = isHov ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.75)";
-  ctx.fillText(label, mx, my);
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -138,8 +127,10 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   // ── Compute placed nodes (responsive, stable jitter) ─────────────────────
   const computePlaced = useCallback((cw: number, ch: number): Placed[] => {
     const cx = cw / 2, cy = ch / 2;
-    const baseDist = Math.min(cw, ch) * 0.38;
-    return parties.map((party, i) => {
+    const compact = cw < 480;
+    const visibleParties = compact ? parties.slice(0, 7) : parties;
+    const baseDist = Math.min(cw, ch) * (compact ? 0.42 : 0.38);
+    return visibleParties.map((party, i) => {
       const jitter = jittersRef.current[i] ?? 0;
       const dist = Math.max(24, baseDist - Math.min(party.dealCount, 4) * 5 + jitter);
       return {
@@ -168,7 +159,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
     const resize = () => {
       const cw = wrap.clientWidth || 640;
-      const ch = Math.round(cw * 0.52);
+      const ch = Math.round(cw < 480 ? cw * 0.75 : cw * 0.52);
       canvas.style.width  = `${cw}px`;
       canvas.style.height = `${ch}px`;
       canvas.width  = cw * dpr;
