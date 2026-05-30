@@ -45,7 +45,7 @@ type HoverInfo = { kind: "party"; party: Placed; edge: GraphEdge | null } | null
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const TEAL  = "0,212,170";
-const AMBER = "240,180,41";
+const ROSE  = "253,164,175"; // rose-300, matches disputed status in timeline & tooltip
 const GREY  = "107,114,128";
 const BG    = "#111318";
 
@@ -73,12 +73,13 @@ function distToSeg(
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
 function edgeColor(edge: GraphEdge): string {
-  // Blend teal→amber by ratio AND absolute count (need 3+ disputed for full amber)
+  // Blend teal→rose-300 by ratio AND absolute count (need 3+ disputed for full rose)
   const ratio = edge.count > 0 ? edge.disputed / edge.count : 0;
   const dr    = ratio * Math.min(edge.disputed / 3, 1);
-  const r  = Math.round(240 * dr);
-  const g  = Math.round(212 - 32  * dr);
-  const b  = Math.round(170 - 129 * dr);
+  // teal(0,212,170) → rose-300(253,164,175)
+  const r  = Math.round(253 * dr);
+  const g  = Math.round(212 - 48 * dr);
+  const b  = Math.round(170 + 5  * dr);
   return `${r},${g},${b}`;
 }
 
@@ -555,8 +556,8 @@ function Legend() {
   const t = useT();
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
-      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}   label={t("publicProfile.graph.legend.fulfilled")} />
-      <LegendItem kind="solid" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
+      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}  label={t("publicProfile.graph.legend.fulfilled")} />
+      <LegendItem kind="solid" color={`rgba(${ROSE},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
     </div>
   );
 }
