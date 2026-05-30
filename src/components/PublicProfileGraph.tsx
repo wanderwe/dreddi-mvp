@@ -120,15 +120,17 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   const jittersRef = useRef<number[]>([]);
   const hovRef     = useRef<HoverInfo>(null);
 
-  const [tooltip,    setTooltip]    = useState<HoverInfo>(null);
-  const [mousePos,   setMousePos]   = useState({ x: 0, y: 0 });
-  const [containerW, setContainerW] = useState(640);
+  const [tooltip,      setTooltip]      = useState<HoverInfo>(null);
+  const [mousePos,     setMousePos]     = useState({ x: 0, y: 0 });
+  const [containerW,   setContainerW]   = useState(640);
+  const [pinnedInfo,   setPinnedInfo]   = useState<HoverInfo>(null);
+  const [pinnedMouse,  setPinnedMouse]  = useState({ x: 0, y: 0 });
 
   // ── Compute placed nodes (responsive, stable jitter) ─────────────────────
   const computePlaced = useCallback((cw: number, ch: number): Placed[] => {
     const cx = cw / 2, cy = ch / 2;
     const compact = cw < 480;
-    const visibleParties = compact ? parties.slice(0, 9) : parties;
+    const visibleParties = compact ? parties.slice(0, 12) : parties;
     const baseDist = Math.min(cw, ch) * (compact ? 0.42 : 0.38);
     return visibleParties.map((party, i) => {
       const jitter = jittersRef.current[i] ?? 0;
@@ -359,16 +361,56 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     hovRef.current = null;
     setTooltip(null);
     if (canvasRef.current) canvasRef.current.style.cursor = "default";
+    // Keep pinned tooltip visible after mouse leaves
   }, []);
 
   const onClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const coords = toCanvasCoords(e);
     if (!coords) return;
     const info = findHover(coords.x, coords.y);
-    if (info?.kind === "party" && info.party.isPublic && info.party.username) {
-      window.open(`/${locale}/u/${info.party.username}`, "_blank");
+
+    if (!info) { setPinnedInfo(null); return; }
+
+    // Second click on same pinned node → navigate
+    if (pinnedInfo?.kind === "party" && info.kind === "party" && pinnedInfo.party.id === info.party.id) {
+      if (info.party.isPublic && info.party.username) {
+        window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
+      }
+      setPinnedInfo(null);
+      return;
     }
-  }, [toCanvasCoords, findHover, locale]);
+
+    // First click → pin tooltip
+    const wRect = wrapRef.current?.getBoundingClientRect();
+    if (wRect) setPinnedMouse({ x: e.clientX - wRect.left, y: e.clientY - wRect.top });
+    setPinnedInfo(info);
+  }, [toCanvasCoords, findHover, pinnedInfo, locale]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const info = findHover(x, y);
+
+    if (!info) { setPinnedInfo(null); return; }
+
+    // Second tap on same node → navigate
+    if (pinnedInfo?.kind === "party" && info.kind === "party" && pinnedInfo.party.id === info.party.id) {
+      if (info.party.isPublic && info.party.username) {
+        window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
+      }
+      setPinnedInfo(null);
+      return;
+    }
+
+    e.preventDefault();
+    const wRect = wrapRef.current?.getBoundingClientRect();
+    if (wRect) setPinnedMouse({ x: touch.clientX - wRect.left, y: touch.clientY - wRect.top });
+    setPinnedInfo(info);
+  }, [findHover, pinnedInfo, locale]);
 
   return (
     <div
@@ -382,14 +424,18 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         onClick={onClick}
+        onTouchStart={onTouchStart}
       />
 
-      {tooltip && (
+      {(pinnedInfo ?? tooltip) && (
         <HoverTooltip
-          info={tooltip}
-          mouse={mousePos}
+          info={pinnedInfo ?? tooltip}
+          mouse={pinnedInfo ? pinnedMouse : mousePos}
           containerW={containerW}
           userName={userName}
+          isPinned={Boolean(pinnedInfo)}
+          locale={locale}
+          onDismiss={() => setPinnedInfo(null)}
         />
       )}
 
@@ -405,11 +451,17 @@ function HoverTooltip({
   mouse,
   containerW,
   userName,
+  isPinned,
+  locale,
+  onDismiss,
 }: {
   info: HoverInfo;
   mouse: { x: number; y: number };
   containerW: number;
   userName: string;
+  isPinned: boolean;
+  locale: string;
+  onDismiss: () => void;
 }) {
   const t = useT();
   if (!info) return null;
@@ -461,12 +513,34 @@ function HoverTooltip({
     );
   }
 
+  const canNavigate = info.kind === "party" && info.party.isPublic && info.party.username;
+
   return (
     <div
-      className="pointer-events-none absolute z-10 rounded-xl border border-white/10 bg-[#111318]/95 p-3 shadow-xl backdrop-blur-sm"
+      className={`absolute z-10 rounded-xl border border-white/10 bg-[#111318]/95 p-3 shadow-xl backdrop-blur-sm ${isPinned ? "pointer-events-auto" : "pointer-events-none"}`}
       style={{ left, top, width: W }}
     >
+      {isPinned && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full text-white/30 transition hover:text-white/70"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      )}
       {content}
+      {isPinned && canNavigate && (
+        <a
+          href={`/${locale}/u/${encodeURIComponent((info as { party: { username: string } }).party.username)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-300/60 transition hover:text-emerald-300"
+        >
+          → {t("publicProfile.graph.tooltip.openProfile")}
+        </a>
+      )}
     </div>
   );
 }

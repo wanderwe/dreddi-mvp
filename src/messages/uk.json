@@ -860,7 +860,8 @@
         "fulfilled": "виконано",
         "disputed": "оскаржено",
         "dispute": "Спір",
-        "disputedBy": "{name} оскаржив результат"
+        "disputedBy": "{name} оскаржив результат",
+        "openProfile": "Відкрити профіль"
       }
     },
     "status": {
