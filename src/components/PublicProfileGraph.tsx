@@ -45,7 +45,7 @@ type HoverInfo = { kind: "party"; party: Placed; edge: GraphEdge | null } | null
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const TEAL  = "0,212,170";
-const AMBER = "240,180,41";
+const ROSE  = "253,164,175"; // rose-300, matches disputed status in timeline & tooltip
 const GREY  = "107,114,128";
 const BG    = "#111318";
 
@@ -73,11 +73,11 @@ function distToSeg(
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
 function edgeColor(edge: GraphEdge): string {
-  // Blend teal→amber as dispute ratio increases
+  // Blend teal(0,212,170) → rose-300(253,164,175) by dispute ratio
   const dr = edge.count > 0 ? edge.disputed / edge.count : 0;
-  const r  = Math.round(240 * dr);
-  const g  = Math.round(212 - 32  * dr);
-  const b  = Math.round(170 - 129 * dr);
+  const r  = Math.round(253 * dr);
+  const g  = Math.round(212 - 48 * dr);
+  const b  = Math.round(170 + 5  * dr);
   return `${r},${g},${b}`;
 }
 
@@ -108,38 +108,32 @@ function drawEdge(
   ctx.lineWidth = isHov ? thick + 0.8 : thick;
   ctx.setLineDash([]);
   ctx.stroke();
-
-  // Count label at midpoint
-  const mx = (sx + ex) / 2, my = (sy + ey) / 2;
-  const label = String(edge.count);
-  ctx.font = `600 9px ui-sans-serif,system-ui,sans-serif`;
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.strokeStyle = "rgba(17,19,24,0.95)";
-  ctx.lineWidth = 3; ctx.lineJoin = "round";
-  ctx.strokeText(label, mx, my);
-  ctx.fillStyle = isHov ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.75)";
-  ctx.fillText(label, mx, my);
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function PublicProfileGraph({ userName, parties, edges, locale = "uk" }: Props) {
-  const canvasRef  = useRef<HTMLCanvasElement>(null);
-  const wrapRef    = useRef<HTMLDivElement>(null);
-  const rafRef     = useRef<number>(0);
-  const tickRef    = useRef<number>(0);
-  const placedRef  = useRef<Placed[]>([]);
-  const jittersRef = useRef<number[]>([]);
-  const hovRef     = useRef<HoverInfo>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const wrapRef      = useRef<HTMLDivElement>(null);
+  const rafRef       = useRef<number>(0);
+  const tickRef      = useRef<number>(0);
+  const placedRef    = useRef<Placed[]>([]);
+  const jittersRef   = useRef<number[]>([]);
+  const hovRef       = useRef<HoverInfo>(null);
+  const lastTouchRef = useRef<number>(0); // suppress synthesized click after touch
 
-  const [tooltip,    setTooltip]    = useState<HoverInfo>(null);
-  const [mousePos,   setMousePos]   = useState({ x: 0, y: 0 });
-  const [containerW, setContainerW] = useState(640);
+  const [tooltip,      setTooltip]      = useState<HoverInfo>(null);
+  const [mousePos,     setMousePos]     = useState({ x: 0, y: 0 });
+  const [containerW,   setContainerW]   = useState(640);
+  const [pinnedInfo,   setPinnedInfo]   = useState<HoverInfo>(null);
+  const [pinnedMouse,  setPinnedMouse]  = useState({ x: 0, y: 0 });
 
   // ── Compute placed nodes (responsive, stable jitter) ─────────────────────
   const computePlaced = useCallback((cw: number, ch: number): Placed[] => {
     const cx = cw / 2, cy = ch / 2;
-    const baseDist = Math.min(cw, ch) * 0.38;
-    return parties.map((party, i) => {
+    const compact = cw < 480;
+    const visibleParties = compact ? parties.slice(0, 12) : parties;
+    const baseDist = Math.min(cw, ch) * (compact ? 0.42 : 0.38);
+    return visibleParties.map((party, i) => {
       const jitter = jittersRef.current[i] ?? 0;
       const dist = Math.max(24, baseDist - Math.min(party.dealCount, 4) * 5 + jitter);
       return {
@@ -168,7 +162,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
     const resize = () => {
       const cw = wrap.clientWidth || 640;
-      const ch = Math.round(cw * 0.52);
+      const ch = Math.round(cw < 480 ? cw * 0.75 : cw * 0.52);
       canvas.style.width  = `${cw}px`;
       canvas.style.height = `${ch}px`;
       canvas.width  = cw * dpr;
@@ -368,16 +362,48 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     hovRef.current = null;
     setTooltip(null);
     if (canvasRef.current) canvasRef.current.style.cursor = "default";
+    // Keep pinned tooltip visible after mouse leaves
   }, []);
 
   const onClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    // Ignore synthesized click that follows touchstart (handled by onTouchStart)
+    if (Date.now() - lastTouchRef.current < 500) return;
     const coords = toCanvasCoords(e);
     if (!coords) return;
     const info = findHover(coords.x, coords.y);
-    if (info?.kind === "party" && info.party.isPublic && info.party.username) {
-      window.open(`/${locale}/u/${info.party.username}`, "_blank");
+    if (!info) return;
+    // Desktop: single click → open profile directly
+    if (info.kind === "party" && info.party.isPublic && info.party.username) {
+      window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
     }
   }, [toCanvasCoords, findHover, locale]);
+
+  const onTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    lastTouchRef.current = Date.now(); // mark touch so onClick is suppressed
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    const info = findHover(x, y);
+
+    if (!info) { setPinnedInfo(null); return; }
+
+    // Second tap on same node → navigate
+    if (pinnedInfo?.kind === "party" && info.kind === "party" && pinnedInfo.party.id === info.party.id) {
+      if (info.party.isPublic && info.party.username) {
+        window.open(`/${locale}/u/${encodeURIComponent(info.party.username)}`, "_blank");
+      }
+      setPinnedInfo(null);
+      return;
+    }
+
+    e.preventDefault();
+    const wRect = wrapRef.current?.getBoundingClientRect();
+    if (wRect) setPinnedMouse({ x: touch.clientX - wRect.left, y: touch.clientY - wRect.top });
+    setPinnedInfo(info);
+  }, [findHover, pinnedInfo, locale]);
 
   return (
     <div
@@ -391,14 +417,18 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         onClick={onClick}
+        onTouchStart={onTouchStart}
       />
 
-      {tooltip && (
+      {(pinnedInfo ?? tooltip) && (
         <HoverTooltip
-          info={tooltip}
-          mouse={mousePos}
+          info={pinnedInfo ?? tooltip}
+          mouse={pinnedInfo ? pinnedMouse : mousePos}
           containerW={containerW}
           userName={userName}
+          isPinned={Boolean(pinnedInfo)}
+          locale={locale}
+          onDismiss={() => setPinnedInfo(null)}
         />
       )}
 
@@ -414,18 +444,25 @@ function HoverTooltip({
   mouse,
   containerW,
   userName,
+  isPinned,
+  locale,
+  onDismiss,
 }: {
   info: HoverInfo;
   mouse: { x: number; y: number };
   containerW: number;
   userName: string;
+  isPinned: boolean;
+  locale: string;
+  onDismiss: () => void;
 }) {
   const t = useT();
   if (!info) return null;
-  const W = 212;
+  const W = Math.min(212, containerW - 8);
   let left = mouse.x + 14;
   let top  = mouse.y - 28;
   if (left + W > containerW - 4) left = mouse.x - W - 14;
+  left = Math.max(4, left);
   if (top < 4) top = mouse.y + 10;
 
   let content: React.ReactNode = null;
@@ -446,12 +483,20 @@ function HoverTooltip({
           <span className="ml-1.5 text-[10px] text-white/40">{t("publicProfile.graph.tooltip.dealsTotal")}</span>
         </div>
         <div className="space-y-1 text-[10px] text-white/55">
-          {active > 0 && <p>{active} {t("publicProfile.graph.tooltip.active")}</p>}
+          {active > 0 && (
+            <p className="flex items-center gap-1.5 text-white/75">
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/50 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white/60" />
+              </span>
+              {active} {t("publicProfile.graph.tooltip.active")}
+            </p>
+          )}
           {p.fulfilled > 0 && (
             <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
           )}
           {disputed > 0 && (
-            <p style={{ color: `rgba(${AMBER},1)` }}>
+            <p className="text-rose-300/85">
               ● {disputed} {t("publicProfile.graph.tooltip.disputed")}
               {whoDisp ? ` · ${whoDisp}` : ""}
             </p>
@@ -461,12 +506,34 @@ function HoverTooltip({
     );
   }
 
+  const canNavigate = info.kind === "party" && info.party.isPublic && info.party.username;
+
   return (
     <div
-      className="pointer-events-none absolute z-10 rounded-xl border border-white/10 bg-[#111318]/95 p-3 shadow-xl backdrop-blur-sm"
+      className={`absolute z-10 rounded-xl border border-white/10 bg-[#111318]/95 p-3 shadow-xl backdrop-blur-sm ${isPinned ? "pointer-events-auto" : "pointer-events-none"}`}
       style={{ left, top, width: W }}
     >
+      {isPinned && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full text-white/30 transition hover:text-white/70"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      )}
       {content}
+      {isPinned && canNavigate && (
+        <a
+          href={`/${locale}/u/${encodeURIComponent((info as { party: { username: string } }).party.username)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-300/60 transition hover:text-emerald-300 md:hidden"
+        >
+          → {t("publicProfile.graph.tooltip.openProfile")}
+        </a>
+      )}
     </div>
   );
 }
@@ -476,8 +543,8 @@ function Legend() {
   const t = useT();
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
-      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}   label={t("publicProfile.graph.legend.fulfilled")} />
-      <LegendItem kind="solid" color={`rgba(${AMBER},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
+      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}  label={t("publicProfile.graph.legend.fulfilled")} />
+      <LegendItem kind="solid" color={`rgba(${ROSE},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
     </div>
   );
 }

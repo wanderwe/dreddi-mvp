@@ -823,7 +823,8 @@
         "fulfilled": "fulfilled",
         "disputed": "disputed",
         "dispute": "Dispute",
-        "disputedBy": "{name} challenged the outcome"
+        "disputedBy": "{name} challenged the outcome",
+        "openProfile": "Open profile"
       }
     },
     "status": {
