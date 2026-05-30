@@ -439,10 +439,10 @@ function HoverTooltip({
         </div>
         <div className="space-y-1 text-[10px] text-white/55">
           {active > 0 && (
-            <p className="flex items-center gap-1.5 text-sky-300/90">
+            <p className="flex items-center gap-1.5 text-white/75">
               <span className="relative flex h-1.5 w-1.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-sky-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/50 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white/60" />
               </span>
               {active} {t("publicProfile.graph.tooltip.active")}
             </p>
@@ -451,7 +451,7 @@ function HoverTooltip({
             <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
           )}
           {disputed > 0 && (
-            <p style={{ color: `rgba(${AMBER},1)` }}>
+            <p className="text-rose-300/85">
               ● {disputed} {t("publicProfile.graph.tooltip.disputed")}
               {whoDisp ? ` · ${whoDisp}` : ""}
             </p>
