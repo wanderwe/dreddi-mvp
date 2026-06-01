@@ -575,7 +575,10 @@ export default function PromisePage() {
       return;
     }
 
-    const token = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    // Short URL-safe token (10 chars, ~54^10 ≈ 21 trillion combinations)
+    const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(10));
+    const token = Array.from(bytes, b => chars[b % chars.length]).join("");
 
     const patch: Partial<PromiseRow> = p.invite_token ? {} : { invite_token: token };
 
@@ -713,9 +716,9 @@ export default function PromisePage() {
 
   const inviteLink = useMemo(() => {
     if (!p?.invite_token) return null;
-    if (appUrl) return `${appUrl}/p/invite/${p.invite_token}`;
+    if (appUrl) return `${appUrl}/join/${p.invite_token}`;
     if (typeof window === "undefined") return null;
-    return `${window.location.origin}/p/invite/${p.invite_token}`;
+    return `${window.location.origin}/join/${p.invite_token}`;
   }, [appUrl, p?.invite_token]);
 
   const promiseLink = useMemo(() => {
@@ -1785,7 +1788,7 @@ export default function PromisePage() {
                         <Clipboard className="h-4 w-4" aria-hidden />
                       {t("promises.detail.copyInvitePrimary")}
                       </button>
-                      <Link href={`/p/invite/${p.invite_token}`} className={`${linkUtilityButtonClass} px-2.5 sm:w-auto`}>
+                      <Link href={`/join/${p.invite_token}`} className={`${linkUtilityButtonClass} px-2.5 sm:w-auto`}>
                         <ExternalLink className="h-4 w-4" aria-hidden />
                         {t("promises.detail.openInviteShort")}
                       </Link>
