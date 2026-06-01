@@ -339,7 +339,7 @@ export default function InvitePage() {
   const inviteLink = useMemo(() => {
     if (!token) return null;
     if (typeof window === "undefined") return null;
-    return `${window.location.origin}${localizePath(`/p/invite/${token}`, locale)}`;
+    return `${window.location.origin}/join/${token}`;
   }, [locale, token]);
   const canManageShare = Boolean(isCreatorViewer && inviteStatus === "awaiting_acceptance" && inviteLink);
   const shareStatusLabel = inviteStatus === "accepted"

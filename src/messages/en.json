@@ -261,7 +261,7 @@
       "conditionRejected": "Counter-condition was rejected",
       "conditionProposedBanner": {
         "title": "Invitee proposed a counter-condition",
-        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel.",
+        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel",
         "confirm": "Confirm & activate",
         "cancel": "Cancel deal",
         "confirming": "Confirming...",
@@ -1163,6 +1163,7 @@
       "system": "Dreddi",
       "created": "Agreement created",
       "createdDescription": "The commitment was recorded as a public agreement",
+      "createdDescriptionPrivate": "The commitment was recorded",
       "accepted": "Agreement accepted",
       "acceptedDescription": "The responsible side acknowledged the agreement",
       "completed": "Marked as completed",
