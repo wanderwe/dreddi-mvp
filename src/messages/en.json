@@ -260,7 +260,7 @@
       "conditionMark": "Mark condition met",
       "conditionProposedBanner": {
         "title": "Invitee proposed a counter-condition",
-        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel.",
+        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel",
         "confirm": "Confirm & activate",
         "cancel": "Cancel deal",
         "confirming": "Confirming...",
