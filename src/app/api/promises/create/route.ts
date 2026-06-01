@@ -39,8 +39,10 @@ export async function POST(req: Request) {
 
     const dueAt = body?.dueAt ? new Date(body.dueAt) : null;
     const dueAtIso = dueAt && !Number.isNaN(dueAt.getTime()) ? dueAt.toISOString() : null;
-    const inviteToken =
-      crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    // Short URL-safe token (10 chars) — shared as dreddi.com/join/:token
+    const _chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    const _bytes = crypto.getRandomValues(new Uint8Array(10));
+    const inviteToken = Array.from(_bytes, b => _chars[b % _chars.length]).join("");
     const nowIso = new Date().toISOString();
 
     const admin = getAdminClient();
@@ -153,7 +155,7 @@ export async function POST(req: Request) {
         title: "New deal invitation",
         body: "You have been invited to a deal",
         dedupeKey: `invite:${insertData.id}:${counterpartyProfile.id}`,
-        ctaUrl: `/p/invite/${insertData.invite_token}`,
+        ctaUrl: `/join/${insertData.invite_token}`,
         priority: mapPriorityForType("invite"),
       });
     }
