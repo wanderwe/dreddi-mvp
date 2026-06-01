@@ -1715,7 +1715,7 @@ export default function PromisePage() {
               </div>
             )}
 
-            {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
+            {hasCondition && isInviteAccepted && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                   {t("promises.detail.conditionLabel")}
