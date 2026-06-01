@@ -1729,12 +1729,14 @@ export default function PromisePage() {
                       {t("promises.detail.conditionStatusLabel")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-white/75">
-                      {conditionMet
-                        ? t("promises.detail.conditionMet")
-                        : t("promises.detail.conditionWaiting")}
+                      {isInviteAccepted
+                        ? conditionMet
+                          ? t("promises.detail.conditionMet")
+                          : t("promises.detail.conditionWaiting")
+                        : t("promises.detail.conditionRejected")}
                     </p>
                   </div>
-                  {isCounterparty && !conditionMet && (
+                  {isInviteAccepted && isCounterparty && !conditionMet && (
                     <ActionButton
                       label={t("promises.detail.conditionMark")}
                       variant="ok"

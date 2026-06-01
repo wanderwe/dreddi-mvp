@@ -31,6 +31,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
+    // Only allow marking condition on live (accepted) deals
+    if (promise.invite_status !== null && promise.invite_status !== "accepted") {
+      return NextResponse.json(
+        { error: "Deal is not in an active state" },
+        { status: 409 }
+      );
+    }
+
     if (!promise.condition_text) {
       return NextResponse.json({ error: "No counter-condition exists" }, { status: 400 });
     }
