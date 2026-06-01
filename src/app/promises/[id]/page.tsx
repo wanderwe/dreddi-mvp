@@ -1715,7 +1715,7 @@ export default function PromisePage() {
               </div>
             )}
 
-            {hasCondition && isInviteAccepted && (
+            {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                   {t("promises.detail.conditionLabel")}
@@ -1729,12 +1729,14 @@ export default function PromisePage() {
                       {t("promises.detail.conditionStatusLabel")}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-white/75">
-                      {conditionMet
-                        ? t("promises.detail.conditionMet")
-                        : t("promises.detail.conditionWaiting")}
+                      {isInviteAccepted
+                        ? conditionMet
+                          ? t("promises.detail.conditionMet")
+                          : t("promises.detail.conditionWaiting")
+                        : t("promises.detail.conditionRejected")}
                     </p>
                   </div>
-                  {isCounterparty && !conditionMet && (
+                  {isInviteAccepted && isCounterparty && !conditionMet && (
                     <ActionButton
                       label={t("promises.detail.conditionMark")}
                       variant="ok"

@@ -258,6 +258,7 @@
       "conditionWaiting": "Waiting for the other side to meet the condition",
       "conditionMet": "Condition met",
       "conditionMark": "Mark condition met",
+      "conditionRejected": "Counter-condition was rejected",
       "conditionProposedBanner": {
         "title": "Invitee proposed a counter-condition",
         "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel.",
