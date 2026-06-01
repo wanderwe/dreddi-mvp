@@ -1192,6 +1192,7 @@
       "system": "Dreddi",
       "created": "Угоду створено",
       "createdDescription": "Домовленість зафіксовано як публічну угоду",
+      "createdDescriptionPrivate": "Домовленість зафіксовано",
       "accepted": "Домовленість прийнято",
       "acceptedDescription": "Відповідальна сторона підтвердила домовленість",
       "completed": "Позначено як виконану",

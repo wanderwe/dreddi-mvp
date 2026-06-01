@@ -136,7 +136,9 @@ function buildAgreementTimeline(
       label: t("publicAgreement.timeline.created"),
       actor: labels.creator,
       timestamp: promise.created_at,
-      description: t("publicAgreement.timeline.createdDescription"),
+      description: promise.visibility === "public"
+        ? t("publicAgreement.timeline.createdDescription")
+        : t("publicAgreement.timeline.createdDescriptionPrivate"),
     },
   ];
 

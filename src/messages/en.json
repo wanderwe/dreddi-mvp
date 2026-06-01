@@ -1162,6 +1162,7 @@
       "system": "Dreddi",
       "created": "Agreement created",
       "createdDescription": "The commitment was recorded as a public agreement",
+      "createdDescriptionPrivate": "The commitment was recorded",
       "accepted": "Agreement accepted",
       "acceptedDescription": "The responsible side acknowledged the agreement",
       "completed": "Marked as completed",
