@@ -761,7 +761,17 @@ export default function PromisesClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
-  const rows = hasAnyFilter
+  // When a text search is active, show results from both tabs combined so the
+  // user doesn't have to guess which tab their deal is in.
+  const summaryAllRolesFiltered = useMemo(
+    () => applyListFilters(summaryRows) as PromiseWithRole[],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summaryRows, activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery]
+  );
+
+  const rows = hasSearchFilter
+    ? summaryAllRolesFiltered
+    : hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
     : filteredListRowsByTab[tab];
   const availableStatusOptions = useMemo(() => {
@@ -1070,7 +1080,7 @@ export default function PromisesClient() {
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
             <Search className="h-4 w-4 text-slate-300" aria-hidden />
           </div>
           <input
