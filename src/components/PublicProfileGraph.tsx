@@ -225,12 +225,16 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         const pulse  = party.recentActivity ? Math.sin(tick * 0.05) * 0.08 + 0.94 : 1;
         const r      = party.r * pulse;
 
+        // Use same teal→rose blend as the edge so node and line share the same hue
+        const nodeEdge = edges.find(e => e.partyId === party.id);
+        const nodeCol  = nodeEdge ? edgeColor(nodeEdge) : TEAL;
+
         // Glow (public only)
         if (!isPriv) {
           const ga = 0.05 + fRatio * 0.04 + (isHov ? 0.08 : 0);
           const gr = r + 6 + fRatio * 4;
           const g  = ctx.createRadialGradient(party.x, party.y, r * 0.5, party.x, party.y, gr);
-          g.addColorStop(0, `rgba(${TEAL},${ga})`);
+          g.addColorStop(0, `rgba(${nodeCol},${ga})`);
           g.addColorStop(1, "transparent");
           ctx.fillStyle = g;
           ctx.beginPath(); ctx.arc(party.x, party.y, gr, 0, Math.PI * 2); ctx.fill();
@@ -240,7 +244,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         ctx.beginPath(); ctx.arc(party.x, party.y, r, 0, Math.PI * 2);
         ctx.fillStyle = isPriv
           ? "rgba(255,255,255,0.02)"
-          : `rgba(${TEAL},${isHov ? 0.18 : 0.08 + fRatio * 0.08})`;
+          : `rgba(${nodeCol},${isHov ? 0.18 : 0.08 + fRatio * 0.08})`;
         ctx.fill();
 
         // Border
@@ -250,7 +254,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
           ctx.lineWidth = 1;
         } else {
           ctx.setLineDash([]);
-          ctx.strokeStyle = `rgba(${TEAL},${isHov ? 0.8 : 0.35 + fRatio * 0.25})`;
+          ctx.strokeStyle = `rgba(${nodeCol},${isHov ? 0.8 : 0.35 + fRatio * 0.25})`;
           ctx.lineWidth = isHov ? 1.5 : 1;
         }
         ctx.stroke();
@@ -261,7 +265,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         ctx.font = `600 ${Math.floor(party.r * 0.6)}px ui-sans-serif,system-ui,sans-serif`;
         ctx.fillStyle = isPriv
           ? `rgba(${GREY},0.5)`
-          : `rgba(${TEAL},${isHov ? 1 : 0.8})`;
+          : `rgba(${nodeCol},${isHov ? 1 : 0.8})`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(lbl, party.x, party.y);
 
