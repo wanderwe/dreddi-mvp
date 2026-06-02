@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -330,6 +330,7 @@ export default function PromisesClient() {
   const [isDealTypeMenuOpen, setIsDealTypeMenuOpen] = useState(false);
   const dealTypeMenuRef = useRef<HTMLDivElement | null>(null);
   const dealTypeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -590,7 +591,7 @@ export default function PromisesClient() {
       : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, listLoading, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -694,13 +695,20 @@ export default function PromisesClient() {
     return rows.filter((row) => (row.visibility ?? "private") === activeDealTypeFilter);
   };
 
+  const applySearchFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) => row.title.toLowerCase().includes(q));
+  };
+
   const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
-  ): T[] => applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows)));
+  ): T[] => applySearchFilter(applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows))));
 
   const filteredSummaryRows = useMemo(
-    () => applyDealTypeFilter(applyMetricFilter(summaryRows)),
-    [summaryRows, activeMetricFilter, activeDealTypeFilter]
+    () => applySearchFilter(applyDealTypeFilter(applyMetricFilter(summaryRows))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summaryRows, activeMetricFilter, activeDealTypeFilter, searchQuery]
   );
 
   const roleCounts = useMemo(
@@ -727,17 +735,19 @@ export default function PromisesClient() {
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"])),
-      "promised-to-me": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"])),
+      "i-promised": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"]))),
+      "promised-to-me": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]))),
     }),
-    [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
   const hasDealTypeFilter = activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasDealTypeFilter;
+  const hasSearchFilter = searchQuery.trim() !== "";
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasDealTypeFilter || hasSearchFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
@@ -747,8 +757,9 @@ export default function PromisesClient() {
     [filteredSummaryRows, tab]
   );
   const summaryRowsForCurrentTab = useMemo(
-    () => applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
-    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter]
+    () => applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
   const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
@@ -1058,6 +1069,32 @@ export default function PromisesClient() {
           </div>
         </div>
 
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <Search className="h-4 w-4 text-slate-400" aria-hidden />
+          </div>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSearchQuery("");
+            }}
+            placeholder={t("promises.search.placeholder")}
+            className="w-full rounded-2xl border border-white/10 bg-black/40 py-3 pl-11 pr-10 text-sm text-white placeholder:text-slate-500 shadow-xl shadow-black/30 backdrop-blur focus:border-emerald-400/40 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-white"
+              aria-label={t("promises.search.clear")}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          )}
+        </div>
+
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <button
@@ -1321,6 +1358,7 @@ export default function PromisesClient() {
                         setActiveMetricFilter("total");
                         setActiveStatusFilter("all");
                         setActiveDealTypeFilter("all");
+                        setSearchQuery("");
                         const sp = new URLSearchParams(searchParams.toString());
                         sp.delete("filter");
                         sp.delete("status");

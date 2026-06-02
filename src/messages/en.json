@@ -235,6 +235,10 @@
         }
       }
     },
+    "search": {
+      "placeholder": "Search deals...",
+      "clear": "Clear search"
+    },
     "detail": {
       "back": "Back",
       "loading": "Loading…",
