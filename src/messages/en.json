@@ -171,6 +171,7 @@
     },
     "list": {
       "tabs": {
+        "all": "All ({count})",
         "executorMe": "I'm the executor ({count})",
         "executorOther": "Other executor ({count})"
       },

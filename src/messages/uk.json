@@ -179,6 +179,7 @@
     },
     "list": {
       "tabs": {
+        "all": "Всі ({count})",
         "executorMe": "Я виконавець ({count})",
         "executorOther": "Інший виконавець ({count})"
       },

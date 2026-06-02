@@ -51,9 +51,10 @@ type PromiseRow = {
   visibility: "public" | "private" | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me";
+type PagedTabKey = "i-promised" | "promised-to-me";
+type TabKey = PagedTabKey | "all";
 const isTabKey = (value: string | null): value is TabKey =>
-  value === "i-promised" || value === "promised-to-me";
+  value === "i-promised" || value === "promised-to-me" || value === "all";
 
 const normalizeTabParam = (value: string | null): TabKey => {
   if (value === "i-am-executor") return "i-promised";
@@ -296,15 +297,15 @@ export default function PromisesClient() {
   };
 
   const [summaryRows, setSummaryRows] = useState<PromiseSummary[]>([]);
-  const [listRowsByTab, setListRowsByTab] = useState<Record<TabKey, PromiseWithRole[]>>({
+  const [listRowsByTab, setListRowsByTab] = useState<Record<PagedTabKey, PromiseWithRole[]>>({
     "i-promised": [],
     "promised-to-me": [],
   });
-  const [pageByTab, setPageByTab] = useState<Record<TabKey, number>>({
+  const [pageByTab, setPageByTab] = useState<Record<PagedTabKey, number>>({
     "i-promised": 0,
     "promised-to-me": 0,
   });
-  const [hasMoreByTab, setHasMoreByTab] = useState<Record<TabKey, boolean>>({
+  const [hasMoreByTab, setHasMoreByTab] = useState<Record<PagedTabKey, boolean>>({
     "i-promised": true,
     "promised-to-me": true,
   });
@@ -422,7 +423,7 @@ export default function PromisesClient() {
     page,
     replace,
   }: {
-    tabKey: TabKey;
+    tabKey: PagedTabKey;
     page: number;
     replace: boolean;
   }) => {
@@ -512,14 +513,20 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (!userId) return;
+    // "all" tab uses summaryRows which is loaded in the summary effect — skip pagination
+    if (tab === "all") {
+      setListLoading(false);
+      return;
+    }
     let cancelled = false;
 
     const loadFirstPage = async () => {
       setListLoading(true);
-      setHasMoreByTab((prev) => ({ ...prev, [tab]: true }));
-      setPageByTab((prev) => ({ ...prev, [tab]: 0 }));
-      setListRowsByTab((prev) => ({ ...prev, [tab]: [] }));
-      await fetchTabPage({ tabKey: tab, page: 0, replace: true });
+      const pagedTab = tab as PagedTabKey;
+      setHasMoreByTab((prev) => ({ ...prev, [pagedTab]: true }));
+      setPageByTab((prev) => ({ ...prev, [pagedTab]: 0 }));
+      setListRowsByTab((prev) => ({ ...prev, [pagedTab]: [] }));
+      await fetchTabPage({ tabKey: pagedTab, page: 0, replace: true });
       if (!cancelled) setListLoading(false);
     };
 
@@ -578,20 +585,28 @@ export default function PromisesClient() {
   }, [dealTypeFromSearch]);
 
   useEffect(() => {
-    if (listLoading) return;
-    const summaryRowsForCurrentTab = applyMetricFilter(summaryRows).filter((row) =>
-      tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-    );
-    const hasAnyActiveFilter =
-      activeMetricFilter !== "total" ||
-      activeStatusFilter !== STATUS_FILTER_ALL ||
-      activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
-    const filteredRows = hasAnyActiveFilter
-      ? applyStatusFilter(summaryRowsForCurrentTab)
-      : applyListFilters(listRowsByTab[tab] ?? []);
+    // "all" tab: wait for summaryRows to load; specific tabs: wait for paginated list
+    const isLoading = tab === "all" ? !summaryLoaded : listLoading;
+    if (isLoading) return;
+
+    let filteredRows: (PromiseSummary | PromiseWithRole)[];
+    if (tab === "all") {
+      filteredRows = applyListFilters(summaryRows);
+    } else {
+      const summaryForTab = applyMetricFilter(summaryRows).filter((row) =>
+        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+      );
+      const hasAnyActiveFilter =
+        activeMetricFilter !== "total" ||
+        activeStatusFilter !== STATUS_FILTER_ALL ||
+        activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
+      filteredRows = hasAnyActiveFilter
+        ? applyStatusFilter(summaryForTab)
+        : applyListFilters(listRowsByTab[tab as "i-promised" | "promised-to-me"] ?? []);
+    }
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, summaryLoaded, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -751,9 +766,11 @@ export default function PromisesClient() {
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
-      filteredSummaryRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      ),
+      tab === "all"
+        ? filteredSummaryRows
+        : filteredSummaryRows.filter((row) =>
+            tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+          ),
     [filteredSummaryRows, tab]
   );
   const summaryRowsForCurrentTab = useMemo(
@@ -761,19 +778,18 @@ export default function PromisesClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
-  // When a text search is active, show results from both tabs combined so the
-  // user doesn't have to guess which tab their deal is in.
+  // "all" tab: apply all filters without role restriction
   const summaryAllRolesFiltered = useMemo(
     () => applyListFilters(summaryRows) as PromiseWithRole[],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [summaryRows, activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
 
-  const rows = hasSearchFilter
+  const rows = tab === "all"
     ? summaryAllRolesFiltered
     : hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
-    : filteredListRowsByTab[tab];
+    : filteredListRowsByTab[tab as "i-promised" | "promised-to-me"];
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -789,9 +805,11 @@ export default function PromisesClient() {
 
     return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
-  const canLoadMore = !hasAnyFilter && hasMoreByTab[tab];
+  const canLoadMore = tab !== "all" && !hasAnyFilter && hasMoreByTab[tab as "i-promised" | "promised-to-me"];
   const totalPromises = summaryRows.length;
-  const isListEmpty = !listLoading && rows.length === 0;
+  // "all" tab uses summaryRows (not paginated), show skeleton while summary loads
+  const effectiveListLoading = tab === "all" ? !summaryLoaded : listLoading;
+  const isListEmpty = !effectiveListLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
@@ -854,6 +872,8 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (!summaryLoaded) return;
+    // "all" tab shows everything — no auto-switch needed
+    if (tab === "all") return;
 
     if (lastFilterRef.current !== activeMetricFilter) {
       lastFilterRef.current = activeMetricFilter;
@@ -868,7 +888,7 @@ export default function PromisesClient() {
       return;
     }
 
-    const fallbackTab: TabKey = tab === "i-promised" ? "promised-to-me" : "i-promised";
+    const fallbackTab: "i-promised" | "promised-to-me" = tab === "i-promised" ? "promised-to-me" : "i-promised";
     const fallbackCount = fallbackTab === "i-promised" ? countMeExecutor : countOtherExecutor;
 
     autoSwitchHandledForFilterRef.current = true;
@@ -923,7 +943,7 @@ export default function PromisesClient() {
   };
 
   const handleLoadMore = async () => {
-    if (loadingMore || listLoading || !canLoadMore) return;
+    if (loadingMore || effectiveListLoading || !canLoadMore) return;
     const nextPage = pageByTab[tab] + 1;
     setLoadingMore(true);
     try {
@@ -1086,7 +1106,14 @@ export default function PromisesClient() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setSearchQuery(next);
+              // Auto-switch to "all" tab so results from both tabs are visible
+              if (next.trim() && tab !== "all") {
+                setTab("all");
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Escape") setSearchQuery("");
             }}
@@ -1107,6 +1134,19 @@ export default function PromisesClient() {
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setTab("all")}
+              className={[
+                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
+                tab === "all"
+                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
+                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
+              ].join(" ")}
+            >
+              {t("promises.list.tabs.all", { count: roleCounts.promisor + roleCounts.counterparty })}
+            </button>
+
             <button
               type="button"
               onClick={() => setTab("i-promised")}
@@ -1237,7 +1277,7 @@ export default function PromisesClient() {
           )}
 
           <div className="mt-4 space-y-3">
-            {listLoading && (
+            {effectiveListLoading && (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-white/5" />
@@ -1245,7 +1285,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!listLoading &&
+            {!effectiveListLoading &&
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
@@ -1385,7 +1425,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!listLoading && rows.length > 0 && canLoadMore && (
+            {!effectiveListLoading && rows.length > 0 && canLoadMore && (
               <div className="flex justify-center pt-2">
                 <button
                   type="button"
