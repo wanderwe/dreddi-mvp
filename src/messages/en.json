@@ -171,6 +171,7 @@
     },
     "list": {
       "tabs": {
+        "all": "All ({count})",
         "executorMe": "I'm the executor ({count})",
         "executorOther": "Other executor ({count})"
       },
@@ -234,6 +235,10 @@
           "reputationStake": "Reputation stake"
         }
       }
+    },
+    "search": {
+      "placeholder": "Search",
+      "clear": "Clear search"
     },
     "detail": {
       "back": "Back",

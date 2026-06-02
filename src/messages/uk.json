@@ -179,6 +179,7 @@
     },
     "list": {
       "tabs": {
+        "all": "Всі ({count})",
         "executorMe": "Я виконавець ({count})",
         "executorOther": "Інший виконавець ({count})"
       },
@@ -242,6 +243,10 @@
           "reputationStake": "З репутаційною ставкою"
         }
       }
+    },
+    "search": {
+      "placeholder": "Пошук",
+      "clear": "Очистити пошук"
     },
     "detail": {
       "back": "Назад",

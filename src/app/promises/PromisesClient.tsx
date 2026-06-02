@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown } from "lucide-react";
+import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
@@ -51,14 +51,15 @@ type PromiseRow = {
   visibility: "public" | "private" | null;
 };
 
-type TabKey = "i-promised" | "promised-to-me";
+type PagedTabKey = "i-promised" | "promised-to-me" | "all";
+type TabKey = PagedTabKey | "all";
 const isTabKey = (value: string | null): value is TabKey =>
-  value === "i-promised" || value === "promised-to-me";
+  value === "i-promised" || value === "promised-to-me" || value === "all";
 
 const normalizeTabParam = (value: string | null): TabKey => {
   if (value === "i-am-executor") return "i-promised";
   if (isTabKey(value)) return value;
-  return "i-promised";
+  return "all";
 };
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
@@ -296,17 +297,20 @@ export default function PromisesClient() {
   };
 
   const [summaryRows, setSummaryRows] = useState<PromiseSummary[]>([]);
-  const [listRowsByTab, setListRowsByTab] = useState<Record<TabKey, PromiseWithRole[]>>({
+  const [listRowsByTab, setListRowsByTab] = useState<Record<PagedTabKey, PromiseWithRole[]>>({
     "i-promised": [],
     "promised-to-me": [],
+    "all": [],
   });
-  const [pageByTab, setPageByTab] = useState<Record<TabKey, number>>({
+  const [pageByTab, setPageByTab] = useState<Record<PagedTabKey, number>>({
     "i-promised": 0,
     "promised-to-me": 0,
+    "all": 0,
   });
-  const [hasMoreByTab, setHasMoreByTab] = useState<Record<TabKey, boolean>>({
+  const [hasMoreByTab, setHasMoreByTab] = useState<Record<PagedTabKey, boolean>>({
     "i-promised": true,
     "promised-to-me": true,
+    "all": true,
   });
   const [listLoading, setListLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -330,6 +334,7 @@ export default function PromisesClient() {
   const [isDealTypeMenuOpen, setIsDealTypeMenuOpen] = useState(false);
   const dealTypeMenuRef = useRef<HTMLDivElement | null>(null);
   const dealTypeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
@@ -421,7 +426,7 @@ export default function PromisesClient() {
     page,
     replace,
   }: {
-    tabKey: TabKey;
+    tabKey: PagedTabKey;
     page: number;
     replace: boolean;
   }) => {
@@ -442,7 +447,9 @@ export default function PromisesClient() {
     const roleFilter =
       tabKey === "i-promised"
         ? buildPromisorFilter(userId)
-        : buildCounterpartyFilter(userId);
+        : tabKey === "promised-to-me"
+        ? buildCounterpartyFilter(userId)
+        : buildBaseFilter(userId); // "all" tab
 
     const baseQuery = supabase
       .from("promises")
@@ -515,10 +522,11 @@ export default function PromisesClient() {
 
     const loadFirstPage = async () => {
       setListLoading(true);
-      setHasMoreByTab((prev) => ({ ...prev, [tab]: true }));
-      setPageByTab((prev) => ({ ...prev, [tab]: 0 }));
-      setListRowsByTab((prev) => ({ ...prev, [tab]: [] }));
-      await fetchTabPage({ tabKey: tab, page: 0, replace: true });
+      const pagedTab = tab as PagedTabKey;
+      setHasMoreByTab((prev) => ({ ...prev, [pagedTab]: true }));
+      setPageByTab((prev) => ({ ...prev, [pagedTab]: 0 }));
+      setListRowsByTab((prev) => ({ ...prev, [pagedTab]: [] }));
+      await fetchTabPage({ tabKey: pagedTab, page: 0, replace: true });
       if (!cancelled) setListLoading(false);
     };
 
@@ -578,19 +586,19 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (listLoading) return;
-    const summaryRowsForCurrentTab = applyMetricFilter(summaryRows).filter((row) =>
-      tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+    const summaryForTab = applyMetricFilter(summaryRows).filter((row) =>
+      tab === "all" ? true : tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
     );
     const hasAnyActiveFilter =
       activeMetricFilter !== "total" ||
       activeStatusFilter !== STATUS_FILTER_ALL ||
       activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
     const filteredRows = hasAnyActiveFilter
-      ? applyStatusFilter(summaryRowsForCurrentTab)
+      ? applyStatusFilter(summaryForTab)
       : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, listLoading, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -694,13 +702,20 @@ export default function PromisesClient() {
     return rows.filter((row) => (row.visibility ?? "private") === activeDealTypeFilter);
   };
 
+  const applySearchFilter = <T extends PromiseSummary | PromiseWithRole>(rows: T[]): T[] => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) => row.title.toLowerCase().includes(q));
+  };
+
   const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
-  ): T[] => applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows)));
+  ): T[] => applySearchFilter(applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows))));
 
   const filteredSummaryRows = useMemo(
-    () => applyDealTypeFilter(applyMetricFilter(summaryRows)),
-    [summaryRows, activeMetricFilter, activeDealTypeFilter]
+    () => applySearchFilter(applyDealTypeFilter(applyMetricFilter(summaryRows))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summaryRows, activeMetricFilter, activeDealTypeFilter, searchQuery]
   );
 
   const roleCounts = useMemo(
@@ -721,34 +736,41 @@ export default function PromisesClient() {
     () => ({
       "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
       "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+      "all": applyMetricFilter(listRowsByTab["all"]),
     }),
     [listRowsByTab, activeMetricFilter]
   );
 
   const filteredListRowsByTab = useMemo(
     () => ({
-      "i-promised": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"])),
-      "promised-to-me": applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"])),
+      "i-promised": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"]))),
+      "promised-to-me": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]))),
+      "all": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["all"]))),
     }),
-    [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
 
   const countMeExecutor = roleCounts.promisor;
   const countOtherExecutor = roleCounts.counterparty;
   const hasStatusFilter = activeStatusFilter !== STATUS_FILTER_ALL;
   const hasDealTypeFilter = activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
-  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasDealTypeFilter;
+  const hasSearchFilter = searchQuery.trim() !== "";
+  const hasAnyFilter = activeMetricFilter !== "total" || hasStatusFilter || hasDealTypeFilter || hasSearchFilter;
 
   const metricSummaryRowsForCurrentTab = useMemo(
     () =>
-      filteredSummaryRows.filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      ),
+      tab === "all"
+        ? filteredSummaryRows
+        : filteredSummaryRows.filter((row) =>
+            tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+          ),
     [filteredSummaryRows, tab]
   );
   const summaryRowsForCurrentTab = useMemo(
-    () => applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab)),
-    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter]
+    () => applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricSummaryRowsForCurrentTab))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
   const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
@@ -770,7 +792,8 @@ export default function PromisesClient() {
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
   const canLoadMore = !hasAnyFilter && hasMoreByTab[tab];
   const totalPromises = summaryRows.length;
-  const isListEmpty = !listLoading && rows.length === 0;
+  const effectiveListLoading = listLoading;
+  const isListEmpty = !effectiveListLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
   const isAwaitingMyActionEmpty =
     isListEmpty && totalPromises > 0 && activeMetricFilter === "awaiting_my_action";
@@ -833,6 +856,8 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (!summaryLoaded) return;
+    // "all" tab shows everything — no auto-switch needed
+    if (tab === "all") return;
 
     if (lastFilterRef.current !== activeMetricFilter) {
       lastFilterRef.current = activeMetricFilter;
@@ -847,7 +872,7 @@ export default function PromisesClient() {
       return;
     }
 
-    const fallbackTab: TabKey = tab === "i-promised" ? "promised-to-me" : "i-promised";
+    const fallbackTab: "i-promised" | "promised-to-me" = tab === "i-promised" ? "promised-to-me" : "i-promised";
     const fallbackCount = fallbackTab === "i-promised" ? countMeExecutor : countOtherExecutor;
 
     autoSwitchHandledForFilterRef.current = true;
@@ -884,14 +909,17 @@ export default function PromisesClient() {
           row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
         )
       );
-      setListRowsByTab((prev) => ({
-        "i-promised": prev["i-promised"].map((row) =>
-          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
-        ),
-        "promised-to-me": prev["promised-to-me"].map((row) =>
-          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
-        ),
-      }));
+      setListRowsByTab((prev) => {
+        const updater = (rows: PromiseWithRole[]) =>
+          rows.map((row) =>
+            row.id === promiseId ? { ...row, status: "completed_by_promisor" as const } : row
+          );
+        return {
+          "i-promised": updater(prev["i-promised"]),
+          "promised-to-me": updater(prev["promised-to-me"]),
+          "all": updater(prev["all"]),
+        };
+      });
     } catch (e) {
       setError(
         e instanceof Error ? e.message : t("promises.list.errors.updateFailed")
@@ -902,7 +930,7 @@ export default function PromisesClient() {
   };
 
   const handleLoadMore = async () => {
-    if (loadingMore || listLoading || !canLoadMore) return;
+    if (loadingMore || effectiveListLoading || !canLoadMore) return;
     const nextPage = pageByTab[tab] + 1;
     setLoadingMore(true);
     try {
@@ -1059,7 +1087,54 @@ export default function PromisesClient() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
+          {/* Search — sits above tabs, full width inside the card */}
+          <div className="relative mb-3">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5">
+              <Search className="h-4 w-4 text-slate-400" aria-hidden />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                const next = e.target.value;
+                setSearchQuery(next);
+                // Auto-switch to "all" tab so results from both tabs are visible
+                if (next.trim() && tab !== "all") {
+                  setTab("all");
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearchQuery("");
+              }}
+              placeholder={t("promises.search.placeholder")}
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-9 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400/40 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition hover:text-white"
+                aria-label={t("promises.search.clear")}
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
+            )}
+          </div>
+
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setTab("all")}
+              className={[
+                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
+                tab === "all"
+                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
+                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
+              ].join(" ")}
+            >
+              {t("promises.list.tabs.all", { count: roleCounts.promisor + roleCounts.counterparty })}
+            </button>
+
             <button
               type="button"
               onClick={() => setTab("i-promised")}
@@ -1190,7 +1265,7 @@ export default function PromisesClient() {
           )}
 
           <div className="mt-4 space-y-3">
-            {listLoading && (
+            {effectiveListLoading && (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-white/5" />
@@ -1198,7 +1273,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!listLoading &&
+            {!effectiveListLoading &&
               rows.map((p) => {
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
@@ -1321,6 +1396,7 @@ export default function PromisesClient() {
                         setActiveMetricFilter("total");
                         setActiveStatusFilter("all");
                         setActiveDealTypeFilter("all");
+                        setSearchQuery("");
                         const sp = new URLSearchParams(searchParams.toString());
                         sp.delete("filter");
                         sp.delete("status");
@@ -1337,7 +1413,7 @@ export default function PromisesClient() {
               </div>
             )}
 
-            {!listLoading && rows.length > 0 && canLoadMore && (
+            {!effectiveListLoading && rows.length > 0 && canLoadMore && (
               <div className="flex justify-center pt-2">
                 <button
                   type="button"
