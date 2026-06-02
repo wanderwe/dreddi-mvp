@@ -1086,42 +1086,41 @@ export default function PromisesClient() {
           </div>
         </div>
 
-        <div className="flex justify-center">
-        <div className="relative w-full max-w-xl">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
-            <Search className="h-4 w-4 text-slate-300" aria-hidden />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              const next = e.target.value;
-              setSearchQuery(next);
-              // Auto-switch to "all" tab so results from both tabs are visible
-              if (next.trim() && tab !== "all") {
-                setTab("all");
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setSearchQuery("");
-            }}
-            placeholder={t("promises.search.placeholder")}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 py-3 pl-11 pr-10 text-sm text-white placeholder:text-slate-500 shadow-xl shadow-black/30 backdrop-blur focus:border-emerald-400/40 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-slate-400 transition hover:text-white"
-              aria-label={t("promises.search.clear")}
-            >
-              <X className="h-4 w-4" aria-hidden />
-            </button>
-          )}
-        </div>
-        </div>
-
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
+          {/* Search — sits above tabs, full width inside the card */}
+          <div className="relative mb-3">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5">
+              <Search className="h-4 w-4 text-slate-400" aria-hidden />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                const next = e.target.value;
+                setSearchQuery(next);
+                // Auto-switch to "all" tab so results from both tabs are visible
+                if (next.trim() && tab !== "all") {
+                  setTab("all");
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearchQuery("");
+              }}
+              placeholder={t("promises.search.placeholder")}
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-9 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400/40 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition hover:text-white"
+                aria-label={t("promises.search.clear")}
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
+            )}
+          </div>
+
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
             <button
               type="button"
