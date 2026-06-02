@@ -51,7 +51,7 @@ type PromiseRow = {
   visibility: "public" | "private" | null;
 };
 
-type PagedTabKey = "i-promised" | "promised-to-me";
+type PagedTabKey = "i-promised" | "promised-to-me" | "all";
 type TabKey = PagedTabKey | "all";
 const isTabKey = (value: string | null): value is TabKey =>
   value === "i-promised" || value === "promised-to-me" || value === "all";
@@ -300,14 +300,17 @@ export default function PromisesClient() {
   const [listRowsByTab, setListRowsByTab] = useState<Record<PagedTabKey, PromiseWithRole[]>>({
     "i-promised": [],
     "promised-to-me": [],
+    "all": [],
   });
   const [pageByTab, setPageByTab] = useState<Record<PagedTabKey, number>>({
     "i-promised": 0,
     "promised-to-me": 0,
+    "all": 0,
   });
   const [hasMoreByTab, setHasMoreByTab] = useState<Record<PagedTabKey, boolean>>({
     "i-promised": true,
     "promised-to-me": true,
+    "all": true,
   });
   const [listLoading, setListLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -444,7 +447,9 @@ export default function PromisesClient() {
     const roleFilter =
       tabKey === "i-promised"
         ? buildPromisorFilter(userId)
-        : buildCounterpartyFilter(userId);
+        : tabKey === "promised-to-me"
+        ? buildCounterpartyFilter(userId)
+        : buildBaseFilter(userId); // "all" tab
 
     const baseQuery = supabase
       .from("promises")
@@ -513,11 +518,6 @@ export default function PromisesClient() {
 
   useEffect(() => {
     if (!userId) return;
-    // "all" tab uses summaryRows which is loaded in the summary effect — skip pagination
-    if (tab === "all") {
-      setListLoading(false);
-      return;
-    }
     let cancelled = false;
 
     const loadFirstPage = async () => {
@@ -585,28 +585,20 @@ export default function PromisesClient() {
   }, [dealTypeFromSearch]);
 
   useEffect(() => {
-    // "all" tab: wait for summaryRows to load; specific tabs: wait for paginated list
-    const isLoading = tab === "all" ? !summaryLoaded : listLoading;
-    if (isLoading) return;
-
-    let filteredRows: (PromiseSummary | PromiseWithRole)[];
-    if (tab === "all") {
-      filteredRows = applyListFilters(summaryRows);
-    } else {
-      const summaryForTab = applyMetricFilter(summaryRows).filter((row) =>
-        tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-      );
-      const hasAnyActiveFilter =
-        activeMetricFilter !== "total" ||
-        activeStatusFilter !== STATUS_FILTER_ALL ||
-        activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
-      filteredRows = hasAnyActiveFilter
-        ? applyStatusFilter(summaryForTab)
-        : applyListFilters(listRowsByTab[tab as "i-promised" | "promised-to-me"] ?? []);
-    }
+    if (listLoading) return;
+    const summaryForTab = applyMetricFilter(summaryRows).filter((row) =>
+      tab === "all" ? true : tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
+    );
+    const hasAnyActiveFilter =
+      activeMetricFilter !== "total" ||
+      activeStatusFilter !== STATUS_FILTER_ALL ||
+      activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
+    const filteredRows = hasAnyActiveFilter
+      ? applyStatusFilter(summaryForTab)
+      : applyListFilters(listRowsByTab[tab] ?? []);
     void loadReminderInfo(filteredRows.map((row) => row.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, summaryLoaded, listRowsByTab, summaryRows, tab]);
+  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, listRowsByTab, summaryRows, tab]);
 
   const handleSendReminder = async (promiseId: string) => {
     setError(null);
@@ -744,6 +736,7 @@ export default function PromisesClient() {
     () => ({
       "i-promised": applyMetricFilter(listRowsByTab["i-promised"]),
       "promised-to-me": applyMetricFilter(listRowsByTab["promised-to-me"]),
+      "all": applyMetricFilter(listRowsByTab["all"]),
     }),
     [listRowsByTab, activeMetricFilter]
   );
@@ -752,6 +745,7 @@ export default function PromisesClient() {
     () => ({
       "i-promised": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["i-promised"]))),
       "promised-to-me": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["promised-to-me"]))),
+      "all": applySearchFilter(applyDealTypeFilter(applyStatusFilter(metricFilteredListRowsByTab["all"]))),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [metricFilteredListRowsByTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
@@ -778,18 +772,9 @@ export default function PromisesClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [metricSummaryRowsForCurrentTab, activeStatusFilter, activeDealTypeFilter, searchQuery]
   );
-  // "all" tab: apply all filters without role restriction
-  const summaryAllRolesFiltered = useMemo(
-    () => applyListFilters(summaryRows) as PromiseWithRole[],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [summaryRows, activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery]
-  );
-
-  const rows = tab === "all"
-    ? summaryAllRolesFiltered
-    : hasAnyFilter
+  const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
-    : filteredListRowsByTab[tab as "i-promised" | "promised-to-me"];
+    : filteredListRowsByTab[tab];
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -805,10 +790,9 @@ export default function PromisesClient() {
 
     return [...optionsMap.entries()].map(([value, label]) => ({ value, label }));
   }, [metricSummaryRowsForCurrentTab, statusLabelForRole, t]);
-  const canLoadMore = tab !== "all" && !hasAnyFilter && hasMoreByTab[tab as "i-promised" | "promised-to-me"];
+  const canLoadMore = !hasAnyFilter && hasMoreByTab[tab];
   const totalPromises = summaryRows.length;
-  // "all" tab uses summaryRows (not paginated), show skeleton while summary loads
-  const effectiveListLoading = tab === "all" ? !summaryLoaded : listLoading;
+  const effectiveListLoading = listLoading;
   const isListEmpty = !effectiveListLoading && rows.length === 0;
   const isGlobalEmpty = isListEmpty && totalPromises === 0;
   const isAwaitingMyActionEmpty =
@@ -925,14 +909,17 @@ export default function PromisesClient() {
           row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
         )
       );
-      setListRowsByTab((prev) => ({
-        "i-promised": prev["i-promised"].map((row) =>
-          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
-        ),
-        "promised-to-me": prev["promised-to-me"].map((row) =>
-          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
-        ),
-      }));
+      setListRowsByTab((prev) => {
+        const updater = (rows: PromiseWithRole[]) =>
+          rows.map((row) =>
+            row.id === promiseId ? { ...row, status: "completed_by_promisor" as const } : row
+          );
+        return {
+          "i-promised": updater(prev["i-promised"]),
+          "promised-to-me": updater(prev["promised-to-me"]),
+          "all": updater(prev["all"]),
+        };
+      });
     } catch (e) {
       setError(
         e instanceof Error ? e.message : t("promises.list.errors.updateFailed")
