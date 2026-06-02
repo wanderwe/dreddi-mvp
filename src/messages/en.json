@@ -371,7 +371,7 @@
       "copyInvitePrimary": "Copy link",
       "openInviteShort": "Open page",
       "withdrawInviteShort": "Withdraw",
-      "conditionStatusLabel": "Counter-condition status",
+      "conditionStatusLabel": "Status",
       "disputeReasonLabel": "Dispute reason"
     },
     "inviteStatus": {
