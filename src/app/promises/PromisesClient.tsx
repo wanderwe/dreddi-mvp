@@ -59,7 +59,7 @@ const isTabKey = (value: string | null): value is TabKey =>
 const normalizeTabParam = (value: string | null): TabKey => {
   if (value === "i-am-executor") return "i-promised";
   if (isTabKey(value)) return value;
-  return "i-promised";
+  return "all";
 };
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";

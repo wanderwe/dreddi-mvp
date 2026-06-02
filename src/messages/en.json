@@ -237,7 +237,7 @@
       }
     },
     "search": {
-      "placeholder": "Search deals...",
+      "placeholder": "Search",
       "clear": "Clear search"
     },
     "detail": {

@@ -245,7 +245,7 @@
       }
     },
     "search": {
-      "placeholder": "Пошук угод...",
+      "placeholder": "Пошук",
       "clear": "Очистити пошук"
     },
     "detail": {
