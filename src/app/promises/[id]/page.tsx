@@ -1005,7 +1005,7 @@ export default function PromisePage() {
   const statusLabel = uiStatus ? statusLabelMap[uiStatus] ?? uiStatus : "";
   const isFinal = Boolean(p && (p.status === "confirmed" || p.status === "disputed"));
   const isPrivateAgreement = p?.visibility === "private";
-  const canAddAgreementUpdate = Boolean(isPrivateAgreement && uiStatus && isAgreementLiveStatus(uiStatus));
+  const canAddAgreementUpdate = Boolean(isPrivateAgreement && isInviteAccepted && uiStatus && isAgreementLiveStatus(uiStatus));
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
