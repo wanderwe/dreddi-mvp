@@ -1733,7 +1733,14 @@ export default function PromisePage() {
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
                       {t("promises.detail.conditionStatusLabel")}
                     </p>
-                    <p className="mt-1 text-sm leading-6 text-white/75">
+                    <p className={[
+                      "mt-1 text-sm font-medium leading-6",
+                      isInviteAccepted
+                        ? conditionMet
+                          ? "text-emerald-300"
+                          : "text-amber-200"
+                        : "text-rose-300",
+                    ].join(" ")}>
                       {isInviteAccepted
                         ? conditionMet
                           ? t("promises.detail.conditionMet")
