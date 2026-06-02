@@ -1086,7 +1086,8 @@ export default function PromisesClient() {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="flex justify-center">
+        <div className="relative w-full max-w-xl">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4">
             <Search className="h-4 w-4 text-slate-300" aria-hidden />
           </div>
@@ -1117,6 +1118,7 @@ export default function PromisesClient() {
               <X className="h-4 w-4" aria-hidden />
             </button>
           )}
+        </div>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
