@@ -1071,10 +1071,10 @@ export default function PromisesClient() {
 
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <Search className="h-4 w-4 text-slate-400" aria-hidden />
+            <Search className="h-4 w-4 text-slate-300" aria-hidden />
           </div>
           <input
-            type="search"
+            type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -1087,7 +1087,7 @@ export default function PromisesClient() {
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-white"
+              className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-slate-400 transition hover:text-white"
               aria-label={t("promises.search.clear")}
             >
               <X className="h-4 w-4" aria-hidden />
