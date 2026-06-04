@@ -35,19 +35,19 @@ const LinkedInIcon = () => (
 
 const PLATFORMS: PlatformConfig[] = [
   {
+    id: "linkedin",
+    provider: "linkedin_oidc",
+    label: "LinkedIn",
+    color: "text-blue-400",
+    icon: <LinkedInIcon />,
+  },
+  {
     id: "twitter",
     provider: "twitter",
     label: "Twitter / X",
     color: "text-sky-300",
     icon: <TwitterIcon />,
     usernamePrefix: "@",
-  },
-  {
-    id: "linkedin",
-    provider: "linkedin_oidc",
-    label: "LinkedIn",
-    color: "text-blue-400",
-    icon: <LinkedInIcon />,
   },
 ];
 
