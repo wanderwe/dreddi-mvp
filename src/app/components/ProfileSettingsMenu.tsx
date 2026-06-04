@@ -437,14 +437,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="space-y-3 pt-3">
                 <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <label
                         htmlFor="profile-display-name"
                         className="text-sm font-medium text-white"
                       >
                         {t("profileSettings.displayNameLabel")}
                       </label>
-                      <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                      <div className="mt-1 flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                         <input
                           id="profile-display-name"
                           type="text"
@@ -469,14 +469,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </div>
                       <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <label
                         htmlFor="profile-handle"
                         className="text-sm font-medium text-white"
                       >
                         {t("profileSettings.handleLabel")}
                       </label>
-                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                      <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                         <span className="text-slate-400">@</span>
                         <input
                           id="profile-handle"
