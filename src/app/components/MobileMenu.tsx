@@ -81,8 +81,14 @@ export function MobileMenu({
                 </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
-                    <LocalizedLink className={baseLinkClasses} href={actionQueueHref}>
-                      {t("nav.actionQueueBadge")} ({actionQueueCount})
+                    <LocalizedLink
+                      className="flex items-center justify-between rounded-xl border border-amber-300/40 bg-amber-300/15 px-3 py-2 text-left text-amber-100 transition hover:border-amber-300/60 hover:bg-amber-300/22"
+                      href={actionQueueHref}
+                    >
+                      <span>{t("nav.actionQueueBadge")}</span>
+                      <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-950">
+                        {actionQueueCount}
+                      </span>
                     </LocalizedLink>
                   </SheetClose>
                 )}
