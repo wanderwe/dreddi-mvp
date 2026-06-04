@@ -334,6 +334,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const applyTagChanges = (nextTags: string[]) => {
     setProfileTags(nextTags);
     setTagsError(null);
+    // Auto-save immediately — each chip add/remove is an explicit action
+    if (!profile) return;
+    void updateProfileRow(
+      { profile_tags: nextTags.map((t) => normalizeTagValue(t)).filter(Boolean) },
+      { profileTags: nextTags }
+    );
   };
 
   const addTagsFromInput = (rawInput: string) => {
@@ -739,14 +745,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               )}
                             </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={saveTags}
-                            disabled={tagsSaveDisabled}
-                            className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                          >
-                            {t("profileSettings.save")}
-                          </button>
                         </div>
                       </div>
                       <div className="space-y-1">
