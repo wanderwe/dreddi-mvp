@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { syncSocialLinks } from "@/lib/syncSocialLinks";
+import { HelperText } from "@/app/components/ui/HelperText";
 
 type SocialLink = {
   platform: string;
@@ -62,6 +63,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDisconnect, setConfirmDisconnect] = useState<string | null>(null);
 
   const loadLinks = async () => {
     try {
@@ -207,14 +209,34 @@ export function SocialLinksSection({ onUpdate }: Props) {
             </div>
 
             {linked ? (
+              confirmDisconnect === platform.id ? (
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDisconnect(null)}
+                    className="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/50 transition hover:text-white"
+                  >
+                    {t("profileSettings.social.cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => { setConfirmDisconnect(null); void handleDisconnect(platform.id); }}
+                    className="cursor-pointer rounded-lg border border-red-400/40 bg-red-500/15 px-2.5 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isBusy ? "…" : t("profileSettings.social.confirmDisconnect")}
+                  </button>
+                </div>
+              ) : (
               <button
                 type="button"
                 disabled={isBusy}
-                onClick={() => void handleDisconnect(platform.id)}
+                onClick={() => setConfirmDisconnect(platform.id)}
                 className="shrink-0 cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isBusy ? "…" : t("profileSettings.social.disconnect")}
+                {t("profileSettings.social.disconnect")}
               </button>
+              )
             ) : (
               <button
                 type="button"
@@ -229,9 +251,9 @@ export function SocialLinksSection({ onUpdate }: Props) {
         );
       })}
 
-      <p className="text-[11px] text-white/30">
+      <HelperText className="mt-1">
         {t("profileSettings.social.hint")}
-      </p>
+      </HelperText>
     </div>
   );
 }
