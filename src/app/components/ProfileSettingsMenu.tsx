@@ -612,7 +612,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         </div>
 
         {/* ── Social verification ─────────────────────────────── */}
-        <div className="border-t border-white/10">
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("social")}
