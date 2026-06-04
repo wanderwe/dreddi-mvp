@@ -124,6 +124,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
   const [tooltip,      setTooltip]      = useState<HoverInfo>(null);
   const [mousePos,     setMousePos]     = useState({ x: 0, y: 0 });
   const [containerW,   setContainerW]   = useState(640);
+  const [containerH,   setContainerH]   = useState(332);
   const [pinnedInfo,   setPinnedInfo]   = useState<HoverInfo>(null);
   const [pinnedMouse,  setPinnedMouse]  = useState({ x: 0, y: 0 });
 
@@ -170,6 +171,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       placedRef.current = computePlaced(cw, ch);
       setContainerW(cw);
+      setContainerH(ch);
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -429,6 +431,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
           info={pinnedInfo ?? tooltip}
           mouse={pinnedInfo ? pinnedMouse : mousePos}
           containerW={containerW}
+          containerH={containerH}
           userName={userName}
           isPinned={Boolean(pinnedInfo)}
           locale={locale}
@@ -447,6 +450,7 @@ function HoverTooltip({
   info,
   mouse,
   containerW,
+  containerH,
   userName,
   isPinned,
   locale,
@@ -455,6 +459,7 @@ function HoverTooltip({
   info: HoverInfo;
   mouse: { x: number; y: number };
   containerW: number;
+  containerH: number;
   userName: string;
   isPinned: boolean;
   locale: string;
@@ -463,10 +468,15 @@ function HoverTooltip({
   const t = useT();
   if (!info) return null;
   const W = Math.min(212, containerW - 8);
+  // Conservative height estimate: covers all possible tooltip states
+  const TOOLTIP_EST_H = 165;
   let left = mouse.x + 14;
   let top  = mouse.y - 28;
+  // Horizontal: flip left if overflows right edge
   if (left + W > containerW - 4) left = mouse.x - W - 14;
   left = Math.max(4, left);
+  // Vertical: flip above cursor if overflows bottom, clamp to top otherwise
+  if (top + TOOLTIP_EST_H > containerH - 4) top = mouse.y - TOOLTIP_EST_H - 10;
   if (top < 4) top = mouse.y + 10;
 
   let content: React.ReactNode = null;
