@@ -40,8 +40,15 @@ export default function AuthCallbackPage() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            setMsg("Auth error: " + error.message);
-            return;
+            // "Identity is already linked" means the OAuth succeeded on a previous
+            // attempt — treat as success and continue to sync + redirect.
+            const isAlreadyLinked =
+              error.message?.toLowerCase().includes("already linked") ||
+              error.code === "identity_already_exists";
+            if (!isAlreadyLinked) {
+              setMsg("Auth error: " + error.message);
+              return;
+            }
           }
         }
 
