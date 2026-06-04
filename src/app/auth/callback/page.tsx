@@ -68,6 +68,10 @@ export default function AuthCallbackPage() {
         const { upsertProfile } = await import("@/lib/ensureProfile");
         await upsertProfile(data.session.user);
 
+        // Sync any OAuth social identities (Twitter, LinkedIn) to social_links table
+        const { syncSocialLinks } = await import("@/lib/syncSocialLinks");
+        await syncSocialLinks(supabase, data.session.user);
+
         const nextPath =
           next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
         window.location.replace(nextPath);

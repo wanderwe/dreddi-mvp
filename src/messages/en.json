@@ -88,6 +88,14 @@
       "handleRequired": "Handle is required"
     },
     "notificationsLabel": "Notifications",
+    "socialLabel": "Verification",
+    "social": {
+      "connected": "Connected",
+      "notConnected": "Not connected",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "hint": "Connecting a social account proves you control it. A verified badge will appear on your public profile."
+    },
     "pushLabel": "In-app notifications",
     "pushDescription": "Notifications about important deal events shown inside the app",
     "emailLabel": "Email notifications",
