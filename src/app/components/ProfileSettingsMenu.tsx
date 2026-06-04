@@ -327,9 +327,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     () => (profile?.profileTags ?? []).map((tag) => normalizeTagValue(tag)).filter(Boolean),
     [profile?.profileTags]
   );
-  const tagsChanged =
-    !!profile && normalizedProfileTags.join("|") !== profileTagsSnapshot.join("|");
-  const tagsSaveDisabled = loading || saving || !profile || !tagsChanged;
 
   const applyTagChanges = (nextTags: string[]) => {
     setProfileTags(nextTags);
@@ -379,14 +376,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
   const removeTag = (tagToRemove: string) => {
     applyTagChanges(normalizedProfileTags.filter((tag) => tag !== tagToRemove));
-  };
-
-  const saveTags = async () => {
-    if (!profile) return;
-    await updateProfileRow(
-      { profile_tags: normalizedProfileTags },
-      { profileTags: normalizedProfileTags }
-    );
   };
 
   const saveIdentity = async () => {
