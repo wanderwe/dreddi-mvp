@@ -878,7 +878,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             type="button"
             onClick={() => setOpenSection("social")}
             aria-expanded={openSection === "social"}
-            className="flex w-full items-center justify-between py-4 text-left text-sm font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between py-4 text-left text-sm font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none sm:px-4"
           >
             {t("profileSettings.socialLabel")}
             <ChevronDown

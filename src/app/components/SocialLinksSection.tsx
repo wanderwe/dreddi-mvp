@@ -94,7 +94,10 @@ export function SocialLinksSection({ onUpdate }: Props) {
         provider: platform.provider,
         options: { redirectTo },
       });
-      if (error) setError(error.message);
+      if (error) {
+        setError(error.message);
+        setBusy(null); // clear busy so button is clickable again
+      }
       // On success the page will redirect; no need to update state here
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to connect");
