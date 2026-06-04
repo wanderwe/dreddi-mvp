@@ -1019,16 +1019,18 @@ export default function PromisesClient() {
 
       <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
         <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-4 shadow-2xl shadow-black/40 backdrop-blur sm:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
               <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
                 {t("promises.overview.eyebrow")}
               </div>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
+              <h1 className="text-2xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
               <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
             </div>
 
-            <NewDealButton label={t("promises.overview.cta")} />
+            <div className="shrink-0">
+              <NewDealButton label={t("promises.overview.cta")} />
+            </div>
           </div>
 
           <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
@@ -1123,8 +1125,8 @@ export default function PromisesClient() {
 
           {/* Tab row + filter row: stacked on mobile, single row on desktop */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-            {/* Tabs — always horizontal, compact chips */}
-            <div className="flex flex-wrap gap-2">
+            {/* Tabs — always horizontal, equal-width */}
+            <div className="flex w-full gap-2 sm:w-auto">
               {(["all", "i-promised", "promised-to-me"] as const).map((key) => {
                 const isActive = tab === key;
                 const label =
@@ -1139,7 +1141,7 @@ export default function PromisesClient() {
                     type="button"
                     onClick={() => setTab(key)}
                     className={[
-                      "whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                      "flex-1 truncate rounded-xl px-3 py-2 text-center text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:flex-initial sm:whitespace-nowrap",
                       isActive
                         ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                         : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
