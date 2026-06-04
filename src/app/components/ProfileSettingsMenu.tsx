@@ -317,7 +317,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     !!profile &&
     (nextDisplayName !== (profile.displayName ?? null) ||
       nextHandle !== (profile.handle ?? null));
-  const identityDisabled = loading || saving || !profile || !identityChanged;
   const normalizeTagValue = (value: string) => value.trim().toLowerCase();
   const normalizedProfileTags = useMemo(
     () => profileTags.map((tag) => normalizeTagValue(tag)).filter(Boolean),
@@ -445,30 +444,28 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.displayNameLabel")}
                       </label>
-                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-                        <div className="min-w-0">
-                          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                            <input
-                              id="profile-display-name"
-                              type="text"
-                              value={displayNameInput}
-                              onChange={(event) => setDisplayNameInput(event.target.value)}
-                              placeholder={t("profileSettings.displayNamePlaceholder")}
-                              maxLength={40}
-                              className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
-                            />
-                            {displayNameInput.length > 0 && (
-                              <button
-                                type="button"
-                                onClick={() => setDisplayNameInput("")}
-                                aria-label={t("profileSettings.close")}
-                                className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
-                              >
-                                <X className="h-3.5 w-3.5" aria-hidden />
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                      <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <input
+                          id="profile-display-name"
+                          type="text"
+                          value={displayNameInput}
+                          onChange={(event) => setDisplayNameInput(event.target.value)}
+                          onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
+                          placeholder={t("profileSettings.displayNamePlaceholder")}
+                          maxLength={40}
+                          className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                        />
+                        {displayNameInput.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setDisplayNameInput("")}
+                            aria-label={t("profileSettings.close")}
+                            className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-within:ring-emerald-300/40"
+                          >
+                            <X className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                        )}
                       </div>
                       <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>
                     </div>
@@ -479,28 +476,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.handleLabel")}
                       </label>
-                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-                        <div className="min-w-0">
-                          <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                            <span className="text-slate-400">@</span>
-                            <input
-                              id="profile-handle"
-                              type="text"
-                              value={handleInput}
-                              onChange={(event) => setHandleInput(event.target.value)}
-                              placeholder={t("profileSettings.handlePlaceholder")}
-                              className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={saveIdentity}
-                          disabled={identityDisabled}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                        >
-                          {t("profileSettings.save")}
-                        </button>
+                      <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <span className="text-slate-400">@</span>
+                        <input
+                          id="profile-handle"
+                          type="text"
+                          value={handleInput}
+                          onChange={(event) => setHandleInput(event.target.value)}
+                          onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
+                          placeholder={t("profileSettings.handlePlaceholder")}
+                          className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                        />
                       </div>
                       <HelperText>{t("profileSettings.handleHelper")}</HelperText>
                       {(displayNameTooShort || displayNameTooLong || handleMissing) && (
