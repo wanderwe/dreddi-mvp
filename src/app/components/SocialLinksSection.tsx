@@ -78,7 +78,20 @@ export function SocialLinksSection({ onUpdate }: Props) {
   };
 
   useEffect(() => {
-    void loadLinks();
+    // On mount: sync any OAuth identities that may not yet be in social_links
+    // (e.g. when the callback redirected to prod before this code was deployed)
+    (async () => {
+      try {
+        const supabase = requireSupabase();
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          await syncSocialLinks(supabase, data.user);
+        }
+      } catch {
+        // ignore — supabase unavailable in preview
+      }
+      await loadLinks();
+    })();
   }, []);
 
   const handleConnect = async (platform: PlatformConfig) => {
