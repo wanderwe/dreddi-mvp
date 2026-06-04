@@ -1121,45 +1121,35 @@ export default function PromisesClient() {
             )}
           </div>
 
+          {/* Tab row + filter row: stacked on mobile, single row on desktop */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-            <button
-              type="button"
-              onClick={() => setTab("all")}
-              className={[
-                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
-                tab === "all"
-                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.all", { count: roleCounts.promisor + roleCounts.counterparty })}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTab("i-promised")}
-              className={[
-                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
-                tab === "i-promised"
-                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.executorMe", { count: roleCounts.promisor })}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTab("promised-to-me")}
-              className={[
-                "min-h-12 w-full rounded-xl px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto",
-                tab === "promised-to-me"
-                  ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                  : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
-              ].join(" ")}
-            >
-              {t("promises.list.tabs.executorOther", { count: roleCounts.counterparty })}
-            </button>
+            {/* Tabs — always horizontal, compact chips */}
+            <div className="flex flex-wrap gap-2">
+              {(["all", "i-promised", "promised-to-me"] as const).map((key) => {
+                const isActive = tab === key;
+                const label =
+                  key === "all"
+                    ? t("promises.list.tabs.all", { count: roleCounts.promisor + roleCounts.counterparty })
+                    : key === "i-promised"
+                    ? t("promises.list.tabs.executorMe", { count: roleCounts.promisor })
+                    : t("promises.list.tabs.executorOther", { count: roleCounts.counterparty });
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setTab(key)}
+                    className={[
+                      "whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                      isActive
+                        ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
+                        : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
 
             <div className="flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center">
               <div className="relative" ref={dealTypeMenuRef}>
