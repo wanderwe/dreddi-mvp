@@ -1,8 +1,9 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
+import { NOTIFICATION_COUNT_SYNC_EVENT } from "@/lib/notifications/clientSync";
 import {
   Sheet,
   SheetClose,
@@ -26,6 +27,15 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (e instanceof CustomEvent) setNotificationCount((e.detail as { count: number }).count ?? 0);
+    };
+    window.addEventListener(NOTIFICATION_COUNT_SYNC_EVENT, handler);
+    return () => window.removeEventListener(NOTIFICATION_COUNT_SYNC_EVENT, handler);
+  }, []);
   const baseLinkClasses =
     "rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100";
   const primaryLinkClasses =
@@ -71,8 +81,14 @@ export function MobileMenu({
                 </SheetClose>
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
-                    <LocalizedLink className={baseLinkClasses} href={actionQueueHref}>
-                      {t("nav.actionQueueBadge")} ({actionQueueCount})
+                    <LocalizedLink
+                      className={`${baseLinkClasses} flex items-center justify-between`}
+                      href={actionQueueHref}
+                    >
+                      <span>{t("nav.actionQueueBadge")}</span>
+                      <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-950">
+                        {actionQueueCount}
+                      </span>
                     </LocalizedLink>
                   </SheetClose>
                 )}
@@ -87,8 +103,13 @@ export function MobileMenu({
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
-                  <LocalizedLink className={baseLinkClasses} href="/notifications">
-                    {t("nav.notifications")}
+                  <LocalizedLink className={`${baseLinkClasses} flex items-center justify-between`} href="/notifications">
+                    <span>{t("nav.notifications")}</span>
+                    {notificationCount > 0 && (
+                      <span className="rounded-full bg-emerald-400 px-1.5 py-0.5 text-[10px] font-semibold text-slate-950">
+                        {notificationCount}
+                      </span>
+                    )}
                   </LocalizedLink>
                 </SheetClose>
                 <div className="mt-2 border-t border-white/10 pt-4">
