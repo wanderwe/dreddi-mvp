@@ -10,6 +10,7 @@ type SocialLink = {
   platform: string;
   username: string | null;
   display_name: string | null;
+  profile_url: string | null;
   verified_at: string;
 };
 
@@ -64,14 +65,23 @@ export function SocialLinksSection({ onUpdate }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmDisconnect, setConfirmDisconnect] = useState<string | null>(null);
+  // profile_url inputs — keyed by platform id (only linkedin for now)
+  const [profileUrlInputs, setProfileUrlInputs] = useState<Record<string, string>>({});
 
   const loadLinks = async () => {
     try {
       const supabase = requireSupabase();
       const { data } = await supabase
         .from("social_links")
-        .select("platform,username,display_name,verified_at");
-      setLinks((data as SocialLink[]) ?? []);
+        .select("platform,username,display_name,profile_url,verified_at");
+      const loaded = (data as SocialLink[]) ?? [];
+      setLinks(loaded);
+      // Sync profile URL inputs from DB
+      const urls: Record<string, string> = {};
+      for (const l of loaded) {
+        if (l.profile_url) urls[l.platform] = l.profile_url;
+      }
+      setProfileUrlInputs((prev) => ({ ...prev, ...urls }));
     } catch {
       // supabase unavailable in preview
     } finally {
@@ -176,6 +186,35 @@ export function SocialLinksSection({ onUpdate }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const normalizeLinkedInUrl = (raw: string): string | null => {
+    const s = raw.trim();
+    if (!s) return null;
+    // Accept: linkedin.com/in/foo, /in/foo, https://... → normalize to https://
+    const match = s.match(/(?:linkedin\.com\/in\/)([\w-]+)/i);
+    if (match) return `https://www.linkedin.com/in/${match[1]}`;
+    return null;
+  };
+
+  const saveProfileUrl = async (platformId: string, raw: string) => {
+    const url = normalizeLinkedInUrl(raw);
+    const stored = links.find((l) => l.platform === platformId)?.profile_url ?? null;
+    // Only save if value actually changed
+    if (url === stored) return;
+    try {
+      const supabase = requireSupabase();
+      await supabase
+        .from("social_links")
+        .update({ profile_url: url })
+        .eq("platform", platformId);
+      setLinks((prev) =>
+        prev.map((l) => l.platform === platformId ? { ...l, profile_url: url } : l)
+      );
+      if (url) setProfileUrlInputs((prev) => ({ ...prev, [platformId]: url }));
+    } catch {
+      // ignore
+    }
+  };
+
   if (loading) return null;
 
   return (
@@ -187,11 +226,15 @@ export function SocialLinksSection({ onUpdate }: Props) {
         const linked = links.find((l) => l.platform === platform.id);
         const isBusy = busy === platform.id;
 
+        const showUrlField = linked && platform.id === "linkedin";
+        const urlInput = profileUrlInputs[platform.id] ?? "";
+
         return (
           <div
             key={platform.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+            className="rounded-xl border border-white/10 bg-white/5"
           >
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               <span className={platform.color}>{platform.icon}</span>
               <div className="min-w-0">
@@ -246,6 +289,27 @@ export function SocialLinksSection({ onUpdate }: Props) {
               >
                 {isBusy ? "…" : t("profileSettings.social.connect")}
               </button>
+            )}
+            </div>
+
+            {/* Optional LinkedIn profile URL — appears after connecting */}
+            {showUrlField && (
+              <div className="border-t border-white/10 px-4 pb-3 pt-2">
+                <p className="mb-1.5 text-[11px] text-white/40">
+                  {t("profileSettings.social.linkedinUrlLabel")}
+                </p>
+                <input
+                  type="url"
+                  value={urlInput}
+                  onChange={(e) =>
+                    setProfileUrlInputs((prev) => ({ ...prev, [platform.id]: e.target.value }))
+                  }
+                  onBlur={() => void saveProfileUrl(platform.id, urlInput)}
+                  onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                  placeholder="linkedin.com/in/your-username"
+                  className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-white/80 placeholder:text-white/25 focus:border-blue-400/40 focus:outline-none focus:ring-1 focus:ring-blue-400/30"
+                />
+              </div>
             )}
           </div>
         );
