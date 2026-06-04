@@ -12,12 +12,19 @@ import { fetchUnreadNotificationCount } from "@/lib/notifications/queries";
 import {
   isNotificationCountEvent,
   NOTIFICATION_COUNT_EVENT,
+  emitNotificationCountSync,
 } from "@/lib/notifications/clientSync";
 
 export function NotificationBell({ className = "" }: { className?: string }) {
   const t = useT();
   const locale = useLocale();
   const [count, setCount] = useState<number>(0);
+
+  // Broadcast the count so components like MobileMenu can display it
+  // without making their own API calls (NotificationBell runs on all viewports).
+  useEffect(() => {
+    emitNotificationCountSync(count);
+  }, [count]);
 
   useEffect(() => {
     let active = true;
