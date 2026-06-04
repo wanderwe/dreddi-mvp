@@ -281,7 +281,7 @@ function ActionButton({
   const toneOk =
     "border-emerald-500/20 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:border-emerald-500/30";
   const toneDanger =
-    "border-red-500/20 bg-transparent text-red-200 hover:bg-red-500/10 hover:border-red-500/30";
+    "border-red-500/25 bg-red-500/10 text-red-200 hover:bg-red-500/18 hover:border-red-500/35";
 
   let cls = base;
 
@@ -1570,7 +1570,7 @@ export default function PromisePage() {
                     {t("promises.detail.statusActions")}
                   </p>
                 </div>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   {isExecutor && p.status === "active" && (
                     isInviteAccepted ? (
                       <ActionButton
@@ -1601,7 +1601,7 @@ export default function PromisePage() {
                       </Link>
                       <Link
                         href={`/promises/${p.id}/confirm?action=dispute`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-transparent px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
                       >
                         {t("promises.confirm.dispute")}
                       </Link>
