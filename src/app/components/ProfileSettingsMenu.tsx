@@ -551,7 +551,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </HelperText>
                       </div>
                     <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
-                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                         <div className="space-y-1">
                           <div className="text-sm font-semibold text-white">
                             {t("profileSettings.publicLabel")}
@@ -654,7 +654,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             <HelperText>{t("profileSettings.tagsEmpty")}</HelperText>
                           )}
                         </div>
-                        <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                           <div className="min-w-0">
                             <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
                               <input
