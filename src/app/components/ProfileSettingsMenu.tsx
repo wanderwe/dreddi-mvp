@@ -513,7 +513,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               {publicProfileUrl}
                             </span>
                             <div className="flex shrink-0 items-center gap-1">
-                              <Tooltip label={t("profileSettings.viewPublicProfile")} placement="top">
+                              <Tooltip label={t("profileSettings.viewPublicProfile")} placement="top" tooltipClassName="!z-[99999]">
                                 <a
                                   href={publicProfilePath}
                                   target="_blank"
@@ -524,7 +524,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                   <ExternalLink className="h-3.5 w-3.5" />
                                 </a>
                               </Tooltip>
-                              <Tooltip label={copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")} placement="top">
+                              <Tooltip label={copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")} placement="top" tooltipClassName="!z-[99999]">
                                 <button
                                   type="button"
                                   onClick={handleCopyLink}
