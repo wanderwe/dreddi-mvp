@@ -617,11 +617,15 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
             type="button"
             onClick={() => setOpenSection("social")}
             aria-expanded={openSection === "social"}
-            className="flex w-full cursor-pointer items-center justify-between py-4 text-left text-sm font-semibold text-white transition hover:text-emerald-100 focus-visible:outline-none sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
           >
-            {t("profileSettings.socialLabel")}
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.socialLabel")}
+              </div>
+            </div>
             <ChevronDown
-              className={`h-4 w-4 text-white/40 transition-transform ${
+              className={`h-4 w-4 shrink-0 text-white/40 transition-transform ${
                 openSection === "social" ? "rotate-180" : ""
               }`}
             />
