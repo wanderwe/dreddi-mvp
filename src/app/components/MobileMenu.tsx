@@ -82,7 +82,7 @@ export function MobileMenu({
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
                     <LocalizedLink
-                      className="flex items-center justify-between rounded-xl border border-amber-300/40 bg-amber-300/15 px-3 py-2 text-left text-amber-100 transition hover:border-amber-300/60 hover:bg-amber-300/22"
+                      className={`${baseLinkClasses} flex items-center justify-between`}
                       href={actionQueueHref}
                     >
                       <span>{t("nav.actionQueueBadge")}</span>
