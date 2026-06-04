@@ -508,8 +508,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           {t("profileSettings.publicLinkLabel")}
                         </div>
                         {publicProfilePath ? (
-                          <div className="mt-1 flex items-center gap-1.5 rounded-xl border border-white/10 bg-black/30 pl-3 pr-1.5 py-1.5">
-                            <span className="min-w-0 flex-1 truncate text-xs text-slate-300">
+                          <div className="mt-1 flex items-center gap-1 rounded-xl border border-white/10 bg-black/30 pl-3 pr-1.5 py-2">
+                            <span className="min-w-0 flex-1 truncate text-sm text-white/70">
                               {publicProfileUrl}
                             </span>
                             <div className="flex shrink-0 items-center gap-1">
