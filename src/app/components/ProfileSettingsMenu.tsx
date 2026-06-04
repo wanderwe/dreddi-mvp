@@ -9,6 +9,7 @@ import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
+import { SocialLinksSection } from "@/app/components/SocialLinksSection";
 import {
   Sheet,
   SheetClose,
@@ -51,7 +52,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [tagsError, setTagsError] = useState<string | null>(null);
-  const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications">(
+  const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications" | "social">(
     "identity"
   );
   const lastHandleRef = useRef<string | null>(null);
@@ -605,6 +606,42 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Social verification ─────────────────────────────── */}
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+          <button
+            type="button"
+            onClick={() => setOpenSection("social")}
+            aria-expanded={openSection === "social"}
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+          >
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.socialLabel")}
+              </div>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 text-white/40 transition-transform ${
+                openSection === "social" ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              openSection === "social" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div
+              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
+                openSection === "social" ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="pt-1">
+                <SocialLinksSection />
               </div>
             </div>
           </div>

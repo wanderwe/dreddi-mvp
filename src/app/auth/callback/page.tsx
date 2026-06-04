@@ -40,8 +40,15 @@ export default function AuthCallbackPage() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            setMsg("Auth error: " + error.message);
-            return;
+            // "Identity is already linked" means the OAuth succeeded on a previous
+            // attempt — treat as success and continue to sync + redirect.
+            const isAlreadyLinked =
+              error.message?.toLowerCase().includes("already linked") ||
+              error.code === "identity_already_exists";
+            if (!isAlreadyLinked) {
+              setMsg("Auth error: " + error.message);
+              return;
+            }
           }
         }
 
@@ -67,6 +74,10 @@ export default function AuthCallbackPage() {
         // Upsert профілю
         const { upsertProfile } = await import("@/lib/ensureProfile");
         await upsertProfile(data.session.user);
+
+        // Sync any OAuth social identities (Twitter, LinkedIn) to social_links table
+        const { syncSocialLinks } = await import("@/lib/syncSocialLinks");
+        await syncSocialLinks(supabase, data.session.user);
 
         const nextPath =
           next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
