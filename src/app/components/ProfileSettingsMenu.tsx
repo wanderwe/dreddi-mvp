@@ -437,7 +437,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               <div className="space-y-3 pt-3">
                 <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <label
                         htmlFor="profile-display-name"
                         className="text-sm font-medium text-white"
@@ -469,7 +469,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </div>
                       <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <label
                         htmlFor="profile-handle"
                         className="text-sm font-medium text-white"
