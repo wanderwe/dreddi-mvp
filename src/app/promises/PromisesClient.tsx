@@ -1143,8 +1143,8 @@ export default function PromisesClient() {
                     className={[
                       "w-full rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto sm:whitespace-nowrap",
                       isActive
-                        ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
-                        : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
+                        ? "cursor-default bg-white/10 text-white ring-2 ring-emerald-400/60"
+                        : "cursor-pointer bg-white/5 text-white/70 ring-white/10 hover:bg-white/10 hover:text-white hover:ring-white/20",
                     ].join(" ")}
                   >
                     {label}
