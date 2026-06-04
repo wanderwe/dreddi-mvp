@@ -1125,8 +1125,8 @@ export default function PromisesClient() {
 
           {/* Tab row + filter row: stacked on mobile, single row on desktop */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-            {/* Tabs — always horizontal, equal-width */}
-            <div className="flex w-full gap-2 sm:w-auto">
+            {/* Tabs — full-width on mobile, auto on desktop */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               {(["all", "i-promised", "promised-to-me"] as const).map((key) => {
                 const isActive = tab === key;
                 const label =
@@ -1141,7 +1141,7 @@ export default function PromisesClient() {
                     type="button"
                     onClick={() => setTab(key)}
                     className={[
-                      "flex-1 truncate rounded-xl px-3 py-2 text-center text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:flex-initial sm:whitespace-nowrap",
+                      "w-full rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto sm:whitespace-nowrap",
                       isActive
                         ? "cursor-default bg-emerald-400 text-slate-950 ring-emerald-300 shadow-lg shadow-emerald-500/25"
                         : "cursor-pointer bg-white/5 text-white ring-white/10 hover:bg-white/10 hover:ring-white/20",
