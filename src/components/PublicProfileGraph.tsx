@@ -471,13 +471,15 @@ function HoverTooltip({
   // Conservative height estimate: covers all possible tooltip states
   const TOOLTIP_EST_H = 165;
   let left = mouse.x + 14;
+  // Default: show tooltip slightly above the cursor
   let top  = mouse.y - 28;
   // Horizontal: flip left if overflows right edge
   if (left + W > containerW - 4) left = mouse.x - W - 14;
   left = Math.max(4, left);
-  // Vertical: flip above cursor if overflows bottom, clamp to top otherwise
+  // Vertical: flip above cursor if overflows bottom
   if (top + TOOLTIP_EST_H > containerH - 4) top = mouse.y - TOOLTIP_EST_H - 10;
-  if (top < 4) top = mouse.y + 10;
+  // Clamp within canvas — handles both top-edge and any remaining overflow
+  top = Math.max(4, Math.min(top, containerH - TOOLTIP_EST_H - 4));
 
   let content: React.ReactNode = null;
 
