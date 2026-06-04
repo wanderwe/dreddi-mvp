@@ -1024,11 +1024,11 @@ export default function PromisesClient() {
               <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
                 {t("promises.overview.eyebrow")}
               </div>
-              <h1 className="text-2xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
+              <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
               <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
             </div>
 
-            <div className="shrink-0">
+            <div className="hidden shrink-0 sm:block">
               <NewDealButton label={t("promises.overview.cta")} />
             </div>
           </div>
