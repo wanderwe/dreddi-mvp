@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, UserRound, X } from "lucide-react";
+import { ChevronDown, UserRound, X, ExternalLink, Copy, Check } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
@@ -317,7 +317,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     !!profile &&
     (nextDisplayName !== (profile.displayName ?? null) ||
       nextHandle !== (profile.handle ?? null));
-  const identityDisabled = loading || saving || !profile || !identityChanged;
   const normalizeTagValue = (value: string) => value.trim().toLowerCase();
   const normalizedProfileTags = useMemo(
     () => profileTags.map((tag) => normalizeTagValue(tag)).filter(Boolean),
@@ -327,13 +326,16 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     () => (profile?.profileTags ?? []).map((tag) => normalizeTagValue(tag)).filter(Boolean),
     [profile?.profileTags]
   );
-  const tagsChanged =
-    !!profile && normalizedProfileTags.join("|") !== profileTagsSnapshot.join("|");
-  const tagsSaveDisabled = loading || saving || !profile || !tagsChanged;
 
   const applyTagChanges = (nextTags: string[]) => {
     setProfileTags(nextTags);
     setTagsError(null);
+    // Auto-save immediately — each chip add/remove is an explicit action
+    if (!profile) return;
+    void updateProfileRow(
+      { profile_tags: nextTags.map((t) => normalizeTagValue(t)).filter(Boolean) },
+      { profileTags: nextTags }
+    );
   };
 
   const addTagsFromInput = (rawInput: string) => {
@@ -373,14 +375,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
   const removeTag = (tagToRemove: string) => {
     applyTagChanges(normalizedProfileTags.filter((tag) => tag !== tagToRemove));
-  };
-
-  const saveTags = async () => {
-    if (!profile) return;
-    await updateProfileRow(
-      { profile_tags: normalizedProfileTags },
-      { profileTags: normalizedProfileTags }
-    );
   };
 
   const saveIdentity = async () => {
@@ -450,30 +444,28 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.displayNameLabel")}
                       </label>
-                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-                        <div className="min-w-0">
-                          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                            <input
-                              id="profile-display-name"
-                              type="text"
-                              value={displayNameInput}
-                              onChange={(event) => setDisplayNameInput(event.target.value)}
-                              placeholder={t("profileSettings.displayNamePlaceholder")}
-                              maxLength={40}
-                              className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
-                            />
-                            {displayNameInput.length > 0 && (
-                              <button
-                                type="button"
-                                onClick={() => setDisplayNameInput("")}
-                                aria-label={t("profileSettings.close")}
-                                className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
-                              >
-                                <X className="h-3.5 w-3.5" aria-hidden />
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                      <div className="mt-1 flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <input
+                          id="profile-display-name"
+                          type="text"
+                          value={displayNameInput}
+                          onChange={(event) => setDisplayNameInput(event.target.value)}
+                          onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
+                          placeholder={t("profileSettings.displayNamePlaceholder")}
+                          maxLength={40}
+                          className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                        />
+                        {displayNameInput.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setDisplayNameInput("")}
+                            aria-label={t("profileSettings.close")}
+                            className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-within:ring-emerald-300/40"
+                          >
+                            <X className="h-3.5 w-3.5" aria-hidden />
+                          </button>
+                        )}
                       </div>
                       <HelperText>{t("profileSettings.displayNameHelper")}</HelperText>
                     </div>
@@ -484,28 +476,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       >
                         {t("profileSettings.handleLabel")}
                       </label>
-                      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-                        <div className="min-w-0">
-                          <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                            <span className="text-slate-400">@</span>
-                            <input
-                              id="profile-handle"
-                              type="text"
-                              value={handleInput}
-                              onChange={(event) => setHandleInput(event.target.value)}
-                              placeholder={t("profileSettings.handlePlaceholder")}
-                              className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={saveIdentity}
-                          disabled={identityDisabled}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                        >
-                          {t("profileSettings.save")}
-                        </button>
+                      <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                        <span className="text-slate-400">@</span>
+                        <input
+                          id="profile-handle"
+                          type="text"
+                          value={handleInput}
+                          onChange={(event) => setHandleInput(event.target.value)}
+                          onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
+                          placeholder={t("profileSettings.handlePlaceholder")}
+                          className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                        />
                       </div>
                       <HelperText>{t("profileSettings.handleHelper")}</HelperText>
                       {(displayNameTooShort || displayNameTooLong || handleMissing) && (
@@ -525,41 +507,43 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         <div className="text-sm font-medium text-white">
                           {t("profileSettings.publicLinkLabel")}
                         </div>
-                        <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
-                          <div className="min-w-0 space-y-2">
-                            {publicProfilePath ? (
-                              <div className="break-words rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-slate-200 [overflow-wrap:anywhere]">
-                                {publicProfileUrl}
-                              </div>
-                            ) : null}
-                            {loading && (
-                              <HelperText className="text-slate-400">
-                                {t("profileSettings.loading")}
-                              </HelperText>
-                            )}
-                          </div>
-                          {publicProfilePath ? (
-                            <div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto md:justify-end">
-                              <a
-                                href={publicProfilePath}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex h-9 w-full items-center justify-center whitespace-nowrap cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-center text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] sm:w-auto"
-                              >
-                                {t("profileSettings.viewPublicProfile")}
-                              </a>
-                              <button
-                                type="button"
-                                onClick={handleCopyLink}
-                                className="inline-flex h-9 w-full items-center justify-center whitespace-nowrap cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-center text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] sm:w-auto"
-                              >
-                                {copied
-                                  ? t("profileSettings.copySuccess")
-                                  : t("profileSettings.copyLink")}
-                              </button>
+                        {publicProfilePath ? (
+                          <div className="mt-1 flex items-center gap-1 rounded-xl border border-white/10 bg-black/30 pl-3 pr-1.5 py-2">
+                            <span className="min-w-0 flex-1 truncate text-sm text-white/70">
+                              {publicProfileUrl}
+                            </span>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <Tooltip label={t("profileSettings.viewPublicProfile")} placement="top" tooltipClassName="!z-[99999]">
+                                <a
+                                  href={publicProfilePath}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                  aria-label={t("profileSettings.viewPublicProfile")}
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                              </Tooltip>
+                              <Tooltip label={copied ? t("profileSettings.copySuccess") : t("profileSettings.copyLink")} placement="top" tooltipClassName="!z-[99999]">
+                                <button
+                                  type="button"
+                                  onClick={handleCopyLink}
+                                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                  aria-label={t("profileSettings.copyLink")}
+                                >
+                                  {copied
+                                    ? <Check className="h-3.5 w-3.5 text-emerald-400" />
+                                    : <Copy className="h-3.5 w-3.5" />}
+                                </button>
+                              </Tooltip>
                             </div>
-                          ) : null}
-                        </div>
+                          </div>
+                        ) : null}
+                        {loading && (
+                          <HelperText className="text-slate-400">
+                            {t("profileSettings.loading")}
+                          </HelperText>
+                        )}
                         <HelperText>
                           {!publicProfileEnabled && publicProfilePath
                             ? t("profileSettings.publicLinkPrivate")
@@ -606,42 +590,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Social verification ─────────────────────────────── */}
-        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
-          <button
-            type="button"
-            onClick={() => setOpenSection("social")}
-            aria-expanded={openSection === "social"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
-          >
-            <div className="space-y-1">
-              <div className="text-sm font-semibold text-white">
-                {t("profileSettings.socialLabel")}
-              </div>
-            </div>
-            <ChevronDown
-              className={`h-4 w-4 shrink-0 text-white/40 transition-transform ${
-                openSection === "social" ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          <div
-            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
-              openSection === "social" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-            }`}
-          >
-            <div
-              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
-                openSection === "social" ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <div className="pt-1">
-                <SocialLinksSection />
               </div>
             </div>
           </div>
@@ -739,14 +687,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               )}
                             </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={saveTags}
-                            disabled={tagsSaveDisabled}
-                            className="h-9 w-full cursor-pointer rounded-lg border border-white/10 px-4 text-xs font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                          >
-                            {t("profileSettings.save")}
-                          </button>
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -763,6 +703,42 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Social verification ─────────────────────────────── */}
+        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+          <button
+            type="button"
+            onClick={() => setOpenSection("social")}
+            aria-expanded={openSection === "social"}
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+          >
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-white">
+                {t("profileSettings.socialLabel")}
+              </div>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 shrink-0 text-white/40 transition-transform ${
+                openSection === "social" ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          <div
+            className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+              openSection === "social" ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+            }`}
+          >
+            <div
+              className={`overflow-hidden pb-5 transition-opacity duration-300 sm:px-4 sm:pb-4 ${
+                openSection === "social" ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="pt-1">
+                <SocialLinksSection />
               </div>
             </div>
           </div>
