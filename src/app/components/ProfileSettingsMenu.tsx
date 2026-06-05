@@ -518,7 +518,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                   href={publicProfilePath}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40"
                                   aria-label={t("profileSettings.viewPublicProfile")}
                                 >
                                   <ExternalLink className="h-3.5 w-3.5" />
@@ -528,7 +528,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 <button
                                   type="button"
                                   onClick={handleCopyLink}
-                                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40"
                                   aria-label={t("profileSettings.copyLink")}
                                 >
                                   {copied
