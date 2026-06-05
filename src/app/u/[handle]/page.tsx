@@ -180,7 +180,7 @@ function SocialBadge({ link }: { link: { platform: string; username: string | nu
       </svg>
     ),
   } : link.platform === "linkedin" ? {
-    tooltip: link.profile_url ? "LinkedIn · Verified · Відкрити профіль" : "LinkedIn · Verified",
+    tooltip: "LinkedIn · Verified",
     color: "text-blue-300 border-blue-400/25 bg-blue-500/10 hover:bg-blue-500/20",
     href: link.profile_url ?? undefined,
     icon: (
