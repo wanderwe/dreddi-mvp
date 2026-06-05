@@ -5,6 +5,8 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { syncSocialLinks } from "@/lib/syncSocialLinks";
 import { HelperText } from "@/app/components/ui/HelperText";
+import { Tooltip } from "@/app/components/ui/Tooltip";
+import { Info } from "lucide-react";
 
 type SocialLink = {
   platform: string;
@@ -295,20 +297,24 @@ export function SocialLinksSection({ onUpdate }: Props) {
             {/* Optional LinkedIn profile URL — appears after connecting */}
             {showUrlField && (
               <div className="border-t border-white/10 px-4 pb-3 pt-2">
-                <input
-                  type="url"
-                  value={urlInput}
-                  onChange={(e) =>
-                    setProfileUrlInputs((prev) => ({ ...prev, [platform.id]: e.target.value }))
-                  }
-                  onBlur={() => void saveProfileUrl(platform.id, urlInput)}
-                  onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
-                  placeholder="linkedin.com/in/your-username"
-                  className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-white/80 placeholder:text-white/25 focus:border-blue-400/40 focus:outline-none focus:ring-1 focus:ring-blue-400/30"
-                />
-                <HelperText className="mt-1.5">
-                  {t("profileSettings.social.linkedinUrlLabel")}
-                </HelperText>
+                <div className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 focus-within:border-blue-400/40 focus-within:ring-1 focus-within:ring-blue-400/30">
+                  <input
+                    type="url"
+                    value={urlInput}
+                    onChange={(e) =>
+                      setProfileUrlInputs((prev) => ({ ...prev, [platform.id]: e.target.value }))
+                    }
+                    onBlur={() => void saveProfileUrl(platform.id, urlInput)}
+                    onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                    placeholder="linkedin.com/in/your-username"
+                    className="min-w-0 flex-1 bg-transparent text-xs text-white/80 placeholder:text-white/25 focus:outline-none"
+                  />
+                  <Tooltip label={t("profileSettings.social.linkedinUrlLabel")} placement="top" tooltipClassName="!z-[99999]">
+                    <span className="cursor-default text-white/30 hover:text-white/60 transition">
+                      <Info className="h-3.5 w-3.5" />
+                    </span>
+                  </Tooltip>
+                </div>
               </div>
             )}
           </div>
