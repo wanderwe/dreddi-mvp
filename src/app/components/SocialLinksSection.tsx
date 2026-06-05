@@ -295,9 +295,6 @@ export function SocialLinksSection({ onUpdate }: Props) {
             {/* Optional LinkedIn profile URL — appears after connecting */}
             {showUrlField && (
               <div className="border-t border-white/10 px-4 pb-3 pt-2">
-                <p className="mb-1.5 text-[11px] text-white/40">
-                  {t("profileSettings.social.linkedinUrlLabel")}
-                </p>
                 <input
                   type="url"
                   value={urlInput}
@@ -309,6 +306,9 @@ export function SocialLinksSection({ onUpdate }: Props) {
                   placeholder="linkedin.com/in/your-username"
                   className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-white/80 placeholder:text-white/25 focus:border-blue-400/40 focus:outline-none focus:ring-1 focus:ring-blue-400/30"
                 />
+                <HelperText className="mt-1.5">
+                  {t("profileSettings.social.linkedinUrlLabel")}
+                </HelperText>
               </div>
             )}
           </div>
