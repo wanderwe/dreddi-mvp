@@ -350,7 +350,12 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           .select("platform,username,display_name,profile_url")
           .eq("user_id", profileIdentity.id);
         if (!active) return;
-        setSocialLinks((links as typeof socialLinks) ?? []);
+        // Fixed display order: LinkedIn → Twitter (matches Verification settings)
+        const PLATFORM_ORDER = ["linkedin", "twitter"];
+        const sorted = ((links as typeof socialLinks) ?? []).sort(
+          (a, b) => PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform)
+        );
+        setSocialLinks(sorted);
       }
       if (process.env.NODE_ENV !== "production") {
         console.info("public profile on-time metrics", {
