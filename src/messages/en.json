@@ -96,6 +96,7 @@
       "disconnect": "Disconnect",
       "confirmDisconnect": "Yes, disconnect",
       "cancel": "Cancel",
+      "linkedinUrlLabel": "LinkedIn profile URL (optional — makes the badge clickable)",
       "hint": "Connecting a social account proves you control it. A verified badge will appear on your public profile."
     },
     "pushLabel": "In-app notifications",
