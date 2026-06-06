@@ -941,6 +941,16 @@
         "description": "Responsibility is now active",
         "cta": "Open"
       },
+      "invite_declined": {
+        "title": "Invite declined",
+        "description": "The invite was declined. No action needed.",
+        "cta": ""
+      },
+      "invite_ignored": {
+        "title": "Agreement withdrawn",
+        "description": "The agreement was withdrawn by the creator before acceptance",
+        "cta": "View"
+      },
       "marked_completed": {
         "title": "Action needed",
         "description": "Deal marked completed, confirm or dispute",
