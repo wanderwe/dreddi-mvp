@@ -320,7 +320,7 @@ export default function ConfirmPromisePage() {
 
                 <div className="flex flex-col items-end gap-2 text-sm text-slate-200">
                   <StatusPill
-                    label={`${t("promises.confirm.statusLabel")}: ${statusLabelMap[promise.status]}`}
+                    label={statusLabelMap[promise.status]}
                     tone={statusToneMap[promise.status] ?? "neutral"}
                     icon={statusIconMap[promise.status] ?? "clock"}
                   />

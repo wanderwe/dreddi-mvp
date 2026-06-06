@@ -8,7 +8,10 @@ export type NotificationEvent =
   | "confirmed"
   | "disputed"
   | "reminder_due_24h"
-  | "deadline_passed";
+  | "deadline_passed"
+  | "counter_condition_proposed"
+  | "counter_condition_confirmed"
+  | "counter_condition_rejected";
 
 export type PromiseNotificationContext = PromiseAcceptance & {
   id: string;
@@ -48,12 +51,22 @@ export const getNotificationRecipients = (
   promise: PromiseNotificationContext,
   actorId?: string | null
 ): NotificationRecipient[] => {
+  const counterpartyId = resolveCounterpartyId(promise);
+
+  // counter-condition events fire before the deal is accepted — handle them first
+  switch (event) {
+    case "counter_condition_proposed":
+      return addRecipient(promise, promise.creator_id, actorId);
+    case "counter_condition_confirmed":
+    case "counter_condition_rejected":
+      return addRecipient(promise, counterpartyId, actorId);
+  }
+
   if (event !== "accepted" && !isPromiseAccepted(promise)) {
     return [];
   }
 
   const executorId = resolveExecutorId(promise);
-  const counterpartyId = resolveCounterpartyId(promise);
 
   switch (event) {
     case "accepted":
@@ -89,6 +102,12 @@ export const getNotificationDedupeKey = (
       return `reminder_due_soon:${promiseId}:${recipientUserId}`;
     case "deadline_passed":
       return `reminder_overdue:${promiseId}:${recipientUserId}`;
+    case "counter_condition_proposed":
+      return `counter_condition_proposed:${promiseId}:${recipientUserId}`;
+    case "counter_condition_confirmed":
+      return `counter_condition_confirmed:${promiseId}:${recipientUserId}`;
+    case "counter_condition_rejected":
+      return `counter_condition_rejected:${promiseId}:${recipientUserId}`;
     default:
       return `event:${promiseId}:${recipientUserId}`;
   }
@@ -108,6 +127,12 @@ export const mapEventToNotificationType = (event: NotificationEvent): Notificati
       return "reminder_due_24h";
     case "deadline_passed":
       return "deadline_passed";
+    case "counter_condition_proposed":
+      return "counter_condition_proposed";
+    case "counter_condition_confirmed":
+      return "counter_condition_confirmed";
+    case "counter_condition_rejected":
+      return "counter_condition_rejected";
     default:
       return "accepted";
   }

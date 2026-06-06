@@ -58,6 +58,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       if (error) {
         return NextResponse.json({ error: "Cancel failed", detail: error.message }, { status: 500 });
       }
+      if (p.counterparty_id) {
+        await dispatchNotificationEvent({
+          admin,
+          event: "counter_condition_rejected",
+          promise: p,
+          actorId: user.id,
+        });
+      }
       return NextResponse.json({ ok: true, cancelled: true });
     }
 
@@ -110,7 +118,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (updatedPromise) {
       await dispatchNotificationEvent({
         admin,
-        event: "accepted",
+        event: "counter_condition_confirmed",
         promise: updatedPromise,
         actorId: user.id,
       });

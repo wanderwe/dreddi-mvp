@@ -171,7 +171,7 @@
       "blockTitle": "Reputation stake",
       "label": "Reputation stake",
       "helper": "Has a stronger impact on reputation after confirmation or dispute",
-      "tooltip": "Reputation stake\nHas a stronger impact on reputation"
+      "tooltip": "Has a stronger impact on reputation"
     },
     "confirmModal": {
       "title": "Confirm completion?",
@@ -1039,6 +1039,21 @@
       "deadline_passed": {
         "title": "Deadline passed",
         "description": "The deadline has passed. Review the agreement and complete the needed actions.",
+        "cta": "Open"
+      },
+      "counter_condition_proposed": {
+        "title": "Counter-condition proposed",
+        "description": "The other side accepted with a modified condition. Review and confirm or cancel.",
+        "cta": "Review"
+      },
+      "counter_condition_confirmed": {
+        "title": "Condition confirmed",
+        "description": "The creator confirmed your proposed condition. The agreement is now active.",
+        "cta": "Open"
+      },
+      "counter_condition_rejected": {
+        "title": "Agreement cancelled",
+        "description": "The creator did not accept your proposed condition and cancelled the agreement.",
         "cta": "Open"
       }
     }

@@ -34,7 +34,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     invite_ignored: {
       title: "Invite awaiting response",
       body: "The invite still has no response. No action needed.",
-      ctaLabel: "",
+      ctaLabel: "View",
     },
     due_soon: {
       title: "Deadline approaching",
@@ -141,6 +141,21 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The deal was marked as not delivered",
       ctaLabel: "View",
     },
+    counter_condition_proposed: {
+      title: "Counter-condition proposed",
+      body: "The other side accepted with a modified condition. Review and confirm or cancel.",
+      ctaLabel: "Review",
+    },
+    counter_condition_confirmed: {
+      title: "Condition confirmed",
+      body: "The creator confirmed your proposed condition. The agreement is now active.",
+      ctaLabel: "Open",
+    },
+    counter_condition_rejected: {
+      title: "Agreement cancelled",
+      body: "The creator did not accept your proposed condition and cancelled the agreement.",
+      ctaLabel: "Open",
+    },
   },
   uk: {
     accepted: {
@@ -166,7 +181,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     invite_ignored: {
       title: "Запрошення без відповіді",
       body: "Запрошення досі без відповіді. Дій не потрібно.",
-      ctaLabel: "",
+      ctaLabel: "Переглянути",
     },
     due_soon: {
       title: "Наближається дедлайн",
@@ -272,6 +287,21 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       title: "Результат оскаржено",
       body: "Угоду позначено як не виконану",
       ctaLabel: "Переглянути",
+    },
+    counter_condition_proposed: {
+      title: "Запропоновано контр-умову",
+      body: "Інша сторона прийняла із зміненою умовою. Перегляньте та підтвердіть або скасуйте.",
+      ctaLabel: "Переглянути",
+    },
+    counter_condition_confirmed: {
+      title: "Умову підтверджено",
+      body: "Автор підтвердив вашу запропоновану умову. Домовленість тепер активна.",
+      ctaLabel: "Відкрити",
+    },
+    counter_condition_rejected: {
+      title: "Домовленість скасовано",
+      body: "Автор не прийняв вашу запропоновану умову і скасував домовленість.",
+      ctaLabel: "Відкрити",
     },
   },
 };

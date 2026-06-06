@@ -514,8 +514,8 @@ export default function InvitePage() {
               </section>
             )}
 
-            {/* Counter-condition section — shown when invitee can respond */}
-            {canAccept && (
+            {/* Counter-condition section — only executor can propose a counter-condition */}
+            {canAccept && inviteRole === "executor" && (
               <section className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
                   {t("invite.condition.sectionTitle")}
@@ -631,7 +631,8 @@ export default function InvitePage() {
                 <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
                   {t("invite.awaitingCounterparty")}
                 </div>
-              ) : canAccept ? (
+              ) : isInviteeAwaitingConfirmation ? null
+              : canAccept ? (
                 <div className="flex flex-wrap justify-end gap-2">
                   {canAccept && (
                     <button

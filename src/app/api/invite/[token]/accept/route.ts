@@ -160,11 +160,9 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
       if (updatedPromise) {
         await dispatchNotificationEvent({
           admin,
-          event: "accepted",
+          event: "counter_condition_proposed",
           promise: updatedPromise,
           actorId: userId,
-          title: undefined,
-          body: undefined,
         });
       }
 
