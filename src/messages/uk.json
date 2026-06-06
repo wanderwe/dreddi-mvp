@@ -971,6 +971,12 @@
         "description": "Відповідальність активна",
         "cta": "Відкрити"
       },
+      "invite_declined": {
+        "cta": ""
+      },
+      "invite_ignored": {
+        "cta": "Переглянути"
+      },
       "invite_withdrawn": {
         "title": "Угоду відкликано",
         "description": "Угоду відкликав ініціатор до прийняття",

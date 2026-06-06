@@ -941,6 +941,12 @@
         "description": "Responsibility is now active",
         "cta": "Open"
       },
+      "invite_declined": {
+        "cta": ""
+      },
+      "invite_ignored": {
+        "cta": "View"
+      },
       "invite_withdrawn": {
         "title": "Agreement withdrawn",
         "description": "The agreement was withdrawn by the creator before acceptance",
