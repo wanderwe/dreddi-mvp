@@ -68,7 +68,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
       role: "counterparty",
       dedupeKey: `invite_withdrawn:${p.id}`,
       ctaUrl: p.invite_token ? `/p/invite/${p.invite_token}` : `/promises/${p.id}`,
-      priority: mapPriorityForType("invite_ignored"),
+      priority: mapPriorityForType("invite_withdrawn"),
     });
   }
 

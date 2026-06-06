@@ -34,7 +34,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     invite_ignored: {
       title: "Invite awaiting response",
       body: "The invite still has no response. No action needed.",
-      ctaLabel: "View",
+      ctaLabel: "",
     },
     due_soon: {
       title: "Deadline approaching",
@@ -186,7 +186,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     invite_ignored: {
       title: "Запрошення без відповіді",
       body: "Запрошення досі без відповіді. Дій не потрібно.",
-      ctaLabel: "Переглянути",
+      ctaLabel: "",
     },
     due_soon: {
       title: "Наближається дедлайн",
