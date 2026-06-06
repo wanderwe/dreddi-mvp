@@ -70,7 +70,6 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
       body: "The agreement was withdrawn by the creator before acceptance.",
       dedupeKey: `invite_cancelled:${p.id}`,
       ctaUrl: p.invite_token ? `/p/invite/${p.invite_token}` : `/promises/${p.id}`,
-      ctaLabel: "View",
       priority: mapPriorityForType("invite_ignored"),
     });
   }
