@@ -64,11 +64,9 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     await createNotification(admin, {
       userId: p.counterparty_id,
       promiseId: p.id,
-      type: "invite_ignored",
+      type: "invite_withdrawn",
       role: "counterparty",
-      title: "Agreement withdrawn",
-      body: "The agreement was withdrawn by the creator before acceptance.",
-      dedupeKey: `invite_cancelled:${p.id}`,
+      dedupeKey: `invite_withdrawn:${p.id}`,
       ctaUrl: p.invite_token ? `/p/invite/${p.invite_token}` : `/promises/${p.id}`,
       priority: mapPriorityForType("invite_ignored"),
     });

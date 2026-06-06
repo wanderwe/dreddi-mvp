@@ -141,6 +141,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The deal was marked as not delivered",
       ctaLabel: "View",
     },
+    invite_withdrawn: {
+      title: "Agreement withdrawn",
+      body: "The agreement was withdrawn by the creator before acceptance.",
+      ctaLabel: "View",
+    },
     counter_condition_proposed: {
       title: "Counter-condition proposed",
       body: "The other side accepted with a modified condition. Review and confirm or cancel.",
@@ -286,6 +291,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     dispute: {
       title: "Результат оскаржено",
       body: "Угоду позначено як не виконану",
+      ctaLabel: "Переглянути",
+    },
+    invite_withdrawn: {
+      title: "Угоду відкликано",
+      body: "Угоду відкликав ініціатор до прийняття.",
       ctaLabel: "Переглянути",
     },
     counter_condition_proposed: {

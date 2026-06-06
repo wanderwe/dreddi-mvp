@@ -4,6 +4,7 @@ export type NotificationType =
   | "invite_followup"
   | "invite_declined"
   | "invite_ignored"
+  | "invite_withdrawn"
   | "marked_completed"
   | "confirmed"
   | "disputed"

@@ -947,6 +947,11 @@
         "cta": ""
       },
       "invite_ignored": {
+        "title": "Invite awaiting response",
+        "description": "The invite still has no response.",
+        "cta": ""
+      },
+      "invite_withdrawn": {
         "title": "Agreement withdrawn",
         "description": "The agreement was withdrawn by the creator before acceptance",
         "cta": "View"
