@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Link2,
   MessageCircle,
+  PenLine,
   RefreshCw,
   Shield,
 } from "lucide-react";
@@ -1252,7 +1253,7 @@ export default function PromisePage() {
         }}
         className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white/75 transition hover:border-white/25 hover:bg-white/[0.1] hover:text-white"
       >
-        <MessageCircle className="h-4 w-4" aria-hidden />
+        <PenLine className="h-4 w-4" aria-hidden />
       </button>
     </Tooltip>
   ) : null;
