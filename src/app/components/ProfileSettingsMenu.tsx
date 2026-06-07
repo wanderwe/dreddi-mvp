@@ -312,7 +312,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const displayNameTooLong = nextDisplayName !== null && nextDisplayName.length > 40;
   const normalizedHandleInput = handleInput.trim().replace(/^@/, "");
   const nextHandle = normalizedHandleInput ? normalizedHandleInput.toLowerCase() : null;
-  const handleMissing = !nextHandle;
+  const handleMissing = !loading && !!profile && !nextHandle;
   const identityChanged =
     !!profile &&
     (nextDisplayName !== (profile.displayName ?? null) ||
