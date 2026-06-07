@@ -1239,6 +1239,24 @@ export default function PromisePage() {
     setUpdateSubmitState("idle");
   }
 
+  const addUpdateTrigger = canAddAgreementUpdate ? (
+    <Tooltip label={t("promises.detail.updates.add")} placement="bottom-right">
+      <button
+        type="button"
+        aria-label={t("promises.detail.updates.add")}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setUpdateSubmitState("idle");
+          setShowUpdateComposer(true);
+        }}
+        className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white/75 transition hover:border-white/25 hover:bg-white/[0.1] hover:text-white"
+      >
+        <MessageCircle className="h-4 w-4" aria-hidden />
+      </button>
+    </Tooltip>
+  ) : null;
+
   const historyPanelContent = (
     <div className="mt-4 space-y-3">
       <div className="grid gap-2 sm:grid-cols-5 lg:grid-cols-1">
@@ -1575,74 +1593,6 @@ export default function PromisePage() {
               </div>
             )}
 
-            {canAddAgreementUpdate ? (
-              <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/75">
-                  {t("promises.detail.updates.title")}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowUpdateComposer((current) => !current);
-                    setUpdateSubmitState("idle");
-                  }}
-                  className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
-                >
-                  {t("promises.detail.updates.add")}
-                </button>
-              </div>
-              {showUpdateComposer ? (
-                <div className="mt-3 rounded-xl border border-cyan-300/25 bg-black/20 p-3">
-                  <label className="text-sm font-semibold text-cyan-50" htmlFor="agreement-update">
-                    {p.visibility === "public"
-                      ? t("publicAgreement.updates.label")
-                      : t("promises.detail.updates.labelPrivate")}
-                  </label>
-                  <textarea
-                    id="agreement-update"
-                    value={updateContent}
-                    onChange={(event) => {
-                      setUpdateContent(event.target.value.slice(0, 500));
-                      if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
-                    }}
-                    placeholder={t("promises.detail.updates.placeholder")}
-                    className="mt-2 h-28 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/60"
-                  />
-                  <div className="mt-2 text-xs text-white/60">
-                    {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
-                  </div>
-                  <div className="mt-3 flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowUpdateComposer(false);
-                        setUpdateContent("");
-                        setUpdateSubmitState("idle");
-                      }}
-                      className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-white/80 transition hover:bg-white/[0.08]"
-                    >
-                      {t("publicAgreement.updates.cancel")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void submitUpdate()}
-                      disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                      className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-3 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {updateSubmitState === "saving"
-                        ? t("publicAgreement.updates.saving")
-                        : t("publicAgreement.updates.publish")}
-                    </button>
-                  </div>
-                  {updateSubmitState === "error" ? (
-                    <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p>
-                  ) : null}
-                </div>
-              ) : null}
-              </div>
-            ) : null}
-
             {(p.status === "disputed" &&
               (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
               <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
@@ -1825,18 +1775,24 @@ export default function PromisePage() {
           <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4 lg:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
               <span>{t("promises.detail.historyTitle")}</span>
-              <ChevronDown
-                className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
-                aria-hidden
-              />
+              <span className="flex items-center gap-2">
+                {addUpdateTrigger}
+                <ChevronDown
+                  className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                  aria-hidden
+                />
+              </span>
             </summary>
             {historyPanelContent}
           </details>
           </div>
 
           <aside className="hidden lg:block lg:sticky lg:top-6">
-            <section className="rounded-2xl border border-white/10 bg-neutral-900/25 p-4">
-              <h2 className="text-sm font-medium text-white">{t("promises.detail.historyTitle")}</h2>
+            <section className="rounded-2xl border border-white/10 bg-neutral-900/25 p-4 pt-5 sm:pt-7">
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="text-sm font-medium text-white">{t("promises.detail.historyTitle")}</h2>
+                {addUpdateTrigger}
+              </div>
               {historyPanelContent}
             </section>
           </aside>
@@ -1872,6 +1828,62 @@ export default function PromisePage() {
                 className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("promises.confirmModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showUpdateComposer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.detail.updates.title")}
+            </h2>
+            <label className="mt-4 block text-sm font-semibold text-cyan-50" htmlFor="agreement-update">
+              {p?.visibility === "public"
+                ? t("publicAgreement.updates.label")
+                : t("promises.detail.updates.labelPrivate")}
+            </label>
+            <textarea
+              id="agreement-update"
+              value={updateContent}
+              onChange={(event) => {
+                setUpdateContent(event.target.value.slice(0, 500));
+                if (updateSubmitState !== "idle") setUpdateSubmitState("idle");
+              }}
+              placeholder={t("promises.detail.updates.placeholder")}
+              autoFocus
+              className="mt-2 h-36 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/60"
+            />
+            <div className="mt-2 text-xs text-white/60">
+              {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
+            </div>
+            {updateSubmitState === "error" ? (
+              <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p>
+            ) : null}
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUpdateComposer(false);
+                  setUpdateContent("");
+                  setUpdateSubmitState("idle");
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {t("publicAgreement.updates.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitUpdate()}
+                disabled={!updateContent.trim() || updateSubmitState === "saving"}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+              >
+                {updateSubmitState === "saving"
+                  ? t("publicAgreement.updates.saving")
+                  : t("publicAgreement.updates.publish")}
               </button>
             </div>
           </div>
