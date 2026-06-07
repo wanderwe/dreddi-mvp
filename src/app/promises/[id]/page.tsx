@@ -1495,6 +1495,86 @@ export default function PromisePage() {
               </div>
             </div>
 
+            {/* Creator banner: invitee proposed a condition change */}
+            {isCreator && inviteStatus === "awaiting_creator_confirmation" && p.condition_text && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  {t("promises.detail.conditionProposedBanner.title")}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-100">
+                  {p.condition_text}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {t("promises.detail.conditionProposedBanner.body")}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <ActionButton
+                    label={
+                      confirmConditionBusy === "confirm"
+                        ? t("promises.detail.conditionProposedBanner.confirming")
+                        : t("promises.detail.conditionProposedBanner.confirm")
+                    }
+                    variant="ok"
+                    loading={confirmConditionBusy === "confirm"}
+                    disabled={confirmConditionBusy !== null}
+                    onClick={() => void confirmCondition("confirm")}
+                  />
+                  <ActionButton
+                    label={
+                      confirmConditionBusy === "cancel"
+                        ? t("promises.detail.conditionProposedBanner.cancelling")
+                        : t("promises.detail.conditionProposedBanner.cancel")
+                    }
+                    variant="danger"
+                    loading={confirmConditionBusy === "cancel"}
+                    disabled={confirmConditionBusy !== null}
+                    onClick={() => void confirmCondition("cancel")}
+                  />
+                </div>
+              </div>
+            )}
+
+            {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                  {t("promises.detail.conditionLabel")}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
+                  {p.condition_text}
+                </p>
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                      {t("promises.detail.conditionStatusLabel")}
+                    </p>
+                    <p className={[
+                      "mt-1 text-sm font-medium leading-6",
+                      isInviteAccepted
+                        ? conditionMet
+                          ? "text-emerald-300"
+                          : "text-amber-200"
+                        : "text-rose-300",
+                    ].join(" ")}>
+                      {isInviteAccepted
+                        ? conditionMet
+                          ? t("promises.detail.conditionMet")
+                          : t("promises.detail.conditionWaiting")
+                        : t("promises.detail.conditionRejected")}
+                    </p>
+                  </div>
+                  {isInviteAccepted && isCounterparty && !conditionMet && (
+                    <ActionButton
+                      label={t("promises.detail.conditionMark")}
+                      variant="ok"
+                      loading={conditionBusy}
+                      disabled={conditionBusy}
+                      onClick={markConditionMet}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
             {canAddAgreementUpdate ? (
               <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
               <div className="flex items-center justify-between gap-3">
@@ -1507,7 +1587,7 @@ export default function PromisePage() {
                     setShowUpdateComposer((current) => !current);
                     setUpdateSubmitState("idle");
                   }}
-                  className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-3 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
+                  className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.06] px-4 text-sm font-medium text-white transition hover:border-white/25 hover:bg-white/[0.1]"
                 >
                   {t("promises.detail.updates.add")}
                 </button>
@@ -1563,14 +1643,73 @@ export default function PromisePage() {
               </div>
             ) : null}
 
+            {(p.status === "disputed" &&
+              (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
+              <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">
+                  {t("promises.detail.disputeReasonLabel")}
+                </p>
+                <div className="mt-2 space-y-2 text-sm leading-6">
+                  {p.disputed_code === "not_delivered" && <p>{t("promises.detail.notDeliveredHint")}</p>}
+                  {p.dispute_reason && <p className="whitespace-pre-wrap">{p.dispute_reason}</p>}
+                </div>
+              </div>
+            )}
+
+            {isAwaitingInviteResponse && (
+              <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
+                  {t("promises.detail.inviteTitle")}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
+                  {canGenerateInvite ? (
+                    <ActionButton
+                      label={t("promises.detail.generate")}
+                      variant="primary"
+                      loading={inviteBusy === "generate"}
+                      disabled={inviteBusy !== null}
+                      onClick={generateInvite}
+                    />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        disabled={inviteBusy !== null || !inviteLink}
+                        onClick={copyInvite}
+                      >
+                        <Clipboard className="h-4 w-4" aria-hidden />
+                      {t("promises.detail.copyInvitePrimary")}
+                      </button>
+                      <Link href={`/join/${p.invite_token}`} className={`${linkUtilityButtonClass} px-2.5 sm:w-auto`}>
+                        <ExternalLink className="h-4 w-4" aria-hidden />
+                        {t("promises.detail.openInviteShort")}
+                      </Link>
+                      {canWithdrawInvite && (
+                        <button
+                          type="button"
+                          className="inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
+                          disabled={inviteBusy !== null}
+                          onClick={cancelInvite}
+                        >
+                          {inviteBusy === "cancel"
+                            ? t("promises.detail.saving")
+                            : t("promises.detail.withdrawInviteShort")}
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
             {hasLifecycleActions && (
               <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
                     {t("promises.detail.statusActions")}
                   </p>
-                </div>
-                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
                   {isExecutor && p.status === "active" && (
                     isInviteAccepted ? (
                       <ActionButton
@@ -1677,146 +1816,7 @@ export default function PromisePage() {
                       <span className="text-center">{t("promises.detail.recreate.label")}</span>
                     </button>
                   )}
-                </div>
-              </div>
-            )}
-
-            {/* Creator banner: invitee proposed a condition change */}
-            {isCreator && inviteStatus === "awaiting_creator_confirmation" && p.condition_text && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-                  {t("promises.detail.conditionProposedBanner.title")}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-100">
-                  {p.condition_text}
-                </p>
-                <p className="mt-2 text-xs text-slate-500">
-                  {t("promises.detail.conditionProposedBanner.body")}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <ActionButton
-                    label={
-                      confirmConditionBusy === "confirm"
-                        ? t("promises.detail.conditionProposedBanner.confirming")
-                        : t("promises.detail.conditionProposedBanner.confirm")
-                    }
-                    variant="ok"
-                    loading={confirmConditionBusy === "confirm"}
-                    disabled={confirmConditionBusy !== null}
-                    onClick={() => void confirmCondition("confirm")}
-                  />
-                  <ActionButton
-                    label={
-                      confirmConditionBusy === "cancel"
-                        ? t("promises.detail.conditionProposedBanner.cancelling")
-                        : t("promises.detail.conditionProposedBanner.cancel")
-                    }
-                    variant="danger"
-                    loading={confirmConditionBusy === "cancel"}
-                    disabled={confirmConditionBusy !== null}
-                    onClick={() => void confirmCondition("cancel")}
-                  />
-                </div>
-              </div>
-            )}
-
-            {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
-                  {t("promises.detail.conditionLabel")}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
-                  {p.condition_text}
-                </p>
-                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
-                      {t("promises.detail.conditionStatusLabel")}
-                    </p>
-                    <p className={[
-                      "mt-1 text-sm font-medium leading-6",
-                      isInviteAccepted
-                        ? conditionMet
-                          ? "text-emerald-300"
-                          : "text-amber-200"
-                        : "text-rose-300",
-                    ].join(" ")}>
-                      {isInviteAccepted
-                        ? conditionMet
-                          ? t("promises.detail.conditionMet")
-                          : t("promises.detail.conditionWaiting")
-                        : t("promises.detail.conditionRejected")}
-                    </p>
                   </div>
-                  {isInviteAccepted && isCounterparty && !conditionMet && (
-                    <ActionButton
-                      label={t("promises.detail.conditionMark")}
-                      variant="ok"
-                      loading={conditionBusy}
-                      disabled={conditionBusy}
-                      onClick={markConditionMet}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-
-            {(p.status === "disputed" &&
-              (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
-              <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">
-                  {t("promises.detail.disputeReasonLabel")}
-                </p>
-                <div className="mt-2 space-y-2 text-sm leading-6">
-                  {p.disputed_code === "not_delivered" && <p>{t("promises.detail.notDeliveredHint")}</p>}
-                  {p.dispute_reason && <p className="whitespace-pre-wrap">{p.dispute_reason}</p>}
-                </div>
-              </div>
-            )}
-
-            {isAwaitingInviteResponse && (
-              <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
-                  {t("promises.detail.inviteTitle")}
-                </p>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
-                  {canGenerateInvite ? (
-                    <ActionButton
-                      label={t("promises.detail.generate")}
-                      variant="primary"
-                      loading={inviteBusy === "generate"}
-                      disabled={inviteBusy !== null}
-                      onClick={generateInvite}
-                    />
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                        disabled={inviteBusy !== null || !inviteLink}
-                        onClick={copyInvite}
-                      >
-                        <Clipboard className="h-4 w-4" aria-hidden />
-                      {t("promises.detail.copyInvitePrimary")}
-                      </button>
-                      <Link href={`/join/${p.invite_token}`} className={`${linkUtilityButtonClass} px-2.5 sm:w-auto`}>
-                        <ExternalLink className="h-4 w-4" aria-hidden />
-                        {t("promises.detail.openInviteShort")}
-                      </Link>
-                      {canWithdrawInvite && (
-                        <button
-                          type="button"
-                          className="inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
-                          disabled={inviteBusy !== null}
-                          onClick={cancelInvite}
-                        >
-                          {inviteBusy === "cancel"
-                            ? t("promises.detail.saving")
-                            : t("promises.detail.withdrawInviteShort")}
-                        </button>
-                      )}
-                    </>
-                  )}
                 </div>
               </div>
             )}

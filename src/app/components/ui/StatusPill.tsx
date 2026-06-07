@@ -30,7 +30,7 @@ export function StatusPill({ label, tone = "neutral", icon, marker = "none", cla
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 rounded-[999px] px-2.5 py-1.5 text-center text-[13px] font-medium leading-none",
+        "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-[999px] px-2.5 py-1.5 text-center text-[13px] font-medium leading-none",
         toneClassMap[tone],
         className
       )}
