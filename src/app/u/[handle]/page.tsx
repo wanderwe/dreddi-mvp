@@ -597,11 +597,14 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   }, [promisesByTab.execution, promisesByTab.reaction]);
   const lastActivityAt = profile?.last_activity_at ?? lastActivityFromPromises;
   const publicProfilePath = useMemo(
-    () => (handle ? `/u/${encodeURIComponent(handle)}` : ""),
-    [handle]
+    () => (handle ? `/${locale}/u/${encodeURIComponent(handle)}` : ""),
+    [handle, locale]
   );
   const publicProfileUrl = origin && publicProfilePath ? `${origin}${publicProfilePath}` : "";
-  const embedPath = useMemo(() => (handle ? `/u/${encodeURIComponent(handle)}/embed` : ""), [handle]);
+  const embedPath = useMemo(
+    () => (handle ? `/${locale}/u/${encodeURIComponent(handle)}/embed` : ""),
+    [handle, locale]
+  );
   const embedUrl = origin && embedPath ? `${origin}${embedPath}` : "";
   const embedFrameId = useMemo(
     () => `dreddi-embed-${(handle ?? "profile").replace(/[^a-zA-Z0-9_-]/g, "-")}`,

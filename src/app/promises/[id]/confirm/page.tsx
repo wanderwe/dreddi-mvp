@@ -356,7 +356,7 @@ export default function ConfirmPromisePage() {
               )}
 
               {canReview ? (
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-6 flex flex-wrap gap-3 sm:justify-end">
                   <button
                     ref={confirmButtonRef}
                     type="button"
