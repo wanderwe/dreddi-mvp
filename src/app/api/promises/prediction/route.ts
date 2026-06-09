@@ -39,16 +39,16 @@ export async function GET(req: Request) {
     }
 
     const actorRows = (actorDeals ?? []) as PromiseStatsRow[];
-    const finalizedDealsCount = actorRows.length;
-    const fulfilledCount = actorRows.filter((row) => row.status === "confirmed").length;
-    const disputedCount = actorRows.filter((row) => row.status === "disputed").length;
 
-    const acceptedResponsibleCount = actorRows.filter(
-      (row) => row.promisor_id === user.id && row.accepted_at
-    ).length;
-    const completedResponsibleCount = actorRows.filter(
-      (row) => row.promisor_id === user.id && row.status === "confirmed"
-    ).length;
+    // Only count deals where the user was the promisor (executor) for rate calculations.
+    // Including promisee/observer roles would inflate rates with deals the user didn't perform.
+    const promisorRows = actorRows.filter((row) => row.promisor_id === user.id);
+    const finalizedDealsCount = promisorRows.length;
+    const fulfilledCount = promisorRows.filter((row) => row.status === "confirmed").length;
+    const disputedCount = promisorRows.filter((row) => row.status === "disputed").length;
+
+    const acceptedResponsibleCount = promisorRows.filter((row) => row.accepted_at).length;
+    const completedResponsibleCount = promisorRows.filter((row) => row.status === "confirmed").length;
 
     const actorMetrics = {
       fulfilledRate:
@@ -63,7 +63,7 @@ export async function GET(req: Request) {
 
     let counterpartyMetrics: {
       priorFulfilledTogether?: number;
-      responseRate?: number;
+      fulfillmentRate?: number;
       isPublicProfile?: boolean;
     } | null = null;
 
@@ -94,29 +94,27 @@ export async function GET(req: Request) {
       }
 
       const isPublicProfile = profile?.is_public_profile ?? false;
-      let responseRate: number | undefined = undefined;
+      let fulfillmentRate: number | undefined = undefined;
 
       if (isPublicProfile) {
         const { data: cpDeals, error: cpDealsError } = await admin
           .from("promises")
-          .select("status")
+          .select("status,promisor_id")
           .in("status", ["confirmed", "disputed"])
-          .or(
-            `creator_id.eq.${counterpartyId},counterparty_id.eq.${counterpartyId},promisor_id.eq.${counterpartyId},promisee_id.eq.${counterpartyId}`
-          );
+          .eq("promisor_id", counterpartyId);
 
         if (cpDealsError) {
-          return NextResponse.json({ error: "Failed to load counterparty response metrics", detail: cpDealsError.message }, { status: 500 });
+          return NextResponse.json({ error: "Failed to load counterparty metrics", detail: cpDealsError.message }, { status: 500 });
         }
 
-        const finalizedCount = (cpDeals ?? []).length;
-        const respondedCount = (cpDeals ?? []).filter((row) => row.status === "confirmed").length;
-        responseRate = finalizedCount > 0 ? (respondedCount / finalizedCount) * 100 : undefined;
+        const cpFinalizedCount = (cpDeals ?? []).length;
+        const cpFulfilledCount = (cpDeals ?? []).filter((row) => row.status === "confirmed").length;
+        fulfillmentRate = cpFinalizedCount > 0 ? (cpFulfilledCount / cpFinalizedCount) * 100 : undefined;
       }
 
       counterpartyMetrics = {
         priorFulfilledTogether,
-        responseRate,
+        fulfillmentRate,
         isPublicProfile,
       };
     }

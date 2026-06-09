@@ -6,7 +6,7 @@ export type PredictionInput = {
     finalizedDealsCount?: number;
   };
   counterpartyMetrics?: {
-    responseRate?: number;
+    fulfillmentRate?: number;
     priorFulfilledTogether?: number;
     isPublicProfile?: boolean;
   };
@@ -26,13 +26,14 @@ export type PredictionReasonKey =
   | "strong_completion_history"
   | "low_completion_history"
   | "high_dispute_rate"
+  | "low_dispute_rate"
   | "limited_history_uncertain"
   | "positive_but_limited_history"
   | "deep_shared_history"
   | "some_shared_history"
   | "new_counterparty"
-  | "counterparty_responsive"
-  | "counterparty_unresponsive"
+  | "counterparty_high_fulfillment"
+  | "counterparty_low_fulfillment"
   | "has_deadline"
   | "no_deadline"
   | "short_deadline_risk"
@@ -49,34 +50,8 @@ export type AppliedModifier = {
 export type PredictionResult = {
   score: number;
   band: PredictionBand;
-  reasons: string[];
   reasonKeys: PredictionReasonKey[];
   appliedModifiers: AppliedModifier[];
-};
-
-const BASE_SCORE = 70;
-const MIN_SCORE = 5;
-const MAX_SCORE = 95;
-
-const EN_REASONS: Record<PredictionReasonKey, string> = {
-  strong_fulfillment_history: "strong fulfillment history",
-  low_fulfillment_history: "low fulfillment history increases risk",
-  strong_completion_history: "strong completion history lowers risk",
-  low_completion_history: "low completion history increases risk",
-  high_dispute_rate: "high dispute rate increases risk",
-  limited_history_uncertain: "limited history makes this prediction less certain",
-  positive_but_limited_history: "you have positive history, but there is still limited data",
-  deep_shared_history: "you have successful history with this person",
-  some_shared_history: "you have fulfilled deals together",
-  new_counterparty: "this is a new counterparty with no shared history",
-  counterparty_responsive: "this counterparty usually responds to deal outcomes",
-  counterparty_unresponsive: "this counterparty often does not respond to deal outcomes",
-  has_deadline: "a clear deadline improves clarity",
-  no_deadline: "no deadline makes outcome less clear",
-  short_deadline_risk: "short deadline increases risk",
-  clear_details: "clear deal details improve clarity",
-  unclear_details: "unclear deal details increase ambiguity",
-  public_commitment: "public commitment adds accountability",
 };
 
 const REASON_TOPIC: Record<PredictionReasonKey, string> = {
@@ -85,16 +60,17 @@ const REASON_TOPIC: Record<PredictionReasonKey, string> = {
   strong_completion_history: "actor_track_record",
   low_completion_history: "actor_track_record",
   high_dispute_rate: "disputes",
+  low_dispute_rate: "disputes",
   limited_history_uncertain: "certainty",
   positive_but_limited_history: "certainty",
   deep_shared_history: "relationship",
   some_shared_history: "relationship",
   new_counterparty: "relationship",
-  counterparty_responsive: "counterparty_responsiveness",
-  counterparty_unresponsive: "counterparty_responsiveness",
-  has_deadline: "deadline_clarity",
-  no_deadline: "deadline_clarity",
-  short_deadline_risk: "deadline_pressure",
+  counterparty_high_fulfillment: "counterparty_reputation",
+  counterparty_low_fulfillment: "counterparty_reputation",
+  has_deadline: "deadline",
+  no_deadline: "deadline",
+  short_deadline_risk: "deadline",
   clear_details: "details_quality",
   unclear_details: "details_quality",
   public_commitment: "public_accountability",
@@ -176,13 +152,22 @@ function pickReasons(modifiers: AppliedModifier[]) {
     }
   }
 
+  // Fallback: ensure at least 2 reasons — check both original and upgraded key name
   if (selected.length < 2) {
-    const fallback = modifiers.find((item) => item.reasonKey === "limited_history_uncertain");
-    if (fallback) selected.push(fallback);
+    const fallback = modifiers.find(
+      (item) =>
+        item.reasonKey === "limited_history_uncertain" ||
+        item.reasonKey === "positive_but_limited_history"
+    );
+    if (fallback && !selected.includes(fallback)) selected.push(fallback);
   }
 
   return selected.slice(0, 4);
 }
+
+const BASE_SCORE = 70;
+const MIN_SCORE = 5;
+const MAX_SCORE = 95;
 
 export function generateDealPrediction(input: PredictionInput): PredictionResult {
   const modifiers: AppliedModifier[] = [];
@@ -194,6 +179,7 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
     modifiers.push({ key, delta, reasonKey });
   };
 
+  // --- Actor: fulfillment rate (as promisor) ---
   if (typeof actor?.fulfilledRate === "number") {
     if (actor.fulfilledRate >= 90) addModifier("actor_fulfilled_rate", 10, "strong_fulfillment_history");
     else if (actor.fulfilledRate >= 75) addModifier("actor_fulfilled_rate", 6, "strong_fulfillment_history");
@@ -202,6 +188,7 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
     else addModifier("actor_fulfilled_rate", -12, "low_fulfillment_history");
   }
 
+  // --- Actor: completion rate (accepted → confirmed) ---
   if (typeof actor?.completionRate === "number") {
     if (actor.completionRate >= 90) addModifier("actor_completion_rate", 8, "strong_completion_history");
     else if (actor.completionRate >= 75) addModifier("actor_completion_rate", 4, "strong_completion_history");
@@ -210,41 +197,51 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
     else addModifier("actor_completion_rate", -10, "low_completion_history");
   }
 
+  // --- Actor: dispute rate — penalise high, reward clean record ---
   if (typeof actor?.disputeRate === "number") {
     if (actor.disputeRate >= 30) addModifier("actor_dispute_rate", -12, "high_dispute_rate");
     else if (actor.disputeRate >= 20) addModifier("actor_dispute_rate", -8, "high_dispute_rate");
-    else addModifier("actor_dispute_rate", 0, "high_dispute_rate");
+    else if (actor.disputeRate === 0) addModifier("actor_dispute_rate", 3, "low_dispute_rate");
+    else if (actor.disputeRate < 10) addModifier("actor_dispute_rate", 1, "low_dispute_rate");
+    // 10–20% → neutral, no modifier
   }
 
+  // --- Actor: volume confidence ---
   if (typeof actor?.finalizedDealsCount === "number") {
     if (actor.finalizedDealsCount < 3) addModifier("actor_volume_confidence", -4, "limited_history_uncertain");
     else if (actor.finalizedDealsCount <= 5) addModifier("actor_volume_confidence", -2, "limited_history_uncertain");
     else if (actor.finalizedDealsCount > 20) addModifier("actor_volume_confidence", 2, "strong_fulfillment_history");
   }
 
+  // --- Counterparty: shared history ---
   if (typeof counterparty?.priorFulfilledTogether === "number") {
     if (counterparty.priorFulfilledTogether >= 3) addModifier("counterparty_prior_fulfilled_together", 8, "deep_shared_history");
     else if (counterparty.priorFulfilledTogether >= 1) addModifier("counterparty_prior_fulfilled_together", 4, "some_shared_history");
-    else addModifier("counterparty_prior_fulfilled_together", -3, "new_counterparty");
+    else addModifier("counterparty_prior_fulfilled_together", -6, "new_counterparty");
   } else {
     addModifier("counterparty_unknown", -8, "new_counterparty");
   }
 
-  if (counterparty?.isPublicProfile && typeof counterparty.responseRate === "number") {
-    if (counterparty.responseRate >= 90) addModifier("counterparty_response_rate", 4, "counterparty_responsive");
-    else if (counterparty.responseRate >= 70) addModifier("counterparty_response_rate", 2, "counterparty_responsive");
-    else if (counterparty.responseRate >= 40) addModifier("counterparty_response_rate", -3, "counterparty_unresponsive");
-    else addModifier("counterparty_response_rate", -7, "counterparty_unresponsive");
+  // --- Counterparty: fulfillment rate (public profiles only) ---
+  if (counterparty?.isPublicProfile && typeof counterparty.fulfillmentRate === "number") {
+    if (counterparty.fulfillmentRate >= 90) addModifier("counterparty_fulfillment_rate", 4, "counterparty_high_fulfillment");
+    else if (counterparty.fulfillmentRate >= 70) addModifier("counterparty_fulfillment_rate", 2, "counterparty_high_fulfillment");
+    else if (counterparty.fulfillmentRate >= 40) addModifier("counterparty_fulfillment_rate", -3, "counterparty_low_fulfillment");
+    else addModifier("counterparty_fulfillment_rate", -7, "counterparty_low_fulfillment");
   }
 
+  // --- Deal: deadline (single block — no contradictory reasons) ---
   if (deal) {
-    addModifier("deal_deadline_presence", deal.hasDeadline ? 2 : -6, deal.hasDeadline ? "has_deadline" : "no_deadline");
-
-    if (deal.hasDeadline && typeof deal.hoursToDeadline === "number") {
-      if (deal.hoursToDeadline < 24) addModifier("deal_deadline_aggressiveness", -12, "short_deadline_risk");
-      else if (deal.hoursToDeadline < 72) addModifier("deal_deadline_aggressiveness", -6, "short_deadline_risk");
-      else if (deal.hoursToDeadline <= 168) addModifier("deal_deadline_aggressiveness", -2, "short_deadline_risk");
-      else if (deal.hoursToDeadline <= 720) addModifier("deal_deadline_aggressiveness", 2, "has_deadline");
+    if (!deal.hasDeadline) {
+      addModifier("deal_deadline", -6, "no_deadline");
+    } else if (typeof deal.hoursToDeadline === "number") {
+      if (deal.hoursToDeadline < 24) addModifier("deal_deadline", -12, "short_deadline_risk");
+      else if (deal.hoursToDeadline < 72) addModifier("deal_deadline", -6, "short_deadline_risk");
+      else if (deal.hoursToDeadline <= 168) addModifier("deal_deadline", -2, "short_deadline_risk");
+      else addModifier("deal_deadline", 2, "has_deadline");
+    } else {
+      // hasDeadline but hoursToDeadline unavailable — treat as positive
+      addModifier("deal_deadline", 2, "has_deadline");
     }
 
     const details = buildDetailsQuality(deal.detailsText);
@@ -253,12 +250,18 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
     if (deal.isPublic) addModifier("deal_public_commitment", 3, "public_commitment");
   }
 
-  const hasSparseActorData = !actor || [actor.fulfilledRate, actor.completionRate, actor.disputeRate].filter((value) => typeof value === "number").length < 2;
+  // --- Sparse actor data fallback ---
+  const hasSparseActorData =
+    !actor ||
+    [actor.fulfilledRate, actor.completionRate, actor.disputeRate].filter(
+      (value) => typeof value === "number"
+    ).length < 2;
 
   if (hasSparseActorData && !modifiers.some((item) => item.reasonKey === "limited_history_uncertain")) {
     addModifier("insufficient_history", -4, "limited_history_uncertain");
   }
 
+  // --- Upgrade "limited_history" when there's a positive shared history ---
   const hasPositiveSharedHistory = modifiers.some(
     (item) => item.reasonKey === "deep_shared_history" || item.reasonKey === "some_shared_history"
   );
@@ -278,7 +281,6 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
   return {
     score,
     band,
-    reasons: topReasons.map((item) => EN_REASONS[item.reasonKey]),
     reasonKeys: topReasons.map((item) => item.reasonKey),
     appliedModifiers: modifiers,
   };
