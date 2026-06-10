@@ -13,7 +13,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
   en: {
     accepted: {
       title: "Agreement accepted",
-      body: "Why now: the other party accepted the agreement.",
+      body: "The other party accepted the agreement.",
       ctaLabel: "Open",
     },
     invite: {
@@ -38,12 +38,12 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     due_soon: {
       title: "Deadline approaching",
-      body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
+      body: "The due date is within 24 hours. Check the agreement details and plan completion.",
       ctaLabel: "View",
     },
     overdue: {
       title: "Agreement is overdue",
-      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done",
+      body: "The due date has passed. Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
     marked_completed: {
@@ -53,7 +53,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     confirmed: {
       title: "Outcome confirmed",
-      body: "Why now: the other party confirmed completion. Review the outcome details.",
+      body: "The other party confirmed completion. Review the outcome details.",
       ctaLabel: "View",
     },
     disputed: {
@@ -98,7 +98,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     reminder_due_24h: {
       title: "Deadline approaching",
-      body: "Why now: the due date is within 24 hours. Check the agreement details and plan completion.",
+      body: "The due date is within 24 hours. Check the agreement details and plan completion.",
       ctaLabel: "View",
     },
     deadline_passed: {
@@ -118,7 +118,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     reminder_overdue: {
       title: "Agreement is overdue",
-      body: "Why now: the due date has passed. Review the agreement and mark it completed if it’s done",
+      body: "The due date has passed. Review the agreement and mark it completed if it’s done",
       ctaLabel: "Open",
     },
     reminder_manual: {
@@ -133,7 +133,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Outcome confirmed",
-      body: "Why now: the other party confirmed completion. Review the outcome details.",
+      body: "The other party confirmed completion. Review the outcome details.",
       ctaLabel: "View",
     },
     dispute: {
@@ -147,25 +147,25 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       ctaLabel: "View",
     },
     counter_condition_proposed: {
-      title: "Counter-condition proposed",
-      body: "The other side accepted with a modified condition. Review and confirm or cancel.",
+      title: "Counter-obligation proposed",
+      body: "Review and confirm or cancel the agreement.",
       ctaLabel: "Review",
     },
     counter_condition_confirmed: {
-      title: "Condition confirmed",
-      body: "The creator confirmed your proposed condition. The agreement is now active.",
+      title: "Counter-obligation confirmed",
+      body: "The agreement is now active.",
       ctaLabel: "Open",
     },
     counter_condition_rejected: {
       title: "Agreement cancelled",
-      body: "The creator did not accept your proposed condition and cancelled the agreement.",
+      body: "The creator did not accept your obligation.",
       ctaLabel: "Open",
     },
   },
   uk: {
     accepted: {
       title: "Домовленість прийнято",
-      body: "Причина: інша сторона прийняла домовленість.",
+      body: "Інша сторона прийняла домовленість.",
       ctaLabel: "Відкрити",
     },
     invite: {
@@ -190,12 +190,12 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     due_soon: {
       title: "Наближається дедлайн",
-      body: "Причина: дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
+      body: "Дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
       ctaLabel: "Переглянути",
     },
     overdue: {
       title: "Дедлайн минув",
-      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
+      body: "Термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
       ctaLabel: "Відкрити",
     },
     marked_completed: {
@@ -205,7 +205,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     confirmed: {
       title: "Результат підтверджено",
-      body: "Причина: інша сторона підтвердила виконання. Перегляньте деталі результату.",
+      body: "Інша сторона підтвердила виконання. Перегляньте деталі результату.",
       ctaLabel: "Переглянути",
     },
     disputed: {
@@ -250,7 +250,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     reminder_due_24h: {
       title: "Наближається дедлайн",
-      body: "Причина: дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
+      body: "Дедлайн уже в межах 24 годин. Перегляньте деталі угоди та сплануйте завершення.",
       ctaLabel: "Переглянути",
     },
     deadline_passed: {
@@ -270,7 +270,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     reminder_overdue: {
       title: "Дедлайн минув",
-      body: "Причина: термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
+      body: "Термін минув. Перегляньте угоду та позначте виконаною, якщо все завершено",
       ctaLabel: "Відкрити",
     },
     reminder_manual: {
@@ -285,7 +285,7 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     },
     completion_followup: {
       title: "Результат підтверджено",
-      body: "Причина: інша сторона підтвердила виконання. Перегляньте деталі результату.",
+      body: "Інша сторона підтвердила виконання. Перегляньте деталі результату.",
       ctaLabel: "Переглянути",
     },
     dispute: {
@@ -299,18 +299,18 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       ctaLabel: "Переглянути",
     },
     counter_condition_proposed: {
-      title: "Запропоновано контр-умову",
-      body: "Інша сторона прийняла із зміненою умовою. Перегляньте та підтвердіть або скасуйте.",
+      title: "Запропоновано зустрічне зобов'язання",
+      body: "Перегляньте та підтвердіть або скасуйте угоду.",
       ctaLabel: "Переглянути",
     },
     counter_condition_confirmed: {
-      title: "Умову підтверджено",
-      body: "Автор підтвердив вашу запропоновану умову. Домовленість тепер активна.",
+      title: "Зустрічне зобов'язання підтверджено",
+      body: "Угода тепер активна.",
       ctaLabel: "Відкрити",
     },
     counter_condition_rejected: {
       title: "Домовленість скасовано",
-      body: "Автор не прийняв вашу запропоновану умову і скасував домовленість.",
+      body: "Автор не прийняв ваше зобов'язання.",
       ctaLabel: "Відкрити",
     },
   },

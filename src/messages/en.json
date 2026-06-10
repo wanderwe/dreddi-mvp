@@ -270,14 +270,14 @@
       "counterpartyFallback": "other side",
       "unknownUser": "Unknown user",
       "noDetails": "No details provided",
-      "conditionLabel": "Counter-condition",
-      "conditionWaiting": "Waiting for the other side to meet the condition",
-      "conditionMet": "Condition met",
-      "conditionMark": "Mark condition met",
-      "conditionRejected": "Counter-condition was rejected",
+      "conditionLabel": "Counter-obligation",
+      "conditionWaiting": "Waiting for the other side to fulfill the counter-obligation",
+      "conditionMet": "Obligation fulfilled",
+      "conditionMark": "Mark obligation fulfilled",
+      "conditionRejected": "Counter-obligation was rejected",
       "conditionProposedBanner": {
-        "title": "Invitee proposed a counter-condition",
-        "body": "Review the proposed counter-condition and confirm to activate the deal, or cancel",
+        "title": "Invitee proposed a counter-obligation",
+        "body": "Review the proposed counter-obligation and confirm to activate the deal, or cancel",
         "confirm": "Confirm & activate",
         "cancel": "Cancel deal",
         "confirming": "Confirming...",
@@ -436,7 +436,7 @@
         "loadFailed": "Failed to load {entityLower}",
         "unsupportedStatus": "{entity} has unsupported status",
         "actionFailed": "Action failed",
-        "conditionNotMet": "You can’t confirm/dispute until the counter-condition is met",
+        "conditionNotMet": "You can’t confirm/dispute until the counter-obligation is met",
         "confirmFailed": "Failed to confirm",
         "disputeFailed": "Failed to dispute"
       }
@@ -466,7 +466,7 @@
       "fields": {
         "title": "Title",
         "details": "Details",
-        "condition": "Counter-condition",
+        "condition": "Counter-obligation",
         "conditionHint": "What is required in return",
         "executor": "{executorRole}",
         "executorHelper": "Choose who is responsible for execution",
@@ -497,9 +497,9 @@
         "paymentTerms": "Payment terms or milestones"
       },
       "actions": {
-        "addCondition": "+ Add counter-condition",
+        "addCondition": "+ Add counter-obligation",
         "removeCounterparty": "Remove selected user",
-        "removeCondition": "Remove counter-condition",
+        "removeCondition": "Remove counter-obligation",
         "clearDate": "Clear date",
         "changeTime": "Change time",
         "selectTime": "Select time",
@@ -631,7 +631,7 @@
     "publicTag": "Public",
     "publicTooltip": "Shown on public profile",
     "reputationStakeTooltip": "Has a stronger impact on reputation",
-    "counterCondition": "Counter-condition",
+    "counterCondition": "Counter-obligation",
     "rewardLabel": "Reward",
     "rewardUnset": "Not specified",
     "paymentTermsLabel": "Payment terms",
@@ -651,15 +651,15 @@
       "cancelled_by_creator": "Withdrawn"
     },
     "condition": {
-      "sectionTitle": "Counter-condition",
-      "proposedByCreator": "Proposed counter-condition",
+      "sectionTitle": "Counter-obligation",
+      "proposedByCreator": "Proposed counter-obligation",
       "acceptAsIs": "Accept as-is",
       "suggestEdit": "Suggest changes",
-      "editPlaceholder": "Your version of the counter-condition...",
-      "acceptWithout": "Accept without a counter-condition",
-      "addOwn": "Add a counter-condition",
-      "addPlaceholder": "Enter your counter-condition...",
-      "awaitingConfirmation": "Your proposed counter-condition is awaiting the creator's confirmation"
+      "editPlaceholder": "Your version of the counter-obligation...",
+      "acceptWithout": "Accept without a counter-obligation",
+      "addOwn": "Add a counter-obligation",
+      "addPlaceholder": "Enter your counter-obligation...",
+      "awaitingConfirmation": "Your proposed counter-obligation is awaiting the creator's confirmation"
     },
     "nextStep": "Next step",
     "nextStepHint": "By accepting, you confirm you understand this {entityLower}",
@@ -929,7 +929,7 @@
     "types": {
       "accepted": {
         "title": "Deal accepted",
-        "description": "Why now: the other party accepted the deal.",
+        "description": "The other party accepted the deal.",
         "cta": "Open"
       },
       "invite": {
@@ -954,7 +954,7 @@
       },
       "confirmed": {
         "title": "Outcome fulfilled",
-        "description": "Why now: the other party marked the deal as fulfilled. Review the outcome details.",
+        "description": "The other party marked the deal as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "disputed": {
@@ -964,7 +964,7 @@
       },
       "reminder_due_24h": {
         "title": "Deadline approaching",
-        "description": "Why now: the due date is within 24 hours. Check the deal details and plan completion.",
+        "description": "The due date is within 24 hours. Check the deal details and plan completion.",
         "cta": "View"
       },
       "reminder_deadline": {
@@ -979,17 +979,17 @@
       },
       "reminder_overdue": {
         "title": "Deal is overdue",
-        "description": "Why now: the due date has passed. Review the deal and mark it completed if it’s done.",
+        "description": "The due date has passed. Review the deal and mark it completed if it’s done.",
         "cta": "Open"
       },
       "due_soon": {
         "title": "Deadline approaching",
-        "description": "Why now: the due date is within 24 hours. Check the deal details and plan completion.",
+        "description": "The due date is within 24 hours. Check the deal details and plan completion.",
         "cta": "View"
       },
       "overdue": {
         "title": "Deal is overdue",
-        "description": "Why now: the due date has passed. Review the deal and mark it completed if it’s done.",
+        "description": "The due date has passed. Review the deal and mark it completed if it’s done.",
         "cta": "Open"
       },
       "completion_waiting": {
@@ -999,7 +999,7 @@
       },
       "completion_followup": {
         "title": "Outcome fulfilled",
-        "description": "Why now: the other party marked the deal as fulfilled. Review the outcome details.",
+        "description": "The other party marked the deal as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "dispute": {
@@ -1048,18 +1048,18 @@
         "cta": "Open"
       },
       "counter_condition_proposed": {
-        "title": "Counter-condition proposed",
-        "description": "The other side accepted with a modified condition. Review and confirm or cancel.",
+        "title": "Counter-obligation proposed",
+        "description": "Review and confirm or cancel the agreement.",
         "cta": "Review"
       },
       "counter_condition_confirmed": {
-        "title": "Condition confirmed",
-        "description": "The creator confirmed your proposed condition. The agreement is now active.",
+        "title": "Counter-obligation confirmed",
+        "description": "The agreement is now active.",
         "cta": "Open"
       },
       "counter_condition_rejected": {
         "title": "Agreement cancelled",
-        "description": "The creator did not accept your proposed condition and cancelled the agreement.",
+        "description": "The creator did not accept your obligation.",
         "cta": "Open"
       }
     }

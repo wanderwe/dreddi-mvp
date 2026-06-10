@@ -59,7 +59,11 @@ export const getNotificationRecipients = (
       return addRecipient(promise, promise.creator_id, actorId);
     case "counter_condition_confirmed":
     case "counter_condition_rejected":
-      return addRecipient(promise, counterpartyId, actorId);
+      // The recipient is always the invitee who proposed the counter-obligation
+      // (promise.counterparty_id), not resolveCounterpartyId — at this point the
+      // invitee may also be the resolved executor, which would make
+      // resolveCounterpartyId return the creator (the actor) and get filtered out.
+      return addRecipient(promise, promise.counterparty_id, actorId);
   }
 
   if (event !== "accepted" && !isPromiseAccepted(promise)) {
