@@ -73,9 +73,15 @@ export function SocialLinksSection({ onUpdate }: Props) {
   const loadLinks = async () => {
     try {
       const supabase = requireSupabase();
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        setLinks([]);
+        return;
+      }
       const { data } = await supabase
         .from("social_links")
-        .select("platform,username,display_name,profile_url,verified_at");
+        .select("platform,username,display_name,profile_url,verified_at")
+        .eq("user_id", userData.user.id);
       const loaded = (data as SocialLink[]) ?? [];
       setLinks(loaded);
       // Sync profile URL inputs from DB
@@ -242,11 +248,26 @@ export function SocialLinksSection({ onUpdate }: Props) {
               <div className="min-w-0">
                 <p className="text-sm font-medium text-white">{platform.label}</p>
                 {linked ? (
-                  <p className="text-xs text-emerald-300">
-                    {linked.username
+                  (() => {
+                    const label = linked.username
                       ? `${platform.usernamePrefix ?? ""}${linked.username}`
-                      : linked.display_name ?? t("profileSettings.social.connected")}
-                  </p>
+                      : linked.display_name ?? t("profileSettings.social.connected");
+                    const href = platform.id === "twitter" && linked.username
+                      ? `https://x.com/${linked.username}`
+                      : linked.profile_url ?? undefined;
+                    return href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-emerald-300 underline-offset-2 hover:underline"
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <p className="text-xs text-emerald-300">{label}</p>
+                    );
+                  })()
                 ) : (
                   <p className="text-xs text-white/40">{t("profileSettings.social.notConnected")}</p>
                 )}

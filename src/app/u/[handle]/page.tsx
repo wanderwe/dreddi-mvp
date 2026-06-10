@@ -43,6 +43,7 @@ type PublicProfileRow = {
   completion_executor_total_count: number | null;
   completion_reviewer_responded_count: number | null;
   completion_reviewer_total_count: number | null;
+  current_streak_count: number | null;
 };
 
 type PublicPromiseRow = {
@@ -671,28 +672,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     [activePromises, activePublicDealsTab, visiblePublicDealsByTab]
   );
   const hasMorePublicDeals = activePromises.length > visiblePublicDealsByTab[activePublicDealsTab];
-  const streakCount = useMemo(() => {
-    const finalizedDeals = promisesByTab.execution
-      .filter((promise) => promise.status === "confirmed" || promise.status === "disputed")
-      .map((promise) => ({
-        status: promise.status,
-        finalizedAt: promise.confirmed_at ?? promise.disputed_at,
-      }))
-      .filter((promise) => Boolean(promise.finalizedAt))
-      .sort((a, b) => {
-        const aTime = a.finalizedAt ? new Date(a.finalizedAt).getTime() : 0;
-        const bTime = b.finalizedAt ? new Date(b.finalizedAt).getTime() : 0;
-        return bTime - aTime;
-      });
-
-    let currentStreak = 0;
-    for (const deal of finalizedDeals) {
-      if (deal.status !== "confirmed") break;
-      currentStreak += 1;
-    }
-
-    return currentStreak;
-  }, [promisesByTab.execution]);
+  const streakCount = profile?.current_streak_count ?? 0;
   const lastActivityRelative = lastActivityAt ? formatRelativeTime(lastActivityAt) : null;
   const lastActivityLabel = lastActivityAt
     ? t("publicProfile.summary.lastActivity", { time: lastActivityRelative ?? "—" })
