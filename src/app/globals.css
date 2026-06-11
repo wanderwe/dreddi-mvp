@@ -47,6 +47,31 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* Scrollbar hidden until hover/scroll focus */
+.scrollbar-fade {
+  scrollbar-color: transparent transparent;
+}
+
+.scrollbar-fade:hover,
+.scrollbar-fade:focus-within {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.scrollbar-fade::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-color: transparent;
+}
+
+.scrollbar-fade::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-fade:hover::-webkit-scrollbar-thumb,
+.scrollbar-fade:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(10, 14, 24, 0.85);
+}
+
 /* LiveAgreementNetwork — feed row slide-in */
 @keyframes lan-feed-in {
   from { opacity: 0; transform: translateY(-8px); }

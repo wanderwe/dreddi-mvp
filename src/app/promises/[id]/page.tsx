@@ -1290,7 +1290,7 @@ export default function PromisePage() {
         ))}
       </div>
 
-      <div className="space-y-2">
+      <div className="scrollbar-fade max-h-[480px] space-y-2 overflow-y-auto pr-1">
         {timeline.map((item) => (
           <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
             <span
