@@ -75,6 +75,11 @@ export function MobileMenu({
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/promises/collective">
+                    {t("nav.collectiveAgreements")}
+                  </LocalizedLink>
+                </SheetClose>
+                <SheetClose asChild>
                   <LocalizedLink className={baseLinkClasses} href="/watching">
                     {t("nav.watching")}
                   </LocalizedLink>

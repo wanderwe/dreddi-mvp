@@ -16,6 +16,7 @@
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
     "groups": "Groups",
+    "collectiveAgreements": "Collective agreements",
     "allGroups": "All groups",
     "watching": "Watchlist"
   },
@@ -1157,6 +1158,78 @@
       "notFound": "Group not found or unavailable"
     }
   },
+  "collectiveAgreements": {
+    "eyebrow": "COLLECTIVE AGREEMENTS",
+    "list": {
+      "title": "Collective agreements",
+      "subtitle": "One agreement that each participant accepts individually — great for teams and companies",
+      "cta": "New collective agreement",
+      "loading": "Loading…",
+      "empty": "No collective agreements yet",
+      "emptyDescription": "Create an agreement and invite several participants — each accepts their own copy",
+      "createdAt": "Created {date}",
+      "participants": "Participants: {count}",
+      "progressAccepted": "Accepted: {accepted}/{total}",
+      "progressConfirmed": "Confirmed: {confirmed}/{total}",
+      "progressDisputed": "Disputed: {disputed}/{total}"
+    },
+    "new": {
+      "title": "New collective agreement",
+      "subtitle": "Describe the commitment and pick participants — each one gets their own copy of the agreement",
+      "fields": {
+        "title": "Title",
+        "details": "Details",
+        "condition": "Condition",
+        "dueDate": "Due date",
+        "participants": "Participants"
+      },
+      "placeholders": {
+        "title": "E.g.: Finish onboarding by Friday",
+        "details": "Additional details (optional)",
+        "condition": "Completion condition (optional)",
+        "participantSearch": "Search by handle or name"
+      },
+      "actions": {
+        "addCondition": "Add condition",
+        "removeCondition": "Remove condition",
+        "removeParticipant": "Remove participant"
+      },
+      "search": {
+        "searching": "Searching…",
+        "noResults": "No results found",
+        "inDreddi": "On Dreddi"
+      },
+      "selectedParticipants": "Selected participants ({count})",
+      "settings": {
+        "important": {
+          "toggle": "Reputation stake",
+          "helper": "Has a bigger impact on reputation after confirmation or a dispute"
+        },
+        "visibility": {
+          "label": "Public agreement",
+          "helper": "When enabled, each participant's copy will appear on their public profile"
+        }
+      },
+      "submit": "Create collective agreement",
+      "creating": "Creating…",
+      "errors": {
+        "titleRequired": "Title is required",
+        "participantsRequired": "Add at least one participant",
+        "createFailed": "Could not create the collective agreement",
+        "network": "Network issue. Please try again"
+      }
+    },
+    "detail": {
+      "back": "Back to collective agreements",
+      "loading": "Loading…",
+      "notFound": "Collective agreement not found or unavailable",
+      "roster": "Participants ({count})",
+      "yourCopy": "Your copy of the agreement",
+      "viewDeal": "View deal →",
+      "createdAt": "Created {date}"
+    },
+    "badge": "Part of a collective agreement"
+  },
   "publicAgreement": {
     "loading": "Loading public agreement…",
     "notPublicTitle": "Agreement is not public",
@@ -1176,6 +1249,7 @@
       "confirmed": "Fulfilled",
       "disputed": "Disputed",
       "awaiting_acceptance": "Awaiting acceptance",
+      "awaiting_creator_confirmation": "Awaiting condition confirmation",
       "declined": "Declined",
       "expired": "Expired",
       "cancelled_by_creator": "Cancelled"
@@ -1211,6 +1285,13 @@
       "disputedDescription": "The outcome was marked as disputed",
       "declined": "Agreement declined",
       "cancelled": "Agreement cancelled",
+      "counterConditionProposed": "Counter-obligation proposed",
+      "counterConditionConfirmed": "Counter-obligation confirmed",
+      "counterConditionConfirmedDescription": "The agreement creator confirmed the counter-obligation",
+      "counterConditionRejected": "Counter-obligation declined",
+      "counterConditionRejectedDescription": "The agreement creator declined the proposed counter-obligation",
+      "counterConditionMet": "Counter-obligation fulfilled",
+      "counterConditionMetDescription": "The counter-obligation was marked as fulfilled",
       "expired": "Invitation expired",
       "update": "Update",
       "updateAuthorFallback": "Agreement participant"

@@ -81,6 +81,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       invite_status: "accepted",
       counterparty_accepted_at: nowIso,
       accepted_at: nowIso,
+      condition_confirmed_at: nowIso,
     };
 
     if (p.condition_text) {

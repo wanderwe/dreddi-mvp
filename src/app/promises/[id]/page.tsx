@@ -43,6 +43,8 @@ type PromiseRow = {
   condition_met_at: string | null;
   condition_met_by: string | null;
   condition_proposed_by: string | null;
+  condition_proposed_at: string | null;
+  condition_confirmed_at: string | null;
   counterparty_contact: string | null;
   due_at: string | null;
   status: PromiseStatus;
@@ -126,7 +128,15 @@ function getLifecycleStates(
 
 function buildAgreementTimeline(
   promise: PromiseRow,
-  labels: { creator: string; accepter: string; executor: string; reviewer: string; system: string },
+  labels: {
+    creator: string;
+    accepter: string;
+    executor: string;
+    reviewer: string;
+    system: string;
+    conditionProposer: string;
+    conditionMetBy: string;
+  },
   uiStatus: PromiseUiStatus,
   t: ReturnType<typeof useT>
 ): AgreementTimelineItem[] {
@@ -142,6 +152,28 @@ function buildAgreementTimeline(
         : t("publicAgreement.timeline.createdDescriptionPrivate"),
     },
   ];
+
+  if (promise.condition_proposed_at && promise.condition_proposed_by) {
+    items.push({
+      key: "counter_condition_proposed",
+      label: t("publicAgreement.timeline.counterConditionProposed"),
+      actor: labels.conditionProposer,
+      timestamp: promise.condition_proposed_at,
+      description: promise.condition_text ?? undefined,
+      tone: "attention",
+    });
+  }
+
+  if (promise.condition_confirmed_at && promise.condition_proposed_by) {
+    items.push({
+      key: "counter_condition_confirmed",
+      label: t("publicAgreement.timeline.counterConditionConfirmed"),
+      actor: labels.creator,
+      timestamp: promise.condition_confirmed_at,
+      description: t("publicAgreement.timeline.counterConditionConfirmedDescription"),
+      tone: "success",
+    });
+  }
 
   if (acceptedAt) {
     items.push({
@@ -198,12 +230,34 @@ function buildAgreementTimeline(
   }
 
   if (promise.cancelled_at) {
+    if (promise.condition_proposed_by) {
+      items.push({
+        key: "counter_condition_rejected",
+        label: t("publicAgreement.timeline.counterConditionRejected"),
+        actor: labels.creator,
+        timestamp: promise.cancelled_at,
+        description: t("publicAgreement.timeline.counterConditionRejectedDescription"),
+        tone: "danger",
+      });
+    } else {
+      items.push({
+        key: "cancelled",
+        label: t("publicAgreement.timeline.cancelled"),
+        actor: labels.creator,
+        timestamp: promise.cancelled_at,
+        tone: "danger",
+      });
+    }
+  }
+
+  if (promise.condition_met_at) {
     items.push({
-      key: "cancelled",
-      label: t("publicAgreement.timeline.cancelled"),
-      actor: labels.creator,
-      timestamp: promise.cancelled_at,
-      tone: "danger",
+      key: "counter_condition_met",
+      label: t("publicAgreement.timeline.counterConditionMet"),
+      actor: labels.conditionMetBy,
+      timestamp: promise.condition_met_at,
+      description: t("publicAgreement.timeline.counterConditionMetDescription"),
+      tone: "success",
     });
   }
 
@@ -407,7 +461,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
       )
       .eq("id", id)
       .maybeSingle();
@@ -1094,6 +1148,8 @@ export default function PromisePage() {
           executor: responsibleLabel,
           reviewer: reviewerLabel,
           system: t("publicAgreement.timeline.system"),
+          conditionProposer: getParticipantLabel(p?.condition_proposed_by ?? null),
+          conditionMetBy: getParticipantLabel(p?.condition_met_by ?? null),
         },
         uiStatus,
         t

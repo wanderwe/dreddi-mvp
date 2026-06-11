@@ -49,6 +49,7 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "public" | "private" | null;
+  collective_agreement_id: string | null;
 };
 
 type PagedTabKey = "i-promised" | "promised-to-me" | "all";
@@ -87,6 +88,7 @@ type PromiseRoleBase = Pick<
   | "promisee_id"
   | "counterparty_id"
   | "visibility"
+  | "collective_agreement_id"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -388,7 +390,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
-        + ",visibility"
+        + ",visibility,collective_agreement_id"
       )
       .or(buildBaseFilter(user.id))
       .order("created_at", { ascending: false })
@@ -455,7 +457,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
-        + ",visibility"
+        + ",visibility,collective_agreement_id"
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
@@ -1316,6 +1318,14 @@ export default function PromisesClient() {
                           </div>
                         </div>
                         <div className="text-xs text-slate-400">{dealMeta}</div>
+                        {p.collective_agreement_id && (
+                          <LocalizedLink
+                            href={`/promises/collective/${p.collective_agreement_id}`}
+                            className="inline-flex w-fit items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs text-emerald-200 hover:text-emerald-100"
+                          >
+                            {t("collectiveAgreements.badge")}
+                          </LocalizedLink>
+                        )}
                       </div>
 
                       <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-slate-200 sm:justify-end lg:self-start">
