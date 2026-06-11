@@ -16,6 +16,7 @@
     "actionQueueBadge": "Потрібні дії",
     "sendFeedback": "Надіслати фідбек",
     "groups": "Групи",
+    "collectiveAgreements": "Спільні угоди",
     "allGroups": "Усі групи",
     "watching": "Стеження"
   },
@@ -1187,6 +1188,78 @@
       "notFound": "Групу не знайдено або вона недоступна"
     }
   },
+  "collectiveAgreements": {
+    "eyebrow": "СПІЛЬНІ УГОДИ",
+    "list": {
+      "title": "Спільні угоди",
+      "subtitle": "Одна угода, яку приймає кожен учасник окремо — зручно для команд і компаній",
+      "cta": "Нова спільна угода",
+      "loading": "Завантаження…",
+      "empty": "Поки немає спільних угод",
+      "emptyDescription": "Створіть угоду й запросіть кількох учасників — кожен прийме свою копію",
+      "createdAt": "Створено {date}",
+      "participants": "Учасників: {count}",
+      "progressAccepted": "Прийняли: {accepted}/{total}",
+      "progressConfirmed": "Підтвердили: {confirmed}/{total}",
+      "progressDisputed": "Оскаржили: {disputed}/{total}"
+    },
+    "new": {
+      "title": "Нова спільна угода",
+      "subtitle": "Опишіть зобов'язання та оберіть учасників — кожен отримає власну копію угоди",
+      "fields": {
+        "title": "Назва",
+        "details": "Опис",
+        "condition": "Умова",
+        "dueDate": "Дедлайн",
+        "participants": "Учасники"
+      },
+      "placeholders": {
+        "title": "Наприклад: Завершити онбординг до п'ятниці",
+        "details": "Додаткові деталі (необов'язково)",
+        "condition": "Умова виконання (необов'язково)",
+        "participantSearch": "Пошук за хендлом або іменем"
+      },
+      "actions": {
+        "addCondition": "Додати умову",
+        "removeCondition": "Прибрати умову",
+        "removeParticipant": "Прибрати учасника"
+      },
+      "search": {
+        "searching": "Пошук…",
+        "noResults": "Нічого не знайдено",
+        "inDreddi": "У Dreddi"
+      },
+      "selectedParticipants": "Обрані учасники ({count})",
+      "settings": {
+        "important": {
+          "toggle": "Ставка на репутацію",
+          "helper": "Дає більший вплив на репутацію після підтвердження або спору"
+        },
+        "visibility": {
+          "label": "Публічна угода",
+          "helper": "Якщо увімкнено, копії угод з'являться на публічних профілях учасників"
+        }
+      },
+      "submit": "Створити спільну угоду",
+      "creating": "Створення…",
+      "errors": {
+        "titleRequired": "Вкажіть назву угоди",
+        "participantsRequired": "Додайте хоча б одного учасника",
+        "createFailed": "Не вдалося створити спільну угоду",
+        "network": "Проблема з мережею. Спробуйте ще раз"
+      }
+    },
+    "detail": {
+      "back": "До спільних угод",
+      "loading": "Завантаження…",
+      "notFound": "Спільну угоду не знайдено або вона недоступна",
+      "roster": "Учасники ({count})",
+      "yourCopy": "Ваша копія угоди",
+      "viewDeal": "Переглянути угоду →",
+      "createdAt": "Створено {date}"
+    },
+    "badge": "Частина спільної угоди"
+  },
   "publicAgreement": {
     "loading": "Завантажуємо публічну угоду…",
     "notPublicTitle": "Угода не є публічною",
@@ -1206,6 +1279,7 @@
       "confirmed": "Дотримано",
       "disputed": "Оскаржено",
       "awaiting_acceptance": "Очікує прийняття",
+      "awaiting_creator_confirmation": "Очікує підтвердження умови",
       "declined": "Відхилено",
       "expired": "Прострочено",
       "cancelled_by_creator": "Скасовано"
