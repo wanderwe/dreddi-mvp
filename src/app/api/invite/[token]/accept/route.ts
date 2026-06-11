@@ -142,6 +142,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ token: string
         invite_status: "awaiting_creator_confirmation",
         condition_text: rawConditionText,
         condition_proposed_by: userId,
+        condition_proposed_at: nowIso,
         ...roleUpdate,
       };
 
