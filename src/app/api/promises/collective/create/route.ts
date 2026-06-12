@@ -4,6 +4,7 @@ import { getAdminClient } from "../../[id]/common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 import { getInviteExpiryIso } from "@/lib/inviteLifecycle";
+import { productFlags } from "@/lib/config/productFlags";
 
 type CreateCollectiveAgreementPayload = {
   title?: string;
@@ -23,6 +24,10 @@ const generateInviteToken = () => {
 
 export async function POST(req: Request) {
   try {
+    if (!productFlags.collectiveAgreements) {
+      return NextResponse.json({ error: "Feature is disabled" }, { status: 404 });
+    }
+
     const cookieStore = await cookies();
     const user = await requireUser(req, cookieStore);
     if (user instanceof NextResponse) return user;

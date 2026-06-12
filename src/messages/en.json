@@ -1218,7 +1218,11 @@
       "viewDeal": "View deal →",
       "createdAt": "Created {date}"
     },
-    "badge": "Part of a collective agreement"
+    "badge": "Part of a collective agreement",
+    "summary": {
+      "title": "Agreement · {title}",
+      "progress": "Participants: {total} · accepted: {accepted}"
+    }
   },
   "publicAgreement": {
     "loading": "Loading public agreement…",

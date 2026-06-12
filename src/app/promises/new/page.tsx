@@ -21,6 +21,7 @@ import {
 } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
+import { productFlags } from "@/lib/config/productFlags";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -777,7 +778,9 @@ export default function NewPromisePage() {
       setVisibility(parsedDraft.visibility === "public" ? "public" : "private");
       setIsImportant(parsedDraft.isImportant ?? false);
       setSelectedCounterparty(parsedDraft.selectedCounterparty ?? null);
-      setMultipleParticipants(restoredExecutor === "other" && (parsedDraft.multipleParticipants ?? false));
+      setMultipleParticipants(
+        productFlags.collectiveAgreements && restoredExecutor === "other" && (parsedDraft.multipleParticipants ?? false)
+      );
       setSelectedParticipants(parsedDraft.selectedParticipants ?? []);
 
       if (parsedDraft.dueAt) {
@@ -1122,7 +1125,7 @@ export default function NewPromisePage() {
               </div>
             </div>
 
-            {executor === "other" && (
+            {productFlags.collectiveAgreements && executor === "other" && (
               <div className="sm:col-span-2">
                 <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                   <span className="min-w-0 flex-1">

@@ -1248,7 +1248,11 @@
       "viewDeal": "Переглянути угоду →",
       "createdAt": "Створено {date}"
     },
-    "badge": "Частина спільної угоди"
+    "badge": "Частина спільної угоди",
+    "summary": {
+      "title": "Угода · {title}",
+      "progress": "Учасників: {total} · прийняли: {accepted}"
+    }
   },
   "publicAgreement": {
     "loading": "Завантажуємо публічну угоду…",

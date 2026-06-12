@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { productFlags } from "@/lib/config/productFlags";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -40,8 +41,15 @@ const statusTone: Record<PromiseUiStatus, StatusPillTone> = {
 export default function CollectiveAgreementDetailPage() {
   const t = useT();
   const locale = useLocale();
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const agreementId = params?.id;
+
+  useEffect(() => {
+    if (!productFlags.collectiveAgreements) {
+      router.replace(localizePath("/promises", locale));
+    }
+  }, [router, locale]);
 
   const [agreement, setAgreement] = useState<AgreementRow | null>(null);
   const [isCreator, setIsCreator] = useState(false);
