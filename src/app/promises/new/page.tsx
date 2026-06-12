@@ -21,6 +21,7 @@ import {
 } from "date-fns";
 import { CalendarIcon, ChevronDown, ChevronLeft, ChevronRight, Info, X } from "lucide-react";
 import { requireSupabase } from "@/lib/supabaseClient";
+import { productFlags } from "@/lib/config/productFlags";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -30,6 +31,13 @@ import {
   type PredictionInput,
   type PredictionReasonKey,
 } from "@/lib/prediction/dealPrediction";
+
+type SearchUser = {
+  id: string;
+  handle: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
 
 export default function NewPromisePage() {
   const PREFILL_MAX_RETRIES = 20;
@@ -88,6 +96,11 @@ export default function NewPromisePage() {
   const [isImportant, setIsImportant] = useState(false);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);
+  const [multipleParticipants, setMultipleParticipants] = useState(false);
+  const [participantQuery, setParticipantQuery] = useState("");
+  const [participantResults, setParticipantResults] = useState<SearchUser[]>([]);
+  const [isParticipantSearching, setIsParticipantSearching] = useState(false);
+  const [selectedParticipants, setSelectedParticipants] = useState<SearchUser[]>([]);
   const shouldShowCondition = showCondition || conditionText.trim().length > 0;
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
   const prefillResolved = useRef(false);
@@ -135,6 +148,9 @@ export default function NewPromisePage() {
   }, [groups, selectedGroupId, t]);
 
   const predictionReady = title.trim().length > 0;
+
+  const isSubmitDisabled =
+    busy || !title.trim() || (multipleParticipants && executor === "other" && selectedParticipants.length === 0);
 
   const reasonText = useMemo(
     () =>
@@ -634,6 +650,60 @@ export default function NewPromisePage() {
   }, [counterpartyQuery, selectedCounterparty]);
 
   useEffect(() => {
+    if (participantQuery.trim().length < 2) {
+      setParticipantResults([]);
+      setIsParticipantSearching(false);
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        setIsParticipantSearching(true);
+        const supabase = requireSupabase();
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        if (!token) {
+          if (!active) return;
+          setParticipantResults([]);
+          return;
+        }
+
+        const res = await fetch(`/api/user-search?q=${encodeURIComponent(participantQuery.trim())}`, {
+          signal: controller.signal,
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const payload = (await res.json().catch(() => null)) as { users?: SearchUser[] } | null;
+        if (!active) return;
+        const selectedIds = new Set(selectedParticipants.map((p) => p.id));
+        setParticipantResults((payload?.users ?? []).filter((u) => !selectedIds.has(u.id)));
+      } catch {
+        if (!active) return;
+        setParticipantResults([]);
+      } finally {
+        if (active) setIsParticipantSearching(false);
+      }
+    }, 250);
+
+    return () => {
+      active = false;
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [participantQuery, selectedParticipants]);
+
+  const addParticipant = (user: SearchUser) => {
+    setSelectedParticipants((prev) => (prev.some((p) => p.id === user.id) ? prev : [...prev, user]));
+    setParticipantQuery("");
+    setParticipantResults([]);
+  };
+
+  const removeParticipant = (id: string) => {
+    setSelectedParticipants((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  useEffect(() => {
     if (!authToken) return;
     let active = true;
     const controller = new AbortController();
@@ -694,6 +764,8 @@ export default function NewPromisePage() {
           displayName: string | null;
           avatarUrl: string | null;
         } | null;
+        multipleParticipants?: boolean;
+        selectedParticipants?: SearchUser[];
       };
 
       setTitle(parsedDraft.title ?? "");
@@ -701,10 +773,15 @@ export default function NewPromisePage() {
       setConditionText(parsedDraft.conditionText ?? "");
       setShowCondition((parsedDraft.conditionText ?? "").trim().length > 0);
       setSelectedGroupId(parsedDraft.selectedGroupId ?? "");
-      setExecutor(parsedDraft.executor === "other" ? "other" : "me");
+      const restoredExecutor = parsedDraft.executor === "other" ? "other" : "me";
+      setExecutor(restoredExecutor);
       setVisibility(parsedDraft.visibility === "public" ? "public" : "private");
       setIsImportant(parsedDraft.isImportant ?? false);
       setSelectedCounterparty(parsedDraft.selectedCounterparty ?? null);
+      setMultipleParticipants(
+        productFlags.collectiveAgreements && restoredExecutor === "other" && (parsedDraft.multipleParticipants ?? false)
+      );
+      setSelectedParticipants(parsedDraft.selectedParticipants ?? []);
 
       if (parsedDraft.dueAt) {
         const parsedDate = new Date(parsedDraft.dueAt);
@@ -732,10 +809,24 @@ export default function NewPromisePage() {
       visibility,
       isImportant,
       selectedCounterparty,
+      multipleParticipants,
+      selectedParticipants,
     };
 
     window.sessionStorage.setItem(DEAL_DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  }, [conditionText, details, dueAt, executor, visibility, isImportant, selectedCounterparty, selectedGroupId, title]);
+  }, [
+    conditionText,
+    details,
+    dueAt,
+    executor,
+    visibility,
+    isImportant,
+    selectedCounterparty,
+    selectedGroupId,
+    title,
+    multipleParticipants,
+    selectedParticipants,
+  ]);
 
   useEffect(() => {
     prefillResolved.current = false;
@@ -853,9 +944,17 @@ export default function NewPromisePage() {
   };
 
   async function createPromise() {
-    setBusy(true);
     setError(null);
     setSessionExpired(false);
+
+    const isCollective = multipleParticipants && executor === "other";
+
+    if (isCollective && selectedParticipants.length === 0) {
+      setError(t("collectiveAgreements.new.errors.participantsRequired"));
+      return;
+    }
+
+    setBusy(true);
 
     let supabase;
     try {
@@ -876,24 +975,34 @@ export default function NewPromisePage() {
       return;
     }
 
-    const secondPartyUserId = selectedCounterparty?.id ?? null;
-
     const shouldMakePublic = visibility === "public" && isPublicProfile;
-    const payload = {
-      title: title.trim(),
-      details: details.trim() || null,
-      conditionText: conditionText.trim() || null,
-      secondPartyUserId,
-      dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
-      executor,
-      visibility: shouldMakePublic ? "public" : "private",
-      groupId: selectedGroupId || null,
-      isImportant,
-    };
+
+    const endpoint = isCollective ? "/api/promises/collective/create" : "/api/promises/create";
+    const payload = isCollective
+      ? {
+          title: title.trim(),
+          details: details.trim() || null,
+          conditionText: conditionText.trim() || null,
+          dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+          visibility: shouldMakePublic ? "public" : "private",
+          isImportant,
+          participantUserIds: selectedParticipants.map((p) => p.id),
+        }
+      : {
+          title: title.trim(),
+          details: details.trim() || null,
+          conditionText: conditionText.trim() || null,
+          secondPartyUserId: selectedCounterparty?.id ?? null,
+          dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
+          executor,
+          visibility: shouldMakePublic ? "public" : "private",
+          groupId: selectedGroupId || null,
+          isImportant,
+        };
 
     let res: Response;
     try {
-      res = await fetch("/api/promises/create", {
+      res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -901,7 +1010,7 @@ export default function NewPromisePage() {
         },
         body: JSON.stringify(payload),
       });
-    } catch (err) {
+    } catch {
       setBusy(false);
       setError(t("promises.new.errors.network"));
       return;
@@ -936,7 +1045,11 @@ export default function NewPromisePage() {
       window.sessionStorage.removeItem(DEAL_DRAFT_STORAGE_KEY);
     }
 
-    router.push(localizePath(`/promises/${body.id}`, locale));
+    router.push(
+      isCollective
+        ? localizePath(`/promises/collective/${body.id}`, locale)
+        : localizePath(`/promises/${body.id}`, locale)
+    );
   }
 
   return (
@@ -986,7 +1099,10 @@ export default function NewPromisePage() {
               <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
                 <button
                   type="button"
-                  onClick={() => setExecutor("me")}
+                  onClick={() => {
+                    setExecutor("me");
+                    setMultipleParticipants(false);
+                  }}
                   className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     executor === "me"
                       ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
@@ -1008,6 +1124,39 @@ export default function NewPromisePage() {
                 </button>
               </div>
             </div>
+
+            {productFlags.collectiveAgreements && executor === "other" && (
+              <div className="sm:col-span-2">
+                <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-white">
+                      {t("collectiveAgreements.new.toggle.label")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-slate-400">
+                      {t("collectiveAgreements.new.toggle.helper")}
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={multipleParticipants}
+                    aria-label={t("collectiveAgreements.new.toggle.label")}
+                    onClick={() => setMultipleParticipants((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
+                      multipleParticipants
+                        ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                        : "border-white/20 bg-white/10 hover:bg-white/20"
+                    }`}
+                  >
+                    <span
+                      className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                        multipleParticipants ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
 
             <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
               <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
@@ -1152,7 +1301,7 @@ export default function NewPromisePage() {
 
             <div className="sm:col-span-2">
               <div className="grid items-start gap-5 sm:grid-cols-2">
-                {executor && (
+                {!multipleParticipants && executor && (
                   <div className="text-sm text-slate-200">
                     <label className="space-y-2 text-sm text-slate-200">
                       <div className="flex items-center gap-2">
@@ -1298,6 +1447,88 @@ export default function NewPromisePage() {
                   </div>
                 )}
 
+                {multipleParticipants && (
+                  <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                      {t("collectiveAgreements.new.fields.participants")}
+                    </span>
+
+                    {selectedParticipants.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedParticipants.map((p) => (
+                          <span
+                            key={p.id}
+                            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/10 px-3 py-1.5 text-sm text-emerald-100"
+                          >
+                            {p.display_name ?? `@${p.handle}`} · @{p.handle}
+                            <button
+                              type="button"
+                              onClick={() => removeParticipant(p.id)}
+                              aria-label={t("collectiveAgreements.new.actions.removeParticipant")}
+                              className="cursor-pointer rounded-full border border-emerald-300/40 p-0.5 text-emerald-100 transition hover:bg-white/10"
+                            >
+                              <X className="h-3 w-3" aria-hidden />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="relative">
+                      <input
+                        autoComplete="off"
+                        className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                        placeholder={t("collectiveAgreements.new.placeholders.participantSearch")}
+                        value={participantQuery}
+                        onChange={(e) => setParticipantQuery(e.target.value)}
+                      />
+                      {participantQuery.trim().length >= 2 && (
+                        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-xl shadow-black/40">
+                          {isParticipantSearching && (
+                            <p className="px-3 py-2 text-xs text-slate-400">
+                              {t("collectiveAgreements.new.search.searching")}
+                            </p>
+                          )}
+                          {!isParticipantSearching && participantResults.length === 0 && (
+                            <p className="px-3 py-3 text-xs text-slate-400">
+                              {t("collectiveAgreements.new.search.noResults")}
+                            </p>
+                          )}
+                          {!isParticipantSearching &&
+                            participantResults.map((user) => (
+                              <button
+                                key={user.id}
+                                type="button"
+                                onClick={() => addParticipant(user)}
+                                className="flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5"
+                              >
+                                <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
+                                  {user.avatar_url ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-xs text-slate-300">
+                                      @{user.handle.slice(0, 1).toUpperCase()}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-semibold text-white">
+                                    {user.display_name ?? `@${user.handle}`}
+                                  </p>
+                                  <p className="truncate text-xs text-slate-400">@{user.handle}</p>
+                                </div>
+                                <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
+                                  {t("collectiveAgreements.new.search.inDreddi")}
+                                </span>
+                              </button>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2 text-sm text-slate-200">
                   <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
                     {t("promises.new.fields.dueDate")}
@@ -1424,7 +1655,7 @@ export default function NewPromisePage() {
             </div>
             </div>
 
-            {predictionResult && (
+            {!multipleParticipants && predictionResult && (
               <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -1484,7 +1715,7 @@ export default function NewPromisePage() {
           <div className="space-y-3">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim()}
+              disabled={isSubmitDisabled}
               className="hidden h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 sm:flex"
             >
               {busy
@@ -1510,7 +1741,7 @@ export default function NewPromisePage() {
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur sm:hidden">
             <button
               onClick={createPromise}
-              disabled={busy || !title.trim()}
+              disabled={isSubmitDisabled}
               className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {busy

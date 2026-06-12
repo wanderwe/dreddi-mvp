@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { productFlags } from "@/lib/config/productFlags";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -40,8 +41,16 @@ const statusTone: Record<PromiseUiStatus, StatusPillTone> = {
 export default function CollectiveAgreementDetailPage() {
   const t = useT();
   const locale = useLocale();
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const agreementId = params?.id;
+
+  useEffect(() => {
+    if (!productFlags.collectiveAgreements) {
+      router.replace(localizePath("/promises", locale));
+    }
+  }, [router, locale]);
+
 
   const [agreement, setAgreement] = useState<AgreementRow | null>(null);
   const [isCreator, setIsCreator] = useState(false);
@@ -174,7 +183,7 @@ export default function CollectiveAgreementDetailPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6">
-        <LocalizedLink href="/promises/collective" className="text-sm text-emerald-200 hover:text-emerald-100">
+        <LocalizedLink href="/promises" className="text-sm text-emerald-200 hover:text-emerald-100">
           ← {t("collectiveAgreements.detail.back")}
         </LocalizedLink>
         <p className="mt-2 text-xs uppercase tracking-[0.2em] text-emerald-200">

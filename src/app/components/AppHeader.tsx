@@ -2,7 +2,7 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
-import { Eye, LayoutGrid, Users, UsersRound } from "lucide-react";
+import { Eye, LayoutGrid, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
@@ -217,13 +217,6 @@ export function AppHeader() {
                       href={localizePath("/promises/groups", locale)}
                       ariaLabel={t("nav.groups")}
                       icon={<LayoutGrid className="h-4 w-4" aria-hidden />}
-                    />
-                  </Tooltip>
-                  <Tooltip label={t("nav.collectiveAgreements")} placement="top">
-                    <IconButton
-                      href={localizePath("/promises/collective", locale)}
-                      ariaLabel={t("nav.collectiveAgreements")}
-                      icon={<Users className="h-4 w-4" aria-hidden />}
                     />
                   </Tooltip>
                   <Tooltip label={t("nav.publicProfiles")} placement="top">
