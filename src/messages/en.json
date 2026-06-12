@@ -16,7 +16,6 @@
     "actionQueueBadge": "Action required",
     "sendFeedback": "Send feedback",
     "groups": "Groups",
-    "collectiveAgreements": "Collective agreements",
     "allGroups": "All groups",
     "watching": "Watchlist"
   },
@@ -1160,22 +1159,13 @@
   },
   "collectiveAgreements": {
     "eyebrow": "COLLECTIVE AGREEMENTS",
-    "list": {
-      "title": "Collective agreements",
-      "subtitle": "One agreement that each participant accepts individually — great for teams and companies",
-      "cta": "New collective agreement",
-      "loading": "Loading…",
-      "empty": "No collective agreements yet",
-      "emptyDescription": "Create an agreement and invite several participants — each accepts their own copy",
-      "createdAt": "Created {date}",
-      "participants": "Participants: {count}",
-      "progressAccepted": "Accepted: {accepted}/{total}",
-      "progressConfirmed": "Confirmed: {confirmed}/{total}",
-      "progressDisputed": "Disputed: {disputed}/{total}"
-    },
     "new": {
       "title": "New collective agreement",
       "subtitle": "Describe the commitment and pick participants — each one gets their own copy of the agreement",
+      "toggle": {
+        "label": "Invite multiple participants",
+        "helper": "Each participant will get their own copy of the agreement to accept"
+      },
       "fields": {
         "title": "Title",
         "details": "Details",
@@ -1220,7 +1210,7 @@
       }
     },
     "detail": {
-      "back": "Back to collective agreements",
+      "back": "Back to deals",
       "loading": "Loading…",
       "notFound": "Collective agreement not found or unavailable",
       "roster": "Participants ({count})",
