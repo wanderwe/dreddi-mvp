@@ -51,6 +51,7 @@ export default function CollectiveAgreementDetailPage() {
     }
   }, [router, locale]);
 
+
   const [agreement, setAgreement] = useState<AgreementRow | null>(null);
   const [isCreator, setIsCreator] = useState(false);
   const [roster, setRoster] = useState<ParticipantRow[]>([]);

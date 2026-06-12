@@ -1279,6 +1279,13 @@
       "disputedDescription": "The outcome was marked as disputed",
       "declined": "Agreement declined",
       "cancelled": "Agreement cancelled",
+      "counterConditionProposed": "Counter-obligation proposed",
+      "counterConditionConfirmed": "Counter-obligation confirmed",
+      "counterConditionConfirmedDescription": "The agreement creator confirmed the counter-obligation",
+      "counterConditionRejected": "Counter-obligation declined",
+      "counterConditionRejectedDescription": "The agreement creator declined the proposed counter-obligation",
+      "counterConditionMet": "Counter-obligation fulfilled",
+      "counterConditionMetDescription": "The counter-obligation was marked as fulfilled",
       "expired": "Invitation expired",
       "update": "Update",
       "updateAuthorFallback": "Agreement participant"
