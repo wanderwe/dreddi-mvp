@@ -86,6 +86,37 @@ export async function POST(req: Request) {
       counterpartyProfile = { id: data.id };
     }
 
+    // Guard against duplicate submissions (e.g. double-click / retry on a slow connection):
+    // if an identical agreement from this creator was just inserted, return it instead of
+    // creating another one.
+    const dedupeWindowIso = new Date(Date.now() - 60_000).toISOString();
+    const detailsValue = body?.details?.trim() || null;
+    const counterpartyValue = counterpartyProfile?.id ?? null;
+
+    let dedupeQuery = admin
+      .from("promises")
+      .select("id, invite_token, counterparty_id")
+      .eq("creator_id", user.id)
+      .eq("title", title)
+      .gte("created_at", dedupeWindowIso);
+
+    dedupeQuery = detailsValue
+      ? dedupeQuery.eq("details", detailsValue)
+      : dedupeQuery.is("details", null);
+    dedupeQuery = counterpartyValue
+      ? dedupeQuery.eq("counterparty_id", counterpartyValue)
+      : dedupeQuery.is("counterparty_id", null);
+    dedupeQuery = dueAtIso ? dedupeQuery.eq("due_at", dueAtIso) : dedupeQuery.is("due_at", null);
+
+    const { data: recentDuplicate } = await dedupeQuery
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (recentDuplicate) {
+      return NextResponse.json({ id: recentDuplicate.id }, { status: 200 });
+    }
+
     const insertPayload = {
       creator_id: user.id,
       promisor_id: executor === "me" ? user.id : null,
