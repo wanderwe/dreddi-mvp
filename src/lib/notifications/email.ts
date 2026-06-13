@@ -15,6 +15,7 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "reminder_manual",
   "due_soon",
   "overdue",
+  "admin_new_feedback",
 ]);
 
 type EmailSendStatus = "sent" | "failed" | "provider_not_configured" | "disabled";
@@ -163,6 +164,16 @@ const resolveEmailCopy = (payload: EmailPayload) => {
         manageUrl,
       });
       return { subject: "Deal overdue", ...content };
+    }
+    case "admin_new_feedback": {
+      const content = renderTemplate({
+        heading: payload.title,
+        message: payload.body,
+        ctaLabel: "Open feedback",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "New Dreddi feedback", ...content };
     }
     default: {
       const content = renderTemplate({

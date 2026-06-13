@@ -25,6 +25,7 @@ export const CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   "reminder_deadline",
   "invite_declined",
   "invite_ignored",
+  "admin_new_feedback",
 ];
 
 export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
@@ -41,6 +42,7 @@ export const PER_DEAL_CAP_BYPASS_NOTIFICATION_TYPES: NotificationType[] = [
   "reminder_deadline",
   "invite_declined",
   "invite_ignored",
+  "admin_new_feedback",
 ];
 
 
