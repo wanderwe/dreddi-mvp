@@ -138,6 +138,18 @@ export function Tooltip({
     setIsOpen(true);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (triggerRef.current?.contains(event.target as Node)) return;
+      setIsOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen]);
+
   return (
     <span
       ref={triggerRef}
@@ -146,6 +158,12 @@ export function Tooltip({
       onMouseLeave={() => setIsOpen(false)}
       onFocus={openTooltip}
       onBlur={() => setIsOpen(false)}
+      onClick={(event) => {
+        event.stopPropagation();
+        if (disabled) return;
+        if (shouldOpen && !shouldOpen()) return;
+        setIsOpen((open) => !open);
+      }}
     >
       {children}
       {isClient && isOpen && !disabled
