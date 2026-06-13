@@ -161,6 +161,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The creator did not accept your obligation.",
       ctaLabel: "Open",
     },
+    admin_new_feedback: {
+      title: "New feedback submitted",
+      body: "A user submitted new feedback.",
+      ctaLabel: "Open",
+    },
   },
   uk: {
     accepted: {
@@ -311,6 +316,11 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
     counter_condition_rejected: {
       title: "Домовленість скасовано",
       body: "Автор не прийняв ваше зобов'язання.",
+      ctaLabel: "Відкрити",
+    },
+    admin_new_feedback: {
+      title: "Новий фідбек",
+      body: "Користувач залишив новий фідбек.",
       ctaLabel: "Відкрити",
     },
   },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { requireUser } from "@/lib/auth/requireUser";
+import { createNotification, buildDedupeKey, mapPriorityForType } from "@/lib/notifications/service";
 
 const FEEDBACK_CATEGORIES = ["bug", "suggestion", "confusing_ux", "other"] as const;
 const MIN_FEEDBACK_LENGTH = 5;
@@ -58,20 +59,49 @@ export async function POST(req: Request) {
   const handle = profile?.handle?.trim() || null;
   const userHandleOrName = displayName || handle;
 
-  const { error } = await admin.from("feedback").insert({
-    user_id: user.id,
-    user_email: user.email ?? null,
-    user_handle_or_name: userHandleOrName,
-    category,
-    message,
-    page_url: pageUrl,
-    locale,
-    allow_contact: allowContact,
-  });
+  const { data: inserted, error } = await admin
+    .from("feedback")
+    .insert({
+      user_id: user.id,
+      user_email: user.email ?? null,
+      user_handle_or_name: userHandleOrName,
+      category,
+      message,
+      page_url: pageUrl,
+      locale,
+      allow_contact: allowContact,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return NextResponse.json({ error: "Failed to send feedback", detail: error.message }, { status: 500 });
   }
 
+  await notifyAdminsOfNewFeedback(admin, inserted.id, category, message);
+
   return NextResponse.json({ ok: true }, { status: 200 });
+}
+
+async function notifyAdminsOfNewFeedback(
+  admin: ReturnType<typeof supabaseAdmin>,
+  feedbackId: string,
+  category: FeedbackCategory,
+  message: string
+) {
+  const { data: admins } = await admin.from("admin_users").select("id");
+
+  for (const { id: adminId } of admins ?? []) {
+    await createNotification(admin, {
+      userId: adminId,
+      promiseId: null,
+      type: "admin_new_feedback",
+      dedupeKey: buildDedupeKey(["admin_new_feedback", feedbackId, adminId]),
+      ctaUrl: "/admin/feedback",
+      ctaLabel: "Open feedback",
+      priority: mapPriorityForType("admin_new_feedback"),
+      title: "New feedback submitted",
+      body: `[${category}] ${message.slice(0, 200)}`,
+    });
+  }
 }

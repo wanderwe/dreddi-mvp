@@ -18,7 +18,7 @@ import type {
 
 export type NotificationRequest = {
   userId: string;
-  promiseId: string;
+  promiseId: string | null;
   type: NotificationType;
   role?: NotificationRole;
   dedupeKey: string;
@@ -109,9 +109,11 @@ async function countNotificationsSince(
 async function fetchLastDealNotificationTime(
   admin: SupabaseClient,
   userId: string,
-  promiseId: string,
+  promiseId: string | null,
   type: NotificationType
 ) {
+  if (!promiseId) return null;
+
   const { data } = await admin
     .from("notifications")
     .select("created_at")
