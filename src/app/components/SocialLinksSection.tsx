@@ -242,7 +242,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
             key={platform.id}
             className="rounded-xl border border-white/10 bg-white/5"
           >
-            <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <span className={platform.color}>{platform.icon}</span>
               <div className="min-w-0">
@@ -276,11 +276,11 @@ export function SocialLinksSection({ onUpdate }: Props) {
 
             {linked ? (
               confirmDisconnect === platform.id ? (
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center justify-end gap-2 sm:justify-start">
                   <button
                     type="button"
                     onClick={() => setConfirmDisconnect(null)}
-                    className="cursor-pointer rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/50 transition hover:text-white"
+                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/50 transition hover:text-white sm:flex-none"
                   >
                     {t("profileSettings.social.cancel")}
                   </button>
@@ -288,7 +288,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                     type="button"
                     disabled={isBusy}
                     onClick={() => { setConfirmDisconnect(null); void handleDisconnect(platform.id); }}
-                    className="cursor-pointer rounded-lg border border-red-400/40 bg-red-500/15 px-2.5 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-red-400/40 bg-red-500/15 px-2.5 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                   >
                     {isBusy ? "…" : t("profileSettings.social.confirmDisconnect")}
                   </button>
@@ -298,7 +298,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                 type="button"
                 disabled={isBusy}
                 onClick={() => setConfirmDisconnect(platform.id)}
-                className="shrink-0 cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 cursor-pointer self-end rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
               >
                 {t("profileSettings.social.disconnect")}
               </button>
@@ -308,7 +308,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                 type="button"
                 disabled={isBusy}
                 onClick={() => void handleConnect(platform)}
-                className="shrink-0 cursor-pointer rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition hover:border-emerald-300/50 hover:bg-emerald-500/18 disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 cursor-pointer self-end rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition hover:border-emerald-300/50 hover:bg-emerald-500/18 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
               >
                 {isBusy ? "…" : t("profileSettings.social.connect")}
               </button>
