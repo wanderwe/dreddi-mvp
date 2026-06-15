@@ -8,7 +8,7 @@ import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
 import { LocaleSwitcher } from "@/app/components/LocaleSwitcher";
 import { MobileMenu } from "@/app/components/MobileMenu";
-import { NewDealButton } from "@/app/components/NewDealButton";
+import { NewItemMenu } from "@/app/components/NewItemMenu";
 import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
 import { IconButton } from "@/app/components/ui/IconButton";
@@ -32,8 +32,13 @@ export function AppHeader() {
   const locale = useLocale();
   const pathname = usePathname();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
-  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale));
-  const [authState, setAuthState] = useState<AuthState>(() => buildAuthState(null));
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale)) || /^\/embed\/commitment\/[^/]+\/?$/.test(pathWithoutLocale);
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    if (typeof window !== "undefined" && window.localStorage.getItem("dreddi_was_logged_in") === "true") {
+      return { user: null, profile: null, isLoggedIn: true, isMock: false };
+    }
+    return buildAuthState(null);
+  });
   const [actionQueueCount, setActionQueueCount] = useState(0);
   const [actionQueueHref, setActionQueueHref] = useState("/promises?filter=awaiting_my_action");
   const isAuthenticated = authState.isLoggedIn;
@@ -49,6 +54,7 @@ export function AppHeader() {
       const nextState = await getAuthState();
       if (!active) return;
       setAuthState(nextState);
+      window.localStorage.setItem("dreddi_was_logged_in", String(nextState.isLoggedIn));
     };
 
     void syncSession();
@@ -64,7 +70,9 @@ export function AppHeader() {
       const user = session?.user
         ? { id: session.user.id, email: session.user.email ?? null }
         : null;
-      setAuthState(buildAuthState(user));
+      const nextState = buildAuthState(user);
+      setAuthState(nextState);
+      window.localStorage.setItem("dreddi_was_logged_in", String(nextState.isLoggedIn));
     });
 
     return () => {
@@ -191,6 +199,9 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
+                  <LocalizedLink className={linkBaseClasses} href="/commitments">
+                    {t("nav.goals")}
+                  </LocalizedLink>
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
@@ -202,9 +213,7 @@ export function AppHeader() {
                   )}
                 </div>
                 <div className="ml-1 flex items-center gap-3">
-                  <Tooltip label={t("nav.newPromise")} placement="top">
-                    <NewDealButton label={t("nav.newPromise")} variant="icon" />
-                  </Tooltip>
+                  <NewItemMenu />
                   <Tooltip label={t("nav.watching")} placement="top">
                     <IconButton
                       href={localizePath("/watching", locale)}
