@@ -160,9 +160,7 @@ export function Tooltip({
       onBlur={() => setIsOpen(false)}
       onClick={(event) => {
         event.stopPropagation();
-        if (disabled) return;
-        if (shouldOpen && !shouldOpen()) return;
-        setIsOpen((open) => !open);
+        setIsOpen(false);
       }}
     >
       {children}

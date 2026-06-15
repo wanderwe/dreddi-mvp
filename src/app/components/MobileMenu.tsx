@@ -70,6 +70,11 @@ export function MobileMenu({
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/commitments">
+                    {t("nav.goals")}
+                  </LocalizedLink>
+                </SheetClose>
+                <SheetClose asChild>
                   <LocalizedLink className={baseLinkClasses} href="/promises/groups">
                     {t("nav.groups")}
                   </LocalizedLink>
@@ -95,6 +100,11 @@ export function MobileMenu({
                 <SheetClose asChild>
                   <LocalizedLink className={primaryLinkClasses} href="/promises/new">
                     {t("nav.newPromise")}
+                  </LocalizedLink>
+                </SheetClose>
+                <SheetClose asChild>
+                  <LocalizedLink className={primaryLinkClasses} href="/commitments/new">
+                    {t("nav.newGoal")}
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>

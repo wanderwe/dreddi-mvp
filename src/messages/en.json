@@ -17,7 +17,21 @@
     "sendFeedback": "Send feedback",
     "groups": "Groups",
     "allGroups": "All groups",
-    "watching": "Watchlist"
+    "watching": "Watchlist",
+    "goals": "Goals",
+    "newGoal": "New goal",
+    "create": "Create",
+    "createMenu": {
+      "label": "Create",
+      "promise": {
+        "title": "New deal",
+        "description": "A two-party agreement that affects your reputation"
+      },
+      "goal": {
+        "title": "New goal",
+        "description": "A personal goal you can make public"
+      }
+    }
   },
   "legal": {
     "sectionEyebrow": "LEGAL",
@@ -53,6 +67,11 @@
     "publicLabel": "Public profile",
     "publicDescription": "Turn on to make your profile and link visible to others",
     "toggleLabel": "Toggle public profile",
+    "goalsStatsScopeLabel": "Personal Goals stats",
+    "goalsStatsScopeDescription": "Show goal stats on your public profile from public goals only, or from all your goals",
+    "goalsStatsScopeToggleLabel": "Toggle Personal Goals stats scope",
+    "goalsStatsScopePublicOnly": "Public goals only",
+    "goalsStatsScopeAll": "All goals",
     "publicLinkLabel": "Public profile link",
     "publicLinkDescription": "Share this link so others can view your public profile",
     "publicLinkPrivate": "This link won’t be publicly visible until you enable your public profile",
@@ -1334,5 +1353,130 @@
     "status": "Status",
     "updated": "Updated",
     "liveNote": "Public status updates in Dreddi"
+  },
+  "commitments": {
+    "dashboard": {
+      "eyebrow": "GOALS",
+      "title": "Personal Goals",
+      "subtitle": "Track and share your own commitments — separate from your deals and reputation",
+      "newGoal": "New goal",
+      "empty": "You haven't added any goals yet",
+      "stats": {
+        "total": "Total goals",
+        "completed": "Completed",
+        "failed": "Failed",
+        "completionRate": "Completion rate",
+        "streak": "Current streak"
+      },
+      "visibility": {
+        "public": "Public",
+        "private": "Private"
+      },
+      "status": {
+        "active": "Active",
+        "completed": "Completed",
+        "failed": "Failed",
+        "abandoned": "Abandoned"
+      },
+      "deadline": "Deadline: {date}",
+      "noDeadline": "No deadline"
+    },
+    "form": {
+      "eyebrow": "GOAL",
+      "title": "New goal",
+      "subtitle": "A lightweight, single-step way to track a personal commitment",
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "deadline": "Deadline"
+      },
+      "placeholders": {
+        "title": "Launch MVP by March 15",
+        "description": "Optional details about this goal (visible to anyone who can see the goal)",
+        "dueDate": "Select date (optional)"
+      },
+      "actions": {
+        "clearDate": "Clear date"
+      },
+      "visibility": {
+        "label": "Public goal",
+        "helper": "If enabled, this goal will appear on your public profile and can be shared via embed"
+      },
+      "submit": "Create goal",
+      "creating": "Creating…",
+      "errors": {
+        "titleRequired": "Title is required",
+        "createFailed": "Could not create this goal",
+        "network": "Network issue. Please try again"
+      }
+    },
+    "detail": {
+      "back": "Back to goals",
+      "loading": "Loading…",
+      "notFound": "Goal not found",
+      "actions": {
+        "markCompleted": "Mark as completed",
+        "markFailed": "Mark as failed",
+        "markAbandoned": "Mark as abandoned"
+      },
+      "embedSection": {
+        "title": "Share this goal",
+        "viewPublic": "View public page",
+        "copyLink": "Copy link",
+        "copyEmbed": "Copy embed",
+        "copied": "Link copied",
+        "embedCodeCopied": "Embed code copied",
+        "copyFailed": "Copy failed"
+      }
+    },
+    "public": {
+      "loading": "Loading public goal…",
+      "notPublicTitle": "Goal is not public",
+      "errors": {
+        "load": "Could not load this public goal",
+        "notPublic": "This goal is not public or does not exist"
+      }
+    },
+    "timeline": {
+      "title": "Public timeline",
+      "system": "Dreddi",
+      "created": "Goal created",
+      "createdDescription": "This personal goal was created",
+      "completed": "Marked as completed",
+      "completedDescription": "The goal was self-reported as completed",
+      "failed": "Marked as failed",
+      "failedDescription": "The goal was self-reported as failed",
+      "abandoned": "Marked as abandoned",
+      "abandonedDescription": "The goal was self-reported as abandoned",
+      "update": "Update",
+      "updates": {
+        "add": "Add update",
+        "label": "Progress update",
+        "placeholder": "Share a quick progress note…",
+        "helper": "Text only · {count} characters left",
+        "cancel": "Cancel",
+        "publish": "Publish update",
+        "saving": "Publishing…",
+        "error": "Could not publish this update",
+        "unavailable": "Updates are currently unavailable"
+      }
+    },
+    "embedWidget": {
+      "badge": "Personal goal",
+      "daysLeft": "{count} days left",
+      "dueToday": "Due today",
+      "overdue": "Overdue",
+      "completed": "Completed",
+      "failed": "Failed",
+      "abandoned": "Abandoned",
+      "noDeadline": "No deadline",
+      "cta": "View goal",
+      "unavailable": "This goal is unavailable"
+    },
+    "profile": {
+      "title": "Personal Goals",
+      "subtitle": "Lightweight, self-reported commitments — separate from reputation",
+      "empty": "No public goals yet"
+    }
   }
 }

@@ -34,6 +34,7 @@ type ProfileState = {
   pushEnabled: boolean;
   emailEnabled: boolean;
   deadlineRemindersEnabled: boolean;
+  goalsStatsScope: "public_only" | "all";
 };
 
 export function ProfileSettingsPanel({ showTitle = true, className = "" }: ProfileSettingsPanelProps) {
@@ -86,6 +87,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           pushEnabled: true,
           emailEnabled: true,
           deadlineRemindersEnabled: true,
+          goalsStatsScope: "public_only",
         });
         setLoading(false);
         return;
@@ -117,7 +119,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         .from("profiles")
         // Quiet hours columns remain in DB for backwards compatibility (deprecated in MVP).
         .select(
-          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,goals_stats_scope"
         )
         .eq("id", session.user.id)
         .single();
@@ -138,6 +140,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         push_notifications_enabled?: boolean | null;
         email_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
+        goals_stats_scope?: string | null;
       } | null;
       const handle = profileRow?.handle ?? null;
       const displayName = profileRow?.display_name ?? null;
@@ -146,6 +149,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       const pushEnabled = profileRow?.push_notifications_enabled ?? true;
       const emailEnabled = profileRow?.email_notifications_enabled ?? true;
       const deadlineRemindersEnabled = profileRow?.deadline_reminders_enabled ?? true;
+      const goalsStatsScope = profileRow?.goals_stats_scope === "all" ? "all" : "public_only";
       if (handle) lastHandleRef.current = handle;
       setProfile({
         userId: session.user.id,
@@ -157,6 +161,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         pushEnabled,
         emailEnabled,
         deadlineRemindersEnabled,
+        goalsStatsScope,
       });
       setLoading(false);
     };
@@ -267,6 +272,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       { is_public_profile: publicProfileInput, handle: nextHandle },
       { handle: nextHandle, isPublic: publicProfileInput }
     );
+  };
+
+  const toggleGoalsStatsScope = async () => {
+    if (!profile) return;
+    const next = profile.goalsStatsScope === "all" ? "public_only" : "all";
+    await updateProfileRow({ goals_stats_scope: next }, { goalsStatsScope: next });
   };
 
   const handleCopyLink = async () => {
@@ -581,6 +592,48 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             <span
                               className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
                                 publicProfileEnabled ? "translate-x-5" : "translate-x-1"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                        <div className="space-y-1">
+                          <div className="text-sm font-semibold text-white">
+                            {t("profileSettings.goalsStatsScopeLabel")}
+                          </div>
+                          <HelperText>
+                            {t("profileSettings.goalsStatsScopeDescription")}
+                          </HelperText>
+                          <HelperText>
+                            {profile?.goalsStatsScope === "all"
+                              ? t("profileSettings.goalsStatsScopeAll")
+                              : t("profileSettings.goalsStatsScopePublicOnly")}
+                          </HelperText>
+                        </div>
+                        <div className="flex justify-end self-center">
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={profile?.goalsStatsScope === "all"}
+                            aria-label={t("profileSettings.goalsStatsScopeToggleLabel")}
+                            onClick={toggleGoalsStatsScope}
+                            disabled={loading || saving || !profile}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                              profile?.goalsStatsScope === "all"
+                                ? "border-emerald-300/50 bg-emerald-400/70"
+                                : "border-white/20 bg-white/10"
+                            } ${
+                              loading || saving || !profile
+                                ? "cursor-not-allowed opacity-60"
+                                : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                            }`}
+                          >
+                            <span
+                              className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                                profile?.goalsStatsScope === "all" ? "translate-x-5" : "translate-x-1"
                               }`}
                             />
                           </button>
