@@ -81,10 +81,10 @@ export type LandingCopy = {
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
-      eyebrow: "Платформа публічної підзвітності",
-      headline: "Слова стають фактами",
+      eyebrow: "Легкий трекер домовленостей",
+      headline: "Домовленість починається з підтвердження",
       description:
-        "Публічна обіцянка — це зобов'язання.\n\nЗафіксуй. Надішли посилання. Хай підтвердить.\n\nФакт зафіксовано — репутація видима.",
+        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
       whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
@@ -121,9 +121,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "Переглянути приклад профілю",
     },
     cta: {
-      getStarted: "Зафіксувати обіцянку",
-      publicProfiles: "Публічні угоди",
-      createPromise: "Зафіксувати обіцянку",
+      getStarted: "Створити угоду",
+      publicProfiles: "Переглянути профілі",
+      createPromise: "Створити угоду",
       reviewDeals: "Переглянути угоди",
     },
     loading: {
@@ -176,10 +176,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
   en: {
     hero: {
-      eyebrow: "Civic accountability platform",
-      headline: "Words become facts",
+      eyebrow: "A lightweight deal tracker",
+      headline: "An agreement starts with confirmation",
       description:
-        "A public promise is a commitment.\n\nRecord it. Send the link. Let them confirm.\n\nThe record exists — reputation follows.",
+        "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
@@ -216,9 +216,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "View example profile",
     },
     cta: {
-      getStarted: "Record a promise",
-      publicProfiles: "Public agreements",
-      createPromise: "Record a promise",
+      getStarted: "Create a deal",
+      publicProfiles: "Browse profiles",
+      createPromise: "Create a deal",
       reviewDeals: "View deals",
     },
     loading: {
