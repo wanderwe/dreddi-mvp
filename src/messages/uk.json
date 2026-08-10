@@ -414,6 +414,11 @@
       "copyInvitePrimary": "Скопіювати посилання",
       "openInviteShort": "Відкрити сторінку",
       "withdrawInviteShort": "Відкликати",
+      "activateWithoutCounterparty": "Активувати без підтвердження",
+      "activateWithoutCounterpartyConfirmTitle": "Активувати без підтвердження?",
+      "activateWithoutCounterpartyConfirmBody": "Угода стане активною без підтвердження іншої сторони. Інша сторона зможе приєднатись пізніше за посиланням. Продовжити?",
+      "activatedWithoutCounterpartyNote": "Активовано без підтвердження іншої сторони",
+      "closedWithoutCounterparty": "Закрито без підтвердження другої сторони",
       "conditionStatusLabel": "Статус",
       "disputeReasonLabel": "Причина оскарження"
     },
@@ -431,6 +436,7 @@
       "promiseLabel": "Угода",
       "dueLabel": "Строк",
       "createdBy": "{creatorLabel}: {name}",
+      "executedBy": "{executorRole}: {name}",
       "statusLabel": "Статус",
       "detailsLabel": "Деталі",
       "alreadyDisputed": "Вже оскаржено",
@@ -1336,6 +1342,8 @@
       "counterConditionMet": "Зустрічне зобовʼязання виконано",
       "counterConditionMetDescription": "Зустрічне зобовʼязання позначено виконаним",
       "expired": "Запрошення прострочено",
+      "activatedWithoutCounterparty": "Активовано без другої сторони",
+      "activatedWithoutCounterpartyDescription": "Угоду активовано без підтвердження іншої сторони. Вони можуть приєднатись пізніше за посиланням.",
       "update": "Оновлення",
       "updateAuthorFallback": "Учасник угоди"
     },
@@ -1391,6 +1399,11 @@
       "subtitle": "Відстежуйте та діліться власними цілями — окремо від угод і репутації",
       "newGoal": "Нова ціль",
       "empty": "Ви ще не додали жодної цілі",
+      "emptyPublic": "Поки що немає публічних цілей",
+      "tabs": {
+        "mine": "Мої",
+        "public": "Публічні"
+      },
       "stats": {
         "total": "Усього цілей",
         "completed": "Виконано",
@@ -1507,6 +1520,9 @@
       "title": "Особисті цілі",
       "subtitle": "Прості, самостійно підтверджені зобов'язання — окремо від репутації",
       "empty": "Поки що немає публічних цілей"
+    },
+    "label": {
+      "goal": "Ціль"
     }
   }
 }

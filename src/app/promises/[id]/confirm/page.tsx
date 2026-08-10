@@ -32,6 +32,8 @@ type PromiseRow = {
   ignored_at: string | null;
   expires_at: string | null;
   cancelled_at: string | null;
+  executor_display_name: string | null;
+  activated_without_counterparty: boolean;
 };
 
 const DISPUTE_OPTIONS = ["not_completed", "partial", "late", "other"] as const;
@@ -151,11 +153,17 @@ export default function ConfirmPromisePage() {
   const isCounterparty = Boolean(
     userId && counterpartyId && userId === counterpartyId && !isExecutor
   );
+  const isWatchdogCreator = Boolean(
+    promise?.activated_without_counterparty &&
+      !promise?.counterparty_id &&
+      userId &&
+      promise?.creator_id === userId
+  );
   const canReview = Boolean(
     promise &&
       (promise.status === "completed_by_promisor" ||
         (promise.status === "active" && !promise.completed_at)) &&
-      isCounterparty &&
+      (isCounterparty || isWatchdogCreator) &&
       isPromiseAccepted(promise)
   );
 
@@ -310,12 +318,6 @@ export default function ConfirmPromisePage() {
                   <p className="text-sm text-slate-300">
                     {t("promises.confirm.dueLabel")}: {formatDate(promise.due_at)}
                   </p>
-                  <p className="text-sm text-slate-400">
-                    {t("promises.confirm.createdBy", {
-                      creatorLabel: promiseLabels.creatorLabel,
-                      name: promise.creator_display_name ?? promise.creator_id.slice(0, 8),
-                    })}
-                  </p>
                 </div>
 
                 <div className="flex flex-col items-end gap-2 text-sm text-slate-200">
@@ -327,12 +329,27 @@ export default function ConfirmPromisePage() {
                 </div>
               </div>
 
+              <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4">
+                <div className="flex flex-wrap gap-x-8 gap-y-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{promiseLabels.creatorLabel}</p>
+                    <p className="mt-1.5 text-sm text-slate-200">{promise.creator_display_name ?? promise.creator_id.slice(0, 8)}</p>
+                  </div>
+                  {executorId && (
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{promiseLabels.executorRole}</p>
+                      <p className="mt-1.5 text-sm text-slate-200">{promise.executor_display_name ?? executorId.slice(0, 8)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {promise.details && (
                 <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
                   <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
                     {t("promises.confirm.detailsLabel")}
                   </p>
-                  <div className="mt-2 whitespace-pre-wrap">{promise.details}</div>
+                  <div className="mt-1.5 whitespace-pre-wrap">{promise.details}</div>
                 </div>
               )}
 

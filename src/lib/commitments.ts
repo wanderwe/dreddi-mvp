@@ -18,6 +18,11 @@ export type SelfCommitment = {
   completed_at: string | null;
 };
 
+export type PublicSelfCommitment = SelfCommitment & {
+  owner_display_name: string | null;
+  owner_handle: string | null;
+};
+
 export type SelfCommitmentUpdate = {
   id: string;
   content: string;

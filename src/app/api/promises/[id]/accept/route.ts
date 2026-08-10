@@ -28,12 +28,21 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Deal is not pending acceptance" }, { status: 400 });
     }
 
-    if (promise.invite_status === "accepted" || promise.accepted_at || promise.counterparty_accepted_at) {
-      return NextResponse.json({ ok: true, status: "accepted" }, { status: 200 });
-    }
+    // Allow counterparty to join even after creator activated without them,
+    // as long as counterparty_id is not yet set (invite link still valid).
+    const canJoinAfterActivation =
+      promise.activated_without_counterparty &&
+      !promise.counterparty_id &&
+      promise.invite_status === "accepted";
 
-    if (promise.invite_status !== "awaiting_acceptance") {
-      return NextResponse.json({ error: "Deal is not pending acceptance" }, { status: 400 });
+    if (!canJoinAfterActivation) {
+      if (promise.invite_status === "accepted" || promise.accepted_at || promise.counterparty_accepted_at) {
+        return NextResponse.json({ ok: true, status: "accepted" }, { status: 200 });
+      }
+
+      if (promise.invite_status !== "awaiting_acceptance") {
+        return NextResponse.json({ error: "Deal is not pending acceptance" }, { status: 400 });
+      }
     }
 
     const nowIso = new Date().toISOString();
@@ -56,15 +65,20 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       cancelled_at: null,
     };
 
-    if (!promise.promisor_id && promise.counterparty_id === user.id) {
+    if (!promise.promisor_id && (promise.counterparty_id === user.id || canJoinAfterActivation)) {
       updatePayload.promisor_id = user.id;
     }
 
-    const { error: updateError } = await admin
-      .from("promises")
-      .update(updatePayload)
-      .eq("id", id)
-      .eq("invite_status", "awaiting_acceptance");
+    // When counterparty joins after creator activated without them,
+    // also set counterparty_id and skip the invite_status filter (already "accepted").
+    const updateQuery = admin.from("promises").update({
+      ...updatePayload,
+      ...(canJoinAfterActivation ? { counterparty_id: user.id } : {}),
+    }).eq("id", id);
+
+    const { error: updateError } = canJoinAfterActivation
+      ? await updateQuery.eq("invite_status", "accepted")
+      : await updateQuery.eq("invite_status", "awaiting_acceptance");
 
     if (updateError) {
       return NextResponse.json(

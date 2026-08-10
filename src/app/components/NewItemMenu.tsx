@@ -6,6 +6,7 @@ import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
 
 export function NewItemMenu({ className }: { className?: string }) {
   const t = useT();
@@ -28,6 +29,22 @@ export function NewItemMenu({ className }: { className?: string }) {
       document.removeEventListener("keydown", handleKey);
     };
   }, [open]);
+
+  if (!COMMITMENTS_ENABLED) {
+    return (
+      <Tooltip label={t("nav.create")} placement="top">
+        <IconButton
+          href="/promises/new"
+          ariaLabel={t("nav.create")}
+          className={[
+            "bg-emerald-400 text-slate-50 shadow-lg shadow-emerald-500/30 hover:bg-emerald-300 hover:text-slate-50 focus-visible:text-slate-50 active:text-slate-50 border-emerald-300/60",
+            className,
+          ].filter(Boolean).join(" ")}
+          icon={<Plus className="h-5 w-5 text-slate-50 opacity-100" strokeWidth={2.5} aria-hidden />}
+        />
+      </Tooltip>
+    );
+  }
 
   return (
     <div ref={containerRef} className="relative">

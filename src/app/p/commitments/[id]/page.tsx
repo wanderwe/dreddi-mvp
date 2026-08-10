@@ -145,7 +145,8 @@ export default function PublicCommitmentPage() {
     <main className="relative py-6">
       <div className="relative mx-auto w-full max-w-2xl space-y-6 px-4 sm:px-6">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("commitments.label.goal")}</div>
+          <div className="mt-1 flex flex-wrap items-start justify-between gap-3">
             <h1 className="text-2xl font-semibold text-white">{goal.title}</h1>
             <StatusPill label={t(`commitments.dashboard.status.${goal.status}`)} tone={statusTone[goal.status]} />
           </div>

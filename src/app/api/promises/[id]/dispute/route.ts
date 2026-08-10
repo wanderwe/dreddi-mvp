@@ -43,12 +43,20 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         userId: user.id,
       });
     }
-    if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
-      return NextResponse.json({ error: "Only the other side can dispute" }, { status: 403 });
-    }
+    // Creator-as-watchdog: when deal was activated without counterparty and
+    // counterparty never joined, the creator can close it as not fulfilled.
+    const isWatchdogClose =
+      promise.activated_without_counterparty &&
+      !promise.counterparty_id &&
+      promise.creator_id === user.id;
 
-    if (!isPromiseAccepted(promise)) {
-      return NextResponse.json({ error: "Deal is not accepted" }, { status: 400 });
+    if (!isWatchdogClose) {
+      if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
+        return NextResponse.json({ error: "Only the other side can dispute" }, { status: 403 });
+      }
+      if (!isPromiseAccepted(promise)) {
+        return NextResponse.json({ error: "Deal is not accepted" }, { status: 400 });
+      }
     }
 
     if (promise.condition_text && !promise.condition_met_at) {
@@ -73,7 +81,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    if (!isNotDeliveredFlow && promise.status !== "completed_by_promisor") {
+    if (!isWatchdogClose && !isNotDeliveredFlow && promise.status !== "completed_by_promisor") {
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
     }
 
@@ -118,11 +126,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       );
     }
 
-    try {
-      await applyReputationForPromiseFinalization(admin, updatedPromise);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Failed to update reputation";
-      return NextResponse.json({ error: message }, { status: 500 });
+    // Skip reputation when creator closes a deal that was never accepted by a real counterparty.
+    if (!isWatchdogClose) {
+      try {
+        await applyReputationForPromiseFinalization(admin, updatedPromise);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to update reputation";
+        return NextResponse.json({ error: message }, { status: 500 });
+      }
     }
 
     const notificationResults = await dispatchNotificationEvent({

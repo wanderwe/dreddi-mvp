@@ -2,6 +2,7 @@
 
 import React from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useEffect, useId, useMemo, useState } from "react";
@@ -1400,7 +1401,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               </section>
             ) : null}
 
-            {!isEmbed && (publicGoals.length > 0 || goalStats.total_goals > 0) ? (
+            {COMMITMENTS_ENABLED && !isEmbed && (publicGoals.length > 0 || goalStats.total_goals > 0) ? (
               <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
                 <h2 className="mb-1 text-lg font-semibold">{t("commitments.profile.title")}</h2>
                 <p className="mb-5 text-sm text-white/55">{t("commitments.profile.subtitle")}</p>
@@ -1443,6 +1444,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         <div>
                           <p className="text-sm font-medium text-white">{goal.title}</p>
                           <p className="text-xs text-white/50">
+                            {t("commitments.label.goal")}
+                            {" · "}
                             {goal.deadline
                               ? t("commitments.dashboard.deadline", {
                                   date: formatDueDate(goal.deadline, locale) ?? "",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getAuthHeaders, type CommitmentVisibility } from "@/lib/commitments";
@@ -11,10 +11,13 @@ export default function NewCommitmentPage() {
   const t = useT();
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState<Date | undefined>();
-  const [visibility, setVisibility] = useState<CommitmentVisibility>("private");
+  const [visibility, setVisibility] = useState<CommitmentVisibility>(
+    searchParams.get("visibility") === "public" ? "public" : "private",
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

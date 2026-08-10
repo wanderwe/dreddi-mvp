@@ -69,6 +69,8 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "private" | "public";
+  activated_without_counterparty: boolean;
+  activated_without_counterparty_at: string | null;
 };
 
 type LifecycleState = {
@@ -175,7 +177,27 @@ function buildAgreementTimeline(
     });
   }
 
-  if (acceptedAt) {
+  if (promise.activated_without_counterparty_at) {
+    items.push({
+      key: "activated_without_counterparty",
+      label: t("publicAgreement.timeline.activatedWithoutCounterparty"),
+      actor: labels.creator,
+      timestamp: promise.activated_without_counterparty_at,
+      description: t("publicAgreement.timeline.activatedWithoutCounterpartyDescription"),
+      tone: "attention",
+    });
+  } else if (acceptedAt) {
+    items.push({
+      key: "accepted",
+      label: t("publicAgreement.timeline.accepted"),
+      actor: labels.accepter,
+      timestamp: acceptedAt,
+      description: t("publicAgreement.timeline.acceptedDescription"),
+      tone: "success",
+    });
+  }
+
+  if (promise.activated_without_counterparty_at && acceptedAt) {
     items.push({
       key: "accepted",
       label: t("publicAgreement.timeline.accepted"),
@@ -391,6 +413,8 @@ export default function PromisePage() {
   const [inviteBusy, setInviteBusy] = useState<"generate" | "cancel" | null>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showActivateWithoutCounterpartyModal, setShowActivateWithoutCounterpartyModal] = useState(false);
+  const [activatingWithoutCounterparty, setActivatingWithoutCounterparty] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCounterpartyConfirmModal, setShowCounterpartyConfirmModal] = useState(false);
   const [showNotDeliveredModal, setShowNotDeliveredModal] = useState(false);
@@ -461,7 +485,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,activated_without_counterparty,activated_without_counterparty_at"
       )
       .eq("id", id)
       .maybeSingle();
@@ -681,6 +705,43 @@ export default function PromisePage() {
     });
 
     setInviteBusy(null);
+
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      setError(j?.error ?? t("promises.detail.errors.updateStatus"));
+      return;
+    }
+
+    await load();
+  }
+
+  async function activateWithoutCounterparty() {
+    if (!p || !canActivateWithoutCounterparty) return;
+    setError(null);
+    setActivatingWithoutCounterparty(true);
+
+    let supabase;
+    try {
+      supabase = requireSupabase();
+    } catch (err) {
+      setError(supabaseErrorMessage(err));
+      setActivatingWithoutCounterparty(false);
+      return;
+    }
+
+    const session = await requireSessionOrRedirect(`/promises/${id}`, supabase);
+    if (!session) {
+      setActivatingWithoutCounterparty(false);
+      return;
+    }
+
+    const res = await fetch(`/api/promises/${p.id}/activate-without-counterparty`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+
+    setActivatingWithoutCounterparty(false);
+    setShowActivateWithoutCounterpartyModal(false);
 
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
@@ -1084,12 +1145,16 @@ export default function PromisePage() {
   const canConfirmWithoutExecutorCompletion = Boolean(
     canReview && p?.status === "active" && !p?.completed_at && isInviteAccepted
   );
+  const isWatchdogCreator = Boolean(
+    p?.activated_without_counterparty && !p?.counterparty_id && isCreator
+  );
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
       canMarkNotDelivered ||
       canConfirmWithoutExecutorCompletion ||
       (canReview && p?.status === "completed_by_promisor") ||
-      (canRespondToInvite && p?.status === "active")
+      (canRespondToInvite && p?.status === "active") ||
+      (isWatchdogCreator && (p?.status === "active" || p?.status === "completed_by_promisor"))
   );
   const showPublicStatus = p?.visibility === "public";
   const canGenerateInvite = Boolean(shouldShowInviteBlock && !p?.invite_token);
@@ -1098,6 +1163,9 @@ export default function PromisePage() {
   );
   const isAwaitingInviteResponse = Boolean(
     shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
+  );
+  const canActivateWithoutCounterparty = Boolean(
+    isCreator && inviteStatus === "awaiting_acceptance" && !isFinal && p?.invite_token
   );
   const hasLifecycleActions = Boolean(
     hasStatusActions || canRecreateDeal
@@ -1493,11 +1561,13 @@ export default function PromisePage() {
               {p.title}
             </h1>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
-                {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-white">{dueText}</span>
-              </span>
-            </div>
+            {p.due_at && (
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+                <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
+                  {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-white">{dueText}</span>
+                </span>
+              </div>
+            )}
 
             {hasDetails && (
               <p className="mt-5 whitespace-pre-wrap break-words text-base leading-7 text-slate-100/85">
@@ -1650,6 +1720,12 @@ export default function PromisePage() {
               </div>
             )}
 
+            {p.activated_without_counterparty && !p.counterparty_id && isFinal && (
+              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-slate-400">
+                <p className="text-sm">{t("promises.detail.closedWithoutCounterparty")}</p>
+              </div>
+            )}
+
             {(p.status === "disputed" &&
               (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
               <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
@@ -1707,6 +1783,18 @@ export default function PromisePage() {
                     </>
                   )}
                 </div>
+                {canActivateWithoutCounterparty && (
+                  <div className="mt-3 border-t border-white/5 pt-3">
+                    <button
+                      type="button"
+                      className="cursor-pointer text-xs text-slate-400/70 transition hover:text-slate-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={inviteBusy !== null || activatingWithoutCounterparty}
+                      onClick={() => setShowActivateWithoutCounterpartyModal(true)}
+                    >
+                      {t("promises.detail.activateWithoutCounterparty")}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1762,6 +1850,23 @@ export default function PromisePage() {
                       disabled={actionBusy !== null}
                       onClick={() => setShowCounterpartyConfirmModal(true)}
                     />
+                  )}
+
+                  {isWatchdogCreator && (p.status === "active" || p.status === "completed_by_promisor") && (
+                    <>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=confirm`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.confirm")}
+                      </Link>
+                      <Link
+                        href={`/promises/${p.id}/confirm?action=dispute`}
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      >
+                        {t("promises.confirm.dispute")}
+                      </Link>
+                    </>
                   )}
 
                   {canMarkNotDelivered && (
@@ -1857,6 +1962,37 @@ export default function PromisePage() {
       ) : !error ? (
         <div className="text-neutral-400">{t("promises.detail.loading")}</div>
       ) : null}
+
+      {showActivateWithoutCounterpartyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-white">
+              {t("promises.detail.activateWithoutCounterpartyConfirmTitle")}
+            </h2>
+            <p className="mt-3 text-sm text-slate-300">
+              {t("promises.detail.activateWithoutCounterpartyConfirmBody")}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setShowActivateWithoutCounterpartyModal(false)}
+                disabled={activatingWithoutCounterparty}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {t("promises.confirm.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void activateWithoutCounterparty()}
+                disabled={activatingWithoutCounterparty}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {activatingWithoutCounterparty ? t("promises.detail.saving") : t("promises.confirm.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">

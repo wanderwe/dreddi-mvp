@@ -92,7 +92,9 @@ export default function NewPromisePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   const [isPublicProfile, setIsPublicProfile] = useState<boolean | null>(null);
-  const [visibility, setVisibility] = useState<"private" | "public">("private");
+  const [visibility, setVisibility] = useState<"private" | "public">(
+    searchParams?.get("visibility") === "public" ? "public" : "private",
+  );
   const [isImportant, setIsImportant] = useState(false);
   const [showCounterpartyDropdown, setShowCounterpartyDropdown] = useState(false);
   const [counterpartyActiveIndex, setCounterpartyActiveIndex] = useState(0);

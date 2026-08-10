@@ -134,7 +134,7 @@
       "deal": "deal"
     },
     "entityPublic": {
-      "deal": "Public Deal"
+      "deal": "Public Agreement"
     },
     "entityNew": {
       "deal": "New deal"
@@ -406,6 +406,11 @@
       "copyInvitePrimary": "Copy link",
       "openInviteShort": "Open page",
       "withdrawInviteShort": "Withdraw",
+      "activateWithoutCounterparty": "Activate without confirmation",
+      "activateWithoutCounterpartyConfirmTitle": "Activate without confirmation?",
+      "activateWithoutCounterpartyConfirmBody": "The agreement will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
+      "activatedWithoutCounterpartyNote": "Activated without counterparty confirmation",
+      "closedWithoutCounterparty": "Closed — counterparty unconfirmed",
       "conditionStatusLabel": "Status",
       "disputeReasonLabel": "Dispute reason"
     },
@@ -423,6 +428,7 @@
       "promiseLabel": "{entity}",
       "dueLabel": "Due",
       "createdBy": "{creatorLabel}: {name}",
+      "executedBy": "{executorRole}: {name}",
       "statusLabel": "Status",
       "detailsLabel": "Details",
       "alreadyDisputed": "Already disputed",
@@ -1306,6 +1312,8 @@
       "counterConditionMet": "Counter-obligation fulfilled",
       "counterConditionMetDescription": "The counter-obligation was marked as fulfilled",
       "expired": "Invitation expired",
+      "activatedWithoutCounterparty": "Activated without other party",
+      "activatedWithoutCounterpartyDescription": "The agreement was activated without the other party's confirmation. They can still join later via the invite link.",
       "update": "Update",
       "updateAuthorFallback": "Agreement participant"
     },
@@ -1361,6 +1369,11 @@
       "subtitle": "Track and share your own commitments — separate from your deals and reputation",
       "newGoal": "New goal",
       "empty": "You haven't added any goals yet",
+      "emptyPublic": "No public goals yet",
+      "tabs": {
+        "mine": "Mine",
+        "public": "Public"
+      },
       "stats": {
         "total": "Total goals",
         "completed": "Completed",
@@ -1477,6 +1490,9 @@
       "title": "Personal Goals",
       "subtitle": "Lightweight, self-reported commitments — separate from reputation",
       "empty": "No public goals yet"
+    },
+    "label": {
+      "goal": "Goal"
     }
   }
 }

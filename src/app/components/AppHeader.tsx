@@ -1,6 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useEffect, useState } from "react";
 import { Eye, LayoutGrid, UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -199,9 +200,11 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  <LocalizedLink className={linkBaseClasses} href="/commitments">
-                    {t("nav.goals")}
-                  </LocalizedLink>
+                  {COMMITMENTS_ENABLED && (
+                    <LocalizedLink className={linkBaseClasses} href="/commitments">
+                      {t("nav.goals")}
+                    </LocalizedLink>
+                  )}
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
