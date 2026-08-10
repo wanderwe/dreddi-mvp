@@ -207,8 +207,7 @@ export default function Home() {
       {
         id: "demo-1",
         titleKey: "landing.demoDeals.deal1.title",
-        status: "confirmed" as const,
-        confirmed_at: "2026-02-14T19:10:00",
+        status: "active" as const,
       },
       {
         id: "demo-2",
@@ -219,8 +218,8 @@ export default function Home() {
       {
         id: "demo-3",
         titleKey: "landing.demoDeals.deal3.title",
-        status: "active" as const,
-        due_at: "2026-03-01T18:00:00",
+        status: "disputed" as const,
+        disputed_at: "2026-03-01T18:00:00",
       },
     ],
     []
@@ -628,20 +627,34 @@ export default function Home() {
           </div>
 
           {!showAuthenticatedCta ? (
-            <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
-              <LocalizedLink
-                href="/login"
-                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
-              >
-                {copy.cta.getStarted}
-              </LocalizedLink>
-              <LocalizedLink
-                href="/u"
-                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
-              >
-                {copy.cta.publicProfiles}
-              </LocalizedLink>
-            </div>
+            <>
+              <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
+                <LocalizedLink
+                  href="/login"
+                  className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
+                >
+                  {copy.cta.getStarted}
+                </LocalizedLink>
+                <LocalizedLink
+                  href="/u"
+                  className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
+                >
+                  {copy.cta.publicProfiles}
+                </LocalizedLink>
+              </div>
+              <div className="order-4 mt-1 flex flex-col gap-3 md:order-5 sm:flex-row sm:gap-4">
+                {(["citizen", "journalist", "personal"] as const).map((key) => (
+                  <div key={key} className="flex-1 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300/80">
+                      {t(`landing.useCases.${key}.title`)}
+                    </p>
+                    <p className="mt-1.5 text-sm leading-snug text-slate-300/80">
+                      {t(`landing.useCases.${key}.body`)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <LocalizedLink

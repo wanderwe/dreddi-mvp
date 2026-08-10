@@ -49,13 +49,27 @@
     },
     "demoDeals": {
       "deal1": {
-        "title": "Help with moving on Saturday"
+        "title": "Repair the road on Sadova street"
       },
       "deal2": {
-        "title": "Prepare an investor pitch"
+        "title": "Publish the quarterly expenditure report"
       },
       "deal3": {
-        "title": "Return $200 by March 1"
+        "title": "Install lighting near School №14"
+      }
+    },
+    "useCases": {
+      "citizen": {
+        "title": "Citizen / Activist",
+        "body": "An official made a promise — put it on record. Send the link. Let them confirm it themselves."
+      },
+      "journalist": {
+        "title": "Journalist / NGO",
+        "body": "Track public pledges by officials. Get status updates. Embed on your site."
+      },
+      "personal": {
+        "title": "Between people",
+        "body": "An agreement with a client, partner, or friend. Private or public — no contracts, no pressure."
       }
     }
   },

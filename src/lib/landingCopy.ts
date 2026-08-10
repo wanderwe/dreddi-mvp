@@ -81,10 +81,10 @@ export type LandingCopy = {
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
-      eyebrow: "Легкий трекер домовленостей",
-      headline: "Домовленість починається з підтвердження",
+      eyebrow: "Платформа публічної підзвітності",
+      headline: "Слова стають фактами",
       description:
-        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
+        "Публічна обіцянка — це зобов'язання.\n\nЗафіксуй. Надішли посилання. Хай підтвердить.\n\nФакт зафіксовано — репутація видима.",
       whyLink: "Чому існує Dreddi →",
     },
     useDreddi: {
@@ -121,9 +121,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "Переглянути приклад профілю",
     },
     cta: {
-      getStarted: "Створити угоду",
-      publicProfiles: "Переглянути профілі",
-      createPromise: "Створити угоду",
+      getStarted: "Зафіксувати обіцянку",
+      publicProfiles: "Публічні угоди",
+      createPromise: "Зафіксувати обіцянку",
       reviewDeals: "Переглянути угоди",
     },
     loading: {
@@ -176,10 +176,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
   en: {
     hero: {
-      eyebrow: "A lightweight deal tracker",
-      headline: "An agreement starts with confirmation",
+      eyebrow: "Civic accountability platform",
+      headline: "Words become facts",
       description:
-        "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
+        "A public promise is a commitment.\n\nRecord it. Send the link. Let them confirm.\n\nThe record exists — reputation follows.",
       whyLink: "Why Dreddi exists →",
     },
     useDreddi: {
@@ -216,9 +216,9 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       cta: "View example profile",
     },
     cta: {
-      getStarted: "Create a deal",
-      publicProfiles: "Browse profiles",
-      createPromise: "Create a deal",
+      getStarted: "Record a promise",
+      publicProfiles: "Public agreements",
+      createPromise: "Record a promise",
       reviewDeals: "View deals",
     },
     loading: {
