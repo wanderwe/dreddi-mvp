@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, UserRound, X, ExternalLink, Copy, Check } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
@@ -598,48 +599,50 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </div>
                       </div>
                     </div>
-                    <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                        <div className="space-y-1">
-                          <div className="text-sm font-semibold text-white">
-                            {t("profileSettings.goalsStatsScopeLabel")}
+                    {COMMITMENTS_ENABLED ? (
+                      <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                          <div className="space-y-1">
+                            <div className="text-sm font-semibold text-white">
+                              {t("profileSettings.goalsStatsScopeLabel")}
+                            </div>
+                            <HelperText>
+                              {t("profileSettings.goalsStatsScopeDescription")}
+                            </HelperText>
+                            <HelperText>
+                              {profile?.goalsStatsScope === "all"
+                                ? t("profileSettings.goalsStatsScopeAll")
+                                : t("profileSettings.goalsStatsScopePublicOnly")}
+                            </HelperText>
                           </div>
-                          <HelperText>
-                            {t("profileSettings.goalsStatsScopeDescription")}
-                          </HelperText>
-                          <HelperText>
-                            {profile?.goalsStatsScope === "all"
-                              ? t("profileSettings.goalsStatsScopeAll")
-                              : t("profileSettings.goalsStatsScopePublicOnly")}
-                          </HelperText>
-                        </div>
-                        <div className="flex justify-end self-center">
-                          <button
-                            type="button"
-                            role="switch"
-                            aria-checked={profile?.goalsStatsScope === "all"}
-                            aria-label={t("profileSettings.goalsStatsScopeToggleLabel")}
-                            onClick={toggleGoalsStatsScope}
-                            disabled={loading || saving || !profile}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                              profile?.goalsStatsScope === "all"
-                                ? "border-emerald-300/50 bg-emerald-400/70"
-                                : "border-white/20 bg-white/10"
-                            } ${
-                              loading || saving || !profile
-                                ? "cursor-not-allowed opacity-60"
-                                : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
-                            }`}
-                          >
-                            <span
-                              className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                                profile?.goalsStatsScope === "all" ? "translate-x-5" : "translate-x-1"
+                          <div className="flex justify-end self-center">
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={profile?.goalsStatsScope === "all"}
+                              aria-label={t("profileSettings.goalsStatsScopeToggleLabel")}
+                              onClick={toggleGoalsStatsScope}
+                              disabled={loading || saving || !profile}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
+                                profile?.goalsStatsScope === "all"
+                                  ? "border-emerald-300/50 bg-emerald-400/70"
+                                  : "border-white/20 bg-white/10"
+                              } ${
+                                loading || saving || !profile
+                                  ? "cursor-not-allowed opacity-60"
+                                  : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
                               }`}
-                            />
-                          </button>
+                            >
+                              <span
+                                className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
+                                  profile?.goalsStatsScope === "all" ? "translate-x-5" : "translate-x-1"
+                                }`}
+                              />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ) : null}
                   </div>
                 </div>
 

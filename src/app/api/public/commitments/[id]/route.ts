@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  commitmentsDisabledResponse,
   getAdminClient,
   getOptionalUser,
   SELF_COMMITMENT_COLUMNS,
@@ -22,6 +23,9 @@ type PublicProfileRecord = {
 };
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const disabled = commitmentsDisabledResponse();
+  if (disabled) return disabled;
+
   try {
     const { id } = await ctx.params;
     const admin = getAdminClient();

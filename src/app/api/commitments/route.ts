@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
 import {
+  commitmentsDisabledResponse,
   getAdminClient,
   isCommitmentVisibility,
   SELF_COMMITMENT_COLUMNS,
@@ -9,6 +10,9 @@ import {
 } from "./common";
 
 export async function GET(req: Request) {
+  const disabled = commitmentsDisabledResponse();
+  if (disabled) return disabled;
+
   try {
     const cookieStore = await cookies();
     const user = await requireUser(req, cookieStore);
@@ -34,6 +38,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const disabled = commitmentsDisabledResponse();
+  if (disabled) return disabled;
+
   try {
     const cookieStore = await cookies();
     const user = await requireUser(req, cookieStore);

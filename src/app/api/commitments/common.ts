@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
+
+// Goals are hidden behind NEXT_PUBLIC_FEATURE_COMMITMENTS; the API must not work when the UI is off.
+export function commitmentsDisabledResponse() {
+  return COMMITMENTS_ENABLED ? null : NextResponse.json({ error: "Not found" }, { status: 404 });
+}
 
 export const COMMITMENT_STATUSES = ["active", "completed", "failed", "abandoned"] as const;
 export type CommitmentStatus = (typeof COMMITMENT_STATUSES)[number];

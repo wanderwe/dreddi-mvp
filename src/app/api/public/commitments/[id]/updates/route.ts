@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getAdminClient, SELF_COMMITMENT_COLUMNS, type SelfCommitmentRecord } from "@/app/api/commitments/common";
+import { commitmentsDisabledResponse, getAdminClient, SELF_COMMITMENT_COLUMNS, type SelfCommitmentRecord } from "@/app/api/commitments/common";
 
 type SelfCommitmentUpdateRecord = {
   id: string;
@@ -11,6 +11,9 @@ type SelfCommitmentUpdateRecord = {
 };
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const disabled = commitmentsDisabledResponse();
+  if (disabled) return disabled;
+
   try {
     const user = await requireUser(req);
     if (user instanceof NextResponse) return user;

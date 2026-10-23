@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminClient, SELF_COMMITMENT_COLUMNS, type SelfCommitmentRecord } from "@/app/api/commitments/common";
+import { commitmentsDisabledResponse, getAdminClient, SELF_COMMITMENT_COLUMNS, type SelfCommitmentRecord } from "@/app/api/commitments/common";
 
 type PublicProfileRecord = {
   id: string;
@@ -9,6 +9,9 @@ type PublicProfileRecord = {
 };
 
 export async function GET() {
+  const disabled = commitmentsDisabledResponse();
+  if (disabled) return disabled;
+
   try {
     const admin = getAdminClient();
 
