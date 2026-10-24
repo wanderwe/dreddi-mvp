@@ -35,6 +35,7 @@ export function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-dreddi-locale", locale);
+  requestHeaders.set("x-dreddi-pathname", pathname);
 
   const response = NextResponse.next({
     request: {

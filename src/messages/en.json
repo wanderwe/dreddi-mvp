@@ -31,6 +31,12 @@
         "title": "New goal",
         "description": "A personal goal you can make public"
       }
+    },
+    "theme": {
+      "current": "Theme: {theme}. Click to change",
+      "system": "system",
+      "light": "light",
+      "dark": "dark"
     }
   },
   "legal": {

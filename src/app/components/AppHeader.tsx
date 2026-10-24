@@ -12,6 +12,7 @@ import { MobileMenu } from "@/app/components/MobileMenu";
 import { NewItemMenu } from "@/app/components/NewItemMenu";
 import { NotificationBell } from "@/app/components/NotificationBell";
 import { ProfileSettingsMenu } from "@/app/components/ProfileSettingsMenu";
+import { ThemeSwitcher } from "@/app/components/ThemeSwitcher";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -241,11 +242,13 @@ export function AppHeader() {
                   <Tooltip label={t("nav.notifications")} placement="top">
                     <NotificationBell />
                   </Tooltip>
+                  <ThemeSwitcher />
                   <LocaleSwitcher />
                   <ProfileSettingsMenu />
                 </div>
               </nav>
               <div className="flex items-center gap-2 md:hidden">
+                <ThemeSwitcher />
                 <LocaleSwitcher />
                 <MobileMenu
                   isAuthenticated={isAuthenticated}
@@ -265,9 +268,11 @@ export function AppHeader() {
                     {t("auth.login.signInCta")}
                   </LocalizedLink>
                 )}
+                <ThemeSwitcher />
                 <LocaleSwitcher />
               </nav>
               <div className="flex items-center gap-2 md:hidden">
+                <ThemeSwitcher />
                 <LocaleSwitcher />
                 <MobileMenu
                   isAuthenticated={isAuthenticated}
