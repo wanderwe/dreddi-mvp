@@ -2,50 +2,29 @@ export function DreddiLogoMark({ className = "h-12 w-12" }: { className?: string
   return (
     <svg
       className={className}
-      viewBox="0 0 64 64"
+      viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="Dreddi knows logo"
     >
-      <defs>
-        <linearGradient id="dreddi-glow" x1="8" y1="6" x2="54" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#5DF0B5" stopOpacity="0.9" />
-          <stop offset="0.55" stopColor="#4B93FF" stopOpacity="0.8" />
-          <stop offset="1" stopColor="#0B1526" stopOpacity="0.95" />
-        </linearGradient>
-        <linearGradient id="dreddi-core" x1="20" y1="18" x2="46" y2="46" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#E7FFF4" />
-          <stop offset="1" stopColor="#B6EAD8" />
-        </linearGradient>
-      </defs>
-
-      <rect x="2.5" y="2.5" width="59" height="59" rx="16" fill="#0B1220" />
-      <rect
-        x="2.5"
-        y="2.5"
-        width="59"
-        height="59"
-        rx="16"
-        fill="url(#dreddi-glow)"
-        opacity="0.9"
-      />
-      <rect x="6.5" y="6.5" width="51" height="51" rx="13" stroke="#9DE8C9" strokeOpacity="0.15" />
-
-      <path
-        d="M20 18H33.5C43 18 50 25 50 32C50 39 43 46 33.5 46H20"
+      <rect width="100" height="100" rx="22" fill="#111318" />
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
         fill="none"
-        stroke="url(#dreddi-core)"
+        stroke="#00d4aa"
+        strokeWidth="2"
+        strokeDasharray="4 3"
+      />
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#00d4aa" strokeWidth="3" />
+      <path d="M38 30 L38 70" stroke="#00d4aa" strokeWidth="6" strokeLinecap="round" />
+      <path
+        d="M38 30 Q66 30 66 50 Q66 70 38 70"
+        stroke="#00d4aa"
         strokeWidth="6"
         strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M20 24 28 32 20 40"
         fill="none"
-        stroke="#36D399"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );
