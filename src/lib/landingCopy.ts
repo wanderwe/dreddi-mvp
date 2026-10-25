@@ -1,10 +1,18 @@
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
+
 export type LandingCopy = {
   hero: {
     eyebrow: string;
     headline: string;
     description: string;
     whyLink: string;
+  };
+  whenToUse: {
+    title: string;
+    subtitle: string;
+    cards: {
+      title: string;
+    }[];
   };
   useDreddi: {
     label: string;
@@ -86,6 +94,17 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
       whyLink: "Чому існує Dreddi →",
+    },
+    whenToUse: {
+      title: "Коли Dreddi стає корисним",
+      subtitle: "Коли чуєш щось подібне",
+      cards: [
+        { title: "Сказали “зроблю до пʼятниці”" },
+        { title: "“Поверну через тиждень”" },
+        { title: "“Давай реально зустрінемось”" },
+        { title: "“Хто за це відповідає?”" },
+        { title: "Щоб потім не було “я такого не казав”" },
+      ],
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -181,6 +200,17 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       description:
         "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
       whyLink: "Why Dreddi exists →",
+    },
+    whenToUse: {
+      title: "When Dreddi becomes useful",
+      subtitle: "When you hear something like this",
+      cards: [
+        { title: "“I’ll do it by Friday”" },
+        { title: "“I’ll return it next week”" },
+        { title: "“Let’s actually meet”" },
+        { title: "“Who’s responsible for this?”" },
+        { title: "So there’s no “I never said that”" },
+      ],
     },
     useDreddi: {
       label: "Use cases",
