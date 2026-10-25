@@ -23,6 +23,28 @@ export type LandingCopy = {
     outcomeDescription: string;
     cta: string;
   };
+  publicAgreements: {
+    label: string;
+    title: string;
+    description: string;
+    supporting: string;
+    principles: string[];
+    mockCard: {
+      title: string;
+      badge: string;
+      watchers: string;
+      statusLabel: string;
+      statusValue: string;
+      deadlineLabel: string;
+      deadlineValue: string;
+      updateLabel: string;
+      updateValue: string;
+      outcomeLabel: string;
+      outcomeValue: string;
+      viewCta: string;
+      observerHint: string;
+    };
+  };
   cta: {
     getStarted: string;
     publicProfiles: string;
@@ -120,6 +142,32 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       outcomeDescription: "Відображає дотримані та оскаржені угоди",
       cta: "Переглянути приклад профілю",
     },
+    publicAgreements: {
+      label: "Публічна відповідальність",
+      title: "Публічні угоди роблять відповідальність видимою",
+      description:
+        "Перетворюйте важливі домовленості на публічні зобовʼязання, за якими можуть стежити інші",
+      supporting: "Прогрес, дедлайни та фінальний результат стають частиною репутації",
+      principles: [
+        "Люди можуть стежити, не стаючи учасниками",
+        "Публічні угоди — це зобовʼязання з видимим результатом",
+      ],
+      mockCard: {
+        title: "Відкрити Space Out VR Bar до серпня",
+        badge: "Публічна",
+        watchers: "Стежать",
+        statusLabel: "Статус",
+        statusValue: "У процесі",
+        deadlineLabel: "Дедлайн",
+        deadlineValue: "1 серпня 2026",
+        updateLabel: "Останнє оновлення",
+        updateValue: "Локацію підтверджено, триває підписання оренди",
+        outcomeLabel: "Результат",
+        outcomeValue: "Після завершення угода переходить у «Виконано» або «Оскаржено»",
+        viewCta: "Переглянути публічну угоду",
+        observerHint: "Спостерігачі бачать прогрес, але не втручаються",
+      },
+    },
     cta: {
       getStarted: "Створити угоду",
       publicProfiles: "Переглянути профілі",
@@ -214,6 +262,32 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       outcomeTitle: "Public profile",
       outcomeDescription: "Shows fulfilled and disputed deals",
       cta: "View example profile",
+    },
+    publicAgreements: {
+      label: "Public accountability",
+      title: "Public agreements make accountability visible",
+      description:
+        "Turn important agreements into public commitments other people can follow",
+      supporting: "Progress, deadlines and final outcomes become part of reputation",
+      principles: [
+        "People can follow without becoming participants",
+        "Public agreements are commitments with visible outcomes",
+      ],
+      mockCard: {
+        title: "Launch Space Out VR Bar by August",
+        badge: "Public",
+        watchers: "Watching",
+        statusLabel: "Status",
+        statusValue: "In progress",
+        deadlineLabel: "Deadline",
+        deadlineValue: "August 1, 2026",
+        updateLabel: "Latest update",
+        updateValue: "Venue confirmed, lease signing in progress",
+        outcomeLabel: "Outcome",
+        outcomeValue: "After completion this agreement resolves as “Fulfilled” or “Disputed”",
+        viewCta: "View public agreement",
+        observerHint: "Observers can follow progress without interfering",
+      },
     },
     cta: {
       getStarted: "Create a deal",
