@@ -22,7 +22,6 @@ interface Ripple {
   r: number; alpha: number;
 }
 
-const TEAL = "0,212,170";
 const NODE_COUNT = 22;
 const MAX_EDGES = 40;
 const SPAWN_MS = 1800;
@@ -60,6 +59,15 @@ export default function AgreementNetworkBackground({
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
+
+    // Network colour comes from the theme (--network-rgb in globals.css) and follows theme switches.
+    const readTeal = () =>
+      getComputedStyle(document.documentElement).getPropertyValue("--network-rgb").replace(/\s/g, "") || "0,212,170";
+    let teal = readTeal();
+    const themeObserver = new MutationObserver(() => {
+      teal = readTeal();
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     const resize = () => {
       const rect = canvas.parentElement!.getBoundingClientRect();
@@ -126,13 +134,13 @@ export default function AgreementNetworkBackground({
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(tx, ty);
-        ctx.strokeStyle = `rgba(${TEAL},${(e.settled ? 0.14 : 0.42) * e.alpha})`;
+        ctx.strokeStyle = `rgba(${teal},${(e.settled ? 0.14 : 0.42) * e.alpha})`;
         ctx.lineWidth = e.settled ? 0.7 : 1;
         ctx.stroke();
         if (!e.settled) {
           ctx.beginPath();
           ctx.arc(tx, ty, 2.2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${TEAL},${e.alpha * 0.9})`;
+          ctx.fillStyle = `rgba(${teal},${e.alpha * 0.9})`;
           ctx.fill();
         }
       });
@@ -143,7 +151,7 @@ export default function AgreementNetworkBackground({
       ripples.forEach((r) => {
         ctx.beginPath();
         ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${TEAL},${r.alpha})`;
+        ctx.strokeStyle = `rgba(${teal},${r.alpha})`;
         ctx.lineWidth = 0.8;
         ctx.stroke();
         r.r += 1.1; r.alpha -= 0.016;
@@ -159,17 +167,17 @@ export default function AgreementNetworkBackground({
         if (isActive) {
           ctx.beginPath();
           ctx.arc(n.x, n.y, r + 10, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${TEAL},0.05)`;
+          ctx.fillStyle = `rgba(${teal},0.05)`;
           ctx.fill();
           ctx.beginPath();
           ctx.arc(n.x, n.y, r + 4, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(${TEAL},0.18)`;
+          ctx.strokeStyle = `rgba(${teal},0.18)`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }
         ctx.beginPath();
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = isActive ? `rgba(${TEAL},0.9)` : `rgba(${TEAL},0.3)`;
+        ctx.fillStyle = isActive ? `rgba(${teal},0.9)` : `rgba(${teal},0.3)`;
         ctx.fill();
       });
 
@@ -186,6 +194,7 @@ export default function AgreementNetworkBackground({
     return () => {
       if (stateRef.current) cancelAnimationFrame(stateRef.current.raf);
       window.removeEventListener("resize", resize);
+      themeObserver.disconnect();
     };
   }, [spawnEdge]);
 

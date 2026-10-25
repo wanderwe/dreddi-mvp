@@ -14,7 +14,7 @@ type TooltipProps = {
 };
 
 const baseTooltipClasses =
-  "pointer-events-none fixed z-[100] max-w-[280px] whitespace-pre-line break-words rounded-md border border-white/10 bg-slate-950/95 px-2.5 py-1.5 text-[11px] font-medium leading-[1.35] text-slate-100 shadow-lg transition-opacity duration-150";
+  "pointer-events-none fixed z-[100] max-w-[280px] whitespace-pre-line break-words rounded-md border border-tone-white/10 bg-tone-950/95 px-2.5 py-1.5 text-[11px] font-medium leading-[1.35] text-tone-100 shadow-lg transition-opacity duration-150";
 
 const VIEWPORT_PADDING = 8;
 const TOOLTIP_OFFSET = 8;

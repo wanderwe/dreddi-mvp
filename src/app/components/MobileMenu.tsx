@@ -38,9 +38,9 @@ export function MobileMenu({
     return () => window.removeEventListener(NOTIFICATION_COUNT_SYNC_EVENT, handler);
   }, []);
   const baseLinkClasses =
-    "rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100";
+    "rounded-xl border border-tone-white/10 px-3 py-2 text-left text-tone-white transition hover:border-accent-300/50 hover:text-accent-100";
   const primaryLinkClasses =
-    "rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/45";
+    "rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:translate-y-[-1px] hover:shadow-accent-400/45";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -50,19 +50,19 @@ export function MobileMenu({
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label="Open menu"
-          className="flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white shadow-sm shadow-black/20 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 md:hidden"
+          className="flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 bg-tone-white/5 p-2 text-tone-white shadow-sm shadow-tone-black/20 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 md:hidden"
         >
           <span className="flex h-5 w-5 flex-col items-center justify-center gap-1">
-            <span className="h-0.5 w-5 rounded-full bg-white" />
-            <span className="h-0.5 w-5 rounded-full bg-white" />
-            <span className="h-0.5 w-5 rounded-full bg-white" />
+            <span className="h-0.5 w-5 rounded-full bg-tone-white" />
+            <span className="h-0.5 w-5 rounded-full bg-tone-white" />
+            <span className="h-0.5 w-5 rounded-full bg-tone-white" />
           </span>
         </button>
       </SheetTrigger>
       <SheetPortal>
         <SheetOverlay />
         <SheetContent id="mobile-menu" className="w-[calc(100vw-1rem)] max-w-sm p-4 md:hidden">
-          <nav className="flex flex-col gap-4 text-sm font-medium text-slate-200">
+          <nav className="flex flex-col gap-4 text-sm font-medium text-tone-200">
             {isAuthenticated ? (
               <>
                 <SheetClose asChild>
@@ -127,8 +127,8 @@ export function MobileMenu({
                     )}
                   </LocalizedLink>
                 </SheetClose>
-                <div className="mt-2 border-t border-white/10 pt-4">
-                  <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                <div className="mt-2 border-t border-tone-white/10 pt-4">
+                  <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
                     {t("profileSettings.sectionLabel")}
                   </div>
                   <ProfileSettingsPanel showTitle={false} className="mt-3" />

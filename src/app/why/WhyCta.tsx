@@ -49,7 +49,7 @@ export function WhyCta({ label }: WhyCtaProps) {
   return (
     <LocalizedLink
       href={href}
-      className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40"
+      className="inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:translate-y-[-1px] hover:shadow-accent-400/40"
     >
       {label}
     </LocalizedLink>

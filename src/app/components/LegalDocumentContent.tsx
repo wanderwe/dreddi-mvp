@@ -40,14 +40,14 @@ export function LegalDocumentContent({ content }: LegalDocumentContentProps) {
   const blocks = parseMarkdown(content);
 
   return (
-    <div className="space-y-5 text-base leading-relaxed text-slate-200">
+    <div className="space-y-5 text-base leading-relaxed text-tone-200">
       {blocks.map((block, index) => {
         if (block.type === "heading") {
           const HeadingTag = block.level === 1 ? "h2" : block.level === 2 ? "h3" : "h4";
           return (
             <HeadingTag
               key={`heading-${block.text}-${index}`}
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-tone-white"
             >
               {block.text}
             </HeadingTag>
@@ -56,7 +56,7 @@ export function LegalDocumentContent({ content }: LegalDocumentContentProps) {
 
         if (block.type === "list") {
           return (
-            <ul key={`list-${index}`} className="list-disc space-y-2 pl-5 text-slate-200">
+            <ul key={`list-${index}`} className="list-disc space-y-2 pl-5 text-tone-200">
               {block.items.map((item, itemIndex) => (
                 <li key={`${item}-${itemIndex}`}>{item}</li>
               ))}

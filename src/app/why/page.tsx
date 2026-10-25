@@ -28,18 +28,18 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
       <WhyProgress title={copy.title} />
 
       <header className="space-y-3">
-        <h1 className="text-4xl font-semibold text-white sm:text-5xl">{copy.title}</h1>
-        {copy.subtitle ? <p className="text-lg text-slate-300 sm:text-xl">{copy.subtitle}</p> : null}
+        <h1 className="text-4xl font-semibold text-tone-white sm:text-5xl">{copy.title}</h1>
+        {copy.subtitle ? <p className="text-lg text-tone-300 sm:text-xl">{copy.subtitle}</p> : null}
       </header>
 
-      <article className="mt-8 space-y-10 text-base leading-7 text-slate-200">
+      <article className="mt-8 space-y-10 text-base leading-7 text-tone-200">
         {copy.sections.map((section, index) => {
           const sectionClassName =
             section.kind === "turn"
-              ? "space-y-3 text-xl font-semibold leading-8 text-slate-50 sm:text-2xl sm:leading-9"
+              ? "space-y-3 text-xl font-semibold leading-8 text-tone-50 sm:text-2xl sm:leading-9"
               : section.kind === "list"
-                ? "space-y-1.5 text-slate-300"
-                : "space-y-2 text-slate-200";
+                ? "space-y-1.5 text-tone-300"
+                : "space-y-2 text-tone-200";
 
           return (
             <section key={`section-${index}`} className={sectionClassName}>

@@ -9,17 +9,17 @@ export function DreddiLogoMark({ className = "h-12 w-12" }: { className?: string
     >
       <defs>
         <linearGradient id="dreddi-glow" x1="8" y1="6" x2="54" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#5DF0B5" stopOpacity="0.9" />
-          <stop offset="0.55" stopColor="#4B93FF" stopOpacity="0.8" />
-          <stop offset="1" stopColor="#0B1526" stopOpacity="0.95" />
+          <stop style={{ stopColor: "var(--logo-glow-1)", stopOpacity: "var(--logo-glow-1-opacity)" }} />
+          <stop offset="0.55" style={{ stopColor: "var(--logo-glow-2)", stopOpacity: "var(--logo-glow-2-opacity)" }} />
+          <stop offset="1" style={{ stopColor: "var(--logo-glow-3)", stopOpacity: "var(--logo-glow-3-opacity)" }} />
         </linearGradient>
         <linearGradient id="dreddi-core" x1="20" y1="18" x2="46" y2="46" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#E7FFF4" />
-          <stop offset="1" stopColor="#B6EAD8" />
+          <stop style={{ stopColor: "var(--logo-letter-from)" }} />
+          <stop offset="1" style={{ stopColor: "var(--logo-letter-to)" }} />
         </linearGradient>
       </defs>
 
-      <rect x="2.5" y="2.5" width="59" height="59" rx="16" fill="#0B1220" />
+      <rect x="2.5" y="2.5" width="59" height="59" rx="16" style={{ fill: "var(--logo-plate)" }} />
       <rect
         x="2.5"
         y="2.5"
@@ -29,7 +29,14 @@ export function DreddiLogoMark({ className = "h-12 w-12" }: { className?: string
         fill="url(#dreddi-glow)"
         opacity="0.9"
       />
-      <rect x="6.5" y="6.5" width="51" height="51" rx="13" stroke="#9DE8C9" strokeOpacity="0.15" />
+      <rect
+        x="6.5"
+        y="6.5"
+        width="51"
+        height="51"
+        rx="13"
+        style={{ fill: "var(--logo-core)", stroke: "var(--logo-rim)", strokeOpacity: "var(--logo-rim-opacity)" }}
+      />
 
       <path
         d="M20 18H33.5C43 18 50 25 50 32C50 39 43 46 33.5 46H20"
@@ -42,7 +49,7 @@ export function DreddiLogoMark({ className = "h-12 w-12" }: { className?: string
       <path
         d="M20 24 28 32 20 40"
         fill="none"
-        stroke="#36D399"
+        style={{ stroke: "var(--logo-chevron)" }}
         strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -75,10 +82,10 @@ export function DreddiLogo({
       <DreddiLogoMark className={markClassName} />
       {showText && (
         <div className={`leading-tight ${textClassName}`}>
-          <div className={`font-semibold uppercase tracking-[0.12em] text-emerald-200 ${accentClassName}`}>
+          <div className={`font-semibold uppercase tracking-[0.12em] text-accent-200 ${accentClassName}`}>
             Dreddi
           </div>
-          <div className={`font-semibold text-white ${titleClassName}`}>knows</div>
+          <div className={`font-semibold text-tone-white ${titleClassName}`}>knows</div>
         </div>
       )}
     </div>

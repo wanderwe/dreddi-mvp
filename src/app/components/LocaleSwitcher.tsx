@@ -78,7 +78,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
       </div>
       {toast && (
         <div
-          className="mt-2 w-max rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1 text-[11px] text-red-100 shadow-sm"
+          className="mt-2 w-max rounded-full border border-danger-400/30 bg-red-500/10 px-3 py-1 text-[11px] text-danger-100 shadow-sm"
           role="status"
           aria-live="polite"
         >

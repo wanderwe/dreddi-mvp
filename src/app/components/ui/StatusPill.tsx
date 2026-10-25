@@ -12,10 +12,10 @@ type StatusPillProps = {
 };
 
 const toneClassMap: Record<StatusPillTone, string> = {
-  success: "bg-emerald-300/7 text-emerald-100",
-  attention: "bg-amber-200/7 text-amber-100",
-  neutral: "bg-slate-200/6 text-slate-200",
-  danger: "bg-rose-300/7 text-rose-100",
+  success: "bg-emerald-300/7 text-accent-100",
+  attention: "bg-amber-200/7 text-warn-100",
+  neutral: "bg-tone-200/6 text-tone-200",
+  danger: "bg-rose-300/7 text-alert-100",
 };
 
 const iconClassName = "h-[14px] w-[14px] text-current opacity-70";

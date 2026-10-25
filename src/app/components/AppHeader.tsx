@@ -46,7 +46,7 @@ export function AppHeader() {
   const isAuthenticated = authState.isLoggedIn;
   const showSignIn = !isAuthenticated && pathWithoutLocale !== "/login";
   const linkBaseClasses =
-    "cursor-pointer whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+    "cursor-pointer whitespace-nowrap rounded-xl border border-transparent px-3 py-1.5 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950";
 
   useEffect(() => {
     let active = true;
@@ -173,16 +173,16 @@ export function AppHeader() {
   if (isEmbedPath) return null;
 
   return (
-    <header className="relative z-50 border-b border-white/10 bg-black/30/50 backdrop-blur">
+    <header className="relative z-50 border-b border-tone-white/10 bg-tone-black/30/50 backdrop-blur">
       <div className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-4 px-6 py-4 md:flex-wrap">
-        <LocalizedLink href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-white">
+        <LocalizedLink href="/" className="flex min-w-0 cursor-pointer items-center gap-2 text-tone-white">
           <DreddiLogo
             accentClassName="text-xs"
             markClassName="h-11 w-11"
             titleClassName="text-lg"
           />
           {productFlags.showBetaUi ? (
-            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-slate-200/70">
+            <span className="inline-flex items-center rounded-full border border-tone-white/10 bg-tone-white/5 px-2 py-0.5 text-[10px] font-semibold lowercase tracking-wide text-tone-200/70">
               beta
             </span>
           ) : null}
@@ -190,13 +190,13 @@ export function AppHeader() {
 
         <div className="flex items-center gap-3">
           {authState.isMock && (
-            <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
+            <span className="rounded-full border border-warn-300/40 bg-amber-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-warn-200">
               MOCK AUTH
             </span>
           )}
           {isAuthenticated ? (
             <>
-              <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-slate-200 md:flex">
+              <nav className="hidden w-full flex-nowrap items-center text-sm font-medium text-tone-200 md:flex">
                 <div className="flex items-center gap-2 pr-3">
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
@@ -209,10 +209,10 @@ export function AppHeader() {
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
-                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-amber-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-amber-100 transition"
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-warn-200/40 bg-amber-300/20 px-2 py-1 text-xs font-semibold text-warn-100 transition"
                     >
                       {t("nav.actionQueueBadge")}
-                      <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-slate-900">{actionQueueCount}</span>
+                      <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-tone-900">{actionQueueCount}</span>
                     </LocalizedLink>
                   )}
                 </div>
@@ -259,11 +259,11 @@ export function AppHeader() {
             </>
           ) : (
             <>
-              <nav className="hidden items-center gap-3 text-sm font-medium text-slate-200 md:flex">
+              <nav className="hidden items-center gap-3 text-sm font-medium text-tone-200 md:flex">
                 {showSignIn && (
                   <LocalizedLink
                     href="/login"
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
                   >
                     {t("auth.login.signInCta")}
                   </LocalizedLink>

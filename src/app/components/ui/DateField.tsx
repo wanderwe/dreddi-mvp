@@ -147,7 +147,7 @@ export function DateField({ value, onChange, locale, placeholder, clearLabel, ar
               width: popoverStyles?.width ?? 320,
             }}
             className={clsx(
-              "fixed z-50 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
+              "fixed z-50 rounded-2xl border border-tone-white/10 bg-tone-950/95 p-4 text-sm text-tone-100 shadow-2xl shadow-tone-black/60 backdrop-blur",
               !popoverStyles && "pointer-events-none opacity-0"
             )}
           >
@@ -155,22 +155,22 @@ export function DateField({ value, onChange, locale, placeholder, clearLabel, ar
               <button
                 type="button"
                 onClick={() => setMonth((prev) => subMonths(prev, 1))}
-                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
                 aria-label="Previous month"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </button>
-              <div className="text-sm font-semibold text-slate-100">{format(month, "MMMM yyyy")}</div>
+              <div className="text-sm font-semibold text-tone-100">{format(month, "MMMM yyyy")}</div>
               <button
                 type="button"
                 onClick={() => setMonth((prev) => addMonths(prev, 1))}
-                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
                 aria-label="Next month"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
             </div>
-            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-tone-500">
               {weekDays.map((day) => (
                 <div key={day}>{day}</div>
               ))}
@@ -191,9 +191,9 @@ export function DateField({ value, onChange, locale, placeholder, clearLabel, ar
                     }}
                     className={clsx(
                       "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-sm transition",
-                      isSelected ? "bg-emerald-400/90 text-slate-950" : "text-slate-200 hover:bg-white/10",
-                      !inMonth && "text-slate-600",
-                      isToday(day) && !isSelected && "border border-emerald-400/40"
+                      isSelected ? "bg-emerald-400/90 text-slate-950" : "text-tone-200 hover:bg-tone-white/10",
+                      !inMonth && "text-tone-600",
+                      isToday(day) && !isSelected && "border border-accent-400/40"
                     )}
                   >
                     {format(day, "d")}
@@ -216,10 +216,10 @@ export function DateField({ value, onChange, locale, placeholder, clearLabel, ar
           onClick={() => setIsOpen((open) => !open)}
           aria-expanded={isOpen}
           aria-label={ariaLabel}
-          className="flex h-12 w-full cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+          className="flex h-12 w-full cursor-pointer items-center gap-3 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/10 sm:flex-1"
         >
-          <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
-          <span className={clsx("flex-1", value ? "text-slate-100" : "text-white/50")}>
+          <CalendarIcon className="h-4 w-4 text-accent-200" aria-hidden />
+          <span className={clsx("flex-1", value ? "text-tone-100" : "text-tone-white/50")}>
             {value ? dateFormatter.format(value) : placeholder}
           </span>
         </button>
@@ -232,7 +232,7 @@ export function DateField({ value, onChange, locale, placeholder, clearLabel, ar
             }}
             aria-label={clearLabel}
             title={clearLabel}
-            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
+            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border border-transparent p-1 text-tone-400 transition hover:border-tone-white/10 hover:bg-tone-white/10 hover:text-tone-100"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>

@@ -186,7 +186,7 @@ export function SheetOverlay({ className = "", ...props }: SheetOverlayProps) {
       aria-hidden="true"
       {...props}
       onClick={handleClick}
-      className={`fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm ${className}`}
+      className={`fixed inset-0 z-[9998] bg-tone-black/70 backdrop-blur-sm ${className}`}
     />
   );
 }
@@ -198,7 +198,7 @@ export function SheetContent({ className = "", ...props }: SheetContentProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className={`fixed right-0 top-0 z-[9999] h-[100dvh] w-[280px] overflow-y-auto border-l border-white/10 bg-slate-950/95 p-6 text-slate-100 shadow-2xl shadow-black/50 backdrop-blur [-webkit-overflow-scrolling:touch] ${className}`}
+      className={`fixed right-0 top-0 z-[9999] h-[100dvh] w-[280px] overflow-y-auto border-l border-tone-white/10 bg-tone-950/95 p-6 text-tone-100 shadow-2xl shadow-tone-black/50 backdrop-blur [-webkit-overflow-scrolling:touch] ${className}`}
       {...props}
     />
   );

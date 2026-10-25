@@ -119,10 +119,10 @@ function DealRow({
   metaText,
   statusLabels,
 }: DealRowProps) {
-  const baseClass = "flex w-full min-w-0 items-start justify-between gap-3 py-2.5 text-slate-200";
-  const interactiveClass = isClickable ? "transition hover:text-white" : "cursor-default";
-  const titleClass = "block w-full truncate text-sm font-medium text-slate-100";
-  const metaClass = "mt-1 truncate text-xs text-slate-400";
+  const baseClass = "flex w-full min-w-0 items-start justify-between gap-3 py-2.5 text-tone-200";
+  const interactiveClass = isClickable ? "transition hover:text-tone-white" : "cursor-default";
+  const titleClass = "block w-full truncate text-sm font-medium text-tone-100";
+  const metaClass = "mt-1 truncate text-xs text-tone-400";
   const statusPillToneMap: Record<PromiseUiStatus, StatusPillTone> = {
     active: "neutral",
     completed_by_promisor: "attention",
@@ -174,7 +174,7 @@ function MetricValue({
     <div className={className}>
       {isLoading ? (
         <span
-          className="block h-8 w-20 animate-pulse rounded-lg bg-white/15"
+          className="block h-8 w-20 animate-pulse rounded-lg bg-tone-white/15"
           aria-hidden="true"
         />
       ) : (
@@ -574,23 +574,23 @@ export default function Home() {
     ));
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+    <main className="relative min-h-screen overflow-hidden bg-tone-950 text-tone-100">
       <AgreementNetworkBackground />
       <div className="absolute inset-0 hero-grid" aria-hidden />
 
       {showBetaBanner ? (
         <div className="relative mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-          <div className="rounded-2xl border border-amber-300/25 bg-gradient-to-r from-amber-500/15 via-slate-900/20 to-rose-500/10 px-4 py-2 text-sm text-slate-50 shadow-[0_8px_24px_rgba(5,15,20,0.35)] backdrop-blur">
+          <div className="rounded-2xl border border-warn-300/25 bg-gradient-to-r from-warn-500/15 via-tone-900/20 to-alert-500/10 px-4 py-2 text-sm text-tone-50 shadow-[0_8px_24px_var(--banner-shadow)] backdrop-blur">
             <div className="flex items-center gap-3">
               <span className="h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.5)]" aria-hidden />
-              <p className="flex-1 text-sm text-slate-100/80">
+              <p className="flex-1 text-sm text-tone-100/80">
                 {t("landing.betaBanner.body")}
               </p>
               <button
                 type="button"
                 onClick={dismissBetaBanner}
                 aria-label={t("landing.betaBanner.dismiss")}
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 text-slate-200/80 transition-colors duration-150 hover:bg-white/5 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-tone-white/10 text-tone-200/80 transition-colors duration-150 hover:bg-tone-white/5 hover:text-tone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
               >
                 <X className="h-4 w-4" aria-hidden />
               </button>
@@ -602,26 +602,26 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-12 pt-16 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex flex-1 flex-col gap-4 md:gap-7">
           <div className="order-1 space-y-3 sm:space-y-4">
-            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-slate-400/90">
+            <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-tone-400/90">
               {copy.hero.headline}
             </p>
             <div className="flex items-center gap-4 sm:gap-5">
               <DreddiLogoMark className="h-12 w-12 drop-shadow-[0_0_25px_rgba(52,211,153,0.35)] sm:h-14 sm:w-14" />
               <div className="relative inline-flex items-baseline gap-2.5 pr-1 text-[2rem] leading-none tracking-[-0.02em] sm:text-5xl">
-                <span className="font-semibold text-emerald-300">
+                <span className="font-semibold text-accent-300">
                   Dreddi
                 </span>
-                <span className="font-medium text-white">
+                <span className="font-medium text-tone-white">
                   {t("landing.hero.brandSuffix")}
                 </span>
               </div>
             </div>
-            <p className="max-w-2xl text-base leading-tight text-slate-300 sm:max-w-xl sm:text-[1.03rem]">
+            <p className="max-w-2xl text-base leading-tight text-tone-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
             <LocalizedLink
               href="/why"
-              className="inline-flex text-sm font-medium text-slate-300/80 transition-colors hover:text-emerald-200"
+              className="inline-flex text-sm font-medium text-tone-300/80 transition-colors hover:text-accent-200"
             >
               {copy.hero.whyLink}
             </LocalizedLink>
@@ -631,13 +631,13 @@ export default function Home() {
             <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <LocalizedLink
                 href="/login"
-                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-2px] hover:shadow-accent-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.getStarted}
               </LocalizedLink>
               <LocalizedLink
                 href="/u"
-                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
+                className="h-12 w-full rounded-xl border border-tone-white/15 px-6 py-3 text-center text-base font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-200 md:h-auto md:w-auto"
               >
                 {copy.cta.publicProfiles}
               </LocalizedLink>
@@ -646,13 +646,13 @@ export default function Home() {
             <div className="order-3 flex w-full flex-col gap-3 md:order-4 md:w-auto md:flex-row md:items-center">
               <LocalizedLink
                 href="/promises/new"
-                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-2px] hover:shadow-emerald-400/50 md:h-auto md:w-auto"
+                className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-2px] hover:shadow-accent-400/50 md:h-auto md:w-auto"
               >
                 {copy.cta.createPromise}
               </LocalizedLink>
               <LocalizedLink
                 href="/promises"
-                className="h-12 w-full rounded-xl border border-white/15 px-6 py-3 text-center text-base font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-200 md:h-auto md:w-auto"
+                className="h-12 w-full rounded-xl border border-tone-white/15 px-6 py-3 text-center text-base font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-200 md:h-auto md:w-auto"
               >
                 {copy.cta.reviewDeals}
               </LocalizedLink>
@@ -662,8 +662,8 @@ export default function Home() {
         </div>
 
         <div className="w-full min-w-0 md:w-[32rem] md:flex-none lg:w-[34rem]">
-          <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-slate-900/5 to-white/[0.02]" aria-hidden />
+          <div className="glass-panel relative w-full overflow-hidden rounded-3xl border-tone-white/10 px-4 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-tone-white/5 via-tone-900/5 to-tone-white/[0.02]" aria-hidden />
             <div
               className="pointer-events-none absolute inset-0 rounded-3xl"
               style={{
@@ -677,13 +677,13 @@ export default function Home() {
                 <DreddiLogoMark className="h-10 w-10" />
                 <div className="flex items-center gap-2">
                   {email ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-tone-white/5 px-2.5 py-1 text-[11px] text-tone-300 ring-1 ring-tone-white/10">
                       <span className="status-pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-300/80" />
                       {copy.score.live}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-300 ring-1 ring-white/10">
-                      <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-tone-white/5 px-2.5 py-1 text-[11px] text-tone-300 ring-1 ring-tone-white/10">
+                      <span className="h-1.5 w-1.5 rounded-full bg-tone-400/70" />
                       {copy.score.signIn}
                     </span>
                   )}
@@ -691,68 +691,68 @@ export default function Home() {
               </div>
 
               <div>
-                <p className="mb-1.5 text-sm font-medium text-slate-300/95">
+                <p className="mb-1.5 text-sm font-medium text-tone-300/95">
                   {copy.score.overviewLabel}
                 </p>
-                <div className="score-metrics-panel mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-white/15 hover:bg-white/[0.05] hover:shadow-[0_16px_30px_rgba(15,23,42,0.45)] sm:px-5 sm:py-3 md:px-4 md:py-3">
-                  <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                <div className="score-metrics-panel mt-3 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-tone-white/15 hover:bg-tone-white/[0.05] hover:shadow-[0_16px_30px_var(--elevated-shadow)] sm:px-5 sm:py-3 md:px-4 md:py-3">
+                  <div className="grid grid-cols-1 divide-y divide-tone-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">{copy.score.shortLabel}</div>
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-tone-400">{copy.score.shortLabel}</div>
                       <MetricValue
                         isLoading={reputationLoading}
                         value={scoreValue}
-                        className="mt-1 text-3xl font-semibold leading-none text-white sm:text-[2.05rem]"
+                        className="mt-1 text-3xl font-semibold leading-none text-tone-white sm:text-[2.05rem]"
                       />
                     </div>
 
                     <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-tone-400">
                         {copy.score.cards.confirmed}
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
                         value={confirmedValue}
-                        className="mt-1 text-3xl font-semibold leading-none text-white"
+                        className="mt-1 text-3xl font-semibold leading-none text-tone-white"
                       />
                     </div>
 
                     <div className="py-2 sm:px-4 sm:py-1">
-                      <div className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                      <div className="text-[11px] uppercase tracking-[0.08em] text-tone-400">
                         {copy.score.cards.disputed}
                       </div>
                       <MetricValue
                         isLoading={reputationLoading}
                         value={disputedValue}
-                        className="mt-1 text-3xl font-semibold leading-none text-white"
+                        className="mt-1 text-3xl font-semibold leading-none text-tone-white"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-tone-400">
                 {copy.score.onTime.label}: {onTimeLineValue}
               </p>
 
                 {reputationError && isAuthenticated && (
-                  <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                  <div className="rounded-xl border border-danger-400/30 bg-red-500/10 px-4 py-3 text-xs text-danger-200">
                     {reputationError}
                   </div>
                 )}
 
                 <div>
-                  <div className="flex items-center justify-between text-sm text-slate-300">
+                  <div className="flex items-center justify-between text-sm text-tone-300">
                     <span>{recentDealsTitle}</span>
                     <LocalizedLink
                       href={recentDealsHref}
-                      className="text-xs font-medium text-slate-400 transition hover:text-slate-200"
+                      className="text-xs font-medium text-tone-400 transition hover:text-tone-200"
                     >
                       {copy.recentDeals.seeAll}
                     </LocalizedLink>
                   </div>
                   {!isAuthenticated ? (
                     <div className="mt-3">
-                      <div className="mt-1 divide-y divide-white/10 text-sm">
+                      <div className="mt-1 divide-y divide-tone-white/10 text-sm">
                         {demoDeals.map((item) => (
                           <DealRow
                             key={item.id}
@@ -767,7 +767,7 @@ export default function Home() {
                   ) : (
                     <>
                       {recentError && (
-                        <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                        <div className="mt-3 rounded-xl border border-danger-400/30 bg-red-500/10 px-3 py-2 text-xs text-danger-200">
                           {recentError}
                         </div>
                       )}
@@ -776,15 +776,15 @@ export default function Home() {
                         {reputationLoading || recentLoading ? (
                           <div className="space-y-2">
                             {[1, 2, 3].map((i) => (
-                              <div key={i} className="h-[52px] animate-pulse rounded-xl bg-white/5" />
+                              <div key={i} className="h-[52px] animate-pulse rounded-xl bg-tone-white/5" />
                             ))}
                           </div>
                         ) : recentDeals.length === 0 ? (
-                          <div className="rounded-xl bg-white/[0.03] px-3 py-3 text-xs text-slate-400">
+                          <div className="rounded-xl bg-tone-white/[0.03] px-3 py-3 text-xs text-tone-400">
                             {copy.recentDeals.empty}
                           </div>
                         ) : (
-                          <div className="divide-y divide-white/10">
+                          <div className="divide-y divide-tone-white/10">
                             {recentDealsLimited.map((item) => (
                               <DealRow
                                 key={item.id}

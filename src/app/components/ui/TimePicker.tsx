@@ -81,13 +81,13 @@ export function TimePicker({
               width: popoverStyles?.width ?? 320,
             }}
             className={clsx(
-              "fixed z-[10000] rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
+              "fixed z-[10000] rounded-2xl border border-tone-white/10 bg-tone-950/95 p-4 text-sm text-tone-100 shadow-2xl shadow-tone-black/60 backdrop-blur",
               !popoverStyles && "pointer-events-none opacity-0"
             )}
           >
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Hours</div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-tone-500">Hours</div>
                 <div className="mt-2 grid grid-cols-6 gap-1">
                   {hours.map((hour) => (
                     <button
@@ -95,8 +95,8 @@ export function TimePicker({
                       type="button"
                       onClick={() => setTimeValue(hour, null)}
                       className={clsx(
-                        "flex h-8 items-center justify-center rounded-lg border border-white/10 text-xs font-medium text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
-                        parsedValue?.hour === hour && "border-emerald-300/60 bg-emerald-400/90 text-slate-950"
+                        "flex h-8 items-center justify-center rounded-lg border border-tone-white/10 text-xs font-medium text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
+                        parsedValue?.hour === hour && "border-accent-300/60 bg-emerald-400/90 text-slate-950"
                       )}
                     >
                       {padTime(hour)}
@@ -105,7 +105,7 @@ export function TimePicker({
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">Minutes</div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-tone-500">Minutes</div>
                 <div className="mt-2 grid grid-cols-4 gap-1">
                   {minutes.map((minute) => (
                     <button
@@ -113,9 +113,9 @@ export function TimePicker({
                       type="button"
                       onClick={() => setTimeValue(null, minute)}
                       className={clsx(
-                        "flex h-8 items-center justify-center rounded-lg border border-white/10 text-xs font-medium text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                        "flex h-8 items-center justify-center rounded-lg border border-tone-white/10 text-xs font-medium text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
                         parsedValue?.minute === minute &&
-                          "border-emerald-300/60 bg-emerald-400/90 text-slate-950"
+                          "border-accent-300/60 bg-emerald-400/90 text-slate-950"
                       )}
                     >
                       {padTime(minute)}
@@ -212,12 +212,12 @@ export function TimePicker({
         aria-label={ariaLabel}
         disabled={disabled}
         className={clsx(
-          "flex h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-11 w-full cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-left text-sm leading-5 text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40 disabled:cursor-not-allowed disabled:opacity-50",
           buttonClassName
         )}
       >
-        <Clock className="h-4 w-4 text-emerald-200" aria-hidden />
-        <span className={clsx("flex-1", displayValue ? "text-slate-100" : "text-slate-500")}>
+        <Clock className="h-4 w-4 text-accent-200" aria-hidden />
+        <span className={clsx("flex-1", displayValue ? "text-tone-100" : "text-tone-500")}>
           {displayValue || placeholder}
         </span>
       </button>

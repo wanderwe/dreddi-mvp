@@ -36,23 +36,23 @@ export function AppFooter() {
   if (isEmbedPath) return null;
 
   return (
-    <footer className="border-t border-white/5 bg-slate-950/60 text-slate-400">
+    <footer className="border-t border-tone-white/5 bg-tone-950/60 text-tone-400">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs sm:flex-row sm:gap-3">
         <span>© {year} Dreddi knows</span>
         <div className="flex w-full flex-col items-center gap-1 text-center sm:w-auto sm:flex-row sm:gap-4 sm:text-left">
           {canSendFeedback && (
             <FeedbackModalTrigger
-              triggerClassName="cursor-pointer text-slate-400 transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40 rounded-sm"
+              triggerClassName="cursor-pointer text-tone-400 transition hover:text-accent-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-300/40 rounded-sm"
             />
           )}
-          <LocalizedLink href="/privacy" className="transition hover:text-emerald-200">
+          <LocalizedLink href="/privacy" className="transition hover:text-accent-200">
             {t("nav.privacy")}
           </LocalizedLink>
-          <LocalizedLink href="/terms" className="transition hover:text-emerald-200">
+          <LocalizedLink href="/terms" className="transition hover:text-accent-200">
             {t("nav.terms")}
           </LocalizedLink>
           {shortSha && (
-            <span className="text-[10px] uppercase tracking-[0.15em] text-slate-500">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-tone-500">
               build {shortSha}
             </span>
           )}
