@@ -454,9 +454,12 @@
         "active": "Not marked as completed yet. You can still confirm if it was fulfilled."
       },
       "success": {
-        "confirmed": "{entity} fulfilled. Redirecting…",
+        "confirmedTitle": "Agreement confirmed",
+        "reputationImpact": "This will count toward their reputation",
         "disputed": "Dispute submitted. Redirecting…"
       },
+      "continuePrompt": "Want to continue working together?",
+      "continueCta": "Create next agreement",
       "errors": {
         "loadFailed": "Failed to load {entityLower}",
         "unsupportedStatus": "{entity} has unsupported status",
