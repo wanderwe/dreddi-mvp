@@ -52,7 +52,7 @@ export function WhyPageContent({ locale }: { locale: Locale }) {
       </article>
 
       <div className="mt-10">
-        <WhyCta label={copy.cta} />
+        <WhyCta primaryLabel={copy.cta.primary} secondaryLabel={copy.cta.secondary} />
       </div>
     </StaticPageLayout>
   );
