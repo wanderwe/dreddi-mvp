@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { isPromiseStatus } from "@/lib/promiseStatus";
+import { isEmailLike, toPublicDisplayName } from "@/lib/publicProfileIdentity";
 import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { buildDedupeKey, createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
@@ -67,8 +68,6 @@ type AgreementUpdateRecord = {
   content: string;
   created_at: string;
 };
-
-const isLikelyPrivateEmail = (value: string) => /\S+@\S+\.\S+/.test(value);
 
 function isMissingAgreementUpdatesTable(error: { code?: string; message?: string }) {
   return (
@@ -154,7 +153,7 @@ function serializePublicAgreement(
     canUseCounterpartyContact &&
     !responsibleProfile &&
     counterpartyContact &&
-    !isLikelyPrivateEmail(counterpartyContact)
+    !isEmailLike(counterpartyContact)
       ? counterpartyContact
       : null;
 
@@ -177,17 +176,17 @@ function serializePublicAgreement(
     ignored_at: promise.ignored_at,
     expires_at: promise.expires_at,
     cancelled_at: promise.cancelled_at,
-    creator_display_name: creatorProfile?.display_name ?? null,
+    creator_display_name: toPublicDisplayName(creatorProfile?.display_name),
     creator_handle: creatorProfile?.is_public_profile ? creatorProfile.handle : null,
     creator_is_public_profile: creatorProfile?.is_public_profile ?? false,
-    executor_display_name: responsibleProfile?.display_name ?? null,
+    executor_display_name: toPublicDisplayName(responsibleProfile?.display_name),
     executor_handle: responsibleProfile?.is_public_profile ? responsibleProfile.handle : null,
     executor_is_public_profile: responsibleProfile?.is_public_profile ?? false,
-    accepter_display_name: accepterProfile?.display_name ?? null,
+    accepter_display_name: toPublicDisplayName(accepterProfile?.display_name),
     accepter_handle: accepterProfile?.is_public_profile ? accepterProfile.handle : null,
     accepter_is_public_profile: accepterProfile?.is_public_profile ?? false,
-    accepter_contact: promise.counterparty_contact,
-    reviewer_display_name: reviewerProfile?.display_name ?? null,
+    accepter_contact: isEmailLike(promise.counterparty_contact) ? null : promise.counterparty_contact,
+    reviewer_display_name: toPublicDisplayName(reviewerProfile?.display_name),
     reviewer_handle: reviewerProfile?.is_public_profile ? reviewerProfile.handle : null,
     reviewer_is_public_profile: reviewerProfile?.is_public_profile ?? false,
     reviewer_id: reviewerId ?? null,
@@ -202,7 +201,7 @@ function serializePublicAgreement(
         id: update.id,
         content: update.content,
         created_at: update.created_at,
-        author_display_name: author?.display_name ?? null,
+        author_display_name: toPublicDisplayName(author?.display_name),
         author_handle: author?.is_public_profile ? author.handle : null,
       };
     }),
@@ -417,7 +416,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         id: update.id,
         content: update.content,
         created_at: update.created_at,
-        author_display_name: author?.display_name ?? null,
+        author_display_name: toPublicDisplayName(author?.display_name),
         author_handle: author?.is_public_profile ? author.handle : null,
       },
       { status: 201 }

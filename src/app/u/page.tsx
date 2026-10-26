@@ -33,7 +33,6 @@ export default function PublicProfilesDirectoryPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [supportsEmailSearch, setSupportsEmailSearch] = useState(true);
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -48,30 +47,26 @@ export default function PublicProfilesDirectoryPage() {
   const applySearchFilters = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: any,
-    normalizedSearch: string,
-    includeEmail: boolean
+    normalizedSearch: string
   ) => {
-    if (!normalizedSearch) return query;
+    // Strip characters that would break the PostgREST filter syntax.
+    const term = normalizedSearch.replace(/[,()]/g, " ").trim();
+    if (!term) return query;
 
-    const raw = normalizedSearch.trim();
-    const localPart = raw.includes("@") ? raw.split("@")[0]?.trim() ?? "" : "";
-    const searchTerms = Array.from(new Set([raw, localPart].filter(Boolean)));
+    const searchPattern = `%${term}%`;
+    // Handles never contain "@", so an address-shaped query only matches handles.
+    // Names that look like emails are excluded so addresses cannot be probed.
+    if (term.includes("@")) {
+      return query.ilike("handle", searchPattern);
+    }
 
-    const filters = searchTerms.flatMap((term) => {
-      const searchPattern = `%${term}%`;
-      const baseFilters = [`handle.ilike.${searchPattern}`, `display_name.ilike.${searchPattern}`];
-      if (includeEmail) {
-        baseFilters.push(`email.ilike.${searchPattern}`);
-      }
-
-      return baseFilters;
-    });
-
-    return query.or(filters.join(","));
+    return query.or(
+      [
+        `handle.ilike.${searchPattern}`,
+        `and(display_name.ilike.${searchPattern},display_name.not.ilike.%@%)`,
+      ].join(",")
+    );
   };
-
-  const isMissingEmailColumnError = (message?: string | null) =>
-    Boolean(message && /public_profile_stats\.email does not exist/i.test(message));
 
   useEffect(() => {
     let active = true;
@@ -97,25 +92,9 @@ export default function PublicProfilesDirectoryPage() {
         .order("confirmed_count", { ascending: false })
         .order("handle", { ascending: true });
 
-      query = applySearchFilters(query, normalizedSearch, supportsEmailSearch);
+      query = applySearchFilters(query, normalizedSearch);
 
-      let { data, error: listError } = await query.range(0, pageSize);
-
-      if (listError && supportsEmailSearch && isMissingEmailColumnError(listError.message)) {
-        setSupportsEmailSearch(false);
-        const fallbackQuery = applySearchFilters(
-          supabase
-            .from("public_profile_stats")
-            .select(publicProfileDirectorySelect)
-            .order("confirmed_count", { ascending: false })
-            .order("handle", { ascending: true }),
-          normalizedSearch,
-          false
-        );
-        const fallback = await fallbackQuery.range(0, pageSize);
-        data = fallback.data;
-        listError = fallback.error;
-      }
+      const { data, error: listError } = await query.range(0, pageSize);
 
       if (!active) return;
 
@@ -138,7 +117,7 @@ export default function PublicProfilesDirectoryPage() {
     return () => {
       active = false;
     };
-  }, [debouncedSearch, pageSize, supportsEmailSearch, t]);
+  }, [debouncedSearch, pageSize, t]);
 
   const loadMore = async () => {
     if (!supabase) {
@@ -161,25 +140,9 @@ export default function PublicProfilesDirectoryPage() {
       .order("confirmed_count", { ascending: false })
       .order("handle", { ascending: true });
 
-    query = applySearchFilters(query, normalizedSearch, supportsEmailSearch);
+    query = applySearchFilters(query, normalizedSearch);
 
-    let { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
-
-    if (listError && supportsEmailSearch && isMissingEmailColumnError(listError.message)) {
-      setSupportsEmailSearch(false);
-      const fallbackQuery = applySearchFilters(
-        supabase
-          .from("public_profile_stats")
-          .select(publicProfileDirectorySelect)
-          .order("confirmed_count", { ascending: false })
-          .order("handle", { ascending: true }),
-        normalizedSearch,
-        false
-      );
-      const fallback = await fallbackQuery.range(startIndex, startIndex + pageSize);
-      data = fallback.data;
-      listError = fallback.error;
-    }
+    const { data, error: listError } = await query.range(startIndex, startIndex + pageSize);
 
     if (listError) {
       setLoadMoreError(listError.message);
@@ -200,13 +163,11 @@ export default function PublicProfilesDirectoryPage() {
   const cards = useMemo(
     () =>
       profiles.map((profile) => {
-        const { title, subtitle, maskedEmail } = getPublicProfileIdentity({
+        const { title, subtitle } = getPublicProfileIdentity({
           displayName: profile.display_name,
           handle: profile.handle,
         });
         const avatarLabel = (title || profile.handle).replace(/^@/, "");
-        const showMaskedEmail =
-          maskedEmail && maskedEmail !== title && maskedEmail !== subtitle ? maskedEmail : null;
         const confirmedCount = profile.confirmed_count ?? 0;
         const disputedCount = profile.disputed_count ?? 0;
         const reputationScore = profile.reputation_score ?? 50;
@@ -236,9 +197,6 @@ export default function PublicProfilesDirectoryPage() {
                 <div className="min-w-0">
                   <div className="text-lg font-semibold text-tone-white truncate">{title}</div>
                   {subtitle && <div className="text-sm text-tone-white/60 truncate">{subtitle}</div>}
-                  {showMaskedEmail && (
-                    <div className="text-xs text-tone-white/40 truncate">{showMaskedEmail}</div>
-                  )}
                 </div>
               </div>
               <div className="rounded-full border border-tone-white/15 bg-tone-white/10 px-3 py-1 text-sm font-semibold text-tone-white shadow-sm shadow-tone-black/30 sm:absolute sm:right-4 sm:top-4">

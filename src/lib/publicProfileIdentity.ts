@@ -1,38 +1,41 @@
-import { maskEmail } from "@/lib/text";
-
 type PublicProfileIdentityInput = {
   displayName?: string | null;
   handle?: string | null;
-  email?: string | null;
 };
 
 type PublicProfileIdentity = {
   title: string;
   subtitle?: string;
-  maskedEmail?: string;
 };
 
 const normalizeValue = (value?: string | null) => value?.trim() ?? "";
 
+// Early profiles were created with display_name = email, so treat any
+// email-shaped name as missing to keep addresses off public surfaces.
+export const isEmailLike = (value?: string | null) => /\S+@\S+\.\S+/.test(value ?? "");
+
+export const toPublicDisplayName = (displayName?: string | null): string | null => {
+  const normalized = normalizeValue(displayName);
+  if (!normalized || isEmailLike(normalized)) return null;
+  return normalized;
+};
+
 export const getPublicProfileIdentity = ({
   displayName,
   handle,
-  email,
 }: PublicProfileIdentityInput): PublicProfileIdentity => {
-  const normalizedDisplayName = normalizeValue(displayName);
+  const publicDisplayName = toPublicDisplayName(displayName) ?? "";
   const normalizedHandle = normalizeValue(handle);
-  const normalizedEmail = normalizeValue(email);
-  const maskedEmail = normalizedEmail ? maskEmail(normalizedEmail) : undefined;
   let title = "";
   let subtitle: string | undefined;
 
-  if (normalizedDisplayName) {
-    title = normalizedDisplayName;
+  if (publicDisplayName) {
+    title = publicDisplayName;
   } else if (normalizedHandle) {
     title = `@${normalizedHandle}`;
   }
 
-  if (normalizedDisplayName && normalizedHandle) {
+  if (publicDisplayName && normalizedHandle) {
     subtitle = `@${normalizedHandle}`;
   }
 
@@ -40,5 +43,5 @@ export const getPublicProfileIdentity = ({
     subtitle = undefined;
   }
 
-  return { title, subtitle, maskedEmail };
+  return { title, subtitle };
 };

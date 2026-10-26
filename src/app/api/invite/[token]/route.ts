@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isEmailLike, toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -75,7 +76,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         .select("display_name,handle")
         .eq("id", p.creator_id)
         .maybeSingle();
-      creator_display_name = creatorProfile?.display_name?.trim() || creatorProfile?.handle?.trim() || null;
+      const creatorHandle = creatorProfile?.handle?.trim();
+      creator_display_name =
+        toPublicDisplayName(creatorProfile?.display_name) || (creatorHandle ? `@${creatorHandle}` : null);
     } catch {
       creator_display_name = null;
     }
@@ -85,10 +88,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
       try {
         const { data: profile } = await admin
           .from("profiles")
-          .select("display_name,email")
+          .select("display_name,handle")
           .eq("id", p.counterparty_id)
           .maybeSingle();
-        counterparty_display_name = profile?.display_name?.trim() || profile?.email?.trim() || null;
+        const counterpartyHandle = profile?.handle?.trim();
+        counterparty_display_name =
+          toPublicDisplayName(profile?.display_name) || (counterpartyHandle ? `@${counterpartyHandle}` : null);
       } catch {
         counterparty_display_name = null;
       }
@@ -117,7 +122,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
         ignored_at: p.ignored_at ?? null,
         expires_at: p.expires_at ?? null,
         cancelled_at: p.cancelled_at ?? null,
-        counterparty_contact: p.counterparty_contact ?? null,
+        counterparty_contact: isEmailLike(p.counterparty_contact) ? null : p.counterparty_contact ?? null,
         visibility: p.visibility ?? "private",
         promisor_id: p.promisor_id ?? null,
         promisee_id: p.promisee_id ?? null,

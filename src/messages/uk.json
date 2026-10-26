@@ -110,6 +110,7 @@
       "copyFailed": "Не вдалося скопіювати посилання",
       "saveFailed": "Не вдалося оновити профіль",
       "displayNameLength": "Показуване ім’я має містити 2–40 символів",
+      "displayNameEmail": "Показуване ім’я не може бути email-адресою",
       "handleRequired": "Handle є обов’язковим"
     },
     "notificationsLabel": "Сповіщення",
@@ -966,8 +967,8 @@
     "loadMore": "Завантажити ще",
     "noMore": "Більше немає",
     "empty": "Публічних профілів ще немає",
-    "searchLabel": "Пошук за нікнеймом, імʼям або email",
-    "searchPlaceholder": "Пошук за нікнеймом, імʼям або email",
+    "searchLabel": "Пошук за нікнеймом або імʼям",
+    "searchPlaceholder": "Пошук за нікнеймом або імʼям",
     "errors": {
       "supabase": "Supabase не налаштовано"
     },

@@ -33,6 +33,7 @@ import { buildAgreementFlowState } from "@/lib/agreementFlowState";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 type PromiseRow = {
   id: string;
@@ -537,14 +538,14 @@ export default function PromisePage() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("display_name,email")
+        .select("display_name,handle")
         .eq("id", p.counterparty_id)
         .maybeSingle();
 
       if (!active) return;
-      const displayName = profile?.display_name?.trim();
-      const email = profile?.email?.trim();
-      setCounterpartyDisplayName(displayName || email || null);
+      const displayName = toPublicDisplayName(profile?.display_name);
+      const handle = profile?.handle?.trim();
+      setCounterpartyDisplayName(displayName || (handle ? `@${handle}` : null));
     };
 
     void loadCounterpartyProfile();
@@ -1272,13 +1273,14 @@ export default function PromisePage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("id,display_name,email,handle,is_public_profile")
+        .select("id,display_name,handle,is_public_profile")
         .in("id", participantIds);
 
       if (!active) return;
       const profiles: Record<string, { label: string; handle: string | null; isPublicProfile: boolean }> = {};
       for (const profile of data ?? []) {
-        const label = profile.display_name?.trim() || profile.email?.trim() || "";
+        const handle = profile.handle?.trim();
+        const label = toPublicDisplayName(profile.display_name) || (handle ? `@${handle}` : "");
         if (label) {
           profiles[profile.id] = {
             label,

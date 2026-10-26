@@ -6,6 +6,7 @@ import {
   SELF_COMMITMENT_COLUMNS,
   type SelfCommitmentRecord,
 } from "@/app/api/commitments/common";
+import { toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 type SelfCommitmentUpdateRecord = {
   id: string;
@@ -70,7 +71,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       status: commitment.status,
       created_at: commitment.created_at,
       completed_at: commitment.completed_at,
-      owner_display_name: owner?.display_name ?? null,
+      owner_display_name: toPublicDisplayName(owner?.display_name),
       owner_handle: owner?.is_public_profile ? owner.handle : null,
       viewer_can_update: viewerCanUpdate,
       updates: (updates ?? []).map((update) => ({

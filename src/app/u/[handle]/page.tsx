@@ -15,7 +15,7 @@ import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { formatDealMeta } from "@/lib/formatDealMeta";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { publicProfileDetailSelect } from "@/lib/publicProfileQueries";
-import { getPublicProfileIdentity } from "@/lib/publicProfileIdentity";
+import { getPublicProfileIdentity, toPublicDisplayName } from "@/lib/publicProfileIdentity";
 import { formatStreakLine } from "@/lib/formatStreakLine";
 import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
@@ -463,7 +463,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               cp.id as string,
               {
                 handle: (cp.handle as string | null) ?? "",
-                display_name: (cp.display_name as string | null) ?? null,
+                display_name: toPublicDisplayName(cp.display_name as string | null),
                 isPublic: Boolean(cp.is_public_profile),
               },
             ])
