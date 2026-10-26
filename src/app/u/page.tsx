@@ -215,11 +215,11 @@ export default function PublicProfilesDirectoryPage() {
           <LocalizedLink
             key={profile.handle}
             href={`/u/${encodeURIComponent(profile.handle)}?from=profiles`}
-            className="group relative flex w-full min-w-0 flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5"
+            className="group relative flex w-full min-w-0 flex-col gap-3 rounded-3xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 flex-1 items-center gap-4 pr-0 sm:pr-12">
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-tone-white/10">
                   {profile.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -228,29 +228,29 @@ export default function PublicProfilesDirectoryPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="text-lg font-semibold text-white/80">
+                    <span className="text-lg font-semibold text-tone-white/80">
                       {avatarLabel.slice(0, 1).toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-lg font-semibold text-white truncate">{title}</div>
-                  {subtitle && <div className="text-sm text-white/60 truncate">{subtitle}</div>}
+                  <div className="text-lg font-semibold text-tone-white truncate">{title}</div>
+                  {subtitle && <div className="text-sm text-tone-white/60 truncate">{subtitle}</div>}
                   {showMaskedEmail && (
-                    <div className="text-xs text-white/40 truncate">{showMaskedEmail}</div>
+                    <div className="text-xs text-tone-white/40 truncate">{showMaskedEmail}</div>
                   )}
                 </div>
               </div>
-              <div className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm font-semibold text-white shadow-sm shadow-black/30 sm:absolute sm:right-4 sm:top-4">
+              <div className="rounded-full border border-tone-white/15 bg-tone-white/10 px-3 py-1 text-sm font-semibold text-tone-white shadow-sm shadow-tone-black/30 sm:absolute sm:right-4 sm:top-4">
                 <span className="sr-only">{t("publicProfile.reputationScore")}</span>
                 {reputationScore}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
-              <span className="inline-flex min-h-8 items-center rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2.5 py-1.5">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-tone-white/70">
+              <span className="inline-flex min-h-8 items-center rounded-full border border-accent-300/30 bg-emerald-400/10 px-2.5 py-1.5">
                 {t("publicProfile.confirmed")}: {confirmedCount}
               </span>
-              <span className="inline-flex min-h-8 items-center rounded-full border border-red-300/30 bg-red-500/10 px-2.5 py-1.5">
+              <span className="inline-flex min-h-8 items-center rounded-full border border-danger-300/30 bg-red-500/10 px-2.5 py-1.5">
                 {t("publicProfile.disputed")}: {disputedCount}
               </span>
             </div>
@@ -263,7 +263,7 @@ export default function PublicProfilesDirectoryPage() {
   const showLoadMoreButton = hasMore;
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#0b0f1a] text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[var(--surface-popover)] text-tone-white">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 py-8 sm:px-6 sm:py-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
@@ -283,7 +283,7 @@ export default function PublicProfilesDirectoryPage() {
                 setSearchTerm(event.target.value);
               }}
               placeholder={t("publicDirectory.searchPlaceholder")}
-              className="public-profile-search w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-sm text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+              className="public-profile-search w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 pr-12 text-sm text-tone-white placeholder:text-tone-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
             />
             {searchTerm ? (
               <button
@@ -292,7 +292,7 @@ export default function PublicProfilesDirectoryPage() {
                   setSearchTerm("");
                 }}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full p-1.5 text-white/50 transition hover:bg-white/10 hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] cursor-pointer"
+                className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full p-1.5 text-tone-white/50 transition hover:bg-tone-white/10 hover:text-accent-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] cursor-pointer"
               >
                 <span aria-hidden="true" className="text-lg leading-none">
                   ×
@@ -303,15 +303,15 @@ export default function PublicProfilesDirectoryPage() {
         </div>
 
         {loading ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-10 text-center text-sm text-tone-white/70">
             {t("publicDirectory.loading")}
           </div>
         ) : error ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-10 text-center text-sm text-tone-white/70">
             {error}
           </div>
         ) : profiles.length === 0 ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-10 text-center text-sm text-tone-white/70">
             {debouncedSearch ? t("publicDirectory.emptySearch") : t("publicDirectory.empty")}
           </div>
         ) : (
@@ -325,7 +325,7 @@ export default function PublicProfilesDirectoryPage() {
                   type="button"
                   onClick={loadMore}
                   disabled={loadingMore || !hasMore}
-                  className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
+                  className="min-h-12 w-full cursor-pointer rounded-xl border border-tone-white/10 px-4 py-2 text-xs font-semibold text-tone-100 transition hover:border-accent-300/40 hover:text-accent-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-h-0 sm:w-auto sm:rounded-full"
                 >
                   {loadingMore
                     ? t("publicDirectory.loadingMore")
@@ -333,7 +333,7 @@ export default function PublicProfilesDirectoryPage() {
                 </button>
               )}
               {loadMoreError && (
-                <div className="text-xs text-white/60">{loadMoreError}</div>
+                <div className="text-xs text-tone-white/60">{loadMoreError}</div>
               )}
             </div>
           </div>

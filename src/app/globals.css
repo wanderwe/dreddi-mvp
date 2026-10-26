@@ -104,6 +104,21 @@
   --elevated-shadow: rgba(15, 23, 42, 0.45);
   --banner-shadow: rgba(5, 15, 20, 0.35);
 
+  /* Popovers and deep page backgrounds that used hardcoded hex. */
+  --surface-popover: #0b0f1a;
+  --surface-deep: #070a12;
+
+  /* Login / auth callback wash. */
+  --auth-wash-1: rgba(82, 193, 106, 0.22);
+  --auth-wash-2: rgba(73, 123, 255, 0.12);
+  --auth-wash-3: rgba(34, 55, 93, 0.18);
+
+  /* Public profile graph (PublicProfileGraph.tsx), colours as "r,g,b" triples. */
+  --graph-bg: #111318;
+  --graph-teal: 0, 212, 170;
+  --graph-rose: 253, 164, 175;
+  --graph-ink: 255, 255, 255;
+
   /* Background network canvas, as an "r,g,b" triple. */
   --network-rgb: 0, 212, 170;
 
@@ -227,6 +242,18 @@
   --banner-shadow: rgba(15, 23, 42, 0.08);
 
   --network-rgb: 13, 148, 136;
+
+  --surface-popover: #ffffff;
+  --surface-deep: #f6f8fb;
+
+  --auth-wash-1: rgba(52, 211, 153, 0.12);
+  --auth-wash-2: rgba(75, 147, 255, 0.08);
+  --auth-wash-3: rgba(148, 163, 184, 0.12);
+
+  --graph-bg: #ffffff;
+  --graph-teal: 13, 148, 136;
+  --graph-rose: 225, 29, 72;
+  --graph-ink: 15, 23, 42;
 
   --logo-plate: #f2fbf7;
   --logo-glow-1: #5df0b5;

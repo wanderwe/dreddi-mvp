@@ -44,10 +44,21 @@ type Placed = GraphParty & { x: number; y: number; r: number };
 type HoverInfo = { kind: "party"; party: Placed; edge: GraphEdge | null } | null;
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const TEAL  = "0,212,170";
-const ROSE  = "253,164,175"; // rose-300, matches disputed status in timeline & tooltip
+// Colours come from the theme (--graph-* in globals.css) as "r,g,b" triples; these are the dark values.
+const palette = {
+  teal: "0,212,170",
+  rose: "253,164,175", // rose-300, matches disputed status in timeline & tooltip
+  ink: "255,255,255",
+};
 const GREY  = "107,114,128";
-const BG    = "#111318";
+
+function readPalette() {
+  const cs = getComputedStyle(document.documentElement);
+  const read = (name: string, fallback: string) => cs.getPropertyValue(name).replace(/\s/g, "") || fallback;
+  palette.teal = read("--graph-teal", palette.teal);
+  palette.rose = read("--graph-rose", palette.rose);
+  palette.ink = read("--graph-ink", palette.ink);
+}
 
 // ── Pure helpers ──────────────────────────────────────────────────────────────
 function trunc(s: string, n: number) {
@@ -73,11 +84,13 @@ function distToSeg(
 
 // ── Canvas drawing ─────────────────────────────────────────────────────────────
 function edgeColor(edge: GraphEdge): string {
-  // Blend teal(0,212,170) → rose-300(253,164,175) by dispute ratio
+  // Blend teal → rose by dispute ratio
   const dr = edge.count > 0 ? edge.disputed / edge.count : 0;
-  const r  = Math.round(253 * dr);
-  const g  = Math.round(212 - 48 * dr);
-  const b  = Math.round(170 + 5  * dr);
+  const [tr, tg, tb] = palette.teal.split(",").map(Number);
+  const [rr, rg, rb] = palette.rose.split(",").map(Number);
+  const r  = Math.round(tr + (rr - tr) * dr);
+  const g  = Math.round(tg + (rg - tg) * dr);
+  const b  = Math.round(tb + (rb - tb) * dr);
   return `${r},${g},${b}`;
 }
 
@@ -159,6 +172,10 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    readPalette();
+    const themeObserver = new MutationObserver(readPalette);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
     const dpr = Math.min(window.devicePixelRatio ?? 1, 2);
 
     const resize = () => {
@@ -193,7 +210,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
       // Ambient centre glow
       const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(cw, ch) * 0.36);
-      bg.addColorStop(0, `rgba(${TEAL},0.06)`);
+      bg.addColorStop(0, `rgba(${palette.teal},0.06)`);
       bg.addColorStop(1, "transparent");
       ctx.fillStyle = bg;
       ctx.beginPath(); ctx.arc(cx, cy, Math.min(cw, ch) * 0.36, 0, Math.PI * 2); ctx.fill();
@@ -229,7 +246,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
         // Use same teal→rose blend as the edge so node and line share the same hue
         const nodeEdge = edges.find(e => e.partyId === party.id);
-        const nodeCol  = nodeEdge ? edgeColor(nodeEdge) : TEAL;
+        const nodeCol  = nodeEdge ? edgeColor(nodeEdge) : palette.teal;
 
         // Glow (public only)
         if (!isPriv) {
@@ -245,7 +262,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         // Fill
         ctx.beginPath(); ctx.arc(party.x, party.y, r, 0, Math.PI * 2);
         ctx.fillStyle = isPriv
-          ? "rgba(255,255,255,0.02)"
+          ? `rgba(${palette.ink},0.02)`
           : `rgba(${nodeCol},${isHov ? 0.18 : 0.08 + fRatio * 0.08})`;
         ctx.fill();
 
@@ -282,7 +299,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
             const nx = len > 0 ? dx / len : 0, ny = len > 0 ? dy / len : 1;
             const lx = party.x + nx * (party.r + 11), ly = party.y + ny * (party.r + 11);
             ctx.font = "10px ui-sans-serif,system-ui,sans-serif";
-            ctx.fillStyle = isHov ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.38)";
+            ctx.fillStyle = isHov ? `rgba(${palette.ink},0.82)` : `rgba(${palette.ink},0.38)`;
             ctx.textAlign = nx > 0.25 ? "left" : nx < -0.25 ? "right" : "center";
             ctx.textBaseline = "middle";
             ctx.fillText(name, lx, ly);
@@ -292,21 +309,21 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
 
       // ── Center user node ────────────────────────────────────────────────────
       const cg = ctx.createRadialGradient(cx, cy, userR * 0.4, cx, cy, userR + 14);
-      cg.addColorStop(0, `rgba(${TEAL},0.08)`); cg.addColorStop(1, "transparent");
+      cg.addColorStop(0, `rgba(${palette.teal},0.08)`); cg.addColorStop(1, "transparent");
       ctx.fillStyle = cg;
       ctx.beginPath(); ctx.arc(cx, cy, userR + 14, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(cx, cy, userR, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${TEAL},0.14)`; ctx.fill();
-      ctx.strokeStyle = `rgba(${TEAL},1)`; ctx.lineWidth = 1.5; ctx.setLineDash([]); ctx.stroke();
+      ctx.fillStyle = `rgba(${palette.teal},0.14)`; ctx.fill();
+      ctx.strokeStyle = `rgba(${palette.teal},1)`; ctx.lineWidth = 1.5; ctx.setLineDash([]); ctx.stroke();
       ctx.font = `700 ${compact ? 11 : 13}px ui-sans-serif,system-ui,sans-serif`;
-      ctx.fillStyle = `rgba(${TEAL},1)`;
+      ctx.fillStyle = `rgba(${palette.teal},1)`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(mkInitials(userName), cx, cy);
 
       // Empty state
       if (placed.length === 0) {
         ctx.font = "11px ui-sans-serif,system-ui,sans-serif";
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
+        ctx.fillStyle = `rgba(${palette.ink},0.18)`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText("Угод ще немає", cx, cy + userR + 38);
       }
@@ -315,7 +332,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     };
 
     rafRef.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect(); };
+    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect(); themeObserver.disconnect(); };
   }, [parties, edges, computePlaced, userName]);
 
   // ── Mouse & click handlers ────────────────────────────────────────────────
@@ -415,7 +432,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
     <div
       ref={wrapRef}
       className="relative w-full select-none overflow-hidden rounded-2xl"
-      style={{ background: BG }}
+      style={{ background: "var(--graph-bg)" }}
     >
       <canvas
         ref={canvasRef}
@@ -493,26 +510,26 @@ function HoverTooltip({
       : null;
     content = (
       <>
-        <p className="mb-2 truncate text-[11px] font-semibold text-white/90">{name}</p>
-        <div className="mb-2 border-b border-white/10 pb-2">
-          <span className="text-[17px] font-semibold text-white">{p.dealCount}</span>
-          <span className="ml-1.5 text-[10px] text-white/40">{t("publicProfile.graph.tooltip.dealsTotal")}</span>
+        <p className="mb-2 truncate text-[11px] font-semibold text-tone-white/90">{name}</p>
+        <div className="mb-2 border-b border-tone-white/10 pb-2">
+          <span className="text-[17px] font-semibold text-tone-white">{p.dealCount}</span>
+          <span className="ml-1.5 text-[10px] text-tone-white/40">{t("publicProfile.graph.tooltip.dealsTotal")}</span>
         </div>
-        <div className="space-y-1 text-[10px] text-white/55">
+        <div className="space-y-1 text-[10px] text-tone-white/55">
           {active > 0 && (
-            <p className="flex items-center gap-1.5 text-white/75">
+            <p className="flex items-center gap-1.5 text-tone-white/75">
               <span className="relative flex h-1.5 w-1.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/50 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white/60" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-tone-white/50 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-tone-white/60" />
               </span>
               {active} {t("publicProfile.graph.tooltip.active")}
             </p>
           )}
           {p.fulfilled > 0 && (
-            <p className="text-emerald-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
+            <p className="text-accent-300/80">✓ {p.fulfilled} {t("publicProfile.graph.tooltip.fulfilled")}</p>
           )}
           {disputed > 0 && (
-            <p className="text-rose-300/85">
+            <p className="text-alert-300/85">
               ● {disputed} {t("publicProfile.graph.tooltip.disputed")}
               {whoDisp ? ` · ${whoDisp}` : ""}
             </p>
@@ -526,14 +543,14 @@ function HoverTooltip({
 
   return (
     <div
-      className={`absolute z-10 rounded-xl border border-white/10 bg-[#111318]/95 p-3 shadow-xl backdrop-blur-sm ${isPinned ? "pointer-events-auto" : "pointer-events-none"}`}
+      className={`absolute z-10 rounded-xl border border-tone-white/10 bg-[var(--graph-bg)]/95 p-3 shadow-xl backdrop-blur-sm ${isPinned ? "pointer-events-auto" : "pointer-events-none"}`}
       style={{ left, top, width: W }}
     >
       {isPinned && (
         <button
           type="button"
           onClick={onDismiss}
-          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full text-white/30 transition hover:text-white/70"
+          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full text-tone-white/30 transition hover:text-tone-white/70"
           aria-label="Close"
         >
           ×
@@ -545,7 +562,7 @@ function HoverTooltip({
           href={`/${locale}/u/${encodeURIComponent((info as { party: { username: string } }).party.username)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-300/60 transition hover:text-emerald-300 md:hidden"
+          className="mt-2.5 flex items-center gap-1 text-[10px] text-accent-300/60 transition hover:text-accent-300 md:hidden"
         >
           → {t("publicProfile.graph.tooltip.openProfile")}
         </a>
@@ -558,9 +575,9 @@ function HoverTooltip({
 function Legend() {
   const t = useT();
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.06] px-5 py-2.5">
-      <LegendItem kind="solid" color={`rgba(${TEAL},0.7)`}  label={t("publicProfile.graph.legend.fulfilled")} />
-      <LegendItem kind="solid" color={`rgba(${ROSE},0.75)`} label={t("publicProfile.graph.legend.disputed")} />
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-tone-white/[0.06] px-5 py-2.5">
+      <LegendItem kind="solid" color="rgba(var(--graph-teal),0.7)"  label={t("publicProfile.graph.legend.fulfilled")} />
+      <LegendItem kind="solid" color="rgba(var(--graph-rose),0.75)" label={t("publicProfile.graph.legend.disputed")} />
     </div>
   );
 }
@@ -576,27 +593,27 @@ function LegendItem({
   label: string;
 }) {
   return (
-    <span className="flex items-center gap-1.5 text-[10px] text-white/28">
+    <span className="flex items-center gap-1.5 text-[10px] text-tone-white/28">
       {kind === "solid"  && (
         <svg width={18} height={2} style={{ overflow: "visible", flexShrink: 0 }}>
-          <line x1={0} y1={1} x2={18} y2={1} stroke={color} strokeWidth={1.5} />
+          <line x1={0} y1={1} x2={18} y2={1} style={{ stroke: color }} strokeWidth={1.5} />
         </svg>
       )}
       {kind === "dashed" && (
         <svg width={18} height={2} style={{ overflow: "visible", flexShrink: 0 }}>
-          <line x1={0} y1={1} x2={18} y2={1} stroke={color} strokeWidth={1} strokeDasharray="4 3" />
+          <line x1={0} y1={1} x2={18} y2={1} style={{ stroke: color }} strokeWidth={1} strokeDasharray="4 3" />
         </svg>
       )}
       {kind === "arrow"  && (
         <svg width={20} height={8} style={{ overflow: "visible", flexShrink: 0 }}>
-          <line x1={0} y1={4} x2={13} y2={4} stroke={color} strokeWidth={1.2} />
-          <polygon points="20,4 12,1 12,7" fill={color} />
+          <line x1={0} y1={4} x2={13} y2={4} style={{ stroke: color }} strokeWidth={1.2} />
+          <polygon points="20,4 12,1 12,7" style={{ fill: color }} />
         </svg>
       )}
       {kind === "node"   && (
         <svg width={10} height={10} style={{ flexShrink: 0 }}>
           <circle cx={5} cy={5} r={4} fill="none"
-            stroke="rgba(0,212,170,0.5)" strokeWidth={1} />
+            style={{ stroke: "rgba(var(--graph-teal),0.5)" }} strokeWidth={1} />
         </svg>
       )}
       {label}

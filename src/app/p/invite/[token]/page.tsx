@@ -381,7 +381,7 @@ export default function InvitePage() {
     canAccept && (conditionChoice === "edit" || conditionChoice === "add");
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-tone-black text-tone-white">
       <div
         className="pointer-events-none absolute inset-0 opacity-70"
         aria-hidden
@@ -395,7 +395,7 @@ export default function InvitePage() {
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
         <div className="flex items-center justify-end">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-tone-white/10 bg-tone-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-tone-300">
             {signedIn ? (
               <>
                 <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> {t("invite.signedIn")}
@@ -408,7 +408,7 @@ export default function InvitePage() {
           </div>
         </div>
         {error && (
-          <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100 shadow-inner shadow-black/30">
+          <div className="rounded-2xl border border-danger-400/30 bg-red-500/10 p-4 text-sm text-danger-100 shadow-inner shadow-tone-black/30">
             {error}
           </div>
         )}
@@ -416,15 +416,15 @@ export default function InvitePage() {
         {!info && !error && (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-28 animate-pulse rounded-2xl bg-white/5" />
+              <div key={i} className="h-28 animate-pulse rounded-2xl bg-tone-white/5" />
             ))}
           </div>
         )}
 
         {info && (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-7">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-6 shadow-2xl shadow-tone-black/30 backdrop-blur sm:p-7">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("invite.eyebrow")}</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-accent-200">{t("invite.eyebrow")}</p>
               {isCreatorViewer && (
                 <div className="flex flex-col items-end gap-1">
                   {canManageShare && (
@@ -434,29 +434,29 @@ export default function InvitePage() {
                           type="button"
                           onClick={() => void copyInviteLink()}
                           aria-label={t("invite.creatorShare.copyInviteLink")}
-                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-tone-white/20 bg-tone-white/5 text-tone-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                         >
                           <Copy className="h-4 w-4" aria-hidden />
                         </button>
                       </Tooltip>
                     </div>
                   )}
-                  {!canManageShare && shareStatusLabel && <p className="text-xs text-slate-300">{shareStatusLabel}</p>}
+                  {!canManageShare && shareStatusLabel && <p className="text-xs text-tone-300">{shareStatusLabel}</p>}
                 </div>
               )}
             </div>
-            <h1 className="mt-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold leading-tight text-tone-white sm:text-4xl">
               {heading}
             </h1>
 
-            <h2 className="mt-4 text-2xl font-semibold text-white">{info.title}</h2>
+            <h2 className="mt-4 text-2xl font-semibold text-tone-white">{info.title}</h2>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-slate-200">
+              <span className="inline-flex items-center rounded-full border border-tone-white/15 bg-tone-black/40 px-3 py-1.5 text-tone-200">
                 <span className="mr-2" aria-hidden>
                   ⏰
                 </span>
                 {t("invite.deadline")}:{" "}
-                <span className="ml-1 font-semibold text-white">
+                <span className="ml-1 font-semibold text-tone-white">
                   {dueParts
                     ? `${dueParts.dateText}${dueParts.timeText ? `, ${dueParts.timeText}` : ""}`
                     : t("invite.noDeadline")}
@@ -464,51 +464,51 @@ export default function InvitePage() {
               </span>
               {info.visibility === "public" && (
                 <Tooltip label={t("invite.publicTooltip")} placement="top">
-                  <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-amber-100">
+                  <span className="inline-flex items-center rounded-full border border-warn-300/30 bg-amber-400/10 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-warn-100">
                     {t("invite.publicTag")}
                   </span>
                 </Tooltip>
               )}
               {info.is_important && (
                 <Tooltip label={t("invite.reputationStakeTooltip")} placement="top">
-                  <span className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-slate-200">
+                  <span className="inline-flex items-center rounded-full border border-tone-white/20 bg-tone-white/5 px-3 py-1.5 font-semibold uppercase tracking-[0.08em] text-tone-200">
                     {t("promises.important.label")}
                   </span>
                 </Tooltip>
               )}
             </div>
 
-            <dl className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm sm:grid-cols-2">
+            <dl className="mt-6 grid gap-3 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.createdByLabel")}</dt>
-                <dd className="mt-1 font-medium text-white">{creatorName}</dd>
+                <dt className="text-xs uppercase tracking-[0.14em] text-tone-400">{t("invite.createdByLabel")}</dt>
+                <dd className="mt-1 font-medium text-tone-white">{creatorName}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.invitedSideLabel")}</dt>
-                <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+                <dt className="text-xs uppercase tracking-[0.14em] text-tone-400">{t("invite.invitedSideLabel")}</dt>
+                <dd className="mt-1 font-medium text-tone-white">{invitedSideName}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.roleLine.label")}</dt>
-                <dd className="mt-1 font-medium text-white">{roleLine}</dd>
+                <dt className="text-xs uppercase tracking-[0.14em] text-tone-400">{t("invite.roleLine.label")}</dt>
+                <dd className="mt-1 font-medium text-tone-white">{roleLine}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.statusLabel")}</dt>
-                <dd className="mt-1 font-medium text-white">{t(`invite.status.${inviteStatus}`)}</dd>
+                <dt className="text-xs uppercase tracking-[0.14em] text-tone-400">{t("invite.statusLabel")}</dt>
+                <dd className="mt-1 font-medium text-tone-white">{t(`invite.status.${inviteStatus}`)}</dd>
               </div>
               {inviteAccepted && (
                 <div className="sm:col-span-2">
-                  <dt className="text-xs uppercase tracking-[0.14em] text-slate-400">{t("invite.acceptedByLabel")}</dt>
-                  <dd className="mt-1 font-medium text-white">{invitedSideName}</dd>
+                  <dt className="text-xs uppercase tracking-[0.14em] text-tone-400">{t("invite.acceptedByLabel")}</dt>
+                  <dd className="mt-1 font-medium text-tone-white">{invitedSideName}</dd>
                 </div>
               )}
             </dl>
 
             {hasDetails && (
-              <section className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
-                <h3 className="text-xs uppercase tracking-[0.14em] text-slate-400">
+              <section className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                <h3 className="text-xs uppercase tracking-[0.14em] text-tone-400">
                   {t("invite.dealDetailsLabel")}
                 </h3>
-                <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-100">
+                <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-tone-100">
                   {detailsText}
                 </p>
               </section>
@@ -516,21 +516,21 @@ export default function InvitePage() {
 
             {/* Counter-condition section — only executor can propose a counter-condition */}
             {canAccept && inviteRole === "executor" && (
-              <section className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <section className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-tone-400">
                   {t("invite.condition.sectionTitle")}
                 </h3>
 
                 {hasCreatorCondition ? (
                   <>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-tone-400">
                       {t("invite.condition.proposedByCreator")}
                     </p>
-                    <p className="mt-2 whitespace-pre-wrap break-words rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm leading-6 text-slate-100">
+                    <p className="mt-2 whitespace-pre-wrap break-words rounded-xl border border-tone-white/10 bg-tone-black/25 px-3 py-2 text-sm leading-6 text-tone-100">
                       {info.condition_text}
                     </p>
                     <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-emerald-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-emerald-100">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-accent-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-accent-100">
                         <input
                           type="radio"
                           name="conditionChoice"
@@ -541,7 +541,7 @@ export default function InvitePage() {
                         />
                         {t("invite.condition.acceptAsIs")}
                       </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-white/20 has-[:checked]:bg-white/10 has-[:checked]:text-white">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-tone-white/20 has-[:checked]:bg-tone-white/10 has-[:checked]:text-tone-white">
                         <input
                           type="radio"
                           name="conditionChoice"
@@ -559,14 +559,14 @@ export default function InvitePage() {
                         onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
                         placeholder={t("invite.condition.editPlaceholder")}
                         rows={3}
-                        className="mt-3 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-white/40 placeholder:text-white/30"
+                        className="mt-3 w-full rounded-xl border border-tone-white/20 bg-tone-black/30 px-3 py-2 text-sm text-tone-white outline-none transition focus:border-tone-white/40 placeholder:text-tone-white/30"
                       />
                     )}
                   </>
                 ) : (
                   <>
                     <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-emerald-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-emerald-100">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-accent-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-accent-100">
                         <input
                           type="radio"
                           name="conditionChoice"
@@ -577,7 +577,7 @@ export default function InvitePage() {
                         />
                         {t("invite.condition.acceptWithout")}
                       </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 transition hover:bg-white/10 has-[:checked]:border-white/20 has-[:checked]:bg-white/10 has-[:checked]:text-white">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-tone-white/20 has-[:checked]:bg-tone-white/10 has-[:checked]:text-tone-white">
                         <input
                           type="radio"
                           name="conditionChoice"
@@ -595,7 +595,7 @@ export default function InvitePage() {
                         onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
                         placeholder={t("invite.condition.addPlaceholder")}
                         rows={3}
-                        className="mt-3 w-full rounded-xl border border-white/20 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-white/40 placeholder:text-white/30"
+                        className="mt-3 w-full rounded-xl border border-tone-white/20 bg-tone-black/30 px-3 py-2 text-sm text-tone-white outline-none transition focus:border-tone-white/40 placeholder:text-tone-white/30"
                       />
                     )}
                   </>
@@ -605,7 +605,7 @@ export default function InvitePage() {
 
             {/* Awaiting confirmation state for invitee */}
             {isInviteeAwaitingConfirmation && (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-300">
+              <div className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 text-sm text-tone-300">
                 {t("invite.condition.awaitingConfirmation")}
               </div>
             )}
@@ -613,14 +613,14 @@ export default function InvitePage() {
             <div className="mt-6">
               {inviteAccepted ? (
                 <div className="flex">
-                  <div className="flex w-full items-center justify-between rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+                  <div className="flex w-full items-center justify-between rounded-2xl border border-accent-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-accent-100">
                     {t("invite.acceptedStateMessage")}
                     <Tooltip label={openDealLabel} placement="top-right">
                       <button
                         type="button"
                         aria-label={openDealLabel}
                         onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/20 bg-white/5 text-emerald-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-tone-white/20 bg-tone-white/5 text-accent-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
                       >
                         <ExternalLink className="h-5 w-5" aria-hidden />
                       </button>
@@ -628,7 +628,7 @@ export default function InvitePage() {
                   </div>
                 </div>
               ) : isAwaitingConfirmation && !isInviteeAwaitingConfirmation ? (
-                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
+                <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 px-4 py-3 text-sm text-tone-300">
                   {t("invite.awaitingCounterparty")}
                 </div>
               ) : isInviteeAwaitingConfirmation ? null
@@ -638,7 +638,7 @@ export default function InvitePage() {
                     <button
                       disabled={busy}
                       onClick={() => signedIn ? setShowDeclineModal(true) : void decline()}
-                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/20 bg-tone-white/5 px-5 py-2.5 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {busy ? t("invite.processing") : t("invite.decline")}
                     </button>
@@ -652,7 +652,7 @@ export default function InvitePage() {
                         void accept();
                       }
                     }}
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:translate-y-[-1px] hover:shadow-accent-400/40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
                   >
                     {busy
                       ? t("invite.processing")
@@ -662,7 +662,7 @@ export default function InvitePage() {
                   </button>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-slate-300">
+                <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 px-4 py-3 text-sm text-tone-300">
                   {inviteStatus === "declined"
                     ? t("invite.declinedMessage")
                     : inviteStatus === "expired"
@@ -678,9 +678,9 @@ export default function InvitePage() {
       </div>
 
       {showDeclineModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("invite.declineModal.title")}
             </h2>
             <p className="mt-3 text-sm text-neutral-200">
@@ -690,7 +690,7 @@ export default function InvitePage() {
               <button
                 type="button"
                 onClick={() => setShowDeclineModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("invite.declineModal.cancel")}
               </button>
@@ -700,7 +700,7 @@ export default function InvitePage() {
                   setShowDeclineModal(false);
                   void decline();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-tone-white shadow-lg shadow-danger-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("invite.declineModal.confirm")}
               </button>
@@ -710,9 +710,9 @@ export default function InvitePage() {
       )}
 
       {showAcceptModal && info && !inviteAccepted && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-neutral-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
             </h2>
             <p className="mt-3 text-sm text-neutral-200">
@@ -723,7 +723,7 @@ export default function InvitePage() {
               <button
                 type="button"
                 onClick={() => setShowAcceptModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("invite.publicModal.cancel")}
               </button>
@@ -733,7 +733,7 @@ export default function InvitePage() {
                   setShowAcceptModal(false);
                   await accept();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
               >
                 {t("invite.publicModal.confirm")}
               </button>
@@ -746,10 +746,10 @@ export default function InvitePage() {
           <div
             role={toastTone === "success" ? "status" : "alert"}
             aria-live={toastTone === "success" ? "polite" : "assertive"}
-            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md ${
+            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-tone-black/35 backdrop-blur-md sm:max-w-md ${
               toastTone === "success"
-                ? "border-emerald-300/35 bg-emerald-500/20 text-emerald-50"
-                : "border-red-300/35 bg-red-500/20 text-red-50"
+                ? "border-accent-300/35 bg-emerald-500/20 text-accent-50"
+                : "border-danger-300/35 bg-red-500/20 text-danger-50"
             }`}
           >
             {toast}

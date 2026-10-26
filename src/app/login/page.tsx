@@ -84,19 +84,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+    <main className="relative min-h-screen bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--auth-wash-1),transparent_30%),radial-gradient(circle_at_70%_10%,var(--auth-wash-2),transparent_28%),radial-gradient(circle_at_55%_65%,var(--auth-wash-3),transparent_40%)]" />
 
       <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl shadow-black/40 backdrop-blur">
+        <div className="w-full max-w-lg rounded-3xl border border-tone-white/10 bg-tone-black/40 p-8 shadow-2xl shadow-tone-black/40 backdrop-blur">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-200">
+              <p className="text-sm uppercase tracking-[0.2em] text-accent-200">
                 {t("auth.login.eyebrow")}
               </p>
-              <h1 className="text-4xl font-semibold text-white">Dreddi knows</h1>
-              <p className="text-slate-300">
+              <h1 className="text-4xl font-semibold text-tone-white">Dreddi knows</h1>
+              <p className="text-tone-300">
                 {stripTrailingPeriod(t("auth.login.subtitle"))}
               </p>
             </div>
@@ -104,12 +104,12 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 space-y-4">
-            <label className="block space-y-2 text-sm text-slate-200">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+            <label className="block space-y-2 text-sm text-tone-200">
+              <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("auth.login.emailLabel")}
               </span>
               <input
-                className="block w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                className="block w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                 placeholder={t("auth.login.emailPlaceholder")}
                 value={email}
                 onChange={(e) => {
@@ -122,7 +122,7 @@ export default function LoginPage() {
             <button
               onClick={sendMagicLink}
               disabled={busy || !email || oauthBusy}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:bg-emerald-300 hover:shadow-emerald-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:bg-emerald-300 hover:shadow-accent-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
             >
               {busy ? t("auth.login.sending") : t("auth.login.sendLink")}
             </button>
@@ -131,17 +131,17 @@ export default function LoginPage() {
               <div
                 role="status"
                 aria-live="polite"
-                className="rounded-xl border border-emerald-400/50 bg-emerald-500/15 p-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/10"
+                className="rounded-xl border border-accent-400/50 bg-emerald-500/15 p-4 text-sm text-accent-100 shadow-lg shadow-accent-500/10"
               >
                 <div className="flex items-center gap-3">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/80 text-xs font-semibold text-slate-950">
                     ✓
                   </span>
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-emerald-50">
+                    <p className="text-sm font-semibold text-accent-50">
                       {t("auth.login.sentTitle")}
                     </p>
-                    <p className="text-sm text-emerald-100/90">
+                    <p className="text-sm text-accent-100/90">
                       {t("auth.login.sentBody")}
                     </p>
                   </div>
@@ -149,21 +149,21 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-xs text-emerald-200/80">
+            <div className="flex items-center gap-2 text-xs text-accent-200/80">
               <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
               <span>{t("auth.login.secure")}</span>
             </div>
 
-            <div className="flex items-center gap-3 pt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-              <span className="h-px flex-1 bg-white/10" />
+            <div className="flex items-center gap-3 pt-2 text-xs uppercase tracking-[0.2em] text-tone-400">
+              <span className="h-px flex-1 bg-tone-white/10" />
               <span>{t("auth.login.or")}</span>
-              <span className="h-px flex-1 bg-white/10" />
+              <span className="h-px flex-1 bg-tone-white/10" />
             </div>
 
             <button
               onClick={signInWithGoogle}
               disabled={oauthBusy}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2.5 text-sm font-semibold text-tone-100 transition hover:border-tone-white/40 hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <svg
                 aria-hidden="true"
@@ -193,7 +193,7 @@ export default function LoginPage() {
                 : t("auth.login.googleCta")}
             </button>
 
-            {error && <div className="text-sm text-red-400">{error}</div>}
+            {error && <div className="text-sm text-danger-400">{error}</div>}
 
           </div>
         </div>

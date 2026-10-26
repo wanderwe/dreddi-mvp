@@ -594,8 +594,8 @@ export default function PublicAgreementPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#070a12] px-4 py-12 text-white">
-        <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-white/70">
+      <main className="min-h-screen bg-[var(--surface-deep)] px-4 py-12 text-tone-white">
+        <div className="mx-auto max-w-4xl rounded-3xl border border-tone-white/10 bg-tone-white/[0.03] p-8 text-tone-white/70">
           {t("publicAgreement.loading")}
         </div>
       </main>
@@ -604,21 +604,21 @@ export default function PublicAgreementPage() {
 
   if (!agreement) {
     return (
-      <main className="min-h-screen bg-[#070a12] px-4 py-12 text-white">
-        <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center">
-          <ShieldCheck className="mx-auto h-10 w-10 text-white/40" aria-hidden="true" />
+      <main className="min-h-screen bg-[var(--surface-deep)] px-4 py-12 text-tone-white">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-tone-white/10 bg-tone-white/[0.03] p-8 text-center">
+          <ShieldCheck className="mx-auto h-10 w-10 text-tone-white/40" aria-hidden="true" />
           <h1 className="mt-5 text-2xl font-semibold">{t("publicAgreement.notPublicTitle")}</h1>
-          <p className="mt-3 text-sm text-white/60">{error ?? t("publicAgreement.errors.notPublic")}</p>
+          <p className="mt-3 text-sm text-tone-white/60">{error ?? t("publicAgreement.errors.notPublic")}</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.13),_transparent_34rem),#070a12] px-4 py-8 text-white sm:py-12">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.13),_transparent_34rem),var(--surface-deep)] px-4 py-8 text-tone-white sm:py-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-5">
-        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/30">
-          <div className="border-b border-white/10 bg-black/20 p-5 sm:p-8">
+        <section className="overflow-hidden rounded-[2rem] border border-tone-white/10 bg-tone-white/[0.04] shadow-2xl shadow-tone-black/30">
+          <div className="border-b border-tone-white/10 bg-tone-black/20 p-5 sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -629,7 +629,7 @@ export default function PublicAgreementPage() {
                     marker="icon"
                   />
                   {agreement.is_important ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/10 px-2.5 py-1.5 text-[13px] font-medium text-amber-100">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/10 px-2.5 py-1.5 text-[13px] font-medium text-warn-100">
                       <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                       {t("publicAgreement.reputationStake")}
                     </span>
@@ -639,7 +639,7 @@ export default function PublicAgreementPage() {
                   {agreement.title}
                 </h1>
                 {dueText ? (
-                  <p className="mt-4 text-sm font-medium text-white/70">
+                  <p className="mt-4 text-sm font-medium text-tone-white/70">
                     {t("publicAgreement.deadline", { date: dueText })}
                   </p>
                 ) : null}
@@ -665,7 +665,7 @@ export default function PublicAgreementPage() {
                           ? t("publicAgreement.copyFailed")
                           : t("publicAgreement.copyLink")
                     }
-                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 bg-transparent text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 active:scale-[0.98]"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
                       {copyState === "copied" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
@@ -692,7 +692,7 @@ export default function PublicAgreementPage() {
                           ? t("publicAgreement.copyFailed")
                           : t("publicAgreement.copyEmbed")
                     }
-                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-transparent text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.98]"
+                    className="inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 bg-transparent text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 active:scale-[0.98]"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
                       {copyEmbedState === "copied" ? <Check className="h-4 w-4" /> : <Code2 className="h-4 w-4" />}
@@ -710,10 +710,10 @@ export default function PublicAgreementPage() {
                       onClick={handleToggleFollow}
                       aria-label={`${followLabel} · ${agreement.viewer_following ? t("publicAgreement.unfollowTooltip") : t("publicAgreement.followTooltip")}`}
                       className={[
-                        "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                        "inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold leading-none transition sm:px-4 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950",
                         agreement.viewer_following
-                          ? "border border-white/15 bg-white/[0.045] text-white/70 hover:border-white/25 hover:bg-white/[0.07] hover:text-white/82"
-                          : "border border-emerald-300/45 bg-emerald-300/12 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-emerald-300/65 hover:bg-emerald-300/18",
+                          ? "border border-tone-white/15 bg-tone-white/[0.045] text-tone-white/70 hover:border-tone-white/25 hover:bg-tone-white/[0.07] hover:text-tone-white/82"
+                          : "border border-accent-300/45 bg-emerald-300/12 text-accent-50 shadow-[0_0_18px_rgba(16,185,129,0.18)] hover:border-accent-300/65 hover:bg-emerald-300/18",
                       ].join(" ")}
                     >
                       {agreement.viewer_following ? <Check className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
@@ -721,7 +721,7 @@ export default function PublicAgreementPage() {
                     </button>
                   </Tooltip>
                 ) : (
-                  <div className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-white/70 sm:px-4 sm:text-sm">
+                  <div className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/[0.03] px-3 py-2 text-xs font-medium text-tone-white/70 sm:px-4 sm:text-sm">
                     <Eye className="h-4 w-4" aria-hidden="true" />
                     <span>{t("publicAgreement.followersCount", { count: followersCount })}</span>
                   </div>
@@ -731,17 +731,17 @@ export default function PublicAgreementPage() {
           </div>
 
           <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+            <div className="rounded-3xl border border-tone-white/10 bg-tone-black/20 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-tone-white/45">
                 {t("publicAgreement.whatAgreed")}
               </p>
-              <p className="mt-3 whitespace-pre-wrap text-base leading-7 text-white/82">
+              <p className="mt-3 whitespace-pre-wrap text-base leading-7 text-tone-white/82">
                 {agreement.details?.trim() || agreement.condition_text?.trim() || t("publicAgreement.noDetails")}
               </p>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+            <div className="rounded-3xl border border-tone-white/10 bg-tone-black/20 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-tone-white/45">
                 {t("publicAgreement.participants.title")}
               </p>
               <div className="mt-5 grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr] lg:grid-cols-1 xl:grid-cols-[1fr_auto_1fr]">
@@ -750,7 +750,7 @@ export default function PublicAgreementPage() {
                   name={creatorName}
                   href={creatorHref}
                 />
-                <div className="hidden h-px w-10 bg-gradient-to-r from-white/10 via-emerald-200/45 to-white/10 sm:block lg:hidden xl:block" />
+                <div className="hidden h-px w-10 bg-gradient-to-r from-tone-white/10 via-accent-200/45 to-tone-white/10 sm:block lg:hidden xl:block" />
                 <ParticipantCard
                   label={t("publicAgreement.participants.acceptedBy")}
                   name={accepterName || executorName || creatorName}
@@ -761,31 +761,31 @@ export default function PublicAgreementPage() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+        <section className="rounded-[2rem] border border-tone-white/10 bg-tone-white/[0.035] p-5 sm:p-7">
           <h2 className="text-lg font-semibold">{t("publicAgreement.flowTitle")}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-5">
             {flowStates.map((state, index) => (
               <div key={state.key} className="relative">
                 {index > 0 ? (
-                  <div className="absolute -left-1.5 top-5 hidden h-px w-3 bg-white/15 sm:block" />
+                  <div className="absolute -left-1.5 top-5 hidden h-px w-3 bg-tone-white/15 sm:block" />
                 ) : null}
                 <div
                   className={[
                     "rounded-2xl border p-3 text-sm transition",
                     state.current && state.disputed
-                      ? "border-rose-300/45 bg-rose-300/12 text-rose-50"
+                      ? "border-alert-300/45 bg-rose-300/12 text-alert-50"
                       : state.complete
-                        ? "border-emerald-300/35 bg-emerald-300/10 text-emerald-50"
+                        ? "border-accent-300/35 bg-emerald-300/10 text-accent-50"
                         : state.current
-                          ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
-                          : "border-white/8 bg-black/20 text-white/35",
+                          ? "border-warn-300/55 bg-tone-black/20 text-warn-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
+                          : "border-tone-white/8 bg-tone-black/20 text-tone-white/35",
                   ].join(" ")}
                 >
                   <div
                     className={[
                       "mb-2 flex h-6 w-6 items-center justify-center rounded-full border text-[11px]",
                       state.current && !state.disputed && !state.complete
-                        ? "border-amber-300/80 bg-black/35 text-amber-100"
+                        ? "border-warn-300/80 bg-tone-black/35 text-warn-100"
                         : "border-current/30",
                     ].join(" ")}
                   >
@@ -798,7 +798,7 @@ export default function PublicAgreementPage() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+        <section className="rounded-[2rem] border border-tone-white/10 bg-tone-white/[0.035] p-5 sm:p-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold">{t("publicAgreement.timeline.title")}</h2>
             {canAddUpdate ? (
@@ -808,7 +808,7 @@ export default function PublicAgreementPage() {
                   setIsUpdateFormOpen((open) => !open);
                   setUpdateSubmitState("idle");
                 }}
-                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-white/82 transition hover:border-emerald-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-tone-white/10 bg-tone-white/[0.06] px-4 py-2 text-sm font-semibold text-tone-white/82 transition hover:border-accent-300/35 hover:bg-emerald-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/50"
               >
                 <MessageSquareText className="h-4 w-4" aria-hidden="true" />
                 {t("publicAgreement.updates.add")}
@@ -818,8 +818,8 @@ export default function PublicAgreementPage() {
 
 
           {canAddUpdate && isUpdateFormOpen ? (
-            <div className="mt-5 rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.045] p-4">
-              <label className="text-sm font-semibold text-emerald-50" htmlFor="agreement-update">
+            <div className="mt-5 rounded-3xl border border-accent-300/15 bg-emerald-300/[0.045] p-4">
+              <label className="text-sm font-semibold text-accent-50" htmlFor="agreement-update">
                 {t("publicAgreement.updates.label")}
               </label>
               <textarea
@@ -831,11 +831,11 @@ export default function PublicAgreementPage() {
                 }}
                 maxLength={500}
                 rows={4}
-                className="mt-3 w-full resize-none rounded-2xl border border-white/10 bg-black/25 p-3 text-sm leading-6 text-white outline-none placeholder:text-white/30 focus:border-emerald-300/45 focus:ring-2 focus:ring-emerald-300/15"
+                className="mt-3 w-full resize-none rounded-2xl border border-tone-white/10 bg-tone-black/25 p-3 text-sm leading-6 text-tone-white outline-none placeholder:text-tone-white/30 focus:border-accent-300/45 focus:ring-2 focus:ring-accent-300/15"
                 placeholder={t("publicAgreement.updates.placeholder")}
               />
               <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-white/45">
+                <p className="text-xs text-tone-white/45">
                   {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -845,7 +845,7 @@ export default function PublicAgreementPage() {
                       setIsUpdateFormOpen(false);
                       setUpdateSubmitState("idle");
                     }}
-                    className="cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/65 transition hover:bg-white/10"
+                    className="cursor-pointer rounded-xl border border-tone-white/10 px-4 py-2 text-sm font-medium text-tone-white/65 transition hover:bg-tone-white/10"
                   >
                     {t("publicAgreement.updates.cancel")}
                   </button>
@@ -862,7 +862,7 @@ export default function PublicAgreementPage() {
                 </div>
               </div>
               {updateSubmitState === "error" ? (
-                <p className="mt-3 text-sm text-rose-200">{t("publicAgreement.updates.error")}</p>
+                <p className="mt-3 text-sm text-alert-200">{t("publicAgreement.updates.error")}</p>
               ) : null}
             </div>
           ) : null}
@@ -875,14 +875,14 @@ export default function PublicAgreementPage() {
                     className={[
                       "mt-1.5 h-3 w-3 rounded-full ring-4",
                       item.tone === "success"
-                        ? "bg-emerald-300 ring-emerald-300/10"
+                        ? "bg-emerald-300 ring-accent-300/10"
                         : item.tone === "danger"
-                          ? "bg-rose-300 ring-rose-300/10"
+                          ? "bg-rose-300 ring-alert-300/10"
                           : item.tone === "attention"
-                            ? "bg-amber-300 ring-amber-300/10"
+                            ? "bg-amber-300 ring-warn-300/10"
                             : item.tone === "update"
-                              ? "bg-sky-200 ring-sky-200/10"
-                              : "bg-white/45 ring-white/10",
+                              ? "bg-sky-200 ring-info-200/10"
+                              : "bg-tone-white/45 ring-tone-white/10",
                     ].join(" ")}
                   />
                 </div>
@@ -890,21 +890,21 @@ export default function PublicAgreementPage() {
                   className={[
                     "rounded-2xl border p-4",
                     item.kind === "update"
-                      ? "border-sky-200/10 bg-sky-200/[0.035]"
-                      : "border-white/10 bg-black/20",
+                      ? "border-info-200/10 bg-sky-200/[0.035]"
+                      : "border-tone-white/10 bg-tone-black/20",
                   ].join(" ")}
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="flex items-center gap-2 font-medium text-white">
+                      <p className="flex items-center gap-2 font-medium text-tone-white">
                         {item.kind === "update" ? (
-                          <MessageSquareText className="h-4 w-4 text-sky-100/70" aria-hidden="true" />
+                          <MessageSquareText className="h-4 w-4 text-info-100/70" aria-hidden="true" />
                         ) : null}
                         {item.label}
                       </p>
-                      <p className="mt-1 text-sm text-white/55">{item.actor}</p>
+                      <p className="mt-1 text-sm text-tone-white/55">{item.actor}</p>
                     </div>
-                    <time className="text-sm text-white/50" dateTime={item.timestamp}>
+                    <time className="text-sm text-tone-white/50" dateTime={item.timestamp}>
                       {formatTimestamp(item.timestamp, locale)}
                     </time>
                   </div>
@@ -912,7 +912,7 @@ export default function PublicAgreementPage() {
                     <p
                       className={[
                         "mt-3 whitespace-pre-wrap text-sm leading-6",
-                        item.kind === "update" ? "text-white/72" : "text-white/60",
+                        item.kind === "update" ? "text-tone-white/72" : "text-tone-white/60",
                       ].join(" ")}
                     >
                       {item.description}
@@ -930,20 +930,20 @@ export default function PublicAgreementPage() {
 
 function ParticipantCard({ label, name, href }: { label: string; name: string; href?: string | null }) {
   const className = [
-    "group block h-full min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition",
+    "group block h-full min-w-0 rounded-2xl border border-tone-white/10 bg-tone-white/[0.04] p-4 transition",
     href
-      ? "cursor-pointer hover:border-emerald-300/40 hover:bg-emerald-300/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45"
+      ? "cursor-pointer hover:border-accent-300/40 hover:bg-emerald-300/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/45"
       : "",
   ].join(" ");
   const content = (
     <>
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition group-hover:bg-emerald-300/15 group-hover:text-emerald-100">
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-tone-white/10 text-tone-white/80 transition group-hover:bg-emerald-300/15 group-hover:text-accent-100">
         <UserRound className="h-5 w-5" aria-hidden="true" />
       </div>
-      <p className="text-xs uppercase tracking-[0.16em] text-white/40">{label}</p>
-      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
+      <p className="text-xs uppercase tracking-[0.16em] text-tone-white/40">{label}</p>
+      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm font-semibold text-tone-white">
         <span className="truncate">{name}</span>
-        {href ? <Link2 className="h-3.5 w-3.5 shrink-0 text-emerald-100/65" aria-hidden="true" /> : null}
+        {href ? <Link2 className="h-3.5 w-3.5 shrink-0 text-accent-100/65" aria-hidden="true" /> : null}
       </p>
     </>
   );

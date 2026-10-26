@@ -182,7 +182,7 @@ function SocialBadge({ link }: { link: { platform: string; username: string | nu
 
   const meta: Meta | undefined = link.platform === "twitter" ? {
     tooltip: link.username ? `Twitter / X · @${link.username} · Verified` : "Twitter / X · Verified",
-    color: "text-sky-300 border-sky-400/25 bg-sky-500/10 hover:bg-sky-500/20",
+    color: "text-info-300 border-info-400/25 bg-sky-500/10 hover:bg-sky-500/20",
     href: link.username ? `https://x.com/${link.username}` : undefined,
     icon: (
       <svg viewBox="0 0 24 24" className="h-3 w-3 fill-current" aria-hidden>
@@ -833,27 +833,27 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
 
   if (isEmbed) {
     return (
-      <main className="w-full bg-transparent text-white">
-        <section className="w-full max-w-[420px] rounded-3xl border border-white/10 bg-[#0b0f1a]/95 p-4 shadow-2xl shadow-black/40">
+      <main className="w-full bg-transparent text-tone-white">
+        <section className="w-full max-w-[420px] rounded-3xl border border-tone-white/10 bg-[var(--surface-popover)]/95 p-4 shadow-2xl shadow-tone-black/40">
           {loading ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/70">
+            <div className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-6 text-center text-xs text-tone-white/70">
               {t("publicProfile.loading")}
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-white/70">
+            <div className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-6 text-center text-xs text-tone-white/70">
               {error}
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-tone-white/10">
                       {profile?.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={profile.avatar_url} alt={primaryLabel} className="h-full w-full object-cover" />
                       ) : (
-                        <span className="text-lg font-semibold text-white/80">
+                        <span className="text-lg font-semibold text-tone-white/80">
                           {avatarLabel.slice(0, 1).toUpperCase()}
                         </span>
                       )}
@@ -861,7 +861,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                     <div className="min-w-0">
                       <h1 className="truncate text-xl font-semibold">{primaryLabel}</h1>
                       {identity.subtitle ? (
-                        <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
+                        <p className="truncate text-sm text-tone-white/60">{identity.subtitle}</p>
                       ) : null}
                     </div>
                   </div>
@@ -870,40 +870,40 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       href={publicProfileUrl || publicProfilePath}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70 transition hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-tone-white/15 bg-tone-white/5 text-tone-white/70 transition hover:border-accent-300/45 hover:bg-emerald-500/10 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
                       aria-label={t("publicProfile.copyLink")}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   ) : null}
                 </div>
-                <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-emerald-100/70">
+                <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-accent-100/70">
                   {t("publicProfile.embed.verifiedBy")}
                 </p>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-white/60">
+                <div className="rounded-xl border border-tone-white/10 bg-tone-black/30 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-tone-white/60">
                     {t("publicProfile.reputationScore")}
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-white">{reputationScore}</p>
+                  <p className="mt-1 text-2xl font-semibold text-tone-white">{reputationScore}</p>
                 </div>
-                <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/10 p-3">
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-emerald-200">
+                <div className="rounded-xl border border-accent-500/15 bg-emerald-500/10 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-accent-200">
                     {t("publicProfile.confirmed")}
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-white">{confirmedCount}</p>
+                  <p className="mt-1 text-2xl font-semibold text-tone-white">{confirmedCount}</p>
                 </div>
-                <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 p-3">
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-amber-200">
+                <div className="rounded-xl border border-warn-400/20 bg-amber-400/10 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-warn-200">
                     {t("publicProfile.disputed")}
                   </p>
-                  <p className="mt-1 text-2xl font-semibold text-white">{disputedCount}</p>
+                  <p className="mt-1 text-2xl font-semibold text-tone-white">{disputedCount}</p>
                 </div>
               </div>
 
-              <p className="text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
+              <p className="text-xs text-tone-white/50">{t("publicProfile.embed.poweredBy")}</p>
             </div>
           )}
         </section>
@@ -912,34 +912,34 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   }
 
   return (
-    <main className={`overflow-x-hidden bg-[#0b0f1a] text-white ${isEmbed ? "min-h-0" : "min-h-screen"}`}>
+    <main className={`overflow-x-hidden bg-[var(--surface-popover)] text-tone-white ${isEmbed ? "min-h-0" : "min-h-screen"}`}>
       <div
         className={`mx-auto flex w-full flex-col gap-8 ${isEmbed ? "max-w-md px-4 py-4" : "max-w-4xl px-6 py-10"}`}
       >
         {!isEmbed ? (
           <LocalizedLink
             href={backLink.href}
-            className="text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+            className="text-sm font-medium text-accent-200 transition hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
           >
             {backLink.label}
           </LocalizedLink>
         ) : null}
         {loading ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-10 text-center text-sm text-tone-white/70">
             {t("publicProfile.loading")}
           </div>
         ) : error ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/70">
+          <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-10 text-center text-sm text-tone-white/70">
             {error}
           </div>
         ) : (
           <>
             <section
-              className={`flex flex-col rounded-3xl border border-white/10 bg-white/5 ${isEmbed ? "gap-4 p-5" : "gap-6 p-8"}`}
+              className={`flex flex-col rounded-3xl border border-tone-white/10 bg-tone-white/5 ${isEmbed ? "gap-4 p-5" : "gap-6 p-8"}`}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-tone-white/10">
                     {profile?.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -948,7 +948,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <span className="text-xl font-semibold text-white/80">
+                      <span className="text-xl font-semibold text-tone-white/80">
                         {avatarLabel.slice(0, 1).toUpperCase()}
                       </span>
                     )}
@@ -965,7 +965,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       )}
                     </div>
                     {identity.subtitle && (
-                      <p className="truncate text-sm text-white/60">{identity.subtitle}</p>
+                      <p className="truncate text-sm text-tone-white/60">{identity.subtitle}</p>
                     )}
                     {profileTags.length > 0 && (
                       <div className="mt-3 flex w-full flex-wrap justify-center gap-2 sm:justify-start">
@@ -973,7 +973,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                           <span
                             key={tag}
                             tabIndex={0}
-                            className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200/90 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                            className="rounded-full border border-tone-white/15 bg-tone-white/5 px-2.5 py-0.5 text-[11px] font-medium text-tone-200/90 transition hover:border-tone-white/30 hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
                           >
                             {tag}
                           </span>
@@ -992,7 +992,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         <IconButton
                           icon={<Copy className="h-4 w-4" />}
                           ariaLabel={t("publicProfile.copyLink")}
-                          className="h-10 w-10 border-white/15 bg-white/5 text-white/75 hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100"
+                          className="h-10 w-10 border-tone-white/15 bg-tone-white/5 text-tone-white/75 hover:border-accent-300/45 hover:bg-emerald-500/10 hover:text-accent-100"
                           onClick={() => void handleCopyLink()}
                         />
                       </span>
@@ -1009,7 +1009,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         <IconButton
                           icon={<Code2 className="h-4 w-4" />}
                           ariaLabel={t("publicProfile.copyEmbedCode")}
-                          className="h-10 w-10 border-white/15 bg-white/5 text-white/75 hover:border-emerald-300/45 hover:bg-emerald-500/10 hover:text-emerald-100"
+                          className="h-10 w-10 border-tone-white/15 bg-tone-white/5 text-tone-white/75 hover:border-accent-300/45 hover:bg-emerald-500/10 hover:text-accent-100"
                           onClick={() => void handleCopyEmbed()}
                         />
                       </span>
@@ -1017,36 +1017,36 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   </div>
                 ) : null}
               </div>
-              <div className="text-xs text-white/50">
+              <div className="text-xs text-tone-white/50">
                 {isEmbed ? t("publicProfile.embed.verifiedBy") : lastActivityLabel}
               </div>
             </section>
 
             <section
-              className={`rounded-3xl border border-white/10 bg-white/5 ${isEmbed ? "p-5" : "p-8"}`}
+              className={`rounded-3xl border border-tone-white/10 bg-tone-white/5 ${isEmbed ? "p-5" : "p-8"}`}
             >
               <div className={`grid gap-3 ${isEmbed ? "grid-cols-2" : "sm:grid-cols-3"}`}>
-                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-sm text-white/80 shadow-inner shadow-black/30">
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/60">
+                <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 px-4 py-4 text-sm text-tone-white/80 shadow-inner shadow-tone-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-tone-white/60">
                     {t("publicProfile.reputationScore")}
                   </div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{reputationScore}</div>
+                  <div className="mt-2 text-2xl font-semibold text-tone-white">{reputationScore}</div>
                 </div>
-                <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100 shadow-inner shadow-black/30">
-                  <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                <div className="rounded-2xl border border-accent-500/15 bg-emerald-500/10 px-4 py-4 text-sm text-accent-100 shadow-inner shadow-tone-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-accent-200">
                     {t("publicProfile.confirmed")}
                   </div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{confirmedCount}</div>
+                  <div className="mt-2 text-2xl font-semibold text-tone-white">{confirmedCount}</div>
                 </div>
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-4 text-sm text-amber-50 shadow-inner shadow-black/30">
-                  <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
+                <div className="rounded-2xl border border-warn-400/20 bg-amber-400/10 px-4 py-4 text-sm text-warn-50 shadow-inner shadow-tone-black/30">
+                  <div className="text-xs uppercase tracking-[0.2em] text-warn-200">
                     {t("publicProfile.disputed")}
                   </div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{disputedCount}</div>
+                  <div className="mt-2 text-2xl font-semibold text-tone-white">{disputedCount}</div>
                 </div>
               </div>
               {!isEmbed ? (
-                <p className="mt-3 text-xs text-white/55">{t("publicProfile.privacyNote.metrics")}</p>
+                <p className="mt-3 text-xs text-tone-white/55">{t("publicProfile.privacyNote.metrics")}</p>
               ) : null}
               {streakCount > 0 ? (
                 <div className="mt-4">
@@ -1069,29 +1069,29 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         d="M12.18 2.25c.59 2.42-.17 3.91-1.07 5.36-.96 1.54-2.04 3.17-2.04 5.48 0 2.25 1.56 4.42 3.93 5.16-1.04-.86-1.66-2.06-1.66-3.39 0-1.58.88-2.66 1.73-3.71.83-1.02 1.63-2.02 1.63-3.5 1.85 1.18 3.06 3.28 3.06 5.58 0 3.52-2.84 6.37-6.35 6.37S5.06 16.75 5.06 13.23c0-3.03 1.68-5.2 3.11-7.13 1.33-1.79 2.46-3.37 4.01-3.85Z"
                       />
                     </svg>
-                    <p className="text-xl font-semibold text-white">
+                    <p className="text-xl font-semibold text-tone-white">
                       {t("publicProfile.streak.title", { count: numberFormatter.format(streakCount) })}
                     </p>
                   </div>
-                  <p className="mt-1 text-xs text-white/60">{formatStreakLine(streakCount, locale)}</p>
+                  <p className="mt-1 text-xs text-tone-white/60">{formatStreakLine(streakCount, locale)}</p>
                 </div>
               ) : null}
               {isEmbed ? (
-                <p className="mt-4 text-xs uppercase tracking-[0.15em] text-emerald-100/70">
+                <p className="mt-4 text-xs uppercase tracking-[0.15em] text-accent-100/70">
                   {t("publicProfile.embed.trustLine")}
                 </p>
               ) : null}
               {isEmbed ? (
-                <p className="mt-3 text-xs text-white/50">{t("publicProfile.embed.poweredBy")}</p>
+                <p className="mt-3 text-xs text-tone-white/50">{t("publicProfile.embed.poweredBy")}</p>
               ) : null}
             </section>
 
             {!isEmbed ? (
-              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <section className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-8">
               <button
                 type="button"
                 onClick={() => setReputationDetailsOpen((prev) => !prev)}
-                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
                 aria-label={
                   reputationDetailsOpen
                     ? t("publicProfile.reputationDetails.collapseLabel")
@@ -1105,7 +1105,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   </h2>
                 </div>
                 <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-tone-white/10 bg-tone-black/40 text-tone-white/70 transition-transform duration-200 ${
                     reputationDetailsOpen ? "rotate-180" : "rotate-0"
                   }`}
                 >
@@ -1129,22 +1129,22 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               >
                 <div className="pt-5">
                   {!reputationEvidence.hasDeals ? (
-                    <p className="text-sm text-white/60">
+                    <p className="text-sm text-tone-white/60">
                       {t("publicProfile.reputationDetails.empty")}
                     </p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
                       {reputationEvidence.uniquePeople !== null && (
-                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                          <h3 className="text-sm font-semibold text-white">
+                        <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-tone-white">
                             {t("publicProfile.reputationDetails.sections.workedWith")}
                           </h3>
                           <div className="mt-2 space-y-2">
-                            <div className="flex items-baseline gap-2 text-white">
+                            <div className="flex items-baseline gap-2 text-tone-white">
                               <span className="text-2xl font-semibold">
                                 {numberFormatter.format(reputationEvidence.uniquePeople)}
                               </span>
-                              <span className="text-sm text-white/70">
+                              <span className="text-sm text-tone-white/70">
                                 {formatPlural(
                                   reputationEvidence.uniquePeople,
                                   "workedWithPeople"
@@ -1152,7 +1152,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                               </span>
                             </div>
                             {reputationEvidence.workedWithDeals > 0 && (
-                              <p className="text-xs text-white/60">
+                              <p className="text-xs text-tone-white/60">
                                 {t("publicProfile.reputationDetails.workedWith.secondary", {
                                   count: numberFormatter.format(reputationEvidence.workedWithDeals),
                                 })}
@@ -1163,17 +1163,17 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       )}
                       {(reputationEvidence.dealsWithDeadlines !== null ||
                         reputationEvidence.onTimeCompletions !== null) && (
-                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                          <h3 className="text-sm font-semibold text-white">
+                        <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-tone-white">
                             {t("publicProfile.reputationDetails.sections.commitments")}
                           </h3>
                           <div className="mt-2 space-y-2">
                             {reputationEvidence.dealsWithDeadlines !== null && (
-                              <div className="flex items-baseline gap-2 text-white">
+                              <div className="flex items-baseline gap-2 text-tone-white">
                                 <span className="text-2xl font-semibold">
                                   {numberFormatter.format(reputationEvidence.dealsWithDeadlines)}
                                 </span>
-                                <span className="text-sm text-white/70">
+                                <span className="text-sm text-tone-white/70">
                                   {formatPlural(
                                     reputationEvidence.dealsWithDeadlines,
                                     "deadlines"
@@ -1182,7 +1182,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                               </div>
                             )}
                             {reputationEvidence.onTimeCompletions !== null && (
-                              <p className="text-xs text-white/60">
+                              <p className="text-xs text-tone-white/60">
                                 {t("publicProfile.reputationDetails.commitments.onTime", {
                                   count: numberFormatter.format(
                                     reputationEvidence.onTimeCompletions
@@ -1194,22 +1194,22 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         </div>
                       )}
                       {reputationEvidence.disputes !== null && (
-                        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                          <h3 className="text-sm font-semibold text-white">
+                        <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                          <h3 className="text-sm font-semibold text-tone-white">
                             {t("publicProfile.reputationDetails.sections.disputes")}
                           </h3>
                           <div className="mt-2 space-y-2">
-                            <div className="flex items-baseline gap-2 text-white">
+                            <div className="flex items-baseline gap-2 text-tone-white">
                               <span className="text-2xl font-semibold">
                                 {numberFormatter.format(reputationEvidence.disputes)}
                               </span>
-                              <span className="text-sm text-white/70">
+                              <span className="text-sm text-tone-white/70">
                                 {formatPlural(reputationEvidence.disputes, "disputes")}
                               </span>
                             </div>
                             {reputationEvidence.totalDeals > 0 &&
                               reputationEvidence.disputeRate !== null && (
-                                <p className="text-xs text-white/60">
+                                <p className="text-xs text-tone-white/60">
                                   {t("publicProfile.reputationDetails.disputes.rate", {
                                     rate: percentFormatter.format(reputationEvidence.disputeRate),
                                   })}
@@ -1218,40 +1218,40 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                           </div>
                         </div>
                       )}
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                        <h3 className="text-sm font-semibold text-white">
+                      <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-tone-white">
                           {t("publicProfile.reputationDetails.sections.trackRecord")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <div className="flex items-baseline gap-2 text-white">
+                          <div className="flex items-baseline gap-2 text-tone-white">
                             <span className="text-2xl font-semibold">
                               {paceFormatter.format(reputationEvidence.pace)}
                             </span>
-                            <span className="text-sm text-white/70">
+                            <span className="text-sm text-tone-white/70">
                               {t("publicProfile.reputationDetails.trackRecord.perMonthUnit")}
                             </span>
                           </div>
-                          <p className="text-xs text-white/60">
+                          <p className="text-xs text-tone-white/60">
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
                               count: numberFormatter.format(reputationEvidence.activeDays),
                             })}
                           </p>
                         </div>
                       </div>
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                        <h3 className="text-sm font-semibold text-white">
+                      <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-tone-white">
                           {t("publicProfile.reputationDetails.sections.completionRate")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <div className="flex items-baseline gap-2 text-white">
+                          <div className="flex items-baseline gap-2 text-tone-white">
                             <span className="text-2xl font-semibold">
                               {percentFormatter.format(reputationEvidence.completionRatePercent)}
                             </span>
-                            <span className="text-sm text-white/70">
+                            <span className="text-sm text-tone-white/70">
                               {t("publicProfile.reputationDetails.disputes.rateLabel")}
                             </span>
                           </div>
-                          <p className="text-xs text-white/60">
+                          <p className="text-xs text-tone-white/60">
                             {t("publicProfile.reputationDetails.completionRate.breakdown", {
                               completed: numberFormatter.format(
                                 reputationEvidence.completionRate.completed
@@ -1265,20 +1265,20 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                           </p>
                         </div>
                       </div>
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                        <h3 className="text-sm font-semibold text-white">
+                      <div className="rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                        <h3 className="text-sm font-semibold text-tone-white">
                           {t("publicProfile.reputationDetails.sections.completionReview")}
                         </h3>
                         <div className="mt-2 space-y-2">
-                          <div className="flex items-baseline gap-2 text-white">
+                          <div className="flex items-baseline gap-2 text-tone-white">
                             <span className="text-2xl font-semibold">
                               {percentFormatter.format(reputationEvidence.completionReviewPercent)}
                             </span>
-                            <span className="text-sm text-white/70">
+                            <span className="text-sm text-tone-white/70">
                               {t("publicProfile.reputationDetails.disputes.rateLabel")}
                             </span>
                           </div>
-                          <p className="text-xs text-white/60">
+                          <p className="text-xs text-tone-white/60">
                             {t("publicProfile.reputationDetails.completionReview.breakdown", {
                               responded: numberFormatter.format(
                                 reputationEvidence.completionReview.responded
@@ -1296,7 +1296,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             ) : null}
 
             {!isEmbed && graphParties.length > 0 ? (
-              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <section className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-8">
                 <h2 className="mb-5 text-lg font-semibold">
                   {t("publicProfile.sections.network")}
                 </h2>
@@ -1310,7 +1310,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             ) : null}
 
             {!isEmbed ? (
-              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <section className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-8">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("publicProfile.sections.publicDeals")}</h2>
               </div>
@@ -1320,8 +1320,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   onClick={() => handlePublicDealsTabChange("execution")}
                   className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "execution"
-                      ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
-                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
+                      ? "border-accent-300/50 bg-emerald-500/15 text-accent-100"
+                      : "border-tone-white/10 bg-transparent text-tone-white/55 hover:border-tone-white/15 hover:bg-tone-white/5 hover:text-tone-white/75"
                   }`}
                 >
                   {t("publicProfile.publicDealsTabs.execution", {
@@ -1333,8 +1333,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                   onClick={() => handlePublicDealsTabChange("reaction")}
                   className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition ${
                     activePublicDealsTab === "reaction"
-                      ? "border-emerald-300/50 bg-emerald-500/15 text-emerald-100"
-                      : "border-white/10 bg-transparent text-white/55 hover:border-white/15 hover:bg-white/5 hover:text-white/75"
+                      ? "border-accent-300/50 bg-emerald-500/15 text-accent-100"
+                      : "border-tone-white/10 bg-transparent text-tone-white/55 hover:border-tone-white/15 hover:bg-tone-white/5 hover:text-tone-white/75"
                   }`}
                 >
                   {t("publicProfile.publicDealsTabs.reaction", {
@@ -1343,7 +1343,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                 </button>
               </div>
               {publicDealsEmpty ? (
-                <p className="text-sm text-white/60">{t("publicProfile.emptyPublicDealsByRole")}</p>
+                <p className="text-sm text-tone-white/60">{t("publicProfile.emptyPublicDealsByRole")}</p>
               ) : (
                 <>
                   <div className="flex flex-col gap-4">
@@ -1351,8 +1351,8 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       const content = (
                         <>
                           <div>
-                            <p className="text-sm font-medium text-white">{promise.title}</p>
-                            <p className="text-xs text-white/50">
+                            <p className="text-sm font-medium text-tone-white">{promise.title}</p>
+                            <p className="text-xs text-tone-white/50">
                               {formatDealMeta(promise, locale, dealMetaLabels)}
                             </p>
                           </div>
@@ -1367,7 +1367,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         return (
                           <div
                             key={`${promise.title}-${promise.created_at}`}
-                            className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 md:flex-row md:items-center md:justify-between"
+                            className="flex flex-col gap-2 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 md:flex-row md:items-center md:justify-between"
                           >
                             {content}
                           </div>
@@ -1378,7 +1378,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                         <LocalizedLink
                           key={`${promise.title}-${promise.created_at}`}
                           href={`/p/agreements/${promise.publicAgreementId}`}
-                          className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20 hover:bg-white/[0.06] md:flex-row md:items-center md:justify-between"
+                          className="flex flex-col gap-2 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 transition hover:border-tone-white/20 hover:bg-tone-white/[0.06] md:flex-row md:items-center md:justify-between"
                         >
                           {content}
                         </LocalizedLink>
@@ -1390,7 +1390,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                       <button
                         type="button"
                         onClick={handleLoadMorePublicDeals}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-tone-white/5 sm:w-auto"
                       >
                         {t("promises.list.loadMore")}
                       </button>
@@ -1402,48 +1402,48 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
             ) : null}
 
             {COMMITMENTS_ENABLED && !isEmbed && (publicGoals.length > 0 || goalStats.total_goals > 0) ? (
-              <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <section className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-8">
                 <h2 className="mb-1 text-lg font-semibold">{t("commitments.profile.title")}</h2>
-                <p className="mb-5 text-sm text-white/55">{t("commitments.profile.subtitle")}</p>
+                <p className="mb-5 text-sm text-tone-white/55">{t("commitments.profile.subtitle")}</p>
 
                 <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="text-2xl font-semibold text-white">{goalStats.total_goals}</div>
-                    <div className="mt-1 text-xs text-white/50">{t("commitments.dashboard.stats.total")}</div>
+                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+                    <div className="text-2xl font-semibold text-tone-white">{goalStats.total_goals}</div>
+                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.total")}</div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="text-2xl font-semibold text-white">{goalStats.completed_goals}</div>
-                    <div className="mt-1 text-xs text-white/50">{t("commitments.dashboard.stats.completed")}</div>
+                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+                    <div className="text-2xl font-semibold text-tone-white">{goalStats.completed_goals}</div>
+                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.completed")}</div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="text-2xl font-semibold text-white">
+                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+                    <div className="text-2xl font-semibold text-tone-white">
                       {goalStats.completion_rate === null
                         ? "—"
                         : `${Math.round(goalStats.completion_rate * 100)}%`}
                     </div>
-                    <div className="mt-1 text-xs text-white/50">
+                    <div className="mt-1 text-xs text-tone-white/50">
                       {t("commitments.dashboard.stats.completionRate")}
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="text-2xl font-semibold text-white">{goalStats.current_streak}</div>
-                    <div className="mt-1 text-xs text-white/50">{t("commitments.dashboard.stats.streak")}</div>
+                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+                    <div className="text-2xl font-semibold text-tone-white">{goalStats.current_streak}</div>
+                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.streak")}</div>
                   </div>
                 </div>
 
                 {publicGoals.length === 0 ? (
-                  <p className="text-sm text-white/60">{t("commitments.profile.empty")}</p>
+                  <p className="text-sm text-tone-white/60">{t("commitments.profile.empty")}</p>
                 ) : (
                   <div className="flex flex-col gap-3">
                     {publicGoals.map((goal) => (
                       <LocalizedLink
                         key={goal.id}
                         href={`/p/commitments/${goal.id}`}
-                        className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-emerald-300/40 hover:bg-white/[0.06] md:flex-row md:items-center md:justify-between"
+                        className="flex flex-col gap-2 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 transition hover:border-accent-300/40 hover:bg-tone-white/[0.06] md:flex-row md:items-center md:justify-between"
                       >
                         <div>
-                          <p className="text-sm font-medium text-white">{goal.title}</p>
-                          <p className="text-xs text-white/50">
+                          <p className="text-sm font-medium text-tone-white">{goal.title}</p>
+                          <p className="text-xs text-tone-white/50">
                             {t("commitments.label.goal")}
                             {" · "}
                             {goal.deadline
