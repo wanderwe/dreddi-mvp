@@ -778,7 +778,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               </div>
             </div>
             <ChevronDown
-              className={`h-4 w-4 shrink-0 text-white/40 transition-transform ${
+              className={`h-4 w-4 shrink-0 text-slate-200 transition-transform ${
                 openSection === "social" ? "rotate-180" : ""
               }`}
             />
