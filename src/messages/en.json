@@ -34,7 +34,6 @@
     },
     "theme": {
       "current": "Theme: {theme}. Click to change",
-      "system": "system",
       "light": "light",
       "dark": "dark"
     }

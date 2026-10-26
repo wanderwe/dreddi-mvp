@@ -1,7 +1,7 @@
 export type Theme = "light" | "dark";
-export type ThemePreference = Theme | "system";
 
-export const THEME_PREFERENCES: ThemePreference[] = ["system", "light", "dark"];
+// Light is the default for everyone; the OS colour scheme is deliberately not followed.
+export const DEFAULT_THEME: Theme = "light";
 
 // Same name for localStorage and the cookie; the cookie lets the server render the saved theme.
 export const THEME_STORAGE_KEY = "dreddi-theme";
@@ -15,32 +15,24 @@ export const THEME_COLORS: Record<Theme, string> = {
 // Embeds live on other people's sites and stay dark until they get their own theme option.
 export const isThemeExcludedPath = (pathname: string | null) => /(^|\/)embed(\/|$)/.test(pathname ?? "");
 
-export const parseThemePreference = (value: string | null | undefined): ThemePreference =>
-  value === "light" || value === "dark" ? value : "system";
+// Anything other than an explicit "dark" (nothing saved, or the old "system" value) is light.
+export const parseTheme = (value: string | null | undefined): Theme =>
+  value === "dark" ? "dark" : DEFAULT_THEME;
 
-export const resolveTheme = (preference: ThemePreference): Theme => {
-  if (preference !== "system") return preference;
-  if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-};
-
-export function applyTheme(preference: ThemePreference) {
-  const theme = resolveTheme(preference);
-  const root = document.documentElement;
-  root.dataset.theme = theme;
-  root.dataset.themePreference = preference;
+export function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
 }
 
-export function saveThemePreference(preference: ThemePreference) {
+export function saveTheme(theme: Theme) {
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, preference);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch {
     // Storage can be blocked; the cookie below still carries the choice.
   }
-  document.cookie = `${THEME_STORAGE_KEY}=${preference}; path=/; max-age=31536000; samesite=lax`;
+  document.cookie = `${THEME_STORAGE_KEY}=${theme}; path=/; max-age=31536000; samesite=lax`;
 }
 
-// Runs in <head> before the first paint, so a light-theme visitor never sees a dark flash.
-// Kept dependency-free and in sync with resolveTheme/applyTheme above.
-export const themeInitScript = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var p=null;try{p=localStorage.getItem(k)}catch(e){}if(!p){var m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]+)'));p=m&&m[1]}if(p!=='light'&&p!=='dark')p='system';var t=p==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;var d=document.documentElement;d.dataset.theme=t;d.dataset.themePreference=p;var c=${JSON.stringify(THEME_COLORS)};var mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.setAttribute('content',c[t])}catch(e){}})();`;
+// Runs in <head> before the first paint, so a visitor whose choice is only in localStorage never sees a flash.
+// Kept dependency-free and in sync with parseTheme/applyTheme above.
+export const themeInitScript = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var p=null;try{p=localStorage.getItem(k)}catch(e){}if(!p){var m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]+)'));p=m&&m[1]}var t=p==='dark'?'dark':${JSON.stringify(DEFAULT_THEME)};document.documentElement.dataset.theme=t;var c=${JSON.stringify(THEME_COLORS)};var mc=document.querySelector('meta[name="theme-color"]');if(mc)mc.setAttribute('content',c[t])}catch(e){}})();`;

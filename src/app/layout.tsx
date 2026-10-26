@@ -7,7 +7,7 @@ import {
   THEME_COLORS,
   THEME_STORAGE_KEY,
   isThemeExcludedPath,
-  parseThemePreference,
+  parseTheme,
   themeInitScript,
 } from "@/lib/theme";
 import "./globals.css";
@@ -41,19 +41,17 @@ export default async function RootLayout({
     return <html lang={locale}>{body}</html>;
   }
 
-  // An explicit choice is known from the cookie; "system" is resolved by themeInitScript before paint.
-  const preference = parseThemePreference((await cookies()).get(THEME_STORAGE_KEY)?.value);
-  const serverTheme = preference === "system" ? undefined : preference;
+  // The cookie carries the saved choice; without one the visitor gets the light default.
+  const serverTheme = parseTheme((await cookies()).get(THEME_STORAGE_KEY)?.value);
 
   return (
     <html
       lang={locale}
       data-theme={serverTheme}
-      data-theme-preference={preference}
       suppressHydrationWarning
     >
       <head>
-        <meta name="theme-color" content={THEME_COLORS[serverTheme ?? "dark"]} />
+        <meta name="theme-color" content={THEME_COLORS[serverTheme]} />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       {body}
