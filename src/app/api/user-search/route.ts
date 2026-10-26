@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "@/lib/auth/requireUser";
+import { toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 type PublicStatsSearchRow = {
   profile_id: string;
@@ -39,14 +40,15 @@ export async function GET(req: Request) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const normalizedQuery = query.startsWith("@") ? query.slice(1) : query;
-  const escaped = normalizedQuery.replace(/[,%]/g, "");
+  const escaped = normalizedQuery.replace(/[,%()]/g, "");
   if (escaped.length < 2) {
     return NextResponse.json({ users: [] }, { status: 200 });
   }
 
   const handlePrefix = `${escaped}%`;
   const nameContains = `%${escaped}%`;
-  const searchFilter = `handle.ilike.${handlePrefix},display_name.ilike.${nameContains}`;
+  // Names that look like emails are never matched, so addresses cannot be probed.
+  const searchFilter = `handle.ilike.${handlePrefix},and(display_name.ilike.${nameContains},display_name.not.ilike.%@%)`;
 
   const statsSearch = await supabase
     .from("public_profile_stats")
@@ -94,7 +96,7 @@ export async function GET(req: Request) {
     .map((row) => ({
       id: row.profile_id,
       handle: row.handle.trim(),
-      display_name: row.display_name,
+      display_name: toPublicDisplayName(row.display_name),
       avatar_url: row.avatar_url,
     }))
     .sort((a, b) => {

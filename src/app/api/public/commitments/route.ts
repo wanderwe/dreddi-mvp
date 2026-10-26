@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { commitmentsDisabledResponse, getAdminClient, SELF_COMMITMENT_COLUMNS, type SelfCommitmentRecord } from "@/app/api/commitments/common";
+import { toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 type PublicProfileRecord = {
   id: string;
@@ -45,7 +46,7 @@ export async function GET() {
         const owner = profileById.get(row.user_id);
         return {
           ...row,
-          owner_display_name: owner?.display_name ?? null,
+          owner_display_name: toPublicDisplayName(owner?.display_name),
           owner_handle: owner?.is_public_profile ? owner.handle : null,
         };
       }),

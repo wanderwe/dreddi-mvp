@@ -139,7 +139,7 @@ export default function PublicCommitmentPage() {
     );
   }
 
-  const ownerName = goal.owner_display_name || goal.owner_handle || null;
+  const ownerName = goal.owner_display_name || (goal.owner_handle ? `@${goal.owner_handle}` : null);
 
   return (
     <main className="relative py-6">
@@ -150,7 +150,7 @@ export default function PublicCommitmentPage() {
             <h1 className="text-2xl font-semibold text-white">{goal.title}</h1>
             <StatusPill label={t(`commitments.dashboard.status.${goal.status}`)} tone={statusTone[goal.status]} />
           </div>
-          {ownerName && <p className="mt-1 text-xs text-slate-400">@{ownerName}</p>}
+          {ownerName && <p className="mt-1 text-xs text-slate-400">{ownerName}</p>}
           {goal.description && <p className="mt-3 text-sm text-slate-300">{goal.description}</p>}
           <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-400">
             <span>

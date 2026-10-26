@@ -19,6 +19,7 @@ import {
   SheetPortal,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
+import { isEmailLike } from "@/lib/publicProfileIdentity";
 
 type ProfileSettingsPanelProps = {
   showTitle?: boolean;
@@ -393,6 +394,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     if (!profile) return;
     if (displayNameTooShort || displayNameTooLong) {
       setError(t("profileSettings.errors.displayNameLength"));
+      return;
+    }
+    if (isEmailLike(nextDisplayName)) {
+      setError(t("profileSettings.errors.displayNameEmail"));
       return;
     }
     if (handleMissing) {

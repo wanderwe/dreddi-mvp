@@ -110,6 +110,7 @@
       "copyFailed": "Failed to copy link",
       "saveFailed": "Failed to update profile",
       "displayNameLength": "Display name must be 2–40 characters",
+      "displayNameEmail": "Display name can’t be an email address",
       "handleRequired": "Handle is required"
     },
     "notificationsLabel": "Notifications",
@@ -936,8 +937,8 @@
     "loadMore": "Load more",
     "noMore": "No more profiles",
     "empty": "No public profiles yet",
-    "searchLabel": "Search by username, name, or email",
-    "searchPlaceholder": "Search by username, name, or email",
+    "searchLabel": "Search by username or name",
+    "searchPlaceholder": "Search by username or name",
     "errors": {
       "supabase": "Supabase is not configured"
     },
