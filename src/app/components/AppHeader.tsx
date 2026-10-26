@@ -242,13 +242,11 @@ export function AppHeader() {
                   <Tooltip label={t("nav.notifications")} placement="top">
                     <NotificationBell />
                   </Tooltip>
-                  <ThemeSwitcher />
                   <LocaleSwitcher />
                   <ProfileSettingsMenu />
                 </div>
               </nav>
               <div className="flex items-center gap-2 md:hidden">
-                <ThemeSwitcher />
                 <LocaleSwitcher />
                 <MobileMenu
                   isAuthenticated={isAuthenticated}

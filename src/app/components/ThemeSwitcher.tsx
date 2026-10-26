@@ -23,8 +23,8 @@ const ICONS: Record<Theme, React.ReactNode> = {
   dark: <Moon className="h-4 w-4" aria-hidden />,
 };
 
-function ThemeSwitcherButton() {
-  const t = useT();
+// Shared by the header button and the profile settings switch.
+export function useThemeToggle() {
   const theme = useSyncExternalStore(subscribe, readTheme, () => DEFAULT_THEME);
 
   const toggle = () => {
@@ -33,6 +33,13 @@ function ThemeSwitcherButton() {
     applyTheme(next);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   };
+
+  return { theme, toggle };
+}
+
+function ThemeSwitcherButton() {
+  const t = useT();
+  const { theme, toggle } = useThemeToggle();
 
   const label = t("nav.theme.current", { theme: t(`nav.theme.${theme}`) });
 
