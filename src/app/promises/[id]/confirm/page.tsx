@@ -288,39 +288,39 @@ export default function ConfirmPromisePage() {
       />
 
       <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-6">
-        <div className="flex items-center justify-end text-sm text-emerald-100/80">
-          <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
+        <div className="flex items-center justify-end text-sm text-accent-100/80">
+          <span className="rounded-full border border-accent-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent-100">
             {t("promises.confirm.badge")}
           </span>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-black/50 p-6 shadow-2xl shadow-black/40 backdrop-blur">
+        <div className="rounded-3xl border border-tone-white/10 bg-tone-black/50 p-6 shadow-2xl shadow-tone-black/40 backdrop-blur">
           {loading ? (
             <div className="space-y-3">
-              <div className="h-6 w-1/3 animate-pulse rounded bg-white/10" />
-              <div className="h-12 animate-pulse rounded-xl bg-white/5" />
-              <div className="h-20 animate-pulse rounded-xl bg-white/5" />
+              <div className="h-6 w-1/3 animate-pulse rounded bg-tone-white/10" />
+              <div className="h-12 animate-pulse rounded-xl bg-tone-white/5" />
+              <div className="h-20 animate-pulse rounded-xl bg-tone-white/5" />
             </div>
           ) : error ? (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-100">{error}</div>
+            <div className="rounded-xl border border-danger-500/30 bg-red-500/10 p-4 text-danger-100">{error}</div>
           ) : !promise ? (
-            <div className="text-slate-200">
+            <div className="text-tone-200">
               {t("promises.confirm.notFound", { entity: promiseLabels.entity })}
             </div>
           ) : (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-1">
-                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  <p className="text-xs uppercase tracking-[0.2em] text-accent-200">
                     {t("promises.confirm.promiseLabel", { entity: promiseLabels.entity })}
                   </p>
-                  <h1 className="text-3xl font-semibold text-white sm:text-4xl">{promise.title}</h1>
-                  <p className="text-sm text-slate-300">
+                  <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{promise.title}</h1>
+                  <p className="text-sm text-tone-300">
                     {t("promises.confirm.dueLabel")}: {formatDate(promise.due_at)}
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-2 text-sm text-slate-200">
+                <div className="flex flex-col items-end gap-2 text-sm text-tone-200">
                   <StatusPill
                     label={statusLabelMap[promise.status]}
                     tone={statusToneMap[promise.status] ?? "neutral"}
@@ -329,24 +329,24 @@ export default function ConfirmPromisePage() {
                 </div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4">
+              <div className="mt-4 rounded-2xl border border-tone-white/5 bg-tone-white/5 p-4">
                 <div className="flex flex-wrap gap-x-8 gap-y-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{promiseLabels.creatorLabel}</p>
-                    <p className="mt-1.5 text-sm text-slate-200">{promise.creator_display_name ?? promise.creator_id.slice(0, 8)}</p>
+                    <p className="text-xs uppercase tracking-[0.15em] text-tone-400">{promiseLabels.creatorLabel}</p>
+                    <p className="mt-1.5 text-sm text-tone-200">{promise.creator_display_name ?? promise.creator_id.slice(0, 8)}</p>
                   </div>
                   {executorId && (
                     <div>
-                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{promiseLabels.executorRole}</p>
-                      <p className="mt-1.5 text-sm text-slate-200">{promise.executor_display_name ?? executorId.slice(0, 8)}</p>
+                      <p className="text-xs uppercase tracking-[0.15em] text-tone-400">{promiseLabels.executorRole}</p>
+                      <p className="mt-1.5 text-sm text-tone-200">{promise.executor_display_name ?? executorId.slice(0, 8)}</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {promise.details && (
-                <div className="mt-4 rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-slate-200">
-                  <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
+                <div className="mt-4 rounded-2xl border border-tone-white/5 bg-tone-white/5 p-4 text-sm text-tone-200">
+                  <p className="text-xs uppercase tracking-[0.15em] text-tone-400">
                     {t("promises.confirm.detailsLabel")}
                   </p>
                   <div className="mt-1.5 whitespace-pre-wrap">{promise.details}</div>
@@ -354,20 +354,20 @@ export default function ConfirmPromisePage() {
               )}
 
               {promise.status === "disputed" && (
-                <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-50">
+                <div className="mt-4 rounded-2xl border border-warn-400/30 bg-amber-500/10 p-4 text-sm text-warn-50">
                   <p className="font-semibold">{t("promises.confirm.alreadyDisputed")}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-amber-200">
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-warn-200">
                     {t("promises.confirm.reasonLabel")}
                   </p>
                   <p className="mt-1">{disputeLabel}</p>
                   {promise.dispute_reason && (
-                    <p className="mt-1 text-amber-100/80">{promise.dispute_reason}</p>
+                    <p className="mt-1 text-warn-100/80">{promise.dispute_reason}</p>
                   )}
                 </div>
               )}
 
               {successMessage && (
-                <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-50">
+                <div className="mt-4 rounded-2xl border border-accent-400/30 bg-emerald-500/10 p-4 text-sm text-accent-50">
                   {successMessage}
                 </div>
               )}
@@ -379,7 +379,7 @@ export default function ConfirmPromisePage() {
                     type="button"
                     onClick={onConfirm}
                     disabled={actionBusy !== null}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
                   >
                     {actionBusy === "confirm" ? t("promises.confirm.confirming") : t("promises.confirm.confirm")}
                   </button>
@@ -389,14 +389,14 @@ export default function ConfirmPromisePage() {
                     type="button"
                     onClick={() => setShowDispute(true)}
                     disabled={actionBusy !== null}
-                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-100 shadow-lg shadow-red-900/30 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:bg-red-500/10"
+                    className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-danger-400/40 bg-red-500/10 px-4 py-2 text-sm font-semibold text-danger-100 shadow-lg shadow-danger-900/30 transition hover:bg-red-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:bg-red-500/10"
                   >
                     {actionBusy === "dispute" ? t("promises.confirm.sending") : t("promises.confirm.dispute")}
                   </button>
                 </div>
               ) : (
                 actionNote && (
-                  <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+                  <div className="mt-6 rounded-xl border border-tone-white/10 bg-tone-white/5 p-4 text-sm text-tone-200">
                     {actionNote}
                   </div>
                 )
@@ -406,29 +406,29 @@ export default function ConfirmPromisePage() {
         </div>
 
         {showDispute && promise && (
-          <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 px-4 py-8">
-            <div className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-neutral-950/95 p-6 shadow-2xl shadow-black/50">
+          <div className="fixed inset-0 z-20 flex items-center justify-center bg-tone-black/70 px-4 py-8">
+            <div className="relative w-full max-w-lg rounded-2xl border border-tone-white/10 bg-ntone-950/95 p-6 shadow-2xl shadow-tone-black/50">
               <button
                 type="button"
                 onClick={() => setShowDispute(false)}
-                className="absolute right-4 top-4 cursor-pointer text-slate-400 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="absolute right-4 top-4 cursor-pointer text-tone-400 hover:text-tone-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 ✕
               </button>
 
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.2em] text-amber-200">
+                <p className="text-xs uppercase tracking-[0.2em] text-warn-200">
                   {t("promises.confirm.disputeBadge")}
                 </p>
-                <h2 className="text-xl font-semibold text-white">{t("promises.confirm.disputeTitle")}</h2>
-                <p className="text-sm text-slate-300">{t("promises.confirm.disputeSubtitle")}</p>
+                <h2 className="text-xl font-semibold text-tone-white">{t("promises.confirm.disputeTitle")}</h2>
+                <p className="text-sm text-tone-300">{t("promises.confirm.disputeSubtitle")}</p>
               </div>
 
               <div className="mt-4 space-y-3">
                 {disputeOptions.map((opt) => (
                   <label
                     key={opt.code}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-sm text-slate-100 hover:border-emerald-300/30"
+                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-tone-white/5 bg-tone-white/5 px-3 py-2 text-sm text-tone-100 hover:border-accent-300/30"
                   >
                     <input
                       type="radio"
@@ -444,14 +444,14 @@ export default function ConfirmPromisePage() {
               </div>
 
               <div className="mt-4">
-                <label className="text-xs uppercase tracking-[0.14em] text-slate-400">
+                <label className="text-xs uppercase tracking-[0.14em] text-tone-400">
                   {t("promises.confirm.disputeExplanationLabel")}
                 </label>
                 <textarea
                   rows={3}
                   value={disputeReason}
                   onChange={(e) => setDisputeReason(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+                  className="mt-2 w-full rounded-xl border border-tone-white/10 bg-tone-black/60 px-3 py-2 text-sm text-tone-white focus:border-accent-400 focus:outline-none"
                   placeholder={t("promises.confirm.disputePlaceholder")}
                 />
               </div>
@@ -461,14 +461,14 @@ export default function ConfirmPromisePage() {
                   type="button"
                   onClick={onDispute}
                   disabled={actionBusy !== null || disputeDisabled}
-                  className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/25 transition hover:translate-y-[-1px] hover:shadow-amber-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-warn-500/25 transition hover:translate-y-[-1px] hover:shadow-warn-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warn-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none"
                 >
                   {actionBusy === "dispute" ? t("promises.confirm.submitting") : t("promises.confirm.submitDispute")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDispute(false)}
-                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
                 >
                   {t("promises.confirm.cancel")}
                 </button>

@@ -434,21 +434,21 @@ export default function PromiseGroupDetailPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-10">
-      <LocalizedLink href="/promises/groups" className="text-sm text-emerald-200 hover:text-emerald-100">
+      <LocalizedLink href="/promises/groups" className="text-sm text-accent-200 hover:text-accent-100">
         ← {t("groups.back")}
       </LocalizedLink>
       {loading ? (
-        <p className="mt-6 text-sm text-slate-400">{t("groups.loading")}</p>
+        <p className="mt-6 text-sm text-tone-400">{t("groups.loading")}</p>
       ) : error || !group ? (
-        <p className="mt-6 rounded-xl border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+        <p className="mt-6 rounded-xl border border-danger-300/40 bg-red-500/10 px-4 py-3 text-sm text-danger-100">
           {error ?? t("groups.errors.notFound")}
         </p>
       ) : (
         <>
-          <header className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm font-semibold text-slate-300">{t("groups.detailEyebrow")}</p>
+          <header className="relative mt-4 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-5">
+            <p className="text-sm font-semibold text-tone-300">{t("groups.detailEyebrow")}</p>
             <div className="mt-2 pr-14">
-              <h1 className="text-3xl font-semibold text-white">{group.title}</h1>
+              <h1 className="text-3xl font-semibold text-tone-white">{group.title}</h1>
               <div className="absolute right-5 top-5 z-10">
                 <button
                   type="button"
@@ -457,7 +457,7 @@ export default function PromiseGroupDetailPage() {
                   aria-haspopup="menu"
                   aria-expanded={isActionsMenuOpen}
                   aria-label={t("groups.actions.menu")}
-                  className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                  className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-tone-white/15 bg-tone-white/[0.04] text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
                 >
                   <EllipsisVertical className="h-5 w-5" aria-hidden />
                 </button>
@@ -466,7 +466,7 @@ export default function PromiseGroupDetailPage() {
                   <div
                     ref={actionsMenuRef}
                     role="menu"
-                    className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                    className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-2 shadow-xl shadow-tone-black/50 backdrop-blur"
                   >
                     <button
                       type="button"
@@ -476,7 +476,7 @@ export default function PromiseGroupDetailPage() {
                         setIsActionsMenuOpen(false);
                       }}
                       disabled={deletingGroup}
-                      className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-semibold leading-none text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-semibold leading-none text-danger-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.action")}
                     </button>
@@ -484,34 +484,34 @@ export default function PromiseGroupDetailPage() {
                 )}
               </div>
             </div>
-            {group.description && <p className="mt-2 text-sm text-slate-300">{group.description}</p>}
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
-              <span className="rounded-full border border-white/15 px-3 py-1">
+            {group.description && <p className="mt-2 text-sm text-tone-300">{group.description}</p>}
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-tone-300">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.total", { count: rows.length })}
               </span>
-              <span className="rounded-full border border-white/15 px-3 py-1">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.awaitingAcceptance", { count: summary.awaiting_acceptance })}
               </span>
-              <span className="rounded-full border border-white/15 px-3 py-1">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.active", { count: summary.active })}
               </span>
-              <span className="rounded-full border border-white/15 px-3 py-1">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.awaitingReview", { count: summary.completed_by_promisor })}
               </span>
-              <span className="rounded-full border border-white/15 px-3 py-1">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.confirmed", { count: summary.confirmed })}
               </span>
-              <span className="rounded-full border border-white/15 px-3 py-1">
+              <span className="rounded-full border border-tone-white/15 px-3 py-1">
                 {t("groups.summary.disputed", { count: summary.disputed })}
               </span>
             </div>
           </header>
 
-          <section className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <h2 className="text-base font-semibold text-white">{t("groups.attachExisting.title")}</h2>
-            <p className="mt-1 text-xs text-slate-400">{t("groups.attachExisting.hint")}</p>
+          <section className="mt-4 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-5">
+            <h2 className="text-base font-semibold text-tone-white">{t("groups.attachExisting.title")}</h2>
+            <p className="mt-1 text-xs text-tone-400">{t("groups.attachExisting.hint")}</p>
             {attachableDeals.length === 0 ? (
-              <p className="mt-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+              <p className="mt-3 rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 text-sm text-tone-300">
                 {t("groups.attachExisting.empty")}
               </p>
             ) : (
@@ -523,13 +523,13 @@ export default function PromiseGroupDetailPage() {
                     onClick={() => setIsAttachMenuOpen((open) => !open)}
                     aria-haspopup="listbox"
                     aria-expanded={isAttachMenuOpen}
-                    className="inline-flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                    className="inline-flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-tone-white/15 bg-tone-white/[0.04] px-3 text-sm font-medium text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
                   >
                     <span className="truncate">
                       {activeAttachDealTitle || t("groups.attachExisting.selectPlaceholder")}
                     </span>
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-300 transition-transform ${isAttachMenuOpen ? "rotate-180" : ""}`}
+                      className={`h-4 w-4 text-tone-300 transition-transform ${isAttachMenuOpen ? "rotate-180" : ""}`}
                       aria-hidden
                     />
                   </button>
@@ -538,18 +538,18 @@ export default function PromiseGroupDetailPage() {
                     <div
                       ref={attachMenuRef}
                       role="listbox"
-                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-2 shadow-xl shadow-tone-black/50 backdrop-blur"
                     >
                       <input
                         type="text"
                         value={attachDealQuery}
                         onChange={(event) => setAttachDealQuery(event.target.value)}
                         placeholder={t("groups.attachExisting.searchPlaceholder")}
-                        className="mb-2 h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60"
+                        className="mb-2 h-10 w-full rounded-lg border border-tone-white/10 bg-tone-black/20 px-3 text-sm text-tone-white outline-none placeholder:text-tone-400 focus:border-accent-300/60"
                       />
                       <div className="max-h-56 overflow-y-auto">
                         {filteredAttachableDeals.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-slate-400">
+                          <div className="px-3 py-2 text-sm text-tone-400">
                             {t("groups.attachExisting.noMatches")}
                           </div>
                         ) : (
@@ -566,8 +566,8 @@ export default function PromiseGroupDetailPage() {
                                   setIsAttachMenuOpen(false);
                                 }}
                                 className={[
-                                  "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
-                                  selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
+                                  "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
+                                  selected ? "bg-emerald-400/90 text-slate-950" : "text-tone-100 hover:bg-tone-white/10",
                                 ].join(" ")}
                               >
                                 <span className="truncate">{deal.title}</span>
@@ -592,9 +592,9 @@ export default function PromiseGroupDetailPage() {
           </section>
 
           <section className="mt-6 space-y-3">
-            <h2 className="text-lg font-semibold text-white">{t("groups.dealsTitle")}</h2>
+            <h2 className="text-lg font-semibold text-tone-white">{t("groups.dealsTitle")}</h2>
             {rows.length === 0 ? (
-              <p className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">
+              <p className="rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 text-sm text-tone-300">
                 {t("groups.dealsEmpty")}
               </p>
             ) : (
@@ -603,14 +603,14 @@ export default function PromiseGroupDetailPage() {
                   const pill = statusPillFor(row.status, row.uiStatus);
                   return (
                     <li key={row.id}>
-                      <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5">
+                      <div className="rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 transition hover:border-accent-300/40 hover:bg-tone-white/5">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <LocalizedLink
                             href={`/promises/${row.id}?from=group&groupId=${groupId}`}
                             className="min-w-0 flex-1"
                           >
-                            <p className="truncate font-semibold text-white">{row.title}</p>
-                            <p className="mt-1 text-xs text-slate-400">
+                            <p className="truncate font-semibold text-tone-white">{row.title}</p>
+                            <p className="mt-1 text-xs text-tone-400">
                               {row.role === "promisor" ? t("groups.dealLine.iAmResponsible") : t("groups.dealLine.otherResponsible")}
                               {" • "}
                               {formatDealMeta({
@@ -635,7 +635,7 @@ export default function PromiseGroupDetailPage() {
                                 aria-haspopup="menu"
                                 aria-expanded={openDealActionsId === row.id}
                                 aria-label={t("groups.deals.menu")}
-                                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-white/5 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-tone-white/15 bg-tone-white/5 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
                               >
                                 <EllipsisVertical className="h-4 w-4" aria-hidden />
                               </button>
@@ -643,7 +643,7 @@ export default function PromiseGroupDetailPage() {
                                 <div
                                   ref={dealActionsMenuRef}
                                   role="menu"
-                                  className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-2 shadow-xl shadow-black/50 backdrop-blur"
+                                  className="absolute right-0 z-20 mt-2 w-max overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-2 shadow-xl shadow-tone-black/50 backdrop-blur"
                                 >
                                   <button
                                     type="button"
@@ -653,7 +653,7 @@ export default function PromiseGroupDetailPage() {
                                       void unlinkDealFromGroup(row.id);
                                     }}
                                     disabled={unlinkingDealId === row.id}
-                                    className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-medium leading-none text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-lg px-4 text-center text-sm font-medium leading-none text-tone-200 transition hover:bg-tone-white/10 disabled:cursor-not-allowed disabled:opacity-60"
                                   >
                                     {unlinkingDealId === row.id ? t("groups.deals.unlinking") : t("groups.deals.unlink")}
                                   </button>
@@ -674,11 +674,11 @@ export default function PromiseGroupDetailPage() {
                   type="button"
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
+                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-tone-white/5 sm:w-auto"
                 >
                   {loadingMore ? (
                     <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-tone-white/20 border-t-tone-white" />
                       {t("promises.list.loadingMore")}
                     </>
                   ) : (
@@ -692,22 +692,22 @@ export default function PromiseGroupDetailPage() {
       )}
 
       {showDeleteConfirm && group && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-950/80 p-4 backdrop-blur-sm">
           <button
             type="button"
             aria-label={t("groups.delete.cancel")}
             className="absolute inset-0"
             onClick={() => !deletingGroup && setShowDeleteConfirm(false)}
           />
-          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-black/60">
-            <h3 className="text-xl font-semibold text-white">{t("groups.delete.action")}</h3>
-            <p className="mt-3 text-sm text-neutral-200">{t("groups.delete.confirm", { title: group.title })}</p>
+          <div className="relative w-full max-w-md rounded-2xl border border-tone-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-tone-black/60">
+            <h3 className="text-xl font-semibold text-tone-white">{t("groups.delete.action")}</h3>
+            <p className="mt-3 text-sm text-ntone-200">{t("groups.delete.confirm", { title: group.title })}</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deletingGroup}
-                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("groups.delete.cancel")}
               </button>
@@ -715,7 +715,7 @@ export default function PromiseGroupDetailPage() {
                 type="button"
                 onClick={() => void deleteGroup()}
                 disabled={deletingGroup}
-                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-red-300/40 bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-danger-300/40 bg-red-500/15 px-4 py-2 text-sm font-semibold text-danger-100 transition hover:bg-red-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deletingGroup ? t("groups.delete.deleting") : t("groups.delete.confirmAction")}
               </button>

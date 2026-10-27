@@ -117,18 +117,18 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
         <div className="fixed inset-0 z-[10020] flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-tone-950/80 backdrop-blur-sm"
             onClick={() => setOpen(false)}
             aria-label={t("feedback.close")}
           />
 
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-4 shadow-2xl shadow-black/60 sm:p-5">
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-tone-white/10 bg-[var(--surface-popover)] p-4 shadow-2xl shadow-tone-black/60 sm:p-5">
             <div className="mb-4 flex items-start justify-between gap-3">
-              <h3 className="text-base font-semibold text-white">{t("feedback.title")}</h3>
+              <h3 className="text-base font-semibold text-tone-white">{t("feedback.title")}</h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="cursor-pointer rounded-lg border border-white/10 p-1.5 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-1.5 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
                 aria-label={t("feedback.close")}
               >
                 <X className="h-4 w-4" aria-hidden />
@@ -137,7 +137,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
 
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <span className="text-xs font-medium text-slate-200">{t("feedback.categoryLabel")}</span>
+                <span className="text-xs font-medium text-tone-200">{t("feedback.categoryLabel")}</span>
                 <div className="grid grid-cols-2 gap-2">
                   {FEEDBACK_CATEGORIES.map((item) => {
                     const active = category === item;
@@ -153,8 +153,8 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
                         onClick={() => setCategory(item)}
                         className={`cursor-pointer rounded-xl border px-3 py-2 text-left text-sm transition ${
                           active
-                            ? "border-emerald-300/60 bg-emerald-400/15 text-emerald-100 hover:bg-emerald-400/20"
-                            : "border-white/10 bg-white/[0.03] text-slate-200 hover:border-white/30 hover:bg-white/[0.06]"
+                            ? "border-accent-300/60 bg-emerald-400/15 text-accent-100 hover:bg-emerald-400/20"
+                            : "border-tone-white/10 bg-tone-white/[0.03] text-tone-200 hover:border-tone-white/30 hover:bg-tone-white/[0.06]"
                         }`}
                       >
                         {t(labelKey)}
@@ -165,22 +165,22 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
               </div>
 
               <label className="block space-y-1.5">
-                <span className="text-xs font-medium text-slate-200">{t("feedback.messageLabel")}</span>
+                <span className="text-xs font-medium text-tone-200">{t("feedback.messageLabel")}</span>
                 <textarea
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                   rows={4}
                   placeholder={t("feedback.messagePlaceholder")}
-                  className="w-full resize-y rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-400 focus:border-emerald-300/50"
+                  className="w-full resize-y rounded-xl border border-tone-white/10 bg-tone-white/[0.03] px-3 py-2 text-sm text-tone-white outline-none transition placeholder:text-tone-400 focus:border-accent-300/50"
                 />
               </label>
 
-              <label className="flex cursor-pointer items-start gap-2.5 text-xs text-slate-200">
+              <label className="flex cursor-pointer items-start gap-2.5 text-xs text-tone-200">
                 <span
                   className={`mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded border transition ${
                     allowContact
-                      ? "border-emerald-300/60 bg-emerald-400/80 text-slate-950"
-                      : "border-white/25 bg-white/[0.03] text-transparent"
+                      ? "border-accent-300/60 bg-emerald-400/80 text-slate-950"
+                      : "border-tone-white/25 bg-tone-white/[0.03] text-transparent"
                   }`}
                 >
                   <Check className="h-3 w-3" aria-hidden />
@@ -195,13 +195,13 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
               </label>
 
               {error && (
-                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                <div className="rounded-xl border border-danger-400/30 bg-red-500/10 px-3 py-2 text-xs text-danger-200">
                   {error}
                 </div>
               )}
 
               {success ? (
-                <div className="rounded-xl border border-emerald-300/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+                <div className="rounded-xl border border-accent-300/30 bg-emerald-500/10 px-3 py-2 text-sm text-accent-200">
                   {t("feedback.success")}
                 </div>
               ) : (
@@ -209,7 +209,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-200 transition hover:border-white/30"
+                    className="cursor-pointer rounded-xl border border-tone-white/10 px-3 py-2 text-sm text-tone-200 transition hover:border-tone-white/30"
                     disabled={submitting}
                   >
                     {t("feedback.cancel")}
@@ -217,7 +217,7 @@ export function FeedbackModalTrigger({ triggerLabel, triggerClassName = "" }: Fe
                   <button
                     type="button"
                     onClick={submitFeedback}
-                    className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-emerald-400/40 disabled:text-slate-800 disabled:opacity-80"
+                    className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-emerald-400/40 disabled:text-tone-800 disabled:opacity-80"
                     disabled={!canSubmit}
                   >
                     {submitting ? t("feedback.sending") : t("feedback.submit")}

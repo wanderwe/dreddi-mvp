@@ -309,13 +309,13 @@ export default function NotificationsClient() {
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+          <p className="text-xs uppercase tracking-[0.3em] text-accent-200">
             {t("notifications.header.eyebrow")}
           </p>
-          <h1 className="text-3xl font-semibold text-white">
+          <h1 className="text-3xl font-semibold text-tone-white">
             {t("notifications.header.title")}
           </h1>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="mt-2 text-sm text-tone-300">
             {t("notifications.header.subtitle")}
           </p>
         </div>
@@ -324,7 +324,7 @@ export default function NotificationsClient() {
             type="button"
             onClick={() => void markAllAsRead()}
             disabled={markingAll}
-            className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
+            className="min-h-12 w-full cursor-pointer rounded-xl border border-tone-white/10 px-4 py-2 text-xs font-semibold text-tone-100 transition hover:border-accent-300/40 hover:text-accent-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-h-0 sm:w-auto sm:rounded-full"
           >
             {t("notifications.markAllRead")}
           </button>
@@ -332,18 +332,18 @@ export default function NotificationsClient() {
       </div>
 
       {loading ? (
-        <div className="text-sm text-slate-300">{t("notifications.loading")}</div>
+        <div className="text-sm text-tone-300">{t("notifications.loading")}</div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="rounded-2xl border border-danger-500/30 bg-red-500/10 px-4 py-3 text-sm text-danger-200">
           {error}
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-slate-300">
+        <div className="rounded-2xl border border-tone-white/10 bg-tone-white/5 px-4 py-6 text-center text-sm text-tone-300">
           {t("notifications.empty")}
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="space-y-2 divide-y divide-white/10">
+          <div className="space-y-2 divide-y divide-tone-white/10">
             {rows.map((row) => {
               const unread = !row.read_at;
               const ctaUrl = row.cta_url ?? "/promises";
@@ -362,8 +362,8 @@ export default function NotificationsClient() {
                   key={row.id}
                   className={`rounded-2xl border px-4 py-4 transition min-h-14 ${
                     unread
-                      ? "border-emerald-400/40 bg-emerald-500/10"
-                      : "border-white/10 bg-white/5"
+                      ? "border-accent-400/40 bg-emerald-500/10"
+                      : "border-tone-white/10 bg-tone-white/5"
                   }`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -375,13 +375,13 @@ export default function NotificationsClient() {
                         aria-hidden
                       />
                       <div className="space-y-1">
-                        <div className="text-sm font-semibold text-white">
+                        <div className="text-sm font-semibold text-tone-white">
                           {stripTrailingPeriod(title)}
                         </div>
-                        <p className="text-sm text-slate-200">
+                        <p className="text-sm text-tone-200">
                           {stripTrailingPeriod(description)}
                         </p>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-tone-400">
                           {formatDate(row.created_at)}
                         </div>
                       </div>
@@ -391,7 +391,7 @@ export default function NotificationsClient() {
                         <LocalizedLink
                           href={ctaUrl}
                           onClick={() => unread && void markAsRead(row.id)}
-                          className="flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-center text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:inline-flex sm:min-h-0 sm:w-auto sm:rounded-full"
+                          className="flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-tone-white/10 px-3 py-2 text-center text-xs font-semibold text-tone-100 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:inline-flex sm:min-h-0 sm:w-auto sm:rounded-full"
                         >
                           {ctaLabel}
                         </LocalizedLink>
@@ -400,7 +400,7 @@ export default function NotificationsClient() {
                         <button
                           type="button"
                           onClick={() => void markAsRead(row.id)}
-                          className="inline-flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-transparent px-3 py-2 text-center text-xs text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-none"
+                          className="inline-flex min-h-12 w-full items-center justify-center cursor-pointer rounded-xl border border-transparent px-3 py-2 text-center text-xs text-accent-200 transition hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-h-0 sm:w-auto sm:rounded-none"
                         >
                           {t("notifications.markRead")}
                         </button>
@@ -417,7 +417,7 @@ export default function NotificationsClient() {
                 type="button"
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="min-h-12 w-full cursor-pointer rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/40 hover:text-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-h-0 sm:w-auto sm:rounded-full"
+                className="min-h-12 w-full cursor-pointer rounded-xl border border-tone-white/10 px-4 py-2 text-xs font-semibold text-tone-100 transition hover:border-accent-300/40 hover:text-accent-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-h-0 sm:w-auto sm:rounded-full"
               >
                 {loadingMore ? t("notifications.loading") : t("notifications.loadMore")}
               </button>

@@ -42,14 +42,14 @@ const PLATFORMS: PlatformConfig[] = [
     id: "linkedin",
     provider: "linkedin_oidc",
     label: "LinkedIn",
-    color: "text-blue-400",
+    color: "text-azure-400",
     icon: <LinkedInIcon />,
   },
   {
     id: "twitter",
     provider: "twitter",
     label: "Twitter / X",
-    color: "text-sky-300",
+    color: "text-info-300",
     icon: <TwitterIcon />,
     usernamePrefix: "@",
   },
@@ -228,7 +228,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
   return (
     <div className="space-y-3">
       {error && (
-        <p className="text-xs text-red-300">{error}</p>
+        <p className="text-xs text-danger-300">{error}</p>
       )}
       {PLATFORMS.map((platform) => {
         const linked = links.find((l) => l.platform === platform.id);
@@ -240,13 +240,13 @@ export function SocialLinksSection({ onUpdate }: Props) {
         return (
           <div
             key={platform.id}
-            className="rounded-xl border border-white/10 bg-white/5"
+            className="rounded-xl border border-tone-white/10 bg-tone-white/5"
           >
             <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <span className={platform.color}>{platform.icon}</span>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-white">{platform.label}</p>
+                <p className="text-sm font-medium text-tone-white">{platform.label}</p>
                 {linked ? (
                   (() => {
                     const label = linked.username
@@ -260,16 +260,16 @@ export function SocialLinksSection({ onUpdate }: Props) {
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-emerald-300 underline-offset-2 hover:underline"
+                        className="text-xs text-accent-300 underline-offset-2 hover:underline"
                       >
                         {label}
                       </a>
                     ) : (
-                      <p className="text-xs text-emerald-300">{label}</p>
+                      <p className="text-xs text-accent-300">{label}</p>
                     );
                   })()
                 ) : (
-                  <p className="text-xs text-white/40">{t("profileSettings.social.notConnected")}</p>
+                  <p className="text-xs text-tone-white/40">{t("profileSettings.social.notConnected")}</p>
                 )}
               </div>
             </div>
@@ -280,7 +280,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                   <button
                     type="button"
                     onClick={() => setConfirmDisconnect(null)}
-                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/50 transition hover:text-white sm:flex-none"
+                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-tone-white/10 bg-tone-white/5 px-2.5 py-1.5 text-xs font-medium text-tone-white/50 transition hover:text-tone-white sm:flex-none"
                   >
                     {t("profileSettings.social.cancel")}
                   </button>
@@ -288,7 +288,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                     type="button"
                     disabled={isBusy}
                     onClick={() => { setConfirmDisconnect(null); void handleDisconnect(platform.id); }}
-                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-red-400/40 bg-red-500/15 px-2.5 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                    className="flex-1 cursor-pointer whitespace-nowrap rounded-lg border border-danger-400/40 bg-red-500/15 px-2.5 py-1.5 text-xs font-medium text-danger-300 transition hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                   >
                     {isBusy ? "…" : t("profileSettings.social.confirmDisconnect")}
                   </button>
@@ -298,7 +298,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                 type="button"
                 disabled={isBusy}
                 onClick={() => setConfirmDisconnect(platform.id)}
-                className="shrink-0 cursor-pointer self-end rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                className="shrink-0 cursor-pointer self-end rounded-lg border border-tone-white/10 bg-tone-white/5 px-3 py-1.5 text-xs font-medium text-tone-white/60 transition hover:border-danger-400/30 hover:bg-red-500/10 hover:text-danger-300 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
               >
                 {t("profileSettings.social.disconnect")}
               </button>
@@ -308,7 +308,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                 type="button"
                 disabled={isBusy}
                 onClick={() => void handleConnect(platform)}
-                className="shrink-0 cursor-pointer self-end rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition hover:border-emerald-300/50 hover:bg-emerald-500/18 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
+                className="shrink-0 cursor-pointer self-end rounded-lg border border-accent-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-accent-200 transition hover:border-accent-300/50 hover:bg-emerald-500/18 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
               >
                 {isBusy ? "…" : t("profileSettings.social.connect")}
               </button>
@@ -317,8 +317,8 @@ export function SocialLinksSection({ onUpdate }: Props) {
 
             {/* Optional LinkedIn profile URL — appears after connecting */}
             {showUrlField && (
-              <div className="border-t border-white/10 px-4 pb-3 pt-2">
-                <div className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/20 px-3 py-1.5 focus-within:border-blue-400/40 focus-within:ring-1 focus-within:ring-blue-400/30">
+              <div className="border-t border-tone-white/10 px-4 pb-3 pt-2">
+                <div className="flex items-center gap-1.5 rounded-lg border border-tone-white/10 bg-tone-black/20 px-3 py-1.5 focus-within:border-azure-400/40 focus-within:ring-1 focus-within:ring-azure-400/30">
                   <input
                     type="url"
                     value={urlInput}
@@ -328,10 +328,10 @@ export function SocialLinksSection({ onUpdate }: Props) {
                     onBlur={() => void saveProfileUrl(platform.id, urlInput)}
                     onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
                     placeholder="linkedin.com/in/your-username"
-                    className="min-w-0 flex-1 bg-transparent text-xs text-white/80 placeholder:text-white/25 focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-xs text-tone-white/80 placeholder:text-tone-white/25 focus:outline-none"
                   />
                   <Tooltip label={t("profileSettings.social.linkedinUrlLabel")} placement="top" tooltipClassName="!z-[99999]">
-                    <span className="cursor-default text-white/30 hover:text-white/60 transition">
+                    <span className="cursor-default text-tone-white/30 hover:text-tone-white/60 transition">
                       <Info className="h-3.5 w-3.5" />
                     </span>
                   </Tooltip>

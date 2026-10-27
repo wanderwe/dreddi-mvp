@@ -434,7 +434,7 @@ export default function InvitePage() {
                           type="button"
                           onClick={() => void copyInviteLink()}
                           aria-label={t("invite.creatorShare.copyInviteLink")}
-                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-tone-white/20 bg-tone-white/5 text-tone-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                          className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-tone-white/20 bg-tone-white/5 text-tone-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
                         >
                           <Copy className="h-4 w-4" aria-hidden />
                         </button>
@@ -620,7 +620,7 @@ export default function InvitePage() {
                         type="button"
                         aria-label={openDealLabel}
                         onClick={() => router.push(localizePath(`/promises/${info.id}`, locale))}
-                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-tone-white/20 bg-tone-white/5 text-accent-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-tone-white/20 bg-tone-white/5 text-accent-100 transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
                       >
                         <ExternalLink className="h-5 w-5" aria-hidden />
                       </button>
@@ -679,18 +679,18 @@ export default function InvitePage() {
 
       {showDeclineModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-neutral-900 p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-tone-white">
               {t("invite.declineModal.title")}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("invite.declineModal.body")}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setShowDeclineModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("invite.declineModal.cancel")}
               </button>
@@ -700,7 +700,7 @@ export default function InvitePage() {
                   setShowDeclineModal(false);
                   void decline();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-tone-white shadow-lg shadow-danger-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-tone-white shadow-lg shadow-danger-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("invite.declineModal.confirm")}
               </button>
@@ -711,11 +711,11 @@ export default function InvitePage() {
 
       {showAcceptModal && info && !inviteAccepted && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p4">
-          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-neutral-900 p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
             <h2 className="text-xl font-semibold text-tone-white">
               {t("invite.publicModal.title", { entityLower: promiseLabels.entityLower })}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("invite.publicModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
@@ -723,7 +723,7 @@ export default function InvitePage() {
               <button
                 type="button"
                 onClick={() => setShowAcceptModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("invite.publicModal.cancel")}
               </button>
@@ -733,7 +733,7 @@ export default function InvitePage() {
                   setShowAcceptModal(false);
                   await accept();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("invite.publicModal.confirm")}
               </button>

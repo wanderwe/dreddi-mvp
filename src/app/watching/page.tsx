@@ -108,22 +108,22 @@ export default function WatchingPage() {
     <main className="relative py-6">
       <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
         <div className="px-1 py-1">
-          <h1 className="text-2xl font-semibold text-white">{t("watching.title")}</h1>
-          <p className="mt-1 text-sm text-slate-300">{t("watching.subtitle")}</p>
+          <h1 className="text-2xl font-semibold text-tone-white">{t("watching.title")}</h1>
+          <p className="mt-1 text-sm text-tone-300">{t("watching.subtitle")}</p>
         </div>
-        {error && <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
+        {error && <div className="rounded-xl border border-danger-400/30 bg-red-500/10 p-3 text-sm text-danger-200">{error}</div>}
         <div className="space-y-3">
-          {loading && [1, 2, 3].map((i) => <div key={i} className="h-[92px] animate-pulse rounded-2xl bg-white/5" />)}
+          {loading && [1, 2, 3].map((i) => <div key={i} className="h-[92px] animate-pulse rounded-2xl bg-tone-white/5" />)}
           {!loading && rows.map((p) => (
-            <LocalizedLink key={p.id} href={`/p/agreements/${p.id}`} className="block rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5">
-              <div className="text-lg font-semibold text-white">{p.title}</div>
-              <div className="mt-1 text-xs text-slate-400">{t("watching.status")}: {statusLabel(p)}</div>
-              {p.due_at && <div className="mt-1 text-xs text-slate-400">{t("watching.deadline")}: {new Date(p.due_at).toLocaleDateString(locale)}</div>}
+            <LocalizedLink key={p.id} href={`/p/agreements/${p.id}`} className="block rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5">
+              <div className="text-lg font-semibold text-tone-white">{p.title}</div>
+              <div className="mt-1 text-xs text-tone-400">{t("watching.status")}: {statusLabel(p)}</div>
+              {p.due_at && <div className="mt-1 text-xs text-tone-400">{t("watching.deadline")}: {new Date(p.due_at).toLocaleDateString(locale)}</div>}
             </LocalizedLink>
           ))}
           {!loading && rows.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
-              <p className="text-lg font-semibold text-white">{t("promises.empty.watchingTitle")}</p>
+            <div className="rounded-2xl border border-dashed border-tone-white/20 bg-tone-white/5 p-6 text-center text-tone-300">
+              <p className="text-lg font-semibold text-tone-white">{t("promises.empty.watchingTitle")}</p>
             </div>
           )}
           {!loading && rows.length > 0 && hasMore && (
@@ -132,7 +132,7 @@ export default function WatchingPage() {
                 type="button"
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/40 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-xl border border-tone-white/20 bg-tone-white/10 px-4 py-2 text-sm font-medium text-tone-white transition hover:border-accent-300/40 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loadingMore ? t("watching.loadingMore") : t("watching.loadMore")}
               </button>

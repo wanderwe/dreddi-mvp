@@ -5,18 +5,21 @@
 //   node scripts/theme-codemod.mjs [--dry] <file> [<file> ...]
 //
 // Rules:
-// - slate-*, white, black -> tone-* (any property). Exception: text-slate-950 stays — it is the
-//   dark text on solid emerald buttons and must remain dark in both themes.
+// - slate-*, white, black -> tone-*; neutral-* -> ntone-* (any property). Exception: text-slate-950
+//   stays — it is the dark text on solid emerald buttons and must remain dark in both themes.
 // - emerald-* -> accent-*, red-* -> danger-*, rose-* -> alert-*, amber-* -> warn-*, sky-* -> info-*,
-//   for every property except bg-*: solid buttons and tinted backgrounds read fine on both themes.
+//   cyan-* -> aqua-*, blue-* -> azure-*, for every property except bg-*: solid buttons and tinted
+//   backgrounds read fine on both themes.
 // Variant prefixes (hover:, sm:, ...) and opacity modifiers (/10, /[0.03]) are kept as written.
+// After running: switch knobs (`rounded-full bg-white shadow` + translate-x) must stay white in both
+// themes — change their `bg-tone-white` back to `bg-white` by hand.
 import fs from "node:fs";
 
-const RAMPS = { emerald: "accent", red: "danger", rose: "alert", amber: "warn", sky: "info" };
+const RAMPS = { emerald: "accent", red: "danger", rose: "alert", amber: "warn", sky: "info", cyan: "aqua", blue: "azure" };
 const PROPS =
   "bg|text|border(?:-[trblxy])?|from|via|to|ring|ring-offset|fill|stroke|shadow|divide|outline|placeholder|decoration|caret";
 const CLASS = new RegExp(
-  `(?<![\\w-])((?:[a-z0-9-]+:)*)(${PROPS})-(white|black|slate|emerald|red|rose|amber|sky)((?:-\\d{2,3})?)((?:\\/\\[?[\\d.]+\\]?)?)(?![\\w-])`,
+  `(?<![\\w-])((?:[a-z0-9-]+:)*)(${PROPS})-(white|black|slate|neutral|emerald|red|rose|amber|sky|cyan|blue)((?:-\\d{2,3})?)((?:\\/\\[?[\\d.]+\\]?)?)(?![\\w-])`,
   "g",
 );
 
@@ -28,6 +31,8 @@ export function rewrite(source) {
     else if (color === "slate") {
       if (prop === "text" && shade === "-950") return match;
       next = `tone${shade}`;
+    } else if (color === "neutral") {
+      next = `ntone${shade}`;
     } else {
       if (prop === "bg") return match;
       next = `${RAMPS[color]}${shade}`;

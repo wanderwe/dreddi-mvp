@@ -415,28 +415,28 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     <div className={`flex min-h-0 flex-col ${className}`}>
       {showTitle && (
         <div className="space-y-1">
-          <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+          <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
             {t("profileSettings.sectionLabel")}
           </div>
-          <h2 className="text-lg font-semibold text-white">{t("profileSettings.title")}</h2>
+          <h2 className="text-lg font-semibold text-tone-white">{t("profileSettings.title")}</h2>
         </div>
       )}
 
       <div className="mt-4 flex min-h-0 flex-col gap-4">
-        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+        <div className="border-t border-tone-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-tone-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("identity")}
             aria-expanded={openSection === "identity"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-tone-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:bg-tone-white/10 sm:px-4"
           >
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-tone-white">
                 {t("profileSettings.identityLabel")}
               </div>
             </div>
             <ChevronDown
-              className={`h-4 w-4 text-slate-200 transition ${
+              className={`h-4 w-4 text-tone-200 transition ${
                 openSection === "identity" ? "rotate-180" : ""
               }`}
               aria-hidden
@@ -453,16 +453,16 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-3 pt-3">
-                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-tone-white/10 sm:bg-tone-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label
                         htmlFor="profile-display-name"
-                        className="text-sm font-medium text-white"
+                        className="text-sm font-medium text-tone-white"
                       >
                         {t("profileSettings.displayNameLabel")}
                       </label>
-                      <div className="mt-1 flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                      <div className="mt-1 flex min-w-0 items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-black/30 px-3 py-2 text-sm text-tone-white focus-within:ring-2 focus-within:ring-accent-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--surface-popover)]">
                         <input
                           id="profile-display-name"
                           type="text"
@@ -472,14 +472,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
                           placeholder={t("profileSettings.displayNamePlaceholder")}
                           maxLength={40}
-                          className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                          className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                         />
                         {displayNameInput.length > 0 && (
                           <button
                             type="button"
                             onClick={() => setDisplayNameInput("")}
                             aria-label={t("profileSettings.close")}
-                            className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-within:ring-emerald-300/40"
+                            className="cursor-pointer rounded-full p-1 text-tone-400 transition hover:bg-tone-white/10 hover:text-tone-white focus-visible:outline-none focus-visible:ring-2 focus-within:ring-accent-300/40"
                           >
                             <X className="h-3.5 w-3.5" aria-hidden />
                           </button>
@@ -490,12 +490,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                     <div className="space-y-2">
                       <label
                         htmlFor="profile-handle"
-                        className="text-sm font-medium text-white"
+                        className="text-sm font-medium text-tone-white"
                       >
                         {t("profileSettings.handleLabel")}
                       </label>
-                      <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
-                        <span className="text-slate-400">@</span>
+                      <div className="mt-1 flex items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-black/30 px-3 py-2 text-sm text-tone-white focus-within:ring-2 focus-within:ring-accent-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--surface-popover)]">
+                        <span className="text-tone-400">@</span>
                         <input
                           id="profile-handle"
                           type="text"
@@ -504,12 +504,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
                           onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
                           placeholder={t("profileSettings.handlePlaceholder")}
-                          className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                          className="w-full bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                         />
                       </div>
                       <HelperText>{t("profileSettings.handleHelper")}</HelperText>
                       {(displayNameTooShort || displayNameTooLong || handleMissing) && (
-                        <HelperText className="text-red-200">
+                        <HelperText className="text-danger-200">
                           {displayNameTooShort || displayNameTooLong
                             ? t("profileSettings.displayNameError")
                             : t("profileSettings.handleError")}
@@ -519,15 +519,15 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-tone-white/10 sm:bg-tone-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-sm font-medium text-tone-white">
                           {t("profileSettings.publicLinkLabel")}
                         </div>
                         {publicProfilePath ? (
-                          <div className="mt-1 flex items-center gap-1 rounded-xl border border-white/10 bg-black/30 pl-3 pr-1.5 py-2">
-                            <span className="min-w-0 flex-1 truncate text-sm text-white/70">
+                          <div className="mt-1 flex items-center gap-1 rounded-xl border border-tone-white/10 bg-tone-black/30 pl-3 pr-1.5 py-2">
+                            <span className="min-w-0 flex-1 truncate text-sm text-tone-white/70">
                               {publicProfileUrl}
                             </span>
                             <div className="flex shrink-0 items-center gap-1">
@@ -536,7 +536,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                   href={publicProfilePath}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40"
+                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-tone-white/50 transition hover:bg-tone-white/10 hover:text-tone-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-300/40"
                                   aria-label={t("profileSettings.viewPublicProfile")}
                                 >
                                   <ExternalLink className="h-3.5 w-3.5" />
@@ -546,11 +546,11 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 <button
                                   type="button"
                                   onClick={handleCopyLink}
-                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-300/40"
+                                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded text-tone-white/50 transition hover:bg-tone-white/10 hover:text-tone-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-300/40"
                                   aria-label={t("profileSettings.copyLink")}
                                 >
                                   {copied
-                                    ? <Check className="h-3.5 w-3.5 text-emerald-400" />
+                                    ? <Check className="h-3.5 w-3.5 text-accent-400" />
                                     : <Copy className="h-3.5 w-3.5" />}
                                 </button>
                               </Tooltip>
@@ -558,7 +558,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           </div>
                         ) : null}
                         {loading && (
-                          <HelperText className="text-slate-400">
+                          <HelperText className="text-tone-400">
                             {t("profileSettings.loading")}
                           </HelperText>
                         )}
@@ -568,10 +568,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             : t("profileSettings.publicLinkDescription")}
                         </HelperText>
                       </div>
-                    <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                    <div className="border-t border-tone-white/10 pt-3 sm:rounded-xl sm:border sm:bg-tone-white/[0.03] sm:px-3 sm:py-2">
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                         <div className="space-y-1">
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-tone-white">
                             {t("profileSettings.publicLabel")}
                           </div>
                           <HelperText>
@@ -588,12 +588,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             disabled={loading || saving || !profile}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                               publicProfileEnabled
-                                ? "border-emerald-300/50 bg-emerald-400/70"
-                                : "border-white/20 bg-white/10"
+                                ? "border-accent-300/50 bg-emerald-400/70"
+                                : "border-tone-white/20 bg-tone-white/10"
                             } ${
                               loading || saving || !profile
                                 ? "cursor-not-allowed opacity-60"
-                                : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                                : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                             }`}
                           >
                             <span
@@ -606,10 +606,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       </div>
                     </div>
                     {COMMITMENTS_ENABLED ? (
-                      <div className="border-t border-white/10 pt-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                      <div className="border-t border-tone-white/10 pt-3 sm:rounded-xl sm:border sm:bg-tone-white/[0.03] sm:px-3 sm:py-2">
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                           <div className="space-y-1">
-                            <div className="text-sm font-semibold text-white">
+                            <div className="text-sm font-semibold text-tone-white">
                               {t("profileSettings.goalsStatsScopeLabel")}
                             </div>
                             <HelperText>
@@ -631,12 +631,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                               disabled={loading || saving || !profile}
                               className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                                 profile?.goalsStatsScope === "all"
-                                  ? "border-emerald-300/50 bg-emerald-400/70"
-                                  : "border-white/20 bg-white/10"
+                                  ? "border-accent-300/50 bg-emerald-400/70"
+                                  : "border-tone-white/20 bg-tone-white/10"
                               } ${
                                 loading || saving || !profile
                                   ? "cursor-not-allowed opacity-60"
-                                  : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                                  : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                               }`}
                             >
                               <span
@@ -657,20 +657,20 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         </div>
 
-        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+        <div className="border-t border-tone-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-tone-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("domains")}
             aria-expanded={openSection === "domains"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-tone-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:bg-tone-white/10 sm:px-4"
           >
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-tone-white">
                 {t("profileSettings.domainsLabel")}
               </div>
             </div>
             <ChevronDown
-              className={`h-4 w-4 text-slate-200 transition ${
+              className={`h-4 w-4 text-tone-200 transition ${
                 openSection === "domains" ? "rotate-180" : ""
               }`}
               aria-hidden
@@ -687,10 +687,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-3 pt-3">
-                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-white/10 sm:bg-white/5 sm:px-4 sm:py-3">
+                <div className="px-0 py-0 sm:rounded-2xl sm:border sm:border-tone-white/10 sm:bg-tone-white/5 sm:px-4 sm:py-3">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-tone-white">
                         {t("profileSettings.tagsLabel")}
                       </div>
                       <div className="space-y-3">
@@ -699,13 +699,13 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                             <span
                               key={tag}
                               tabIndex={0}
-                              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-slate-200/90 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                              className="inline-flex items-center gap-1 rounded-full border border-tone-white/15 bg-tone-white/5 px-2.5 py-0.5 text-[11px] font-medium text-tone-200/90 transition hover:border-tone-white/30 hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
                             >
                               {tag}
                               <button
                                 type="button"
                                 onClick={() => removeTag(tag)}
-                                className="cursor-pointer rounded-full p-0.5 text-white/60 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+                                className="cursor-pointer rounded-full p-0.5 text-tone-white/60 transition hover:bg-tone-white/10 hover:text-tone-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
                                 aria-label={t("profileSettings.tagsRemove", { tag })}
                               >
                                 <X className="h-3 w-3" aria-hidden />
@@ -718,7 +718,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         </div>
                         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                           <div className="min-w-0">
-                            <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-emerald-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0b0f1a]">
+                            <div className="flex min-w-0 items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-black/30 px-3 py-2 text-sm text-tone-white focus-within:ring-2 focus-within:ring-accent-300/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--surface-popover)]">
                               <input
                                 type="text"
                                 value={profileTagsInput}
@@ -734,7 +734,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 }}
                                 onBlur={() => addTagsFromInput(profileTagsInput)}
                                 placeholder={t("profileSettings.tagsPlaceholder")}
-                                className="w-full min-w-0 bg-transparent text-base text-white placeholder:text-slate-500 focus-visible:outline-none md:text-sm"
+                                className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                               />
                               {profileTagsInput.trim().length > 0 && (
                                 <button
@@ -742,7 +742,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                   onMouseDown={(event) => event.preventDefault()}
                                   onClick={() => setProfileTagsInput("")}
                                   aria-label={t("profileSettings.tagsClear")}
-                                  className="cursor-pointer rounded-full p-1 text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                                  className="cursor-pointer rounded-full p-1 text-tone-400 transition hover:bg-tone-white/10 hover:text-tone-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40"
                                 >
                                   <X className="h-3.5 w-3.5" aria-hidden />
                                 </button>
@@ -759,7 +759,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           })}
                         </HelperText>
                         {tagsError && (
-                          <HelperText className="text-red-200">{tagsError}</HelperText>
+                          <HelperText className="text-danger-200">{tagsError}</HelperText>
                         )}
                       </div>
                     </div>
@@ -771,20 +771,20 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         </div>
 
         {/* ── Social verification ─────────────────────────────── */}
-        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+        <div className="border-t border-tone-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-tone-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("social")}
             aria-expanded={openSection === "social"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-tone-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:bg-tone-white/10 sm:px-4"
           >
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-tone-white">
                 {t("profileSettings.socialLabel")}
               </div>
             </div>
             <ChevronDown
-              className={`h-4 w-4 shrink-0 text-slate-200 transition-transform ${
+              className={`h-4 w-4 shrink-0 text-tone-200 transition-transform ${
                 openSection === "social" ? "rotate-180" : ""
               }`}
             />
@@ -806,20 +806,20 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         </div>
 
-        <div className="border-t border-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-white/5">
+        <div className="border-t border-tone-white/10 bg-transparent sm:rounded-2xl sm:border sm:bg-tone-white/5">
           <button
             type="button"
             onClick={() => setOpenSection("notifications")}
             aria-expanded={openSection === "notifications"}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:bg-white/10 sm:px-4"
+            className="flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left transition hover:bg-tone-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:bg-tone-white/10 sm:px-4"
           >
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-tone-white">
                 {t("profileSettings.notificationsLabel")}
               </div>
             </div>
             <ChevronDown
-              className={`h-4 w-4 text-slate-200 transition ${
+              className={`h-4 w-4 text-tone-200 transition ${
                 openSection === "notifications" ? "rotate-180" : ""
               }`}
               aria-hidden
@@ -836,10 +836,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }`}
             >
               <div className="space-y-4 pt-3">
-                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                <div className="border-t border-tone-white/10 py-3 sm:rounded-xl sm:border sm:bg-tone-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-tone-white">
                         {t("profileSettings.pushLabel")}
                       </div>
                       <HelperText>{t("profileSettings.pushDescription")}</HelperText>
@@ -853,12 +853,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         disabled={loading || saving || !profile}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                           profile?.pushEnabled
-                            ? "border-emerald-300/50 bg-emerald-400/70"
-                            : "border-white/20 bg-white/10"
+                            ? "border-accent-300/50 bg-emerald-400/70"
+                            : "border-tone-white/20 bg-tone-white/10"
                         } ${
                           loading || saving || !profile
                             ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                            : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                           }`}
                       >
                         <span
@@ -871,10 +871,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                <div className="border-t border-tone-white/10 py-3 sm:rounded-xl sm:border sm:bg-tone-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-tone-white">
                         {t("profileSettings.deadlineLabel")}
                       </div>
                       <HelperText>{t("profileSettings.deadlineDescription")}</HelperText>
@@ -888,12 +888,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         disabled={loading || saving || !profile}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                           profile?.deadlineRemindersEnabled
-                            ? "border-emerald-300/50 bg-emerald-400/70"
-                            : "border-white/20 bg-white/10"
+                            ? "border-accent-300/50 bg-emerald-400/70"
+                            : "border-tone-white/20 bg-tone-white/10"
                         } ${
                           loading || saving || !profile
                             ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                            : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                           }`}
                       >
                         <span
@@ -906,10 +906,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 py-3 sm:rounded-xl sm:border sm:bg-white/[0.03] sm:px-3 sm:py-2">
+                <div className="border-t border-tone-white/10 py-3 sm:rounded-xl sm:border sm:bg-tone-white/[0.03] sm:px-3 sm:py-2">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-tone-white">
                         {t("profileSettings.emailLabel")}
                       </div>
                       <HelperText>{t("profileSettings.emailDescription")}</HelperText>
@@ -923,12 +923,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         disabled={emailToggleDisabled}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
                             emailToggleChecked
-                              ? "border-emerald-300/50 bg-emerald-400/70"
-                              : "border-white/20 bg-white/10"
+                              ? "border-accent-300/50 bg-emerald-400/70"
+                              : "border-tone-white/20 bg-tone-white/10"
                           } ${
                             emailToggleDisabled
                               ? "cursor-not-allowed opacity-60"
-                              : "cursor-pointer hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                              : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                           }`}
                       >
                         <span
@@ -949,14 +949,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         {LIGHT_THEME_ENABLED && <ThemeSettingRow />}
 
         {error && (
-          <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+          <div className="rounded-xl border border-danger-400/30 bg-red-500/10 px-3 py-2 text-xs text-danger-200">
             {error}
           </div>
         )}
 
-        <div className="mt-4 border-t border-white/10 pt-4 pb-3">
+        <div className="mt-4 border-t border-tone-white/10 pt-4 pb-3">
           <FeedbackModalTrigger
-            triggerClassName="w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+            triggerClassName="w-full cursor-pointer rounded-xl border border-tone-white/10 px-3 py-2 text-sm font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
           />
 
           <button
@@ -983,12 +983,12 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                 );
               }
             }}
-            className="mt-3 w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+            className="mt-3 w-full cursor-pointer rounded-xl border border-tone-white/10 px-3 py-2 text-sm font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
           >
             {t("nav.logout")}
           </button>
           {logoutError && (
-            <div className="mt-2 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+            <div className="mt-2 rounded-xl border border-danger-400/30 bg-red-500/10 px-3 py-2 text-xs text-danger-200">
               {logoutError}
             </div>
           )}
@@ -1005,10 +1005,10 @@ function ThemeSettingRow() {
   const isDark = theme === "dark";
 
   return (
-    <div className="border-t border-white/10 bg-transparent py-3 sm:rounded-2xl sm:border sm:bg-white/5 sm:px-4">
+    <div className="border-t border-tone-white/10 bg-transparent py-3 sm:rounded-2xl sm:border sm:bg-tone-white/5 sm:px-4">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="space-y-1">
-          <div className="text-sm font-semibold text-white">{t("profileSettings.darkThemeLabel")}</div>
+          <div className="text-sm font-semibold text-tone-white">{t("profileSettings.darkThemeLabel")}</div>
           <HelperText>{t("profileSettings.darkThemeDescription")}</HelperText>
         </div>
         <div className="flex justify-end self-center">
@@ -1018,8 +1018,8 @@ function ThemeSettingRow() {
             aria-checked={isDark}
             aria-label={t("profileSettings.darkThemeLabel")}
             onClick={toggle}
-            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full border transition hover:border-emerald-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] ${
-              isDark ? "border-emerald-300/50 bg-emerald-400/70" : "border-white/20 bg-white/10"
+            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full border transition hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98] ${
+              isDark ? "border-accent-300/50 bg-emerald-400/70" : "border-tone-white/20 bg-tone-white/10"
             }`}
           >
             <span
@@ -1059,7 +1059,7 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
         <SheetTrigger asChild>
           <button
             type="button"
-            className={`w-full cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-left text-white transition hover:border-emerald-300/50 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98] ${className}`}
+            className={`w-full cursor-pointer rounded-xl border border-tone-white/10 px-3 py-2 text-left text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98] ${className}`}
           >
             {t("profileSettings.buttonLabel")}
           </button>
@@ -1067,18 +1067,18 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
       )}
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-black/60 overflow-y-auto pb-[max(env(safe-area-inset-bottom),1rem)]">
+        <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-tone-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-tone-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-tone-black/60 overflow-y-auto pb-[max(env(safe-area-inset-bottom),1rem)]">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <div className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+              <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
                 {t("profileSettings.sectionLabel")}
               </div>
-              <h2 className="text-lg font-semibold text-white">{t("profileSettings.title")}</h2>
+              <h2 className="text-lg font-semibold text-tone-white">{t("profileSettings.title")}</h2>
             </div>
             <SheetClose asChild>
               <button
                 type="button"
-                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a] active:scale-[0.98]"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                 aria-label={t("profileSettings.close")}
               >
                 <X className="h-4 w-4" aria-hidden />

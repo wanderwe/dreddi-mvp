@@ -218,7 +218,7 @@ function DealTitleLink({ id, title, href }: { id: string; title: string; href?: 
         <LocalizedLink
           href={href ?? `/promises/${id}?from=deals`}
           title={undefined}
-          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-white transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap text-lg font-semibold leading-snug text-tone-white transition hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
         >
           {title}
         </LocalizedLink>
@@ -980,7 +980,7 @@ export default function PromisesClient() {
 
   const metricValueClass = "mt-1 text-base font-semibold leading-tight";
   const metricBaseClass =
-    "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-black/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
+    "rounded-2xl border px-4 py-3 text-left shadow-inner shadow-tone-black/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950";
 
   const handleMetricClick = (next: MetricFilter) => {
     const resolved = activeMetricFilter === next && next !== "total" ? "total" : next;
@@ -1043,7 +1043,7 @@ export default function PromisesClient() {
           <div
             role="status"
             aria-live="polite"
-            className="max-w-sm rounded-2xl border border-emerald-300/35 bg-emerald-500/20 px-4 py-3 text-sm font-semibold text-emerald-50 shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md"
+            className="max-w-sm rounded-2xl border border-accent-300/35 bg-emerald-500/20 px-4 py-3 text-sm font-semibold text-accent-50 shadow-2xl shadow-tone-black/35 backdrop-blur-md sm:max-w-md"
           >
             {toast}
           </div>
@@ -1056,14 +1056,14 @@ export default function PromisesClient() {
       />
 
       <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
-        <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-black/40 p-4 shadow-2xl shadow-black/40 backdrop-blur sm:p-6">
+        <div className="flex flex-col gap-4 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-4 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-1">
-              <div className="text-xs uppercase tracking-[0.32em] text-emerald-200">
+              <div className="text-xs uppercase tracking-[0.32em] text-accent-200">
                 {t("promises.overview.eyebrow")}
               </div>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">{t("promises.overview.title")}</h1>
-              <p className="text-sm text-slate-300">{t("promises.overview.subtitle")}</p>
+              <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("promises.overview.title")}</h1>
+              <p className="text-sm text-tone-300">{t("promises.overview.subtitle")}</p>
             </div>
 
             <div className="hidden shrink-0 sm:block">
@@ -1071,23 +1071,23 @@ export default function PromisesClient() {
             </div>
           </div>
 
-          <div className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
+          <div className="grid gap-3 text-sm text-tone-200 sm:grid-cols-3">
             <button
               type="button"
               onClick={() => handleMetricClick("total")}
               aria-pressed={activeMetricFilter === "total"}
               className={[
                 metricBaseClass,
-                "cursor-pointer border-white/10 bg-white/5 text-slate-200 hover:border-white/20 hover:bg-white/10",
+                "cursor-pointer border-tone-white/10 bg-tone-white/5 text-tone-200 hover:border-tone-white/20 hover:bg-tone-white/10",
                 activeMetricFilter === "total"
-                  ? "ring-2 ring-emerald-400/60"
+                  ? "ring-2 ring-accent-400/60"
                   : "active:scale-[0.99]",
               ].join(" ")}
             >
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <div className="text-xs uppercase tracking-[0.2em] text-tone-400">
                 {t("promises.overview.metrics.total")}
               </div>
-              <div className={`${metricValueClass} text-white`}>{overview.total}</div>
+              <div className={`${metricValueClass} text-tone-white`}>{overview.total}</div>
             </button>
             <button
               type="button"
@@ -1095,13 +1095,13 @@ export default function PromisesClient() {
               aria-pressed={activeMetricFilter === "awaiting_my_action"}
               className={[
                 metricBaseClass,
-                "cursor-pointer border-emerald-400/20 bg-emerald-500/10 text-emerald-100 hover:border-emerald-300/40 hover:bg-emerald-500/15",
+                "cursor-pointer border-accent-400/20 bg-emerald-500/10 text-accent-100 hover:border-accent-300/40 hover:bg-emerald-500/15",
                 activeMetricFilter === "awaiting_my_action"
-                  ? "ring-2 ring-emerald-300/70"
+                  ? "ring-2 ring-accent-300/70"
                   : "active:scale-[0.99]",
               ].join(" ")}
             >
-              <div className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <div className="text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("promises.overview.metrics.awaitingYou")}
               </div>
               <div className={metricValueClass}>{overview.awaitingYou}</div>
@@ -1112,13 +1112,13 @@ export default function PromisesClient() {
               aria-pressed={activeMetricFilter === "awaiting_others"}
               className={[
                 metricBaseClass,
-                "cursor-pointer border-amber-300/30 bg-amber-400/10 text-amber-50 hover:border-amber-300/60 hover:bg-amber-400/15",
+                "cursor-pointer border-warn-300/30 bg-amber-400/10 text-warn-50 hover:border-warn-300/60 hover:bg-amber-400/15",
                 activeMetricFilter === "awaiting_others"
-                  ? "ring-2 ring-amber-300/70"
+                  ? "ring-2 ring-warn-300/70"
                   : "active:scale-[0.99]",
               ].join(" ")}
             >
-              <div className="text-xs uppercase tracking-[0.2em] text-amber-200">
+              <div className="text-xs uppercase tracking-[0.2em] text-warn-200">
                 {t("promises.overview.metrics.awaitingOthers")}
               </div>
               <div className={metricValueClass}>{overview.awaitingOthers}</div>
@@ -1126,11 +1126,11 @@ export default function PromisesClient() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-black/30 p-4 shadow-xl shadow-black/30 backdrop-blur">
+        <div className="rounded-3xl border border-tone-white/10 bg-tone-black/30 p-4 shadow-xl shadow-tone-black/30 backdrop-blur">
           {/* Search — sits above tabs, full width inside the card */}
           <div className="relative mb-3">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5">
-              <Search className="h-4 w-4 text-slate-400" aria-hidden />
+              <Search className="h-4 w-4 text-tone-400" aria-hidden />
             </div>
             <input
               type="text"
@@ -1147,13 +1147,13 @@ export default function PromisesClient() {
                 if (e.key === "Escape") setSearchQuery("");
               }}
               placeholder={t("promises.search.placeholder")}
-              className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-9 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400/40 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
+              className="w-full rounded-xl border border-tone-white/10 bg-tone-white/5 py-2.5 pl-10 pr-9 text-sm text-tone-white placeholder:text-tone-500 focus:border-accent-400/40 focus:outline-none focus:ring-1 focus:ring-accent-400/30"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition hover:text-white"
+                className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-tone-400 transition hover:text-tone-white"
                 aria-label={t("promises.search.clear")}
               >
                 <X className="h-4 w-4" aria-hidden />
@@ -1179,10 +1179,10 @@ export default function PromisesClient() {
                     type="button"
                     onClick={() => setTab(key)}
                     className={[
-                      "w-full rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto sm:whitespace-nowrap",
+                      "w-full rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:w-auto sm:whitespace-nowrap",
                       isActive
-                        ? "cursor-default bg-white/10 text-white ring-2 ring-emerald-400/60"
-                        : "cursor-pointer bg-white/5 text-white/70 ring-white/10 hover:bg-white/10 hover:text-white hover:ring-white/20",
+                        ? "cursor-default bg-tone-white/10 text-tone-white ring-2 ring-accent-400/60"
+                        : "cursor-pointer bg-tone-white/5 text-tone-white/70 ring-tone-white/10 hover:bg-tone-white/10 hover:text-tone-white hover:ring-tone-white/20",
                     ].join(" ")}
                   >
                     {label}
@@ -1201,11 +1201,11 @@ export default function PromisesClient() {
                   aria-haspopup="listbox"
                   aria-expanded={isDealTypeMenuOpen}
                   aria-label={t("promises.list.dealTypeFilter.label")}
-                  className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
+                  className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-tone-white/15 bg-tone-white/[0.04] px-3 py-2 text-sm font-medium text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-w-[212px] sm:w-auto"
                 >
                   <span className="truncate">{activeDealTypeLabel}</span>
                   <ChevronDown
-                    className={`h-4 w-4 text-slate-300 transition-transform ${isDealTypeMenuOpen ? "rotate-180" : ""}`}
+                    className={`h-4 w-4 text-tone-300 transition-transform ${isDealTypeMenuOpen ? "rotate-180" : ""}`}
                     aria-hidden
                   />
                 </button>
@@ -1213,7 +1213,7 @@ export default function PromisesClient() {
                   <div
                     role="listbox"
                     aria-label={t("promises.list.dealTypeFilter.label")}
-                    className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                    className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-1 shadow-xl shadow-tone-black/50 backdrop-blur sm:w-auto"
                   >
                     {dealTypeOptions.map((option) => {
                       const selected = option.value === activeDealTypeFilter;
@@ -1225,10 +1225,10 @@ export default function PromisesClient() {
                           aria-selected={selected}
                           onClick={() => handleDealTypeFilterChange(option.value)}
                           className={[
-                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                            "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
                             selected
                               ? "bg-emerald-400/90 text-slate-950"
-                              : "text-slate-100 hover:bg-white/10",
+                              : "text-tone-100 hover:bg-tone-white/10",
                           ].join(" ")}
                         >
                           {option.label}
@@ -1247,11 +1247,11 @@ export default function PromisesClient() {
                 aria-haspopup="listbox"
                 aria-expanded={isStatusMenuOpen}
                 aria-label={t("promises.list.statusFilter.label")}
-                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:min-w-[212px] sm:w-auto"
+                className="inline-flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-tone-white/15 bg-tone-white/[0.04] px-3 py-2 text-sm font-medium text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:min-w-[212px] sm:w-auto"
               >
                 <span className="truncate">{activeStatusLabel}</span>
                 <ChevronDown
-                  className={`h-4 w-4 text-slate-300 transition-transform ${isStatusMenuOpen ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 text-tone-300 transition-transform ${isStatusMenuOpen ? "rotate-180" : ""}`}
                   aria-hidden
                 />
               </button>
@@ -1260,7 +1260,7 @@ export default function PromisesClient() {
                 <div
                   role="listbox"
                   aria-label={t("promises.list.statusFilter.label")}
-                  className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur sm:w-auto"
+                  className="absolute right-0 z-20 mt-2 w-full min-w-[212px] overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-1 shadow-xl shadow-tone-black/50 backdrop-blur sm:w-auto"
                 >
                   {statusOptions.map((option) => {
                     const selected = option.value === activeStatusFilter;
@@ -1272,10 +1272,10 @@ export default function PromisesClient() {
                         aria-selected={selected}
                         onClick={() => handleStatusFilterChange(option.value)}
                         className={[
-                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
                           selected
                             ? "bg-emerald-400/90 text-slate-950"
-                            : "text-slate-100 hover:bg-white/10",
+                            : "text-tone-100 hover:bg-tone-white/10",
                         ].join(" ")}
                       >
                         {option.label}
@@ -1289,7 +1289,7 @@ export default function PromisesClient() {
           </div>
 
           {error && (
-            <div className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+            <div className="mt-4 rounded-xl border border-danger-400/30 bg-red-500/10 p-3 text-sm text-danger-200">
               {error}
             </div>
           )}
@@ -1298,7 +1298,7 @@ export default function PromisesClient() {
             {effectiveListLoading && (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-white/5" />
+                  <div key={i} className="h-[102px] animate-pulse rounded-2xl bg-tone-white/5" />
                 ))}
               </div>
             )}
@@ -1322,7 +1322,7 @@ export default function PromisesClient() {
                   return (
                     <div
                       key={p.collective_agreement_id}
-                      className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4"
+                      className="group overflow-hidden rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4"
                     >
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                         <div className="min-w-0 flex-1 space-y-1">
@@ -1335,10 +1335,10 @@ export default function PromisesClient() {
                               />
                             </div>
                           </div>
-                          <div className="text-xs text-slate-400">{dealMeta}</div>
+                          <div className="text-xs text-tone-400">{dealMeta}</div>
                         </div>
 
-                        <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-slate-200 sm:justify-end lg:self-start">
+                        <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
                           <StatusPill
                             label={t("collectiveAgreements.summary.progress", {
                               total: stats.total,
@@ -1392,7 +1392,7 @@ export default function PromisesClient() {
                   <div
                     key={p.id}
                     className={[
-                      "group overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4",
+                      "group overflow-hidden rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4",
                       isArchivedInviteStatus ? "opacity-70" : "",
                     ].join(" ")}
                   >
@@ -1403,18 +1403,18 @@ export default function PromisesClient() {
                             <DealTitleLink id={p.id} title={p.title} />
                           </div>
                         </div>
-                        <div className="text-xs text-slate-400">{dealMeta}</div>
+                        <div className="text-xs text-tone-400">{dealMeta}</div>
                         {productFlags.collectiveAgreements && p.collective_agreement_id && (
                           <LocalizedLink
                             href={`/promises/collective/${p.collective_agreement_id}`}
-                            className="inline-flex w-fit items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs text-emerald-200 hover:text-emerald-100"
+                            className="inline-flex w-fit items-center gap-1 rounded-full border border-accent-300/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs text-accent-200 hover:text-accent-100"
                           >
                             {t("collectiveAgreements.badge")}
                           </LocalizedLink>
                         )}
                       </div>
 
-                      <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-slate-200 sm:justify-end lg:self-start">
+                      <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
                         <StatusPill
                           label={statusLabel}
                           tone={statusPill.tone}
@@ -1463,14 +1463,14 @@ export default function PromisesClient() {
               })}
 
             {isListEmpty && (
-              <div className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-6 text-center text-slate-300">
-                <p className="text-lg font-semibold text-white">{emptyTitle}</p>
-                <p className="text-sm text-slate-400">{emptyDescription}</p>
+              <div className="rounded-2xl border border-dashed border-tone-white/20 bg-tone-white/5 p-6 text-center text-tone-300">
+                <p className="text-lg font-semibold text-tone-white">{emptyTitle}</p>
+                <p className="text-sm text-tone-400">{emptyDescription}</p>
                 {isGlobalEmpty && (
                   <div className="mt-4">
                     <LocalizedLink
                       href="/promises/new"
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/25 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-md shadow-accent-500/25 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:w-auto"
                     >
                       {t("promises.empty.cta")}
                     </LocalizedLink>
@@ -1492,7 +1492,7 @@ export default function PromisesClient() {
                         sp.delete("type");
                         router.push(localizePath(`/promises?${sp.toString()}`, locale));
                       }}
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 sm:w-auto"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 sm:w-auto"
                     >
                       {t("promises.empty.showAll")}
                     </button>
@@ -1507,11 +1507,11 @@ export default function PromisesClient() {
                   type="button"
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white/5 sm:w-auto"
+                  className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-tone-white/5 sm:w-auto"
                 >
                   {loadingMore ? (
                     <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-tone-white/20 border-t-tone-white" />
                       {t("promises.list.loadingMore")}
                     </>
                   ) : (
@@ -1525,12 +1525,12 @@ export default function PromisesClient() {
       </div>
 
       {confirmingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.confirmModal.title")}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("promises.confirmModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
@@ -1538,7 +1538,7 @@ export default function PromisesClient() {
               <button
                 type="button"
                 onClick={() => setConfirmingId(null)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
               >
                 {t("promises.confirmModal.cancel")}
               </button>
@@ -1549,7 +1549,7 @@ export default function PromisesClient() {
                   setConfirmingId(null);
                   if (id) await handleMarkCompleted(id);
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
               >
                 {t("promises.confirmModal.confirm")}
               </button>

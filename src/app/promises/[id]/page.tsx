@@ -339,27 +339,27 @@ function ActionButton({
 }) {
   const base =
     "inline-flex min-h-12 w-full sm:w-auto items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-medium leading-tight " +
-    "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 " +
+    "transition select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 " +
     "disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
   const ghost =
-    "border-white/20 bg-white/[0.035] text-neutral-100 hover:border-white/25 hover:bg-white/[0.07]";
+    "border-tone-white/20 bg-tone-white/[0.035] text-ntone-100 hover:border-tone-white/25 hover:bg-tone-white/[0.07]";
 
   const primary =
-    "border-emerald-400/35 bg-emerald-400/15 text-emerald-50 shadow-lg shadow-emerald-950/20 hover:border-emerald-300/45 hover:bg-emerald-400/20";
+    "border-accent-400/35 bg-emerald-400/15 text-accent-50 shadow-lg shadow-accent-950/20 hover:border-accent-300/45 hover:bg-emerald-400/20";
 
   // мягкая активная подсветка (не “белая заливка на весь экран”)
   const activeNeutral =
-    "border-white/20 bg-white/10 text-white hover:bg-white/14 hover:border-white/25";
+    "border-tone-white/20 bg-tone-white/10 text-tone-white hover:bg-tone-white/14 hover:border-tone-white/25";
   const activeOk =
-    "border-emerald-500/35 bg-emerald-500/12 text-emerald-100 hover:bg-emerald-500/16";
+    "border-accent-500/35 bg-emerald-500/12 text-accent-100 hover:bg-emerald-500/16";
   const activeDanger =
-    "border-red-500/35 bg-red-500/12 text-red-100 hover:bg-red-500/16";
+    "border-danger-500/35 bg-red-500/12 text-danger-100 hover:bg-red-500/16";
 
   const toneOk =
-    "border-emerald-500/20 bg-transparent text-emerald-200 hover:bg-emerald-500/10 hover:border-emerald-500/30";
+    "border-accent-500/20 bg-transparent text-accent-200 hover:bg-emerald-500/10 hover:border-accent-500/30";
   const toneDanger =
-    "border-red-500/25 bg-red-500/10 text-red-200 hover:bg-red-500/18 hover:border-red-500/35";
+    "border-danger-500/25 bg-red-500/10 text-danger-200 hover:bg-red-500/18 hover:border-danger-500/35";
 
   let cls = base;
 
@@ -1172,7 +1172,7 @@ export default function PromisePage() {
     hasStatusActions || canRecreateDeal
   );
   const linkUtilityButtonClass =
-    "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
+    "inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/[0.035] px-3 py-2 text-sm font-medium text-ntone-100 transition hover:border-tone-white/20 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto";
   const hasCondition = Boolean(p?.condition_text?.trim());
   const conditionMet = Boolean(p?.condition_met_at);
   const getParticipantLabel = (participantId: string | null) => {
@@ -1377,7 +1377,7 @@ export default function PromisePage() {
           setUpdateSubmitState("idle");
           setShowUpdateComposer(true);
         }}
-        className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white/75 transition hover:border-white/25 hover:bg-white/[0.1] hover:text-white"
+        className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-tone-white/15 bg-tone-white/[0.06] text-tone-white/75 transition hover:border-tone-white/25 hover:bg-tone-white/[0.1] hover:text-tone-white"
       >
         <PenLine className="h-4 w-4" aria-hidden />
       </button>
@@ -1393,19 +1393,19 @@ export default function PromisePage() {
             className={[
               "rounded-xl border px-3 py-2 text-xs transition",
               state.current && state.disputed
-                ? "border-rose-300/35 bg-rose-300/10 text-rose-50"
+                ? "border-alert-300/35 bg-rose-300/10 text-alert-50"
                 : state.complete
-                  ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50"
+                  ? "border-accent-300/25 bg-emerald-300/10 text-accent-50"
                   : state.current
-                    ? "border-amber-300/55 bg-black/20 text-amber-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
-                    : "border-white/10 bg-black/15 text-white/35",
+                    ? "border-warn-300/55 bg-tone-black/20 text-warn-100 shadow-[0_0_0_1px_rgba(252,211,77,0.16)]"
+                    : "border-tone-white/10 bg-tone-black/15 text-tone-white/35",
             ].join(" ")}
           >
             <span
               className={[
                 "mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]",
                 state.current && !state.disputed && !state.complete
-                  ? "border-amber-300/80 bg-black/35 text-amber-100"
+                  ? "border-warn-300/80 bg-tone-black/35 text-warn-100"
                   : "border-current/25",
               ].join(" ")}
             >
@@ -1418,7 +1418,7 @@ export default function PromisePage() {
 
       <div className="scrollbar-fade max-h-[480px] space-y-2 overflow-y-auto pr-1">
         {timeline.map((item) => (
-          <div key={item.key} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/15 p-3">
+          <div key={item.key} className="flex items-start gap-3 rounded-xl border border-tone-white/10 bg-tone-black/15 p-3">
             <span
               className={[
                 "mt-1.5 h-2 w-2 shrink-0 rounded-full",
@@ -1428,21 +1428,21 @@ export default function PromisePage() {
                     ? "bg-rose-300"
                     : item.tone === "attention"
                       ? "bg-amber-300"
-                      : "bg-white/45",
+                      : "bg-tone-white/45",
               ].join(" ")}
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between lg:flex-col lg:gap-0.5">
                 <div>
-                  <p className="text-sm font-medium text-white">{item.label}</p>
-                  <p className="mt-0.5 text-xs text-white/50">{item.actor}</p>
+                  <p className="text-sm font-medium text-tone-white">{item.label}</p>
+                  <p className="mt-0.5 text-xs text-tone-white/50">{item.actor}</p>
                   {item.description ? (
-                    <p className={item.kind === "update" ? "mt-1.5 text-sm text-white/85" : "mt-1.5 text-sm text-white/65"}>
+                    <p className={item.kind === "update" ? "mt-1.5 text-sm text-tone-white/85" : "mt-1.5 text-sm text-tone-white/65"}>
                       {item.description}
                     </p>
                   ) : null}
                 </div>
-                <time className="text-xs text-white/45" dateTime={item.timestamp}>
+                <time className="text-xs text-tone-white/45" dateTime={item.timestamp}>
                   {formatTimestamp(item.timestamp, locale)}
                 </time>
               </div>
@@ -1457,13 +1457,13 @@ export default function PromisePage() {
     <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-8 sm:px-6 sm:py-10">
       <Link
         href={backLink.href}
-        className="inline-flex text-sm font-medium text-emerald-200 transition hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+        className="inline-flex text-sm font-medium text-accent-200 transition hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
       >
         {backLink.label}
       </Link>
 
       {error && (
-        <div className="rounded-2xl border border-red-900/40 bg-red-950/20 p-4 text-red-300">
+        <div className="rounded-2xl border border-danger-900/40 bg-red-950/20 p-4 text-danger-300">
           {error}
         </div>
       )}
@@ -1473,10 +1473,10 @@ export default function PromisePage() {
           <div
             role={toastTone === "success" ? "status" : "alert"}
             aria-live={toastTone === "success" ? "polite" : "assertive"}
-            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-black/35 backdrop-blur-md sm:max-w-md ${
+            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl shadow-tone-black/35 backdrop-blur-md sm:max-w-md ${
               toastTone === "success"
-                ? "border-emerald-300/35 bg-emerald-500/20 text-emerald-50"
-                : "border-red-300/35 bg-red-500/20 text-red-50"
+                ? "border-accent-300/35 bg-emerald-500/20 text-accent-50"
+                : "border-danger-300/35 bg-red-500/20 text-danger-50"
             }`}
           >
             {toast}
@@ -1487,7 +1487,7 @@ export default function PromisePage() {
       {p ? (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
           <div className="space-y-5">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/25 backdrop-blur sm:p-7">
+          <section className="rounded-3xl border border-tone-white/10 bg-tone-white/[0.045] p-5 shadow-2xl shadow-tone-black/25 backdrop-blur sm:p-7">
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
                 {uiStatus && (
@@ -1501,7 +1501,7 @@ export default function PromisePage() {
                 {p.is_important && (
                   <Tooltip label={t("promises.important.tooltip")} placement="top">
                     <span
-                      className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-amber-100"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-warn-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-warn-100"
                       aria-label={t("promises.important.label")}
                     >
                       <Shield className="h-3.5 w-3.5" aria-hidden />
@@ -1514,14 +1514,14 @@ export default function PromisePage() {
                     {publicAgreementPath ? (
                       <Link
                         href={publicAgreementPath}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:border-amber-200/45 hover:bg-amber-400/15 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200/35 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-warn-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-warn-100 transition hover:border-warn-200/45 hover:bg-amber-400/15 hover:text-warn-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warn-200/35 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
                       >
                         <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                         <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                       </Link>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-100">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-warn-300/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-warn-100">
                         <ExternalLink className="h-3.5 w-3.5 opacity-85" aria-hidden />
                         {t("promises.detail.publicStatus.public")}
                       </span>
@@ -1537,7 +1537,7 @@ export default function PromisePage() {
                       <IconButton
                         icon={<Link2 className="h-4 w-4" />}
                         ariaLabel={t("promises.detail.linkCopy.label")}
-                        className="h-10 w-10 border-cyan-400/30 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/10 hover:text-cyan-100"
+                        className="h-10 w-10 border-aqua-400/30 text-aqua-200 hover:border-aqua-300/50 hover:bg-cyan-500/10 hover:text-aqua-100"
                         onClick={() => void copyPromiseLink()}
                       />
                     </span>
@@ -1549,7 +1549,7 @@ export default function PromisePage() {
                       <IconButton
                         icon={<MessageCircle className="h-4 w-4" />}
                         ariaLabel={t("promises.detail.reminderCopy.label")}
-                        className="h-10 w-10 border-sky-400/30 text-sky-200 hover:border-sky-300/50 hover:bg-sky-500/10 hover:text-sky-100"
+                        className="h-10 w-10 border-info-400/30 text-info-200 hover:border-info-300/50 hover:bg-sky-500/10 hover:text-info-100"
                         disabled={!userId || !promiseLink}
                         onClick={() => void copyReminder()}
                       />
@@ -1559,38 +1559,38 @@ export default function PromisePage() {
               </div>
             </div>
 
-            <h1 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            <h1 className="mt-4 text-3xl font-semibold leading-tight text-tone-white sm:text-4xl">
               {p.title}
             </h1>
 
             {p.due_at && (
               <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-                <span className="inline-flex items-center rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-slate-200">
-                  {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-white">{dueText}</span>
+                <span className="inline-flex items-center rounded-full border border-tone-white/15 bg-tone-black/30 px-3 py-1.5 text-tone-200">
+                  {t("promises.detail.deadline")}: <span className="ml-1 font-semibold text-tone-white">{dueText}</span>
                 </span>
               </div>
             )}
 
             {hasDetails && (
-              <p className="mt-5 whitespace-pre-wrap break-words text-base leading-7 text-slate-100/85">
+              <p className="mt-5 whitespace-pre-wrap break-words text-base leading-7 text-tone-100/85">
                 {detailsText}
               </p>
             )}
 
-            <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+            <div className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-tone-white/45">
                 {t("promises.detail.roles.title")}
               </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                <div className="min-w-0 rounded-xl border border-tone-white/10 bg-tone-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-tone-white/40">
                     {t("promises.detail.roles.createdBy")}
                   </p>
-                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-tone-white [overflow-wrap:anywhere]">
                     {creatorHref ? (
                       <Link
                         href={creatorHref}
-                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        className="underline decoration-tone-white/25 underline-offset-2 transition hover:text-accent-200 hover:decoration-accent-300"
                       >
                         {createdByLabel}
                       </Link>
@@ -1599,15 +1599,15 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                <div className="min-w-0 rounded-xl border border-tone-white/10 bg-tone-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-tone-white/40">
                     {t("promises.detail.roles.responsible")}
                   </p>
-                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-tone-white [overflow-wrap:anywhere]">
                     {responsibleHref ? (
                       <Link
                         href={responsibleHref}
-                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        className="underline decoration-tone-white/25 underline-offset-2 transition hover:text-accent-200 hover:decoration-accent-300"
                       >
                         {responsibleLabel}
                       </Link>
@@ -1616,15 +1616,15 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                <div className="min-w-0 rounded-xl border border-tone-white/10 bg-tone-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-tone-white/40">
                     {t("promises.detail.roles.madeTo")}
                   </p>
-                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">
+                  <p className="mt-1 min-w-0 text-sm font-medium text-tone-white [overflow-wrap:anywhere]">
                     {promiseToHref ? (
                       <Link
                         href={promiseToHref}
-                        className="underline decoration-white/25 underline-offset-2 transition hover:text-emerald-200 hover:decoration-emerald-300"
+                        className="underline decoration-tone-white/25 underline-offset-2 transition hover:text-accent-200 hover:decoration-accent-300"
                       >
                         {promiseToLabel}
                       </Link>
@@ -1633,25 +1633,25 @@ export default function PromisePage() {
                     )}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                <div className="min-w-0 rounded-xl border border-tone-white/10 bg-tone-white/[0.035] px-3 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-tone-white/40">
                     {t("promises.detail.inviteLabel")}
                   </p>
-                  <p className="mt-1 min-w-0 text-sm font-medium text-white [overflow-wrap:anywhere]">{inviteMetaText}</p>
+                  <p className="mt-1 min-w-0 text-sm font-medium text-tone-white [overflow-wrap:anywhere]">{inviteMetaText}</p>
                 </div>
               </div>
             </div>
 
             {/* Creator banner: invitee proposed a condition change */}
             {isCreator && inviteStatus === "awaiting_creator_confirmation" && p.condition_text && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <div className="mt-5 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-tone-400">
                   {t("promises.detail.conditionProposedBanner.title")}
                 </p>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-100">
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-tone-100">
                   {p.condition_text}
                 </p>
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-tone-500">
                   {t("promises.detail.conditionProposedBanner.body")}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -1682,25 +1682,25 @@ export default function PromisePage() {
             )}
 
             {hasCondition && inviteStatus !== "awaiting_creator_confirmation" && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+              <div className="mt-5 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-tone-white/45">
                   {t("promises.detail.conditionLabel")}
                 </p>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/75">
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-tone-white/75">
                   {p.condition_text}
                 </p>
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-tone-white/45">
                       {t("promises.detail.conditionStatusLabel")}
                     </p>
                     <p className={[
                       "mt-1 text-sm font-medium leading-6",
                       isInviteAccepted
                         ? conditionMet
-                          ? "text-emerald-300"
-                          : "text-amber-200"
-                        : "text-rose-300",
+                          ? "text-accent-300"
+                          : "text-warn-200"
+                        : "text-alert-300",
                     ].join(" ")}>
                       {isInviteAccepted
                         ? conditionMet
@@ -1723,15 +1723,15 @@ export default function PromisePage() {
             )}
 
             {p.activated_without_counterparty && !p.counterparty_id && isFinal && (
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-slate-400">
+              <div className="mt-5 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] p-4 text-tone-400">
                 <p className="text-sm">{t("promises.detail.closedWithoutCounterparty")}</p>
               </div>
             )}
 
             {(p.status === "disputed" &&
               (p.disputed_code === "not_delivered" || Boolean(p.dispute_reason?.trim()))) && (
-              <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-amber-100">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">
+              <div className="mt-5 rounded-2xl border border-warn-400/30 bg-amber-500/10 p-4 text-warn-100">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-warn-200">
                   {t("promises.detail.disputeReasonLabel")}
                 </p>
                 <div className="mt-2 space-y-2 text-sm leading-6">
@@ -1742,8 +1742,8 @@ export default function PromisePage() {
             )}
 
             {isAwaitingInviteResponse && (
-              <div className="mt-5 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.03] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
+              <div className="mt-5 rounded-2xl border border-accent-300/15 bg-emerald-300/[0.03] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-100/75">
                   {t("promises.detail.inviteTitle")}
                 </p>
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1.5">
@@ -1759,7 +1759,7 @@ export default function PromisePage() {
                     <>
                       <button
                         type="button"
-                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/35 bg-emerald-400/18 px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-accent-300/35 bg-emerald-400/18 px-2.5 py-2 text-sm font-semibold text-accent-50 transition hover:bg-emerald-400/28 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/45 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         disabled={inviteBusy !== null || !inviteLink}
                         onClick={copyInvite}
                       >
@@ -1773,7 +1773,7 @@ export default function PromisePage() {
                       {canWithdrawInvite && (
                         <button
                           type="button"
-                          className="inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg px-1.5 py-1 text-xs font-medium text-white/55 transition hover:text-rose-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
+                          className="inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg px-1.5 py-1 text-xs font-medium text-tone-white/55 transition hover:text-alert-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
                           disabled={inviteBusy !== null}
                           onClick={cancelInvite}
                         >
@@ -1786,10 +1786,10 @@ export default function PromisePage() {
                   )}
                 </div>
                 {canActivateWithoutCounterparty && (
-                  <div className="mt-3 border-t border-white/5 pt-3">
+                  <div className="mt-3 border-t border-tone-white/5 pt-3">
                     <button
                       type="button"
-                      className="cursor-pointer text-xs text-slate-400/70 transition hover:text-slate-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                      className="cursor-pointer text-xs text-tone-400/70 transition hover:text-tone-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={inviteBusy !== null || activatingWithoutCounterparty}
                       onClick={() => setShowActivateWithoutCounterpartyModal(true)}
                     >
@@ -1801,9 +1801,9 @@ export default function PromisePage() {
             )}
 
             {hasLifecycleActions && (
-              <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.07] p-4">
+              <div className="mt-5 rounded-2xl border border-accent-300/20 bg-emerald-300/[0.07] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/70">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-100/70">
                     {t("promises.detail.statusActions")}
                   </p>
                   <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
@@ -1818,7 +1818,7 @@ export default function PromisePage() {
                       />
                     ) : (
                       !canRespondToInvite && (
-                        <div className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-center text-sm font-medium leading-tight text-white/65 sm:w-auto">
+                        <div className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-2 text-center text-sm font-medium leading-tight text-tone-white/65 sm:w-auto">
                           {inviteStatus === "awaiting_acceptance"
                             ? stripTrailingPeriod(t("promises.detail.shareInvite"))
                             : t(`promises.inviteStatus.${inviteStatus}`)}
@@ -1831,13 +1831,13 @@ export default function PromisePage() {
                     <>
                       <Link
                         href={`/promises/${p.id}/confirm?action=confirm`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-accent-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-accent-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 sm:w-auto"
                       >
                         {t("promises.confirm.confirm")}
                       </Link>
                       <Link
                         href={`/promises/${p.id}/confirm?action=dispute`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-alert-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-alert-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alert-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 sm:w-auto"
                       >
                         {t("promises.confirm.dispute")}
                       </Link>
@@ -1858,13 +1858,13 @@ export default function PromisePage() {
                     <>
                       <Link
                         href={`/promises/${p.id}/confirm?action=confirm`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-accent-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-accent-50 transition hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 sm:w-auto"
                       >
                         {t("promises.confirm.confirm")}
                       </Link>
                       <Link
                         href={`/promises/${p.id}/confirm?action=dispute`}
-                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-rose-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl border border-alert-300/40 bg-rose-500/10 px-4 py-2 text-sm font-semibold text-alert-100 transition hover:bg-rose-500/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alert-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 sm:w-auto"
                       >
                         {t("promises.confirm.dispute")}
                       </Link>
@@ -1923,7 +1923,7 @@ export default function PromisePage() {
                   {canRecreateDeal && (
                     <button
                       type="button"
-                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 sm:w-auto"
+                      className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-accent-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-medium text-accent-50 transition hover:border-accent-300/40 hover:bg-emerald-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 sm:w-auto"
                       onClick={() => router.push(localizePath(`/promises/new?fromPromise=${p.id}`, locale))}
                     >
                       <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
@@ -1936,13 +1936,13 @@ export default function PromisePage() {
             )}
           </section>
 
-          <details className="group rounded-2xl border border-white/10 bg-neutral-900/25 p-4 lg:hidden">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-white marker:hidden">
+          <details className="group rounded-2xl border border-tone-white/10 bg-ntone-900/25 p-4 lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-tone-white marker:hidden">
               <span>{t("promises.detail.historyTitle")}</span>
               <span className="flex items-center gap-2">
                 {addUpdateTrigger}
                 <ChevronDown
-                  className="h-4 w-4 text-white/45 transition-transform group-open:rotate-180"
+                  className="h-4 w-4 text-tone-white/45 transition-transform group-open:rotate-180"
                   aria-hidden
                 />
               </span>
@@ -1952,9 +1952,9 @@ export default function PromisePage() {
           </div>
 
           <aside className="hidden lg:block lg:sticky lg:top-6">
-            <section className="rounded-2xl border border-white/10 bg-neutral-900/25 p-4 pt-5 sm:pt-7">
+            <section className="rounded-2xl border border-tone-white/10 bg-ntone-900/25 p-4 pt-5 sm:pt-7">
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-sm font-medium text-white">{t("promises.detail.historyTitle")}</h2>
+                <h2 className="text-sm font-medium text-tone-white">{t("promises.detail.historyTitle")}</h2>
                 {addUpdateTrigger}
               </div>
               {historyPanelContent}
@@ -1962,16 +1962,16 @@ export default function PromisePage() {
           </aside>
         </div>
       ) : !error ? (
-        <div className="text-neutral-400">{t("promises.detail.loading")}</div>
+        <div className="text-ntone-400">{t("promises.detail.loading")}</div>
       ) : null}
 
       {showActivateWithoutCounterpartyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.detail.activateWithoutCounterpartyConfirmTitle")}
             </h2>
-            <p className="mt-3 text-sm text-slate-300">
+            <p className="mt-3 text-sm text-tone-300">
               {t("promises.detail.activateWithoutCounterpartyConfirmBody")}
             </p>
             <div className="mt-6 flex flex-wrap gap-3 sm:justify-end">
@@ -1979,7 +1979,7 @@ export default function PromisePage() {
                 type="button"
                 onClick={() => setShowActivateWithoutCounterpartyModal(false)}
                 disabled={activatingWithoutCounterparty}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-100 transition hover:bg-tone-white/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {t("promises.confirm.cancel")}
               </button>
@@ -1987,7 +1987,7 @@ export default function PromisePage() {
                 type="button"
                 onClick={() => void activateWithoutCounterparty()}
                 disabled={activatingWithoutCounterparty}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-accent-300/40 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-accent-50 transition hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {activatingWithoutCounterparty ? t("promises.detail.saving") : t("promises.confirm.confirm")}
               </button>
@@ -1997,12 +1997,12 @@ export default function PromisePage() {
       )}
 
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.confirmModal.title")}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("promises.confirmModal.body", { entityLower: promiseLabels.entityLower })}
             </p>
 
@@ -2010,7 +2010,7 @@ export default function PromisePage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.confirmModal.cancel")}
               </button>
@@ -2020,7 +2020,7 @@ export default function PromisePage() {
                   setShowConfirmModal(false);
                   await markCompleted();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.confirmModal.confirm")}
               </button>
@@ -2030,12 +2030,12 @@ export default function PromisePage() {
       )}
 
       {showUpdateComposer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.detail.updates.title")}
             </h2>
-            <label className="mt-4 block text-sm font-semibold text-cyan-50" htmlFor="agreement-update">
+            <label className="mt-4 block text-sm font-semibold text-aqua-50" htmlFor="agreement-update">
               {p?.visibility === "public"
                 ? t("publicAgreement.updates.label")
                 : t("promises.detail.updates.labelPrivate")}
@@ -2049,13 +2049,13 @@ export default function PromisePage() {
               }}
               placeholder={t("promises.detail.updates.placeholder")}
               autoFocus
-              className="mt-2 h-36 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-300/60"
+              className="mt-2 h-36 w-full rounded-xl border border-tone-white/10 bg-tone-black/25 px-3 py-2 text-sm text-tone-white outline-none transition focus:border-aqua-300/60"
             />
-            <div className="mt-2 text-xs text-white/60">
+            <div className="mt-2 text-xs text-tone-white/60">
               {t("publicAgreement.updates.helper", { count: String(remainingUpdateChars) })}
             </div>
             {updateSubmitState === "error" ? (
-              <p className="mt-2 text-xs text-rose-200">{t("publicAgreement.updates.error")}</p>
+              <p className="mt-2 text-xs text-alert-200">{t("publicAgreement.updates.error")}</p>
             ) : null}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -2066,7 +2066,7 @@ export default function PromisePage() {
                   setUpdateContent("");
                   setUpdateSubmitState("idle");
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("publicAgreement.updates.cancel")}
               </button>
@@ -2074,7 +2074,7 @@ export default function PromisePage() {
                 type="button"
                 onClick={() => void submitUpdate()}
                 disabled={!updateContent.trim() || updateSubmitState === "saving"}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-cyan-300/35 bg-cyan-400/15 px-4 py-2 text-sm font-semibold text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-aqua-300/35 bg-cyan-400/15 px-4 py-2 text-sm font-semibold text-aqua-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {updateSubmitState === "saving"
                   ? t("publicAgreement.updates.saving")
@@ -2086,12 +2086,12 @@ export default function PromisePage() {
       )}
 
       {showNotDeliveredModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0b0f1a] p-6 shadow-2xl shadow-black/60">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-950/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-[var(--surface-popover)] p-6 shadow-2xl shadow-tone-black/60">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.notDeliveredModal.title")}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("promises.notDeliveredModal.body")}
             </p>
 
@@ -2099,7 +2099,7 @@ export default function PromisePage() {
               <button
                 type="button"
                 onClick={() => setShowNotDeliveredModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.notDeliveredModal.cancel")}
               </button>
@@ -2109,7 +2109,7 @@ export default function PromisePage() {
                   setShowNotDeliveredModal(false);
                   await markNotDelivered();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.notDeliveredModal.confirm")}
               </button>
@@ -2119,12 +2119,12 @@ export default function PromisePage() {
       )}
 
       {showCounterpartyConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
+            <h2 className="text-xl font-semibold text-tone-white">
               {t("promises.confirmModal.title")}
             </h2>
-            <p className="mt-3 text-sm text-neutral-200">
+            <p className="mt-3 text-sm text-ntone-200">
               {t("promises.confirmModal.counterpartyBody", {
                 entityLower: promiseLabels.entityLower,
               })}
@@ -2134,7 +2134,7 @@ export default function PromisePage() {
               <button
                 type="button"
                 onClick={() => setShowCounterpartyConfirmModal(false)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.confirmModal.cancel")}
               </button>
@@ -2144,7 +2144,7 @@ export default function PromisePage() {
                   setShowCounterpartyConfirmModal(false);
                   await confirmCompletion();
                 }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
               >
                 {t("promises.confirmModal.confirm")}
               </button>

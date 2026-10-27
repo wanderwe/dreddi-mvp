@@ -72,15 +72,15 @@ export default function PromisesLayout({ children }: { children: React.ReactNode
   }, [locale, pathname, mockMode]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(82,193,106,0.2),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_60%_70%,rgba(34,55,93,0.22),transparent_45%)]" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,var(--page-wash-1),transparent_30%),radial-gradient(circle_at_70%_10%,var(--page-wash-2),transparent_28%),radial-gradient(circle_at_60%_70%,var(--page-wash-3),transparent_45%)]" aria-hidden />
 
       <main className="relative">
         {supabaseError && !mockMode ? (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-16 text-center text-slate-200">
-            <h1 className="text-3xl font-semibold text-white">Authentication unavailable</h1>
-            <p className="text-sm text-slate-300">{supabaseError}</p>
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-16 text-center text-tone-200">
+            <h1 className="text-3xl font-semibold text-tone-white">Authentication unavailable</h1>
+            <p className="text-sm text-tone-300">{supabaseError}</p>
           </div>
         ) : (
           children

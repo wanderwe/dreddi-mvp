@@ -250,7 +250,7 @@ export default function NewPromisePage() {
               width: popoverStyles?.width ?? 320,
             }}
             className={clsx(
-              "fixed z-50 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm text-slate-100 shadow-2xl shadow-black/60 backdrop-blur",
+              "fixed z-50 rounded-2xl border border-tone-white/10 bg-tone-950/95 p-4 text-sm text-tone-100 shadow-2xl shadow-tone-black/60 backdrop-blur",
               !popoverStyles && "pointer-events-none opacity-0"
             )}
           >
@@ -258,24 +258,24 @@ export default function NewPromisePage() {
               <button
                 type="button"
                 onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
-                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
                 aria-label="Previous month"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </button>
-              <div className="text-sm font-semibold text-slate-100">
+              <div className="text-sm font-semibold text-tone-100">
                 {format(calendarMonth, "MMMM yyyy")}
               </div>
               <button
                 type="button"
                 onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
-                className="cursor-pointer rounded-lg border border-white/10 p-2 text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-emerald-100"
+                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
                 aria-label="Next month"
               >
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
             </div>
-            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[11px] uppercase tracking-[0.2em] text-tone-500">
               {weekDays.map((day) => (
                 <div key={day}>{day}</div>
               ))}
@@ -302,9 +302,9 @@ export default function NewPromisePage() {
                       "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-sm transition",
                       isSelected
                         ? "bg-emerald-400/90 text-slate-950"
-                        : "text-slate-200 hover:bg-white/10",
-                      !inMonth && "text-slate-600",
-                      isToday(day) && !isSelected && "border border-emerald-400/40"
+                        : "text-tone-200 hover:bg-tone-white/10",
+                      !inMonth && "text-tone-600",
+                      isToday(day) && !isSelected && "border border-accent-400/40"
                     )}
                   >
                     {format(day, "d")}
@@ -323,20 +323,20 @@ export default function NewPromisePage() {
           <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
             <button
               type="button"
-              className="absolute inset-0 cursor-pointer bg-black/60"
+              className="absolute inset-0 cursor-pointer bg-tone-black/60"
               aria-label={t("promises.new.actions.closeTimePicker")}
               onClick={() => setIsTimePickerOpen(false)}
             />
-            <div className="relative w-full max-w-md rounded-t-3xl border border-white/10 bg-slate-950/95 p-5 text-slate-100 shadow-2xl shadow-black/60 backdrop-blur sm:rounded-3xl">
+            <div className="relative w-full max-w-md rounded-t-3xl border border-tone-white/10 bg-tone-950/95 p-5 text-tone-100 shadow-2xl shadow-tone-black/60 backdrop-blur sm:rounded-3xl">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-slate-100">
+                <div className="text-sm font-semibold text-tone-100">
                   {t("promises.new.actions.selectTime")}
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsTimePickerOpen(false)}
                   aria-label={t("promises.new.actions.closeTimePicker")}
-                  className="cursor-pointer rounded-full border border-white/10 p-1 text-slate-300 transition hover:border-emerald-300/40 hover:bg-white/5 hover:text-white"
+                  className="cursor-pointer rounded-full border border-tone-white/10 p-1 text-tone-300 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-tone-white"
                 >
                   <X className="h-4 w-4" aria-hidden />
                 </button>
@@ -351,14 +351,14 @@ export default function NewPromisePage() {
                       applyTimeChange(preset.hour, preset.minute);
                       setIsTimePickerOpen(false);
                     }}
-                    className="cursor-pointer rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-slate-100 transition hover:border-emerald-300/60 hover:bg-white/5 hover:text-emerald-100"
+                    className="cursor-pointer rounded-full border border-tone-white/10 px-3 py-1 text-xs font-semibold text-tone-100 transition hover:border-accent-300/60 hover:bg-tone-white/5 hover:text-accent-100"
                   >
                     {preset.label}
                   </button>
                 ))}
               </div>
 
-              <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-white/10 bg-black/30 p-2">
+              <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-tone-white/10 bg-tone-black/30 p-2">
                 <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-4">
                   {timeOptions.map((option) => {
                     const isSelected =
@@ -374,8 +374,8 @@ export default function NewPromisePage() {
                         className={clsx(
                           "rounded-xl border px-2 py-2 text-sm transition cursor-pointer",
                           isSelected
-                            ? "border-emerald-300/70 bg-emerald-400/20 text-emerald-100"
-                            : "border-white/10 text-slate-200 hover:border-emerald-300/50 hover:bg-white/5 hover:text-emerald-100"
+                            ? "border-accent-300/70 bg-emerald-400/20 text-accent-100"
+                            : "border-tone-white/10 text-tone-200 hover:border-accent-300/50 hover:bg-tone-white/5 hover:text-accent-100"
                         )}
                       >
                         {option.label}
@@ -1055,27 +1055,27 @@ export default function NewPromisePage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-b from-slate-950 via-[#0a101a] to-[#05070b] text-slate-100">
+    <main className="relative min-h-screen bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
       {calendarPopover}
       {timePicker}
       <div className="absolute inset-0 hero-grid" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(82,193,106,0.22),transparent_30%),radial-gradient(circle_at_70%_10%,rgba(73,123,255,0.12),transparent_28%),radial-gradient(circle_at_55%_65%,rgba(34,55,93,0.18),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--auth-wash-1),transparent_30%),radial-gradient(circle_at_70%_10%,var(--auth-wash-2),transparent_28%),radial-gradient(circle_at_55%_65%,var(--auth-wash-3),transparent_40%)]" />
 
       <div className="relative flex min-h-screen items-center justify-center px-4 py-8 md:py-10">
-        <div className="w-full max-w-2xl space-y-5 rounded-3xl border border-white/10 bg-black/40 p-5 pb-28 shadow-2xl shadow-black/40 backdrop-blur sm:p-8 sm:pb-8">
+        <div className="w-full max-w-2xl space-y-5 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-5 pb-28 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-8 sm:pb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <p className="text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("promises.new.eyebrow", { newEntity: promiseLabels.newEntity })}
               </p>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">
+              <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">
                 {t("promises.new.title", { entityLower: promiseLabels.entityLower })}
               </h1>
-              <p className="text-sm text-slate-300">
+              <p className="text-sm text-tone-300">
                 {t("promises.new.subtitle", { entityLower: promiseLabels.entityLower })}
               </p>
               {showPrefillConfirmation && (
-                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/20 bg-emerald-400/5 px-2.5 py-1.5 text-xs text-emerald-100/90">
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent-200/20 bg-emerald-400/5 px-2.5 py-1.5 text-xs text-accent-100/90">
                   <Info className="h-3.5 w-3.5" aria-hidden />
                   {t("promises.new.prefill.fromExpiredDeal")}
                 </p>
@@ -1084,21 +1084,21 @@ export default function NewPromisePage() {
           </div>
 
           <div className="grid items-start gap-5 sm:grid-cols-2">
-            <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
+            <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
               <div className="flex items-center gap-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                   {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
                 </span>
                 <Tooltip label={t("promises.new.fields.executorHelper")} placement="top">
                   <span
                     aria-label={t("promises.new.fields.executorHelper")}
-                    className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
+                    className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100"
                   >
                     <Info className="h-3.5 w-3.5" aria-hidden />
                   </span>
                 </Tooltip>
               </div>
-              <div className="flex w-full rounded-2xl border border-white/10 bg-white/5 p-1">
+              <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -1107,8 +1107,8 @@ export default function NewPromisePage() {
                   }}
                   className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     executor === "me"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                      : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
                   }`}
                 >
                   {t("promises.new.executor.me")}
@@ -1118,8 +1118,8 @@ export default function NewPromisePage() {
                   onClick={() => setExecutor("other")}
                   className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     executor === "other"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-emerald-500/20"
-                      : "text-slate-200 hover:bg-white/10 hover:text-emerald-100"
+                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                      : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
                   }`}
                 >
                   {t("promises.new.executor.other")}
@@ -1129,12 +1129,12 @@ export default function NewPromisePage() {
 
             {productFlags.collectiveAgreements && executor === "other" && (
               <div className="sm:col-span-2">
-                <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2.5">
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-white">
+                    <span className="block text-sm font-semibold text-tone-white">
                       {t("collectiveAgreements.new.toggle.label")}
                     </span>
-                    <span className="mt-0.5 block text-xs text-slate-400">
+                    <span className="mt-0.5 block text-xs text-tone-400">
                       {t("collectiveAgreements.new.toggle.helper")}
                     </span>
                   </span>
@@ -1146,8 +1146,8 @@ export default function NewPromisePage() {
                     onClick={() => setMultipleParticipants((prev) => !prev)}
                     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
                       multipleParticipants
-                        ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                        : "border-white/20 bg-white/10 hover:bg-white/20"
+                        ? "border-accent-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                        : "border-tone-white/20 bg-tone-white/10 hover:bg-tone-white/20"
                     }`}
                   >
                     <span
@@ -1160,12 +1160,12 @@ export default function NewPromisePage() {
               </div>
             )}
 
-            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+            <label className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("promises.new.fields.title")}
               </span>
               <input
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                className="w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                 placeholder={t("promises.new.placeholders.title", { entityLower: promiseLabels.entityLower })}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -1173,8 +1173,8 @@ export default function NewPromisePage() {
             </label>
 
             {ENABLE_GROUP_SELECTION && (
-              <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <label className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                   {t("promises.new.fields.group")}
                 </span>
                 <div className="relative">
@@ -1186,11 +1186,11 @@ export default function NewPromisePage() {
                     aria-expanded={isGroupMenuOpen}
                     aria-label={t("promises.new.fields.group")}
                     disabled={isGroupsLoading}
-                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-tone-white/15 bg-tone-white/[0.04] px-4 py-2 text-sm font-medium text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <span className="truncate">{selectedGroupLabel}</span>
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-300 transition-transform ${isGroupMenuOpen ? "rotate-180" : ""}`}
+                      className={`h-4 w-4 text-tone-300 transition-transform ${isGroupMenuOpen ? "rotate-180" : ""}`}
                       aria-hidden
                     />
                   </button>
@@ -1200,7 +1200,7 @@ export default function NewPromisePage() {
                       ref={groupMenuRef}
                       role="listbox"
                       aria-label={t("promises.new.fields.group")}
-                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 p-1 shadow-xl shadow-black/50 backdrop-blur"
+                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 p-1 shadow-xl shadow-tone-black/50 backdrop-blur"
                     >
                       <button
                         type="button"
@@ -1211,10 +1211,10 @@ export default function NewPromisePage() {
                           setIsGroupMenuOpen(false);
                         }}
                         className={[
-                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
+                          "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
                           selectedGroupId === ""
                             ? "bg-emerald-400/90 text-slate-950"
-                            : "text-slate-100 hover:bg-white/10",
+                            : "text-tone-100 hover:bg-tone-white/10",
                         ].join(" ")}
                       >
                         {t("promises.new.group.none")}
@@ -1232,8 +1232,8 @@ export default function NewPromisePage() {
                               setIsGroupMenuOpen(false);
                             }}
                             className={[
-                              "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40",
-                              selected ? "bg-emerald-400/90 text-slate-950" : "text-slate-100 hover:bg-white/10",
+                              "flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/40",
+                              selected ? "bg-emerald-400/90 text-slate-950" : "text-tone-100 hover:bg-tone-white/10",
                             ].join(" ")}
                           >
                             {group.title}
@@ -1243,11 +1243,11 @@ export default function NewPromisePage() {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-between text-xs text-slate-400">
+                <div className="flex items-center justify-between text-xs text-tone-400">
                   <span>{t("promises.new.group.helper")}</span>
                   <LocalizedLink
                     href="/promises/groups?returnTo=%2Fpromises%2Fnew"
-                    className="text-emerald-200 hover:text-emerald-100"
+                    className="text-accent-200 hover:text-accent-100"
                   >
                     {t("promises.new.group.manage")}
                   </LocalizedLink>
@@ -1255,12 +1255,12 @@ export default function NewPromisePage() {
               </label>
             )}
 
-            <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-              <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+            <label className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+              <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("promises.new.fields.details")}
               </span>
               <textarea
-                className="min-h-[130px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                className="min-h-[130px] w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                 placeholder={t("promises.new.placeholders.details")}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
@@ -1270,7 +1270,7 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     onClick={() => setShowCondition(true)}
-                    className="cursor-pointer text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
+                    className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
                   >
                     {t("promises.new.actions.addCondition")}
                   </button>
@@ -1279,12 +1279,12 @@ export default function NewPromisePage() {
             </label>
 
             {shouldShowCondition && (
-              <label className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <label className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                   {t("promises.new.fields.condition")}
                 </span>
                 <textarea
-                  className="min-h-[90px] w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                  className="min-h-[90px] w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                   placeholder={t("promises.new.placeholders.condition")}
                   value={conditionText}
                   onChange={(e) => setConditionText(e.target.value)}
@@ -1293,7 +1293,7 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     onClick={handleRemoveCondition}
-                    className="cursor-pointer text-xs font-semibold text-slate-300 transition hover:text-emerald-100"
+                    className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
                   >
                     {t("promises.new.actions.removeCondition")}
                   </button>
@@ -1304,30 +1304,30 @@ export default function NewPromisePage() {
             <div className="sm:col-span-2">
               <div className="grid items-start gap-5 sm:grid-cols-2">
                 {!multipleParticipants && executor && (
-                  <div className="text-sm text-slate-200">
-                    <label className="space-y-2 text-sm text-slate-200">
+                  <div className="text-sm text-tone-200">
+                    <label className="space-y-2 text-sm text-tone-200">
                       <div className="flex items-center gap-2">
-                        <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                           {t("promises.new.fields.counterparty")}
                         </span>
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
                           <span
                             aria-label={t("promises.new.fields.counterpartyHelper")}
-                            className="inline-flex items-center justify-center text-slate-500 transition hover:text-emerald-100"
+                            className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100"
                           >
                             <Info className="h-3.5 w-3.5" aria-hidden />
                           </span>
                         </Tooltip>
                       </div>
                       {selectedCounterparty ? (
-                        <div className="flex h-11 items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-400/10 px-3 text-sm text-emerald-100">
+                        <div className="flex h-11 items-center justify-between rounded-xl border border-accent-300/40 bg-emerald-400/10 px-3 text-sm text-accent-100">
                           <div className="flex min-w-0 items-center gap-2">
-                            <div className="h-7 w-7 overflow-hidden rounded-full bg-white/10">
+                            <div className="h-7 w-7 overflow-hidden rounded-full bg-tone-white/10">
                               {selectedCounterparty.avatarUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={selectedCounterparty.avatarUrl} alt="" className="h-full w-full object-cover" />
                               ) : (
-                                <div className="flex h-full w-full items-center justify-center text-xs text-slate-200">
+                                <div className="flex h-full w-full items-center justify-center text-xs text-tone-200">
                                   @{selectedCounterparty.handle.slice(0, 1).toUpperCase()}
                                 </div>
                               )}
@@ -1345,7 +1345,7 @@ export default function NewPromisePage() {
                               setShowCounterpartyDropdown(false);
                             }}
                             aria-label={t("promises.new.actions.removeCounterparty")}
-                            className="ml-2 inline-flex cursor-pointer rounded-full border border-emerald-300/40 p-1 text-emerald-100 transition hover:bg-white/10"
+                            className="ml-2 inline-flex cursor-pointer rounded-full border border-accent-300/40 p-1 text-accent-100 transition hover:bg-tone-white/10"
                           >
                             <X className="h-3 w-3" aria-hidden />
                           </button>
@@ -1355,7 +1355,7 @@ export default function NewPromisePage() {
                           <input
                             id="counterparty"
                             autoComplete="off"
-                            className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm leading-5 text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                            className="h-12 w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm leading-5 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                             placeholder={
                               executor === "me"
                                 ? t("promises.new.placeholders.counterpartyMe")
@@ -1395,15 +1395,15 @@ export default function NewPromisePage() {
                             }}
                           />
                           {showCounterpartyDropdown && counterpartyQuery.trim().length >= 2 && (
-                            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-xl shadow-black/40">
+                            <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 shadow-xl shadow-tone-black/40">
                               {isCounterpartySearching && (
-                                <p className="px-3 py-2 text-xs text-slate-400">
+                                <p className="px-3 py-2 text-xs text-tone-400">
                                   {t("promises.new.search.searching")}
                                 </p>
                               )}
                               {!isCounterpartySearching && counterpartyResults.length === 0 && (
                                 <div className="px-3 py-3">
-                                  <p className="text-xs text-slate-400">{t("promises.new.search.noResults")}</p>
+                                  <p className="text-xs text-tone-400">{t("promises.new.search.noResults")}</p>
                                 </div>
                               )}
                               {!isCounterpartySearching &&
@@ -1416,27 +1416,27 @@ export default function NewPromisePage() {
                                       selectCounterparty(user);
                                     }}
                                     className={clsx(
-                                      "flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5",
-                                      index === counterpartyActiveIndex && "bg-white/10"
+                                      "flex w-full cursor-pointer items-center gap-3 border-b border-tone-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-tone-white/5",
+                                      index === counterpartyActiveIndex && "bg-tone-white/10"
                                     )}
                                   >
-                                    <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
+                                    <div className="h-8 w-8 overflow-hidden rounded-full bg-tone-white/10">
                                       {user.avatar_url ? (
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
                                       ) : (
-                                        <div className="flex h-full w-full items-center justify-center text-xs text-slate-300">
+                                        <div className="flex h-full w-full items-center justify-center text-xs text-tone-300">
                                           @{user.handle.slice(0, 1).toUpperCase()}
                                         </div>
                                       )}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm font-semibold text-white">
+                                      <p className="truncate text-sm font-semibold text-tone-white">
                                         {user.display_name ?? `@${user.handle}`}
                                       </p>
-                                      <p className="truncate text-xs text-slate-400">@{user.handle}</p>
+                                      <p className="truncate text-xs text-tone-400">@{user.handle}</p>
                                     </div>
-                                    <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
+                                    <span className="rounded-full border border-accent-300/40 px-2 py-0.5 text-[10px] text-accent-100">
                                       {t("promises.new.search.inDreddi")}
                                     </span>
                                   </button>
@@ -1450,8 +1450,8 @@ export default function NewPromisePage() {
                 )}
 
                 {multipleParticipants && (
-                  <div className="space-y-2 text-sm text-slate-200 sm:col-span-2">
-                    <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                  <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+                    <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                       {t("collectiveAgreements.new.fields.participants")}
                     </span>
 
@@ -1460,14 +1460,14 @@ export default function NewPromisePage() {
                         {selectedParticipants.map((p) => (
                           <span
                             key={p.id}
-                            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/10 px-3 py-1.5 text-sm text-emerald-100"
+                            className="inline-flex items-center gap-2 rounded-full border border-accent-300/40 bg-emerald-400/10 px-3 py-1.5 text-sm text-accent-100"
                           >
                             {p.display_name ?? `@${p.handle}`} · @{p.handle}
                             <button
                               type="button"
                               onClick={() => removeParticipant(p.id)}
                               aria-label={t("collectiveAgreements.new.actions.removeParticipant")}
-                              className="cursor-pointer rounded-full border border-emerald-300/40 p-0.5 text-emerald-100 transition hover:bg-white/10"
+                              className="cursor-pointer rounded-full border border-accent-300/40 p-0.5 text-accent-100 transition hover:bg-tone-white/10"
                             >
                               <X className="h-3 w-3" aria-hidden />
                             </button>
@@ -1479,20 +1479,20 @@ export default function NewPromisePage() {
                     <div className="relative">
                       <input
                         autoComplete="off"
-                        className="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-300/60 focus:ring-2 focus:ring-emerald-400/40"
+                        className="h-12 w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
                         placeholder={t("collectiveAgreements.new.placeholders.participantSearch")}
                         value={participantQuery}
                         onChange={(e) => setParticipantQuery(e.target.value)}
                       />
                       {participantQuery.trim().length >= 2 && (
-                        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-950/95 shadow-xl shadow-black/40">
+                        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950/95 shadow-xl shadow-tone-black/40">
                           {isParticipantSearching && (
-                            <p className="px-3 py-2 text-xs text-slate-400">
+                            <p className="px-3 py-2 text-xs text-tone-400">
                               {t("collectiveAgreements.new.search.searching")}
                             </p>
                           )}
                           {!isParticipantSearching && participantResults.length === 0 && (
-                            <p className="px-3 py-3 text-xs text-slate-400">
+                            <p className="px-3 py-3 text-xs text-tone-400">
                               {t("collectiveAgreements.new.search.noResults")}
                             </p>
                           )}
@@ -1502,25 +1502,25 @@ export default function NewPromisePage() {
                                 key={user.id}
                                 type="button"
                                 onClick={() => addParticipant(user)}
-                                className="flex w-full cursor-pointer items-center gap-3 border-b border-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-white/5"
+                                className="flex w-full cursor-pointer items-center gap-3 border-b border-tone-white/5 px-3 py-2 text-left last:border-b-0 hover:bg-tone-white/5"
                               >
-                                <div className="h-8 w-8 overflow-hidden rounded-full bg-white/10">
+                                <div className="h-8 w-8 overflow-hidden rounded-full bg-tone-white/10">
                                   {user.avatar_url ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
                                   ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-xs text-slate-300">
+                                    <div className="flex h-full w-full items-center justify-center text-xs text-tone-300">
                                       @{user.handle.slice(0, 1).toUpperCase()}
                                     </div>
                                   )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="truncate text-sm font-semibold text-white">
+                                  <p className="truncate text-sm font-semibold text-tone-white">
                                     {user.display_name ?? `@${user.handle}`}
                                   </p>
-                                  <p className="truncate text-xs text-slate-400">@{user.handle}</p>
+                                  <p className="truncate text-xs text-tone-400">@{user.handle}</p>
                                 </div>
-                                <span className="rounded-full border border-emerald-300/40 px-2 py-0.5 text-[10px] text-emerald-100">
+                                <span className="rounded-full border border-accent-300/40 px-2 py-0.5 text-[10px] text-accent-100">
                                   {t("collectiveAgreements.new.search.inDreddi")}
                                 </span>
                               </button>
@@ -1531,8 +1531,8 @@ export default function NewPromisePage() {
                   </div>
                 )}
 
-                <div className="space-y-2 text-sm text-slate-200">
-                  <span className="block text-xs uppercase tracking-[0.2em] text-emerald-200">
+                <div className="space-y-2 text-sm text-tone-200">
+                  <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
                     {t("promises.new.fields.dueDate")}
                   </span>
                   <div className="relative flex flex-col sm:flex-row sm:items-center">
@@ -1542,11 +1542,11 @@ export default function NewPromisePage() {
                       onClick={() => setIsCalendarOpen((open) => !open)}
                       aria-expanded={isCalendarOpen}
                       aria-label={t("promises.new.fields.dueDate")}
-                      className="flex h-12 w-full cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10 sm:flex-1"
+                      className="flex h-12 w-full cursor-pointer items-center gap-3 rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 pr-10 text-left text-sm leading-5 text-tone-100 transition hover:border-accent-300/40 hover:bg-tone-white/10 sm:flex-1"
                     >
-                      <CalendarIcon className="h-4 w-4 text-emerald-200" aria-hidden />
+                      <CalendarIcon className="h-4 w-4 text-accent-200" aria-hidden />
                       <span
-                        className={clsx("flex-1", dueAt ? "text-slate-100" : "text-white/50")}
+                        className={clsx("flex-1", dueAt ? "text-tone-100" : "text-tone-white/50")}
                       >
                         {formattedDueAt}
                       </span>
@@ -1560,21 +1560,21 @@ export default function NewPromisePage() {
                         }}
                         aria-label={t("promises.new.actions.clearDate")}
                         title={t("promises.new.actions.clearDate")}
-                        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border border-transparent p-1 text-slate-400 transition hover:border-white/10 hover:bg-white/10 hover:text-slate-100"
+                        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full border border-transparent p-1 text-tone-400 transition hover:border-tone-white/10 hover:bg-tone-white/10 hover:text-tone-100"
                       >
                         <X className="h-4 w-4" aria-hidden />
                       </button>
                     )}
                   </div>
                   {dueAt && (
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-tone-300">
+                      <span className="rounded-full border border-tone-white/10 bg-tone-white/5 px-3 py-1 text-xs font-semibold text-tone-200">
                         {dueTimeFormatter.format(dueAt)}
                       </span>
                       <button
                         type="button"
                         onClick={() => setIsTimePickerOpen(true)}
-                        className="cursor-pointer text-xs font-semibold text-emerald-200 transition hover:text-emerald-100"
+                        className="cursor-pointer text-xs font-semibold text-accent-200 transition hover:text-accent-100"
                       >
                         {t("promises.new.actions.changeTime")}
                       </button>
@@ -1584,19 +1584,19 @@ export default function NewPromisePage() {
             </div>
 
             <div className="mt-6 space-y-2">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+              <p className="text-xs uppercase tracking-[0.2em] text-accent-200">
                 {t("promises.new.fields.settings")}
               </p>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+              <div className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 text-sm text-tone-200">
                 <div className="space-y-4">
                 <div>
-                  <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                  <div className="flex w-full items-center justify-between gap-3 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2.5">
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-white">
+                      <span className="block text-sm font-semibold text-tone-white">
                       {t("promises.new.settings.importance.toggle")}
                       </span>
-                      <span className="mt-0.5 block text-xs text-slate-400">
+                      <span className="mt-0.5 block text-xs text-tone-400">
                         {t("promises.new.settings.importance.helper")}
                       </span>
                     </span>
@@ -1608,8 +1608,8 @@ export default function NewPromisePage() {
                       onClick={() => setIsImportant((prev) => !prev)}
                       className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
                         isImportant
-                          ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                          : "border-white/20 bg-white/10 hover:bg-white/20"
+                          ? "border-accent-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                          : "border-tone-white/20 bg-tone-white/10 hover:bg-tone-white/20"
                       }`}
                     >
                       <span
@@ -1622,12 +1622,12 @@ export default function NewPromisePage() {
                 </div>
 
                 <div className="pt-1">
-                  <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+                  <div className="flex items-center gap-3 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2.5">
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-white">
+                      <span className="block text-sm font-semibold text-tone-white">
                       {t("promises.new.visibility.public.label")}
                       </span>
-                      <span className="mt-0.5 block text-xs text-slate-400">
+                      <span className="mt-0.5 block text-xs text-tone-400">
                         {t("promises.new.settings.visibility.helper")}
                       </span>
                     </span>
@@ -1641,8 +1641,8 @@ export default function NewPromisePage() {
                       }
                       className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer items-center rounded-full border transition ${
                         visibility === "public"
-                          ? "border-emerald-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
-                          : "border-white/20 bg-white/10 hover:bg-white/20"
+                          ? "border-accent-300/50 bg-emerald-400/70 hover:bg-emerald-400/80"
+                          : "border-tone-white/20 bg-tone-white/10 hover:bg-tone-white/20"
                       }`}
                     >
                       <span
@@ -1658,17 +1658,17 @@ export default function NewPromisePage() {
             </div>
 
             {!multipleParticipants && predictionResult && (
-              <section className="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/5 p-4 text-sm text-slate-200">
+              <section className="mt-6 rounded-2xl border border-accent-300/20 bg-emerald-400/5 p-4 text-sm text-tone-200">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+                    <p className="text-xs uppercase tracking-[0.2em] text-accent-200">
                       {t("promises.new.prediction.title")}
                     </p>
-                    <p className="mt-2 text-lg font-semibold text-white">
+                    <p className="mt-2 text-lg font-semibold text-tone-white">
                       {t("promises.new.prediction.chance", { score: predictionResult.score })}
                     </p>
                     {!isPredictionExpanded && (
-                      <p className="mt-1 text-xs text-slate-300">
+                      <p className="mt-1 text-xs text-tone-300">
                         {t(`promises.new.prediction.bands.${predictionResult.band}`)}
                       </p>
                     )}
@@ -1676,7 +1676,7 @@ export default function NewPromisePage() {
                   <button
                     type="button"
                     onClick={() => setIsPredictionExpanded((prev) => !prev)}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-300/40 hover:text-emerald-100"
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-tone-white/15 px-3 py-1.5 text-xs font-semibold text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
                   >
                     {isPredictionExpanded
                       ? t("promises.new.prediction.actions.collapse")
@@ -1693,13 +1693,13 @@ export default function NewPromisePage() {
 
                 {isPredictionExpanded && (
                   <>
-                    <p className="mt-2 text-xs text-slate-300">
+                    <p className="mt-2 text-xs text-tone-300">
                       {t(`promises.new.prediction.bands.${predictionResult.band}`)}
                     </p>
-                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-tone-300">
                       {t("promises.new.prediction.why")}
                     </p>
-                    <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
+                    <ul className="mt-2 space-y-1.5 text-sm text-tone-200">
                       {predictionResult.reasonKeys.map((reasonKey) => (
                         <li key={reasonKey} className="flex items-center gap-2">
                           <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-200/80" />
@@ -1718,7 +1718,7 @@ export default function NewPromisePage() {
             <button
               onClick={createPromise}
               disabled={isSubmitDisabled}
-              className="hidden h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:translate-y-[-1px] hover:shadow-emerald-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 sm:flex"
+              className="hidden h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 sm:flex"
             >
               {busy
                 ? t("promises.new.creating", { entityLower: promiseLabels.entityLower })
@@ -1726,12 +1726,12 @@ export default function NewPromisePage() {
             </button>
 
             {error && (
-              <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+              <div className="rounded-xl border border-danger-400/30 bg-red-500/10 p-3 text-sm text-danger-200">
                 <p>{error}</p>
                 {sessionExpired && (
                   <LocalizedLink
                     href={localizeLoginPath(localizePath("/promises/new", locale), locale)}
-                    className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"
+                    className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-accent-200 hover:text-accent-100"
                   >
                     Sign in again →
                   </LocalizedLink>
@@ -1740,11 +1740,11 @@ export default function NewPromisePage() {
             )}
           </div>
 
-          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/80 px-4 py-3 backdrop-blur sm:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-tone-white/10 bg-tone-950/80 px-4 py-3 backdrop-blur sm:hidden">
             <button
               onClick={createPromise}
               disabled={isSubmitDisabled}
-              className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/30 transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-4 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {busy
                 ? t("promises.new.creating", { entityLower: promiseLabels.entityLower })

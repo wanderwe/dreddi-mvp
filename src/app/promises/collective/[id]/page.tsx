@@ -165,7 +165,7 @@ export default function CollectiveAgreementDetailPage() {
   if (loading) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-        <p className="text-sm text-slate-400">{t("collectiveAgreements.detail.loading")}</p>
+        <p className="text-sm text-tone-400">{t("collectiveAgreements.detail.loading")}</p>
       </main>
     );
   }
@@ -173,7 +173,7 @@ export default function CollectiveAgreementDetailPage() {
   if (error || !agreement) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-        <p className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+        <p className="rounded-xl border border-danger-300/40 bg-red-500/10 px-3 py-2 text-sm text-danger-100">
           {error ?? t("collectiveAgreements.detail.notFound")}
         </p>
       </main>
@@ -183,31 +183,31 @@ export default function CollectiveAgreementDetailPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6">
-        <LocalizedLink href="/promises" className="text-sm text-emerald-200 hover:text-emerald-100">
+        <LocalizedLink href="/promises" className="text-sm text-accent-200 hover:text-accent-100">
           ← {t("collectiveAgreements.detail.back")}
         </LocalizedLink>
-        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-emerald-200">
+        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-accent-200">
           {t("collectiveAgreements.eyebrow")}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{agreement.title}</h1>
-        {agreement.details && <p className="mt-2 text-sm text-slate-300">{agreement.details}</p>}
-        <p className="mt-2 text-xs text-slate-400">
+        <h1 className="mt-2 text-3xl font-semibold text-tone-white">{agreement.title}</h1>
+        {agreement.details && <p className="mt-2 text-sm text-tone-300">{agreement.details}</p>}
+        <p className="mt-2 text-xs text-tone-400">
           {t("collectiveAgreements.detail.createdAt", { date: dateFormatter.format(new Date(agreement.created_at)) })}
         </p>
       </div>
 
       {isCreator ? (
         <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-tone-white">
             {t("collectiveAgreements.detail.roster", { count: roster.length })}
           </h2>
           <ul className="space-y-2">
             {roster.map((participant) => (
               <li
                 key={participant.promiseId}
-                className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3"
               >
-                <span className="min-w-0 truncate text-sm text-white">
+                <span className="min-w-0 truncate text-sm text-tone-white">
                   {participant.displayName ?? (participant.handle ? `@${participant.handle}` : participant.promiseId)}
                   {participant.displayName && participant.handle ? ` · @${participant.handle}` : ""}
                 </span>
@@ -221,11 +221,11 @@ export default function CollectiveAgreementDetailPage() {
         </section>
       ) : (
         ownPromiseId && (
-          <section className="rounded-xl border border-white/10 bg-black/20 px-4 py-4">
-            <p className="text-sm font-semibold text-white">{t("collectiveAgreements.detail.yourCopy")}</p>
+          <section className="rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-4">
+            <p className="text-sm font-semibold text-tone-white">{t("collectiveAgreements.detail.yourCopy")}</p>
             <LocalizedLink
               href={`/promises/${ownPromiseId}`}
-              className="mt-2 inline-flex text-sm font-semibold text-emerald-200 hover:text-emerald-100"
+              className="mt-2 inline-flex text-sm font-semibold text-accent-200 hover:text-accent-100"
             >
               {t("collectiveAgreements.detail.viewDeal")}
             </LocalizedLink>

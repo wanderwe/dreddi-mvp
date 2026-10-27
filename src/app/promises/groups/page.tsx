@@ -149,14 +149,14 @@ export default function PromiseGroupsPage() {
       <div className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">{t("groups.eyebrow")}</p>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{t("groups.title")}</h1>
-            <p className="mt-2 text-sm text-slate-300">{t("groups.subtitle")}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent-200">{t("groups.eyebrow")}</p>
+            <h1 className="mt-2 text-3xl font-semibold text-tone-white">{t("groups.title")}</h1>
+            <p className="mt-2 text-sm text-tone-300">{t("groups.subtitle")}</p>
           </div>
           {returnToPath && (
             <LocalizedLink
               href={returnToPath}
-              className="self-start rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-emerald-200 transition hover:border-emerald-300/30 hover:text-emerald-100 sm:mt-1 sm:shrink-0 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0"
+              className="self-start rounded-lg border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-accent-200 transition hover:border-accent-300/30 hover:text-accent-100 sm:mt-1 sm:shrink-0 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0"
             >
               ← {t("groups.backToDeal")}
             </LocalizedLink>
@@ -164,19 +164,19 @@ export default function PromiseGroupsPage() {
         </div>
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <section className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-5">
         <button
           type="button"
           onClick={() => setIsCreateSectionOpen((prev) => !prev)}
-          className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0f1a]"
+          className="flex w-full cursor-pointer items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)]"
           aria-label={
             isCreateSectionOpen ? t("groups.create.collapseLabel") : t("groups.create.expandLabel")
           }
           aria-expanded={isCreateSectionOpen}
         >
-          <h2 className="text-lg font-semibold text-white">{t("groups.create.title")}</h2>
+          <h2 className="text-lg font-semibold text-tone-white">{t("groups.create.title")}</h2>
           <span
-            className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 transition-transform duration-200 ${
+            className={`flex h-10 w-10 items-center justify-center rounded-full border border-tone-white/10 bg-tone-black/40 text-tone-white/70 transition-transform duration-200 ${
               isCreateSectionOpen ? "rotate-180" : "rotate-0"
             }`}
           >
@@ -189,19 +189,19 @@ export default function PromiseGroupsPage() {
           }`}
         >
           <form className="mt-4 space-y-3" onSubmit={createGroup}>
-            <label htmlFor="group-name" className="block text-sm font-medium text-slate-200">
+            <label htmlFor="group-name" className="block text-sm font-medium text-tone-200">
               {t("groups.create.titleLabel")}
             </label>
             <input
               id="group-name"
-              className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:text-sm"
+              className="h-11 w-full rounded-xl border border-tone-white/10 bg-tone-black/20 px-3 text-base text-tone-white outline-none placeholder:text-tone-400 focus:border-accent-300/60 sm:text-sm"
               placeholder={t("groups.create.titlePlaceholder")}
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               maxLength={120}
             />
             <textarea
-              className="min-h-[96px] w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-base text-white outline-none placeholder:text-slate-400 focus:border-emerald-300/60 sm:min-h-[80px] sm:text-sm"
+              className="min-h-[96px] w-full rounded-xl border border-tone-white/10 bg-tone-black/20 px-3 py-2 text-base text-tone-white outline-none placeholder:text-tone-400 focus:border-accent-300/60 sm:min-h-[80px] sm:text-sm"
               placeholder={t("groups.create.descriptionPlaceholder")}
               value={description}
               onChange={(event) => setDescription(event.target.value)}
@@ -221,24 +221,24 @@ export default function PromiseGroupsPage() {
       </section>
 
       <section className="mt-6 space-y-3">
-        <h2 className="text-lg font-semibold text-white">{t("groups.list.title", { count: groups.length })}</h2>
-        {error && <p className="rounded-xl border border-red-300/40 bg-red-500/10 px-3 py-2 text-sm text-red-100">{error}</p>}
+        <h2 className="text-lg font-semibold text-tone-white">{t("groups.list.title", { count: groups.length })}</h2>
+        {error && <p className="rounded-xl border border-danger-300/40 bg-red-500/10 px-3 py-2 text-sm text-danger-100">{error}</p>}
         {loading ? (
-          <p className="text-sm text-slate-400">{t("groups.loading")}</p>
+          <p className="text-sm text-tone-400">{t("groups.loading")}</p>
         ) : groups.length === 0 ? (
-          <p className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300">{t("groups.empty")}</p>
+          <p className="rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 text-sm text-tone-300">{t("groups.empty")}</p>
         ) : (
           <ul className="space-y-2">
             {groups.map((group) => (
               <li key={group.id}>
                 <LocalizedLink
                   href={`/promises/groups/${group.id}`}
-                  className="block cursor-pointer rounded-xl border border-white/10 bg-black/20 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/5"
+                  className="block cursor-pointer rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 transition hover:border-accent-300/40 hover:bg-tone-white/5"
                 >
-                  <p className="font-semibold text-white">
+                  <p className="font-semibold text-tone-white">
                     {group.title} • {t("groups.list.dealCount", { count: group.dealCount })}
                   </p>
-                  {group.description && <p className="mt-1 text-sm text-slate-300">{group.description}</p>}
+                  {group.description && <p className="mt-1 text-sm text-tone-300">{group.description}</p>}
                 </LocalizedLink>
               </li>
             ))}
