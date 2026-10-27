@@ -12,8 +12,9 @@ export const THEME_COLORS: Record<Theme, string> = {
   dark: "#070a10",
 };
 
-// Embeds live on other people's sites and stay dark until they get their own theme option.
-export const isThemeExcludedPath = (pathname: string | null) => /(^|\/)embed(\/|$)/.test(pathname ?? "");
+// Embeds (shown on other people's sites) and the admin panel stay dark-only for now.
+export const isThemeExcludedPath = (pathname: string | null) =>
+  /^(\/[a-z]{2})?\/(admin|embed)(\/|$)|^(\/[a-z]{2})?\/u\/[^/]+\/embed(\/|$)/.test(pathname ?? "");
 
 // Anything other than an explicit "dark" (nothing saved, or the old "system" value) is light.
 export const parseTheme = (value: string | null | undefined): Theme =>
