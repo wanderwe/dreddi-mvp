@@ -3,7 +3,7 @@
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useEffect, useState } from "react";
-import { Eye, LayoutGrid, UsersRound } from "lucide-react";
+import { UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { extractLocaleFromPathname, localizePath } from "@/lib/i18n/routing";
 import { DreddiLogo } from "@/app/components/DreddiLogo";
@@ -218,20 +218,6 @@ export function AppHeader() {
                 </div>
                 <div className="ml-1 flex items-center gap-3">
                   <NewItemMenu />
-                  <Tooltip label={t("nav.watching")} placement="top">
-                    <IconButton
-                      href={localizePath("/watching", locale)}
-                      ariaLabel={t("nav.watching")}
-                      icon={<Eye className="h-4 w-4" aria-hidden />}
-                    />
-                  </Tooltip>
-                  <Tooltip label={t("nav.groups")} placement="top">
-                    <IconButton
-                      href={localizePath("/promises/groups", locale)}
-                      ariaLabel={t("nav.groups")}
-                      icon={<LayoutGrid className="h-4 w-4" aria-hidden />}
-                    />
-                  </Tooltip>
                   <Tooltip label={t("nav.publicProfiles")} placement="top">
                     <IconButton
                       href={localizePath("/u", locale)}

@@ -4,14 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, UserRound, X, ExternalLink, Copy, Check } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { COMMITMENTS_ENABLED, LIGHT_THEME_ENABLED } from "@/lib/features";
+import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
 import { SocialLinksSection } from "@/app/components/SocialLinksSection";
-import { useThemeToggle } from "@/app/components/ThemeSwitcher";
+import { ThemeSegment } from "@/app/components/ThemeSwitcher";
 import {
   Sheet,
   SheetClose,
@@ -946,8 +946,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
           </div>
         </div>
 
-        {LIGHT_THEME_ENABLED && <ThemeSettingRow />}
-
         {error && (
           <div className="rounded-xl border border-danger-400/30 bg-red-500/10 px-3 py-2 text-xs text-danger-200">
             {error}
@@ -999,41 +997,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   );
 }
 
-function ThemeSettingRow() {
-  const t = useT();
-  const { theme, toggle } = useThemeToggle();
-  const isDark = theme === "dark";
-
-  return (
-    <div className="border-t border-tone-white/10 bg-transparent py-3 sm:rounded-2xl sm:border sm:bg-tone-white/5 sm:px-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="space-y-1">
-          <div className="text-sm font-semibold text-tone-white">{t("profileSettings.darkThemeLabel")}</div>
-          <HelperText>{t("profileSettings.darkThemeDescription")}</HelperText>
-        </div>
-        <div className="flex justify-end self-center">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isDark}
-            aria-label={t("profileSettings.darkThemeLabel")}
-            onClick={toggle}
-            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full border transition hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98] ${
-              isDark ? "border-accent-300/50 bg-emerald-400/70" : "border-tone-white/20 bg-tone-white/10"
-            }`}
-          >
-            <span
-              className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                isDark ? "translate-x-5" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 type ProfileSettingsMenuProps = {
   variant?: "icon" | "text";
   className?: string;
@@ -1075,15 +1038,18 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
               </div>
               <h2 className="text-lg font-semibold text-tone-white">{t("profileSettings.title")}</h2>
             </div>
-            <SheetClose asChild>
-              <button
-                type="button"
-                className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
-                aria-label={t("profileSettings.close")}
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </SheetClose>
+            <div className="flex items-center gap-2">
+              <ThemeSegment />
+              <SheetClose asChild>
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
+                  aria-label={t("profileSettings.close")}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </SheetClose>
+            </div>
           </div>
           <ProfileSettingsPanel showTitle={false} className="mt-4" />
         </SheetContent>

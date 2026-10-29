@@ -1,6 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { DealsTabs } from "@/app/components/DealsTabs";
 import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -1037,7 +1038,7 @@ export default function PromisesClient() {
     t("promises.list.dealTypeFilter.options.all");
 
   return (
-    <main className="relative py-10">
+    <main className="relative py-8 sm:py-10">
       {toast && (
         <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
           <div
@@ -1056,6 +1057,7 @@ export default function PromisesClient() {
       />
 
       <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
+        <DealsTabs />
         <div className="flex flex-col gap-4 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-4 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-1">

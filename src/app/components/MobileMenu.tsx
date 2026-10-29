@@ -4,6 +4,7 @@ import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useState, useEffect } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
+import { ThemeSegment } from "@/app/components/ThemeSwitcher";
 import { NOTIFICATION_COUNT_SYNC_EVENT } from "@/lib/notifications/clientSync";
 import {
   Sheet,
@@ -128,8 +129,11 @@ export function MobileMenu({
                   </LocalizedLink>
                 </SheetClose>
                 <div className="mt-2 border-t border-tone-white/10 pt-4">
-                  <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
-                    {t("profileSettings.sectionLabel")}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
+                      {t("profileSettings.sectionLabel")}
+                    </div>
+                    <ThemeSegment />
                   </div>
                   <ProfileSettingsPanel showTitle={false} className="mt-3" />
                 </div>

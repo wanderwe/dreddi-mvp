@@ -35,7 +35,12 @@
     "theme": {
       "current": "Theme: {theme}. Click to change",
       "light": "light",
-      "dark": "dark"
+      "dark": "dark",
+      "options": {
+        "label": "Theme",
+        "light": "Light",
+        "dark": "Dark"
+      }
     }
   },
   "legal": {
@@ -124,8 +129,6 @@
       "linkedinUrlLabel": "LinkedIn profile URL (optional — makes the badge clickable)",
       "hint": "Connecting a social account proves you control it. A verified badge will appear on your public profile."
     },
-    "darkThemeLabel": "Dark theme",
-    "darkThemeDescription": "Light theme is used by default",
     "pushLabel": "In-app notifications",
     "pushDescription": "Notifications about important deal events shown inside the app",
     "emailLabel": "Email notifications",
@@ -1502,5 +1505,9 @@
     "label": {
       "goal": "Goal"
     }
+  },
+  "dealsTabs": {
+    "label": "Deal sections",
+    "mine": "My deals"
   }
 }

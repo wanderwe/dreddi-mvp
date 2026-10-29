@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { DealsTabs } from "@/app/components/DealsTabs";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -105,8 +106,9 @@ export default function WatchingPage() {
   };
 
   return (
-    <main className="relative py-6">
+    <main className="relative py-8 sm:py-10">
       <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
+        <DealsTabs />
         <div className="px-1 py-1">
           <h1 className="text-2xl font-semibold text-tone-white">{t("watching.title")}</h1>
           <p className="mt-1 text-sm text-tone-300">{t("watching.subtitle")}</p>
