@@ -8,6 +8,7 @@ import {
   buildSystemPrompt,
   estimateCostUsd,
   type JudgePhase,
+  type JudgeStyle,
   type JudgePromise,
   type JudgeTurn,
 } from "@/lib/ai/judge";
@@ -17,6 +18,7 @@ const LAB_ENABLED = process.env.LAB_ENABLED === "true";
 
 type JudgeRequest = {
   phase?: JudgePhase;
+  style?: JudgeStyle;
   promise?: JudgePromise;
   turns?: JudgeTurn[];
 };
@@ -44,6 +46,7 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => null)) as JudgeRequest | null;
   const phase: JudgePhase = body?.phase === "verdict" ? "verdict" : "criteria";
+  const style: JudgeStyle = body?.style === "dredd" ? "dredd" : "plain";
   const promise = body?.promise;
   const turns = body?.turns ?? [];
 
@@ -62,7 +65,7 @@ export async function POST(req: Request) {
     const response = await client.messages.parse({
       model: JUDGE_MODEL,
       max_tokens: 4000,
-      system: buildSystemPrompt(phase, promise),
+      system: buildSystemPrompt(phase, promise, style),
       messages: toMessages(turns),
       output_config: { effort: "medium", format: zodOutputFormat(schema) },
     });

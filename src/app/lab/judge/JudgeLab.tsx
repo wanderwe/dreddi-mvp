@@ -7,6 +7,7 @@ import type {
   VerdictResult,
   JudgeImage,
   JudgePhase,
+  JudgeStyle,
   JudgeTurn,
 } from "@/lib/ai/judge";
 
@@ -47,6 +48,7 @@ const inputClass =
   "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
 
 export function JudgeLab() {
+  const [style, setStyle] = useState<JudgeStyle>("plain");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -83,6 +85,7 @@ export function JudgeLab() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          style,
           phase,
           promise: { title, details, deadline, criteria },
           turns: turns.map(({ role, text: turnText, speaker: turnSpeaker, images: turnImages }) => ({
@@ -133,6 +136,20 @@ export function JudgeLab() {
           Суддя погоджує критерії, а потім перевіряє докази. Якщо пише лише виконавець, він перевіряє його сам; якщо
           висловилась і інша сторона, вислуховує обох.
         </p>
+        <div className="inline-flex rounded-xl border border-tone-white/10 p-0.5 text-sm">
+          {(["plain", "dredd"] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setStyle(value)}
+              className={`cursor-pointer rounded-lg px-4 py-1.5 font-semibold ${
+                style === value ? "bg-emerald-400/90 text-slate-950" : "text-tone-200"
+              }`}
+            >
+              {value === "plain" ? "Звичайний" : "Дредд"}
+            </button>
+          ))}
+        </div>
       </header>
 
       <section className="space-y-3 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4">
