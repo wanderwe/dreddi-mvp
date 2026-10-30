@@ -159,7 +159,13 @@
       "group": {
         "helper": "Optional: attach this promise to a group to view related context together"
       },
-      "title": "Record the {entityLower}"
+      "title": "Record the {entityLower}",
+      "selfPromise": {
+        "choose": "No other side: a promise to yourself",
+        "selected": "A promise to yourself, no other side",
+        "remove": "Add the other side",
+        "note": "You close it yourself. Without another person confirming it, the promise does not affect your reputation."
+      }
     }
   },
   "invite": {

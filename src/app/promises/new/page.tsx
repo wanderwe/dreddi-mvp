@@ -24,6 +24,7 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { productFlags } from "@/lib/config/productFlags";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
+import { POSITIONING } from "@/lib/features";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 import {
@@ -88,6 +89,10 @@ export default function NewPromisePage() {
     placement: "top" | "bottom";
   } | null>(null);
   const [executor, setExecutor] = useState<"me" | "other">("me");
+  // "pledge" positioning: a promise to yourself has no other side; the creator closes it and it
+  // does not count towards reputation, which the form says plainly.
+  const [noCounterparty, setNoCounterparty] = useState(false);
+  const selfPromise = POSITIONING === "pledge" && noCounterparty && executor === "me";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
@@ -103,7 +108,7 @@ export default function NewPromisePage() {
   const [participantResults, setParticipantResults] = useState<SearchUser[]>([]);
   const [isParticipantSearching, setIsParticipantSearching] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState<SearchUser[]>([]);
-  const shouldShowCondition = showCondition || conditionText.trim().length > 0;
+  const shouldShowCondition = !selfPromise && (showCondition || conditionText.trim().length > 0);
   const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
   const prefillResolved = useRef(false);
   const draftHydrated = useRef(false);
@@ -993,13 +998,14 @@ export default function NewPromisePage() {
       : {
           title: title.trim(),
           details: details.trim() || null,
-          conditionText: conditionText.trim() || null,
-          secondPartyUserId: selectedCounterparty?.id ?? null,
+          conditionText: selfPromise ? null : conditionText.trim() || null,
+          secondPartyUserId: selfPromise ? null : selectedCounterparty?.id ?? null,
           dueAt: normalizedDueAt ? normalizedDueAt.toISOString() : null,
           executor,
           visibility: shouldMakePublic ? "public" : "private",
           groupId: selectedGroupId || null,
           isImportant,
+          ...(selfPromise ? { selfPromise: true } : {}),
         };
 
     let res: Response;
@@ -1265,7 +1271,7 @@ export default function NewPromisePage() {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
-              {!shouldShowCondition && (
+              {!shouldShowCondition && !selfPromise && (
                 <div className="flex -mt-1">
                   <button
                     type="button"
@@ -1319,7 +1325,22 @@ export default function NewPromisePage() {
                           </span>
                         </Tooltip>
                       </div>
-                      {selectedCounterparty ? (
+                      {selfPromise ? (
+                        <div className="space-y-2">
+                          <div className="flex h-11 items-center justify-between rounded-xl border border-tone-white/15 bg-tone-white/5 px-3 text-sm text-tone-100">
+                            <span className="truncate">{t("promises.new.selfPromise.selected")}</span>
+                            <button
+                              type="button"
+                              onClick={() => setNoCounterparty(false)}
+                              aria-label={t("promises.new.selfPromise.remove")}
+                              className="ml-2 inline-flex cursor-pointer rounded-full border border-tone-white/20 p-1 text-tone-200 transition hover:bg-tone-white/10"
+                            >
+                              <X className="h-3 w-3" aria-hidden />
+                            </button>
+                          </div>
+                          <p className="text-xs text-tone-400">{t("promises.new.selfPromise.note")}</p>
+                        </div>
+                      ) : selectedCounterparty ? (
                         <div className="flex h-11 items-center justify-between rounded-xl border border-accent-300/40 bg-emerald-400/10 px-3 text-sm text-accent-100">
                           <div className="flex min-w-0 items-center gap-2">
                             <div className="h-7 w-7 overflow-hidden rounded-full bg-tone-white/10">
@@ -1442,6 +1463,19 @@ export default function NewPromisePage() {
                                   </button>
                                 ))}
                             </div>
+                          )}
+                          {POSITIONING === "pledge" && executor === "me" && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNoCounterparty(true);
+                                setCounterpartyQuery("");
+                                setShowCounterpartyDropdown(false);
+                              }}
+                              className="mt-2 cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
+                            >
+                              {t("promises.new.selfPromise.choose")}
+                            </button>
                           )}
                         </div>
                       )}

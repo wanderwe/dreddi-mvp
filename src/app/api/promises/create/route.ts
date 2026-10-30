@@ -15,6 +15,9 @@ type CreatePromisePayload = {
   visibility?: "private" | "public";
   groupId?: string | null;
   isImportant?: boolean;
+  // A one-sided promise (to yourself or to everyone): the creator keeps it, there is no other side
+  // to accept it, so it starts active, as if the creator had activated it without a counterparty.
+  selfPromise?: boolean;
 };
 
 export async function POST(req: Request) {
@@ -26,8 +29,9 @@ export async function POST(req: Request) {
     const body = (await req.json().catch(() => null)) as CreatePromisePayload | null;
 
     const title = body?.title?.trim();
-    const secondPartyUserId = body?.secondPartyUserId?.trim();
-    const executor = body?.executor === "other" ? "other" : "me";
+    const selfPromise = body?.selfPromise === true;
+    const secondPartyUserId = selfPromise ? undefined : body?.secondPartyUserId?.trim();
+    const executor = selfPromise ? "me" : body?.executor === "other" ? "other" : "me";
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -123,13 +127,13 @@ export async function POST(req: Request) {
       promisee_id: executor === "other" ? user.id : null,
       title,
       details: body?.details?.trim() || null,
-      condition_text: body?.conditionText?.trim() || null,
+      condition_text: selfPromise ? null : body?.conditionText?.trim() || null,
       counterparty_contact: null,
       due_at: dueAtIso,
       status: "active",
       invite_token: inviteToken,
       counterparty_id: counterpartyProfile?.id ?? null,
-      invite_status: "awaiting_acceptance",
+      invite_status: selfPromise ? "accepted" : "awaiting_acceptance",
       invited_at: nowIso,
       accepted_at: null,
       declined_at: null,
@@ -140,6 +144,9 @@ export async function POST(req: Request) {
       promise_mode: "deal",
       group_id: groupId,
       is_important: isImportant,
+      ...(selfPromise
+        ? { activated_without_counterparty: true, activated_without_counterparty_at: nowIso }
+        : {}),
     };
 
     const { data: insertData, error: insertError } = await admin
