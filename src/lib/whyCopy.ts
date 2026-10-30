@@ -1,3 +1,4 @@
+import { POSITIONING } from "@/lib/features";
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
 export type WhySectionKind = "turn" | "body" | "list";
@@ -103,4 +104,49 @@ export const whyCopy: Record<Locale, WhyCopy> = {
   },
 };
 
-export const getWhyCopy = (locale: Locale): WhyCopy => whyCopy[locale] ?? whyCopy[defaultLocale];
+// "pledge" positioning (NEXT_PUBLIC_POSITIONING=pledge): why Dreddi exists, told around public promises.
+const pledgeWhyCopy: Record<Locale, WhyCopy> = {
+  en: {
+    seo: {
+      title: "Why Dreddi Exists — Dreddi",
+      description: "Promises you can see: companies’ and people’s public promises with a deadline and an open outcome",
+    },
+    title: "Why Dreddi exists",
+    subtitle: "",
+    sections: [
+      { kind: "body", paragraphs: ["Making promises is easy"] },
+      { kind: "list", paragraphs: ["“We’ll ship it by October”", "“We’ll launch this year”", "“I’ll start on Monday”"] },
+      { kind: "turn", paragraphs: ["And then nobody remembers what exactly was promised"] },
+      { kind: "body", paragraphs: ["Or by when"] },
+      { kind: "turn", paragraphs: ["Dreddi remembers"] },
+      { kind: "list", paragraphs: ["A promise with a deadline", "A day counter", "An open outcome"] },
+      { kind: "body", paragraphs: ["For companies, it’s trust", "For people, it’s discipline", "For everyone, it’s visible"] },
+      { kind: "list", paragraphs: ["No pressure", "Just clarity — and consequences"] },
+    ],
+    cta: "Record your first promise",
+  },
+  uk: {
+    seo: {
+      title: "Чому існує Dreddi — Dreddi",
+      description: "Обіцянки, які видно: публічні обіцянки компаній і людей з дедлайном і відкритим результатом",
+    },
+    title: "Чому існує Dreddi",
+    subtitle: "",
+    sections: [
+      { kind: "body", paragraphs: ["Обіцяти легко"] },
+      { kind: "list", paragraphs: ["«Зробимо до жовтня»", "«Запустимо цього року»", "«З понеділка почну»"] },
+      { kind: "turn", paragraphs: ["А потім ніхто не пам’ятає, що саме обіцяли"] },
+      { kind: "body", paragraphs: ["І до коли"] },
+      { kind: "turn", paragraphs: ["Dreddi пам’ятає"] },
+      { kind: "list", paragraphs: ["Обіцянка з дедлайном", "Лічильник днів", "Відкритий результат"] },
+      { kind: "body", paragraphs: ["Для компаній — це довіра", "Для людей — це дисципліна", "Для всіх — це видно"] },
+      { kind: "list", paragraphs: ["Без тиску", "Просто ясність — і наслідки"] },
+    ],
+    cta: "Зафіксувати першу обіцянку",
+  },
+};
+
+export const getWhyCopy = (locale: Locale): WhyCopy => {
+  const copy = POSITIONING === "pledge" ? pledgeWhyCopy : whyCopy;
+  return copy[locale] ?? copy[defaultLocale];
+};

@@ -1,3 +1,4 @@
+import { POSITIONING } from "@/lib/features";
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
 export type LandingCopy = {
   hero: {
@@ -271,5 +272,64 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
 };
 
-export const getLandingCopy = (locale: Locale): LandingCopy =>
-  landingCopy[locale] ?? landingCopy[defaultLocale];
+// "pledge" positioning (NEXT_PUBLIC_POSITIONING=pledge): the same page told around public promises.
+const withPledge = (base: LandingCopy, pledge: {
+  hero: Pick<LandingCopy["hero"], "headline" | "description" | "whyLink">;
+  cta: Pick<LandingCopy["cta"], "getStarted" | "createPromise" | "reviewDeals">;
+  overviewLabel: string;
+  recentDeals: Pick<LandingCopy["recentDeals"], "title" | "demoTitle" | "empty" | "eventFallbackTitle">;
+}): LandingCopy => ({
+  ...base,
+  hero: { ...base.hero, ...pledge.hero },
+  cta: { ...base.cta, ...pledge.cta },
+  score: { ...base.score, overviewLabel: pledge.overviewLabel },
+  recentDeals: { ...base.recentDeals, ...pledge.recentDeals },
+});
+
+const pledgeCopy: Record<Locale, LandingCopy> = {
+  uk: withPledge(landingCopy.uk, {
+    hero: {
+      headline: "Обіцянки, які видно",
+      description:
+        "Стеж за публічними обіцянками компаній і давай власні.\nДедлайн, лічильник днів і результат — у відкритому записі, який не перепишеш заднім числом.",
+      whyLink: "Чому Dreddi →",
+    },
+    cta: {
+      getStarted: "Зафіксувати обіцянку",
+      createPromise: "Зафіксувати обіцянку",
+      reviewDeals: "Мої обіцянки",
+    },
+    overviewLabel: "Огляд обіцянок",
+    recentDeals: {
+      title: "Останні обіцянки",
+      demoTitle: "Останні обіцянки",
+      empty: "У вас поки що немає жодної обіцянки",
+      eventFallbackTitle: "Обіцянка",
+    },
+  }),
+  en: withPledge(landingCopy.en, {
+    hero: {
+      headline: "Promises you can see",
+      description:
+        "Track companies’ public promises and make your own.\nDeadline, day counter and outcome — in an open record that can’t be rewritten after the fact.",
+      whyLink: "Why Dreddi →",
+    },
+    cta: {
+      getStarted: "Record a promise",
+      createPromise: "Record a promise",
+      reviewDeals: "My promises",
+    },
+    overviewLabel: "Promises overview",
+    recentDeals: {
+      title: "Recent promises",
+      demoTitle: "Recent promises",
+      empty: "You don't have any promises yet",
+      eventFallbackTitle: "Promise",
+    },
+  }),
+};
+
+export const getLandingCopy = (locale: Locale): LandingCopy => {
+  const copy = POSITIONING === "pledge" ? pledgeCopy : landingCopy;
+  return copy[locale] ?? copy[defaultLocale];
+};

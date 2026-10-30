@@ -8,6 +8,7 @@ import { Tooltip } from "@/app/components/ui/Tooltip";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { getAuthState, isMockAuthEnabled } from "@/lib/auth/getAuthState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { POSITIONING } from "@/lib/features";
 import { getLandingCopy } from "@/lib/landingCopy";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
@@ -47,6 +48,49 @@ type DemoDealSource = {
   disputed_at?: string | null;
   declined_at?: string | null;
 };
+
+const CLASSIC_DEMO_DEALS: DemoDealSource[] = [
+  {
+    id: "demo-1",
+    titleKey: "landing.demoDeals.deal1.title",
+    status: "confirmed",
+    confirmed_at: "2026-02-14T19:10:00",
+  },
+  {
+    id: "demo-2",
+    titleKey: "landing.demoDeals.deal2.title",
+    status: "confirmed",
+    confirmed_at: "2026-02-10T11:35:00",
+  },
+  {
+    id: "demo-3",
+    titleKey: "landing.demoDeals.deal3.title",
+    status: "active",
+    due_at: "2026-03-01T18:00:00",
+  },
+];
+
+// "pledge" positioning: a company's open promise, a personal one kept, and one disputed.
+const PLEDGE_DEMO_DEALS: DemoDealSource[] = [
+  {
+    id: "demo-1",
+    titleKey: "landing.demoDeals.deal1.title",
+    status: "active",
+    due_at: "2026-12-31T18:00:00",
+  },
+  {
+    id: "demo-2",
+    titleKey: "landing.demoDeals.deal2.title",
+    status: "confirmed",
+    confirmed_at: "2026-03-29T10:15:00",
+  },
+  {
+    id: "demo-3",
+    titleKey: "landing.demoDeals.deal3.title",
+    status: "disputed",
+    disputed_at: "2026-09-03T12:00:00",
+  },
+];
 
 type ReputationResponse = {
   reputation: {
@@ -203,26 +247,7 @@ export default function Home() {
   const showAuthenticatedCta = ready && isAuthenticated;
   const showBetaUi = productFlags.showBetaUi;
   const demoDealsSource: DemoDealSource[] = useMemo(
-    () => [
-      {
-        id: "demo-1",
-        titleKey: "landing.demoDeals.deal1.title",
-        status: "confirmed" as const,
-        confirmed_at: "2026-02-14T19:10:00",
-      },
-      {
-        id: "demo-2",
-        titleKey: "landing.demoDeals.deal2.title",
-        status: "confirmed" as const,
-        confirmed_at: "2026-02-10T11:35:00",
-      },
-      {
-        id: "demo-3",
-        titleKey: "landing.demoDeals.deal3.title",
-        status: "active" as const,
-        due_at: "2026-03-01T18:00:00",
-      },
-    ],
+    () => (POSITIONING === "pledge" ? PLEDGE_DEMO_DEALS : CLASSIC_DEMO_DEALS),
     []
   );
   const demoDeals: DealRow[] = useMemo(

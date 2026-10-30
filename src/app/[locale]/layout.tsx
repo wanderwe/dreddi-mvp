@@ -3,12 +3,13 @@ import type { ReactNode } from "react";
 import { AppFooter } from "@/app/components/AppFooter";
 import { AppHeader } from "@/app/components/AppHeader";
 import { DocumentLanguageSync } from "@/app/components/DocumentLanguageSync";
+import { POSITIONING } from "@/lib/features";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { localizePath } from "@/lib/i18n/routing";
 import { resolveRouteLocale } from "@/lib/i18n/resolveRouteLocale";
 
-const OG_COPY = {
+const CLASSIC_OG_COPY = {
   en: {
     title: "Dreddi",
     description: "Track agreements, confirm outcomes, build reputation.",
@@ -20,6 +21,21 @@ const OG_COPY = {
     locale: "uk_UA",
   },
 };
+
+const PLEDGE_OG_COPY = {
+  en: {
+    title: "Dreddi — promises you can see",
+    description: "Public promises of companies and people: a deadline, a day counter and an open outcome.",
+    locale: "en_US",
+  },
+  uk: {
+    title: "Dreddi — обіцянки, які видно",
+    description: "Публічні обіцянки компаній і людей: дедлайн, лічильник днів і відкритий результат.",
+    locale: "uk_UA",
+  },
+};
+
+const OG_COPY = POSITIONING === "pledge" ? PLEDGE_OG_COPY : CLASSIC_OG_COPY;
 
 export async function generateMetadata({
   params,

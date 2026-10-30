@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "myPromises": "Promises",
+    "newPromise": "New promise",
+    "createMenu": {
+      "promise": {
+        "title": "New promise",
+        "description": "A public promise with a deadline and an open outcome"
+      }
+    }
+  },
+  "dealsTabs": {
+    "label": "Promise sections",
+    "mine": "My promises"
+  },
+  "landing": {
+    "demoDeals": {
+      "deal1": {
+        "title": "Nova Energy: 500 charging stations by December"
+      },
+      "deal2": {
+        "title": "Run a half marathon by April 1"
+      },
+      "deal3": {
+        "title": "Open a tech hub in Vinnytsia by September"
+      }
+    }
+  }
+}
