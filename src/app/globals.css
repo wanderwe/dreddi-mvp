@@ -171,7 +171,7 @@
   --logo-chevron: #36d399;
 }
 
-/* Set on <html> only when NEXT_PUBLIC_FEATURE_LIGHT_THEME is on (see src/lib/theme.ts). */
+/* Set on <html> by the root layout, except on embeds and /admin (see src/lib/theme.ts). */
 :root[data-theme="light"] {
   color-scheme: light;
 

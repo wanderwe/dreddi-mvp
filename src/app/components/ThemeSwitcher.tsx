@@ -4,7 +4,6 @@ import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
-import { LIGHT_THEME_ENABLED } from "@/lib/features";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { DEFAULT_THEME, type Theme, applyTheme, parseTheme, saveTheme } from "@/lib/theme";
 
@@ -36,7 +35,7 @@ export function useThemeToggle() {
   return { theme, set, toggle: () => set(theme === "dark" ? "light" : "dark") };
 }
 
-function ThemeSwitcherButton() {
+export function ThemeSwitcher() {
   const t = useT();
   const { theme, toggle } = useThemeToggle();
 
@@ -49,18 +48,12 @@ function ThemeSwitcherButton() {
   );
 }
 
-export function ThemeSwitcher() {
-  return LIGHT_THEME_ENABLED ? <ThemeSwitcherButton /> : null;
-}
-
 const THEMES: Theme[] = ["light", "dark"];
 
 // Light | Dark segment in the profile settings header (signed-in users); icons only on narrow screens.
 export function ThemeSegment({ className = "" }: { className?: string }) {
   const t = useT();
   const { theme, set } = useThemeToggle();
-
-  if (!LIGHT_THEME_ENABLED) return null;
 
   return (
     <div
