@@ -2,7 +2,6 @@
 
 import React from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useEffect, useId, useMemo, useState } from "react";
@@ -21,13 +20,6 @@ import { getLifetimePaceMetrics, getMonthlyPace } from "@/lib/paceMetrics";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import { Code2, Copy, ExternalLink } from "lucide-react";
 import PublicProfileGraph, { GraphParty, GraphEdge } from "@/components/PublicProfileGraph";
-import { formatDueDate } from "@/lib/formatDueDate";
-import {
-  EMPTY_STATS,
-  type CommitmentStatus,
-  type SelfCommitment,
-  type SelfCommitmentStats,
-} from "@/lib/commitments";
 
 type PublicProfileRow = {
   profile_id: string | null;
@@ -236,13 +228,6 @@ const getPublicProfileStats = async (handle: string) => {
     .maybeSingle();
 };
 
-const goalStatusTones: Record<CommitmentStatus, StatusPillTone> = {
-  active: "attention",
-  completed: "success",
-  failed: "danger",
-  abandoned: "neutral",
-};
-
 const statusTones: Record<PromiseUiStatus, StatusPillTone> = {
   active: "neutral",
   completed_by_promisor: "attention",
@@ -293,8 +278,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
   const [graphEdges, setGraphEdges] = useState<GraphEdge[]>([]);
   const [reputationDetailsOpen, setReputationDetailsOpen] = useState(false);
   const [socialLinks, setSocialLinks] = useState<Array<{ platform: string; username: string | null; display_name: string | null; profile_url: string | null }>>([]);
-  const [publicGoals, setPublicGoals] = useState<SelfCommitment[]>([]);
-  const [goalStats, setGoalStats] = useState<SelfCommitmentStats>(EMPTY_STATS);
   const streakFireGradientId = useId();
 
   const formatRelativeTime = useMemo(() => {
@@ -375,24 +358,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
           (a, b) => PLATFORM_ORDER.indexOf(a.platform) - PLATFORM_ORDER.indexOf(b.platform)
         );
         setSocialLinks(sorted);
-
-        const { data: goalRows } = await supabase
-          .from("self_commitments")
-          .select("id,user_id,title,description,deadline,status,visibility,created_at,completed_at")
-          .eq("user_id", profileIdentity.id)
-          .eq("visibility", "public")
-          .order("created_at", { ascending: false });
-        if (!active) return;
-        setPublicGoals((goalRows as SelfCommitment[]) ?? []);
-      }
-
-      {
-        const { data: statsRows } = await supabase.rpc("get_self_commitment_profile_stats", {
-          p_handle: profileRow.handle,
-        });
-        if (!active) return;
-        const row = Array.isArray(statsRows) ? statsRows[0] : null;
-        if (row) setGoalStats(row as SelfCommitmentStats);
       }
       if (process.env.NODE_ENV !== "production") {
         console.info("public profile on-time metrics", {
@@ -1401,68 +1366,6 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
               </section>
             ) : null}
 
-            {COMMITMENTS_ENABLED && !isEmbed && (publicGoals.length > 0 || goalStats.total_goals > 0) ? (
-              <section className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-8">
-                <h2 className="mb-1 text-lg font-semibold">{t("commitments.profile.title")}</h2>
-                <p className="mb-5 text-sm text-tone-white/55">{t("commitments.profile.subtitle")}</p>
-
-                <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
-                    <div className="text-2xl font-semibold text-tone-white">{goalStats.total_goals}</div>
-                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.total")}</div>
-                  </div>
-                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
-                    <div className="text-2xl font-semibold text-tone-white">{goalStats.completed_goals}</div>
-                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.completed")}</div>
-                  </div>
-                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
-                    <div className="text-2xl font-semibold text-tone-white">
-                      {goalStats.completion_rate === null
-                        ? "—"
-                        : `${Math.round(goalStats.completion_rate * 100)}%`}
-                    </div>
-                    <div className="mt-1 text-xs text-tone-white/50">
-                      {t("commitments.dashboard.stats.completionRate")}
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-tone-white/10 bg-tone-black/20 p-4">
-                    <div className="text-2xl font-semibold text-tone-white">{goalStats.current_streak}</div>
-                    <div className="mt-1 text-xs text-tone-white/50">{t("commitments.dashboard.stats.streak")}</div>
-                  </div>
-                </div>
-
-                {publicGoals.length === 0 ? (
-                  <p className="text-sm text-tone-white/60">{t("commitments.profile.empty")}</p>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    {publicGoals.map((goal) => (
-                      <LocalizedLink
-                        key={goal.id}
-                        href={`/p/commitments/${goal.id}`}
-                        className="flex flex-col gap-2 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4 transition hover:border-accent-300/40 hover:bg-tone-white/[0.06] md:flex-row md:items-center md:justify-between"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-tone-white">{goal.title}</p>
-                          <p className="text-xs text-tone-white/50">
-                            {t("commitments.label.goal")}
-                            {" · "}
-                            {goal.deadline
-                              ? t("commitments.dashboard.deadline", {
-                                  date: formatDueDate(goal.deadline, locale) ?? "",
-                                })
-                              : t("commitments.dashboard.noDeadline")}
-                          </p>
-                        </div>
-                        <StatusPill
-                          label={t(`commitments.dashboard.status.${goal.status}`)}
-                          tone={goalStatusTones[goal.status]}
-                        />
-                      </LocalizedLink>
-                    ))}
-                  </div>
-                )}
-              </section>
-            ) : null}
           </>
         )}
       </div>

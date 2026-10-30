@@ -1,7 +1,6 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useState, useEffect } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
 import { ThemeSegment } from "@/app/components/ThemeSwitcher";
@@ -71,13 +70,6 @@ export function MobileMenu({
                     {t("nav.myPromises")}
                   </LocalizedLink>
                 </SheetClose>
-                {COMMITMENTS_ENABLED && (
-                  <SheetClose asChild>
-                    <LocalizedLink className={baseLinkClasses} href="/commitments">
-                      {t("nav.goals")}
-                    </LocalizedLink>
-                  </SheetClose>
-                )}
                 {actionQueueCount > 0 && (
                   <SheetClose asChild>
                     <LocalizedLink
@@ -96,13 +88,6 @@ export function MobileMenu({
                     {t("nav.newPromise")}
                   </LocalizedLink>
                 </SheetClose>
-                {COMMITMENTS_ENABLED && (
-                  <SheetClose asChild>
-                    <LocalizedLink className={primaryLinkClasses} href="/commitments/new">
-                      {t("nav.newGoal")}
-                    </LocalizedLink>
-                  </SheetClose>
-                )}
                 <SheetClose asChild>
                   <LocalizedLink className={baseLinkClasses} href="/u">
                     {t("nav.publicProfiles")}

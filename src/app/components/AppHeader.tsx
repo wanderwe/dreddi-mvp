@@ -1,7 +1,6 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { COMMITMENTS_ENABLED } from "@/lib/features";
 import { useEffect, useState } from "react";
 import { UsersRound } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -34,7 +33,7 @@ export function AppHeader() {
   const locale = useLocale();
   const pathname = usePathname();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
-  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale)) || /^\/embed\/commitment\/[^/]+\/?$/.test(pathWithoutLocale);
+  const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale));
   const [authState, setAuthState] = useState<AuthState>(() => {
     if (typeof window !== "undefined" && window.localStorage.getItem("dreddi_was_logged_in") === "true") {
       return { user: null, profile: null, isLoggedIn: true, isMock: false };
@@ -201,11 +200,6 @@ export function AppHeader() {
                   <LocalizedLink className={linkBaseClasses} href="/promises">
                     {t("nav.myPromises")}
                   </LocalizedLink>
-                  {COMMITMENTS_ENABLED && (
-                    <LocalizedLink className={linkBaseClasses} href="/commitments">
-                      {t("nav.goals")}
-                    </LocalizedLink>
-                  )}
                   {actionQueueCount > 0 && (
                     <LocalizedLink
                       href={actionQueueHref}
