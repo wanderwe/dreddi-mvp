@@ -19,6 +19,7 @@ import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { pledgeWording } from "@/lib/pledgeWording";
 import { stripTrailingPeriod } from "@/lib/text";
 import { getPromiseLabels } from "@/lib/promiseLabels";
 import {
@@ -899,7 +900,7 @@ export default function PromisePage() {
     if (locale === "uk") {
       return [
         "Нагадування 👇",
-        "Будь ласка, перевір цю угоду:",
+        pledgeWording("Будь ласка, перевір цю угоду:"),
         "",
         promiseLink,
         "",
@@ -909,7 +910,7 @@ export default function PromisePage() {
 
     return [
       "Quick reminder 👇",
-      "Please check this agreement:",
+      pledgeWording("Please check this agreement:"),
       "",
       promiseLink,
       "",

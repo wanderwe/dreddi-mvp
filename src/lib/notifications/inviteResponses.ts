@@ -1,4 +1,5 @@
 import { NotificationCopy, NotificationLocale } from "./types";
+import { pledgeWording } from "@/lib/pledgeWording";
 
 export type InviteResponseType = "declined" | "ignored";
 
@@ -54,15 +55,15 @@ export const getInviteResponseCopy = ({
   dealTitle,
 }: InviteResponseCopyInput): NotificationCopy => {
   const actor = actorName?.trim() || fallbackNameByLocale[locale];
-  const deal = dealTitle?.trim() || fallbackDealByLocale[locale];
+  const deal = dealTitle?.trim() || pledgeWording(fallbackDealByLocale[locale]);
 
   const body =
     response === "declined"
       ? locale === "uk"
-        ? `${actor} відхилив(ла) запрошення до угоди: ${deal}. Дій не потрібно.`
-        : `${actor} declined the invite to the deal: ${deal}. No action needed.`
+        ? `${actor} відхилив(ла) запрошення до ${pledgeWording("угоди")}: ${deal}. Дій не потрібно.`
+        : `${actor} declined the invite to the ${pledgeWording("deal")}: ${deal}. No action needed.`
       : locale === "uk"
-        ? `${actor} поки що не відповів(ла) на запрошення до угоди: ${deal}. Дій не потрібно.`
+        ? `${actor} поки що не відповів(ла) на запрошення до ${pledgeWording("угоди")}: ${deal}. Дій не потрібно.`
         : `${actor} hasn't responded to the invite yet: ${deal}. No action needed.`;
 
   return {

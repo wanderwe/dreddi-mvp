@@ -1,4 +1,5 @@
 import { Locale } from "@/lib/i18n/locales";
+import { pledgeWording } from "./pledgeWording";
 
 type UkForms = {
   one: string;
@@ -40,8 +41,10 @@ export const formatStreakLine = (count: number, locale: Locale) => {
       many: "дотримані",
     });
 
-    return `${formattedCount} ${dealWord} поспіль ${fulfillmentWord} як виконавець`;
+    return pledgeWording(`${formattedCount} ${dealWord} поспіль ${fulfillmentWord} як виконавець`);
   }
 
-  return `${formattedCount} ${pluralizeEn(count, "agreement", "agreements")} fulfilled in a row as responsible side`;
+  return pledgeWording(
+    `${formattedCount} ${pluralizeEn(count, "agreement", "agreements")} fulfilled in a row as responsible side`
+  );
 };

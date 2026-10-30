@@ -3,6 +3,7 @@ import { getLocale } from "@/lib/i18n/getLocale";
 import { type Locale } from "@/lib/i18n/locales";
 import { lookupInvitePreview } from "@/lib/invitePreview";
 import { localizePath } from "@/lib/i18n/routing";
+import { pledgeWording } from "@/lib/pledgeWording";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
@@ -20,7 +21,8 @@ const INVITE_METADATA_COPY = {
 };
 
 export async function buildInviteMetadata(token: string, locale: Locale): Promise<Metadata> {
-  const copy = INVITE_METADATA_COPY[locale] ?? INVITE_METADATA_COPY.en;
+  const baseCopy = INVITE_METADATA_COPY[locale] ?? INVITE_METADATA_COPY.en;
+  const copy = { ...baseCopy, description: pledgeWording(baseCopy.description) };
   const invitePreview = await lookupInvitePreview(token);
   const agreementTitle = invitePreview?.title ?? copy.fallbackTitle;
   const pageTitle = `${agreementTitle} — Dreddi`;

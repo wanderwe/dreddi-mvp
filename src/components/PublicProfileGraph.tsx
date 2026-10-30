@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { pledgeWording } from "@/lib/pledgeWording";
 
 // ── Public API types ───────────────────────────────────────────────────────────
 export interface GraphParty {
@@ -325,7 +326,7 @@ export default function PublicProfileGraph({ userName, parties, edges, locale = 
         ctx.font = "11px ui-sans-serif,system-ui,sans-serif";
         ctx.fillStyle = `rgba(${palette.ink},0.18)`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText("Угод ще немає", cx, cy + userR + 38);
+        ctx.fillText(pledgeWording("Угод ще немає"), cx, cy + userR + 38);
       }
 
       rafRef.current = requestAnimationFrame(draw);

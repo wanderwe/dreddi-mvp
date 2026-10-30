@@ -6,6 +6,7 @@ import {
   normalizeNotificationType,
 } from "./types";
 import { stripTrailingPeriod } from "@/lib/text";
+import { pledgeWording } from "@/lib/pledgeWording";
 
 const fallbackLocale: NotificationLocale = "en";
 
@@ -422,8 +423,8 @@ export const getNotificationCopy = ({
   }
 
   return {
-    title: stripTrailingPeriod(title),
-    body: stripTrailingPeriod(body),
+    title: stripTrailingPeriod(pledgeWording(title)),
+    body: stripTrailingPeriod(pledgeWording(body)),
     ctaLabel,
   };
 };
