@@ -24,13 +24,13 @@ const CLASSIC_OG_COPY = {
 
 const PLEDGE_OG_COPY = {
   en: {
-    title: "Dreddi — promises you can see",
-    description: "Public promises of companies and people: a deadline, a day counter and an open outcome.",
+    title: "Promised? Dreddi knows",
+    description: "A promise to yourself, an agreement with others or a public pledge — record it in Dreddi. A kept word becomes your reputation.",
     locale: "en_US",
   },
   uk: {
-    title: "Dreddi — обіцянки, які видно",
-    description: "Публічні обіцянки компаній і людей: дедлайн, лічильник днів і відкритий результат.",
+    title: "Пообіцяв? Dreddi знає",
+    description: "Обіцянка собі, домовленість з людьми чи публічна заява — запиши її в Dreddi. Дотримане слово стає репутацією.",
     locale: "uk_UA",
   },
 };

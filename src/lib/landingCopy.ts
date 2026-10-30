@@ -289,9 +289,9 @@ const withPledge = (base: LandingCopy, pledge: {
 const pledgeCopy: Record<Locale, LandingCopy> = {
   uk: withPledge(landingCopy.uk, {
     hero: {
-      headline: "Обіцянки, які видно",
+      headline: "Пообіцяв? Dreddi знає",
       description:
-        "Стеж за публічними обіцянками компаній і давай власні.\nДедлайн, лічильник днів і результат — у відкритому записі, який не перепишеш заднім числом.",
+        "Обіцянка собі, домовленість з людьми чи публічна заява — запиши її в Dreddi.\nВиконання фіксується, а дотримане слово стає репутацією.",
       whyLink: "Чому Dreddi →",
     },
     cta: {
@@ -309,9 +309,9 @@ const pledgeCopy: Record<Locale, LandingCopy> = {
   }),
   en: withPledge(landingCopy.en, {
     hero: {
-      headline: "Promises you can see",
+      headline: "Promised? Dreddi knows",
       description:
-        "Track companies’ public promises and make your own.\nDeadline, day counter and outcome — in an open record that can’t be rewritten after the fact.",
+        "A promise to yourself, an agreement with others or a public pledge — record it in Dreddi.\nDelivery is recorded, and a kept word becomes your reputation.",
       whyLink: "Why Dreddi →",
     },
     cta: {

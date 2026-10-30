@@ -104,23 +104,23 @@ export const whyCopy: Record<Locale, WhyCopy> = {
   },
 };
 
-// "pledge" positioning (NEXT_PUBLIC_POSITIONING=pledge): why Dreddi exists, told around public promises.
+// "pledge" positioning (NEXT_PUBLIC_POSITIONING=pledge): why Dreddi exists, told around promises.
 const pledgeWhyCopy: Record<Locale, WhyCopy> = {
   en: {
     seo: {
       title: "Why Dreddi Exists — Dreddi",
-      description: "Promises you can see: companies’ and people’s public promises with a deadline and an open outcome",
+      description: "Promised? Dreddi knows. A promise to yourself, an agreement with others or a public pledge — record it, and a kept word becomes your reputation.",
     },
     title: "Why Dreddi exists",
     subtitle: "",
     sections: [
-      { kind: "body", paragraphs: ["Making promises is easy"] },
+      { kind: "turn", paragraphs: ["Making promises is easy"] },
       { kind: "list", paragraphs: ["“We’ll ship it by October”", "“We’ll launch this year”", "“I’ll start on Monday”"] },
       { kind: "turn", paragraphs: ["And then nobody remembers what exactly was promised"] },
-      { kind: "body", paragraphs: ["Or by when"] },
-      { kind: "turn", paragraphs: ["Dreddi remembers"] },
-      { kind: "list", paragraphs: ["A promise with a deadline", "A day counter", "An open outcome"] },
-      { kind: "body", paragraphs: ["For companies, it’s trust", "For people, it’s discipline", "For everyone, it’s visible"] },
+      { kind: "body", paragraphs: ["Or whether it was kept"] },
+      { kind: "turn", paragraphs: ["Dreddi knows"] },
+      { kind: "list", paragraphs: ["Who promised", "What exactly", "Whether it was kept"] },
+      { kind: "body", paragraphs: ["For yourself, it’s discipline", "For others, it’s trust", "Over time, it’s a reputation"] },
       { kind: "list", paragraphs: ["No pressure", "Just clarity — and consequences"] },
     ],
     cta: "Record your first promise",
@@ -128,18 +128,18 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
   uk: {
     seo: {
       title: "Чому існує Dreddi — Dreddi",
-      description: "Обіцянки, які видно: публічні обіцянки компаній і людей з дедлайном і відкритим результатом",
+      description: "Пообіцяв? Dreddi знає. Обіцянка собі, домовленість з людьми чи публічна заява — запиши її, і дотримане слово стане репутацією.",
     },
     title: "Чому існує Dreddi",
     subtitle: "",
     sections: [
-      { kind: "body", paragraphs: ["Обіцяти легко"] },
+      { kind: "turn", paragraphs: ["Обіцяти легко"] },
       { kind: "list", paragraphs: ["«Зробимо до жовтня»", "«Запустимо цього року»", "«З понеділка почну»"] },
       { kind: "turn", paragraphs: ["А потім ніхто не пам’ятає, що саме обіцяли"] },
-      { kind: "body", paragraphs: ["І до коли"] },
-      { kind: "turn", paragraphs: ["Dreddi пам’ятає"] },
-      { kind: "list", paragraphs: ["Обіцянка з дедлайном", "Лічильник днів", "Відкритий результат"] },
-      { kind: "body", paragraphs: ["Для компаній — це довіра", "Для людей — це дисципліна", "Для всіх — це видно"] },
+      { kind: "body", paragraphs: ["І чи це виконали"] },
+      { kind: "turn", paragraphs: ["Dreddi знає"] },
+      { kind: "list", paragraphs: ["Хто пообіцяв", "Що саме", "Чи дотримав"] },
+      { kind: "body", paragraphs: ["Для себе — це дисципліна", "Для інших — це довіра", "З часом — це репутація"] },
       { kind: "list", paragraphs: ["Без тиску", "Просто ясність — і наслідки"] },
     ],
     cta: "Зафіксувати першу обіцянку",
