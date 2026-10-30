@@ -1311,11 +1311,16 @@ export default function NewPromisePage() {
               <div className="grid items-start gap-5 sm:grid-cols-2">
                 {!multipleParticipants && executor && (
                   <div className="text-sm text-tone-200">
-                    <label className="space-y-2 text-sm text-tone-200">
+                    {/* A div, not a label: the field holds buttons, and some browsers send a click
+                        inside a label to the input instead. */}
+                    <div className="space-y-2 text-sm text-tone-200">
                       <div className="flex items-center gap-2">
-                        <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
+                        <label
+                          htmlFor="counterparty"
+                          className="block text-xs uppercase tracking-[0.2em] text-accent-200"
+                        >
                           {t("promises.new.fields.counterparty")}
-                        </span>
+                        </label>
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
                           <span
                             aria-label={t("promises.new.fields.counterpartyHelper")}
@@ -1325,21 +1330,31 @@ export default function NewPromisePage() {
                           </span>
                         </Tooltip>
                       </div>
-                      {selfPromise ? (
-                        <div className="space-y-2">
-                          <div className="flex h-11 items-center justify-between rounded-xl border border-tone-white/15 bg-tone-white/5 px-3 text-sm text-tone-100">
-                            <span className="truncate">{t("promises.new.selfPromise.selected")}</span>
+                      {POSITIONING === "pledge" && executor === "me" && (
+                        <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
+                          {([false, true] as const).map((value) => (
                             <button
+                              key={String(value)}
                               type="button"
-                              onClick={() => setNoCounterparty(false)}
-                              aria-label={t("promises.new.selfPromise.remove")}
-                              className="ml-2 inline-flex cursor-pointer rounded-full border border-tone-white/20 p-1 text-tone-200 transition hover:bg-tone-white/10"
+                              aria-pressed={noCounterparty === value}
+                              onClick={() => {
+                                setNoCounterparty(value);
+                                setCounterpartyQuery("");
+                                setShowCounterpartyDropdown(false);
+                              }}
+                              className={`flex-1 cursor-pointer rounded-2xl px-3 py-2 text-sm font-semibold transition ${
+                                noCounterparty === value
+                                  ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                                  : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
+                              }`}
                             >
-                              <X className="h-3 w-3" aria-hidden />
+                              {value ? t("promises.new.selfPromise.optionSelf") : t("promises.new.selfPromise.optionOther")}
                             </button>
-                          </div>
-                          <p className="text-xs text-tone-400">{t("promises.new.selfPromise.note")}</p>
+                          ))}
                         </div>
+                      )}
+                      {selfPromise ? (
+                        <p className="text-xs text-tone-400">{t("promises.new.selfPromise.note")}</p>
                       ) : selectedCounterparty ? (
                         <div className="flex h-11 items-center justify-between rounded-xl border border-accent-300/40 bg-emerald-400/10 px-3 text-sm text-accent-100">
                           <div className="flex min-w-0 items-center gap-2">
@@ -1464,22 +1479,9 @@ export default function NewPromisePage() {
                                 ))}
                             </div>
                           )}
-                          {POSITIONING === "pledge" && executor === "me" && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setNoCounterparty(true);
-                                setCounterpartyQuery("");
-                                setShowCounterpartyDropdown(false);
-                              }}
-                              className="mt-2 cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
-                            >
-                              {t("promises.new.selfPromise.choose")}
-                            </button>
-                          )}
                         </div>
                       )}
-                    </label>
+                    </div>
                   </div>
                 )}
 

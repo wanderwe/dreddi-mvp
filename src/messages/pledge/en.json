@@ -161,10 +161,9 @@
       },
       "title": "Record the {entityLower}",
       "selfPromise": {
-        "choose": "No other side: a promise to yourself",
-        "selected": "A promise to yourself, no other side",
-        "remove": "Add the other side",
-        "note": "You close it yourself. Without another person confirming it, the promise does not affect your reputation."
+        "note": "You close it yourself. Without another person confirming it, the promise does not affect your reputation.",
+        "optionOther": "There is another side",
+        "optionSelf": "A promise to yourself"
       }
     }
   },
