@@ -627,6 +627,17 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-12 pt-16 sm:px-6 md:gap-16 md:flex-row md:items-center md:py-14">
         <div className="flex flex-1 flex-col gap-4 md:gap-7">
           <div className="order-1 space-y-3 sm:space-y-4">
+            {POSITIONING === "pledge" ? (
+              // The header already shows the logo, so here the tagline itself is the headline.
+              <h1 className="max-w-xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.025em] text-tone-white sm:text-6xl">
+                {copy.hero.headline.slice(0, copy.hero.headline.indexOf("Dreddi"))}
+                <span className="whitespace-nowrap">
+                  <span className="text-accent-300">Dreddi</span>
+                  {copy.hero.headline.slice(copy.hero.headline.indexOf("Dreddi") + "Dreddi".length)}
+                </span>
+              </h1>
+            ) : (
+              <>
             <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-tone-400/90">
               {copy.hero.headline}
             </p>
@@ -641,6 +652,8 @@ export default function Home() {
                 </span>
               </div>
             </div>
+              </>
+            )}
             <p className="max-w-2xl text-base leading-tight text-tone-300 sm:max-w-xl sm:text-[1.03rem]">
               {renderMultiline(copy.hero.description)}
             </p>
