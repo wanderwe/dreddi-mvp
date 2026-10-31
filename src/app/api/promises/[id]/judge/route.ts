@@ -153,6 +153,18 @@ async function loadCase(promiseId: string, userId: string) {
   const approvedRoles = proposal ? approversOf(proposal.id) : new Set<Speaker>();
   const criteriaAgreed = Boolean(agreed);
   const criteriaStatus = proposal ? "proposed" : revision ? "draft" : agreed ? "agreed" : "none";
+  // The writer approved an earlier version that has since been replaced, so they are asked again.
+  const approvedEarlierVersion =
+    Boolean(proposal) &&
+    !agreed &&
+    !approvedRoles.has(role) &&
+    rows.some(
+      (row) =>
+        row.author_role === role &&
+        row.approves_message_id !== null &&
+        row.approves_message_id !== proposal?.id &&
+        proposals.some((version) => version.id === row.approves_message_id)
+    );
   // The sides that were called and have not answered yet, with their response deadline.
   const awaiting = requiredRoles.flatMap((side) => {
     const since = waitingSince(rows, side);
@@ -176,6 +188,8 @@ async function loadCase(promiseId: string, userId: string) {
     criteria: revision?.criteria ?? agreed?.criteria ?? [],
     criteriaStatus,
     criteriaAgreed,
+    approvedEarlierVersion,
+    lastCriteria: lastCriteria ? { list: lastCriteria.criteria ?? [], ready: Boolean(lastCriteria.criteria_ready) } : null,
     proposalId: proposal?.id ?? null,
     awaiting,
     approvals: Object.fromEntries(requiredRoles.map((side) => [side, approvedRoles.has(side)])) as Partial<
@@ -263,6 +277,10 @@ async function loadSettledCase(promiseId: string, userId: string) {
   return (await applyBindingRuling(loaded)) ? loadCase(promiseId, userId) : loaded;
 }
 
+const normalizeCriterion = (text: string) => text.trim().toLowerCase().replace(/\s+/g, " ").replace(/[.\s]+$/, "");
+const sameCriteria = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((item, index) => normalizeCriterion(item) === normalizeCriterion(b[index]));
+
 // Approvals are buttons and cost nothing, so only what the sides write counts.
 const sideMessageCount = (rows: MessageRow[]) =>
   rows.filter((row) => row.author_role !== "judge" && !row.approves_message_id).length;
@@ -273,6 +291,7 @@ const caseView = (loaded: LoadedCase) => ({
   criteria: loaded.criteria,
   criteriaStatus: loaded.criteriaStatus,
   criteriaAgreed: loaded.criteriaAgreed,
+  approvedEarlierVersion: loaded.approvedEarlierVersion,
   proposalId: loaded.proposalId,
   approvals: loaded.approvals,
   awaiting: loaded.awaiting,
@@ -433,6 +452,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const result = answer.result;
     const phase: JudgePhase = "mode" in result ? result.mode : "verdict";
     const criteriaResult = phase === "criteria" && "criteria" in result ? result : null;
+    // A list that only repeats the latest version is not a new one: saving it would reset the approvals.
+    const repeatsLatest =
+      Boolean(criteriaResult && loaded.lastCriteria) &&
+      sameCriteria(criteriaResult?.criteria ?? [], loaded.lastCriteria?.list ?? []) &&
+      (loaded.lastCriteria?.ready || !criteriaResult?.ready);
+    const newVersion = criteriaResult?.criteria.length && !repeatsLatest ? criteriaResult : null;
     const verdictResult = phase === "verdict" && "verdict" in result ? result : null;
 
     // One insert for both rows: PostgREST fills a column missing from one row with NULL, not its
@@ -470,8 +495,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         phase,
         content: result.reply,
         evidence_notes: [],
-        criteria: criteriaResult?.criteria.length ? criteriaResult.criteria : null,
-        criteria_ready: criteriaResult ? criteriaResult.ready : null,
+        criteria: newVersion ? newVersion.criteria : null,
+        criteria_ready: newVersion ? newVersion.ready : null,
         verdict: verdictResult ? (verdictResult.verdict ?? "undecided") : null,
         confidence: verdictResult?.confidence ?? null,
         reasons: verdictResult?.reasons ?? null,

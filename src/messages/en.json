@@ -1422,7 +1422,8 @@
       "inForce": "agreed",
       "revisionTitle": "New criteria",
       "revisionHint": "Until every side approves the new criteria, the agreed ones stay in force.",
-      "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it."
+      "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it.",
+      "changedAfterApproval": "The criteria changed after you approved them: approve the new version or write what is wrong"
     },
     "ruling": {
       "pending": "The ruling «{verdict}» takes effect when both sides accept it. Then the agreement status changes.",

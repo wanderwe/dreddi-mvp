@@ -55,7 +55,9 @@ export const CriteriaSchema = z.object({
   reply: z.string().describe("What you say to the user now, in their language"),
   criteria: z
     .array(z.string())
-    .describe("Concrete, checkable criteria agreed so far, each one short line; empty until you can name any"),
+    .describe(
+      "Only when you propose a new or changed version: the full list, each one short line. Empty otherwise, so earlier approvals stay valid"
+    ),
   ready: z.boolean().describe("True once the criteria are concrete enough to verify later"),
   evidence_notes: z
     .array(z.string())
@@ -82,7 +84,9 @@ export const AutoSchema = z.object({
   reply: z.string().describe("What you say to the user now, in their language"),
   criteria: z
     .array(z.string())
-    .describe("mode criteria only: the criteria proposed so far, each one short line; otherwise empty"),
+    .describe(
+      "mode criteria only, and only when you propose a new or changed version: the full list, each one short line. Empty otherwise"
+    ),
   ready: z.boolean().describe("mode criteria only: true once the criteria are concrete enough to verify; otherwise false"),
   // Nullable: in criteria mode the model sometimes leaves it empty, and a strict enum then fails the whole answer.
   verdict: z
@@ -111,6 +115,8 @@ const PHASE_RULES: Record<JudgePhase, string> = {
   criteria: `Phase: agreeing on criteria, before the work is done.
 Turn the promise into 1 to 4 concrete, checkable criteria: what counts as done, by when, and what evidence will prove it (for example a screenshot, a link, a receipt, a photo).
 Each criterion is one short line, at most about 12 words, with no subordinate clauses and no restating who the promisor is.
+Return the criteria list only when you propose a version: there are none yet, the current draft changes, or a side asks to change them. Every new version makes the sides approve again, so when you only answer a question or repeat what is already proposed or agreed, leave the list empty.
+In a new version, copy every unchanged criterion word for word from the current one; change only what the side asked for.
 Ask exactly one short question per reply when the promise is vague. Do not invent requirements the person did not mean.
 Set ready to true once the criteria are clear enough that a stranger could check them. That only proposes them: each side then approves them with the «Погоджую критерії» button, and they are fixed when every side has approved. End such a reply by offering both paths: approve with «Погоджую критерії» (name it exactly so) or write what to change. Never say the criteria are agreed or final on your own.
 While the criteria are still too vague to check, set ready to false, ask your one question and do not mention «Погоджую критерії»: there is no such button yet.

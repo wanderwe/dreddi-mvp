@@ -35,6 +35,7 @@ type CaseView = {
   criteria: string[];
   criteriaStatus: "none" | "draft" | "proposed" | "agreed";
   criteriaAgreed: boolean;
+  approvedEarlierVersion: boolean;
   proposalId: string | null;
   // The sides that must approve, and whether each one has.
   approvals: Partial<Record<Speaker, boolean>>;
@@ -389,6 +390,9 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                 </button>
               )}
             </div>
+          )}
+          {view.criteriaStatus === "proposed" && view.approvedEarlierVersion && (
+            <p className="mt-2 text-xs text-warn-200">{t("arbitration.criteria.changedAfterApproval")}</p>
           )}
           {view.criteriaStatus === "proposed" && (
             <p className="mt-2 text-[11px] text-tone-500">
