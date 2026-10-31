@@ -81,6 +81,9 @@ const ROLE_LABEL: Record<Speaker, string> = { promisor: "Promisor", counterparty
 
 // After a side writes, the other side has this long to answer before Dreddi may rule without them.
 const RESPONSE_DAYS = 3;
+// Beta limits on what the model calls cost: per case for both sides together, and per person a day.
+const CASE_MESSAGE_LIMIT = 30;
+const DAILY_MESSAGE_LIMIT = 100;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 // When a side has been called and not answered since: the first message from the other side after
@@ -261,6 +264,10 @@ async function loadSettledCase(promiseId: string, userId: string) {
   return (await applyBindingRuling(loaded)) ? loadCase(promiseId, userId) : loaded;
 }
 
+// Approvals are buttons and cost nothing, so only what the sides write counts.
+const sideMessageCount = (rows: MessageRow[]) =>
+  rows.filter((row) => row.author_role !== "judge" && !row.approves_message_id).length;
+
 const caseView = (loaded: LoadedCase) => ({
   role: loaded.role,
   agreedCriteria: loaded.agreedCriteria,
@@ -274,6 +281,7 @@ const caseView = (loaded: LoadedCase) => ({
   closed: !isCaseOpen(loaded.promise),
   promiseStatus: loaded.promise.status,
   promiseTitle: loaded.promise.title,
+  messagesLeft: Math.max(0, CASE_MESSAGE_LIMIT - sideMessageCount(loaded.messages)),
   messages: loaded.messages.map((row) => ({
     ...row,
     author_name: row.author_id ? loaded.authorNames[row.author_id] ?? null : null,
@@ -349,6 +357,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (!isCaseOpen(promise)) {
       throw new JudgeError("The case is closed: the promise status is final", 409);
     }
+    if (sideMessageCount(loaded.messages) >= CASE_MESSAGE_LIMIT) throw new JudgeError("case_limit", 429);
+    const { count: todayCount } = await admin
+      .from("judge_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", user.id)
+      .is("approves_message_id", null)
+      .gte("created_at", new Date(Date.now() - DAY_MS).toISOString());
+    if ((todayCount ?? 0) >= DAILY_MESSAGE_LIMIT) throw new JudgeError("daily_limit", 429);
     // After a ruling every message is an appeal, so the criteria can no longer change: checking only.
     // With no other side nobody else guards the bar, so agreed criteria stay as they are past the deadline.
     // Otherwise Dreddi tells from the message whether it is about the criteria or about the result.

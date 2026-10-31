@@ -1450,7 +1450,11 @@
     "sendReply": "Reply",
     "errors": {
       "signIn": "Sign in again",
-      "stale": "The case has changed. Refresh the page"
-    }
+      "stale": "The case has changed. Refresh the page",
+      "caseLimit": "This case has used up its beta message limit",
+      "dailyLimit": "You have used up today's messages to Dreddi. Try again tomorrow"
+    },
+    "messagesLeft": "Beta: messages left in this case: {count}",
+    "limitReached": "In the beta a case holds up to 30 messages, and they are used up. The «I approve the criteria» and «I accept the ruling» buttons still work."
   }
 }

@@ -6,6 +6,7 @@ import { toJudgeImage } from "@/lib/ai/judgeImage";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { Share2, Sparkles } from "lucide-react";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 
 // Lab: Dreddi, the AI judge, on a real promise. Renders nothing unless the server has LAB_ENABLED=true.
 
@@ -39,6 +40,7 @@ type CaseView = {
   // Sides that were called and have not answered yet; overdue: Dreddi may rule without them.
   awaiting: { role: Speaker; since: string; until: string; overdue: boolean }[];
   promiseTitle: string;
+  messagesLeft: number;
   // The latest kept / not kept ruling: pending until accepted, appealed or 3 days pass.
   ruling: {
     rulingId: string;
@@ -87,7 +89,14 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     return message.content;
   };
   const errorText = useCallback(
-    (status: number, fallback?: string) => (status === 409 ? t("arbitration.errors.stale") : fallback ?? `HTTP ${status}`),
+    (status: number, fallback?: string) =>
+      status === 409
+        ? t("arbitration.errors.stale")
+        : status === 429 && fallback === "case_limit"
+          ? t("arbitration.errors.caseLimit")
+          : status === 429 && fallback === "daily_limit"
+            ? t("arbitration.errors.dailyLimit")
+            : fallback ?? `HTTP ${status}`,
     [t]
   );
   const [view, setView] = useState<CaseView | null>(null);
@@ -227,15 +236,16 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         {view && "counterparty" in view.approvals && !view.closed && view.messages.length > 0 && (
           <span className="flex items-center gap-2 text-xs">
             {summonCopied && <span className="text-accent-200">{t("arbitration.summonCopied")}</span>}
-            <button
-              type="button"
-              onClick={() => void copySummons()}
-              title={t("arbitration.copySummons")}
-              aria-label={t("arbitration.copySummons")}
-              className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
-            >
-              <Share2 className="h-4 w-4" aria-hidden />
-            </button>
+            <Tooltip label={t("arbitration.copySummons")}>
+              <button
+                type="button"
+                onClick={() => void copySummons()}
+                aria-label={t("arbitration.copySummons")}
+                className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
+              >
+                <Share2 className="h-4 w-4" aria-hidden />
+              </button>
+            </Tooltip>
           </span>
         )}
       </header>
@@ -413,7 +423,11 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         </p>
       )}
 
-      {view && !view.closed && (
+      {view && !view.closed && view.messagesLeft === 0 && (
+        <p className="rounded-xl border border-tone-white/10 p-3 text-xs text-tone-300">{t("arbitration.limitReached")}</p>
+      )}
+
+      {view && !view.closed && view.messagesLeft > 0 && (
         <div className="space-y-2">
           <textarea
             className={`${inputClass} min-h-[80px]`}
@@ -450,6 +464,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                 {t("arbitration.attached", { count: images.length })}
               </button>
             )}
+            <span className="text-[11px] text-tone-500">{t("arbitration.messagesLeft", { count: view.messagesLeft })}</span>
             <button
               type="button"
               onClick={() => void send()}
