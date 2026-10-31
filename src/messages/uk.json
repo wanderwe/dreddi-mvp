@@ -536,7 +536,9 @@
         "clearDate": "Очистити дату",
         "changeTime": "Змінити час",
         "selectTime": "Оберіть час",
-        "closeTimePicker": "Закрити вибір часу"
+        "closeTimePicker": "Закрити вибір часу",
+        "previousMonth": "Попередній місяць",
+        "nextMonth": "Наступний місяць"
       },
       "visibility": {
         "label": "Видимість",

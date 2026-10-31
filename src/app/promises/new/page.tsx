@@ -80,6 +80,7 @@ export default function NewPromisePage() {
   const defaultDueTime = { hour: 18, minute: 0 };
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const calendarPlacementRef = useRef<"top" | "bottom" | null>(null);
   const groupMenuRef = useRef<HTMLDivElement | null>(null);
   const groupButtonRef = useRef<HTMLButtonElement | null>(null);
   const [popoverStyles, setPopoverStyles] = useState<{
@@ -214,10 +215,16 @@ export default function NewPromisePage() {
     return days;
   }, [calendarMonth]);
 
+  // Calendar labels in the site language (date-fns would print English).
   const weekDays = useMemo(() => {
     const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    return Array.from({ length: 7 }, (_, index) => format(addDays(start, index), "EE"));
-  }, []);
+    const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" });
+    return Array.from({ length: 7 }, (_, index) => weekday.format(addDays(start, index)));
+  }, [locale]);
+  const monthTitle = useMemo(() => {
+    const title = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(calendarMonth);
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  }, [locale, calendarMonth]);
 
   const timePresets = [
     { label: "09:00", hour: 9, minute: 0 },
@@ -264,18 +271,18 @@ export default function NewPromisePage() {
                 type="button"
                 onClick={() => setCalendarMonth((prev) => subMonths(prev, 1))}
                 className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
-                aria-label="Previous month"
+                aria-label={t("promises.new.actions.previousMonth")}
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden />
               </button>
               <div className="text-sm font-semibold text-tone-100">
-                {format(calendarMonth, "MMMM yyyy")}
+                {monthTitle}
               </div>
               <button
                 type="button"
                 onClick={() => setCalendarMonth((prev) => addMonths(prev, 1))}
                 className="cursor-pointer rounded-lg border border-tone-white/10 p-2 text-tone-200 transition hover:border-accent-300/40 hover:bg-tone-white/5 hover:text-accent-100"
-                aria-label="Next month"
+                aria-label={t("promises.new.actions.nextMonth")}
               >
                 <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
@@ -437,6 +444,7 @@ export default function NewPromisePage() {
   useEffect(() => {
     if (!isCalendarOpen) {
       setPopoverStyles(null);
+      calendarPlacementRef.current = null;
       return;
     }
 
@@ -456,16 +464,17 @@ export default function NewPromisePage() {
       );
       const width = Math.min(desiredWidth, maxWidth);
 
-      let top = triggerRect.bottom + spacing;
-      let placement: "top" | "bottom" = "bottom";
-      if (top + popoverRect.height > viewportHeight - viewportPadding) {
-        const nextTop = triggerRect.top - spacing - popoverRect.height;
-        if (nextTop >= viewportPadding) {
-          top = nextTop;
-          placement = "top";
-        } else {
-          top = Math.max(viewportPadding, viewportHeight - popoverRect.height - viewportPadding);
-        }
+      // The side is chosen once per opening: months have 5 or 6 week rows, and re-choosing on
+      // every month switch made the calendar jump between above and below the field.
+      const fitsBelow = triggerRect.bottom + spacing + popoverRect.height <= viewportHeight - viewportPadding;
+      const fitsAbove = triggerRect.top - spacing - popoverRect.height >= viewportPadding;
+      const placement: "top" | "bottom" =
+        calendarPlacementRef.current ?? (!fitsBelow && fitsAbove ? "top" : "bottom");
+      if (popoverRect.height > 0) calendarPlacementRef.current = placement;
+      let top =
+        placement === "top" ? triggerRect.top - spacing - popoverRect.height : triggerRect.bottom + spacing;
+      if (placement === "bottom" && top + popoverRect.height > viewportHeight - viewportPadding) {
+        top = Math.max(viewportPadding, viewportHeight - popoverRect.height - viewportPadding);
       }
 
       let left = triggerRect.left;
