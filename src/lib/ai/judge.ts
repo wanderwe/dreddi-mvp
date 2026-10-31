@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatKyivDate } from "./kyivDate";
 
 // Lab prototype (LAB_ENABLED=true, local only): an AI judge that checks whether a promise was kept,
 // on its own when there is no other side, or hearing both sides of an agreement. No database access.
@@ -156,8 +157,7 @@ Examples of the voice only. They are about other, made-up cases: never copy thei
 - Ruling with no other side: «Вирок: виконано. Звіт здано 12 листопада, лист із підтвердженням. Справу закрито.»`;
 
 // The model has no clock, so "has the deadline passed" needs today's date from us (Kyiv time).
-export const formatKyivDate = (date: Date, locale = "uk-UA") =>
-  new Intl.DateTimeFormat(locale, { timeZone: "Europe/Kyiv", day: "numeric", month: "long", year: "numeric" }).format(date);
+export { formatKyivDate };
 
 export const buildSystemPrompt = (
   phase: JudgeMode,

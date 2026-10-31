@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { formatKyivDate, type JudgeImage, type JudgePhase, type Speaker } from "@/lib/ai/judge";
+import type { JudgeImage, JudgePhase, Speaker } from "@/lib/ai/judge";
+import { formatKyivDate } from "@/lib/ai/kyivDate";
 import { toJudgeImage } from "@/lib/ai/judgeImage";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
