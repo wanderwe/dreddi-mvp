@@ -130,7 +130,6 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
       { kind: "turn", paragraphs: ["And promising yourself is the easiest"] },
       { kind: "body", paragraphs: ["Because no one asks if you did it"], labParagraphs: ["Dreddi will"] },
       { kind: "body", paragraphs: ["For yourself — discipline", "For others — trust", "Over time — reputation"] },
-      { kind: "list", paragraphs: ["Just clarity and consequences"] },
     ],
     cta: "Record your first promise",
   },
@@ -155,7 +154,6 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
       { kind: "body", paragraphs: ["Бо ніхто не спитає, чи виконав"], labParagraphs: ["Але не Дредді"] },
       // The one deliberate exception to "no long dashes": the summary reads as a formula.
       { kind: "body", paragraphs: ["Для себе — це дисципліна", "Для інших — довіра", "З часом — репутація"] },
-      { kind: "list", paragraphs: ["Просто ясність і наслідки"] },
     ],
     cta: "Зафіксувати першу обіцянку",
   },
