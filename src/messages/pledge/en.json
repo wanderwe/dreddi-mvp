@@ -49,7 +49,7 @@
     },
     "overview": {
       "title": "Your promises overview",
-      "subtitle": "Overview of promises by responsibility — what you’re accountable for and what others owe you",
+      "subtitle": "What you promised yourself, others, and what others promised you",
       "cta": "New promise"
     },
     "empty": {
@@ -159,10 +159,10 @@
       },
       "prediction": {
         "reasons": {
-          "strongCompletionHistory": "you complete promises often — this lowers risk",
-          "lowCompletionHistory": "you rarely complete promises — this increases risk",
+          "strongCompletionHistory": "you complete promises often, which lowers risk",
+          "lowCompletionHistory": "you rarely complete promises, which increases risk",
           "someSharedHistory": "you have fulfilled promises together",
-          "newCounterparty": "first promise with this person — no shared history yet",
+          "newCounterparty": "first promise with this person: no shared history yet",
           "clearDetails": "clear promise details improve clarity",
           "unclearDetails": "unclear promise details increase ambiguity"
         }
@@ -365,7 +365,7 @@
   },
   "groups": {
     "title": "Promise groups",
-    "subtitle": "A lightweight way to organize related promises in one list without boards and extra steps",
+    "subtitle": "Keep related promises together: by project, person or goal",
     "backToDeal": "Back to promise draft",
     "dealsTitle": "Promises in this group",
     "dealsEmpty": "No promises in this group yet",
@@ -392,10 +392,9 @@
     "emptyDescription": "Create your first group above to keep related promises in one list"
   },
   "collectiveAgreements": {
-    "eyebrow": "COLLECTIVE PROMISES",
     "new": {
       "title": "New collective promise",
-      "subtitle": "Describe the commitment and pick participants — each one gets their own copy of the promise",
+      "subtitle": "Describe the commitment and pick participants: each one gets their own copy of the promise",
       "toggle": {
         "helper": "Each participant will get their own copy of the promise to accept"
       },

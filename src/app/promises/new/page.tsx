@@ -1094,9 +1094,6 @@ export default function NewPromisePage() {
         <div className="w-full max-w-2xl space-y-5 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-5 pb-28 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-8 sm:pb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.2em] text-accent-200">
-                {t("promises.new.eyebrow", { newEntity: promiseLabels.newEntity })}
-              </p>
               <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">
                 {t("promises.new.title", { entityLower: promiseLabels.entityLower })}
               </h1>

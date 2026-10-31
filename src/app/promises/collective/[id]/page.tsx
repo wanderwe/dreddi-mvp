@@ -186,9 +186,6 @@ export default function CollectiveAgreementDetailPage() {
         <LocalizedLink href="/promises" className="text-sm text-accent-200 hover:text-accent-100">
           ← {t("collectiveAgreements.detail.back")}
         </LocalizedLink>
-        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-accent-200">
-          {t("collectiveAgreements.eyebrow")}
-        </p>
         <h1 className="mt-2 text-3xl font-semibold text-tone-white">{agreement.title}</h1>
         {agreement.details && <p className="mt-2 text-sm text-tone-300">{agreement.details}</p>}
         <p className="mt-2 text-xs text-tone-400">

@@ -403,9 +403,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     <div className={`flex min-h-0 flex-col ${className}`}>
       {showTitle && (
         <div className="space-y-1">
-          <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
-            {t("profileSettings.sectionLabel")}
-          </div>
           <h2 className="text-lg font-semibold text-tone-white">{t("profileSettings.title")}</h2>
         </div>
       )}
@@ -977,9 +974,6 @@ export function ProfileSettingsMenu({ variant = "icon", className = "" }: Profil
         <SheetContent className="top-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] rounded-2xl border border-tone-white/10 p-4 flex flex-col sm:w-[360px] sm:p-6 md:right-1/2 md:w-[min(720px,calc(100vw-2.5rem))] md:translate-x-1/2 lg:right-auto lg:left-1/2 lg:top-1/2 lg:h-[90dvh] lg:max-h-[90dvh] lg:w-[840px] lg:max-w-[90vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-3xl lg:border lg:border-tone-white/10 lg:border-l-0 lg:p-10 lg:shadow-2xl lg:shadow-tone-black/60 overflow-y-auto pb-[max(env(safe-area-inset-bottom),1rem)]">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <div className="text-xs uppercase tracking-[0.3em] text-accent-200">
-                {t("profileSettings.sectionLabel")}
-              </div>
               <h2 className="text-lg font-semibold text-tone-white">{t("profileSettings.title")}</h2>
             </div>
             <div className="flex items-center gap-2">

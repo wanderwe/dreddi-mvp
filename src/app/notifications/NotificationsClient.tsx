@@ -309,9 +309,6 @@ export default function NotificationsClient() {
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-accent-200">
-            {t("notifications.header.eyebrow")}
-          </p>
           <h1 className="text-3xl font-semibold text-tone-white">
             {t("notifications.header.title")}
           </h1>
