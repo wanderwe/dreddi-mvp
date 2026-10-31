@@ -1396,6 +1396,8 @@
     "summonFailed": "Could not copy the message",
     "summon": "Dreddi is deciding whether «{title}» was kept. Take a look and add your side{until}: {link}",
     "summonUntil": " by {date}",
+    "summonCriteria": "Dreddi has proposed criteria for «{title}». Take a look and approve them or write what to change: {link}",
+    "summonCase": "The case «{title}» in Dreddi arbitration: {link}",
     "empty": "The case is empty. Start with how you will prove it was done, and Dreddi will agree the criteria.",
     "showEarlier": "Show earlier messages ({count})",
     "hideEarlier": "Hide earlier messages",

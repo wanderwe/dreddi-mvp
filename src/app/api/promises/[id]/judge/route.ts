@@ -435,6 +435,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       approves_message_id: null,
       in_absentia: false,
     };
+    // Both rows would get the same now(), and the id tiebreak is random: explicit times keep the
+    // side's message before Dreddi's answer.
+    const savedAt = Date.now();
     const { error: insertError } = await admin.from("judge_messages").insert([
       {
         promise_id: promise.id,
@@ -444,6 +447,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         content: text || "(evidence only)",
         evidence_notes: result.evidence_notes,
         ...emptyJudgeFields,
+        created_at: new Date(savedAt).toISOString(),
       },
       {
         promise_id: promise.id,
@@ -454,7 +458,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         evidence_notes: [],
         criteria: criteriaResult?.criteria.length ? criteriaResult.criteria : null,
         criteria_ready: criteriaResult ? criteriaResult.ready : null,
-        verdict: verdictResult?.verdict ?? null,
+        verdict: verdictResult ? (verdictResult.verdict ?? "undecided") : null,
         confidence: verdictResult?.confidence ?? null,
         reasons: verdictResult?.reasons ?? null,
         // No rulings in absentia while the other side gets no notice of the case.
@@ -463,6 +467,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         input_tokens: answer.usage.inputTokens,
         output_tokens: answer.usage.outputTokens,
         approves_message_id: null,
+        created_at: new Date(savedAt + 1).toISOString(),
       },
     ]);
     if (insertError) throw new JudgeError(`Could not save the case: ${insertError.message}`, 500);

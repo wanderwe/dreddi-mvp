@@ -132,14 +132,21 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
   }, [call, errorText]);
 
   // Ready-to-send text for a messenger, with a link straight to this arbitration block.
-  const copySummons = async (until?: string) => {
+  // It says what the other side is needed for now: answering a request to decide, approving criteria, or just the case.
+  const copySummons = async () => {
     if (!view) return;
     const link = `${window.location.origin}${window.location.pathname}#arbitration`;
-    const message = t("arbitration.summon", {
-      title: view.promiseTitle,
-      until: until ? t("arbitration.summonUntil", { date: formatDate(until) }) : "",
-      link,
-    });
+    const waiting = view.awaiting.find((item) => item.role !== view.role);
+    const otherApproved = Object.entries(view.approvals).some(([side, approved]) => side !== view.role && approved);
+    const message = waiting
+      ? t("arbitration.summon", {
+          title: view.promiseTitle,
+          until: t("arbitration.summonUntil", { date: formatDate(waiting.until) }),
+          link,
+        })
+      : view.criteriaStatus === "proposed" && !otherApproved
+        ? t("arbitration.summonCriteria", { title: view.promiseTitle, link })
+        : t("arbitration.summonCase", { title: view.promiseTitle, link });
     try {
       await navigator.clipboard.writeText(message);
       setSummonCopied(true);
@@ -216,6 +223,21 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
             {t("arbitration.beta")}
           </span>
         </h2>
+        {/* Any stage may need the other side: approving criteria or answering a request to decide. */}
+        {view && "counterparty" in view.approvals && !view.closed && view.messages.length > 0 && (
+          <span className="flex items-center gap-2 text-xs">
+            {summonCopied && <span className="text-accent-200">{t("arbitration.summonCopied")}</span>}
+            <button
+              type="button"
+              onClick={() => void copySummons()}
+              title={t("arbitration.copySummons")}
+              aria-label={t("arbitration.copySummons")}
+              className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+            </button>
+          </span>
+        )}
       </header>
 
       {view && view.awaiting.some((item) => item.role !== view.role) && (
@@ -229,18 +251,6 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                   : t("arbitration.awaiting", { role: roleLabel(item.role), date: formatDate(item.until) })}
               </span>
             ))}
-          <span className="ml-auto flex items-center gap-2">
-            {summonCopied && <span className="text-accent-200">{t("arbitration.summonCopied")}</span>}
-            <button
-              type="button"
-              onClick={() => void copySummons(view.awaiting.find((item) => item.role !== view.role)?.until)}
-              title={t("arbitration.copySummons")}
-              aria-label={t("arbitration.copySummons")}
-              className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
-            >
-              <Share2 className="h-4 w-4" aria-hidden />
-            </button>
-          </span>
         </div>
       )}
 
