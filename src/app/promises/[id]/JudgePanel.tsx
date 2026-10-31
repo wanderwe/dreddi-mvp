@@ -40,6 +40,7 @@ type CaseView = {
   // Sides that were called and have not answered yet; overdue: Dreddi may rule without them.
   awaiting: { role: Speaker; since: string; until: string; overdue: boolean }[];
   promiseTitle: string;
+  messageLimit: number;
   messagesLeft: number;
   // The latest kept / not kept ruling: pending until accepted, appealed or 3 days pass.
   ruling: {
@@ -64,6 +65,8 @@ const VERDICT_CLASSES = {
 } as const;
 
 const VISIBLE_MESSAGES = 4;
+// The composer shows the beta message count only once it gets close to the limit.
+const FEW_MESSAGES_LEFT = 5;
 
 const inputClass =
   "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
@@ -227,10 +230,19 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         <h2 className="flex items-center gap-2 text-lg font-semibold text-tone-white">
           {t("arbitration.title")}
           {/* Violet, not the green of primary actions: the usual mark of an AI feature. */}
-          <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-500">
-            <Sparkles className="h-3 w-3" aria-hidden />
-            {t("arbitration.beta")}
-          </span>
+          {/* The beta limit lives in the badge's tooltip, so the composer is not cluttered while it is far off. */}
+          <Tooltip
+            label={
+              view
+                ? t("arbitration.betaLimit", { limit: view.messageLimit, count: view.messagesLeft })
+                : t("arbitration.beta")
+            }
+          >
+            <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-500">
+              <Sparkles className="h-3 w-3" aria-hidden />
+              {t("arbitration.beta")}
+            </span>
+          </Tooltip>
         </h2>
         {/* Any stage may need the other side: approving criteria or answering a request to decide. */}
         {view && "counterparty" in view.approvals && !view.closed && view.messages.length > 0 && (
@@ -464,12 +476,14 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                 {t("arbitration.attached", { count: images.length })}
               </button>
             )}
-            <span className="ml-auto text-[11px] text-tone-500">{t("arbitration.messagesLeft", { count: view.messagesLeft })}</span>
+            {view.messagesLeft <= FEW_MESSAGES_LEFT && (
+              <span className="ml-auto text-[11px] text-tone-500">{t("arbitration.messagesLeft", { count: view.messagesLeft })}</span>
+            )}
             <button
               type="button"
               onClick={() => void send()}
               disabled={busy || (!text.trim() && images.length === 0)}
-              className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+              className={`${view.messagesLeft <= FEW_MESSAGES_LEFT ? "" : "ml-auto "}cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {view.messages.length === 0 ? t("arbitration.sendFirst") : t("arbitration.sendReply")}
             </button>

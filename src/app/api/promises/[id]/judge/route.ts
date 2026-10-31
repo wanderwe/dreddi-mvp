@@ -281,6 +281,7 @@ const caseView = (loaded: LoadedCase) => ({
   closed: !isCaseOpen(loaded.promise),
   promiseStatus: loaded.promise.status,
   promiseTitle: loaded.promise.title,
+  messageLimit: CASE_MESSAGE_LIMIT,
   messagesLeft: Math.max(0, CASE_MESSAGE_LIMIT - sideMessageCount(loaded.messages)),
   messages: loaded.messages.map((row) => ({
     ...row,
