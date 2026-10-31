@@ -11,6 +11,8 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { productFlags } from "@/lib/config/productFlags";
+import { POSITIONING } from "@/lib/features";
+import { isSelfPromise } from "@/lib/selfPromise";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -52,6 +54,8 @@ type PromiseRow = {
   promisee_id: string | null;
   visibility: "public" | "private" | null;
   collective_agreement_id: string | null;
+  activated_without_counterparty: boolean | null;
+  activated_without_counterparty_at: string | null;
 };
 
 type PagedTabKey = "i-promised" | "promised-to-me" | "all";
@@ -67,7 +71,7 @@ const normalizeTabParam = (value: string | null): TabKey => {
 
 type MetricFilter = "total" | "awaiting_my_action" | "awaiting_others";
 type StatusFilter = string;
-type DealTypeFilter = "all" | "public" | "private" | "reputation_stake";
+type DealTypeFilter = "all" | "public" | "private" | "reputation_stake" | "self";
 type PromiseRoleBase = Pick<
   PromiseRow,
   | "id"
@@ -91,6 +95,8 @@ type PromiseRoleBase = Pick<
   | "counterparty_id"
   | "visibility"
   | "collective_agreement_id"
+  | "activated_without_counterparty"
+  | "activated_without_counterparty_at"
 >;
 type PromiseWithRole = PromiseRow & {
   role: PromiseRole;
@@ -119,6 +125,7 @@ const DEAL_TYPE_FILTER_ALL: DealTypeFilter = "all";
 
 const normalizeDealTypeParam = (typeValue: string | null, visibilityValue: string | null): DealTypeFilter => {
   if (typeValue === "public" || typeValue === "private" || typeValue === "reputation_stake") return typeValue;
+  if (typeValue === "self" && POSITIONING === "pledge") return typeValue;
   if (visibilityValue === "public" || visibilityValue === "private") return visibilityValue;
   return DEAL_TYPE_FILTER_ALL;
 };
@@ -392,7 +399,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
-        + ",visibility,collective_agreement_id"
+        + ",visibility,collective_agreement_id,activated_without_counterparty,activated_without_counterparty_at"
       )
       .or(buildBaseFilter(user.id))
       .order("created_at", { ascending: false })
@@ -459,7 +466,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
-        + ",visibility,collective_agreement_id"
+        + ",visibility,collective_agreement_id,activated_without_counterparty,activated_without_counterparty_at"
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
@@ -663,7 +670,7 @@ export default function PromisesClient() {
       filtered = filtered.filter((row) => isAwaitingYourAction(row));
     }
     if (activeMetricFilter === "awaiting_others") {
-      filtered = filtered.filter((row) => isAwaitingOthers(row));
+      filtered = filtered.filter((row) => isAwaitingOthers(row) && !isSelfPromise(row));
     }
 
     return filtered;
@@ -702,6 +709,9 @@ export default function PromisesClient() {
     if (activeDealTypeFilter === DEAL_TYPE_FILTER_ALL) return rows;
     if (activeDealTypeFilter === "reputation_stake") {
       return rows.filter((row) => row.is_important);
+    }
+    if (activeDealTypeFilter === "self") {
+      return rows.filter((row) => isSelfPromise(row));
     }
     return rows.filter((row) => (row.visibility ?? "private") === activeDealTypeFilter);
   };
@@ -858,7 +868,7 @@ export default function PromisesClient() {
   const overview = useMemo(() => {
     const total = dedupeCollectiveForCount(summaryRows).length;
     const awaitingYou = summaryRows.filter((row) => isAwaitingYourAction(row)).length;
-    const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row)).length;
+    const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row) && !isSelfPromise(row)).length;
 
     return { total, awaitingYou, awaitingOthers };
   }, [summaryRows]);
@@ -1029,6 +1039,9 @@ export default function PromisesClient() {
     { value: "public", label: t("promises.list.dealTypeFilter.options.public") },
     { value: "private", label: t("promises.list.dealTypeFilter.options.private") },
     { value: "reputation_stake", label: t("promises.list.dealTypeFilter.options.reputationStake") },
+    ...(POSITIONING === "pledge"
+      ? [{ value: "self" as const, label: t("promises.list.dealTypeFilter.options.self") }]
+      : []),
   ];
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??
@@ -1414,6 +1427,11 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
+                        {POSITIONING === "pledge" && isSelfPromise(p) && (
+                          <span className="rounded-full border border-tone-white/15 px-2 py-0.5 text-xs text-tone-300">
+                            {t("promises.list.selfBadge")}
+                          </span>
+                        )}
                         <StatusPill
                           label={statusLabel}
                           tone={statusPill.tone}

@@ -74,9 +74,11 @@
       "dealTypeFilter": {
         "label": "Promise type",
         "options": {
-          "all": "All promises"
+          "all": "All promises",
+          "self": "Promises to yourself"
         }
-      }
+      },
+      "selfBadge": "to yourself"
     },
     "detail": {
       "conditionProposedBanner": {
@@ -106,7 +108,9 @@
         "summary": {
           "invitedSideExecutes": "{responsible} is expected to complete this promise for {recipient}",
           "invitedSideReceives": "{responsible} makes this promise to {recipient}"
-        }
+        },
+        "selfValue": "Yourself",
+        "noOtherSide": "No other side"
       },
       "publicAgreementLink": {
         "helper": "A page for monitoring this promise",

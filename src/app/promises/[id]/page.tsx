@@ -19,6 +19,8 @@ import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { isSelfPromise } from "@/lib/selfPromise";
+import { POSITIONING } from "@/lib/features";
 import { JudgePanel } from "./JudgePanel";
 import { pledgeWording } from "@/lib/pledgeWording";
 import { stripTrailingPeriod } from "@/lib/text";
@@ -1128,8 +1130,11 @@ export default function PromisePage() {
   const canManageInvite = Boolean(p && userId === p.creator_id);
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
+  // A promise to yourself has nobody to remind and nobody it was made to.
+  const isSelf = Boolean(p && POSITIONING === "pledge" && isSelfPromise(p));
   const canShareReminder = Boolean(
     p &&
+      !isSelf &&
       inviteStatus === "accepted" &&
       (p.status === "active" || p.status === "completed_by_promisor") &&
       getNextActionOwner(p, userId) === "other"
@@ -1199,14 +1204,16 @@ export default function PromisePage() {
   const accepterLabel = getParticipantLabel(accepterId);
   const reviewerLabel = getParticipantLabel(reviewerId);
   const responsibleLabel = getParticipantLabel(executorId);
-  const promiseToLabel = getParticipantLabel(promiseMadeToId);
+  const promiseToLabel = isSelf ? t("promises.detail.roles.selfValue") : getParticipantLabel(promiseMadeToId);
   const acceptingUserName = useMemo(() => {
     if (!p?.counterparty_id) return t("promises.detail.unknownUser");
     const displayName = counterpartyDisplayName?.trim();
     if (displayName) return displayName;
     return p.counterparty_id.slice(0, 8);
   }, [counterpartyDisplayName, p?.counterparty_id, t]);
-  const inviteMetaText = inviteStatus === "accepted"
+  const inviteMetaText = isSelf
+    ? t("promises.detail.roles.noOtherSide")
+    : inviteStatus === "accepted"
     ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
     : t(`promises.inviteStatus.${inviteStatus}`);
   const lifecycleStates = p && uiStatus ? getLifecycleStates(p, uiStatus, t) : [];
@@ -1245,7 +1252,7 @@ export default function PromisePage() {
   const hasDetails = detailsText.length > 0;
   const creatorHref = getParticipantHref(p?.creator_id ?? null);
   const responsibleHref = getParticipantHref(executorId);
-  const promiseToHref = getParticipantHref(promiseMadeToId);
+  const promiseToHref = isSelf ? null : getParticipantHref(promiseMadeToId);
 
   useEffect(() => {
     let active = true;

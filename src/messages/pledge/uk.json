@@ -81,9 +81,11 @@
       "dealTypeFilter": {
         "label": "Тип обіцянки",
         "options": {
-          "all": "Усі обіцянки"
+          "all": "Усі обіцянки",
+          "self": "Обіцянки собі"
         }
-      }
+      },
+      "selfBadge": "собі"
     },
     "detail": {
       "cardTitle": "Обіцянка",
@@ -125,7 +127,9 @@
         "summary": {
           "invitedSideExecutes": "{responsible} має виконати цю обіцянку для {recipient}",
           "invitedSideReceives": "Цю обіцянку дає {responsible} для {recipient}"
-        }
+        },
+        "selfValue": "Собі",
+        "noOtherSide": "Без іншої сторони"
       },
       "publicAgreementLink": {
         "helper": "Сторінка для спостереження за обіцянкою",
