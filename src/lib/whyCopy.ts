@@ -135,8 +135,8 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
     sections: [
       { kind: "turn", paragraphs: ["Обіцяти легко"] },
       { kind: "list", paragraphs: ["«Зробимо до жовтня»", "«Запустимо цього року»", "«З понеділка почну»"] },
-      { kind: "turn", paragraphs: ["А потім ніхто не пам’ятає, що саме обіцяли"] },
-      { kind: "body", paragraphs: ["І чи це виконали"] },
+      { kind: "turn", paragraphs: ["А потім ніхто не пам’ятає деталей"] },
+      { kind: "body", paragraphs: ["Ані того, чи слово дотримали"] },
       { kind: "turn", paragraphs: ["Dreddi знає"] },
       { kind: "list", paragraphs: ["Хто пообіцяв", "Що саме", "Чи дотримав"] },
       { kind: "body", paragraphs: ["Для себе — це дисципліна", "Для інших — це довіра", "З часом — це репутація"] },
