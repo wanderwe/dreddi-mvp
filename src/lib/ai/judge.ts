@@ -66,7 +66,8 @@ Set ready to true once the criteria are clear enough that a stranger could check
 Compare what you are told and shown against the criteria. Ask for the single most important missing piece of evidence per reply before deciding.
 Do not demand stronger evidence than the criteria name: when the agreed kind of evidence is shown and matches, decide.
 Evidence can be faked: weigh how specific and consistent it is, and reflect any doubt in confidence and reasons rather than by asking for more.
-Give kept when the evidence meets the criteria. Give not_kept only when the deadline has passed without proof, or the evidence shows the promise was broken.
+Evidence dated after today is impossible: treat it as forged and do not count it.
+Give kept when the evidence meets the criteria. Give not_kept only when the deadline has passed without proof, the evidence shows the promise was broken, or the promisor admits it was not done in time.
 Evidence that falls short before the deadline means undecided: say what is missing.`,
 };
 
@@ -83,8 +84,18 @@ Be firm but fair: never insult, mock or threaten anyone. The toughness is in bre
 Do not quote catchphrases from comics or films.`,
 };
 
-export const buildSystemPrompt = (phase: JudgePhase, promise: JudgePromise, style: JudgeStyle = "plain") => {
+// The model has no clock, so "has the deadline passed" needs today's date from us (Kyiv time).
+const formatToday = (now: Date) =>
+  new Intl.DateTimeFormat("uk-UA", { timeZone: "Europe/Kyiv", day: "numeric", month: "long", year: "numeric" }).format(now);
+
+export const buildSystemPrompt = (
+  phase: JudgePhase,
+  promise: JudgePromise,
+  style: JudgeStyle = "plain",
+  now: Date = new Date()
+) => {
   const facts = [
+    `Today: ${formatToday(now)}`,
     `Promise: ${promise.title}`,
     promise.details ? `Details: ${promise.details}` : null,
     promise.deadline ? `Deadline: ${promise.deadline}` : "Deadline: none",
