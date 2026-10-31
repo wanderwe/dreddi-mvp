@@ -19,6 +19,7 @@ import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
+import { JudgePanel } from "./JudgePanel";
 import { pledgeWording } from "@/lib/pledgeWording";
 import { stripTrailingPeriod } from "@/lib/text";
 import { getPromiseLabels } from "@/lib/promiseLabels";
@@ -1936,6 +1937,8 @@ export default function PromisePage() {
               </div>
             )}
           </section>
+
+          <JudgePanel promiseId={p.id} />
 
           <details className="group rounded-2xl border border-tone-white/10 bg-ntone-900/25 p-4 lg:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-tone-white marker:hidden">

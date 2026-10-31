@@ -1,0 +1,102 @@
+import Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import {
+  CriteriaSchema,
+  JUDGE_MODEL,
+  VerdictSchema,
+  buildSystemPrompt,
+  estimateCostUsd,
+  type CriteriaResult,
+  type JudgePhase,
+  type JudgePromise,
+  type JudgeTurn,
+  type VerdictResult,
+} from "@/lib/ai/judge";
+
+// Server only: one call to the AI judge, shared by the lab page and real promises.
+
+export class JudgeError extends Error {
+  constructor(
+    message: string,
+    readonly status: number
+  ) {
+    super(message);
+  }
+}
+
+const SPEAKER_LABEL = { promisor: "Promisor", counterparty: "Counterparty" } as const;
+
+const toMessages = (turns: JudgeTurn[]): Anthropic.MessageParam[] =>
+  turns.map((turn) => {
+    if (turn.role === "assistant") return { role: "assistant", content: turn.text };
+    const label = turn.label ?? SPEAKER_LABEL[turn.speaker ?? "promisor"];
+    const notes = turn.evidenceNotes?.length
+      ? `\n(Evidence shown with this message, as you noted then: ${turn.evidenceNotes.join("; ")})`
+      : "";
+    const content: Anthropic.ContentBlockParam[] = [
+      ...(turn.images ?? []).map(
+        (image): Anthropic.ImageBlockParam => ({
+          type: "image",
+          source: { type: "base64", media_type: image.mediaType, data: image.data },
+        })
+      ),
+      { type: "text", text: `[${label}] ${turn.text || "(no text, see the attached evidence)"}${notes}` },
+    ];
+    return { role: "user", content };
+  });
+
+export type JudgeAnswer<P extends JudgePhase> = {
+  result: P extends "criteria" ? CriteriaResult : VerdictResult;
+  model: string;
+  usage: { inputTokens: number; outputTokens: number; costUsd: number };
+};
+
+export async function askJudge<P extends JudgePhase>({
+  phase,
+  promise,
+  turns,
+}: {
+  phase: P;
+  promise: JudgePromise;
+  turns: JudgeTurn[];
+}): Promise<JudgeAnswer<P>> {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new JudgeError("Add ANTHROPIC_API_KEY to .env.local and restart", 500);
+  }
+
+  const client = new Anthropic();
+  const schema = phase === "criteria" ? CriteriaSchema : VerdictSchema;
+
+  try {
+    const response = await client.messages.parse({
+      model: JUDGE_MODEL,
+      max_tokens: 4000,
+      system: buildSystemPrompt(phase, promise),
+      messages: toMessages(turns),
+      output_config: { effort: "medium", format: zodOutputFormat(schema) },
+    });
+
+    if (response.stop_reason === "refusal") throw new JudgeError("The model declined to answer", 422);
+    if (!response.parsed_output) {
+      throw new JudgeError(`No structured answer (stop: ${response.stop_reason})`, 502);
+    }
+
+    const { input_tokens: inputTokens, output_tokens: outputTokens } = response.usage;
+    return {
+      result: response.parsed_output as JudgeAnswer<P>["result"],
+      model: response.model,
+      usage: { inputTokens, outputTokens, costUsd: estimateCostUsd(inputTokens, outputTokens) },
+    };
+  } catch (error) {
+    if (error instanceof JudgeError) throw error;
+    if (error instanceof Anthropic.AuthenticationError) {
+      throw new JudgeError("No valid ANTHROPIC_API_KEY in .env.local", 500);
+    }
+    if (error instanceof Anthropic.RateLimitError) throw new JudgeError("Rate limited, try again in a minute", 429);
+    if (error instanceof Anthropic.APIConnectionError) throw new JudgeError("Could not reach the Claude API", 502);
+    if (error instanceof Anthropic.APIError) {
+      throw new JudgeError(`Claude API error ${error.status}: ${error.message}`, 502);
+    }
+    throw error;
+  }
+}

@@ -7,11 +7,11 @@ import type {
   VerdictResult,
   JudgeImage,
   JudgePhase,
-  JudgeStyle,
   JudgeTurn,
 } from "@/lib/ai/judge";
+import { toJudgeImage } from "@/lib/ai/judgeImage";
 
-// Lab prototype UI for the AI judge. Internal only, so the copy is not translated.
+// Lab prototype UI for Dreddi, the AI judge. Internal only, so the copy is not translated.
 
 type Usage = { inputTokens: number; outputTokens: number; costUsd: number; model?: string };
 type LogEntry = JudgeTurn & { phase: JudgePhase; usage?: Usage; verdict?: VerdictResult };
@@ -28,27 +28,12 @@ const VERDICT_CLASSES: Record<VerdictResult["verdict"], string> = {
   undecided: "bg-tone-200/10 text-tone-200",
 };
 
-const MAX_IMAGE_SIDE = 1568;
-
-// Shrinks a photo before upload so a phone picture stays well under the request size limit.
-const toJudgeImage = async (file: File): Promise<JudgeImage> => {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-  return { mediaType: "image/jpeg", data: dataUrl.slice(dataUrl.indexOf(",") + 1) };
-};
-
 const formatCost = (usd: number) => `$${usd.toFixed(5)}`;
 
 const inputClass =
   "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
 
 export function JudgeLab() {
-  const [style, setStyle] = useState<JudgeStyle>("plain");
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -85,7 +70,6 @@ export function JudgeLab() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          style,
           phase,
           promise: { title, details, deadline, criteria },
           turns: turns.map(({ role, text: turnText, speaker: turnSpeaker, images: turnImages }) => ({
@@ -131,25 +115,11 @@ export function JudgeLab() {
     <main className="mx-auto w-full max-w-3xl space-y-6 px-4 py-10">
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.2em] text-accent-200">Лабораторія</p>
-        <h1 className="text-3xl font-semibold text-tone-white">AI-суддя</h1>
+        <h1 className="text-3xl font-semibold text-tone-white">Дредді</h1>
         <p className="text-sm text-tone-300">
-          Суддя погоджує критерії, а потім перевіряє докази. Якщо пише лише виконавець, він перевіряє його сам; якщо
-          висловилась і інша сторона, вислуховує обох.
+          Суддя Dreddi погоджує критерії, а потім перевіряє докази. Якщо пише лише виконавець, він перевіряє його сам;
+          якщо висловилась і інша сторона, вислуховує обох.
         </p>
-        <div className="inline-flex rounded-xl border border-tone-white/10 p-0.5 text-sm">
-          {(["plain", "dredd"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setStyle(value)}
-              className={`cursor-pointer rounded-lg px-4 py-1.5 font-semibold ${
-                style === value ? "bg-emerald-400/90 text-slate-950" : "text-tone-200"
-              }`}
-            >
-              {value === "plain" ? "Звичайний" : "Дредд"}
-            </button>
-          ))}
-        </div>
       </header>
 
       <section className="space-y-3 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4">
@@ -219,7 +189,7 @@ export function JudgeLab() {
           >
             <p className="mb-1 text-xs text-tone-400">
               {entry.role === "assistant"
-                ? "AI-суддя"
+                ? "Дредді"
                 : entry.speaker
                   ? SPEAKER_LABELS[entry.speaker]
                   : "Ви"}
@@ -260,7 +230,7 @@ export function JudgeLab() {
             )}
           </div>
         ))}
-        {busy && <p className="text-xs text-tone-400">Думає…</p>}
+        {busy && <p className="text-xs text-tone-400">Дредді розглядає справу…</p>}
         {error && <p className="rounded-xl bg-red-500/10 p-3 text-sm text-danger-200">{error}</p>}
       </section>
 
