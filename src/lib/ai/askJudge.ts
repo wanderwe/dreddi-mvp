@@ -26,6 +26,9 @@ export class JudgeError extends Error {
   }
 }
 
+const isParseFailure = (error: unknown) =>
+  error instanceof Error && error.message.includes("Failed to parse structured output");
+
 const SPEAKER_LABEL = { promisor: "Promisor", counterparty: "Counterparty" } as const;
 
 const toMessages = (turns: JudgeTurn[]): Anthropic.MessageParam[] =>
@@ -69,13 +72,19 @@ export async function askJudge<P extends JudgeMode>({
   const client = new Anthropic();
   const schema = phase === "criteria" ? CriteriaSchema : phase === "verdict" ? VerdictSchema : AutoSchema;
 
+  const request = {
+    model: JUDGE_MODEL,
+    max_tokens: 4000,
+    system: buildSystemPrompt(phase, promise),
+    messages: toMessages(turns),
+    output_config: { effort: "medium" as const, format: zodOutputFormat(schema) },
+  };
+
   try {
-    const response = await client.messages.parse({
-      model: JUDGE_MODEL,
-      max_tokens: 4000,
-      system: buildSystemPrompt(phase, promise),
-      messages: toMessages(turns),
-      output_config: { effort: "medium", format: zodOutputFormat(schema) },
+    // An answer that does not match the schema is rare and random: one more try usually fixes it.
+    const response = await client.messages.parse(request).catch((error: unknown) => {
+      if (!isParseFailure(error)) throw error;
+      return client.messages.parse(request);
     });
 
     if (response.stop_reason === "refusal") throw new JudgeError("The model declined to answer", 422);
@@ -99,6 +108,7 @@ export async function askJudge<P extends JudgeMode>({
     if (error instanceof Anthropic.APIError) {
       throw new JudgeError(`Claude API error ${error.status}: ${error.message}`, 502);
     }
+    if (isParseFailure(error)) throw new JudgeError("Dreddi's answer came out garbled, try again", 502);
     throw error;
   }
 }

@@ -25,8 +25,8 @@ export async function POST(req: Request) {
 
   try {
     // Only the lab's own fields: real-case facts come from the database, never from the client.
-    const { title, details, deadline, criteria, otherSide } = promise;
-    const answer = await askJudge({ phase, promise: { title, details, deadline, criteria, otherSide }, turns });
+    const { title, details, deadline, criteria, otherSide, openedAt } = promise;
+    const answer = await askJudge({ phase, promise: { title, details, deadline, criteria, otherSide, openedAt }, turns });
     return NextResponse.json(answer);
   } catch (error) {
     if (error instanceof JudgeError) return NextResponse.json({ error: error.message }, { status: error.status });

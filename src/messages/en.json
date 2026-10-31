@@ -1414,16 +1414,16 @@
     "thinking": "Dreddi is reviewing the case…",
     "criteria": {
       "title": "Completion criteria",
-      "draft": "still being worked out",
-      "proposed": "proposed by Dreddi",
+      "draft": "being worked out",
+      "proposed": "awaiting approval",
       "agreed": "agreed",
       "approved": "approved ✓",
       "waiting": "waiting",
       "approve": "I approve the criteria",
       "hint": "Something wrong? Write to Dreddi below and he will propose a new version. The criteria are fixed once every side approves them.",
-      "inForce": "in force",
-      "revisionTitle": "New version of the criteria",
-      "revisionHint": "Until every side approves the new version, the agreed criteria stay in force.",
+      "inForce": "agreed",
+      "revisionTitle": "New criteria",
+      "revisionHint": "Until every side approves the new criteria, the agreed ones stay in force.",
       "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it."
     },
     "ruling": {
