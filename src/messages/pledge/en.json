@@ -421,7 +421,7 @@
       "created": "Promise created",
       "createdDescription": "The commitment was recorded as a public promise",
       "accepted": "Promise accepted",
-      "acceptedDescription": "The responsible side acknowledged the promise",
+      "acceptedDescription": "Invite accepted, the promise is in progress",
       "confirmed": "Promise fulfilled",
       "confirmedDescription": "The outcome was recorded as a fulfilled promise",
       "disputed": "Promise disputed",
@@ -436,7 +436,7 @@
       "load": "Could not load this public promise",
       "notPublic": "This promise is not public or does not exist"
     },
-    "awaitingAcceptanceNote": "The responsible side has not confirmed the promise yet",
+    "awaitingAcceptanceNote": "The invite has not been accepted yet",
     "updates": {
       "error": "Could not publish this update. Only promise participants can add official updates."
     },
@@ -445,8 +445,7 @@
   },
   "watching": {
     "subtitle": "Other people’s public promises: status and outcome in one place",
-    "title": "Promises you follow",
-    "emptyDescription": "Open someone’s public promise and press «Watch» to see how it goes here"
+    "title": "Promises you follow"
   },
   "agreementEmbed": {
     "badge": "Public promise",
@@ -456,5 +455,12 @@
   "dealsTabs": {
     "label": "Promise sections",
     "mine": "My promises"
+  },
+  "arbitration": {
+    "ruling": {
+      "pending": "The ruling «{verdict}» takes effect when both sides accept it, or on {date} if nobody appeals. Then the promise status changes.",
+      "binding": "The ruling has taken effect.{how} Promise status: «{status}»."
+    },
+    "closed": "The case is closed: the promise status is final."
   }
 }

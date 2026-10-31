@@ -14,6 +14,7 @@ import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipa
 import { getRulingState } from "@/lib/ai/judgeRuling";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
+import { getPromiseInviteStatus, type InviteStatus } from "@/lib/promiseAcceptance";
 
 // Dreddi, the AI judge, on a real promise (lab: LAB_ENABLED=true only). The case lives in judge_messages, so
 // whoever comes back weeks later, the judge gets the whole case again: what was promised, by whom,
@@ -35,6 +36,14 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   counterparty_id: string | null;
+  invite_status: string | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  declined_at: string | null;
+  ignored_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
+  counterparty_accepted_at: string | null;
 };
 
 type MessageRow = {
@@ -63,7 +72,6 @@ type JudgeCaseRequest = {
   proposalId?: string;
   text?: string;
   images?: JudgeImage[];
-  phase?: JudgePhase;
 };
 
 const MESSAGE_COLUMNS =
@@ -91,7 +99,7 @@ async function loadCase(promiseId: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,condition_text,status,visibility,due_at,created_at,completed_at,creator_id,promisor_id,promisee_id,counterparty_id"
+      "id,title,details,condition_text,status,visibility,due_at,created_at,completed_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,counterparty_accepted_at"
     )
     .eq("id", promiseId)
     .maybeSingle<PromiseRow>();
@@ -122,17 +130,25 @@ async function loadCase(promiseId: string, userId: string) {
   if (messagesError) throw new JudgeError(`Case lookup failed: ${messagesError.message}`, 500);
 
   const rows = messages ?? [];
-  const lastCriteria = [...rows].reverse().find((row) => row.author_role === "judge" && row.criteria?.length);
-  // The judge only proposes; criteria are fixed once every side approved the latest proposal.
-  const proposal = lastCriteria?.criteria_ready ? lastCriteria : null;
   const requiredRoles: Speaker[] = counterpartyId ? ["promisor", "counterparty"] : ["promisor"];
-  const approvedRoles = new Set(
-    rows
-      .filter((row) => proposal && row.approves_message_id === proposal.id && row.author_role !== "judge")
-      .map((row) => row.author_role as Speaker)
-  );
-  const criteriaAgreed = Boolean(proposal) && requiredRoles.every((side) => approvedRoles.has(side));
-  const criteriaStatus = criteriaAgreed ? "agreed" : proposal ? "proposed" : lastCriteria ? "draft" : "none";
+  const approversOf = (id: string) =>
+    new Set(
+      rows
+        .filter((row) => row.approves_message_id === id && row.author_role !== "judge")
+        .map((row) => row.author_role as Speaker)
+    );
+  const proposals = rows.filter((row) => row.author_role === "judge" && row.criteria?.length);
+  // The judge only proposes; a version is fixed once every side approved it. The latest such version
+  // stays in force while a newer one (a change asked for later) waits for every side.
+  const agreed = [...proposals]
+    .reverse()
+    .find((row) => row.criteria_ready && requiredRoles.every((side) => approversOf(row.id).has(side)));
+  const lastCriteria = proposals.at(-1);
+  const revision = lastCriteria && lastCriteria !== agreed ? lastCriteria : null;
+  const proposal = revision?.criteria_ready ? revision : null;
+  const approvedRoles = proposal ? approversOf(proposal.id) : new Set<Speaker>();
+  const criteriaAgreed = Boolean(agreed);
+  const criteriaStatus = proposal ? "proposed" : revision ? "draft" : agreed ? "agreed" : "none";
   // The sides that were called and have not answered yet, with their response deadline.
   const awaiting = requiredRoles.flatMap((side) => {
     const since = waitingSince(rows, side);
@@ -151,7 +167,9 @@ async function loadCase(promiseId: string, userId: string) {
     counterpartyName: nameOf(counterpartyId),
     authorNames: Object.fromEntries(ids.map((id) => [id, nameOf(id)])) as Record<string, string | null>,
     messages: rows,
-    criteria: lastCriteria?.criteria ?? [],
+    // In force: the agreed version. Proposed: a newer version still being worked out or approved.
+    agreedCriteria: agreed?.criteria ?? [],
+    criteria: revision?.criteria ?? agreed?.criteria ?? [],
     criteriaStatus,
     criteriaAgreed,
     proposalId: proposal?.id ?? null,
@@ -166,6 +184,26 @@ type LoadedCase = Awaited<ReturnType<typeof loadCase>>;
 
 // Only an open promise can still be decided; once confirmed or disputed the case is closed.
 const OPEN_STATUSES = ["active", "completed_by_promisor"];
+// The other side never took it on: the invite expired, was declined or withdrawn. Nothing to decide.
+const DEAD_INVITES: InviteStatus[] = ["expired", "declined", "cancelled_by_creator"];
+
+const isCaseOpen = (promise: PromiseRow) =>
+  OPEN_STATUSES.includes(promise.status) && !DEAD_INVITES.includes(getPromiseInviteStatus(promise));
+
+// What Dreddi is told about the promise status, in words rather than database values.
+const describeStatus = (promise: PromiseRow) => {
+  const invite = getPromiseInviteStatus(promise);
+  if (promise.status === "confirmed") return "kept and confirmed; the case is closed";
+  if (promise.status === "disputed") return "disputed; the case is closed";
+  if (promise.status === "declined") return "declined; the case is closed";
+  if (invite === "expired") return "the invite expired: the other side never accepted it, so the case is closed";
+  if (invite === "declined") return "the other side declined the invite; the case is closed";
+  if (invite === "cancelled_by_creator") return "withdrawn by its creator before anyone accepted; the case is closed";
+  if (invite === "awaiting_acceptance") return "active, but the other side has not accepted the invite yet";
+  if (invite === "awaiting_creator_confirmation") return "waiting for the creator to confirm the counter-obligation";
+  if (promise.status === "completed_by_promisor") return "the promisor marked it done; waiting for the other side to confirm";
+  return "active";
+};
 
 const PROMISE_MIN_COLUMNS =
   "id,title,is_important,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at";
@@ -174,7 +212,7 @@ const PROMISE_MIN_COLUMNS =
 // not kept = disputed, with the same reputation update (half weight with no other side).
 async function applyBindingRuling(loaded: LoadedCase) {
   const { admin, promise, ruling } = loaded;
-  if (!ruling?.binding || !OPEN_STATUSES.includes(promise.status)) return false;
+  if (!ruling?.binding || !isCaseOpen(promise)) return false;
 
   const now = new Date().toISOString();
   const update =
@@ -188,7 +226,7 @@ async function applyBindingRuling(loaded: LoadedCase) {
           status: "disputed",
           disputed_at: now,
           disputed_code: "not_completed",
-          dispute_reason: "Рішення Дредді",
+          dispute_reason: null,
         };
   const { data: updated, error } = await admin
     .from("promises")
@@ -204,13 +242,13 @@ async function applyBindingRuling(loaded: LoadedCase) {
   const selfPromise = !loaded.requiredRoles.includes("counterparty");
   await applyReputationForPromiseFinalization(admin, updated, selfPromise ? { weight: 0.5, verifiedBy: "dreddi" } : {});
 
-  const how = { self: "", accepted: " Обидві сторони прийняли рішення.", silence: " Оскаржень не надійшло." }[ruling.binding];
+  // A marker, not a sentence: each side reads it in their own language (see JudgePanel).
   await admin.from("judge_messages").insert({
     promise_id: promise.id,
     author_id: null,
     author_role: "judge",
     phase: "verdict",
-    content: `Рішення набрало сили.${how} Статус обіцянки: ${ruling.verdict === "kept" ? "«Дотримано»" : "«Оскаржено»"}.`,
+    content: `ruling-binding:${ruling.binding}:${ruling.verdict}`,
   });
   return true;
 }
@@ -223,6 +261,7 @@ async function loadSettledCase(promiseId: string, userId: string) {
 
 const caseView = (loaded: LoadedCase) => ({
   role: loaded.role,
+  agreedCriteria: loaded.agreedCriteria,
   criteria: loaded.criteria,
   criteriaStatus: loaded.criteriaStatus,
   criteriaAgreed: loaded.criteriaAgreed,
@@ -230,7 +269,7 @@ const caseView = (loaded: LoadedCase) => ({
   approvals: loaded.approvals,
   awaiting: loaded.awaiting,
   ruling: loaded.ruling,
-  closed: !OPEN_STATUSES.includes(loaded.promise.status),
+  closed: !isCaseOpen(loaded.promise),
   promiseStatus: loaded.promise.status,
   promiseTitle: loaded.promise.title,
   messages: loaded.messages.map((row) => ({
@@ -269,11 +308,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (body?.action === "approve") {
     try {
       const loaded = await loadSettledCase((await ctx.params).id, user.id);
-      if (!OPEN_STATUSES.includes(loaded.promise.status)) return NextResponse.json(caseView(loaded));
+      if (!isCaseOpen(loaded.promise)) return NextResponse.json(caseView(loaded));
       // The side approves either the current criteria proposal or the current, still pending ruling.
       const pendingRuling = loaded.ruling && !loaded.ruling.binding && !loaded.ruling.appealed ? loaded.ruling : null;
       const target =
-        body.proposalId && body.proposalId === loaded.proposalId && !loaded.criteriaAgreed
+        body.proposalId && body.proposalId === loaded.proposalId
           ? { phase: "criteria" as const, content: "Погоджую критерії", done: Boolean(loaded.approvals[loaded.role]) }
           : body.proposalId && body.proposalId === pendingRuling?.rulingId
             ? { phase: "verdict" as const, content: "Приймаю рішення", done: pendingRuling.acceptedBy.includes(loaded.role) }
@@ -305,13 +344,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   try {
     const loaded = await loadSettledCase((await ctx.params).id, user.id);
     const { admin, promise, role } = loaded;
-    if (!OPEN_STATUSES.includes(promise.status)) {
-      throw new JudgeError("Справу закрито: статус обіцянки вже остаточний", 409);
+    if (!isCaseOpen(promise)) {
+      throw new JudgeError("The case is closed: the promise status is final", 409);
     }
-    // Agreed criteria are final: after that the case only moves on to checking. Before it, a side may
-    // skip straight to checking (a promise that predates the judge is judged by its own wording).
-    const checking = loaded.criteriaAgreed || loaded.messages.some((row) => row.phase === "verdict");
-    const phase: JudgePhase = checking || body?.phase === "verdict" ? "verdict" : "criteria";
+    // After a ruling every message is an appeal, so the criteria can no longer change: checking only.
+    // With no other side nobody else guards the bar, so agreed criteria stay as they are past the deadline.
+    // Otherwise Dreddi tells from the message whether it is about the criteria or about the result.
+    const deadlinePassed = Boolean(promise.due_at) && Date.now() > new Date(promise.due_at as string).getTime();
+    const checkingOnly =
+      Boolean(loaded.ruling) || (loaded.counterpartyName === null && loaded.criteriaAgreed && deadlinePassed);
+    const mode = checkingOnly ? ("verdict" as const) : ("auto" as const);
     const writerName = loaded.authorNames[user.id] ?? "Unknown";
     const otherRole: Speaker | null = loaded.counterpartyName === null ? null : role === "promisor" ? "counterparty" : "promisor";
     const otherWait = loaded.awaiting.find((item) => item.role === otherRole);
@@ -327,6 +369,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const history: JudgeTurn[] = loaded.messages.map((row) => {
       const date = formatKyivDate(new Date(row.created_at));
       if (row.author_role === "judge") {
+        if (row.content.startsWith("ruling-binding:")) {
+          return { role: "assistant", text: "(Your ruling took effect and the promise status changed.)" };
+        }
         const verdict = row.verdict ? `\n(Your verdict then: ${row.verdict})` : "";
         return { role: "assistant", text: `${row.content}${verdict}` };
       }
@@ -350,17 +395,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     };
 
     const answer = await askJudge({
-      phase,
+      phase: mode,
       promise: {
         title: promise.title,
         details: promise.details ?? undefined,
         counterObligation: promise.condition_text ?? undefined,
         deadline: promise.due_at ? formatKyivDate(new Date(promise.due_at)) : undefined,
         openedAt: formatKyivDate(new Date(promise.created_at)),
-        status: promise.status,
+        status: describeStatus(promise),
         visibility: promise.visibility ?? undefined,
-        criteria: loaded.criteria,
+        criteria: loaded.criteriaAgreed ? loaded.agreedCriteria : loaded.criteria,
         criteriaAgreed: loaded.criteriaAgreed,
+        proposedCriteria: loaded.criteriaAgreed && loaded.criteriaStatus !== "agreed" ? loaded.criteria : undefined,
         otherSide,
         promisorName: loaded.promisorName,
         counterpartyName: loaded.counterpartyName,
@@ -371,6 +417,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     });
 
     const result = answer.result;
+    const phase: JudgePhase = "mode" in result ? result.mode : "verdict";
     const criteriaResult = phase === "criteria" && "criteria" in result ? result : null;
     const verdictResult = phase === "verdict" && "verdict" in result ? result : null;
 

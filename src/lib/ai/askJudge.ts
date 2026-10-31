@@ -1,13 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import {
+  AutoSchema,
   CriteriaSchema,
   JUDGE_MODEL,
   VerdictSchema,
   buildSystemPrompt,
   estimateCostUsd,
+  type AutoResult,
   type CriteriaResult,
-  type JudgePhase,
+  type JudgeMode,
   type JudgePromise,
   type JudgeTurn,
   type VerdictResult,
@@ -45,13 +47,13 @@ const toMessages = (turns: JudgeTurn[]): Anthropic.MessageParam[] =>
     return { role: "user", content };
   });
 
-export type JudgeAnswer<P extends JudgePhase> = {
-  result: P extends "criteria" ? CriteriaResult : VerdictResult;
+export type JudgeAnswer<P extends JudgeMode> = {
+  result: P extends "criteria" ? CriteriaResult : P extends "verdict" ? VerdictResult : AutoResult;
   model: string;
   usage: { inputTokens: number; outputTokens: number; costUsd: number };
 };
 
-export async function askJudge<P extends JudgePhase>({
+export async function askJudge<P extends JudgeMode>({
   phase,
   promise,
   turns,
@@ -65,7 +67,7 @@ export async function askJudge<P extends JudgePhase>({
   }
 
   const client = new Anthropic();
-  const schema = phase === "criteria" ? CriteriaSchema : VerdictSchema;
+  const schema = phase === "criteria" ? CriteriaSchema : phase === "verdict" ? VerdictSchema : AutoSchema;
 
   try {
     const response = await client.messages.parse({

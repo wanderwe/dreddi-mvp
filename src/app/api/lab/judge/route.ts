@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { JudgeError, askJudge } from "@/lib/ai/askJudge";
-import type { JudgePhase, JudgePromise, JudgeTurn } from "@/lib/ai/judge";
+import type { JudgeMode, JudgePromise, JudgeTurn } from "@/lib/ai/judge";
 
 // Lab prototype: only answers when LAB_ENABLED=true (never set on Vercel).
 const LAB_ENABLED = process.env.LAB_ENABLED === "true";
 
 type JudgeRequest = {
-  phase?: JudgePhase;
+  phase?: JudgeMode;
   promise?: JudgePromise;
   turns?: JudgeTurn[];
 };
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   if (!LAB_ENABLED) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = (await req.json().catch(() => null)) as JudgeRequest | null;
-  const phase: JudgePhase = body?.phase === "verdict" ? "verdict" : "criteria";
+  const phase: JudgeMode = body?.phase === "verdict" || body?.phase === "auto" ? body.phase : "criteria";
   const promise = body?.promise;
   const turns = body?.turns ?? [];
 

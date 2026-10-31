@@ -418,7 +418,7 @@
       "awaiting_creator_confirmation": "Awaiting confirmation",
       "accepted": "Accepted",
       "declined": "Declined",
-      "expired": "Expired",
+      "expired": "Invite expired",
       "cancelled_by_creator": "Withdrawn"
     },
     "confirm": {
@@ -1296,7 +1296,7 @@
       "createdDescription": "The commitment was recorded as a public agreement",
       "createdDescriptionPrivate": "The commitment was recorded",
       "accepted": "Agreement accepted",
-      "acceptedDescription": "The responsible side acknowledged the agreement",
+      "acceptedDescription": "Invite accepted, the agreement is in progress",
       "completed": "Marked as completed",
       "completedDescription": "The responsible side reported that the commitment was fulfilled",
       "confirmed": "Agreement fulfilled",
@@ -1323,7 +1323,7 @@
       "load": "Could not load this public agreement",
       "notPublic": "This agreement is not public or does not exist"
     },
-    "awaitingAcceptanceNote": "The responsible side has not confirmed the agreement yet",
+    "awaitingAcceptanceNote": "The invite has not been accepted yet",
     "updates": {
       "add": "Add update",
       "label": "Official progress update",
@@ -1348,8 +1348,7 @@
     "status": "Status",
     "deadline": "Deadline",
     "loadMore": "Load more",
-    "loadingMore": "Loading…",
-    "emptyDescription": "Open someone’s public agreement and press «Watch» to see how it goes here"
+    "loadingMore": "Loading…"
   },
   "agreementEmbed": {
     "badge": "Public agreement",
@@ -1367,5 +1366,75 @@
   "dealsTabs": {
     "label": "Deal sections",
     "mine": "My deals"
+  },
+  "arbitration": {
+    "title": "Arbitration",
+    "beta": "beta",
+    "roles": {
+      "promisor": "Promisor",
+      "counterparty": "Other side",
+      "judge": "Dreddi"
+    },
+    "awaiting": "{role}: no answer yet, deadline {date}",
+    "awaitingOverdue": "{role}: no answer yet; the deadline has passed, so Dreddi may rule in absentia",
+    "copySummons": "Copy summons",
+    "summonCopied": "Summons copied",
+    "summonFailed": "Could not copy the summons",
+    "summon": "The case «{title}» is open in Dreddi arbitration. Dreddi is waiting for your side{until}: {link}",
+    "summonUntil": " by {date}",
+    "empty": "The case is empty. Start with how you will prove it was done, and Dreddi will agree the criteria.",
+    "showEarlier": "Show earlier messages ({count})",
+    "hideEarlier": "Hide earlier messages",
+    "evidence": "Evidence: {note}",
+    "evidenceOnly": "(evidence only)",
+    "verdict": {
+      "kept": "Kept",
+      "not_kept": "Not kept",
+      "undecided": "Not decided yet"
+    },
+    "inAbsentia": "in absentia",
+    "confidence": "confidence {value}%",
+    "tokens": "{input} in + {output} out tokens",
+    "thinking": "Dreddi is reviewing the case…",
+    "criteria": {
+      "title": "Completion criteria",
+      "draft": "still being worked out",
+      "proposed": "proposed by Dreddi",
+      "agreed": "agreed",
+      "approved": "approved ✓",
+      "waiting": "waiting",
+      "approve": "I approve the criteria",
+      "hint": "Something wrong? Write to Dreddi below and he will propose a new version. The criteria are fixed once every side approves them.",
+      "inForce": "in force",
+      "revisionTitle": "New version of the criteria",
+      "revisionHint": "Until every side approves the new version, the agreed criteria stay in force.",
+      "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it."
+    },
+    "ruling": {
+      "pending": "The ruling «{verdict}» takes effect when both sides accept it, or on {date} if nobody appeals. Then the agreement status changes.",
+      "hint": "Disagree? Write to Dreddi below why, with evidence. A new message is an appeal, and Dreddi will review the case.",
+      "accepted": "accepted ✓",
+      "accept": "I accept the ruling",
+      "binding": "The ruling has taken effect.{how} Agreement status: «{status}».",
+      "bindingAccepted": " Both sides accepted it.",
+      "bindingSilence": " Nobody appealed."
+    },
+    "approvedCriteria": "I approve the criteria",
+    "acceptedRuling": "I accept the ruling",
+    "closed": "The case is closed: the agreement status is final.",
+    "placeholder": {
+      "ruling": "Disagree with the ruling? Write why and add evidence",
+      "criteria": "Disagree with the criteria? Write what to change",
+      "start": "For example: how will I prove it was done?",
+      "check": "Tell what was done or what went wrong, and add evidence"
+    },
+    "attachPhoto": "+ Photo or screenshot",
+    "attached": "Attached: {count} (remove)",
+    "sendFirst": "Ask Dreddi",
+    "sendReply": "Reply",
+    "errors": {
+      "signIn": "Sign in again",
+      "stale": "The case has changed. Refresh the page"
+    }
   }
 }

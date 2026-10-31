@@ -34,6 +34,8 @@ export type JudgePromise = {
   criteria?: string[];
   // False while the criteria are only the judge's proposal; the lab treats its criteria as agreed.
   criteriaAgreed?: boolean;
+  // A change to agreed criteria that not every side has approved yet; the agreed ones stay in force.
+  proposedCriteria?: string[];
   // Whether the other side has answered, and their response window (two-sided cases only).
   otherSide?: string;
   // Known for a real promise, not in the lab.
@@ -71,8 +73,29 @@ export const VerdictSchema = z.object({
     .describe("Factual notes on each piece of evidence in the latest message (what it shows, dates, numbers); empty if none"),
 });
 
+// On a real promise Dreddi decides from the message whether it is about the criteria or about the result.
+export const AutoSchema = z.object({
+  mode: z
+    .enum(["criteria", "verdict"])
+    .describe("criteria: working out what counts as done; verdict: checking whether it was kept"),
+  reply: z.string().describe("What you say to the user now, in their language"),
+  criteria: z.array(z.string()).describe("mode criteria only: the criteria proposed so far; otherwise empty"),
+  ready: z.boolean().describe("mode criteria only: true once the criteria are concrete enough to verify; otherwise false"),
+  verdict: z
+    .enum(["kept", "not_kept", "undecided"])
+    .describe("mode verdict only: undecided while you still need answers or evidence; otherwise undecided"),
+  confidence: z.number().describe("mode verdict only: 0 to 1, how sure you are; otherwise 0"),
+  reasons: z.array(z.string()).describe("mode verdict only: short reasons tied to the criteria and the evidence"),
+  evidence_notes: z
+    .array(z.string())
+    .describe("Factual notes on each piece of evidence in the latest message (what it shows, dates, numbers); empty if none"),
+});
+
 export type CriteriaResult = z.infer<typeof CriteriaSchema>;
 export type VerdictResult = z.infer<typeof VerdictSchema>;
+export type AutoResult = z.infer<typeof AutoSchema>;
+// "auto": Dreddi chooses; the lab can still force one of the two.
+export type JudgeMode = JudgePhase | "auto";
 
 const ROLE_RULES = `You are Dreddi (in Ukrainian «Дредді»), the AI judge of Dreddi, a service where people record promises and agreements and build a reputation by keeping them.
 Each user message is labelled with who wrote it: the promisor (who must deliver) or the counterparty (who receives it).
@@ -84,7 +107,9 @@ const PHASE_RULES: Record<JudgePhase, string> = {
 Turn the promise into 1 to 4 concrete, checkable criteria: what counts as done, by when, and what evidence will prove it (for example a screenshot, a link, a receipt, a photo).
 Ask exactly one short question per reply when the promise is vague. Do not invent requirements the person did not mean.
 Set ready to true once the criteria are clear enough that a stranger could check them. That only proposes them: each side then approves them with the «Погоджую критерії» button, and they are fixed when every side has approved. End such a reply by offering both paths: approve with «Погоджую критерії» (name it exactly so) or write what to change. Never say the criteria are agreed or final on your own.
-When there are two sides, propose criteria fair to both and take both sides' wishes into account.`,
+When there are two sides, propose criteria fair to both and take both sides' wishes into account.
+Agreed criteria can still change, but only by consent: when a side asks for a change, propose the new version the same way. The agreed criteria stay in force until every side approves the new version; never say they changed before that. If a side does not approve, the agreed criteria remain.
+With no other side, a change is allowed only before the deadline: say plainly that the promisor is changing their own criteria.`,
   verdict: `Phase: checking whether the promise was kept.
 Compare what you are told and shown against the criteria. Ask for the single most important missing piece of evidence per reply before deciding.
 Do not demand stronger evidence than the criteria name: when the agreed kind of evidence is shown and matches, decide.
@@ -93,11 +118,18 @@ Evidence dated after today is impossible: treat it as forged and do not count it
 Give kept when the evidence meets the criteria. Give not_kept only when the deadline has passed without proof, the evidence shows the promise was broken, or the promisor admits it was not done in time.
 Evidence that falls short before the deadline means undecided: say what is missing.
 If the criteria were never agreed by every side, judge by the promise itself and what both sides said, and say so.
+Judge by the agreed criteria. A proposed change that not every side has approved does not count yet.
 When the other side has not answered: while their response window is open, do not give kept or not_kept against them; say until when they can answer. Once it has passed, you may rule in absentia on the evidence you have, and say plainly that the ruling was made without the other side.
 If the deadline has passed and the promisor admits it was not done, rule not_kept at once; do not ask for more evidence.
 Your kept or not_kept ruling has consequences: it sets the promise status and reputation once the sides accept it, or after 3 days without an appeal, and at once when there is no other side. Give it only when you are sure, and end it by offering both paths: accept it with «Приймаю рішення» (name it exactly so) or write why they disagree, with evidence. With no other side there is no such button and no appeal: the ruling takes effect at once and closes the case, so say that instead.
 A message from a side after your ruling is an appeal: reconsider with the new arguments and evidence, and keep or change your ruling.`,
 };
+
+const AUTO_RULES = `Decide what the latest message is about and set mode:
+- criteria while the sides are still working out what counts as done and how it will be proven, or a side asks to change agreed criteria;
+- verdict when someone reports the result, shows evidence, admits it was not done, disagrees with your ruling, or asks you to decide.
+If the criteria are only proposed and not yet approved by every side, a request to decide is still a verdict: judge by the promise itself and say the criteria were not agreed.
+Fill only the fields of the mode you chose.`;
 
 const SHARED_RULES = `Reply in the language the user writes in. Never show the English labels: in Ukrainian call the sides «виконавець» and «інша сторона».
 Do not use long dashes (—) in your replies.
@@ -110,11 +142,11 @@ Be firm but fair: never insult, mock or threaten anyone. The toughness is in bre
 Do not quote catchphrases from comics or films.`;
 
 // The model has no clock, so "has the deadline passed" needs today's date from us (Kyiv time).
-export const formatKyivDate = (date: Date) =>
-  new Intl.DateTimeFormat("uk-UA", { timeZone: "Europe/Kyiv", day: "numeric", month: "long", year: "numeric" }).format(date);
+export const formatKyivDate = (date: Date, locale = "uk-UA") =>
+  new Intl.DateTimeFormat(locale, { timeZone: "Europe/Kyiv", day: "numeric", month: "long", year: "numeric" }).format(date);
 
 export const buildSystemPrompt = (
-  phase: JudgePhase,
+  phase: JudgeMode,
   promise: JudgePromise,
   now: Date = new Date()
 ) => {
@@ -138,6 +170,9 @@ export const buildSystemPrompt = (
     promise.criteria?.length
       ? `${promise.criteriaAgreed === false ? "Proposed criteria, not yet approved by every side" : "Agreed criteria"}:\n${promise.criteria.map((c) => `- ${c}`).join("\n")}`
       : null,
+    promise.proposedCriteria?.length
+      ? `Proposed change to the criteria, not yet approved by every side:\n${promise.proposedCriteria.map((c) => `- ${c}`).join("\n")}`
+      : null,
     promise.writerName && promise.writerRole
       ? `Writing now: ${promise.writerName} (${promise.writerRole}). Earlier messages carry their own dates; time may have passed since then.`
       : null,
@@ -145,5 +180,7 @@ export const buildSystemPrompt = (
     .filter(Boolean)
     .join("\n");
 
-  return `${ROLE_RULES}\n\n${PHASE_RULES[phase]}\n\n${SHARED_RULES}\n${STYLE_RULES}\n\n${facts}`;
+  const phaseRules =
+    phase === "auto" ? `${AUTO_RULES}\n\n${PHASE_RULES.criteria}\n\n${PHASE_RULES.verdict}` : PHASE_RULES[phase];
+  return `${ROLE_RULES}\n\n${phaseRules}\n\n${SHARED_RULES}\n${STYLE_RULES}\n\n${facts}`;
 };
