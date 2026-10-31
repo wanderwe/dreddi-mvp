@@ -291,7 +291,7 @@ const pledgeCopy: Record<Locale, LandingCopy> = {
     hero: {
       headline: "Пообіцяв? Dreddi знає",
       description:
-        "Записуй обіцянки собі й домовленості з людьми: що саме, до коли і хто відповідає.\nВиконання підтверджується, а дотримане слово стає твоєю репутацією.",
+        "Тримай слово перед іншими й перед собою.\nЗаписуй обіцянки й домовленості, а дотримане слово стане репутацією, якій довіряють.",
       whyLink: "Чому Dreddi →",
     },
     cta: {
@@ -311,7 +311,7 @@ const pledgeCopy: Record<Locale, LandingCopy> = {
     hero: {
       headline: "Promised? Dreddi knows",
       description:
-        "Record promises to yourself and agreements with others: what, by when, and who’s responsible.\nCompletion gets confirmed, and a kept word becomes your reputation.",
+        "Keep your word to others and to yourself.\nRecord promises and agreements, and a kept word becomes a reputation people trust.",
       whyLink: "Why Dreddi →",
     },
     cta: {

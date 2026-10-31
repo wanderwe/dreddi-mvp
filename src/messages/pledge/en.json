@@ -268,7 +268,7 @@
   },
   "notifications": {
     "header": {
-      "subtitle": "Stay on top of promises"
+      "subtitle": "Everything happening with your promises"
     },
     "types": {
       "accepted": {

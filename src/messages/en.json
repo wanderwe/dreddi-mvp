@@ -924,6 +924,7 @@
   },
   "publicDirectory": {
     "title": "Public profiles",
+    "subtitle": "The reputation of people who keep their word in the open",
     "back": "Back",
     "loading": "Loading profiles…",
     "loadingMore": "Loading more…",
@@ -940,7 +941,7 @@
   "notifications": {
     "header": {
       "title": "Your notifications",
-      "subtitle": "Stay on top of agreements"
+      "subtitle": "Everything happening with your agreements"
     },
     "loading": "Loading notifications…",
     "empty": "No notifications yet",
