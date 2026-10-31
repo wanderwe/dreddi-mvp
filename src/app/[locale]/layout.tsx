@@ -25,12 +25,12 @@ const CLASSIC_OG_COPY = {
 const PLEDGE_OG_COPY = {
   en: {
     title: "Promised? Dreddi knows",
-    description: "Record promises to yourself and agreements with others: what, by when, and who’s responsible. A kept word becomes your reputation.",
+    description: "Keep your word to others and to yourself. Record promises and agreements, and a kept word becomes a reputation people trust.",
     locale: "en_US",
   },
   uk: {
     title: "Пообіцяв? Dreddi знає",
-    description: "Записуй обіцянки собі й домовленості з людьми: що саме, до коли і хто відповідає. Дотримане слово стає твоєю репутацією.",
+    description: "Тримай слово перед іншими й перед собою. Записуй обіцянки й домовленості, а дотримане слово стане репутацією, якій довіряють.",
     locale: "uk_UA",
   },
 };

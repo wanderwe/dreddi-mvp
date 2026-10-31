@@ -272,7 +272,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
   },
 };
 
-// "pledge" positioning (NEXT_PUBLIC_POSITIONING=pledge): the same page told around public promises.
+// "pledge" positioning (the default): the same page told around promises.
 const withPledge = (base: LandingCopy, pledge: {
   hero: Pick<LandingCopy["hero"], "headline" | "description" | "whyLink">;
   cta: Pick<LandingCopy["cta"], "getStarted" | "createPromise" | "reviewDeals">;
