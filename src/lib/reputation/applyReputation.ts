@@ -15,7 +15,13 @@ type EventMeta = {
   on_time?: boolean;
   late_penalty?: boolean;
   role?: string;
+  verified_by?: "dreddi";
+  weight?: number;
 };
+
+// A promise with no other side, checked by Dreddi (the AI judge), counts at a reduced weight:
+// a screenshot is easier to fake than a person who confirms it.
+export type ReputationOptions = { weight?: number; verifiedBy?: "dreddi" };
 
 type EventInput = {
   user_id: string;
@@ -27,7 +33,7 @@ type EventInput = {
 
 const clampScore = (value: number) => Math.max(0, Math.min(100, value));
 
-function computeDeltas(promise: PromiseRowMin): EventInput[] {
+function computeDeltas(promise: PromiseRowMin, options: ReputationOptions = {}): EventInput[] {
   const events: EventInput[] = [];
   const executorId = resolveExecutorId(promise);
   if (!executorId) return events;
@@ -37,7 +43,9 @@ function computeDeltas(promise: PromiseRowMin): EventInput[] {
     confirmed_at: promise.confirmed_at,
     disputed_at: promise.disputed_at,
     due_at: promise.due_at,
+    ...(options.verifiedBy ? { verified_by: options.verifiedBy, weight: options.weight } : {}),
   };
+  const weigh = (delta: number) => (options.weight === undefined ? delta : Math.round(delta * options.weight));
 
   const impactInput = {
     status: promise.status,
@@ -49,7 +57,7 @@ function computeDeltas(promise: PromiseRowMin): EventInput[] {
   const late = calcLatePenalty(impactInput);
 
   if (promise.status === "confirmed") {
-    const executorDelta = calc_score_impact(impactInput);
+    const executorDelta = weigh(calc_score_impact(impactInput));
     events.push({
       user_id: executorId,
       promise_id: promise.id,
@@ -61,7 +69,7 @@ function computeDeltas(promise: PromiseRowMin): EventInput[] {
   }
 
   if (promise.status === "disputed") {
-    const executorDelta = calc_score_impact(impactInput);
+    const executorDelta = weigh(calc_score_impact(impactInput));
     events.push({
       user_id: executorId,
       promise_id: promise.id,
@@ -83,13 +91,14 @@ async function ensureReputationRows(admin: SupabaseClient, userIds: string[]) {
 
 export async function applyReputationForPromiseFinalization(
   admin: SupabaseClient,
-  promise: PromiseRowMin
+  promise: PromiseRowMin,
+  options: ReputationOptions = {}
 ) {
   if (!promise.creator_id) return;
   if (!isPromiseStatus(promise.status)) return;
   if (promise.status !== "confirmed" && promise.status !== "disputed") return;
 
-  const events = computeDeltas(promise);
+  const events = computeDeltas(promise, options);
   if (events.length === 0) return;
 
   const userIds = Array.from(new Set(events.map((e) => e.user_id)));
