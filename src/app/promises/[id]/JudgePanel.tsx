@@ -464,12 +464,12 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                 {t("arbitration.attached", { count: images.length })}
               </button>
             )}
-            <span className="text-[11px] text-tone-500">{t("arbitration.messagesLeft", { count: view.messagesLeft })}</span>
+            <span className="ml-auto text-[11px] text-tone-500">{t("arbitration.messagesLeft", { count: view.messagesLeft })}</span>
             <button
               type="button"
               onClick={() => void send()}
               disabled={busy || (!text.trim() && images.length === 0)}
-              className="ml-auto cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {view.messages.length === 0 ? t("arbitration.sendFirst") : t("arbitration.sendReply")}
             </button>

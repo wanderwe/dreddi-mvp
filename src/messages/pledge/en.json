@@ -54,7 +54,7 @@
     },
     "empty": {
       "globalDescription": "You don’t have any promises yet",
-      "watchingTitle": "You are not following any promises yet",
+      "watchingTitle": "You are not following any public promises yet",
       "watchingDescription": "Public promises you follow will appear here",
       "filteredTitle": "No promises match this filter",
       "publicFilteredTitle": "No public promises in this filter",

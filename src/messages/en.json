@@ -162,7 +162,7 @@
     "empty": {
       "title": "Nothing here yet",
       "globalDescription": "You don’t have any deals yet",
-      "watchingTitle": "You are not following any agreements yet",
+      "watchingTitle": "You are not following any public agreements yet",
       "watchingDescription": "Public agreements you follow will appear here",
       "filteredTitle": "No deals match this filter",
       "publicFilteredTitle": "No public deals in this filter",
