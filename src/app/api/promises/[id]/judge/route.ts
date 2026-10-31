@@ -85,11 +85,15 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 // When a side has been called and not answered since: the first message from the other side after
 // that side's own last message. null when nobody is waiting for them.
+// The other side is waited for only once someone asks Dreddi to decide (a message about the result),
+// not while the criteria are being worked out. Anything the side writes or approves answers it.
 const waitingSince = (rows: MessageRow[], side: Speaker) => {
   let since: string | null = null;
   for (const row of rows) {
     if (row.author_role === side) since = null;
-    else if (row.author_role !== "judge" && !since) since = row.created_at;
+    else if (row.author_role !== "judge" && row.phase === "verdict" && !row.approves_message_id && !since) {
+      since = row.created_at;
+    }
   }
   return since;
 };
@@ -361,10 +365,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const otherSide = !otherRole
       ? undefined
       : otherWait
-        ? `${otherName} (${otherRole}) has been called since ${formatKyivDate(new Date(otherWait.since))} and has not answered. Their response window ${
-            otherWait.overdue ? "has passed" : `is open until ${formatKyivDate(new Date(otherWait.until))}`
-          }.`
-        : `${otherName} (${otherRole}) has answered everything so far, or has not been called yet; this message calls them, with ${RESPONSE_DAYS} days to answer.`;
+        ? `${otherName} (${otherRole}) has been asked since ${formatKyivDate(new Date(otherWait.since))} and has not answered yet.`
+        : `${otherName} (${otherRole}) has answered everything so far, or has not been asked yet.`;
 
     const history: JudgeTurn[] = loaded.messages.map((row) => {
       const date = formatKyivDate(new Date(row.created_at));
@@ -457,9 +459,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         verdict: verdictResult?.verdict ?? null,
         confidence: verdictResult?.confidence ?? null,
         reasons: verdictResult?.reasons ?? null,
-        in_absentia: Boolean(
-          verdictResult && verdictResult.verdict !== "undecided" && otherWait?.overdue
-        ),
+        // No rulings in absentia while the other side gets no notice of the case.
+        in_absentia: false,
         model: answer.model,
         input_tokens: answer.usage.inputTokens,
         output_tokens: answer.usage.outputTokens,

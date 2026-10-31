@@ -5,7 +5,7 @@ import { formatKyivDate, type JudgeImage, type JudgePhase, type Speaker } from "
 import { toJudgeImage } from "@/lib/ai/judgeImage";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
-import { Sparkles } from "lucide-react";
+import { Share2, Sparkles } from "lucide-react";
 
 // Lab: Dreddi, the AI judge, on a real promise. Renders nothing unless the server has LAB_ENABLED=true.
 
@@ -218,7 +218,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         </h2>
       </header>
 
-      {view && "counterparty" in view.approvals && (
+      {view && view.awaiting.some((item) => item.role !== view.role) && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-tone-300">
           {view.awaiting
             .filter((item) => item.role !== view.role)
@@ -229,13 +229,18 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                   : t("arbitration.awaiting", { role: roleLabel(item.role), date: formatDate(item.until) })}
               </span>
             ))}
-          <button
-            type="button"
-            onClick={() => void copySummons(view.awaiting.find((item) => item.role !== view.role)?.until)}
-            className="ml-auto cursor-pointer rounded-xl border border-tone-white/15 px-3 py-1.5 text-xs font-semibold text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
-          >
-            {summonCopied ? t("arbitration.summonCopied") : t("arbitration.copySummons")}
-          </button>
+          <span className="ml-auto flex items-center gap-2">
+            {summonCopied && <span className="text-accent-200">{t("arbitration.summonCopied")}</span>}
+            <button
+              type="button"
+              onClick={() => void copySummons(view.awaiting.find((item) => item.role !== view.role)?.until)}
+              title={t("arbitration.copySummons")}
+              aria-label={t("arbitration.copySummons")}
+              className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+            </button>
+          </span>
         </div>
       )}
 
@@ -368,7 +373,6 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
           <p>
             {t("arbitration.ruling.pending", {
               verdict: verdictLabel(view.ruling.verdict),
-              date: formatDate(view.ruling.bindsAt),
             })}
           </p>
           <p className="text-[11px] text-tone-500">{t("arbitration.ruling.hint")}</p>

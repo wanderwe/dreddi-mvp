@@ -2,10 +2,12 @@
 // A ruling is the latest judge message with a kept / not_kept verdict. It binds:
 // - at once for a promise with no other side (Dreddi is the only one who checks it);
 // - when every side accepted it;
-// - or when nobody appealed within RULING_RESPONSE_DAYS (silence counts as acceptance).
+// - or, once SILENCE_BINDS is on, when nobody appealed within RULING_RESPONSE_DAYS.
+// Silence stays off until the other side gets notified of the case: they cannot lose a case they never heard of.
 // Any message from a side after the ruling, other than accepting it, is an appeal: the case goes on.
 
 export const RULING_RESPONSE_DAYS = 3;
+export const SILENCE_BINDS = false;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type RulingSide = "promisor" | "counterparty";
@@ -49,7 +51,7 @@ export function getRulingState(
   if (!appealed) {
     if (!requiredSides.includes("counterparty")) binding = "self";
     else if (acceptedBy.length === requiredSides.length) binding = "accepted";
-    else if (now.getTime() >= new Date(bindsAt).getTime()) binding = "silence";
+    else if (SILENCE_BINDS && now.getTime() >= new Date(bindsAt).getTime()) binding = "silence";
   }
 
   return { rulingId: ruling.id, verdict: ruling.verdict, acceptedBy, bindsAt, appealed, binding };

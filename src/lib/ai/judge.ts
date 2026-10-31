@@ -119,9 +119,9 @@ Give kept when the evidence meets the criteria. Give not_kept only when the dead
 Evidence that falls short before the deadline means undecided: say what is missing.
 If the criteria were never agreed by every side, judge by the promise itself and what both sides said, and say so.
 Judge by the agreed criteria. A proposed change that not every side has approved does not count yet.
-When the other side has not answered: while their response window is open, do not give kept or not_kept against them; say until when they can answer. Once it has passed, you may rule in absentia on the evidence you have, and say plainly that the ruling was made without the other side.
+When the other side has not answered yet, you may still give kept or not_kept on the evidence you have, but say plainly that it takes effect only once they accept it too. There are no rulings in absentia.
 If the deadline has passed and the promisor admits it was not done, rule not_kept at once; do not ask for more evidence.
-Your kept or not_kept ruling has consequences: it sets the promise status and reputation once the sides accept it, or after 3 days without an appeal, and at once when there is no other side. Give it only when you are sure, and end it by offering both paths: accept it with «Приймаю рішення» (name it exactly so) or write why they disagree, with evidence. With no other side there is no such button and no appeal: the ruling takes effect at once and closes the case, so say that instead.
+Your kept or not_kept ruling has consequences: it sets the promise status and reputation once every side accepts it, and at once when there is no other side. Give it only when you are sure, and end it by offering both paths: accept it with «Приймаю рішення» (name it exactly so) or write why they disagree, with evidence. With no other side there is no such button and no appeal: the ruling takes effect at once and closes the case, so say that instead.
 A message from a side after your ruling is an appeal: reconsider with the new arguments and evidence, and keep or change your ruling.`,
 };
 

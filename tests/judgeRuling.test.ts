@@ -39,7 +39,8 @@ test("pending until both sides accept or the response window passes", () => {
   const bothAccepted = [...oneAccepted, row("a2", "counterparty", "2026-10-20T13:00:00Z", { approves_message_id: "j1" })];
   assert.equal(getRulingState(bothAccepted, [...both], early)?.binding, "accepted");
 
-  assert.equal(getRulingState(oneAccepted, [...both], new Date("2026-10-23T10:00:06Z"))?.binding, "silence");
+  // Silence does not bind while the other side gets no notice of the case.
+  assert.equal(getRulingState(oneAccepted, [...both], new Date("2026-10-23T10:00:06Z"))?.binding, null);
 });
 
 test("a message after the ruling is an appeal and keeps the case open", () => {

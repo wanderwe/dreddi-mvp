@@ -1375,12 +1375,12 @@
       "counterparty": "Other side",
       "judge": "Dreddi"
     },
-    "awaiting": "{role}: no answer yet, deadline {date}",
-    "awaitingOverdue": "{role}: no answer yet; the deadline has passed, so Dreddi may rule in absentia",
-    "copySummons": "Copy summons",
-    "summonCopied": "Summons copied",
-    "summonFailed": "Could not copy the summons",
-    "summon": "The case «{title}» is open in Dreddi arbitration. Dreddi is waiting for your side{until}: {link}",
+    "awaiting": "{role}: waiting for an answer until {date}",
+    "awaitingOverdue": "{role}: no answer. Without it the ruling will not take effect",
+    "copySummons": "Share the case with the other side",
+    "summonCopied": "Copied, send it to the other side",
+    "summonFailed": "Could not copy the message",
+    "summon": "Dreddi is deciding whether «{title}» was kept. Take a look and add your side{until}: {link}",
     "summonUntil": " by {date}",
     "empty": "The case is empty. Start with how you will prove it was done, and Dreddi will agree the criteria.",
     "showEarlier": "Show earlier messages ({count})",
@@ -1411,7 +1411,7 @@
       "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it."
     },
     "ruling": {
-      "pending": "The ruling «{verdict}» takes effect when both sides accept it, or on {date} if nobody appeals. Then the agreement status changes.",
+      "pending": "The ruling «{verdict}» takes effect when both sides accept it. Then the agreement status changes.",
       "hint": "Disagree? Write to Dreddi below why, with evidence. A new message is an appeal, and Dreddi will review the case.",
       "accepted": "accepted ✓",
       "accept": "I accept the ruling",
