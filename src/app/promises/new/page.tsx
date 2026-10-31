@@ -94,6 +94,16 @@ export default function NewPromisePage() {
   // does not count towards reputation, which the form says plainly.
   const [noCounterparty, setNoCounterparty] = useState(false);
   const selfPromise = POSITIONING === "pledge" && noCounterparty && executor === "me";
+  // Pledge asks one question, who promises whom, instead of an executor switch plus a self switch:
+  // three choices cover every valid pair, and the rest of the form follows from it.
+  const promiseKind: "self" | "me" | "other" = selfPromise ? "self" : executor;
+  const choosePromiseKind = (kind: "self" | "me" | "other") => {
+    setExecutor(kind === "other" ? "other" : "me");
+    setNoCounterparty(kind === "self");
+    if (kind !== "other") setMultipleParticipants(false);
+    setCounterpartyQuery("");
+    setShowCounterpartyDropdown(false);
+  };
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
@@ -1100,6 +1110,30 @@ export default function NewPromisePage() {
           </div>
 
           <div className="grid items-start gap-5 sm:grid-cols-2">
+            {POSITIONING === "pledge" ? (
+              <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
+                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
+                  {t("promises.new.fields.promiseKind")}
+                </span>
+                <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
+                  {(["self", "me", "other"] as const).map((kind) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      aria-pressed={promiseKind === kind}
+                      onClick={() => choosePromiseKind(kind)}
+                      className={`flex-1 cursor-pointer rounded-2xl px-2 py-2 text-sm font-semibold leading-tight transition ${
+                        promiseKind === kind
+                          ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                          : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
+                      }`}
+                    >
+                      {t(`promises.new.promiseKind.${kind}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
             <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
               <div className="flex items-center gap-2">
                 <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
@@ -1142,6 +1176,7 @@ export default function NewPromisePage() {
                 </button>
               </div>
             </div>
+            )}
 
             {productFlags.collectiveAgreements && executor === "other" && (
               <div className="sm:col-span-2">
@@ -1182,7 +1217,11 @@ export default function NewPromisePage() {
               </span>
               <input
                 className="w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
-                placeholder={t("promises.new.placeholders.title", { entityLower: promiseLabels.entityLower })}
+                placeholder={
+                  POSITIONING === "pledge"
+                    ? t(`promises.new.placeholders.title_${promiseKind}`)
+                    : t("promises.new.placeholders.title", { entityLower: promiseLabels.entityLower })
+                }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -1317,30 +1356,6 @@ export default function NewPromisePage() {
               </label>
             )}
 
-            {POSITIONING === "pledge" && executor === "me" && !multipleParticipants && (
-              // Its own row, like the executor switch; a promise to yourself locks the other-side field.
-              <div className="sm:col-span-2 flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
-                {([false, true] as const).map((value) => (
-                  <button
-                    key={String(value)}
-                    type="button"
-                    aria-pressed={noCounterparty === value}
-                    onClick={() => {
-                      setNoCounterparty(value);
-                      setCounterpartyQuery("");
-                      setShowCounterpartyDropdown(false);
-                    }}
-                    className={`flex-1 cursor-pointer rounded-2xl px-3 py-2 text-sm font-semibold transition ${
-                      noCounterparty === value
-                        ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                        : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
-                    }`}
-                  >
-                    {value ? t("promises.new.selfPromise.optionSelf") : t("promises.new.selfPromise.optionOther")}
-                  </button>
-                ))}
-              </div>
-            )}
             <div className="sm:col-span-2">
               <div className="grid items-start gap-5 sm:grid-cols-2">
                 {!multipleParticipants && executor && (
@@ -1353,7 +1368,9 @@ export default function NewPromisePage() {
                           htmlFor="counterparty"
                           className="block text-xs uppercase tracking-[0.2em] text-accent-200"
                         >
-                          {t("promises.new.fields.counterparty")}
+                          {POSITIONING === "pledge" && promiseKind !== "self"
+                            ? t(`promises.new.fields.counterparty_${promiseKind}`)
+                            : t("promises.new.fields.counterparty")}
                         </label>
                         <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
                           <span

@@ -131,10 +131,16 @@
       },
       "fields": {
         "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the promise.",
-        "counterparty": "Other side"
+        "counterparty": "Other side",
+        "promiseKind": "Who promises whom",
+        "counterparty_me": "To whom",
+        "counterparty_other": "Who promises"
       },
       "placeholders": {
-        "details": "Clarify what is included in this promise (optional)"
+        "details": "Clarify what is included in this promise (optional)",
+        "title_self": "For example: “Run my first marathon”",
+        "title_me": "For example: “Deliver the project to the client by Friday”",
+        "title_other": "For example: “Pay back the loan by the end of the month”"
       },
       "visibility": {
         "private": {
@@ -165,12 +171,15 @@
       },
       "title": "Record the {entityLower}",
       "selfPromise": {
-        "optionOther": "There is another side",
-        "optionSelf": "A promise to yourself",
         "inputDisabled": "No other side"
       },
       "executor": {
         "other": "Other side"
+      },
+      "promiseKind": {
+        "self": "To myself",
+        "me": "I promise someone",
+        "other": "Someone promises me"
       }
     }
   },
