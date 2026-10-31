@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { DealsTabs } from "@/app/components/DealsTabs";
+import { EmptyState } from "@/app/components/ui/EmptyState";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
@@ -109,8 +110,8 @@ export default function WatchingPage() {
     <main className="relative py-8 sm:py-10">
       <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
         <DealsTabs />
-        <div className="px-1 py-1">
-          <h1 className="text-2xl font-semibold text-tone-white">{t("watching.title")}</h1>
+        <div>
+          <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("watching.title")}</h1>
           <p className="mt-1 text-sm text-tone-300">{t("watching.subtitle")}</p>
         </div>
         {error && <div className="rounded-xl border border-danger-400/30 bg-red-500/10 p-3 text-sm text-danger-200">{error}</div>}
@@ -124,9 +125,14 @@ export default function WatchingPage() {
             </LocalizedLink>
           ))}
           {!loading && rows.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-tone-white/20 bg-tone-white/5 p-6 text-center text-tone-300">
-              <p className="text-lg font-semibold text-tone-white">{t("promises.empty.watchingTitle")}</p>
-            </div>
+            <EmptyState title={t("promises.empty.watchingTitle")} description={t("watching.emptyDescription")}>
+              <LocalizedLink
+                href="/u"
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/15 px-4 py-2 text-sm font-semibold text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
+              >
+                {t("nav.publicProfiles")}
+              </LocalizedLink>
+            </EmptyState>
           )}
           {!loading && rows.length > 0 && hasMore && (
             <div className="flex justify-center pt-2">

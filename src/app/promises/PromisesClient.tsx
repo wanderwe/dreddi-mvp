@@ -1061,9 +1061,6 @@ export default function PromisesClient() {
         <div className="flex flex-col gap-4 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-4 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-1">
-              <div className="text-xs uppercase tracking-[0.32em] text-accent-200">
-                {t("promises.overview.eyebrow")}
-              </div>
               <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("promises.overview.title")}</h1>
               <p className="text-sm text-tone-300">{t("promises.overview.subtitle")}</p>
             </div>
@@ -1466,8 +1463,8 @@ export default function PromisesClient() {
 
             {isListEmpty && (
               <div className="rounded-2xl border border-dashed border-tone-white/20 bg-tone-white/5 p-6 text-center text-tone-300">
-                <p className="text-lg font-semibold text-tone-white">{emptyTitle}</p>
-                <p className="text-sm text-tone-400">{emptyDescription}</p>
+                <p className="text-base font-semibold text-tone-white">{emptyTitle}</p>
+                <p className="mx-auto mt-1 max-w-md text-sm text-tone-400">{emptyDescription}</p>
                 {isGlobalEmpty && (
                   <div className="mt-4">
                     <LocalizedLink

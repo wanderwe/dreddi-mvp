@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { DealsTabs } from "@/app/components/DealsTabs";
+import { EmptyState } from "@/app/components/ui/EmptyState";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
@@ -151,9 +152,8 @@ export default function PromiseGroupsPage() {
       <div className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-accent-200">{t("groups.eyebrow")}</p>
-            <h1 className="mt-2 text-3xl font-semibold text-tone-white">{t("groups.title")}</h1>
-            <p className="mt-2 text-sm text-tone-300">{t("groups.subtitle")}</p>
+            <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("groups.title")}</h1>
+            <p className="mt-1 text-sm text-tone-300">{t("groups.subtitle")}</p>
           </div>
           {returnToPath && (
             <LocalizedLink
@@ -228,7 +228,7 @@ export default function PromiseGroupsPage() {
         {loading ? (
           <p className="text-sm text-tone-400">{t("groups.loading")}</p>
         ) : groups.length === 0 ? (
-          <p className="rounded-xl border border-tone-white/10 bg-tone-black/20 px-4 py-3 text-sm text-tone-300">{t("groups.empty")}</p>
+          <EmptyState title={t("groups.emptyTitle")} description={t("groups.emptyDescription")} />
         ) : (
           <ul className="space-y-2">
             {groups.map((group) => (

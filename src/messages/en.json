@@ -150,7 +150,6 @@
       }
     },
     "overview": {
-      "eyebrow": "DEALS",
       "title": "Your deals overview",
       "subtitle": "Overview of deals by responsibility — what you’re accountable for and what others owe you",
       "cta": "New deal",
@@ -163,7 +162,7 @@
     "empty": {
       "title": "Nothing here yet",
       "globalDescription": "You don’t have any deals yet",
-      "watchingTitle": "You are not tracking agreements from other users yet",
+      "watchingTitle": "You are not following any agreements yet",
       "watchingDescription": "Public agreements you follow will appear here",
       "filteredTitle": "No deals match this filter",
       "publicFilteredTitle": "No public deals in this filter",
@@ -1118,14 +1117,12 @@
     }
   },
   "groups": {
-    "eyebrow": "GROUPS",
     "detailEyebrow": "Group",
     "title": "Deal groups",
     "subtitle": "A lightweight way to organize related deals in one list without boards and extra steps",
     "backToDeal": "Back to deal draft",
     "back": "Back to groups",
     "loading": "Loading groups…",
-    "empty": "No groups yet. Create your first group for related deals.",
     "dealsTitle": "Deals in this group",
     "dealsEmpty": "No deals in this group yet",
     "deals": {
@@ -1182,7 +1179,9 @@
     "errors": {
       "createFailed": "Could not create group",
       "notFound": "Group not found or unavailable"
-    }
+    },
+    "emptyTitle": "No groups yet",
+    "emptyDescription": "Create your first group above to keep related agreements in one list"
   },
   "collectiveAgreements": {
     "eyebrow": "COLLECTIVE AGREEMENTS",
@@ -1344,12 +1343,13 @@
     "followTooltip": "Watch this public agreement to monitor status changes and the final outcome"
   },
   "watching": {
-    "title": "Watchlist",
-    "subtitle": "Public agreements from other users you follow",
+    "title": "Agreements you follow",
+    "subtitle": "Other people’s public agreements: status and outcome in one place",
     "status": "Status",
     "deadline": "Deadline",
     "loadMore": "Load more",
-    "loadingMore": "Loading…"
+    "loadingMore": "Loading…",
+    "emptyDescription": "Open someone’s public agreement and press «Watch» to see how it goes here"
   },
   "agreementEmbed": {
     "badge": "Public agreement",

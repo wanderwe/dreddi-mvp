@@ -48,14 +48,13 @@
       "deal": "promises"
     },
     "overview": {
-      "eyebrow": "PROMISES",
       "title": "Your promises overview",
       "subtitle": "Overview of promises by responsibility — what you’re accountable for and what others owe you",
       "cta": "New promise"
     },
     "empty": {
       "globalDescription": "You don’t have any promises yet",
-      "watchingTitle": "You are not tracking promises from other users yet",
+      "watchingTitle": "You are not following any promises yet",
       "watchingDescription": "Public promises you follow will appear here",
       "filteredTitle": "No promises match this filter",
       "publicFilteredTitle": "No public promises in this filter",
@@ -354,7 +353,6 @@
     "title": "Promise groups",
     "subtitle": "A lightweight way to organize related promises in one list without boards and extra steps",
     "backToDeal": "Back to promise draft",
-    "empty": "No groups yet. Create your first group for related promises.",
     "dealsTitle": "Promises in this group",
     "dealsEmpty": "No promises in this group yet",
     "deals": {
@@ -376,7 +374,8 @@
     },
     "summary": {
       "total": "Total promises: {count}"
-    }
+    },
+    "emptyDescription": "Create your first group above to keep related promises in one list"
   },
   "collectiveAgreements": {
     "eyebrow": "COLLECTIVE PROMISES",
@@ -441,7 +440,9 @@
     "followTooltip": "Watch this public promise to monitor status changes and the final outcome"
   },
   "watching": {
-    "subtitle": "Public promises from other users you follow"
+    "subtitle": "Other people’s public promises: status and outcome in one place",
+    "title": "Promises you follow",
+    "emptyDescription": "Open someone’s public promise and press «Watch» to see how it goes here"
   },
   "agreementEmbed": {
     "badge": "Public promise",
