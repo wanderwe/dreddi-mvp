@@ -9,7 +9,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { Share2, Sparkles } from "lucide-react";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 
-// Lab: Dreddi, the AI judge, on a real promise. Renders nothing unless the server has LAB_ENABLED=true.
+// Dreddi, the AI judge, on a real promise. Renders nothing unless arbitration is on (the API answers 404).
 
 type CaseMessage = {
   id: string;

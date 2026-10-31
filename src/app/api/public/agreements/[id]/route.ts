@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { ARBITRATION_ENABLED } from "@/lib/ai/arbitration";
 import { getAgreedCriteria, getBindingOutcome, type CriteriaRow } from "@/lib/ai/judgeRuling";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
@@ -10,12 +11,10 @@ import { isEmailLike, toPublicDisplayName } from "@/lib/publicProfileIdentity";
 import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { buildDedupeKey, createNotification, mapPriorityForType } from "@/lib/notifications/service";
 
-const LAB_ENABLED = process.env.LAB_ENABLED === "true";
-
 // Only the outcome of a case goes public: Dreddi's ruling that took effect and the agreed criteria.
 // The chat and the evidence stay with the sides.
 async function loadDreddiRuling(admin: ReturnType<typeof getAdminClient>, promise: PromisePublicAgreementRecord) {
-  if (!LAB_ENABLED) return null;
+  if (!ARBITRATION_ENABLED) return null;
   const { data, error } = await admin
     .from("judge_messages")
     .select("id,author_role,content,verdict,criteria,criteria_ready,approves_message_id,created_at")

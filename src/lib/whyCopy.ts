@@ -1,3 +1,4 @@
+import { ARBITRATION_ENABLED } from "@/lib/ai/arbitration";
 import { POSITIONING } from "@/lib/features";
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
@@ -13,7 +14,7 @@ export type WhyCopy = {
   sections: {
     kind: WhySectionKind;
     paragraphs: string[];
-    // Shown only where the arbitration with Dreddi is on (LAB_ENABLED), so the page promises nothing missing:
+    // Shown only where the arbitration with Dreddi is on (ARBITRATION_ENABLED), so the page promises nothing missing:
     // the whole section, or just the lines in labParagraphs.
     lab?: boolean;
     labParagraphs?: string[];
@@ -159,16 +160,15 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
   },
 };
 
-const LAB_ENABLED = process.env.LAB_ENABLED === "true";
 
 export const getWhyCopy = (locale: Locale): WhyCopy => {
   const all = POSITIONING === "pledge" ? pledgeWhyCopy : whyCopy;
   const copy = all[locale] ?? all[defaultLocale];
   const sections = copy.sections
-    .filter((section) => LAB_ENABLED || !section.lab)
+    .filter((section) => ARBITRATION_ENABLED || !section.lab)
     .map((section) => ({
       ...section,
-      paragraphs: LAB_ENABLED ? [...section.paragraphs, ...(section.labParagraphs ?? [])] : section.paragraphs,
+      paragraphs: ARBITRATION_ENABLED ? [...section.paragraphs, ...(section.labParagraphs ?? [])] : section.paragraphs,
     }));
   return { ...copy, sections };
 };
