@@ -332,7 +332,7 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
     invite_followup: {
       creator: {
         title: "Agreement accepted",
-        body: "The other side confirmed the agreement",
+        body: "The other side accepted the invite",
         ctaLabel: "Open",
       },
     },
@@ -348,7 +348,7 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
     invite_followup: {
       creator: {
         title: "Домовленість прийнято",
-        body: "Інша сторона підтвердила домовленість",
+        body: "Інша сторона прийняла запрошення",
         ctaLabel: "Відкрити",
       },
     },

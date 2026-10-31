@@ -125,14 +125,7 @@ export default function WatchingPage() {
             </LocalizedLink>
           ))}
           {!loading && rows.length === 0 && (
-            <EmptyState title={t("promises.empty.watchingTitle")} description={t("watching.emptyDescription")}>
-              <LocalizedLink
-                href="/u"
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/15 px-4 py-2 text-sm font-semibold text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
-              >
-                {t("nav.publicProfiles")}
-              </LocalizedLink>
-            </EmptyState>
+            <EmptyState title={t("promises.empty.watchingTitle")} />
           )}
           {!loading && rows.length > 0 && hasMore && (
             <div className="flex justify-center pt-2">
