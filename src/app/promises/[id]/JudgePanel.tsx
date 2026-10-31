@@ -69,6 +69,8 @@ const VERDICT_CLASSES = {
   undecided: "bg-tone-200/10 text-tone-200",
 } as const;
 
+const VISIBLE_MESSAGES = 4;
+
 const inputClass =
   "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
 
@@ -76,7 +78,8 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
   const [view, setView] = useState<CaseView | null>(null);
   const [phase, setPhase] = useState<JudgePhase>("criteria");
   const [text, setText] = useState("");
-  const [appealing, setAppealing] = useState(false);
+
+  const [showAll, setShowAll] = useState(false);
   const [images, setImages] = useState<JudgeImage[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -168,7 +171,6 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
       applyView(body as CaseView);
       setText("");
       setImages([]);
-      setAppealing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -178,13 +180,24 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
 
   if (!view && !error) return null;
 
+  // Only the latest messages show by default; Dreddi still gets the whole case from the server.
+  const messages = view?.messages ?? [];
+  const visibleMessages = showAll ? messages : messages.slice(-VISIBLE_MESSAGES);
+  const hiddenCount = messages.length - visibleMessages.length;
+  const pendingRuling = Boolean(view?.ruling && !view.ruling.binding && !view.ruling.appealed && !view.closed);
+
   return (
     <section
       id="arbitration"
       className="scroll-mt-24 space-y-4 rounded-2xl border border-accent-300/20 bg-tone-white/[0.03] p-4 sm:p-5"
     >
       <header className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-tone-white">Арбітраж</h2>
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-tone-white">
+          Арбітраж
+          <span className="rounded-full border border-accent-300/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-200">
+            бета
+          </span>
+        </h2>
         {view && <p className="text-xs text-tone-400">Ви тут: {ROLE_LABELS[view.role].toLowerCase()}</p>}
       </header>
 
@@ -210,43 +223,6 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         </div>
       )}
 
-      {view && view.criteria.length > 0 && (
-        <div className="rounded-xl border border-accent-300/20 bg-emerald-400/5 p-3">
-          <p className="mb-1 text-xs uppercase tracking-[0.2em] text-accent-200">
-            Критерії виконання · {CRITERIA_STATUS_LABELS[view.criteriaStatus]}
-          </p>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-tone-100">
-            {view.criteria.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          {view.criteriaStatus === "proposed" && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-tone-300">
-              {(Object.entries(view.approvals) as [Speaker, boolean][]).map(([side, approved]) => (
-                <span key={side}>
-                  {ROLE_LABELS[side]}: {approved ? "погоджено ✓" : "чекаємо"}
-                </span>
-              ))}
-              {!view.approvals[view.role] && (
-                <button
-                  type="button"
-                  onClick={() => void approve(view.proposalId)}
-                  disabled={busy}
-                  className="ml-auto cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
-                >
-                  Погоджую критерії
-                </button>
-              )}
-            </div>
-          )}
-          {view.criteriaStatus === "proposed" && (
-            <p className="mt-2 text-[11px] text-tone-500">
-              Критерії зафіксуються, коли їх погодять усі сторони. Після цього змінити їх не можна.
-            </p>
-          )}
-        </div>
-      )}
-
       {view && view.messages.length === 0 && (
         <p className="text-sm text-tone-300">
           Справа ще порожня. Почніть з того, як ви доведете виконання, і Дредді погодить критерії.
@@ -254,7 +230,16 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
       )}
 
       <div className="space-y-3">
-        {view?.messages.map((message) => (
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="w-full cursor-pointer rounded-xl border border-dashed border-tone-white/15 py-2 text-xs text-tone-400 transition hover:text-accent-100"
+          >
+            Показати ранні повідомлення ({hiddenCount})
+          </button>
+        )}
+        {visibleMessages.map((message) => (
           <div
             key={message.id}
             className={`rounded-xl border p-3 text-sm ${
@@ -302,11 +287,53 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         {error && <p className="rounded-xl bg-red-500/10 p-3 text-sm text-danger-200">{error}</p>}
       </div>
 
+      {view && view.criteria.length > 0 && (
+        <div className="rounded-xl border border-accent-300/20 bg-emerald-400/5 p-3">
+          <p className="mb-1 text-xs uppercase tracking-[0.2em] text-accent-200">
+            Критерії виконання · {CRITERIA_STATUS_LABELS[view.criteriaStatus]}
+          </p>
+          <ul className="list-disc space-y-1 pl-5 text-sm text-tone-100">
+            {view.criteria.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          {view.criteriaStatus === "proposed" && (
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-tone-300">
+              {(Object.entries(view.approvals) as [Speaker, boolean][]).map(([side, approved]) => (
+                <span key={side}>
+                  {ROLE_LABELS[side]}: {approved ? "погоджено ✓" : "чекаємо"}
+                </span>
+              ))}
+              {!view.approvals[view.role] && (
+                <button
+                  type="button"
+                  onClick={() => void approve(view.proposalId)}
+                  disabled={busy}
+                  className="ml-auto cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
+                >
+                  Погоджую критерії
+                </button>
+              )}
+            </div>
+          )}
+          {view.criteriaStatus === "proposed" && (
+            <p className="mt-2 text-[11px] text-tone-500">
+              Щось не так? Напишіть Дредді нижче, і він запропонує нову версію. Критерії зафіксуються, коли їх
+              погодять усі сторони, і після цього змінити їх не можна.
+            </p>
+          )}
+        </div>
+      )}
+
       {view?.ruling && !view.ruling.binding && !view.ruling.appealed && !view.closed && (
         <div className="space-y-2 rounded-xl border border-tone-white/10 p-3 text-xs text-tone-300">
           <p>
             Рішення «{VERDICT_LABELS[view.ruling.verdict]}» набере сили, коли його приймуть обидві сторони або{" "}
             {formatKyivDate(new Date(view.ruling.bindsAt))}, якщо ніхто не оскаржить. Тоді зміниться статус обіцянки.
+          </p>
+          <p className="text-[11px] text-tone-500">
+            Не згодні? Напишіть Дредді нижче, чому, і додайте докази. Нове повідомлення означає оскарження, і Дредді
+            перегляне справу.
           </p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {(Object.keys(view.approvals) as Speaker[]).map((side) => (
@@ -315,23 +342,14 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               </span>
             ))}
             {!view.ruling.acceptedBy.includes(view.role) && (
-              <span className="ml-auto flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setAppealing(true)}
-                  className="cursor-pointer rounded-xl border border-tone-white/15 px-3 py-1.5 text-sm font-semibold text-tone-200 transition hover:border-rose-300/40 hover:text-alert-100"
-                >
-                  Оскаржую
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void approve(view.ruling?.rulingId)}
-                  disabled={busy}
-                  className="cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
-                >
-                  Приймаю рішення
-                </button>
-              </span>
+              <button
+                type="button"
+                onClick={() => void approve(view.ruling?.rulingId)}
+                disabled={busy}
+                className="ml-auto cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
+              >
+                Приймаю рішення
+              </button>
             )}
           </div>
         </div>
@@ -345,17 +363,16 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
 
       {view && !view.closed && (
         <div className="space-y-2">
-          {appealing && (
-            <p className="text-xs text-alert-100">
-              Поясніть, з чим ви не згодні, і додайте докази. Дредді перегляне справу.
-            </p>
-          )}
           <textarea
             className={`${inputClass} min-h-[80px]`}
             placeholder={
-              phase === "criteria"
-                ? "Наприклад: як я доведу, що виконав?"
-                : "Розкажіть, що зроблено або що не так, і додайте докази"
+              pendingRuling
+                ? "Не згодні з рішенням? Напишіть чому й додайте докази"
+                : view.criteriaStatus === "proposed"
+                  ? "Не згодні з критеріями? Напишіть, що змінити"
+                  : phase === "criteria"
+                    ? "Наприклад: як я доведу, що виконав?"
+                    : "Розкажіть, що зроблено або що не так, і додайте докази"
             }
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -397,7 +414,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               disabled={busy || (!text.trim() && images.length === 0)}
               className="ml-auto cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {appealing ? "Оскаржити" : view.messages.length === 0 ? "Звернутись до Дредді" : "Відповісти"}
+              {view.messages.length === 0 ? "Звернутись до Дредді" : "Відповісти"}
             </button>
           </div>
         </div>

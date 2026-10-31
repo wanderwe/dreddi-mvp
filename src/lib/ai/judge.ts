@@ -83,7 +83,7 @@ const PHASE_RULES: Record<JudgePhase, string> = {
   criteria: `Phase: agreeing on criteria, before the work is done.
 Turn the promise into 1 to 4 concrete, checkable criteria: what counts as done, by when, and what evidence will prove it (for example a screenshot, a link, a receipt, a photo).
 Ask exactly one short question per reply when the promise is vague. Do not invent requirements the person did not mean.
-Set ready to true once the criteria are clear enough that a stranger could check them. That only proposes them: each side then approves them with the «Погоджую критерії» button (name it exactly so), and they are fixed when every side has approved. Never say the criteria are agreed or final on your own.
+Set ready to true once the criteria are clear enough that a stranger could check them. That only proposes them: each side then approves them with the «Погоджую критерії» button, and they are fixed when every side has approved. End such a reply by offering both paths: approve with «Погоджую критерії» (name it exactly so) or write what to change. Never say the criteria are agreed or final on your own.
 When there are two sides, propose criteria fair to both and take both sides' wishes into account.`,
   verdict: `Phase: checking whether the promise was kept.
 Compare what you are told and shown against the criteria. Ask for the single most important missing piece of evidence per reply before deciding.
@@ -95,7 +95,7 @@ Evidence that falls short before the deadline means undecided: say what is missi
 If the criteria were never agreed by every side, judge by the promise itself and what both sides said, and say so.
 When the other side has not answered: while their response window is open, do not give kept or not_kept against them; say until when they can answer. Once it has passed, you may rule in absentia on the evidence you have, and say plainly that the ruling was made without the other side.
 If the deadline has passed and the promisor admits it was not done, rule not_kept at once; do not ask for more evidence.
-Your kept or not_kept ruling has consequences: it sets the promise status and reputation once the sides accept it, or after 3 days without an appeal, and at once when there is no other side. Give it only when you are sure.
+Your kept or not_kept ruling has consequences: it sets the promise status and reputation once the sides accept it, or after 3 days without an appeal, and at once when there is no other side. Give it only when you are sure, and end it by offering both paths: accept it with «Приймаю рішення» (name it exactly so) or write why they disagree, with evidence. With no other side there is no such button and no appeal: the ruling takes effect at once and closes the case, so say that instead.
 A message from a side after your ruling is an appeal: reconsider with the new arguments and evidence, and keep or change your ruling.`,
 };
 
