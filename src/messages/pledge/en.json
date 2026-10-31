@@ -130,11 +130,12 @@
         "fromExpiredDeal": "Prefilled from expired promise"
       },
       "fields": {
-        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the promise.",
+        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them with a link: you will see it right after creating the promise.",
         "counterparty": "Other side",
         "promiseKind": "Who promises whom",
         "counterparty_me": "To whom",
-        "counterparty_other": "Who promises"
+        "counterparty_other": "Who promises",
+        "counterpartyHelperSelf": "A promise to yourself has no other side: you make it and you keep it"
       },
       "placeholders": {
         "details": "Clarify what is included in this promise (optional)",

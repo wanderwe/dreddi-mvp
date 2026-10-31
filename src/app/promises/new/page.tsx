@@ -97,6 +97,9 @@ export default function NewPromisePage() {
   // Pledge asks one question, who promises whom, instead of an executor switch plus a self switch:
   // three choices cover every valid pair, and the rest of the form follows from it.
   const promiseKind: "self" | "me" | "other" = selfPromise ? "self" : executor;
+  const counterpartyHelper = selfPromise
+    ? t("promises.new.fields.counterpartyHelperSelf")
+    : t("promises.new.fields.counterpartyHelper");
   const choosePromiseKind = (kind: "self" | "me" | "other") => {
     setExecutor(kind === "other" ? "other" : "me");
     setNoCounterparty(kind === "self");
@@ -1116,7 +1119,7 @@ export default function NewPromisePage() {
                   {t("promises.new.fields.promiseKind")}
                 </span>
                 <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
-                  {(["self", "me", "other"] as const).map((kind) => (
+                  {(["me", "other", "self"] as const).map((kind) => (
                     <button
                       key={kind}
                       type="button"
@@ -1372,9 +1375,9 @@ export default function NewPromisePage() {
                             ? t(`promises.new.fields.counterparty_${promiseKind}`)
                             : t("promises.new.fields.counterparty")}
                         </label>
-                        <Tooltip label={t("promises.new.fields.counterpartyHelper")} placement="top">
+                        <Tooltip label={counterpartyHelper} placement="top">
                           <span
-                            aria-label={t("promises.new.fields.counterpartyHelper")}
+                            aria-label={counterpartyHelper}
                             className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100"
                           >
                             <Info className="h-3.5 w-3.5" aria-hidden />
