@@ -199,9 +199,10 @@ export default function NewPromisePage() {
         hoursToDeadline: dueAt ? (dueAt.getTime() - Date.now()) / (60 * 60 * 1000) : null,
         isPublic: visibility === "public",
         detailsText: details,
+        selfPromise,
       },
     });
-  }, [predictionInput, predictionReady, dueAt, visibility, details, executor]);
+  }, [predictionInput, predictionReady, dueAt, visibility, details, executor, selfPromise]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(calendarMonth), { weekStartsOn: 1 });

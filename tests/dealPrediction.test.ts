@@ -284,3 +284,14 @@ test("includes public_commitment reason when public toggle increases score", () 
   assert.ok(publicResult.score > privateResult.score);
   assert.ok(publicResult.reasonKeys.includes("public_commitment"));
 });
+
+test("a promise to yourself ignores the other side entirely", () => {
+  const deal = { hasDeadline: true, hoursToDeadline: 24 * 14, isPublic: false, detailsText: "Run 21 km" };
+  const withOtherSide = generateDealPrediction({ deal });
+  const selfPromise = generateDealPrediction({ deal: { ...deal, selfPromise: true } });
+
+  assert.ok(withOtherSide.appliedModifiers.some((modifier) => modifier.reasonKey === "new_counterparty"));
+  assert.ok(!selfPromise.appliedModifiers.some((modifier) => modifier.key.startsWith("counterparty")));
+  assert.ok(!selfPromise.reasonKeys.includes("new_counterparty"));
+  assert.ok(selfPromise.score > withOtherSide.score);
+});

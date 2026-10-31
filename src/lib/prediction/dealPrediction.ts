@@ -15,6 +15,8 @@ export type PredictionInput = {
     hoursToDeadline?: number | null;
     isPublic: boolean;
     detailsText?: string | null;
+    // A promise to yourself: there is no other side, so nothing about one counts.
+    selfPromise?: boolean;
   };
 };
 
@@ -214,7 +216,9 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
   }
 
   // --- Counterparty: shared history ---
-  if (typeof counterparty?.priorFulfilledTogether === "number") {
+  if (deal?.selfPromise) {
+    // No other side to have history with.
+  } else if (typeof counterparty?.priorFulfilledTogether === "number") {
     if (counterparty.priorFulfilledTogether >= 3) addModifier("counterparty_prior_fulfilled_together", 8, "deep_shared_history");
     else if (counterparty.priorFulfilledTogether >= 1) addModifier("counterparty_prior_fulfilled_together", 4, "some_shared_history");
     else addModifier("counterparty_prior_fulfilled_together", -6, "new_counterparty");
@@ -223,7 +227,7 @@ export function generateDealPrediction(input: PredictionInput): PredictionResult
   }
 
   // --- Counterparty: fulfillment rate (public profiles only) ---
-  if (counterparty?.isPublicProfile && typeof counterparty.fulfillmentRate === "number") {
+  if (!deal?.selfPromise && counterparty?.isPublicProfile && typeof counterparty.fulfillmentRate === "number") {
     if (counterparty.fulfillmentRate >= 90) addModifier("counterparty_fulfillment_rate", 4, "counterparty_high_fulfillment");
     else if (counterparty.fulfillmentRate >= 70) addModifier("counterparty_fulfillment_rate", 2, "counterparty_high_fulfillment");
     else if (counterparty.fulfillmentRate >= 40) addModifier("counterparty_fulfillment_rate", -3, "counterparty_low_fulfillment");
