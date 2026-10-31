@@ -13,6 +13,10 @@ export type WhyCopy = {
   sections: {
     kind: WhySectionKind;
     paragraphs: string[];
+    // Shown only where the arbitration with Dreddi is on (LAB_ENABLED), so the page promises nothing missing:
+    // the whole section, or just the lines in labParagraphs.
+    lab?: boolean;
+    labParagraphs?: string[];
   }[];
   cta: string;
 };
@@ -116,12 +120,22 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
     sections: [
       { kind: "turn", paragraphs: ["Making promises is easy"] },
       { kind: "list", paragraphs: ["“We’ll ship it by October”", "“We’ll launch this year”", "“I’ll start on Monday”"] },
-      { kind: "turn", paragraphs: ["And then nobody remembers what exactly was promised"] },
-      { kind: "body", paragraphs: ["Or whether it was kept"] },
+      { kind: "turn", paragraphs: ["And then nobody remembers the details"] },
+      { kind: "body", paragraphs: ["Or whether the word was kept"] },
       { kind: "turn", paragraphs: ["Dreddi knows"] },
-      { kind: "list", paragraphs: ["Who promised", "What exactly", "Whether it was kept"] },
+      { kind: "list", paragraphs: ["Who promised", "What, and by when", "How it ended"] },
+      { kind: "turn", paragraphs: ["And if you disagree"], lab: true },
+      { kind: "body", paragraphs: ["Dreddi, the AI judge, settles it"], lab: true },
+      { kind: "list", paragraphs: ["Helps agree on what counts as done", "Checks evidence, not words", "And makes the call"], lab: true },
+      { kind: "turn", paragraphs: ["Even when you promise yourself"] },
+      { kind: "body", paragraphs: ["Those promises are the easiest to put off", "No one reminds you, no one asks"] },
+      {
+        kind: "list",
+        paragraphs: ["A recorded promise can’t be quietly put off"],
+        labParagraphs: ["And Dreddi checks whether you really did it"],
+      },
       { kind: "body", paragraphs: ["For yourself, it’s discipline", "For others, it’s trust", "Over time, it’s a reputation"] },
-      { kind: "list", paragraphs: ["No pressure", "Just clarity — and consequences"] },
+      { kind: "list", paragraphs: ["No pressure", "Just clarity and consequences"] },
     ],
     cta: "Record your first promise",
   },
@@ -138,15 +152,34 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
       { kind: "turn", paragraphs: ["А потім ніхто не пам’ятає деталей"] },
       { kind: "body", paragraphs: ["Ані того, чи слово дотримали"] },
       { kind: "turn", paragraphs: ["Dreddi знає"] },
-      { kind: "list", paragraphs: ["Хто пообіцяв", "Що саме", "Чи дотримав"] },
-      { kind: "body", paragraphs: ["Для себе — це дисципліна", "Для інших — це довіра", "З часом — це репутація"] },
-      { kind: "list", paragraphs: ["Без тиску", "Просто ясність — і наслідки"] },
+      { kind: "list", paragraphs: ["Хто пообіцяв", "Що саме і коли", "Чим усе закінчилось"] },
+      { kind: "turn", paragraphs: ["А якщо думки розходяться"], lab: true },
+      { kind: "body", paragraphs: ["Розсудить Дредді, AI-суддя"], lab: true },
+      { kind: "list", paragraphs: ["Допоможе домовитися, що вважати виконанням", "Перевірить докази, а не слова", "І ухвалить рішення"], lab: true },
+      { kind: "turn", paragraphs: ["Навіть коли обіцяєш собі"] },
+      { kind: "body", paragraphs: ["Такі обіцянки найлегше відкласти", "Ніхто не нагадає, ніхто не спитає"] },
+      {
+        kind: "list",
+        paragraphs: ["Записану обіцянку вже не відкладеш мовчки"],
+        labParagraphs: ["А Дредді перевірить, чи справді виконав"],
+      },
+      { kind: "body", paragraphs: ["Для себе це дисципліна", "Для інших це довіра", "З часом це репутація"] },
+      { kind: "list", paragraphs: ["Без тиску", "Просто ясність і наслідки"] },
     ],
     cta: "Зафіксувати першу обіцянку",
   },
 };
 
+const LAB_ENABLED = process.env.LAB_ENABLED === "true";
+
 export const getWhyCopy = (locale: Locale): WhyCopy => {
-  const copy = POSITIONING === "pledge" ? pledgeWhyCopy : whyCopy;
-  return copy[locale] ?? copy[defaultLocale];
+  const all = POSITIONING === "pledge" ? pledgeWhyCopy : whyCopy;
+  const copy = all[locale] ?? all[defaultLocale];
+  const sections = copy.sections
+    .filter((section) => LAB_ENABLED || !section.lab)
+    .map((section) => ({
+      ...section,
+      paragraphs: LAB_ENABLED ? [...section.paragraphs, ...(section.labParagraphs ?? [])] : section.paragraphs,
+    }));
+  return { ...copy, sections };
 };
