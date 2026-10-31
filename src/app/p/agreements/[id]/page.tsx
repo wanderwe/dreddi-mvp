@@ -66,6 +66,13 @@ type PublicAgreementRow = {
   viewer_following?: boolean | null;
   followers_count?: number | null;
   viewer_can_follow?: boolean | null;
+  // Dreddi's ruling that took effect, with the agreed criteria; the case itself stays private.
+  dreddi_ruling?: {
+    verdict: "kept" | "not_kept";
+    how: "self" | "accepted" | "silence";
+    decided_at: string;
+    criteria: string[];
+  } | null;
 };
 
 type PublicAgreement = PublicAgreementRow & {
@@ -760,6 +767,43 @@ export default function PublicAgreementPage() {
             </div>
           </div>
         </section>
+
+        {agreement.dreddi_ruling ? (
+          <section className="rounded-[2rem] border border-tone-white/10 bg-tone-white/[0.035] p-5 sm:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <ShieldCheck className="h-5 w-5 text-violet-500" aria-hidden />
+                {t("publicAgreement.dreddi.title")}
+              </h2>
+              <span
+                className={[
+                  "rounded-full border px-3 py-1 text-sm font-semibold",
+                  agreement.dreddi_ruling.verdict === "kept"
+                    ? "border-accent-300/40 bg-emerald-300/10 text-accent-100"
+                    : "border-alert-300/45 bg-rose-300/12 text-alert-50",
+                ].join(" ")}
+              >
+                {t(`publicAgreement.dreddi.verdict.${agreement.dreddi_ruling.verdict}`)}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-tone-300">
+              {t(`publicAgreement.dreddi.how.${agreement.dreddi_ruling.how}`, {
+                date: formatTimestamp(agreement.dreddi_ruling.decided_at, locale),
+              })}
+            </p>
+            {agreement.dreddi_ruling.criteria.length > 0 ? (
+              <div className="mt-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-tone-400">{t("publicAgreement.dreddi.criteria")}</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-tone-100">
+                  {agreement.dreddi_ruling.criteria.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <p className="mt-4 text-xs text-tone-500">{t("publicAgreement.dreddi.private")}</p>
+          </section>
+        ) : null}
 
         <section className="rounded-[2rem] border border-tone-white/10 bg-tone-white/[0.035] p-5 sm:p-7">
           <h2 className="text-lg font-semibold">{t("publicAgreement.flowTitle")}</h2>

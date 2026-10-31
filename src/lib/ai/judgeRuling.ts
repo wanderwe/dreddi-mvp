@@ -56,3 +56,35 @@ export function getRulingState(
 
   return { rulingId: ruling.id, verdict: ruling.verdict, acceptedBy, bindsAt, appealed, binding };
 }
+
+export type CriteriaRow = RulingRow & { criteria: string[] | null; criteria_ready: boolean | null };
+
+// The criteria in force: the latest version Dreddi proposed as ready that every side approved.
+export function getAgreedCriteria<T extends CriteriaRow>(rows: T[], requiredSides: RulingSide[]): T | null {
+  const approvedBy = (id: string) =>
+    new Set(rows.filter((row) => row.approves_message_id === id && row.author_role !== "judge").map((row) => row.author_role));
+  return (
+    [...rows]
+      .reverse()
+      .find(
+        (row) =>
+          row.author_role === "judge" &&
+          row.criteria?.length &&
+          row.criteria_ready &&
+          requiredSides.every((side) => approvedBy(row.id).has(side))
+      ) ?? null
+  );
+}
+
+export type BindingOutcome = { verdict: "kept" | "not_kept"; how: "self" | "accepted" | "silence"; at: string };
+
+// The record left when a ruling took effect ("ruling-binding:<how>:<verdict>"); the latest one counts.
+export function getBindingOutcome(rows: (RulingRow & { content: string })[]): BindingOutcome | null {
+  const marker = [...rows].reverse().find((row) => row.author_role === "judge" && row.content.startsWith("ruling-binding:"));
+  if (!marker) return null;
+  const [, how, verdict] = marker.content.split(":");
+  if ((verdict !== "kept" && verdict !== "not_kept") || (how !== "self" && how !== "accepted" && how !== "silence")) {
+    return null;
+  }
+  return { verdict, how, at: marker.created_at };
+}

@@ -1340,7 +1340,21 @@
     "unfollowHint": "Unfollow",
     "unfollowTooltip": "Stop watching this public agreement",
     "followersCount": "{count} following",
-    "followTooltip": "Watch this public agreement to monitor status changes and the final outcome"
+    "followTooltip": "Watch this public agreement to monitor status changes and the final outcome",
+    "dreddi": {
+      "title": "Dreddi's ruling",
+      "verdict": {
+        "kept": "Kept",
+        "not_kept": "Not kept"
+      },
+      "how": {
+        "self": "Dreddi checked the evidence · {date}",
+        "accepted": "Both sides accepted the ruling · {date}",
+        "silence": "Nobody appealed the ruling · {date}"
+      },
+      "criteria": "Agreed criteria",
+      "private": "Only the sides see the conversation with Dreddi and the evidence"
+    }
   },
   "watching": {
     "title": "Agreements you follow",

@@ -11,7 +11,7 @@ import {
   type Speaker,
 } from "@/lib/ai/judge";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
-import { getRulingState } from "@/lib/ai/judgeRuling";
+import { getAgreedCriteria, getRulingState } from "@/lib/ai/judgeRuling";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { getPromiseInviteStatus, type InviteStatus } from "@/lib/promiseAcceptance";
@@ -144,9 +144,7 @@ async function loadCase(promiseId: string, userId: string) {
   const proposals = rows.filter((row) => row.author_role === "judge" && row.criteria?.length);
   // The judge only proposes; a version is fixed once every side approved it. The latest such version
   // stays in force while a newer one (a change asked for later) waits for every side.
-  const agreed = [...proposals]
-    .reverse()
-    .find((row) => row.criteria_ready && requiredRoles.every((side) => approversOf(row.id).has(side)));
+  const agreed = getAgreedCriteria(rows, requiredRoles);
   const lastCriteria = proposals.at(-1);
   const revision = lastCriteria && lastCriteria !== agreed ? lastCriteria : null;
   const proposal = revision?.criteria_ready ? revision : null;

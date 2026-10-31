@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getRulingState, type RulingRow } from "../src/lib/ai/judgeRuling";
+import { getAgreedCriteria, getBindingOutcome, getRulingState, type RulingRow } from "../src/lib/ai/judgeRuling";
 
 const both = ["promisor", "counterparty"] as const;
 const row = (id: string, author_role: RulingRow["author_role"], created_at: string, extra: Partial<RulingRow> = {}) => ({
@@ -60,4 +60,31 @@ test("a newer ruling replaces the old one", () => {
   assert.equal(state?.rulingId, "j2");
   assert.equal(state?.verdict, "not_kept");
   assert.equal(state?.appealed, false);
+});
+
+test("agreed criteria stay in force while a newer version waits for approval", () => {
+  const criteria = (id: string, created_at: string, list: string[]) =>
+    ({ ...row(id, "judge", created_at), criteria: list, criteria_ready: true, content: "" });
+  const approval = (id: string, side: "promisor" | "counterparty", target: string, created_at: string) =>
+    ({ ...row(id, side, created_at, { approves_message_id: target }), criteria: null, criteria_ready: null, content: "" });
+  const rows = [
+    criteria("c1", "2026-10-20T10:00:00Z", ["4 runs a week"]),
+    approval("a1", "promisor", "c1", "2026-10-20T11:00:00Z"),
+    approval("a2", "counterparty", "c1", "2026-10-20T12:00:00Z"),
+    criteria("c2", "2026-10-21T10:00:00Z", ["3 runs a week"]),
+    approval("a3", "promisor", "c2", "2026-10-21T11:00:00Z"),
+  ];
+  assert.equal(getAgreedCriteria(rows, [...both])?.id, "c1");
+  const accepted = [...rows, approval("a4", "counterparty", "c2", "2026-10-21T12:00:00Z")];
+  assert.equal(getAgreedCriteria(accepted, [...both])?.id, "c2");
+});
+
+test("the outcome comes from the latest binding record", () => {
+  const marker = (id: string, content: string) => ({ ...row(id, "judge", "2026-10-22T10:00:00Z"), content });
+  assert.equal(getBindingOutcome([marker("j1", "Вирок: виконано")]), null);
+  assert.deepEqual(getBindingOutcome([marker("b1", "ruling-binding:accepted:kept")]), {
+    verdict: "kept",
+    how: "accepted",
+    at: "2026-10-22T10:00:00Z",
+  });
 });

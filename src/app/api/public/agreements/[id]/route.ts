@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
-import { resolveExecutorId } from "@/lib/promiseParticipants";
+import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { getAgreedCriteria, getBindingOutcome, type CriteriaRow } from "@/lib/ai/judgeRuling";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
@@ -8,6 +9,31 @@ import { isPromiseStatus } from "@/lib/promiseStatus";
 import { isEmailLike, toPublicDisplayName } from "@/lib/publicProfileIdentity";
 import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import { buildDedupeKey, createNotification, mapPriorityForType } from "@/lib/notifications/service";
+
+const LAB_ENABLED = process.env.LAB_ENABLED === "true";
+
+// Only the outcome of a case goes public: Dreddi's ruling that took effect and the agreed criteria.
+// The chat and the evidence stay with the sides.
+async function loadDreddiRuling(admin: ReturnType<typeof getAdminClient>, promise: PromisePublicAgreementRecord) {
+  if (!LAB_ENABLED) return null;
+  const { data, error } = await admin
+    .from("judge_messages")
+    .select("id,author_role,content,verdict,criteria,criteria_ready,approves_message_id,created_at")
+    .eq("promise_id", promise.id)
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true })
+    .returns<(CriteriaRow & { content: string })[]>();
+  if (error || !data) return null;
+  const outcome = getBindingOutcome(data);
+  if (!outcome) return null;
+  const sides = resolveCounterpartyId(promise) ? (["promisor", "counterparty"] as const) : (["promisor"] as const);
+  return {
+    verdict: outcome.verdict,
+    how: outcome.how,
+    decided_at: outcome.at,
+    criteria: getAgreedCriteria(data, [...sides])?.criteria ?? [],
+  };
+}
 
 function getEnv(name: string) {
   const value = process.env[name];
@@ -308,8 +334,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
     const agreementLive = isAgreementLive(promise);
 
-    return NextResponse.json(
-      serializePublicAgreement(
+    return NextResponse.json({
+      ...serializePublicAgreement(
         promise,
         profilesById,
         publicUpdates ?? [],
@@ -318,8 +344,9 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         viewerFollowing,
         followersCount ?? 0,
         !viewerIsParticipant
-      )
-    );
+      ),
+      dreddi_ruling: await loadDreddiRuling(admin, promise),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: "Unexpected error", message }, { status: 500 });
