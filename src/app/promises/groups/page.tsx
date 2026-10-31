@@ -148,7 +148,7 @@ export default function PromiseGroupsPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <DealsTabs className="mb-6" />
+      <DealsTabs className="mb-5" />
       <div className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">

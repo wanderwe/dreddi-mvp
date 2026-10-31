@@ -108,7 +108,7 @@ export default function WatchingPage() {
 
   return (
     <main className="relative py-8 sm:py-10">
-      <div className="relative mx-auto w-full max-w-5xl space-y-4 px-4 sm:px-6">
+      <div className="relative mx-auto w-full max-w-5xl space-y-5 px-4 sm:px-6">
         <DealsTabs />
         <div>
           <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("watching.title")}</h1>
