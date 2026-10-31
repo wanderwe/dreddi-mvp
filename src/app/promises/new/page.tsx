@@ -1316,6 +1316,30 @@ export default function NewPromisePage() {
               </label>
             )}
 
+            {POSITIONING === "pledge" && executor === "me" && !multipleParticipants && (
+              // Its own row, like the executor switch; a promise to yourself locks the other-side field.
+              <div className="sm:col-span-2 flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
+                {([false, true] as const).map((value) => (
+                  <button
+                    key={String(value)}
+                    type="button"
+                    aria-pressed={noCounterparty === value}
+                    onClick={() => {
+                      setNoCounterparty(value);
+                      setCounterpartyQuery("");
+                      setShowCounterpartyDropdown(false);
+                    }}
+                    className={`flex-1 cursor-pointer rounded-2xl px-3 py-2 text-sm font-semibold transition ${
+                      noCounterparty === value
+                        ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                        : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
+                    }`}
+                  >
+                    {value ? t("promises.new.selfPromise.optionSelf") : t("promises.new.selfPromise.optionOther")}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="sm:col-span-2">
               <div className="grid items-start gap-5 sm:grid-cols-2">
                 {!multipleParticipants && executor && (
@@ -1339,32 +1363,7 @@ export default function NewPromisePage() {
                           </span>
                         </Tooltip>
                       </div>
-                      {POSITIONING === "pledge" && executor === "me" && (
-                        <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
-                          {([false, true] as const).map((value) => (
-                            <button
-                              key={String(value)}
-                              type="button"
-                              aria-pressed={noCounterparty === value}
-                              onClick={() => {
-                                setNoCounterparty(value);
-                                setCounterpartyQuery("");
-                                setShowCounterpartyDropdown(false);
-                              }}
-                              className={`flex-1 cursor-pointer rounded-2xl px-3 py-2 text-sm font-semibold transition ${
-                                noCounterparty === value
-                                  ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                                  : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
-                              }`}
-                            >
-                              {value ? t("promises.new.selfPromise.optionSelf") : t("promises.new.selfPromise.optionOther")}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {selfPromise ? (
-                        <p className="text-xs text-tone-400">{t("promises.new.selfPromise.note")}</p>
-                      ) : selectedCounterparty ? (
+                      {selectedCounterparty && !selfPromise ? (
                         <div className="flex h-11 items-center justify-between rounded-xl border border-accent-300/40 bg-emerald-400/10 px-3 text-sm text-accent-100">
                           <div className="flex min-w-0 items-center gap-2">
                             <div className="h-7 w-7 overflow-hidden rounded-full bg-tone-white/10">
@@ -1400,11 +1399,14 @@ export default function NewPromisePage() {
                           <input
                             id="counterparty"
                             autoComplete="off"
-                            className="h-12 w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm leading-5 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
+                            disabled={selfPromise}
+                            className="h-12 w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-2 text-sm leading-5 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40 disabled:cursor-not-allowed disabled:opacity-50"
                             placeholder={
-                              executor === "me"
-                                ? t("promises.new.placeholders.counterpartyMe")
-                                : t("promises.new.placeholders.counterpartyOther")
+                              selfPromise
+                                ? t("promises.new.selfPromise.inputDisabled")
+                                : executor === "me"
+                                  ? t("promises.new.placeholders.counterpartyMe")
+                                  : t("promises.new.placeholders.counterpartyOther")
                             }
                             value={counterpartyQuery}
                             onFocus={() => setShowCounterpartyDropdown(true)}

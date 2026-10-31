@@ -127,7 +127,8 @@
         "fromExpiredDeal": "Prefilled from expired promise"
       },
       "fields": {
-        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the promise."
+        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them via link — you will see it right after creating the promise.",
+        "counterparty": "Other side"
       },
       "placeholders": {
         "details": "Clarify what is included in this promise (optional)"
@@ -161,9 +162,12 @@
       },
       "title": "Record the {entityLower}",
       "selfPromise": {
-        "note": "You close it yourself. Without another person confirming it, the promise does not affect your reputation.",
         "optionOther": "There is another side",
-        "optionSelf": "A promise to yourself"
+        "optionSelf": "A promise to yourself",
+        "inputDisabled": "No other side"
+      },
+      "executor": {
+        "other": "Other side"
       }
     }
   },
