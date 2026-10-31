@@ -1,4 +1,3 @@
-import { ARBITRATION_ENABLED } from "@/lib/ai/arbitration";
 import { POSITIONING } from "@/lib/features";
 import { type Locale, defaultLocale } from "@/lib/i18n/locales";
 
@@ -14,10 +13,6 @@ export type WhyCopy = {
   sections: {
     kind: WhySectionKind;
     paragraphs: string[];
-    // Shown only where the arbitration with Dreddi is on (ARBITRATION_ENABLED), so the page promises nothing missing:
-    // the whole section, or just the lines in labParagraphs.
-    lab?: boolean;
-    labParagraphs?: string[];
   }[];
   cta: string;
 };
@@ -125,11 +120,11 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
       { kind: "body", paragraphs: ["Or whether the word was kept"] },
       { kind: "turn", paragraphs: ["Dreddi knows"] },
       { kind: "list", paragraphs: ["Who promised", "What, and by when", "How it ended"] },
-      { kind: "turn", paragraphs: ["And if you disagree"], lab: true },
-      { kind: "body", paragraphs: ["Dreddi settles it"], lab: true },
-      { kind: "list", paragraphs: ["Helps agree on what counts as done", "Checks evidence, not words", "And makes the call"], lab: true },
+      { kind: "turn", paragraphs: ["And if you disagree"] },
+      { kind: "body", paragraphs: ["Dreddi settles it"] },
+      { kind: "list", paragraphs: ["Helps agree on what counts as done", "Checks evidence, not words", "And makes the call"] },
       { kind: "turn", paragraphs: ["And promising yourself is the easiest"] },
-      { kind: "body", paragraphs: ["Because no one asks if you did it"], labParagraphs: ["Except Dreddi"] },
+      { kind: "body", paragraphs: ["Because no one asks if you did it", "Except Dreddi"] },
       { kind: "body", paragraphs: ["For yourself — discipline", "For others — trust", "Over time — reputation"] },
     ],
     cta: "Record your first promise",
@@ -148,11 +143,11 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
       { kind: "body", paragraphs: ["Ані того, чи дотримали слово"] },
       { kind: "turn", paragraphs: ["Dreddi знає"] },
       { kind: "list", paragraphs: ["Хто пообіцяв", "Що саме і коли", "Чим усе закінчилось"] },
-      { kind: "turn", paragraphs: ["А якщо думки розходяться"], lab: true },
-      { kind: "body", paragraphs: ["Дредді розсудить"], lab: true },
-      { kind: "list", paragraphs: ["Допоможе домовитися, що вважати виконанням", "Перевірить докази, а не слова", "І ухвалить рішення"], lab: true },
+      { kind: "turn", paragraphs: ["А якщо думки розходяться"] },
+      { kind: "body", paragraphs: ["Дредді розсудить"] },
+      { kind: "list", paragraphs: ["Допоможе домовитися, що вважати виконанням", "Перевірить докази, а не слова", "І ухвалить рішення"] },
       { kind: "turn", paragraphs: ["А собі обіцяти найлегше"] },
-      { kind: "body", paragraphs: ["Бо ніхто не спитає, чи виконав"], labParagraphs: ["Окрім Дредді"] },
+      { kind: "body", paragraphs: ["Бо ніхто не спитає, чи виконав", "Окрім Дредді"] },
       // The one deliberate exception to "no long dashes": the summary reads as a formula.
       { kind: "body", paragraphs: ["Для себе — це дисципліна", "Для інших — довіра", "З часом — репутація"] },
     ],
@@ -163,12 +158,5 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
 
 export const getWhyCopy = (locale: Locale): WhyCopy => {
   const all = POSITIONING === "pledge" ? pledgeWhyCopy : whyCopy;
-  const copy = all[locale] ?? all[defaultLocale];
-  const sections = copy.sections
-    .filter((section) => ARBITRATION_ENABLED || !section.lab)
-    .map((section) => ({
-      ...section,
-      paragraphs: ARBITRATION_ENABLED ? [...section.paragraphs, ...(section.labParagraphs ?? [])] : section.paragraphs,
-    }));
-  return { ...copy, sections };
+  return all[locale] ?? all[defaultLocale];
 };

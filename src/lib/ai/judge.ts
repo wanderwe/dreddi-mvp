@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { formatKyivDate } from "./kyivDate";
 
-// Dreddi, the AI judge (on wherever ARBITRATION_ENABLED; the lab page only with LAB_ENABLED): an AI judge that checks whether a promise was kept,
+// Dreddi, the AI judge (the lab page with LAB_ENABLED only): an AI judge that checks whether a promise was kept,
 // on its own when there is no other side, or hearing both sides of an agreement. No database access.
 
 export const JUDGE_MODEL = "claude-haiku-5-5";

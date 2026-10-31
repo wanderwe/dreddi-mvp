@@ -9,7 +9,7 @@ import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { Share2, Sparkles } from "lucide-react";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 
-// Dreddi, the AI judge, on a real promise. Renders nothing unless arbitration is on (the API answers 404).
+// Dreddi, the AI judge, on a real promise. Renders nothing for someone who is not a side of it.
 
 type CaseMessage = {
   id: string;
@@ -132,7 +132,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     let active = true;
     void (async () => {
       const res = await call().catch(() => null);
-      // 404: the lab is off. 403: not a side of this promise. Either way, no panel.
+      // 404: no such promise. 403: not a side of this promise. Either way, no panel.
       if (!active || !res || res.status === 404 || res.status === 403) return;
       const body = await res.json();
       if (!active) return;

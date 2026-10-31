@@ -11,13 +11,12 @@ import {
   type Speaker,
 } from "@/lib/ai/judge";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
-import { ARBITRATION_ENABLED } from "@/lib/ai/arbitration";
 import { getAgreedCriteria, getRulingState } from "@/lib/ai/judgeRuling";
 import { applyReputationForPromiseFinalization } from "@/lib/reputation/applyReputation";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
 import { getPromiseInviteStatus, type InviteStatus } from "@/lib/promiseAcceptance";
 
-// Dreddi, the AI judge, on a real promise (on wherever ARBITRATION_ENABLED). The case lives in judge_messages, so
+// Dreddi, the AI judge, on a real promise. The case lives in judge_messages, so
 // whoever comes back weeks later, the judge gets the whole case again: what was promised, by whom,
 // when it was recorded, the agreed criteria and every earlier message with its date.
 
@@ -298,7 +297,6 @@ const errorResponse = (error: unknown) => {
 };
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
-  if (!ARBITRATION_ENABLED) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const user = await requireUser(req, await cookies());
   if (user instanceof NextResponse) return user;
 
@@ -310,7 +308,6 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 }
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
-  if (!ARBITRATION_ENABLED) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const user = await requireUser(req, await cookies());
   if (user instanceof NextResponse) return user;
 
