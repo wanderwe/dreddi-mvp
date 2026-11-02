@@ -451,6 +451,8 @@ body {
     radial-gradient(circle at 80% 20%, var(--page-glow-2), transparent 32%),
     radial-gradient(circle at 50% 65%, var(--page-glow-3), transparent 35%),
     var(--background);
+  /* The glows sit on the viewport, not the page: on a long page they would stretch and tint the content. */
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
