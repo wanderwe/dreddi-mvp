@@ -1389,7 +1389,7 @@
     },
     "awaiting": "{role}: waiting for an answer until {date}",
     "awaitingOverdue": "{role}: no answer. Without it the ruling will not take effect",
-    "copySummons": "Share case No. {number} with the other side",
+    "copySummons": "Share the case with the other side",
     "summonCopied": "Copied, send it to the other side",
     "summonFailed": "Could not copy the message",
     "summon": "Case No. {number}. Dreddi is deciding whether «{title}» was kept. Take a look and add your side{until}: {link}",
