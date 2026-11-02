@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { JudgeImage, JudgePhase, Speaker } from "@/lib/ai/judge";
+import { caseNumber } from "@/lib/ai/caseNumber";
 import { formatKyivDate } from "@/lib/ai/kyivDate";
 import { toJudgeImage } from "@/lib/ai/judgeImage";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -112,6 +113,9 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [summonCopied, setSummonCopied] = useState(false);
+  // The message being sent: shown in the case at once, with Dreddi thinking under it, until the answer comes.
+  const [pending, setPending] = useState<{ text: string; images: number } | null>(null);
+  const number = caseNumber(promiseId);
 
   const call = useCallback(
     async (init?: RequestInit) => {
@@ -155,12 +159,13 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     const message = waiting
       ? t("arbitration.summon", {
           title: view.promiseTitle,
+          number,
           until: t("arbitration.summonUntil", { date: formatDate(waiting.until) }),
           link,
         })
       : view.criteriaStatus === "proposed" && !otherApproved
-        ? t("arbitration.summonCriteria", { title: view.promiseTitle, link })
-        : t("arbitration.summonCase", { title: view.promiseTitle, link });
+        ? t("arbitration.summonCriteria", { title: view.promiseTitle, number, link })
+        : t("arbitration.summonCase", { title: view.promiseTitle, number, link });
     try {
       await navigator.clipboard.writeText(message);
       setSummonCopied(true);
@@ -193,23 +198,30 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
 
   const send = async () => {
     if (!text.trim() && images.length === 0) return;
+    const sentText = text;
+    const sentImages = images;
     setBusy(true);
     setError(null);
+    setPending({ text: sentText, images: sentImages.length });
+    setText("");
+    setImages([]);
     try {
       const res = await call({
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, images }),
+        body: JSON.stringify({ text: sentText, images: sentImages }),
       });
       if (!res) throw new Error(t("arbitration.errors.signIn"));
       const body = await res.json();
       if (!res.ok) throw new Error(errorText(res.status, body.error));
       applyView(body as CaseView);
-      setText("");
-      setImages([]);
     } catch (err) {
+      // Nothing was saved: give the text back so it is not lost.
+      setText(sentText);
+      setImages(sentImages);
       setError(err instanceof Error ? err.message : String(err));
     } finally {
+      setPending(null);
       setBusy(false);
     }
   };
@@ -245,16 +257,17 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               {t("arbitration.beta")}
             </span>
           </Tooltip>
+          <span className="text-xs font-normal text-tone-400">{t("arbitration.caseNumber", { number })}</span>
         </h2>
         {/* Any stage may need the other side: approving criteria or answering a request to decide. */}
         {view && "counterparty" in view.approvals && !view.closed && view.messages.length > 0 && (
           <span className="flex items-center gap-2 text-xs">
             {summonCopied && <span className="text-accent-200">{t("arbitration.summonCopied")}</span>}
-            <Tooltip label={t("arbitration.copySummons")}>
+            <Tooltip label={t("arbitration.copySummons", { number })}>
               <button
                 type="button"
                 onClick={() => void copySummons()}
-                aria-label={t("arbitration.copySummons")}
+                aria-label={t("arbitration.copySummons", { number })}
                 className="cursor-pointer rounded-xl border border-tone-white/15 p-2 text-tone-200 transition hover:border-accent-300/40 hover:text-accent-100"
               >
                 <Share2 className="h-4 w-4" aria-hidden />
@@ -278,7 +291,27 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
         </div>
       )}
 
-      {view && view.messages.length === 0 && (
+      {/* Agreed criteria are a reference, not an action: on top and folded, so the latest messages stay in view. */}
+      {view && view.criteriaAgreed && (
+        <details className="group rounded-xl border border-accent-300/20 bg-emerald-400/5 p-3">
+          <summary className="cursor-pointer list-none text-xs uppercase tracking-[0.2em] text-accent-200">
+            {t("arbitration.criteria.title")} · {t("arbitration.criteria.agreed")} ({view.agreedCriteria.length})
+            <span className="ml-1 inline-block transition group-open:rotate-180" aria-hidden>
+              ▾
+            </span>
+          </summary>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-tone-100">
+            {view.agreedCriteria.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          {!revising && !view.ruling && !view.closed && (
+            <p className="mt-2 text-[11px] text-tone-500">{t("arbitration.criteria.changeHint")}</p>
+          )}
+        </details>
+      )}
+
+      {view && view.messages.length === 0 && !pending && (
         <p className="text-sm text-tone-300">{t("arbitration.empty")}</p>
       )}
 
@@ -339,25 +372,30 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
             )}
           </div>
         ))}
-        {busy && <p className="text-xs text-tone-400">{t("arbitration.thinking")}</p>}
+        {pending && view && (
+          <>
+            <div className="ml-6 rounded-xl border border-tone-white/10 p-3 text-sm text-tone-200 opacity-80">
+              <p className="mb-1 text-xs text-tone-400">{roleLabel(view.role)}</p>
+              <p className="whitespace-pre-wrap">{pending.text || t("arbitration.evidenceOnly")}</p>
+              {pending.images > 0 && (
+                <p className="mt-1 text-xs text-tone-400">{t("arbitration.attached", { count: pending.images })}</p>
+              )}
+            </div>
+            <p className="flex items-center gap-2 text-xs text-tone-300" role="status">
+              <span className="inline-flex gap-1" aria-hidden>
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-300 [animation-delay:-0.3s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-300 [animation-delay:-0.15s]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-300" />
+              </span>
+              {t("arbitration.thinking")}
+            </p>
+          </>
+        )}
         {error && <p className="rounded-xl bg-red-500/10 p-3 text-sm text-danger-200">{error}</p>}
       </div>
 
-      {/* While a change is being worked out, the agreed version stays on top: it is the one in force. */}
-      {view && revising && (
-        <div className="rounded-xl border border-accent-300/20 bg-emerald-400/5 p-3">
-          <p className="mb-1 text-xs uppercase tracking-[0.2em] text-accent-200">
-            {t("arbitration.criteria.title")} · {t("arbitration.criteria.inForce")}
-          </p>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-tone-100">
-            {view.agreedCriteria.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {view && view.criteria.length > 0 && (
+      {/* Near the input: only criteria that still wait for the sides. */}
+      {view && view.criteria.length > 0 && view.criteriaStatus !== "agreed" && (
         <div
           className={`rounded-xl border p-3 ${
             revising ? "border-dashed border-accent-300/30" : "border-accent-300/20 bg-emerald-400/5"
@@ -398,9 +436,6 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
             <p className="mt-2 text-[11px] text-tone-500">
               {revising ? t("arbitration.criteria.revisionHint") : t("arbitration.criteria.hint")}
             </p>
-          )}
-          {view.criteriaStatus === "agreed" && !view.ruling && !view.closed && (
-            <p className="mt-2 text-[11px] text-tone-500">{t("arbitration.criteria.changeHint")}</p>
           )}
         </div>
       )}
@@ -490,7 +525,11 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               disabled={busy || (!text.trim() && images.length === 0)}
               className={`${view.messagesLeft <= FEW_MESSAGES_LEFT ? "" : "ml-auto "}cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50`}
             >
-              {view.messages.length === 0 ? t("arbitration.sendFirst") : t("arbitration.sendReply")}
+              {pending
+                ? t("arbitration.thinkingButton")
+                : view.messages.length === 0
+                  ? t("arbitration.sendFirst")
+                  : t("arbitration.sendReply")}
             </button>
           </div>
         </div>

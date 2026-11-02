@@ -16,6 +16,7 @@ import { isPromiseStatus } from "@/lib/promiseStatus";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
+import { caseNumber } from "@/lib/ai/caseNumber";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
 
@@ -774,6 +775,9 @@ export default function PublicAgreementPage() {
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <ShieldCheck className="h-5 w-5 text-violet-500" aria-hidden />
                 {t("publicAgreement.dreddi.title")}
+                <span className="text-xs font-normal text-tone-400">
+                  {t("arbitration.caseNumber", { number: caseNumber(agreement.id) })}
+                </span>
               </h2>
               <span
                 className={[
