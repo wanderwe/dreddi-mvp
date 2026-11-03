@@ -423,9 +423,8 @@ export default function InvitePage() {
 
         {info && (
           <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-6 shadow-2xl shadow-tone-black/30 backdrop-blur sm:p-7">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-accent-200">{t("invite.eyebrow")}</p>
-              {isCreatorViewer && (
+            {isCreatorViewer && (
+              <div className="mb-3 flex justify-end">
                 <div className="flex flex-col items-end gap-1">
                   {canManageShare && (
                     <div className="flex items-center gap-2">
@@ -443,9 +442,9 @@ export default function InvitePage() {
                   )}
                   {!canManageShare && shareStatusLabel && <p className="text-xs text-tone-300">{shareStatusLabel}</p>}
                 </div>
-              )}
-            </div>
-            <h1 className="mt-3 text-3xl font-semibold leading-tight text-tone-white sm:text-4xl">
+              </div>
+            )}
+            <h1 className="text-3xl font-semibold leading-tight text-tone-white sm:text-4xl">
               {heading}
             </h1>
 

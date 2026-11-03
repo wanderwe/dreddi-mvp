@@ -416,6 +416,7 @@
       "activateWithoutCounterparty": "Активувати без підтвердження",
       "activateWithoutCounterpartyConfirmTitle": "Активувати без підтвердження?",
       "activateWithoutCounterpartyConfirmBody": "Угода стане активною без підтвердження іншої сторони. Інша сторона зможе приєднатись пізніше за посиланням. Продовжити?",
+      "activateWithoutCounterpartyHint": "Для публічної угоди з групою людей, де ніхто окремо не прийматиме запрошення",
       "activatedWithoutCounterpartyNote": "Активовано без підтвердження іншої сторони",
       "closedWithoutCounterparty": "Закрито без підтвердження другої сторони",
       "conditionStatusLabel": "Статус",
@@ -639,7 +640,6 @@
     "back": "Назад на головну",
     "signedIn": "Увійшли",
     "guestMode": "Гостьовий режим",
-    "eyebrow": "Запрошення",
     "heading": {
       "pending": "Запрошення до угоди",
       "accepted": "Це запрошення вже прийнято",

@@ -408,6 +408,7 @@
       "activateWithoutCounterparty": "Activate without confirmation",
       "activateWithoutCounterpartyConfirmTitle": "Activate without confirmation?",
       "activateWithoutCounterpartyConfirmBody": "The agreement will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
+      "activateWithoutCounterpartyHint": "For a public agreement with a group of people, where no one accepts the invite individually",
       "activatedWithoutCounterpartyNote": "Activated without counterparty confirmation",
       "closedWithoutCounterparty": "Closed, counterparty unconfirmed",
       "conditionStatusLabel": "Status",
@@ -631,7 +632,6 @@
     "back": "Back to home",
     "signedIn": "Signed in",
     "guestMode": "Guest mode",
-    "eyebrow": "Invitation",
     "heading": {
       "pending": "Deal invitation",
       "accepted": "This invite has been accepted",
