@@ -1153,8 +1153,9 @@ export default function PromisePage() {
   const canConfirmWithoutExecutorCompletion = Boolean(
     canReview && p?.status === "active" && !p?.completed_at && isInviteAccepted
   );
+  // The creator closes a promise nobody else joined, unless the creator is the one keeping it.
   const isWatchdogCreator = Boolean(
-    p?.activated_without_counterparty && !p?.counterparty_id && isCreator
+    p?.activated_without_counterparty && !p?.counterparty_id && isCreator && !isExecutor
   );
   const hasStatusActions = Boolean(
       (isExecutor && p?.status === "active" && isInviteAccepted) ||
@@ -1216,7 +1217,10 @@ export default function PromisePage() {
     : inviteStatus === "accepted"
     ? t("promises.detail.inviteAcceptedByInline", { name: acceptingUserName })
     : t(`promises.inviteStatus.${inviteStatus}`);
-  const lifecycleStates = p && uiStatus ? getLifecycleStates(p, uiStatus, t) : [];
+  // A promise to yourself has nobody to accept it and was not "activated without" anyone.
+  const lifecycleStates = (p && uiStatus ? getLifecycleStates(p, uiStatus, t) : []).filter(
+    (state) => !(isSelf && state.key === "accepted")
+  );
   const timeline = p && uiStatus
     ? buildAgreementTimeline(
         p,
@@ -1231,7 +1235,7 @@ export default function PromisePage() {
         },
         uiStatus,
         t
-      )
+      ).filter((item) => !(isSelf && item.key === "activated_without_counterparty"))
     : [];
   if (isPrivateAgreement) {
     for (const update of updates) {
@@ -1729,6 +1733,10 @@ export default function PromisePage() {
                   )}
                 </div>
               </div>
+            )}
+
+            {isSelf && p.status === "completed_by_promisor" && (
+              <p className="mt-5 text-sm text-tone-300">{t("promises.detail.selfDoneHint")}</p>
             )}
 
             {p.activated_without_counterparty && !p.counterparty_id && isFinal && (

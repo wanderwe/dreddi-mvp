@@ -116,7 +116,8 @@
         "helper": "A page for monitoring this promise",
         "copied": "Public promise link copied"
       },
-      "activateWithoutCounterpartyConfirmBody": "The promise will become active without the other party's confirmation. They can still join later via the invite link. Continue?"
+      "activateWithoutCounterpartyConfirmBody": "The promise will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
+      "selfDoneHint": "To count it toward your reputation, show the evidence to Dreddi in Arbitration below"
     },
     "confirm": {
       "back": "Back to promises"

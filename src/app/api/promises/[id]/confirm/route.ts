@@ -31,10 +31,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
     // Creator-as-watchdog: when deal was activated without counterparty and
     // counterparty never joined, the creator can close it directly.
+    // Never the one who keeps the promise: closing your own promise yourself would be self-scoring.
     const isWatchdogClose =
       promise.activated_without_counterparty &&
       !promise.counterparty_id &&
-      promise.creator_id === user.id;
+      promise.creator_id === user.id &&
+      executorId !== user.id;
 
     if (!isWatchdogClose) {
       if (!counterpartyId || counterpartyId !== user.id || executorId === user.id) {
