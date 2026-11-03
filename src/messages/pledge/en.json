@@ -77,8 +77,7 @@
           "all": "All promises",
           "self": "Promises to yourself"
         }
-      },
-      "selfBadge": "to yourself"
+      }
     },
     "detail": {
       "conditionProposedBanner": {

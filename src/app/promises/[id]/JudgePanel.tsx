@@ -525,11 +525,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               disabled={busy || (!text.trim() && images.length === 0)}
               className={`${view.messagesLeft <= FEW_MESSAGES_LEFT ? "" : "ml-auto "}cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50`}
             >
-              {pending
-                ? t("arbitration.thinkingButton")
-                : view.messages.length === 0
-                  ? t("arbitration.sendFirst")
-                  : t("arbitration.sendReply")}
+              {view.messages.length === 0 && !pending ? t("arbitration.sendFirst") : t("arbitration.sendReply")}
             </button>
           </div>
         </div>

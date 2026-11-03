@@ -1427,11 +1427,6 @@ export default function PromisesClient() {
                       </div>
 
                       <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
-                        {POSITIONING === "pledge" && isSelfPromise(p) && (
-                          <span className="rounded-full border border-tone-white/15 px-2 py-0.5 text-xs text-tone-300">
-                            {t("promises.list.selfBadge")}
-                          </span>
-                        )}
                         <StatusPill
                           label={statusLabel}
                           tone={statusPill.tone}

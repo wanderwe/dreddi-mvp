@@ -1456,7 +1456,6 @@
     "messagesLeft": "Messages left: {count}",
     "limitReached": "In the beta a case holds a limited number of messages, and they are used up. The «I approve the criteria» and «I accept the ruling» buttons still work.",
     "betaLimit": "Beta: up to {limit} messages per case, {count} left",
-    "caseNumber": "Case No. {number}",
-    "thinkingButton": "Dreddi is thinking…"
+    "caseNumber": "Case No. {number}"
   }
 }
