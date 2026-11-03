@@ -56,6 +56,8 @@ export type JudgeAnswer<P extends JudgeMode> = {
   usage: { inputTokens: number; outputTokens: number; costUsd: number };
 };
 
+const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
+
 export async function askJudge<P extends JudgeMode>({
   phase,
   promise,
@@ -93,8 +95,10 @@ export async function askJudge<P extends JudgeMode>({
     }
 
     const { input_tokens: inputTokens, output_tokens: outputTokens } = response.usage;
+    // The prompt bans long dashes, but a cheap model still slips one in now and then.
+    const result = { ...response.parsed_output, reply: noLongDashes(response.parsed_output.reply) };
     return {
-      result: response.parsed_output as JudgeAnswer<P>["result"],
+      result: result as JudgeAnswer<P>["result"],
       model: response.model,
       usage: { inputTokens, outputTokens, costUsd: estimateCostUsd(inputTokens, outputTokens) },
     };
