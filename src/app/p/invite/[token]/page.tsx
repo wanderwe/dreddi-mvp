@@ -633,7 +633,7 @@ export default function InvitePage() {
                 </div>
               ) : isInviteeAwaitingConfirmation ? null
               : canAccept ? (
-                <div className="flex flex-wrap justify-end gap-2">
+                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   {canAccept && (
                     <button
                       disabled={busy}

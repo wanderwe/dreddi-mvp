@@ -422,7 +422,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                   type="button"
                   onClick={() => void approve(view.proposalId)}
                   disabled={busy}
-                  className="ml-auto cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
+                  className="w-full cursor-pointer rounded-xl border border-accent-300/40 px-3 py-2 sm:ml-auto sm:w-auto sm:py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
                 >
                   {t("arbitration.criteria.approve")}
                 </button>
@@ -460,7 +460,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
                 type="button"
                 onClick={() => void approve(view.ruling?.rulingId)}
                 disabled={busy}
-                className="ml-auto cursor-pointer rounded-xl border border-accent-300/40 px-3 py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
+                className="w-full cursor-pointer rounded-xl border border-accent-300/40 px-3 py-2 sm:ml-auto sm:w-auto sm:py-1.5 text-sm font-semibold text-accent-100 transition hover:bg-emerald-400/10 disabled:opacity-50"
               >
                 {t("arbitration.ruling.accept")}
               </button>
