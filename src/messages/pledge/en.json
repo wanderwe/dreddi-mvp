@@ -425,7 +425,9 @@
     "notPublicTitle": "Promise is not public",
     "noDetails": "The promise text is captured in the title",
     "participants": {
-      "creatorFallback": "Promise creator"
+      "creatorFallback": "Promise creator",
+      "promisedTo": "Promised to",
+      "self": "Themselves"
     },
     "timeline": {
       "created": "Promise created",
@@ -451,7 +453,8 @@
       "error": "Could not publish this update. Only promise participants can add official updates."
     },
     "unfollowTooltip": "Stop watching this public promise",
-    "followTooltip": "Watch this public promise to monitor status changes and the final outcome"
+    "followTooltip": "Watch this public promise to monitor status changes and the final outcome",
+    "whatAgreed": "What was promised"
   },
   "watching": {
     "subtitle": "Other people’s public promises: status and outcome in one place",

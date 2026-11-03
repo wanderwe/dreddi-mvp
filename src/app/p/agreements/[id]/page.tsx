@@ -17,6 +17,7 @@ import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { caseNumber } from "@/lib/ai/caseNumber";
+import { POSITIONING } from "@/lib/features";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
 
@@ -67,6 +68,7 @@ type PublicAgreementRow = {
   viewer_following?: boolean | null;
   followers_count?: number | null;
   viewer_can_follow?: boolean | null;
+  is_self_promise?: boolean | null;
   // Dreddi's ruling that took effect, with the agreed criteria; the case itself stays private.
   dreddi_ruling?: {
     verdict: "kept" | "not_kept";
@@ -465,7 +467,11 @@ export default function PublicAgreementPage() {
       )
     : [];
 
-  const flowStates = agreement ? getFlowStates(agreement, t) : [];
+  // A promise to yourself has nobody to accept it.
+  const isSelf = Boolean(POSITIONING === "pledge" && agreement?.is_self_promise);
+  const flowStates = (agreement ? getFlowStates(agreement, t) : []).filter(
+    (state) => !(isSelf && state.key === "accepted")
+  );
   const dueText = agreement?.due_at
     ? formatDueDate(agreement.due_at, locale, { includeYear: true, includeTime: true })
     : null;
@@ -759,11 +765,15 @@ export default function PublicAgreementPage() {
                   href={creatorHref}
                 />
                 <div className="hidden h-px w-10 bg-gradient-to-r from-tone-white/10 via-accent-200/45 to-tone-white/10 sm:block lg:hidden xl:block" />
-                <ParticipantCard
-                  label={t("publicAgreement.participants.acceptedBy")}
-                  name={accepterName || executorName || creatorName}
-                  href={counterpartyHref}
-                />
+                {isSelf ? (
+                  <ParticipantCard label={t("publicAgreement.participants.promisedTo")} name={t("publicAgreement.participants.self")} href={null} />
+                ) : (
+                  <ParticipantCard
+                    label={t("publicAgreement.participants.acceptedBy")}
+                    name={accepterName || executorName || creatorName}
+                    href={counterpartyHref}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { getAgreedCriteria, getBindingOutcome, type CriteriaRow } from "@/lib/ai/judgeRuling";
+import { isSelfPromise } from "@/lib/selfPromise";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
@@ -52,6 +53,9 @@ function getAuthClient() {
 
 type PromisePublicAgreementRecord = {
   id: string;
+  activated_without_counterparty?: boolean | null;
+  activated_without_counterparty_at?: string | null;
+  invited_at?: string | null;
   title: string | null;
   details: string | null;
   condition_text: string | null;
@@ -239,7 +243,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const { data: promise, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact"
+        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
       )
       .eq("id", id)
       .eq("visibility", "public")
@@ -343,6 +347,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         !viewerIsParticipant
       ),
       dreddi_ruling: await loadDreddiRuling(admin, promise),
+      is_self_promise: isSelfPromise(promise),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -367,7 +372,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const { data: promise, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact"
+        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
       )
       .eq("id", id)
       .eq("visibility", "public")
