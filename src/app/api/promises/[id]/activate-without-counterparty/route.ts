@@ -17,6 +17,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Only the creator can activate without counterparty" }, { status: 403 });
     }
 
+    // Only a public promise to a group can start without anyone accepting it; a private one is to a person who must accept.
+    if (promise.visibility !== "public") {
+      return NextResponse.json({ error: "Only a public promise can be activated without counterparty" }, { status: 400 });
+    }
+
     if (promise.status !== "active") {
       return NextResponse.json({ error: "Deal is not active" }, { status: 400 });
     }

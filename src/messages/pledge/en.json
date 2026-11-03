@@ -116,6 +116,7 @@
         "copied": "Public promise link copied"
       },
       "activateWithoutCounterpartyConfirmBody": "The promise will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
+      "activateWithoutCounterpartyHint": "For a public promise to a group of people, where no one accepts the invite individually",
       "selfDoneHint": "To count it toward your reputation, show the evidence to Dreddi in Arbitration below"
     },
     "confirm": {

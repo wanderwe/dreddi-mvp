@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 
 type PromiseRecord = PromiseRowMin & {
   details: string | null;
+  visibility: "private" | "public" | null;
 };
 
 export const DISPUTE_CODES = ["not_completed", "partial", "late", "other", "not_delivered"] as const;
@@ -31,7 +32,7 @@ export async function loadPromiseForUser(id: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,is_important,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,condition_text,condition_met_at,condition_met_by,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,activated_without_counterparty,activated_without_counterparty_at"
+      "id,title,details,is_important,status,due_at,creator_id,counterparty_id,promisor_id,promisee_id,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,condition_text,condition_met_at,condition_met_by,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,activated_without_counterparty,activated_without_counterparty_at,visibility"
     )
     .eq("id", id)
     .maybeSingle<PromiseRecord>();

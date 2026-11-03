@@ -1174,7 +1174,7 @@ export default function PromisePage() {
     shouldShowInviteBlock && inviteStatus === "awaiting_acceptance"
   );
   const canActivateWithoutCounterparty = Boolean(
-    isCreator && inviteStatus === "awaiting_acceptance" && !isFinal && p?.invite_token
+    isCreator && inviteStatus === "awaiting_acceptance" && !isFinal && p?.invite_token && p?.visibility === "public"
   );
   const hasLifecycleActions = Boolean(
     hasStatusActions || canRecreateDeal
@@ -1812,6 +1812,7 @@ export default function PromisePage() {
                     >
                       {t("promises.detail.activateWithoutCounterparty")}
                     </button>
+                    <p className="mt-1 text-[11px] text-tone-500">{t("promises.detail.activateWithoutCounterpartyHint")}</p>
                   </div>
                 )}
               </div>
