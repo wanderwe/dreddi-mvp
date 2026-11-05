@@ -475,6 +475,6 @@
       "pending": "The ruling «{verdict}» takes effect when both sides accept it. Then the promise status changes.",
       "binding": "The ruling has taken effect.{how} Promise status: «{status}»."
     },
-    "closed": "The case is closed: the promise status is final."
+    "closed": "The case is closed: the promise status is final"
   }
 }

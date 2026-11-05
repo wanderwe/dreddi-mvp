@@ -1421,7 +1421,7 @@
       "hint": "Something wrong? Write to Dreddi below and he will propose a new version. The criteria are fixed once every side approves them.",
       "inForce": "agreed",
       "revisionTitle": "New criteria",
-      "revisionHint": "Until every side approves the new criteria, the agreed ones stay in force.",
+      "revisionHint": "Until every side approves the new criteria, the agreed ones stay in force",
       "changeHint": "To change the criteria, write to Dreddi. A new version takes effect only once every side approves it.",
       "changedAfterApproval": "The criteria changed after you approved them: approve the new version or write what is wrong"
     },
@@ -1436,7 +1436,7 @@
     },
     "approvedCriteria": "I approve the criteria",
     "acceptedRuling": "I accept the ruling",
-    "closed": "The case is closed: the agreement status is final.",
+    "closed": "The case is closed: the agreement status is final",
     "placeholder": {
       "ruling": "Disagree with the ruling? Write why and add evidence",
       "criteria": "Disagree with the criteria? Write what to change",
