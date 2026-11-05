@@ -57,6 +57,8 @@ export type JudgeAnswer<P extends JudgeMode> = {
 };
 
 const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
+// Criteria are single short lines, and single lines carry no closing period in Dreddi.
+const noClosingPeriod = (line: string) => line.trim().replace(/(?<!\.)\.$/, "");
 
 export async function askJudge<P extends JudgeMode>({
   phase,
@@ -96,7 +98,14 @@ export async function askJudge<P extends JudgeMode>({
 
     const { input_tokens: inputTokens, output_tokens: outputTokens } = response.usage;
     // The prompt bans long dashes, but a cheap model still slips one in now and then.
-    const result = { ...response.parsed_output, reply: noLongDashes(response.parsed_output.reply) };
+    const parsed = response.parsed_output;
+    const result = {
+      ...parsed,
+      reply: noLongDashes(parsed.reply),
+      ...("criteria" in parsed && Array.isArray(parsed.criteria)
+        ? { criteria: parsed.criteria.map((line: string) => noClosingPeriod(noLongDashes(line))) }
+        : {}),
+    };
     return {
       result: result as JudgeAnswer<P>["result"],
       model: response.model,

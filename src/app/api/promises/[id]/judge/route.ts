@@ -219,7 +219,11 @@ const describeStatus = (promise: PromiseRow) => {
   if (invite === "cancelled_by_creator") return "withdrawn by its creator before anyone accepted; the case is closed";
   if (invite === "awaiting_acceptance") return "active, but the other side has not accepted the invite yet";
   if (invite === "awaiting_creator_confirmation") return "waiting for the creator to confirm the counter-obligation";
-  if (promise.status === "completed_by_promisor") return "the promisor marked it done; waiting for the other side to confirm";
+  if (promise.status === "completed_by_promisor") {
+    return promise.counterparty_id
+      ? "the promisor marked it done; waiting for the other side to confirm"
+      : "the promisor marked it done in Dreddi; there is no other side, so only your ruling can count it as kept";
+  }
   return "active";
 };
 
@@ -383,11 +387,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .gte("created_at", new Date(Date.now() - DAY_MS).toISOString());
     if ((todayCount ?? 0) >= DAILY_MESSAGE_LIMIT) throw new JudgeError("daily_limit", 429);
     // After a ruling every message is an appeal, so the criteria can no longer change: checking only.
-    // With no other side nobody else guards the bar, so agreed criteria stay as they are past the deadline.
+    // With no other side nobody else guards the bar: past the deadline the criteria, agreed or not, can no longer change.
     // Otherwise Dreddi tells from the message whether it is about the criteria or about the result.
     const deadlinePassed = Boolean(promise.due_at) && Date.now() > new Date(promise.due_at as string).getTime();
     const checkingOnly =
-      Boolean(loaded.ruling) || (loaded.counterpartyName === null && loaded.criteriaAgreed && deadlinePassed);
+      Boolean(loaded.ruling) || (loaded.counterpartyName === null && deadlinePassed);
     const mode = checkingOnly ? ("verdict" as const) : ("auto" as const);
     const writerName = loaded.authorNames[user.id] ?? "Unknown";
     const otherRole: Speaker | null = loaded.counterpartyName === null ? null : role === "promisor" ? "counterparty" : "promisor";
