@@ -37,7 +37,7 @@ export function AppFooter() {
 
   return (
     <footer className="border-t border-tone-white/5 bg-tone-950/60 text-tone-400">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs sm:flex-row sm:gap-3">
+      <div className="mx-auto flex w-full max-w-6xl flex-col-reverse items-center justify-between gap-3 px-6 py-6 text-xs sm:flex-row sm:gap-3">
         <span>© {year} Dreddi knows</span>
         <div className="flex w-full flex-col items-center gap-1 text-center sm:w-auto sm:flex-row sm:gap-4 sm:text-left">
           {canSendFeedback && (
