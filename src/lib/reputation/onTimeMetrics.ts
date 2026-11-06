@@ -1,10 +1,12 @@
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import type { PromiseStatus } from "@/lib/promiseStatus";
+import { isCompletedOnTime } from "@/lib/reputation/onTime";
 
 type OnTimePromiseRow = {
   status: PromiseStatus;
   due_at: string | null;
   completed_at: string | null;
+  completed_on_time?: boolean | null;
   confirmed_at: string | null;
   creator_id: string;
   counterparty_id: string | null;
@@ -18,12 +20,6 @@ type OnTimeMetrics = {
   confirmedWithDeadline: number;
   onTime: number;
   totalCompleted: number;
-};
-
-const isOnTime = (row: OnTimePromiseRow) => {
-  if (!row.due_at) return false;
-  if (!row.completed_at) return false;
-  return new Date(row.completed_at).getTime() <= new Date(row.due_at).getTime();
 };
 
 export const buildOnTimeMetrics = (rows: OnTimePromiseRow[], userId: string): OnTimeMetrics => {
@@ -43,7 +39,7 @@ export const buildOnTimeMetrics = (rows: OnTimePromiseRow[], userId: string): On
       metrics.confirmed += 1;
       if (row.due_at) {
         metrics.confirmedWithDeadline += 1;
-        if (isOnTime(row)) metrics.onTime += 1;
+        if (isCompletedOnTime(row)) metrics.onTime += 1;
       }
     } else if (row.status === "disputed") {
       metrics.disputed += 1;

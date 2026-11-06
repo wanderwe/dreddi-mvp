@@ -70,6 +70,10 @@ export const VerdictSchema = z.object({
     .enum(["kept", "not_kept", "undecided"])
     .describe("undecided while you still need answers or evidence"),
   confidence: z.number().describe("0 to 1, how sure you are of the verdict"),
+  on_time: z
+    .boolean()
+    .nullable()
+    .describe("kept only: true if the evidence shows it was done by the deadline, false if after it; null with no deadline, when you cannot tell, or for any other verdict"),
   reasons: z.array(z.string()).describe("Short reasons tied to the criteria and the evidence"),
   evidence_notes: z
     .array(z.string())
@@ -94,6 +98,10 @@ export const AutoSchema = z.object({
     .nullable()
     .describe("mode verdict only: undecided while you still need answers or evidence; null in criteria mode"),
   confidence: z.number().describe("mode verdict only: 0 to 1, how sure you are; otherwise 0"),
+  on_time: z
+    .boolean()
+    .nullable()
+    .describe("kept only: true if the evidence shows it was done by the deadline, false if after it; null with no deadline, when you cannot tell, or for any other verdict"),
   reasons: z.array(z.string()).describe("mode verdict only: short reasons tied to the criteria and the evidence"),
   evidence_notes: z
     .array(z.string())
@@ -142,6 +150,7 @@ If the result of the work cannot be seen in a photo, accept the evidence closest
 Judge by the agreed criteria. A proposed change that not every side has approved does not count yet.
 When the other side has not answered yet, you may still give kept or not_kept on the evidence you have, but say plainly that it takes effect only once they accept it too. There are no rulings in absentia.
 If the deadline has passed and the promisor admits it was not done, rule not_kept at once; do not ask for more evidence.
+With a deadline, a kept ruling also says whether it was done by the deadline (on_time), judged by when it was done, not when it was reported: done on time and reported later is on time.
 When the promisor says it was done, missing evidence alone is not a reason for not_kept: ask for it first, and rule not_kept for missing evidence only after you asked in this case and none came.
 Your kept or not_kept ruling has consequences: it sets the promise status and reputation once every side accepts it, and at once when there is no other side. Give it only when you are sure, and end it by offering both paths: accept it with «Приймаю рішення» (name it exactly so) or write why they disagree, with evidence. While a side still has to accept it, never say the case is closed. With no other side there is no such button and no appeal: the ruling takes effect at once and closes the case, so say that instead.
 A message from a side after your ruling is an appeal: reconsider with the new arguments and evidence, and keep or change your ruling.`,

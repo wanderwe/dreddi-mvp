@@ -8,6 +8,7 @@ import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { dispatchNotificationEvent } from "@/lib/notifications/dispatch";
 import { notifyAgreementWatchers } from "@/lib/notifications/watchers";
 import type { PromiseRowMin } from "@/lib/promiseTypes";
+import { resolveConfirmedOnTime } from "@/lib/reputation/onTime";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -67,18 +68,24 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       return NextResponse.json({ error: "Deal is not awaiting confirmation" }, { status: 400 });
     }
 
+    // After the deadline the confirming side says whether it was done on time; marking it later is common.
+    const body = (await req.json().catch(() => null)) as { onTime?: unknown } | null;
+    const onTimeAnswer = typeof body?.onTime === "boolean" ? body.onTime : undefined;
+
     const admin = getAdminClient();
-    const confirmedAt = new Date().toISOString();
+    const now = new Date();
+    const confirmedAt = now.toISOString();
     const { data: updatedPromise, error } = await admin
       .from("promises")
       .update({
         status: "confirmed",
         confirmed_at: confirmedAt,
         confirmed_without_executor_completion: isConfirmedWithoutExecutorCompletion,
+        completed_on_time: resolveConfirmedOnTime(promise, onTimeAnswer, now),
       })
       .eq("id", id)
       .select(
-        "id,title,is_important,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at"
+        "id,title,is_important,status,due_at,completed_at,completed_on_time,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at"
       )
       .single<PromiseRowMin>();
 

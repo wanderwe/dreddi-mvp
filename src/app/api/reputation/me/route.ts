@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     const { data: deliveries, error: deliveriesErr } = await admin
       .from("promises")
       .select(
-        "status,due_at,confirmed_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id"
+        "status,due_at,confirmed_at,completed_at,completed_on_time,creator_id,counterparty_id,promisor_id,promisee_id"
       )
       .in("status", ["confirmed", "disputed"])
       .or(

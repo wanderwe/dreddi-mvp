@@ -58,6 +58,7 @@ type MessageRow = {
   criteria_ready: boolean | null;
   verdict: "kept" | "not_kept" | "undecided" | null;
   confidence: number | null;
+  on_time: boolean | null;
   reasons: string[] | null;
   model: string | null;
   input_tokens: number | null;
@@ -76,7 +77,7 @@ type JudgeCaseRequest = {
 };
 
 const MESSAGE_COLUMNS =
-  "id,author_id,author_role,phase,content,evidence_notes,criteria,criteria_ready,verdict,confidence,reasons,model,input_tokens,output_tokens,approves_message_id,in_absentia,created_at";
+  "id,author_id,author_role,phase,content,evidence_notes,criteria,criteria_ready,verdict,confidence,on_time,reasons,model,input_tokens,output_tokens,approves_message_id,in_absentia,created_at";
 
 const ROLE_LABEL: Record<Speaker, string> = { promisor: "Promisor", counterparty: "Counterparty" };
 
@@ -243,7 +244,7 @@ const describeStatus = (promise: PromiseRow) => {
 };
 
 const PROMISE_MIN_COLUMNS =
-  "id,title,is_important,status,due_at,completed_at,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at";
+  "id,title,is_important,status,due_at,completed_at,completed_on_time,creator_id,counterparty_id,promisor_id,promisee_id,confirmed_at,disputed_at,disputed_code,dispute_reason,invite_status,invited_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at";
 
 // A binding ruling moves the promise like the sides' own buttons do: kept = confirmed,
 // not kept = disputed, with the same reputation update (half weight with no other side).
@@ -258,6 +259,10 @@ async function applyBindingRuling(loaded: LoadedCase) {
           status: "confirmed",
           confirmed_at: now,
           confirmed_without_executor_completion: promise.status === "active" && !promise.completed_at,
+          // Dreddi's own call on the deadline, from the evidence it ruled on.
+          completed_on_time: promise.due_at
+            ? (loaded.messages.find((row) => row.id === ruling.rulingId)?.on_time ?? null)
+            : null,
         }
       : {
           status: "disputed",
@@ -486,6 +491,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       criteria_ready: null,
       verdict: null,
       confidence: null,
+      on_time: null,
       reasons: null,
       model: null,
       input_tokens: null,
@@ -518,6 +524,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         criteria_ready: newVersion ? newVersion.ready : null,
         verdict: verdictResult ? (verdictResult.verdict ?? "undecided") : null,
         confidence: verdictResult?.confidence ?? null,
+        on_time: verdictResult?.verdict === "kept" ? (verdictResult.on_time ?? null) : null,
         reasons: verdictResult?.reasons ?? null,
         // No rulings in absentia while the other side gets no notice of the case.
         in_absentia: false,

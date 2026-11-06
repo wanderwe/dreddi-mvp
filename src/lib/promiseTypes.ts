@@ -8,6 +8,8 @@ export type PromiseRowMin = {
   status: PromiseStatus;
   due_at: string | null;
   completed_at: string | null;
+  // Settled by the side the promise was made to when they confirm; null: decided by completed_at.
+  completed_on_time?: boolean | null;
   creator_id: string;
   counterparty_id: string | null;
   promisor_id: string | null;

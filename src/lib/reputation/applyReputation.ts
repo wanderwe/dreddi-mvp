@@ -51,6 +51,7 @@ function computeDeltas(promise: PromiseRowMin, options: ReputationOptions = {}):
     status: promise.status,
     due_at: promise.due_at,
     completed_at: promise.completed_at,
+    completed_on_time: promise.completed_on_time ?? null,
     is_important: promise.is_important,
   };
   const onTime = calcOnTime(impactInput);

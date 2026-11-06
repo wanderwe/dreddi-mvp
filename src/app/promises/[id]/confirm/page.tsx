@@ -56,6 +56,8 @@ export default function ConfirmPromisePage() {
   );
   const [disputeReason, setDisputeReason] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  // Past the deadline the confirming side says whether it was done on time: people mark it done later.
+  const [onTime, setOnTime] = useState(true);
   const confirmButtonRef = useRef<HTMLButtonElement | null>(null);
   const disputeButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -217,7 +219,7 @@ export default function ConfirmPromisePage() {
     setActionBusy("confirm");
     setError(null);
     try {
-      await postAction(`/api/promises/${promise.id}/confirm`);
+      await postAction(`/api/promises/${promise.id}/confirm`, askOnTime ? { onTime } : undefined);
       setSuccessMessage(t("promises.confirm.success.confirmed", { entity: promiseLabels.entity }));
       setTimeout(() => router.push(localizePath("/promises", locale)), 1000);
     } catch (e) {
@@ -248,6 +250,13 @@ export default function ConfirmPromisePage() {
   }
 
   const disputeDisabled = disputeReason.trim().length < 4;
+
+  // Asked only when it is open: past the deadline and not marked done before it.
+  const askOnTime = Boolean(
+    promise?.due_at &&
+      Date.now() > new Date(promise.due_at).getTime() &&
+      !(promise.completed_at && new Date(promise.completed_at).getTime() <= new Date(promise.due_at).getTime())
+  );
 
   const disputeLabel = useMemo(() => {
     if (!promise?.disputed_code) return promise?.disputed_code;
@@ -370,6 +379,37 @@ export default function ConfirmPromisePage() {
                 <div className="mt-4 rounded-2xl border border-accent-400/30 bg-emerald-500/10 p-4 text-sm text-accent-50">
                   {successMessage}
                 </div>
+              )}
+
+              {canReview && askOnTime && (
+                <fieldset className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4">
+                  <legend className="sr-only">{t("promises.confirm.onTimeQuestion", { date: formatDate(promise.due_at) })}</legend>
+                  <p className="text-sm font-semibold text-tone-white" aria-hidden>
+                    {t("promises.confirm.onTimeQuestion", { date: formatDate(promise.due_at) })}
+                  </p>
+                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                    {([true, false] as const).map((value) => (
+                      <label
+                        key={String(value)}
+                        className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition ${
+                          onTime === value
+                            ? "border-accent-300/60 bg-emerald-400/10 font-semibold text-tone-white"
+                            : "border-tone-white/10 text-tone-200 hover:border-tone-white/20"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="on-time"
+                          className="accent-emerald-500"
+                          checked={onTime === value}
+                          onChange={() => setOnTime(value)}
+                        />
+                        {value ? t("promises.confirm.onTimeYes") : t("promises.confirm.onTimeNo")}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-tone-400">{t("promises.confirm.onTimeHint")}</p>
+                </fieldset>
               )}
 
               {canReview ? (

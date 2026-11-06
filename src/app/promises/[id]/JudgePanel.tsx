@@ -157,12 +157,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     const waiting = view.awaiting.find((item) => item.role !== view.role);
     const otherApproved = Object.entries(view.approvals).some(([side, approved]) => side !== view.role && approved);
     const message = waiting
-      ? t("arbitration.summon", {
-          title: view.promiseTitle,
-          number,
-          until: t("arbitration.summonUntil", { date: formatDate(waiting.until) }),
-          link,
-        })
+      ? t("arbitration.summon", { title: view.promiseTitle, number, link })
       : view.criteriaStatus === "proposed" && !otherApproved
         ? t("arbitration.summonCriteria", { title: view.promiseTitle, number, link })
         : t("arbitration.summonCase", { title: view.promiseTitle, number, link });
@@ -285,7 +280,7 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
               <span key={item.role}>
                 {item.overdue
                   ? t("arbitration.awaitingOverdue", { role: roleLabel(item.role) })
-                  : t("arbitration.awaiting", { role: roleLabel(item.role), date: formatDate(item.until) })}
+                  : t("arbitration.awaiting", { role: roleLabel(item.role) })}
               </span>
             ))}
         </div>

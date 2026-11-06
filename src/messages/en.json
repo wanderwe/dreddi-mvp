@@ -464,7 +464,11 @@
         "conditionNotMet": "You can’t confirm/dispute until the counter-obligation is met",
         "confirmFailed": "Failed to confirm",
         "disputeFailed": "Failed to dispute"
-      }
+      },
+      "onTimeQuestion": "Done by the deadline, {date}?",
+      "onTimeYes": "Yes, on time",
+      "onTimeNo": "No, late",
+      "onTimeHint": "What matters is when it was done, not when it was marked"
     },
     "disputeOptions": {
       "not_completed": "It wasn’t completed",
@@ -1387,13 +1391,12 @@
       "counterparty": "Other side",
       "judge": "Dreddi"
     },
-    "awaiting": "{role}: waiting for an answer until {date}",
+    "awaiting": "{role}: waiting for an answer",
     "awaitingOverdue": "{role}: no answer. Without it the ruling will not take effect",
     "copySummons": "Share the case with the other side",
     "summonCopied": "Copied, send it to the other side",
     "summonFailed": "Could not copy the message",
-    "summon": "Case No. {number}. Dreddi is deciding whether «{title}» was kept. Take a look and add your side{until}: {link}",
-    "summonUntil": " by {date}",
+    "summon": "Case No. {number}. Dreddi is deciding whether «{title}» was kept. Without your answer the ruling won’t take effect: {link}",
     "summonCriteria": "Case No. {number}. Dreddi has proposed criteria for «{title}». Take a look and approve them or write what to change: {link}",
     "summonCase": "Case No. {number} «{title}» in Dreddi arbitration: {link}",
     "empty": "The case is empty. Start with how you will prove it was done, and Dreddi will agree the criteria.",
