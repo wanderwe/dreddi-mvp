@@ -26,6 +26,8 @@ type PromiseRow = {
   title: string;
   details: string | null;
   condition_text: string | null;
+  condition_proposed_by: string | null;
+  condition_met_at: string | null;
   status: string;
   visibility: string | null;
   due_at: string | null;
@@ -105,7 +107,7 @@ async function loadCase(promiseId: string, userId: string) {
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,condition_text,status,visibility,due_at,created_at,completed_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,counterparty_accepted_at"
+      "id,title,details,condition_text,condition_proposed_by,condition_met_at,status,visibility,due_at,created_at,completed_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,counterparty_accepted_at"
     )
     .eq("id", promiseId)
     .maybeSingle<PromiseRow>();
@@ -204,6 +206,19 @@ type LoadedCase = Awaited<ReturnType<typeof loadCase>>;
 const OPEN_STATUSES = ["active", "completed_by_promisor"];
 // The other side never took it on: the invite expired, was declined or withdrawn. Nothing to decide.
 const DEAD_INVITES: InviteStatus[] = ["expired", "declined", "cancelled_by_creator"];
+
+// The counter-obligation in words: who set it (its owner, whom it protects) and whether it was marked met.
+const describeCounterObligation = (promise: PromiseRow) => {
+  if (!promise.condition_text) return undefined;
+  const setter =
+    promise.condition_proposed_by && promise.condition_proposed_by === promise.promisor_id
+      ? "set by the promisor as their condition for doing their part: the other side does it first"
+      : promise.condition_proposed_by
+        ? "set by the counterparty as a condition the promisor does first"
+        : "a condition between the sides";
+  const met = promise.condition_met_at ? "marked met" : "not marked met in Dreddi";
+  return `${promise.condition_text} (${setter}; ${met})`;
+};
 
 const isCaseOpen = (promise: PromiseRow) =>
   OPEN_STATUSES.includes(promise.status) && !DEAD_INVITES.includes(getPromiseInviteStatus(promise));
@@ -436,7 +451,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       promise: {
         title: promise.title,
         details: promise.details ?? undefined,
-        counterObligation: promise.condition_text ?? undefined,
+        counterObligation: describeCounterObligation(promise),
         deadline: promise.due_at ? formatKyivDate(new Date(promise.due_at)) : undefined,
         openedAt: formatKyivDate(new Date(promise.created_at)),
         status: describeStatus(promise),

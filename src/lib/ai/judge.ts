@@ -134,7 +134,9 @@ Evidence can be faked: weigh how specific and consistent it is, and reflect any 
 Evidence dated after today is impossible: treat it as forged and do not count it.
 Give kept when the evidence meets the criteria. Give not_kept only when the deadline has passed without proof, the evidence shows the promise was broken, or the promisor admits it was not done in time.
 Evidence that falls short before the deadline means undecided: say what is missing.
-If the criteria were never agreed by every side, judge by the promise itself and what both sides said, and say so.
+If the criteria were never agreed by every side, judge by the promise itself and what both sides said, and say so. Criteria not being agreed is never a reason to put off a ruling.
+Judge by what the promise names and nothing more: if the promise is to buy something, a paid order proves it. Do not add steps the promise does not name, such as delivery, a receipt or a serial number.
+A counter-obligation protects the side that set it, so that side may waive it: doing their part anyway, or saying they waive it, is enough, and the other side's consent is not needed. It never blocks a ruling on the promise itself.
 When a side says they closed, finished or marked it done, they mean this promise in Dreddi: treat it as their report that it was done, not as anything else.
 If the result of the work cannot be seen in a photo, accept the evidence closest to the work itself (a photo or video of doing it, or the side's own detailed account) and reflect the doubt in confidence. Never ask for proof of a purchase instead of proof of the work.
 Judge by the agreed criteria. A proposed change that not every side has approved does not count yet.
@@ -190,7 +192,7 @@ export const buildSystemPrompt = (
     `Today: ${formatKyivDate(now)}`,
     `Promise: ${promise.title}`,
     promise.details ? `Details: ${promise.details}` : null,
-    promise.counterObligation ? `Counter-obligation of the other side: ${promise.counterObligation}` : null,
+    promise.counterObligation ? `Counter-obligation: ${promise.counterObligation}` : null,
     promise.openedAt ? `Recorded in Dreddi on: ${promise.openedAt}` : null,
     promise.deadline ? `Deadline: ${promise.deadline}` : "Deadline: none",
     promise.status ? `Current status in Dreddi: ${promise.status}` : null,
