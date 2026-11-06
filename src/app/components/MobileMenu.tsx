@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useState, useEffect } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
@@ -14,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { useSignInHref } from "@/lib/i18n/useSignInHref";
 
 type MobileMenuProps = {
   isAuthenticated?: boolean;
@@ -28,6 +30,7 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const signInHref = useSignInHref();
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
@@ -115,9 +118,9 @@ export function MobileMenu({
               </>
             ) : (
               <SheetClose asChild>
-                <LocalizedLink className={primaryLinkClasses} href="/login">
+                <Link className={primaryLinkClasses} href={signInHref}>
                   {t("auth.login.signInCta")}
-                </LocalizedLink>
+                </Link>
               </SheetClose>
             )}
           </nav>

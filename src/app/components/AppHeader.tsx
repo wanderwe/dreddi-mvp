@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useEffect, useState } from "react";
 import { UsersRound } from "lucide-react";
@@ -15,6 +16,7 @@ import { ThemeSwitcher } from "@/app/components/ThemeSwitcher";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { useSignInHref } from "@/lib/i18n/useSignInHref";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 import { isAwaitingYourAction } from "@/lib/promiseActions";
 import { productFlags } from "@/lib/config/productFlags";
@@ -32,6 +34,7 @@ export function AppHeader() {
   const t = useT();
   const locale = useLocale();
   const pathname = usePathname();
+  const signInHref = useSignInHref();
   const pathWithoutLocale = extractLocaleFromPathname(pathname || "/").pathnameWithoutLocale;
   const isEmbedPath = /^\/u\/[^/]+\/embed\/?$/.test(pathWithoutLocale) || (/^\/embed\/agreement\/[^/]+\/?$/.test(pathWithoutLocale) || /^\/embed\/agreements\/[^/]+\/?$/.test(pathWithoutLocale));
   const [authState, setAuthState] = useState<AuthState>(() => {
@@ -239,12 +242,12 @@ export function AppHeader() {
             <>
               <nav className="hidden items-center gap-3 text-sm font-medium text-tone-200 md:flex">
                 {showSignIn && (
-                  <LocalizedLink
-                    href="/login"
+                  <Link
+                    href={signInHref}
                     className="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
                   >
                     {t("auth.login.signInCta")}
-                  </LocalizedLink>
+                  </Link>
                 )}
                 <ThemeSwitcher />
                 <LocaleSwitcher />
