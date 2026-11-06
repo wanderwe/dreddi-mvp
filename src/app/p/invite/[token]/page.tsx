@@ -44,6 +44,33 @@ type InviteInfo = {
 
 type ConditionChoice = "accept" | "edit" | "add" | null;
 
+const pendingConditionKey = (token: string) => `dreddi:invite-condition:${token}`;
+
+// Reads and clears what a guest wrote before signing in (see goToSignInToAccept).
+function readPendingCondition(token: string): { choice: ConditionChoice; text: string } | null {
+  try {
+    const raw = window.localStorage.getItem(pendingConditionKey(token));
+    window.localStorage.removeItem(pendingConditionKey(token));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { choice?: unknown; text?: unknown };
+    const choice = parsed.choice === "add" || parsed.choice === "edit" ? parsed.choice : null;
+    if (!choice || typeof parsed.text !== "string") return null;
+    return { choice, text: parsed.text };
+  } catch {
+    return null;
+  }
+}
+
+// Counter-obligation choices: the chosen one is green. Styled from state, not :has(:checked),
+// which browsers do not always repaint after a click.
+function conditionOptionClass(selected: boolean) {
+  return `flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition ${
+    selected
+      ? "border-accent-400/40 bg-emerald-500/10 text-accent-100"
+      : "border-tone-white/10 bg-tone-white/5 text-tone-200 hover:bg-tone-white/10"
+  }`;
+}
+
 export default function InvitePage() {
   const t = useT();
   const locale = useLocale();
@@ -124,32 +151,67 @@ export default function InvitePage() {
 
     if (inviteStatus === "awaiting_acceptance") {
       setAutoAcceptAttempted(true);
+
+      let pendingCondition: string | undefined;
+      if (searchParams.get("cond") === "1") {
+        const stored = readPendingCondition(token!);
+        // Meant a counter-obligation but it did not survive sign-in: show the form, accept nothing.
+        if (!stored) return;
+        setConditionChoice(stored.choice);
+        setConditionEditText(stored.text);
+        pendingCondition = resolveConditionPayload(stored.choice, stored.text);
+        if (pendingCondition === undefined) return;
+      }
+
       if (info.visibility === "public") {
         setShowAcceptModal(true);
         return;
       }
-      void accept();
+      void accept(pendingCondition);
     }
   }, [autoAcceptAttempted, info, router, searchParams, signedIn, userId]);
 
-  function resolveConditionPayload(): string | undefined {
+  function resolveConditionPayload(
+    choice: ConditionChoice = conditionChoice,
+    editText: string = conditionEditText
+  ): string | undefined {
     if (!info) return undefined;
     if (info.condition_text) {
       // creator had a condition
-      if (conditionChoice === "accept") return undefined; // accept as-is, no payload
-      if (conditionChoice === "edit") {
-        const text = conditionEditText.trim();
+      if (choice === "accept") return undefined; // accept as-is, no payload
+      if (choice === "edit") {
+        const text = editText.trim();
         return text && text !== info.condition_text.trim() ? text : undefined;
       }
       return undefined;
     } else {
       // creator had no condition
-      if (conditionChoice === "add") {
-        const text = conditionEditText.trim();
+      if (choice === "add") {
+        const text = editText.trim();
         return text || undefined;
       }
       return undefined;
     }
+  }
+
+  // A guest who accepts goes to sign in and comes back with ?accept=1, which accepts on return.
+  // A counter-obligation they wrote would be lost on the way, and the promise accepted without it,
+  // so it is kept in localStorage (the email link may open in another tab) and ?cond=1 marks that
+  // one was meant. Without it on return, nothing is accepted automatically.
+  function goToSignInToAccept(conditionText: string | undefined) {
+    let nextQuery = "accept=1";
+    if (conditionText !== undefined) {
+      nextQuery += "&cond=1";
+      try {
+        window.localStorage.setItem(
+          pendingConditionKey(token!),
+          JSON.stringify({ choice: conditionChoice, text: conditionEditText })
+        );
+      } catch {
+        // Storage unavailable: ?cond=1 still stops the automatic accept.
+      }
+    }
+    router.push(localizeLoginPath(localizePath(`/p/invite/${token}?${nextQuery}`, locale), locale));
   }
 
   async function accept(conditionTextOverride?: string | undefined) {
@@ -160,8 +222,11 @@ export default function InvitePage() {
       return;
     }
 
+    const conditionText =
+      conditionTextOverride !== undefined ? conditionTextOverride : resolveConditionPayload();
+
     if (!signedIn) {
-      router.push(localizeLoginPath(localizePath(`/p/invite/${token}?accept=1`, locale), locale));
+      goToSignInToAccept(conditionText);
       return;
     }
 
@@ -170,16 +235,12 @@ export default function InvitePage() {
 
     const { data: s } = await supabase.auth.getSession();
     if (!s.session) {
-      const nextPath = localizePath(`/p/invite/${token}?accept=1`, locale);
-      router.push(localizeLoginPath(nextPath, locale));
+      goToSignInToAccept(conditionText);
       setBusy(false);
       return;
     }
 
     const accessToken = s.session.access_token;
-
-    const conditionText =
-      conditionTextOverride !== undefined ? conditionTextOverride : resolveConditionPayload();
 
     const body: Record<string, unknown> = {};
     if (conditionText !== undefined) body.conditionText = conditionText;
@@ -198,8 +259,7 @@ export default function InvitePage() {
 
     if (!res.ok) {
       if (res.status === 401) {
-        const nextPath = localizePath(`/p/invite/${token}?accept=1`, locale);
-        router.push(localizeLoginPath(nextPath, locale));
+        goToSignInToAccept(conditionText);
         return;
       }
       setError(j?.error ?? t("invite.errors.acceptFailed"));
@@ -394,19 +454,6 @@ export default function InvitePage() {
       />
 
       <div className="relative mx-auto max-w-3xl px-6 py-12 space-y-8">
-        <div className="flex items-center justify-end">
-          <div className="inline-flex items-center gap-2 rounded-full border border-tone-white/10 bg-tone-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-tone-300">
-            {signedIn ? (
-              <>
-                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> {t("invite.signedIn")}
-              </>
-            ) : (
-              <>
-                <span className="h-2 w-2 rounded-full bg-amber-300" aria-hidden /> {t("invite.guestMode")}
-              </>
-            )}
-          </div>
-        </div>
         {error && (
           <div className="rounded-2xl border border-danger-400/30 bg-red-500/10 p-4 text-sm text-danger-100 shadow-inner shadow-tone-black/30">
             {error}
@@ -422,6 +469,26 @@ export default function InvitePage() {
         )}
 
         {info && (
+          <div className="space-y-3">
+          {/* Who is looking (guest or signed in): about the app, not this promise, so it sits above the card.
+              A pill on the right on wider screens; on phones a quiet line, since a pill there looks like a button. */}
+          <p className="flex items-center gap-2 px-2 text-xs text-tone-400 sm:hidden">
+            <span className={`h-2 w-2 rounded-full ${signedIn ? "bg-emerald-400" : "bg-amber-300"}`} aria-hidden />
+            {signedIn ? t("invite.signedIn") : t("invite.guestMode")}
+          </p>
+          <div className="hidden sm:flex sm:justify-end">
+          <div className="inline-flex items-center gap-2 rounded-full border border-tone-white/10 bg-tone-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-tone-300">
+            {signedIn ? (
+              <>
+                <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden /> {t("invite.signedIn")}
+              </>
+            ) : (
+              <>
+                <span className="h-2 w-2 rounded-full bg-amber-300" aria-hidden /> {t("invite.guestMode")}
+              </>
+            )}
+          </div>
+          </div>
           <div className="rounded-3xl border border-tone-white/10 bg-tone-white/5 p-6 shadow-2xl shadow-tone-black/30 backdrop-blur sm:p-7">
             {isCreatorViewer && (
               <div className="mb-3 flex justify-end">
@@ -513,14 +580,14 @@ export default function InvitePage() {
               </section>
             )}
 
-            {/* Counter-condition section — only executor can propose a counter-condition */}
-            {canAccept && inviteRole === "executor" && (
+            {/* Counter-condition: only the executor can propose one. When the creator set one, it is shown with
+                a choice to accept it or suggest an edit. Otherwise most people need none, so it stays a quiet
+                link until asked for, as on the create form. */}
+            {canAccept && inviteRole === "executor" && hasCreatorCondition && (
               <section className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-tone-400">
                   {t("invite.condition.sectionTitle")}
                 </h3>
-
-                {hasCreatorCondition ? (
                   <>
                     <p className="mt-1 text-xs text-tone-400">
                       {t("invite.condition.proposedByCreator")}
@@ -528,8 +595,8 @@ export default function InvitePage() {
                     <p className="mt-2 whitespace-pre-wrap break-words rounded-xl border border-tone-white/10 bg-tone-black/25 px-3 py-2 text-sm leading-6 text-tone-100">
                       {info.condition_text}
                     </p>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-accent-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-accent-100">
+                    <div className="mt-3 grid gap-2">
+                      <label className={conditionOptionClass(conditionChoice === "accept")}>
                         <input
                           type="radio"
                           name="conditionChoice"
@@ -540,14 +607,14 @@ export default function InvitePage() {
                         />
                         {t("invite.condition.acceptAsIs")}
                       </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-tone-white/20 has-[:checked]:bg-tone-white/10 has-[:checked]:text-tone-white">
+                      <label className={conditionOptionClass(conditionChoice === "edit")}>
                         <input
                           type="radio"
                           name="conditionChoice"
                           value="edit"
                           checked={conditionChoice === "edit"}
                           onChange={() => setConditionChoice("edit")}
-                          className="cursor-pointer accent-white"
+                          className="cursor-pointer accent-emerald-400"
                         />
                         {t("invite.condition.suggestEdit")}
                       </label>
@@ -562,44 +629,46 @@ export default function InvitePage() {
                       />
                     )}
                   </>
-                ) : (
-                  <>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-accent-400/40 has-[:checked]:bg-emerald-500/10 has-[:checked]:text-accent-100">
-                        <input
-                          type="radio"
-                          name="conditionChoice"
-                          value="none"
-                          checked={conditionChoice === null || conditionChoice === "accept"}
-                          onChange={() => setConditionChoice("accept")}
-                          className="cursor-pointer accent-emerald-400"
-                        />
-                        {t("invite.condition.acceptWithout")}
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-200 transition hover:bg-tone-white/10 has-[:checked]:border-tone-white/20 has-[:checked]:bg-tone-white/10 has-[:checked]:text-tone-white">
-                        <input
-                          type="radio"
-                          name="conditionChoice"
-                          value="add"
-                          checked={conditionChoice === "add"}
-                          onChange={() => setConditionChoice("add")}
-                          className="cursor-pointer accent-white"
-                        />
-                        {t("invite.condition.addOwn")}
-                      </label>
-                    </div>
-                    {conditionChoice === "add" && (
-                      <textarea
-                        value={conditionEditText}
-                        onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
-                        placeholder={t("invite.condition.addPlaceholder")}
-                        rows={3}
-                        className="mt-3 w-full rounded-xl border border-tone-white/20 bg-tone-black/30 px-3 py-2 text-sm text-tone-white outline-none transition focus:border-tone-white/40 placeholder:text-tone-white/30"
-                      />
-                    )}
-                  </>
-                )}
               </section>
+            )}
+            {canAccept && inviteRole === "executor" && !hasCreatorCondition && (
+              conditionChoice === "add" ? (
+                <section className="mt-6 rounded-2xl border border-tone-white/10 bg-tone-black/30 p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-tone-400">
+                    {t("invite.condition.sectionTitle")}
+                  </h3>
+                  <textarea
+                    autoFocus
+                    value={conditionEditText}
+                    onChange={(e) => setConditionEditText(e.target.value.slice(0, 500))}
+                    placeholder={t("invite.condition.addPlaceholder")}
+                    rows={3}
+                    className="mt-3 w-full rounded-xl border border-tone-white/20 bg-tone-black/30 px-3 py-2 text-sm text-tone-white outline-none transition focus:border-tone-white/40 placeholder:text-tone-white/30"
+                  />
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConditionChoice("accept");
+                        setConditionEditText("");
+                      }}
+                      className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
+                    >
+                      {t("promises.new.actions.removeCondition")}
+                    </button>
+                  </div>
+                </section>
+              ) : (
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setConditionChoice("add")}
+                    className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
+                  >
+                    {t("promises.new.actions.addCondition")}
+                  </button>
+                </div>
+              )
             )}
 
             {/* Awaiting confirmation state for invitee */}
@@ -672,6 +741,7 @@ export default function InvitePage() {
                 </div>
               )}
             </div>
+          </div>
           </div>
         )}
       </div>

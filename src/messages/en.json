@@ -685,8 +685,6 @@
       "acceptAsIs": "Accept as-is",
       "suggestEdit": "Suggest changes",
       "editPlaceholder": "Your version of the counter-obligation...",
-      "acceptWithout": "Accept without a counter-obligation",
-      "addOwn": "Add a counter-obligation",
       "addPlaceholder": "Enter your counter-obligation...",
       "awaitingConfirmation": "Your proposed counter-obligation is awaiting the creator's confirmation"
     },
