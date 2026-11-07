@@ -396,7 +396,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const loaded = await loadSettledCase((await ctx.params).id, user.id);
     const { admin, promise, role } = loaded;
     if (!isCaseOpen(promise)) {
-      throw new JudgeError("The case is closed: the promise status is final", 409);
+      throw new JudgeError("case_closed", 409);
     }
     if (sideMessageCount(loaded.messages) >= CASE_MESSAGE_LIMIT) throw new JudgeError("case_limit", 429);
     const { count: todayCount } = await admin

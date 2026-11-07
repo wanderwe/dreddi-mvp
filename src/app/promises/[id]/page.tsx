@@ -1954,7 +1954,7 @@ export default function PromisePage() {
             )}
           </section>
 
-          <JudgePanel promiseId={p.id} />
+          <JudgePanel promiseId={p.id} promiseStatus={p.status} />
 
           <details className="group rounded-2xl border border-tone-white/10 bg-ntone-900/25 p-4 lg:hidden">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-tone-white marker:hidden">

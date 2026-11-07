@@ -74,7 +74,9 @@ const FEW_MESSAGES_LEFT = 5;
 const inputClass =
   "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
 
-export function JudgePanel({ promiseId }: { promiseId: string }) {
+// promiseStatus: when the promise is marked done, confirmed or disputed on the same page, the case is
+// read again, so a closed case shows as closed instead of offering a message the server will refuse.
+export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; promiseStatus?: string }) {
   const t = useT();
   const locale = useLocale();
   const formatDate = (value: string) => formatKyivDate(new Date(value), locale === "en" ? "en-GB" : "uk-UA");
@@ -133,6 +135,12 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     setView(next);
   };
 
+  const loadView = useCallback(async () => {
+    const res = await call().catch(() => null);
+    if (!res || !res.ok) return null;
+    return (await res.json()) as CaseView;
+  }, [call]);
+
   useEffect(() => {
     let active = true;
     void (async () => {
@@ -147,7 +155,14 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
     return () => {
       active = false;
     };
-  }, [call, errorText]);
+  }, [call, errorText, promiseStatus]);
+
+  // The case was closed while this page was open (by the other side, or in another tab): show it closed.
+  const isCaseClosedError = (status: number, body: { error?: string }) => status === 409 && body.error === "case_closed";
+  const showClosed = async () => {
+    const next = await loadView();
+    if (next) applyView(next);
+  };
 
   // Ready-to-send text for a messenger, with a link straight to this arbitration block.
   // It says what the other side is needed for now: answering a request to decide, approving criteria, or just the case.
@@ -208,6 +223,10 @@ export function JudgePanel({ promiseId }: { promiseId: string }) {
       });
       if (!res) throw new Error(t("arbitration.errors.signIn"));
       const body = await res.json();
+      if (isCaseClosedError(res.status, body)) {
+        await showClosed();
+        return;
+      }
       if (!res.ok) throw new Error(errorText(res.status, body.error));
       applyView(body as CaseView);
     } catch (err) {
