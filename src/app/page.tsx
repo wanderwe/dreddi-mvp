@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -228,6 +228,21 @@ function MetricValue({
   );
 }
 
+const metricsPanelClass =
+  "score-metrics-panel mt-3 block rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] px-4 py-4 sm:px-5 sm:py-3 md:px-4 md:py-3";
+const metricsPanelLinkClass =
+  "transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-tone-white/15 hover:bg-tone-white/[0.05] hover:shadow-[0_16px_30px_var(--elevated-shadow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60";
+
+// Signed in, the metrics lead to the user's profile, where they are broken down. The demo has no profile.
+function MetricsPanel({ href, children }: { href: string | null; children: ReactNode }) {
+  if (!href) return <div className={metricsPanelClass}>{children}</div>;
+  return (
+    <LocalizedLink href={href} className={`${metricsPanelClass} ${metricsPanelLinkClass}`}>
+      {children}
+    </LocalizedLink>
+  );
+}
+
 export default function Home() {
   const locale = useLocale();
   const t = useT();
@@ -242,6 +257,7 @@ export default function Home() {
   const [reputation, setReputation] = useState<ReputationResponse | null>(null);
   const [reputationLoading, setReputationLoading] = useState(false);
   const [reputationError, setReputationError] = useState<string | null>(null);
+  const [profileHandle, setProfileHandle] = useState<string | null>(null);
   const mockMode = isMockAuthEnabled();
   const isAuthenticated = Boolean(email);
   const showAuthenticatedCta = ready && isAuthenticated;
@@ -556,6 +572,29 @@ export default function Home() {
     };
   }, [email, mockMode]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const client = supabase;
+    if (mockMode || !client || !email) {
+      setProfileHandle(null);
+      return;
+    }
+
+    const loadHandle = async () => {
+      const { data: sessionData } = await client.auth.getSession();
+      const userId = sessionData.session?.user.id;
+      if (!userId) return;
+      const { data } = await client.from("profiles").select("handle").eq("id", userId).maybeSingle();
+      if (!cancelled) setProfileHandle(data?.handle ?? null);
+    };
+
+    void loadHandle();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [email, mockMode]);
+
   const rep = reputation?.reputation;
   const score = rep?.score ?? 50;
   const confirmedCount = rep?.confirmed_count ?? 0;
@@ -732,7 +771,9 @@ export default function Home() {
                 <p className="mb-1.5 text-sm font-medium text-tone-300/95">
                   {copy.score.overviewLabel}
                 </p>
-                <div className="score-metrics-panel mt-3 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] px-4 py-4 transition-[background,box-shadow,border-color] duration-300 ease-out hover:border-tone-white/15 hover:bg-tone-white/[0.05] hover:shadow-[0_16px_30px_var(--elevated-shadow)] sm:px-5 sm:py-3 md:px-4 md:py-3">
+                <MetricsPanel
+                  href={isAuthenticated && profileHandle ? `/u/${encodeURIComponent(profileHandle)}` : null}
+                >
                   <div className="grid grid-cols-1 divide-y divide-tone-white/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                     <div className="py-2 sm:px-4 sm:py-1">
                       <div className="text-[11px] uppercase tracking-[0.08em] text-tone-400">{copy.score.shortLabel}</div>
@@ -765,7 +806,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                </div>
+                </MetricsPanel>
               </div>
 
               <p className="text-sm text-tone-400">
