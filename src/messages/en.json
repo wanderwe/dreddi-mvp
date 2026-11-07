@@ -803,7 +803,7 @@
       "trackRecord": {
         "perMonthValue": "{count} / month",
         "perMonthUnit": "/ month",
-        "activeDays": "active {count} days"
+        "activeDays": "active {count} {label}"
       },
       "completionRate": {
         "breakdown": "{completed} of {total} {label} marked completed"

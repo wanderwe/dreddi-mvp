@@ -816,7 +816,7 @@
       "trackRecord": {
         "perMonthValue": "{count} / місяць",
         "perMonthUnit": "/ місяць",
-        "activeDays": "активність {count} днів"
+        "activeDays": "активність {count} {label}"
       },
       "completionRate": {
         "breakdown": "{completed} з {total} {label} позначено як виконані"

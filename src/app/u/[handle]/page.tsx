@@ -724,13 +724,16 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
       completionRate.total > 0 ? (completionRate.completed / completionRate.total) * 100 : 0;
     const completionReviewPercent =
       completionReview.total > 0 ? (completionReview.responded / completionReview.total) * 100 : 0;
+    // The profile's age is counted in whole days, so on its first day it is 0 and the pace too,
+    // even with a promise closed. With closed promises, count at least one day.
+    const profileDays =
+      profileActiveDays !== null && totalDeals > 0 ? Math.max(1, profileActiveDays) : profileActiveDays;
     const pace = hasProfilePace
       ? Number(profileAvgDealsPerMonth.toFixed(1))
-      : profileActiveDays && profileActiveDays > 0
-        ? getMonthlyPace(totalDeals, profileActiveDays)
+      : profileDays && profileDays > 0
+        ? getMonthlyPace(totalDeals, profileDays)
         : promisePaceMetrics.pace;
-    const activeDays =
-      profileActiveDays && profileActiveDays > 0 ? profileActiveDays : promisePaceMetrics.activeDays;
+    const activeDays = profileDays && profileDays > 0 ? profileDays : promisePaceMetrics.activeDays;
 
     return {
       totalDeals,
@@ -1199,6 +1202,7 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
                           <p className="text-xs text-tone-white/60">
                             {t("publicProfile.reputationDetails.trackRecord.activeDays", {
                               count: numberFormatter.format(reputationEvidence.activeDays),
+                              label: formatPlural(reputationEvidence.activeDays, "days"),
                             })}
                           </p>
                         </div>

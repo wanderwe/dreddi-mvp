@@ -422,6 +422,8 @@ export default function PromisePage() {
   const [activatingWithoutCounterparty, setActivatingWithoutCounterparty] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCounterpartyConfirmModal, setShowCounterpartyConfirmModal] = useState(false);
+  // Confirming here past the deadline asks, as the confirm page does, whether it was done on time.
+  const [confirmOnTime, setConfirmOnTime] = useState(true);
   const [showNotDeliveredModal, setShowNotDeliveredModal] = useState(false);
   const [updates, setUpdates] = useState<AgreementUpdate[]>([]);
   const [showUpdateComposer, setShowUpdateComposer] = useState(false);
@@ -597,6 +599,13 @@ export default function PromisePage() {
     load();
   }
 
+  // Past the deadline and not marked done before it: when it was done is not known, so ask.
+  const askConfirmOnTime = Boolean(
+    p?.due_at &&
+      Date.now() > new Date(p.due_at).getTime() &&
+      !(p.completed_at && new Date(p.completed_at).getTime() <= new Date(p.due_at).getTime())
+  );
+
   async function confirmCompletion() {
     if (!p) return;
     setError(null);
@@ -621,7 +630,9 @@ export default function PromisePage() {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify(askConfirmOnTime ? { onTime: confirmOnTime } : {}),
     });
 
     setActionBusy(null);
@@ -2149,6 +2160,38 @@ export default function PromisePage() {
                 entityLower: promiseLabels.entityLower,
               })}
             </p>
+
+            {askConfirmOnTime && p?.due_at && (
+              <fieldset className="mt-5">
+                <legend className="text-sm font-semibold text-tone-white">
+                  {t("promises.confirm.onTimeQuestion", {
+                    date: formatDueDate(p.due_at, locale, { includeYear: true, includeTime: true }) ?? "",
+                  })}
+                </legend>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  {([true, false] as const).map((value) => (
+                    <label
+                      key={String(value)}
+                      className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition ${
+                        confirmOnTime === value
+                          ? "border-accent-300/60 bg-emerald-400/10 font-semibold text-tone-white"
+                          : "border-tone-white/10 text-tone-200 hover:border-tone-white/20"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="confirm-on-time"
+                        className="accent-emerald-500"
+                        checked={confirmOnTime === value}
+                        onChange={() => setConfirmOnTime(value)}
+                      />
+                      {value ? t("promises.confirm.onTimeYes") : t("promises.confirm.onTimeNo")}
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-tone-400">{t("promises.confirm.onTimeHint")}</p>
+              </fieldset>
+            )}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
