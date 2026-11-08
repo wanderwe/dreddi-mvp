@@ -39,6 +39,14 @@ export type JudgeAnswer<P extends JudgeMode> = {
 const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
 // Criteria are single short lines, and single lines carry no closing period in Dreddi.
 const noClosingPeriod = (line: string) => line.trim().replace(/(?<!\.)\.$/, "");
+// The ids (C1, M2) are for criteria_check only; one that slips into text people read is dropped.
+export const noIds = (text: string) =>
+  text
+    .replace(/(?<![A-Z]{2,}\s*)\s*\(?(?<![\p{L}\d])(?:за\s+)?(?:критері\p{L}*\s+)?[CM]\d+(?:\s*(?:,|і|та|and)\s*[CM]\d+)*(?![\p{L}\d])\)?/gu, "")
+    .replace(/\s+([.,;:])/g, "$1")
+    .trim();
+// Criteria carry ids (C1) in the prompt; a new version must not copy them into its own lines.
+const noCriterionId = (line: string) => line.replace(/^\s*C\d+[.:)]\s*/, "");
 
 export async function askJudge<P extends JudgeMode>({
   phase,
@@ -81,9 +89,12 @@ export async function askJudge<P extends JudgeMode>({
     const parsed = response.parsed_output;
     const result = {
       ...parsed,
-      reply: noLongDashes(parsed.reply),
+      reply: noIds(noLongDashes(parsed.reply)),
       ...("criteria" in parsed && Array.isArray(parsed.criteria)
-        ? { criteria: parsed.criteria.map((line: string) => noClosingPeriod(noLongDashes(line))) }
+        ? { criteria: parsed.criteria.map((line: string) => noClosingPeriod(noLongDashes(noCriterionId(line)))) }
+        : {}),
+      ...("reasons" in parsed && Array.isArray(parsed.reasons)
+        ? { reasons: parsed.reasons.map((line: string) => noIds(noLongDashes(line))) }
         : {}),
       // The schema cannot bound a number, so the 0 to 1 range is kept here.
       ...("confidence" in parsed ? { confidence: Math.min(1, Math.max(0, Number(parsed.confidence) || 0)) } : {}),

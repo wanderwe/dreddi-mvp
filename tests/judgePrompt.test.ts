@@ -51,7 +51,7 @@ test("normal dispute: each side in its own party_input, facts once, with the lat
   ];
   const messages = buildJudgeMessages(turns, fence, now);
   assert.equal(messages.length, 3);
-  assert.match(textOf(messages[0]), /^<party_input from="Promisor · Олег · 4 листопада 2026">/);
+  assert.match(textOf(messages[0]), /^<party_input id="M1" from="Promisor · Олег · 4 листопада 2026">/);
   assert.match(textOf(messages[0]), /<evidence_notes>.*дві нові секції.*<\/evidence_notes>/);
   assert.equal(messages[1].content, "Чекаю відповіді іншої сторони.");
   const last = textOf(messages[2]);
@@ -94,4 +94,39 @@ test("one side writes far more: both sides get the same structure, length change
   assert.ok(wrap(messages[0]).includes(long.trim()), "nothing is cut");
   assert.equal(wrap(messages[0]).replace(/from="[^"]*"/, "").replace(long, "X").length,
     wrap(messages[1]).replace(/from="[^"]*"/, "").replace("Не зроблено", "X").length);
+});
+
+test("evidence ids: criteria and side messages are numbered, Dreddi's records are in the facts", () => {
+  const facts = buildCaseFacts({ ...fence, markedDoneAt: "4 листопада 2026" }, now);
+  assert.ok(facts.includes("C1. Дві секції замінено до 5 листопада"));
+  assert.ok(facts.includes("C2. Доказ: фото паркану"));
+  assert.ok(facts.includes("The promisor marked it done in Dreddi on: 4 листопада 2026"));
+  assert.ok(!buildCaseFacts(fence, now).includes("marked it done"));
+
+  const messages = buildJudgeMessages(
+    [
+      { role: "user", text: "Зроблено", speaker: "promisor" },
+      { role: "assistant", text: "Доказ?" },
+      { role: "user", text: "Фото", speaker: "promisor" },
+      { role: "user", text: "Підтверджую", speaker: "counterparty" },
+    ],
+    fence,
+    now
+  );
+  assert.deepEqual(
+    messages.filter((m) => m.role === "user").map((m) => textOf(m).match(/<party_input id="(M\d+)"/)?.[1]),
+    ["M1", "M2", "M3"]
+  );
+  for (const phase of ["verdict", "auto"] as const) {
+    assert.match(buildSystemPrompt(phase), /Evidence order, strongest first/);
+    assert.match(buildSystemPrompt(phase), /Never show the ids in replies/);
+  }
+});
+
+test("ids that slip into text people read are dropped", async () => {
+  const { noIds } = await import("../src/lib/ai/askJudge");
+  assert.equal(noIds("Підтвердження іншої сторони є доказом за критеріями C2."), "Підтвердження іншої сторони є доказом.");
+  assert.equal(noIds("Фото (M3) показує нові секції."), "Фото показує нові секції.");
+  assert.equal(noIds("Виконано C1 і C2."), "Виконано.");
+  assert.equal(noIds("Машина BMW M3 на фото"), "Машина BMW M3 на фото");
 });

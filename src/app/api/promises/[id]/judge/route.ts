@@ -459,6 +459,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         counterObligation: describeCounterObligation(promise),
         deadline: promise.due_at ? formatKyivDate(new Date(promise.due_at)) : undefined,
         openedAt: formatKyivDate(new Date(promise.created_at)),
+        markedDoneAt: promise.completed_at ? formatKyivDate(new Date(promise.completed_at)) : undefined,
         status: describeStatus(promise),
         visibility: promise.visibility ?? undefined,
         criteria: loaded.criteriaAgreed ? loaded.agreedCriteria : loaded.criteria,
