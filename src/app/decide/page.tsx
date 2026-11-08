@@ -29,7 +29,7 @@ export default function QuickDisputeHistoryPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{t("decide.history.title")}</h1>
         <a href={localizePath("/decide/new", locale)} className={primaryButtonClass}>
-          {t("decide.homeButton")}
+          {t("decide.history.newButton")}
         </a>
       </div>
       {signedIn === false && (

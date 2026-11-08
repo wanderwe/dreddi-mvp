@@ -1537,7 +1537,8 @@
         "deciding": "In progress",
         "decided": "Decided",
         "expired": "Closed"
-      }
+      },
+      "newButton": "New dispute"
     },
     "errors": {
       "daily_limit": "You've reached today's dispute limit. Try again tomorrow.",
