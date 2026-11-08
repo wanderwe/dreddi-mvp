@@ -12,6 +12,7 @@ import {
   NicknameTag,
   PageShell,
   SkeletonRows,
+  actionRowClass,
   StepsBar,
   decideFetch,
   inputClass,
@@ -109,10 +110,12 @@ export default function JoinQuickDisputePage() {
         : null;
 
   const startOwn = (
-    <a href={localizePath("/decide/new", locale)} className={`${primaryButtonClass} w-full sm:w-auto`}>
-      <Swords className="h-4 w-4" aria-hidden />
-      {t("decide.join.startOwn")}
-    </a>
+    <div className={actionRowClass}>
+      <a href={localizePath("/decide/new", locale)} className={primaryButtonClass}>
+        <Swords className="h-4 w-4" aria-hidden />
+        {t("decide.join.startOwn")}
+      </a>
+    </div>
   );
 
   if (!preview) {

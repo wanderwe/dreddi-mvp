@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
+import { Check, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { formatKyivDate } from "@/lib/ai/kyivDate";
@@ -13,6 +13,7 @@ import {
   CopyField,
   PageShell,
   SkeletonRows,
+  actionRowClass,
   StepsBar,
   TypingDots,
   decideFetch,
@@ -119,10 +120,12 @@ export default function QuickDisputePage() {
         {error ? (
           <div className="space-y-4">
             <p className="text-sm text-tone-300">{error}</p>
-            <a href={localizePath("/decide/new", locale)} className={primaryButtonClass}>
-              <Swords className="h-4 w-4" aria-hidden />
-              {t("decide.join.startOwn")}
-            </a>
+            <div className={actionRowClass}>
+              <a href={localizePath("/decide/new", locale)} className={primaryButtonClass}>
+                <Swords className="h-4 w-4" aria-hidden />
+                {t("decide.join.startOwn")}
+              </a>
+            </div>
           </div>
         ) : (
           <div className="space-y-5" aria-busy="true">
@@ -270,12 +273,12 @@ export default function QuickDisputePage() {
           <div className="decide-pop space-y-3 rounded-2xl border border-accent-400/30 bg-accent-400/5 p-4">
             <p className="text-sm text-tone-300">{t("decide.chat.proposedWording", { nickname: other?.nickname ?? "" })}</p>
             <p className="text-lg font-semibold text-tone-white">{view.questionProposed}</p>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={primaryButtonClass} disabled={busy} onClick={() => void act({ action: "accept_question" })}>
-                {t("decide.chat.agree")}
-              </button>
+            <div className={actionRowClass}>
               <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "keep_question" })}>
                 {t("decide.chat.keepMine")}
+              </button>
+              <button type="button" className={primaryButtonClass} disabled={busy} onClick={() => void act({ action: "accept_question" })}>
+                {t("decide.chat.agree")}
               </button>
             </div>
           </div>
@@ -301,13 +304,13 @@ export default function QuickDisputePage() {
             placeholder={t("decide.chat.rebuttalPlaceholder")}
             onChange={(e) => setRebuttal(e.target.value)}
           />
-          <div className="flex flex-wrap gap-2">
+          <div className={actionRowClass}>
+            <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
+              {t("decide.chat.noReply")}
+            </button>
             <button type="submit" className={primaryButtonClass} disabled={busy || !rebuttal.trim()}>
               <Send className="h-4 w-4" aria-hidden />
               {t("decide.chat.reply")}
-            </button>
-            <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
-              {t("decide.chat.noReply")}
             </button>
           </div>
         </form>
@@ -320,9 +323,11 @@ export default function QuickDisputePage() {
             {t("decide.chat.waitingRebuttal", { nickname: other.nickname })}
           </p>
           {view.canDecideNow ? (
-            <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "decide" })}>
-              {t("decide.chat.decideNow")}
-            </button>
+            <div className={actionRowClass}>
+              <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "decide" })}>
+                {t("decide.chat.decideNow")}
+              </button>
+            </div>
           ) : view.decideNowAt ? (
             <p className="text-xs text-tone-500">
               {t("decide.chat.decideNow")}: {t("decide.chat.availableAt", {
@@ -346,15 +351,12 @@ export default function QuickDisputePage() {
       {view.status === "decided" && view.verdict && (
         <div className="decide-pop space-y-4">
           <VerdictCard verdict={view.verdict} nicknames={nicknames} t={t} />
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            {shareUrl && (
-              <button type="button" className={primaryButtonClass} onClick={() => void shareVerdict()}>
-                <Share2 className="h-4 w-4" aria-hidden />
-                {shared ? t("decide.linkCopied") : t("decide.verdict.share")}
-              </button>
-            )}
+          <div className={actionRowClass}>
             {view.saved ? (
-              <span className="self-center text-sm text-tone-400">{t("decide.verdict.saved")}</span>
+              <span className="inline-flex items-center justify-center gap-1.5 py-2 text-sm text-tone-400 sm:mr-auto">
+                <Check className="h-4 w-4 text-accent-200" aria-hidden />
+                {t("decide.verdict.saved")}
+              </span>
             ) : signedIn ? (
               <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "claim" })}>
                 {t("decide.verdict.save")}
@@ -368,14 +370,22 @@ export default function QuickDisputePage() {
               <Swords className="h-4 w-4" aria-hidden />
               {t("decide.verdict.rematch")}
             </a>
+            {shareUrl && (
+              <button type="button" className={primaryButtonClass} onClick={() => void shareVerdict()}>
+                <Share2 className="h-4 w-4" aria-hidden />
+                {shared ? t("decide.linkCopied") : t("decide.verdict.share")}
+              </button>
+            )}
           </div>
-          {!view.saved && !signedIn && <p className="text-xs text-tone-400">{t("decide.verdict.saveHint")}</p>}
+          {!view.saved && !signedIn && <p className="text-xs text-tone-400 sm:text-right">{t("decide.verdict.saveHint")}</p>}
           {view.verdict.suggest_mediation && (
             <div className="space-y-2 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] p-4">
               <p className="text-sm text-tone-200">{t("decide.verdict.mediation")}</p>
-              <a href={localizePath("/promises/new", locale)} className={secondaryButtonClass}>
-                {t("decide.verdict.mediationButton")}
-              </a>
+              <div className={actionRowClass}>
+                <a href={localizePath("/promises/new", locale)} className={secondaryButtonClass}>
+                  {t("decide.verdict.mediationButton")}
+                </a>
+              </div>
             </div>
           )}
         </div>

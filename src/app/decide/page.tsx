@@ -26,9 +26,9 @@ export default function QuickDisputeHistoryPage() {
 
   return (
     <PageShell>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{t("decide.history.title")}</h1>
-        <a href={localizePath("/decide/new", locale)} className={primaryButtonClass}>
+        <a href={localizePath("/decide/new", locale)} className={`${primaryButtonClass} py-3 sm:py-2.5`}>
           {t("decide.history.newButton")}
         </a>
       </div>

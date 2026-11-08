@@ -20,6 +20,9 @@ export const primaryButtonClass =
 export const secondaryButtonClass =
   "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-tone-white/15 px-4 py-2.5 text-sm font-semibold text-tone-200 transition hover:border-accent-300/50 hover:text-accent-200 disabled:cursor-not-allowed disabled:opacity-50";
 
+// A row of actions: the main one on the right on desktop, on top on a phone (the DOM lists it last).
+export const actionRowClass = "flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end";
+
 export async function decideFetch(path: string, init?: RequestInit) {
   const { data } = (await supabaseOptional?.auth.getSession()) ?? { data: { session: null } };
   const token = data.session?.access_token;
@@ -147,13 +150,13 @@ export function IdentityChoice({
   return (
     <div className="decide-pop space-y-3 rounded-2xl border border-accent-400/30 bg-accent-400/[0.06] p-4">
       <p className="text-base font-semibold text-tone-white">{t("decide.identityAsk")}</p>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <button type="button" className={primaryButtonClass} disabled={busy} onClick={onAnonymous}>
-          {t("decide.anonAs", { nickname })}
-        </button>
+      <div className={actionRowClass}>
         <a href={loginHref} className={secondaryButtonClass}>
           {t("decide.signIn")}
         </a>
+        <button type="button" className={primaryButtonClass} disabled={busy} onClick={onAnonymous}>
+          {t("decide.anonAs", { nickname })}
+        </button>
       </div>
       <p className="text-xs text-tone-400">{t("decide.anonHint", { nickname })}</p>
     </div>
