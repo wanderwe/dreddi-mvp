@@ -474,6 +474,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     });
 
     const result = answer.result;
+    if (result.injection_attempt) {
+      // Not shown to the sides: Dreddi already treats such text as a claim. Logged to watch for abuse.
+      console.warn("judge: injection attempt", { promiseId: promise.id, role });
+    }
     const phase: JudgePhase = "mode" in result ? result.mode : "verdict";
     const criteriaResult = phase === "criteria" && "criteria" in result ? result : null;
     // A list that only repeats the latest version is not a new one: saving it would reset the approvals.

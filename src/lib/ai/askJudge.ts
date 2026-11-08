@@ -5,6 +5,7 @@ import {
   CriteriaSchema,
   JUDGE_MODEL,
   VerdictSchema,
+  buildJudgeMessages,
   buildSystemPrompt,
   estimateCostUsd,
   type AutoResult,
@@ -13,7 +14,7 @@ import {
   type JudgePromise,
   type JudgeTurn,
   type VerdictResult,
-} from "@/lib/ai/judge";
+} from "./judge";
 
 // Server only: one call to the AI judge, shared by the lab page and real promises.
 
@@ -28,27 +29,6 @@ export class JudgeError extends Error {
 
 const isParseFailure = (error: unknown) =>
   error instanceof Error && error.message.includes("Failed to parse structured output");
-
-const SPEAKER_LABEL = { promisor: "Promisor", counterparty: "Counterparty" } as const;
-
-const toMessages = (turns: JudgeTurn[]): Anthropic.MessageParam[] =>
-  turns.map((turn) => {
-    if (turn.role === "assistant") return { role: "assistant", content: turn.text };
-    const label = turn.label ?? SPEAKER_LABEL[turn.speaker ?? "promisor"];
-    const notes = turn.evidenceNotes?.length
-      ? `\n(Evidence shown with this message, as you noted then: ${turn.evidenceNotes.join("; ")})`
-      : "";
-    const content: Anthropic.ContentBlockParam[] = [
-      ...(turn.images ?? []).map(
-        (image): Anthropic.ImageBlockParam => ({
-          type: "image",
-          source: { type: "base64", media_type: image.mediaType, data: image.data },
-        })
-      ),
-      { type: "text", text: `[${label}] ${turn.text || "(no text, see the attached evidence)"}${notes}` },
-    ];
-    return { role: "user", content };
-  });
 
 export type JudgeAnswer<P extends JudgeMode> = {
   result: P extends "criteria" ? CriteriaResult : P extends "verdict" ? VerdictResult : AutoResult;
@@ -79,8 +59,8 @@ export async function askJudge<P extends JudgeMode>({
   const request = {
     model: JUDGE_MODEL,
     max_tokens: 4000,
-    system: buildSystemPrompt(phase, promise),
-    messages: toMessages(turns),
+    system: buildSystemPrompt(phase),
+    messages: buildJudgeMessages(turns, promise) as Anthropic.MessageParam[],
     output_config: { effort: "medium" as const, format: zodOutputFormat(schema) },
   };
 
@@ -105,6 +85,8 @@ export async function askJudge<P extends JudgeMode>({
       ...("criteria" in parsed && Array.isArray(parsed.criteria)
         ? { criteria: parsed.criteria.map((line: string) => noClosingPeriod(noLongDashes(line))) }
         : {}),
+      // The schema cannot bound a number, so the 0 to 1 range is kept here.
+      ...("confidence" in parsed ? { confidence: Math.min(1, Math.max(0, Number(parsed.confidence) || 0)) } : {}),
     };
     return {
       result: result as JudgeAnswer<P>["result"],
