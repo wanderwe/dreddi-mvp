@@ -8,6 +8,7 @@ import {
   buildView,
   isExpired,
   isRandomNickname,
+  maskNames,
   randomNickname,
   readyForVerdict,
   rebuttalDone,
@@ -418,12 +419,23 @@ export async function getPublicCard(slug: string) {
     const other = parties?.find((row) => row.role !== role)?.nickname;
     return randomNickname(dispute.lang, other, seededRandom(party.id));
   };
+  const names = (parties ?? [])
+    .filter((party) => party.user_id)
+    .map((party) => ({ real: party.nickname, shown: nickname(party.role) }));
+  const mask = (text: string) => maskNames(text, names);
+  const verdict = dispute.verdict;
   return {
     lang: dispute.lang,
-    question: dispute.question,
+    question: mask(dispute.question),
     nicknameA: nickname("A"),
     nicknameB: nickname("B"),
     decidedAt: dispute.decided_at,
-    verdict: dispute.verdict,
+    verdict: {
+      ...verdict,
+      short_answer: mask(verdict.short_answer),
+      explanation: mask(verdict.explanation),
+      nuance: verdict.nuance ? mask(verdict.nuance) : verdict.nuance,
+      share_text: mask(verdict.share_text),
+    },
   };
 }

@@ -165,3 +165,21 @@ export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: Quic
     }),
   };
 }
+
+const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// The public card swaps a signed-in side's profile name for their public nickname, also inside the
+// verdict text, where the model may have inflected it («Ігоря Андрійовича»): each word of the name
+// matches with a short ending, the full name first so it becomes one nickname, not two.
+export function maskNames(text: string, names: { real: string; shown: string }[]): string {
+  let result = text;
+  for (const { real, shown } of names) {
+    const words = real.trim().split(/\s+/).filter((word) => word.length >= 3);
+    if (words.length === 0) continue;
+    const word = (part: string) => `${escapeRegExp(part.slice(0, Math.max(3, part.length - 1)))}\\p{L}{0,3}`;
+    const edge = (body: string) => new RegExp(`(?<!\\p{L})${body}(?!\\p{L})`, "giu");
+    if (words.length > 1) result = result.replace(edge(words.map(word).join("\\s+")), shown);
+    for (const part of words) result = result.replace(edge(word(part)), shown);
+  }
+  return result;
+}

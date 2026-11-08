@@ -49,12 +49,14 @@ export async function QuickCardPage({ slug, locale }: { slug: string; locale: Lo
             </p>
           </div>
           <VerdictCard verdict={card.verdict} nicknames={{ A: card.nicknameA, B: card.nicknameB }} t={t} />
-          <a
-            href={localizePath("/decide/new", locale)}
-            className="inline-block rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-          >
-            {t("decide.homeButton")}
-          </a>
+          <div className="flex justify-end">
+            <a
+              href={localizePath("/decide/new", locale)}
+              className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:shadow-accent-400/50 sm:w-auto"
+            >
+              {t("decide.homeButton")}
+            </a>
+          </div>
         </div>
       </div>
     </main>

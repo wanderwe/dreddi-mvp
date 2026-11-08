@@ -143,3 +143,19 @@ test("random nicknames differ from the other side's", () => {
   assert.notEqual(randomNickname("uk", "Тихий Борсук", random), "Тихий Борсук");
   assert.match(randomNickname("en", undefined, () => 0.99), /^\S+ \S+$/);
 });
+
+test("the public card hides profile names inside the verdict, inflected too", async () => {
+  const { maskNames } = await import("../src/lib/quickDisputes/state");
+  const names = [
+    { real: "Ігор Андрійович", shown: "Бадьорий Пугач" },
+    { real: "Никита", shown: "Тихий Лис" },
+  ];
+  assert.equal(
+    maskNames("Никита чує «12 утра», і Ігор Андрійович має рацію", names),
+    "Тихий Лис чує «12 утра», і Бадьорий Пугач має рацію"
+  );
+  assert.equal(maskNames("Позиція Ігоря Андрійовича ближча, ніж у Никити", names), "Позиція Бадьорий Пугач ближча, ніж у Тихий Лис");
+  assert.equal(maskNames("Ігор сказав", names), "Бадьорий Пугач сказав");
+  assert.equal(maskNames("Ігорівна тут ні до чого? 12 дня", names).includes("12 дня"), true);
+  assert.equal(maskNames("нікого", [{ real: "Ян", shown: "X" }]), "нікого");
+});
