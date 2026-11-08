@@ -27,7 +27,7 @@
       }
     },
     "theme": {
-      "current": "Theme: {theme}. Click to change",
+      "current": "Theme: {theme}. Click to change.",
       "light": "light",
       "dark": "dark",
       "options": {
@@ -240,7 +240,7 @@
         "sendFailed": "Could not send reminder",
         "rateLimited": "A reminder was already sent in the last 24 hours",
         "forbidden": "Only the side waiting for action can send a reminder",
-        "unavailable": "Reminder feature is temporarily unavailable. Please try again later",
+        "unavailable": "Reminder feature is temporarily unavailable. Please try again later.",
         "invalidState": "Reminders are available only while someone is waiting for action",
         "acceptedOnly": "Reminders are available only after a deal is accepted",
         "last": "Last reminder: {date}",
@@ -329,7 +329,7 @@
       "inviteLinkTitle": "Invite link",
       "inviteAccepted": "Invite accepted",
       "inviteAcceptedBy": "Invitation accepted by: {name}",
-      "noInviteToken": "No invite token yet. Press “Generate” to create one",
+      "noInviteToken": "No invite token yet. Press “Generate” to create one.",
       "generate": "Generate",
       "copyLink": "Copy link",
       "copySuccess": "Copied",
@@ -703,7 +703,7 @@
     },
     "publicModal": {
       "title": "Accept public {entityLower}?",
-      "body": "This {entityLower} is public. If you proceed, its details will be visible on public profiles after confirmation",
+      "body": "This {entityLower} is public. If you proceed, its details will be visible on public profiles after confirmation.",
       "cancel": "Cancel",
       "confirm": "Continue"
     },
@@ -1232,7 +1232,7 @@
         "titleRequired": "Title is required",
         "participantsRequired": "Add at least one participant",
         "createFailed": "Could not create the collective agreement",
-        "network": "Network issue. Please try again"
+        "network": "Network issue. Please try again."
       }
     },
     "detail": {
@@ -1390,7 +1390,7 @@
       "judge": "Dreddi"
     },
     "awaiting": "{role}: waiting for an answer",
-    "awaitingOverdue": "{role}: no answer. Without it the ruling will not take effect",
+    "awaitingOverdue": "{role}: no answer. Without it the ruling will not take effect.",
     "copySummons": "Share the case with the other side",
     "summonCopied": "Copied, send it to the other side",
     "summonFailed": "Could not copy the message",
@@ -1450,9 +1450,9 @@
     "sendReply": "Reply",
     "errors": {
       "signIn": "Sign in again",
-      "stale": "The case has changed. Refresh the page",
+      "stale": "The case has changed. Refresh the page.",
       "caseLimit": "This case has used up its beta message limit",
-      "dailyLimit": "You have used up today's messages to Dreddi. Try again tomorrow"
+      "dailyLimit": "You have used up today's messages to Dreddi. Try again tomorrow."
     },
     "messagesLeft": "Messages left: {count}",
     "limitReached": "In the beta a case holds a limited number of messages, and they are used up. The «I approve the criteria» and «I accept the ruling» buttons still work.",
