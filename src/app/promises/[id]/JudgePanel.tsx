@@ -117,6 +117,8 @@ export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; pr
   const [summonCopied, setSummonCopied] = useState(false);
   // The message being sent: shown in the case at once, with Dreddi thinking under it, until the answer comes.
   const [pending, setPending] = useState<{ text: string; images: number } | null>(null);
+  // A calmer version of the message, offered before it goes out; the side picks which one is sent.
+  const [toneSuggestion, setToneSuggestion] = useState<{ original: string; softened: string } | null>(null);
   const number = caseNumber(promiseId);
 
   const call = useCallback(
@@ -206,10 +208,33 @@ export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; pr
     }
   };
 
+  // First a tone check: a harsh message gets a calmer version to choose from. If the check fails, the
+  // message goes out as written.
   const send = async () => {
     if (!text.trim() && images.length === 0) return;
-    const sentText = text;
+    if (text.trim()) {
+      setBusy(true);
+      setError(null);
+      const softened = await call({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "tone", text }),
+      })
+        .then(async (res) => (res?.ok ? ((await res.json()) as { text: string; changed: boolean }) : null))
+        .catch(() => null);
+      setBusy(false);
+      if (softened?.changed && softened.text.trim()) {
+        setToneSuggestion({ original: text, softened: softened.text });
+        return;
+      }
+    }
+    await submit(text);
+  };
+
+  const submit = async (sentText: string) => {
+    if (!sentText.trim() && images.length === 0) return;
     const sentImages = images;
+    setToneSuggestion(null);
     setBusy(true);
     setError(null);
     setPending({ text: sentText, images: sentImages.length });
@@ -507,8 +532,35 @@ export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; pr
                     : t("arbitration.placeholder.start")
             }
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              setToneSuggestion(null);
+            }}
           />
+          {toneSuggestion && (
+            <div className="rounded-xl border border-accent-400/30 bg-accent-400/5 p-3 text-sm">
+              <p className="text-xs font-semibold text-accent-200">{t("arbitration.tone.hint")}</p>
+              <p className="mt-1 whitespace-pre-wrap text-tone-100">{toneSuggestion.softened}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => void submit(toneSuggestion.softened)}
+                  disabled={busy}
+                  className="cursor-pointer rounded-xl bg-emerald-400 px-3 py-1.5 text-xs font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t("arbitration.tone.sendSoftened")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void submit(toneSuggestion.original)}
+                  disabled={busy}
+                  className="cursor-pointer rounded-xl border border-tone-white/15 px-3 py-1.5 text-xs font-semibold text-tone-200 hover:border-tone-white/30 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t("arbitration.tone.keepMine")}
+                </button>
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-3">
             <label className="cursor-pointer text-xs font-semibold text-tone-300 hover:text-accent-100">
               {t("arbitration.attachPhoto")}
@@ -536,7 +588,7 @@ export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; pr
             <button
               type="button"
               onClick={() => void send()}
-              disabled={busy || (!text.trim() && images.length === 0)}
+              disabled={busy || Boolean(toneSuggestion) || (!text.trim() && images.length === 0)}
               className={`${view.messagesLeft <= FEW_MESSAGES_LEFT ? "" : "ml-auto "}cursor-pointer rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {view.messages.length === 0 && !pending ? t("arbitration.sendFirst") : t("arbitration.sendReply")}

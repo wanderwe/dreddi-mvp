@@ -1448,6 +1448,11 @@
     "attached": "Attached: {count} (remove)",
     "sendFirst": "Ask Dreddi",
     "sendReply": "Reply",
+    "tone": {
+      "hint": "You could say it more calmly",
+      "sendSoftened": "Send this",
+      "keepMine": "Keep as is"
+    },
     "errors": {
       "signIn": "Sign in again",
       "stale": "The case has changed. Refresh the page.",

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAdminClient } from "../common";
 import { requireUser } from "@/lib/auth/requireUser";
-import { JudgeError, askJudge } from "@/lib/ai/askJudge";
+import { JudgeError, askJudge, askTone } from "@/lib/ai/askJudge";
 import {
   formatKyivDate,
   type JudgeImage,
@@ -70,7 +70,8 @@ type MessageRow = {
 
 type JudgeCaseRequest = {
   // "approve": the side agrees to the judge's proposed criteria (proposalId); no model call.
-  action?: "approve";
+  // "tone": a calmer version of the text the side is about to send; nothing is saved.
+  action?: "approve" | "tone";
   proposalId?: string;
   text?: string;
   images?: JudgeImage[];
@@ -87,6 +88,8 @@ const RESPONSE_DAYS = 3;
 const CASE_MESSAGE_LIMIT = 30;
 const DAILY_MESSAGE_LIMIT = 100;
 const DAY_MS = 24 * 60 * 60 * 1000;
+// Longer messages go out as they are: a tone check would cost more than it helps.
+const TONE_MAX_LENGTH = 4000;
 
 // When a side has been called and not answered since: the first message from the other side after
 // that side's own last message. null when nobody is waiting for them.
@@ -355,6 +358,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (user instanceof NextResponse) return user;
 
   const body = (await req.json().catch(() => null)) as JudgeCaseRequest | null;
+
+  if (body?.action === "tone") {
+    const draft = body.text?.trim() ?? "";
+    if (!draft || draft.length > TONE_MAX_LENGTH) return NextResponse.json({ text: draft, changed: false });
+    try {
+      const loaded = await loadCase((await ctx.params).id, user.id);
+      if (!isCaseOpen(loaded.promise)) throw new JudgeError("case_closed", 409);
+      const { text, changed } = await askTone(draft);
+      return NextResponse.json({ text, changed });
+    } catch (error) {
+      return errorResponse(error);
+    }
+  }
 
   if (body?.action === "approve") {
     try {
