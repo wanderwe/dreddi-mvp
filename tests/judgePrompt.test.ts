@@ -129,6 +129,8 @@ test("ids that slip into text people read are dropped", async () => {
   assert.equal(noIds("Фото (M3) показує нові секції."), "Фото показує нові секції.");
   assert.equal(noIds("Виконано C1 і C2."), "Виконано.");
   assert.equal(noIds("Машина BMW M3 на фото"), "Машина BMW M3 на фото");
+  assert.equal(noIds("Критерій С2 вимагав доказу, якого нема."), "Критерій вимагав доказу, якого нема.");
+  assert.equal(noIds("Площа 5 m2"), "Площа 5 m2");
 });
 
 test("tone check: the draft is data inside party_input, and the rules keep every fact", async () => {

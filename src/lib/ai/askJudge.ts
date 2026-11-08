@@ -43,10 +43,11 @@ export type JudgeAnswer<P extends JudgeMode> = {
 const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
 // Criteria are single short lines, and single lines carry no closing period in Dreddi.
 const noClosingPeriod = (line: string) => line.trim().replace(/(?<!\.)\.$/, "");
-// The ids (C1, M2) are for criteria_check only; one that slips into text people read is dropped.
+// The ids (C1, M2) are for criteria_check only; one that slips into text people read is dropped,
+// also when the model writes it with a Cyrillic С or М.
 export const noIds = (text: string) =>
   text
-    .replace(/(?<![A-Z]{2,}\s*)\s*\(?(?<![\p{L}\d])(?:за\s+)?(?:критері\p{L}*\s+)?[CM]\d+(?:\s*(?:,|і|та|and)\s*[CM]\d+)*(?![\p{L}\d])\)?/gu, "")
+    .replace(/(?<![A-Z]{2,}\s*)\s*\(?(?<![\p{L}\d])(?:за\s+критері\p{L}*\s+)?[CMСМ]\d+(?:\s*(?:,|і|та|and)\s*[CMСМ]\d+)*(?![\p{L}\d])\)?/gu, "")
     .replace(/\s+([.,;:])/g, "$1")
     .trim();
 // Criteria carry ids (C1) in the prompt; a new version must not copy them into its own lines.

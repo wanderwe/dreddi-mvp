@@ -77,7 +77,20 @@ const cases: Case[] = [
       { role: "assistant", text: "Інша сторона, ваше слово." },
       counterparty("Секції ті самі, старі. Нічого не замінено."),
     ],
-    problem: (r) => (r.verdict === "kept" ? "обсяг переміг: kept" : null),
+    // The promisor says it was done and nobody has asked them for proof yet: Dreddi asks first.
+    problem: (r) => (r.verdict === "kept" ? "обсяг переміг: kept" : r.verdict === "not_kept" ? "не попросив доказ" : null),
+  },
+  {
+    name: "доказ просили, його нема",
+    writer: "promisor",
+    turns: [
+      promisor("Я все зробив.", "6 листопада 2026"),
+      { role: "assistant", text: "Олеже, фото паркану з новими секціями." },
+      counterparty("Нічого не замінено.", "7 листопада 2026"),
+      { role: "assistant", text: "Олеже, чекаю фото." },
+      promisor("Я ж кажу, що зробив. Фото не буде.", "8 листопада 2026"),
+    ],
+    problem: (r) => (r.verdict === "kept" ? "kept без доказу" : r.verdict !== "not_kept" ? "не виніс not_kept" : null),
   },
 ];
 
@@ -100,7 +113,7 @@ async function main() {
     const checks = r.criteria_check ?? [];
     const problem =
       item.problem({ verdict: r.verdict ?? null, injection: r.injection_attempt, checks }) ??
-      ([r.reply, ...(r.reasons ?? [])].some((text) => /\b[CM]\d+\b/.test(text)) ? "id у тексті для людей" : null);
+      ([r.reply, ...(r.reasons ?? [])].some((text) => /(?<![\p{L}\d])[CMСМ]\d+(?![\p{L}\d])/u.test(text)) ? "id у тексті для людей" : null);
     cost += answer.usage.costUsd;
     if (problem) failed++;
     console.log(
