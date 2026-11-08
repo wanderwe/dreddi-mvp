@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import type { QuickStatus } from "@/lib/quickDisputes/state";
-import { PageShell, decideFetch, primaryButtonClass, useLoginHref, useSignedIn } from "./shared";
+import { PageShell, SkeletonRows, decideFetch, primaryButtonClass, useLoginHref, useSignedIn } from "./shared";
 
 type Item = { id: string; createdAt: string; question: string; status: QuickStatus; shortAnswer: string | null; waitingOnMe?: boolean };
 
@@ -40,6 +40,7 @@ export default function QuickDisputeHistoryPage() {
           </a>
         </p>
       )}
+      {!items && <SkeletonRows />}
       {items && items.length === 0 && <p className="text-sm text-tone-400">{t("decide.history.empty")}</p>}
       {items && items.length > 0 && (
         <ul className="divide-y divide-tone-white/10">

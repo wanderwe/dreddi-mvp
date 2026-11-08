@@ -11,8 +11,8 @@ import {
   IdentityChoice,
   NicknameTag,
   PageShell,
+  SkeletonRows,
   StepsBar,
-  TypingDots,
   decideFetch,
   inputClass,
   primaryButtonClass,
@@ -124,8 +124,10 @@ export default function JoinQuickDisputePage() {
             {startOwn}
           </div>
         ) : (
-          <div className="flex justify-center py-10 text-tone-400">
-            <TypingDots />
+          <div className="space-y-5" aria-busy="true">
+            <SkeletonRows count={1} className="h-1.5" />
+            <SkeletonRows count={1} className="h-9 w-2/3" />
+            <SkeletonRows count={3} className="h-16" />
           </div>
         )}
       </PageShell>

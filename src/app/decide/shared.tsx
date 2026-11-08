@@ -303,6 +303,17 @@ export function CopyField({ text, label, copiedLabel }: { text: string; label: s
   );
 }
 
+// The loading placeholder used across the product: pulsing blocks where content will appear.
+export function SkeletonRows({ count = 3, className = "h-[52px]" }: { count?: number; className?: string }) {
+  return (
+    <div className="space-y-2" aria-busy="true">
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className={`${className} animate-pulse rounded-xl bg-tone-white/5`} />
+      ))}
+    </div>
+  );
+}
+
 export function PageShell({ children }: { children: ReactNode }) {
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
