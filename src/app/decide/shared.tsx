@@ -208,6 +208,7 @@ export function Bubble({
   label,
   children,
   ghost = false,
+  muted = false,
   highlight = false,
   wide = false,
   delayMs = 0,
@@ -217,6 +218,7 @@ export function Bubble({
   label: ReactNode;
   children: ReactNode;
   ghost?: boolean;
+  muted?: boolean;
   highlight?: boolean;
   wide?: boolean;
   delayMs?: number;
@@ -238,7 +240,7 @@ export function Bubble({
         <p className="px-1 text-xs font-semibold text-tone-400">{label}</p>
         <div
           className={`w-full rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-            ghost
+            ghost || muted
               ? "border border-dashed border-tone-white/20 text-tone-500"
               : mine
                 ? "rounded-br-md border border-emerald-400/30 bg-emerald-400/[0.12] text-tone-100"

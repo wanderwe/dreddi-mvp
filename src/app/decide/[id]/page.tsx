@@ -49,6 +49,7 @@ export default function QuickDisputePage() {
   const [error, setError] = useState<string | null>(null);
   const [rebuttal, setRebuttal] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [shared, setShared] = useState(false);
   const autoSaved = useRef(false);
@@ -68,6 +69,7 @@ export default function QuickDisputePage() {
   const act = useCallback(
     async (payload: Record<string, unknown>) => {
       setBusy(true);
+      setPending(typeof payload.action === "string" ? payload.action : null);
       setError(null);
       try {
         const res = await decideFetch(`/api/decide/${id}`, { method: "POST", body: JSON.stringify(payload) });
@@ -85,6 +87,7 @@ export default function QuickDisputePage() {
         return false;
       } finally {
         setBusy(false);
+        setPending(null);
       }
     },
     [id, errorText, load, t, router, locale]
@@ -139,7 +142,11 @@ export default function QuickDisputePage() {
   const shareUrl = view.shareSlug && origin ? `${origin}${localizePath(`/d/${view.shareSlug}`, locale)}` : null;
   const bothDone = view.parties.length === 2 && view.parties.every((party) => party.rebuttalDone);
   const stuck = view.status === "rebuttals" && bothDone && !busy;
-  const deciding = view.status === "deciding" || (busy && view.status === "rebuttals" && (bothDone || view.canDecideNow));
+  // The request that completes the replies also waits for the verdict, so show Dreddi at work right away.
+  const finishing =
+    pending === "decide" ||
+    ((pending === "rebuttal" || pending === "skip_rebuttal") && Boolean(other?.rebuttalDone));
+  const deciding = view.status === "deciding" || (busy && view.status === "rebuttals" && finishing);
 
   const sideOf = (role: "A" | "B") => (view.myRole === role ? "me" : "other") as "me" | "other";
   const labelOf = (party: NonNullable<typeof me>) => (
@@ -243,7 +250,7 @@ export default function QuickDisputePage() {
               <p className="whitespace-pre-wrap">{party.rebuttal}</p>
             </Bubble>
           ) : !party.isMe && party.rebuttalDone && me && !me.rebuttalDone && view.status === "rebuttals" ? (
-            <Bubble key={`r-${party.role}`} side="other" name={party.nickname} label={labelOf(party)} ghost>
+            <Bubble key={`r-${party.role}`} side="other" name={party.nickname} label={labelOf(party)} muted>
               {t("decide.chat.rebuttalHidden", { nickname: party.nickname })}
             </Bubble>
           ) : null
