@@ -30,6 +30,14 @@ export type Identity = {
   ipHash: string | null;
 };
 
+// The same pseudo-random sequence for the same seed, so a card shows the same nickname every time.
+const seededRandom = (seed: string) => {
+  let state = parseInt(sha256(seed).slice(0, 8), 16) || 1;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+};
 const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
 const randomToken = (bytes: number) => randomBytes(bytes).toString("base64url");
 
@@ -224,11 +232,21 @@ type Action =
   | { action: "rebuttal"; text?: unknown }
   | { action: "skip_rebuttal" }
   | { action: "decide" }
-  | { action: "claim" };
+  | { action: "claim" }
+  | { action: "cancel" };
 
 export async function act(id: string, identity: Identity, body: Action) {
   const { admin, dispute, parties, me } = await loadForSide(id, identity);
   const now = new Date().toISOString();
+
+  // Side A takes the dispute back before anyone answered: it is gone, the link stops working.
+  if (body.action === "cancel") {
+    if (me.role !== "A" || dispute.status !== "awaiting_b" || parties.some((party) => party.role === "B")) {
+      throw new JudgeError("stale", 409);
+    }
+    await admin.from("quick_disputes").delete().eq("id", id).eq("status", "awaiting_b");
+    return { cancelled: true as const };
+  }
 
   if (body.action === "accept_question" || body.action === "keep_question") {
     if (me.role !== "A" || dispute.status !== "awaiting_question") throw new JudgeError("stale", 409);
@@ -364,10 +382,18 @@ export async function getPublicCard(slug: string) {
   if (!dispute?.verdict) return null;
   const { data: parties } = await admin
     .from("quick_dispute_parties")
-    .select("role,nickname")
+    .select("id,role,nickname,user_id")
     .eq("dispute_id", dispute.id)
-    .returns<{ role: QuickRole; nickname: string }[]>();
-  const nickname = (role: QuickRole) => parties?.find((party) => party.role === role)?.nickname ?? role;
+    .returns<{ id: string; role: QuickRole; nickname: string; user_id: string | null }[]>();
+  // Anyone can open the card, and either side can share it: a signed-in side shows up under a random
+  // nickname of their own here, never their profile name.
+  const nickname = (role: QuickRole) => {
+    const party = parties?.find((row) => row.role === role);
+    if (!party) return role;
+    if (!party.user_id) return party.nickname;
+    const other = parties?.find((row) => row.role !== role)?.nickname;
+    return randomNickname(dispute.lang, other, seededRandom(party.id));
+  };
   return {
     lang: dispute.lang,
     question: dispute.question,
