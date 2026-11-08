@@ -40,7 +40,7 @@ export type JudgeAnswer<P extends JudgeMode> = {
   usage: { inputTokens: number; outputTokens: number; costUsd: number };
 };
 
-const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
+export const noLongDashes = (text: string) => text.replace(/\s*—\s*/g, ", ");
 // Criteria are single short lines, and single lines carry no closing period in Dreddi.
 const noClosingPeriod = (line: string) => line.trim().replace(/(?<!\.)\.$/, "");
 // The ids (C1, M2) are for criteria_check only; one that slips into text people read is dropped,
@@ -115,7 +115,7 @@ export async function askJudge<P extends JudgeMode>({
 }
 
 // The SDK's errors as JudgeErrors the routes can answer with.
-const toJudgeError = (error: unknown) => {
+export const toJudgeError = (error: unknown) => {
   if (error instanceof JudgeError) return error;
   if (error instanceof Anthropic.AuthenticationError) return new JudgeError("No valid ANTHROPIC_API_KEY in .env.local", 500);
   if (error instanceof Anthropic.RateLimitError) return new JudgeError("Rate limited, try again in a minute", 429);

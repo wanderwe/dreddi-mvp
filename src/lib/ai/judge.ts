@@ -265,7 +265,7 @@ export const buildSystemPrompt = (phase: JudgeMode) => {
 };
 
 // A side cannot close our tags from inside their own text and pass the rest off as Dreddi's own data.
-const OUR_TAGS = /<(\/?)(case|party_input|evidence_notes)/gi;
+const OUR_TAGS = /<(\/?)(case|party_input|evidence_notes|dispute|question|side|position|rebuttal)/gi;
 export const escapeSideText = (text: string) => text.replace(OUR_TAGS, "‹$1$2");
 const escapeAttr = (text: string) => escapeSideText(text).replace(/"/g, "'");
 
