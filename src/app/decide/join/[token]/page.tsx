@@ -215,10 +215,12 @@ export default function JoinQuickDisputePage() {
             {askIdentity && !signedIn && nickname ? (
               <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void join(nickname)} />
             ) : (
-              <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
-                <Send className="h-4 w-4" aria-hidden />
-                {t("decide.join.reply")}
-              </button>
+              <div className="flex justify-end">
+                <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
+                  <Send className="h-4 w-4" aria-hidden />
+                  {t("decide.join.reply")}
+                </button>
+              </div>
             )}
             {error && <p className="text-sm text-danger-300">{error}</p>}
           </>

@@ -122,10 +122,12 @@ export default function NewQuickDisputePage() {
         {askIdentity && !signedIn && nickname ? (
           <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void create(nickname)} />
         ) : (
-          <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
-            <Swords className="h-4 w-4" aria-hidden />
-            {t("decide.create")}
-          </button>
+          <div className="flex justify-end">
+            <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
+              <Swords className="h-4 w-4" aria-hidden />
+              {t("decide.create")}
+            </button>
+          </div>
         )}
         {error && <p className="text-sm text-danger-300">{error}</p>}
       </form>
