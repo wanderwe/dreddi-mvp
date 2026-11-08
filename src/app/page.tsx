@@ -737,10 +737,6 @@ export default function Home() {
             </div>
           )}
 
-          <div className="order-4 w-full md:order-5">
-            <DecideEntry />
-          </div>
-
         </div>
 
         <div className="w-full min-w-0 md:w-[32rem] md:flex-none lg:w-[34rem]">
@@ -887,6 +883,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <DecideEntry />
       </div>
     </main>
   );

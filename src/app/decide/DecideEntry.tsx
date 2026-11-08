@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Scale } from "lucide-react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { decideFetch } from "./shared";
 
-// A quiet way into «Хто правий?» on the home page, which stays about promises, and back to one's own
-// disputes (signed in or not), with how many wait for this person's move.
+// «Хто правий?» as its own full-width section under the first screen, which stays about promises; also
+// the way back to one's own disputes (signed in or not), with how many wait for this person's move.
 export function DecideEntry() {
   const t = useT();
   const [count, setCount] = useState(0);
@@ -24,27 +25,39 @@ export function DecideEntry() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-1">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+    <section className="glass-panel flex w-full flex-col gap-5 rounded-3xl border-tone-white/10 px-5 py-6 sm:px-8 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-400/15 text-accent-200" aria-hidden>
+          <Scale className="h-6 w-6" />
+        </span>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-tone-white sm:text-2xl">{t("decide.title")}</h2>
+          <p className="text-sm text-tone-300 sm:text-base">{t("decide.homeHint")}</p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 md:items-end">
         <LocalizedLink
           href="/decide/new"
-          className="inline-flex w-fit items-center gap-2 text-base font-semibold text-accent-200 transition-colors hover:text-accent-100"
+          className="h-12 w-full rounded-xl border border-tone-white/15 px-6 py-3 text-center text-base font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-200 md:w-auto"
         >
-          {t("decide.title")} →
+          {t("decide.homeButton")}
         </LocalizedLink>
-        {count > 0 && (
-          <LocalizedLink href="/decide" className="text-sm font-medium text-tone-300 hover:text-accent-200">
-            {t("decide.history.title")} ({count})
-          </LocalizedLink>
-        )}
-        {waiting > 0 && (
-          <LocalizedLink href="/decide" className="inline-flex items-center gap-1.5 text-sm font-semibold text-tone-200 hover:text-accent-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
-            {t("decide.arena.waiting", { count: waiting })}
-          </LocalizedLink>
+        {(count > 0 || waiting > 0) && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm md:justify-end">
+            {waiting > 0 && (
+              <LocalizedLink href="/decide" className="inline-flex items-center gap-1.5 font-semibold text-tone-200 hover:text-accent-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                {t("decide.arena.waiting", { count: waiting })}
+              </LocalizedLink>
+            )}
+            {count > 0 && (
+              <LocalizedLink href="/decide" className="font-medium text-tone-300 hover:text-accent-200">
+                {t("decide.history.title")} ({count})
+              </LocalizedLink>
+            )}
+          </div>
         )}
       </div>
-      <p className="text-sm text-tone-400">{t("decide.homeHint")}</p>
-    </div>
+    </section>
   );
 }
