@@ -75,6 +75,13 @@ export function randomNickname(lang: QuickLang, avoid?: string, random: () => nu
   return `${adjectives[0]} ${animals[0]}`;
 }
 
+// The nickname the page showed an anonymous side before they started: accepted only if it is one we make.
+export function isRandomNickname(lang: QuickLang, name: unknown): name is string {
+  if (typeof name !== "string") return false;
+  const [adjective, animal, ...rest] = name.split(" ");
+  return rest.length === 0 && NICKNAMES[lang].adjectives.includes(adjective) && NICKNAMES[lang].animals.includes(animal);
+}
+
 export const isExpired = (dispute: Pick<DisputeRow, "status" | "created_at">, now: Date = new Date()) =>
   dispute.status === "awaiting_b" && now.getTime() - new Date(dispute.created_at).getTime() > LIMITS.inviteDays * DAY_MS;
 

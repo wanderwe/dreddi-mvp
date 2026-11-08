@@ -736,6 +736,16 @@ export default function Home() {
             </div>
           )}
 
+          <div className="order-4 flex w-full flex-col gap-1 md:order-5">
+            <LocalizedLink
+              href="/decide/new"
+              className="inline-flex w-fit items-center gap-2 text-base font-semibold text-accent-200 transition-colors hover:text-accent-100"
+            >
+              {t("decide.homeButton")} →
+            </LocalizedLink>
+            <p className="text-sm text-tone-400">{t("decide.homeHint")}</p>
+          </div>
+
         </div>
 
         <div className="w-full min-w-0 md:w-[32rem] md:flex-none lg:w-[34rem]">

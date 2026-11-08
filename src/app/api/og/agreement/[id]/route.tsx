@@ -7,6 +7,7 @@ import { caseNumber } from "@/lib/ai/caseNumber";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { createTranslator } from "@/lib/i18n/t";
 import { normalizeLocale } from "@/lib/i18n/locales";
+import { loadFont } from "@/lib/ogFont";
 
 // The picture a shared link to a public promise shows in Telegram, Facebook, X and the like.
 export const runtime = "nodejs";
@@ -21,24 +22,6 @@ const STATUS_TONE: Record<string, { bg: string; fg: string; border: string }> = 
   expired: { bg: "#fdecee", fg: "#b42339", border: "#f3b3bd" },
 };
 const NEUTRAL_TONE = { bg: "#eef1f6", fg: "#334155", border: "#d5dbe5" };
-
-// The default image font has no Cyrillic, so Inter comes from Google Fonts: Geist, the site font, spaces
-// Cyrillic words unevenly here. The whole font, not a cut to the drawn text. Loaded once per server instance.
-const fontCache = new Map<number, Promise<ArrayBuffer>>();
-function loadFont(weight: number) {
-  const cached = fontCache.get(weight);
-  if (cached) return cached;
-  const font = fetch(`https://fonts.googleapis.com/css2?family=Inter:wght@${weight}`)
-    .then((res) => res.text())
-    .then((css) => {
-      const url = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/)?.[1];
-      if (!url) throw new Error("Font not found");
-      return fetch(url).then((res) => res.arrayBuffer());
-    });
-  font.catch(() => fontCache.delete(weight));
-  fontCache.set(weight, font);
-  return font;
-}
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;

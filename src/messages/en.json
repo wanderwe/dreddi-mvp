@@ -1463,5 +1463,83 @@
     "limitReached": "In the beta a case holds a limited number of messages, and they are used up. The «I approve the criteria» and «I accept the ruling» buttons still work.",
     "betaLimit": "Beta: up to {limit} messages per case, {count} left",
     "caseNumber": "Case No. {number}"
+  },
+  "decide": {
+    "homeButton": "Who's right?",
+    "homeHint": "A dispute without an agreement. Dreddi hears both sides and decides.",
+    "title": "Dreddi, decide",
+    "signIn": "Sign in",
+    "continueAnon": "Continue anonymously",
+    "anonHint": "You'll be “{nickname}”. To save the dispute, you'll need to sign in later.",
+    "questionLabel": "What's the dispute about",
+    "questionPlaceholder": "For example: what is the highest mountain in Ukraine?",
+    "positionLabel": "Your position",
+    "positionPlaceholder": "What you think and why",
+    "create": "Start the dispute",
+    "sendLink": "Send the link to the other side",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "waitingB": "Waiting for the other side",
+    "join": {
+      "title": "{nickname} is taking you to Dreddi",
+      "question": "Question",
+      "positionOf": "{nickname}'s position",
+      "questionFair": "The question is worded fairly",
+      "reword": "Reword the question",
+      "reply": "Reply",
+      "taken": "Someone has already answered this dispute",
+      "own": "This is your dispute. Send the link to the other side.",
+      "expired": "The dispute is closed: the other side didn't answer within 7 days"
+    },
+    "chat": {
+      "proposedWording": "{nickname} suggests a different wording",
+      "agree": "I agree",
+      "keepMine": "Keep mine",
+      "waitingWording": "Waiting for {nickname} to approve the wording",
+      "rebuttalPlaceholder": "One reply to the other side's position",
+      "reply": "Reply",
+      "noReply": "No reply",
+      "rebuttalHidden": "{nickname} has replied. You'll see it after yours.",
+      "waitingRebuttal": "Waiting for {nickname}'s reply",
+      "decideNow": "Decide without the reply",
+      "availableAt": "Available {date}",
+      "deciding": "Dreddi is deciding",
+      "you": "you"
+    },
+    "verdict": {
+      "title": "Dreddi's verdict",
+      "winner": "Closer to the truth: {nickname}",
+      "both": "Both are partly right",
+      "neither": "Neither is right",
+      "undecidable": "There is no right answer here",
+      "nuance": "But there's a nuance",
+      "sources": "Sources",
+      "share": "Share",
+      "disclaimer": "This is Dreddi's opinion, not a court ruling",
+      "mediation": "This goes deeper than one question. Record an agreement in Dreddi and it will keep track.",
+      "mediationButton": "Create an agreement",
+      "save": "Save the dispute",
+      "saveHint": "Sign in to keep the dispute in your history",
+      "saved": "Dispute saved"
+    },
+    "history": {
+      "title": "My disputes",
+      "empty": "No disputes yet",
+      "status": {
+        "awaiting_b": "Waiting for the other side",
+        "awaiting_question": "In progress",
+        "rebuttals": "In progress",
+        "deciding": "In progress",
+        "decided": "Decided",
+        "expired": "Closed"
+      }
+    },
+    "errors": {
+      "daily_limit": "You've reached today's dispute limit. Try again tomorrow.",
+      "service_limit": "Dreddi has settled too many disputes today. Try again tomorrow.",
+      "not_a_side": "Only the sides can see this dispute",
+      "stale": "The dispute has changed. Refresh the page.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

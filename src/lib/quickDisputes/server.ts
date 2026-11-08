@@ -7,6 +7,7 @@ import {
   LIMITS,
   buildView,
   isExpired,
+  isRandomNickname,
   randomNickname,
   readyForVerdict,
   type DisputeRow,
@@ -49,7 +50,7 @@ const clean = (value: unknown, max: number) => {
   return text;
 };
 
-async function nicknameFor(identity: Identity, lang: QuickLang, avoid?: string) {
+async function nicknameFor(identity: Identity, lang: QuickLang, avoid?: string, requested?: unknown) {
   if (identity.userId) {
     const { data } = await getAdminClient()
       .from("profiles")
@@ -59,6 +60,7 @@ async function nicknameFor(identity: Identity, lang: QuickLang, avoid?: string) 
     const name = data?.display_name?.trim() || (data?.handle ? `@${data.handle}` : "");
     if (name && name !== avoid) return name.slice(0, 60);
   }
+  if (isRandomNickname(lang, requested) && requested !== avoid) return requested;
   return randomNickname(lang, avoid);
 }
 
@@ -90,7 +92,10 @@ async function loadForSide(id: string, identity: Identity) {
   return { ...loaded, me };
 }
 
-export async function createDispute(identity: Identity, body: { lang?: unknown; question?: unknown; position?: unknown }) {
+export async function createDispute(
+  identity: Identity,
+  body: { lang?: unknown; question?: unknown; position?: unknown; nickname?: unknown }
+) {
   const lang: QuickLang = body.lang === "en" ? "en" : "uk";
   const question = clean(body.question, LIMITS.question);
   const position = clean(body.position, LIMITS.position);
@@ -132,7 +137,7 @@ export async function createDispute(identity: Identity, body: { lang?: unknown; 
     role: "A",
     user_id: identity.userId,
     secret_hash: identity.secretHash,
-    nickname: await nicknameFor(identity, lang),
+    nickname: await nicknameFor(identity, lang, undefined, body.nickname),
     position,
     position_at: new Date().toISOString(),
   });
@@ -161,7 +166,11 @@ export async function previewInvite(token: string, identity: Identity) {
 }
 
 // Side B joins with their position, and either confirms the question or proposes a new wording.
-export async function joinDispute(token: string, identity: Identity, body: { position?: unknown; question?: unknown }) {
+export async function joinDispute(
+  token: string,
+  identity: Identity,
+  body: { position?: unknown; question?: unknown; nickname?: unknown }
+) {
   const { admin, dispute, parties } = await loadDispute({ invite_token: token });
   const sideA = parties.find((party) => party.role === "A");
   if (sideA && isMine(sideA, identity)) throw new JudgeError("own_dispute", 409);
@@ -190,7 +199,7 @@ export async function joinDispute(token: string, identity: Identity, body: { pos
     role: "B",
     user_id: identity.userId,
     secret_hash: identity.secretHash,
-    nickname: await nicknameFor(identity, dispute.lang, sideA?.nickname),
+    nickname: await nicknameFor(identity, dispute.lang, sideA?.nickname, body.nickname),
     position,
     position_at: now,
   });
