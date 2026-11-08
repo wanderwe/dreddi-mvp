@@ -264,21 +264,37 @@ export function TypingDots() {
   );
 }
 
-export function CopyButton({ text, label, copiedLabel }: { text: string; label: string; copiedLabel: string }) {
+// A read-only link with the copy button inside the field: one click copies, the icon turns into a check.
+export function CopyField({ text, label, copiedLabel }: { text: string; label: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false);
+  const copy = () => {
+    void navigator.clipboard.writeText(text).catch(() => undefined);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   return (
-    <button
-      type="button"
-      className={secondaryButtonClass}
-      onClick={() => {
-        void navigator.clipboard.writeText(text).catch(() => undefined);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }}
-    >
-      {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
-      {copied ? copiedLabel : label}
-    </button>
+    <div className="relative">
+      <input
+        className={`${inputClass} py-3 pr-12`}
+        value={text}
+        readOnly
+        onFocus={(e) => e.target.select()}
+      />
+      <button
+        type="button"
+        onClick={copy}
+        title={copied ? copiedLabel : label}
+        aria-label={copied ? copiedLabel : label}
+        className={`absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg transition ${
+          copied ? "bg-emerald-400 text-slate-950" : "text-tone-300 hover:bg-tone-white/10 hover:text-accent-200"
+        }`}
+      >
+        {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+      </button>
+      <span className="sr-only" aria-live="polite">
+        {copied ? copiedLabel : ""}
+      </span>
+    </div>
   );
 }
 

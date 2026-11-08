@@ -10,7 +10,7 @@ import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
 import { VerdictCard } from "../VerdictCard";
 import {
   Bubble,
-  CopyButton,
+  CopyField,
   PageShell,
   StepsBar,
   TypingDots,
@@ -203,10 +203,7 @@ export default function QuickDisputePage() {
               </a>
             ))}
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <input className={`${inputClass} flex-1`} value={inviteUrl} readOnly onFocus={(e) => e.target.select()} />
-            <CopyButton text={inviteUrl} label={t("decide.copyLink")} copiedLabel={t("decide.linkCopied")} />
-          </div>
+          <CopyField text={inviteUrl} label={t("decide.copyLink")} copiedLabel={t("decide.linkCopied")} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-2 text-xs text-tone-400">
               <TypingDots />
