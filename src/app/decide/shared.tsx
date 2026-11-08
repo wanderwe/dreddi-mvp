@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { Check, Copy, Dices } from "lucide-react";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath } from "@/lib/i18n/routing";
@@ -116,15 +117,16 @@ export function NicknameTag({ nickname, onReroll }: { nickname: string | null; o
     <span className="inline-flex items-center gap-1.5">
       <span>{nickname ? t("decide.youAs", { nickname }) : t("decide.you")}</span>
       {nickname && onReroll && (
-        <button
-          type="button"
-          onClick={onReroll}
-          title={t("decide.anotherNickname")}
-          aria-label={t("decide.anotherNickname")}
-          className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-tone-400 transition hover:bg-tone-white/10 hover:text-accent-200"
-        >
-          <Dices className="h-3.5 w-3.5" aria-hidden />
-        </button>
+        <Tooltip label={t("decide.anotherNickname")} placement="top">
+          <button
+            type="button"
+            onClick={onReroll}
+            aria-label={t("decide.anotherNickname")}
+            className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-tone-400 transition hover:bg-tone-white/10 hover:text-accent-200"
+          >
+            <Dices className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        </Tooltip>
       )}
     </span>
   );
@@ -280,17 +282,20 @@ export function CopyField({ text, label, copiedLabel }: { text: string; label: s
         readOnly
         onFocus={(e) => e.target.select()}
       />
-      <button
-        type="button"
-        onClick={copy}
-        title={copied ? copiedLabel : label}
-        aria-label={copied ? copiedLabel : label}
-        className={`absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg transition ${
-          copied ? "bg-emerald-400 text-slate-950" : "text-tone-300 hover:bg-tone-white/10 hover:text-accent-200"
-        }`}
-      >
-        {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
-      </button>
+      <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
+        <Tooltip label={copied ? copiedLabel : label} placement="top">
+          <button
+            type="button"
+            onClick={copy}
+            aria-label={copied ? copiedLabel : label}
+            className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition ${
+              copied ? "bg-emerald-400 text-slate-950" : "text-tone-300 hover:bg-tone-white/10 hover:text-accent-200"
+            }`}
+          >
+            {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
+          </button>
+        </Tooltip>
+      </div>
       <span className="sr-only" aria-live="polite">
         {copied ? copiedLabel : ""}
       </span>

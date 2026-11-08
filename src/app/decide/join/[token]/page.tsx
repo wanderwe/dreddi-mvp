@@ -79,7 +79,13 @@ export default function JoinQuickDisputePage() {
         body: JSON.stringify({ position: draft.position, question: reword ? question : null, nickname: asNickname }),
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.error === "taken" ? t("decide.join.taken") : errorText(body.error));
+      // Someone else answered first while this person was typing: show the closed state with the way out.
+      if (res.status === 409 && body.error === "taken") {
+        setPreview((current) => (current ? { ...current, open: false } : current));
+        setBusy(false);
+        return;
+      }
+      if (!res.ok) throw new Error(errorText(body.error));
       clear();
       router.push(localizePath(`/decide/${body.id}`, locale));
     } catch (err) {
