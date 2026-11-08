@@ -10,6 +10,7 @@ import {
   isRandomNickname,
   randomNickname,
   readyForVerdict,
+  rebuttalDone,
   type DisputeRow,
   type PartyRow,
   type QuickRole,
@@ -347,9 +348,9 @@ export async function listMine(identity: Identity) {
     : `secret_hash.eq.${identity.secretHash}`;
   const { data: mine } = await admin
     .from("quick_dispute_parties")
-    .select("dispute_id,role")
+    .select("dispute_id,role,rebuttal,rebuttal_skipped")
     .or(filter)
-    .returns<{ dispute_id: string; role: QuickRole }[]>();
+    .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>();
   const ids = (mine ?? []).map((row) => row.dispute_id);
   if (ids.length === 0) return [];
   const { data: disputes } = await admin
@@ -359,14 +360,22 @@ export async function listMine(identity: Identity) {
     .order("created_at", { ascending: false })
     .limit(100)
     .returns<Pick<DisputeRow, "id" | "created_at" | "question" | "status" | "verdict" | "decided_at">[]>();
-  return (disputes ?? []).map((row) => ({
-    id: row.id,
-    createdAt: row.created_at,
-    question: row.question,
-    status: row.status,
-    shortAnswer: row.verdict?.short_answer ?? null,
-    myRole: mine?.find((m) => m.dispute_id === row.id)?.role ?? null,
-  }));
+  return (disputes ?? []).map((row) => {
+    const side = mine?.find((m) => m.dispute_id === row.id);
+    // The next move is this side's: approve the reworded question, or write the rebuttal.
+    const waitingOnMe =
+      (row.status === "awaiting_question" && side?.role === "A") ||
+      (row.status === "rebuttals" && Boolean(side) && !rebuttalDone(side as Pick<PartyRow, "rebuttal" | "rebuttal_skipped">));
+    return {
+      id: row.id,
+      createdAt: row.created_at,
+      question: row.question,
+      status: row.status,
+      shortAnswer: row.verdict?.short_answer ?? null,
+      myRole: side?.role ?? null,
+      waitingOnMe,
+    };
+  });
 }
 
 // The public card: the question, the nicknames and the verdict, never the positions.

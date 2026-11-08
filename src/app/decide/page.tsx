@@ -6,7 +6,7 @@ import { localizePath } from "@/lib/i18n/routing";
 import type { QuickStatus } from "@/lib/quickDisputes/state";
 import { PageShell, decideFetch, primaryButtonClass, useLoginHref, useSignedIn } from "./shared";
 
-type Item = { id: string; createdAt: string; question: string; status: QuickStatus; shortAnswer: string | null };
+type Item = { id: string; createdAt: string; question: string; status: QuickStatus; shortAnswer: string | null; waitingOnMe?: boolean };
 
 // The quick disputes of the signed-in user, or of this browser for an anonymous side.
 export default function QuickDisputeHistoryPage() {
@@ -46,7 +46,10 @@ export default function QuickDisputeHistoryPage() {
           {items.map((item) => (
             <li key={item.id}>
               <a href={localizePath(`/decide/${item.id}`, locale)} className="block py-3 hover:bg-tone-white/[0.02]">
-                <p className="text-sm font-semibold text-tone-white">{item.question}</p>
+                <p className="flex items-center gap-2 text-sm font-semibold text-tone-white">
+                  {item.waitingOnMe && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-300" aria-hidden />}
+                  {item.question}
+                </p>
                 <p className="mt-0.5 text-xs text-tone-400">
                   {t(`decide.history.status.${item.status}`)}
                   {item.shortAnswer ? ` · ${item.shortAnswer}` : ""}

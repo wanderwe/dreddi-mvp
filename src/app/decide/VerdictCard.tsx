@@ -1,3 +1,4 @@
+import { Scale, Trophy } from "lucide-react";
 import type { QuickVerdict } from "@/lib/ai/quickVerdict";
 import type { TFunction } from "@/lib/i18n/t";
 
@@ -21,12 +22,19 @@ export function VerdictCard({
   t: TFunction;
 }) {
   return (
-    <section className="space-y-4 rounded-2xl border border-accent-400/30 bg-accent-400/[0.06] p-5">
-      <div className="space-y-1">
-        <p className="text-xs uppercase tracking-[0.2em] text-accent-200">{t("decide.verdict.title")}</p>
-        <p className="text-sm font-semibold text-tone-300">{verdictHeadline(verdict, nicknames, t)}</p>
+    <section className="relative space-y-4 overflow-clip rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-300/[0.10] via-accent-400/[0.05] to-transparent p-5 shadow-xl shadow-amber-500/10">
+      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-300/20 blur-3xl" aria-hidden />
+      <div className="relative space-y-2">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-200">
+          <Scale className="h-3.5 w-3.5" aria-hidden />
+          {t("decide.verdict.title")}
+        </p>
+        <p className="inline-flex items-center gap-2 rounded-full bg-amber-300/20 px-3 py-1 text-sm font-bold text-tone-white">
+          {(verdict.winner === "A" || verdict.winner === "B") && <Trophy className="h-4 w-4 text-amber-400" aria-hidden />}
+          {verdictHeadline(verdict, nicknames, t)}
+        </p>
       </div>
-      <p className="text-2xl font-semibold leading-snug text-tone-white">{verdict.short_answer}</p>
+      <p className="relative text-2xl font-semibold leading-snug text-tone-white sm:text-3xl">{verdict.short_answer}</p>
       <p className="whitespace-pre-wrap text-sm leading-relaxed text-tone-200">{verdict.explanation}</p>
       {verdict.nuance && (
         <div className="rounded-xl border border-tone-white/10 bg-tone-white/[0.03] p-3">

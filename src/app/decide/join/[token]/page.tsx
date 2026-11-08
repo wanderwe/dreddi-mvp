@@ -2,10 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Scale, Send, Swords } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickRole, type QuickStatus } from "@/lib/quickDisputes/state";
-import { IdentityGate, PageShell, decideFetch, inputClass, primaryButtonClass, useErrorText, useSignedIn } from "../../shared";
+import {
+  Bubble,
+  IdentityChoice,
+  NicknameTag,
+  PageShell,
+  StepsBar,
+  TypingDots,
+  decideFetch,
+  inputClass,
+  primaryButtonClass,
+  useDraft,
+  useDraftNickname,
+  useErrorText,
+  useSignedIn,
+} from "../../shared";
 
 type Preview = {
   id: string;
@@ -17,7 +32,8 @@ type Preview = {
   open: boolean;
 };
 
-// The invite link: side B sees the question and A's position, confirms or rewords the question, and answers.
+// The invite link: side B sees the question and A's message, confirms or rewords the question, and
+// answers in the same chat. Someone who came too late gets the way to start their own.
 export default function JoinQuickDisputePage() {
   const t = useT();
   const locale = useLocale();
@@ -25,12 +41,13 @@ export default function JoinQuickDisputePage() {
   const { token } = useParams<{ token: string }>();
   const signedIn = useSignedIn();
   const errorText = useErrorText();
+  const { nickname, reroll } = useDraftNickname();
+  const { draft, update, clear } = useDraft(`join:${token}`, { position: "", question: "", reword: "" });
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [reword, setReword] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [position, setPosition] = useState("");
+  const [askIdentity, setAskIdentity] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const reword = draft.reword === "1";
 
   useEffect(() => {
     if (signedIn === null) return;
@@ -42,25 +59,28 @@ export default function JoinQuickDisputePage() {
       }
       const next = body as Preview;
       // Already a side of it (side A opening their own link, or B coming back): straight to the dispute.
-      if (next.myRole === "B") {
+      if (next.myRole) {
         router.replace(localizePath(`/decide/${next.id}`, locale));
         return;
       }
       setPreview(next);
-      setQuestion(next.question);
     });
   }, [token, signedIn, errorText, router, locale]);
 
-  const join = async (nickname: string | null) => {
+  const question = draft.question || preview?.question || "";
+  const ready = Boolean(draft.position.trim() && (!reword || question.trim()));
+
+  const join = async (asNickname: string | null) => {
     setBusy(true);
     setError(null);
     try {
       const res = await decideFetch(`/api/decide/join/${encodeURIComponent(token)}`, {
         method: "POST",
-        body: JSON.stringify({ position, question: reword ? question : null, nickname }),
+        body: JSON.stringify({ position: draft.position, question: reword ? question : null, nickname: asNickname }),
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error === "taken" ? t("decide.join.taken") : errorText(body.error));
+      clear();
       router.push(localizePath(`/decide/${body.id}`, locale));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("decide.errors.generic"));
@@ -68,88 +88,136 @@ export default function JoinQuickDisputePage() {
     }
   };
 
+  const submit = () => {
+    if (!ready || signedIn === null) return;
+    if (signedIn) void join(null);
+    else setAskIdentity(true);
+  };
+
   const closedText = !preview
     ? null
-    : preview.myRole === "A"
-      ? t("decide.join.own")
-      : preview.status === "expired"
-        ? t("decide.join.expired")
-        : !preview.open
-          ? t("decide.join.taken")
-          : null;
+    : preview.status === "expired"
+      ? t("decide.join.expired")
+      : !preview.open
+        ? t("decide.join.taken")
+        : null;
+
+  const startOwn = (
+    <a href={localizePath("/decide/new", locale)} className={`${primaryButtonClass} w-full sm:w-auto`}>
+      <Swords className="h-4 w-4" aria-hidden />
+      {t("decide.join.startOwn")}
+    </a>
+  );
+
+  if (!preview) {
+    return (
+      <PageShell>
+        {error ? (
+          <div className="space-y-4">
+            <p className="text-sm text-tone-300">{error}</p>
+            {startOwn}
+          </div>
+        ) : (
+          <div className="flex justify-center py-10 text-tone-400">
+            <TypingDots />
+          </div>
+        )}
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell>
-      {preview ? (
-        <>
-          <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">
-            {t("decide.join.title", { nickname: preview.nicknameA })}
-          </h1>
-          <div className="space-y-3 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] p-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-tone-400">{t("decide.join.question")}</p>
-              <p className="mt-1 text-lg font-semibold text-tone-white">{preview.question}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-tone-400">{t("decide.join.positionOf", { nickname: preview.nicknameA })}</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-tone-200">{preview.positionA}</p>
-            </div>
-          </div>
-          {closedText ? (
-            <p className="text-sm text-tone-300">{closedText}</p>
-          ) : (
-            <IdentityGate signedIn={signedIn}>
-              {(nickname) => (
-                <form
-                  className="space-y-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    void join(nickname);
-                  }}
-                >
-                  <fieldset className="space-y-2">
-                    {[false, true].map((value) => (
-                      <label key={String(value)} className="flex cursor-pointer items-center gap-2 text-sm text-tone-200">
-                        <input type="radio" name="reword" checked={reword === value} onChange={() => setReword(value)} />
-                        {value ? t("decide.join.reword") : t("decide.join.questionFair")}
-                      </label>
-                    ))}
-                  </fieldset>
-                  {reword && (
-                    <input
-                      className={inputClass}
-                      value={question}
-                      maxLength={LIMITS.question}
-                      autoFocus
-                      onChange={(e) => setQuestion(e.target.value)}
-                    />
-                  )}
-                  <label className="block space-y-1.5">
-                    <span className="text-sm font-semibold text-tone-200">{t("decide.positionLabel")}</span>
-                    <textarea
-                      className={`${inputClass} min-h-[110px]`}
-                      value={position}
-                      maxLength={LIMITS.position}
-                      placeholder={t("decide.positionPlaceholder")}
-                      onChange={(e) => setPosition(e.target.value)}
-                    />
-                  </label>
-                  {error && <p className="text-sm text-danger-300">{error}</p>}
-                  <button
-                    type="submit"
-                    className={primaryButtonClass}
-                    disabled={busy || !position.trim() || (reword && !question.trim())}
-                  >
-                    {t("decide.join.reply")}
-                  </button>
-                </form>
-              )}
-            </IdentityGate>
+      <StepsBar current={1} />
+      <div className="space-y-2">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-200">
+          <Scale className="h-3.5 w-3.5" aria-hidden />
+          {t("decide.join.title", { nickname: preview.nicknameA })}
+        </p>
+        <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{preview.question}</h1>
+      </div>
+
+      <form
+        className="space-y-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+      >
+        <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">
+          <Bubble side="other" name={preview.nicknameA} label={preview.nicknameA}>
+            <p className="whitespace-pre-wrap">{preview.positionA}</p>
+          </Bubble>
+          {closedText ? null : (
+            <Bubble
+              side="me"
+              name={nickname ?? "?"}
+              label={<NicknameTag nickname={signedIn ? null : nickname} onReroll={signedIn ? undefined : reroll} />}
+              wide
+              delayMs={120}
+            >
+              <textarea
+                className="min-h-[96px] w-full resize-y bg-transparent text-sm text-tone-100 outline-none placeholder:text-tone-500"
+                value={draft.position}
+                maxLength={LIMITS.position}
+                placeholder={t("decide.positionPlaceholder")}
+                aria-label={t("decide.positionLabel")}
+                autoFocus
+                onChange={(e) => update({ position: e.target.value })}
+              />
+            </Bubble>
           )}
-        </>
-      ) : (
-        error && <p className="text-sm text-tone-300">{error}</p>
-      )}
+        </div>
+
+        {closedText ? (
+          <div className="space-y-4">
+            <p className="text-sm text-tone-300">{closedText}</p>
+            {startOwn}
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2" role="radiogroup">
+                {[false, true].map((value) => (
+                  <button
+                    key={String(value)}
+                    type="button"
+                    role="radio"
+                    aria-checked={reword === value}
+                    onClick={() => update({ reword: value ? "1" : "" })}
+                    className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                      reword === value
+                        ? "border-emerald-400/60 bg-emerald-400/15 text-tone-white"
+                        : "border-tone-white/10 text-tone-300 hover:border-tone-white/25"
+                    }`}
+                  >
+                    {value ? t("decide.join.reword") : t("decide.join.questionFair")}
+                  </button>
+                ))}
+              </div>
+              {reword && (
+                <input
+                  className={inputClass}
+                  value={question}
+                  maxLength={LIMITS.question}
+                  autoFocus
+                  onChange={(e) => update({ question: e.target.value })}
+                />
+              )}
+            </div>
+
+            {askIdentity && !signedIn && nickname ? (
+              <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void join(nickname)} />
+            ) : (
+              <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
+                <Send className="h-4 w-4" aria-hidden />
+                {t("decide.join.reply")}
+              </button>
+            )}
+            {error && <p className="text-sm text-danger-300">{error}</p>}
+          </>
+        )}
+      </form>
     </PageShell>
   );
 }

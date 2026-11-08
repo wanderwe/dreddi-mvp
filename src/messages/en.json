@@ -1465,9 +1465,9 @@
     "caseNumber": "Case No. {number}"
   },
   "decide": {
-    "homeButton": "Who's right?",
+    "homeButton": "Settle a dispute",
     "homeHint": "A dispute without an agreement. Dreddi hears both sides and decides.",
-    "title": "Dreddi, decide",
+    "title": "Who's right?",
     "signIn": "Sign in",
     "continueAnon": "Continue anonymously",
     "anonHint": "You'll be “{nickname}”. To save the dispute, you'll need to sign in later.",
@@ -1475,7 +1475,7 @@
     "questionPlaceholder": "For example: what is the highest mountain in Ukraine?",
     "positionLabel": "Your position",
     "positionPlaceholder": "What you think and why",
-    "create": "Start the dispute",
+    "create": "Challenge",
     "sendLink": "Send the link to the other side",
     "copyLink": "Copy link",
     "linkCopied": "Link copied",
@@ -1489,7 +1489,8 @@
       "reply": "Reply",
       "taken": "Someone has already answered this dispute",
       "own": "This is your dispute. Send the link to the other side.",
-      "expired": "The dispute is closed: the other side didn't answer within 7 days"
+      "expired": "The dispute is closed: the other side didn't answer within 7 days",
+      "startOwn": "Start your own dispute"
     },
     "chat": {
       "proposedWording": "{nickname} suggests a different wording",
@@ -1504,7 +1505,9 @@
       "decideNow": "Decide without the reply",
       "availableAt": "Available {date}",
       "deciding": "Dreddi is deciding",
-      "you": "you"
+      "you": "you",
+      "notDecided": "Dreddi couldn't decide in time.",
+      "retry": "Try again"
     },
     "verdict": {
       "title": "Dreddi's verdict",
@@ -1520,7 +1523,8 @@
       "mediationButton": "Create an agreement",
       "save": "Save the dispute",
       "saveHint": "Sign in to keep the dispute in your history",
-      "saved": "Dispute saved"
+      "saved": "Dispute saved",
+      "rematch": "Rematch"
     },
     "history": {
       "title": "My disputes",
@@ -1541,6 +1545,30 @@
       "not_a_side": "Only the sides can see this dispute",
       "stale": "The dispute has changed. Refresh the page.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "arena": {
+      "demo1": "A tomato is a vegetable, it goes in salads",
+      "demo2": "No, botanically it's a berry, so a fruit",
+      "example1": "Tomato: fruit or vegetable?",
+      "example2": "Is 12:00 noon or midnight?",
+      "example3": "Does pineapple belong on pizza?",
+      "waiting": "Waiting for you: {count}"
+    },
+    "steps": {
+      "question": "Question",
+      "positions": "Positions",
+      "replies": "Replies",
+      "verdict": "Verdict"
+    },
+    "anotherNickname": "Another nickname",
+    "opponent": "Opponent",
+    "opponentEmpty": "The reply of whoever you send the link to will show here",
+    "identityAsk": "How should your opponent see you?",
+    "anonAs": "Anonymously as {nickname}",
+    "readyTitle": "Your challenge is ready. Send it to your opponent.",
+    "shareText": "Let's settle it in Dreddi: {question}",
+    "cancel": "Cancel the dispute",
+    "you": "You",
+    "youAs": "You · {nickname}"
   }
 }
