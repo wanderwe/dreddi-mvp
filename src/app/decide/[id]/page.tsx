@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
+import { Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { formatKyivDate } from "@/lib/ai/kyivDate";
@@ -206,7 +206,7 @@ export default function QuickDisputePage() {
           <CopyField text={inviteUrl} label={t("decide.copyLink")} copiedLabel={t("decide.linkCopied")} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-2 text-xs text-tone-400">
-              <TypingDots />
+              <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
               {t("decide.waitingB")}
             </p>
             <button
@@ -278,7 +278,7 @@ export default function QuickDisputePage() {
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-tone-400">
-            <TypingDots />
+            <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
             {t("decide.chat.waitingWording", { nickname: other?.nickname ?? "" })}
           </p>
         ))}
@@ -313,7 +313,7 @@ export default function QuickDisputePage() {
       {view.status === "rebuttals" && me?.rebuttalDone && other && !other.rebuttalDone && !deciding && (
         <div className="space-y-2">
           <p className="flex items-center gap-2 text-sm text-tone-400">
-            <TypingDots />
+            <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
             {t("decide.chat.waitingRebuttal", { nickname: other.nickname })}
           </p>
           {view.canDecideNow ? (

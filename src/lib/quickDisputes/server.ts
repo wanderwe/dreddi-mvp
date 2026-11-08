@@ -174,6 +174,21 @@ export async function previewInvite(token: string, identity: Identity) {
   };
 }
 
+// What a shared invite link shows in messengers: the question and who is calling, never the position.
+export async function getInviteCard(token: string) {
+  if (!/^[A-Za-z0-9_-]{20,32}$/.test(token)) return null;
+  try {
+    const { dispute, parties } = await loadDispute({ invite_token: token });
+    return {
+      question: dispute.question,
+      nicknameA: parties.find((party) => party.role === "A")?.nickname ?? "",
+      open: dispute.status === "awaiting_b" && !parties.some((party) => party.role === "B"),
+    };
+  } catch {
+    return null;
+  }
+}
+
 // Side B joins with their position, and either confirms the question or proposes a new wording.
 export async function joinDispute(
   token: string,
