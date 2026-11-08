@@ -33,31 +33,29 @@ export function DecideEntry() {
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-tone-white sm:text-2xl">{t("decide.title")}</h2>
           <p className="text-sm text-tone-300 sm:text-base">{t("decide.homeHint")}</p>
+          {(count > 0 || waiting > 0) && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-sm">
+              {count > 0 && (
+                <LocalizedLink href="/decide" className="font-medium text-accent-200 hover:text-accent-100">
+                  {t("decide.history.title")} ({count}) →
+                </LocalizedLink>
+              )}
+              {waiting > 0 && (
+                <LocalizedLink href="/decide" className="inline-flex items-center gap-1.5 font-semibold text-tone-200 hover:text-accent-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                  {t("decide.arena.waiting", { count: waiting })}
+                </LocalizedLink>
+              )}
+            </div>
+          )}
         </div>
       </div>
-      <div className="flex flex-col gap-2 md:items-end">
-        <LocalizedLink
-          href="/decide/new"
-          className="h-12 w-full rounded-xl border border-tone-white/15 px-6 py-3 text-center text-base font-semibold text-tone-white transition hover:border-accent-300/50 hover:text-accent-200 md:w-auto"
-        >
-          {t("decide.homeButton")}
-        </LocalizedLink>
-        {(count > 0 || waiting > 0) && (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm md:justify-end">
-            {waiting > 0 && (
-              <LocalizedLink href="/decide" className="inline-flex items-center gap-1.5 font-semibold text-tone-200 hover:text-accent-200">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
-                {t("decide.arena.waiting", { count: waiting })}
-              </LocalizedLink>
-            )}
-            {count > 0 && (
-              <LocalizedLink href="/decide" className="font-medium text-tone-300 hover:text-accent-200">
-                {t("decide.history.title")} ({count})
-              </LocalizedLink>
-            )}
-          </div>
-        )}
-      </div>
+      <LocalizedLink
+        href="/decide/new"
+        className="h-12 w-full shrink-0 rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:shadow-accent-400/50 md:w-auto"
+      >
+        {t("decide.homeButton")}
+      </LocalizedLink>
     </section>
   );
 }
