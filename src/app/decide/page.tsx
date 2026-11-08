@@ -8,7 +8,7 @@ import { PageShell, decideFetch, primaryButtonClass, useLoginHref, useSignedIn }
 
 type Item = { id: string; createdAt: string; question: string; status: QuickStatus; shortAnswer: string | null };
 
-// The signed-in user's quick disputes.
+// The quick disputes of the signed-in user, or of this browser for an anonymous side.
 export default function QuickDisputeHistoryPage() {
   const t = useT();
   const locale = useLocale();
@@ -17,7 +17,7 @@ export default function QuickDisputeHistoryPage() {
   const [items, setItems] = useState<Item[] | null>(null);
 
   useEffect(() => {
-    if (!signedIn) return;
+    if (signedIn === null) return;
     void decideFetch("/api/decide/history").then(async (res) => {
       const body = await res.json().catch(() => ({}));
       setItems(res.ok ? (body.disputes as Item[]) : []);
@@ -33,9 +33,12 @@ export default function QuickDisputeHistoryPage() {
         </a>
       </div>
       {signedIn === false && (
-        <a href={loginHref} className="text-sm font-semibold text-accent-200 hover:underline">
-          {t("decide.signIn")}
-        </a>
+        <p className="text-sm text-tone-400">
+          {t("decide.history.browserOnly")}{" "}
+          <a href={loginHref} className="font-semibold text-accent-200 hover:underline">
+            {t("decide.signIn")}
+          </a>
+        </p>
       )}
       {items && items.length === 0 && <p className="text-sm text-tone-400">{t("decide.history.empty")}</p>}
       {items && items.length > 0 && (

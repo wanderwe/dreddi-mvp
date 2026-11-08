@@ -1525,6 +1525,7 @@
     "history": {
       "title": "My disputes",
       "empty": "No disputes yet",
+      "browserOnly": "Without signing in, only disputes from this browser show here.",
       "status": {
         "awaiting_b": "Waiting for the other side",
         "awaiting_question": "In progress",

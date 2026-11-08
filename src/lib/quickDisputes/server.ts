@@ -321,12 +321,16 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
   }
 }
 
-export async function listMine(userId: string) {
+// The disputes of the signed-in user, and of this browser: an anonymous side finds theirs again too.
+export async function listMine(identity: Identity) {
   const admin = getAdminClient();
+  const filter = identity.userId
+    ? `user_id.eq.${identity.userId},secret_hash.eq.${identity.secretHash}`
+    : `secret_hash.eq.${identity.secretHash}`;
   const { data: mine } = await admin
     .from("quick_dispute_parties")
     .select("dispute_id,role")
-    .eq("user_id", userId)
+    .or(filter)
     .returns<{ dispute_id: string; role: QuickRole }[]>();
   const ids = (mine ?? []).map((row) => row.dispute_id);
   if (ids.length === 0) return [];

@@ -1,6 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
+import { DecideEntry } from "@/app/decide/DecideEntry";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
@@ -736,14 +737,8 @@ export default function Home() {
             </div>
           )}
 
-          <div className="order-4 flex w-full flex-col gap-1 md:order-5">
-            <LocalizedLink
-              href="/decide/new"
-              className="inline-flex w-fit items-center gap-2 text-base font-semibold text-accent-200 transition-colors hover:text-accent-100"
-            >
-              {t("decide.homeButton")} →
-            </LocalizedLink>
-            <p className="text-sm text-tone-400">{t("decide.homeHint")}</p>
+          <div className="order-4 w-full md:order-5">
+            <DecideEntry />
           </div>
 
         </div>
