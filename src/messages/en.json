@@ -1547,11 +1547,6 @@
       "generic": "Something went wrong. Please try again."
     },
     "arena": {
-      "demo1": "A tomato is a vegetable, it goes in salads",
-      "demo2": "No, botanically it's a berry, so a fruit",
-      "example1": "Tomato: fruit or vegetable?",
-      "example2": "Is 12:00 noon or midnight?",
-      "example3": "Does pineapple belong on pizza?",
       "waiting": "Waiting for you: {count}"
     },
     "steps": {
