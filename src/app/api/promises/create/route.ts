@@ -4,6 +4,8 @@ import { getAdminClient } from "../[id]/common";
 import { requireUser } from "@/lib/auth/requireUser";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 import { getInviteExpiryIso } from "@/lib/inviteLifecycle";
+import { JudgeError } from "@/lib/ai/askJudge";
+import { checkStakePromise, linkStakePromise } from "@/lib/quickDisputes/server";
 
 type CreatePromisePayload = {
   title?: string;
@@ -18,6 +20,8 @@ type CreatePromisePayload = {
   // A one-sided promise (to yourself or to everyone): the creator keeps it, there is no other side
   // to accept it, so it starts active, as if the creator had activated it without a counterparty.
   selfPromise?: boolean;
+  // Recording the lost stake of a «Хто правий?» dispute: the loser promises the winner.
+  sourceDisputeId?: string | null;
 };
 
 export async function POST(req: Request) {
@@ -35,6 +39,18 @@ export async function POST(req: Request) {
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+
+    // A stake from a dispute: only its lost stake, once, from the loser to the winner (whoever records it).
+    const sourceDisputeId = !selfPromise && typeof body?.sourceDisputeId === "string" ? body.sourceDisputeId : null;
+    let stakeOtherUserId: string | null = null;
+    if (sourceDisputeId) {
+      try {
+        stakeOtherUserId = (await checkStakePromise(sourceDisputeId, user.id, executor)).otherUserId;
+      } catch (error) {
+        const status = error instanceof JudgeError ? error.status : 500;
+        return NextResponse.json({ error: error instanceof Error ? error.message : "stake_check_failed" }, { status });
+      }
     }
 
     if (secondPartyUserId === user.id) {
@@ -78,11 +94,12 @@ export async function POST(req: Request) {
     }
 
     let counterpartyProfile: { id: string } | null = null;
-    if (secondPartyUserId) {
+    const counterpartyUserId = sourceDisputeId ? stakeOtherUserId : secondPartyUserId;
+    if (counterpartyUserId) {
       const { data } = await admin
         .from("profiles")
         .select("id")
-        .eq("id", secondPartyUserId)
+        .eq("id", counterpartyUserId)
         .maybeSingle();
       if (!data?.id) {
         return NextResponse.json({ error: "Counterparty not found" }, { status: 404 });
@@ -144,6 +161,7 @@ export async function POST(req: Request) {
       promise_mode: "deal",
       group_id: groupId,
       is_important: isImportant,
+      source_dispute_id: sourceDisputeId,
       ...(selfPromise
         ? { activated_without_counterparty: true, activated_without_counterparty_at: nowIso }
         : {}),
@@ -168,6 +186,12 @@ export async function POST(req: Request) {
         { error: insertError?.message ?? "Insert failed" },
         { status: 400 }
       );
+    }
+
+    // The other side may have recorded the same stake a moment earlier: keep theirs.
+    if (sourceDisputeId && !(await linkStakePromise(sourceDisputeId, insertData.id))) {
+      await admin.from("promises").delete().eq("id", insertData.id);
+      return NextResponse.json({ error: "stale" }, { status: 409 });
     }
 
     if (counterpartyProfile?.id) {

@@ -9,6 +9,8 @@ import {
   readyForReview,
   readyForVerdict,
   reviewOutcome,
+  stakeOutcome,
+  verdictFinal,
   type DisputeRow,
   type PartyRow,
 } from "../src/lib/quickDisputes/state";
@@ -207,4 +209,22 @@ test("an unanswered rewording keeps the original question after 24 hours", async
   assert.equal(wordingOverdue(dispute, new Date("2026-11-10T10:00:00.000Z")), true);
   assert.equal(wordingDeadline({ status: "rebuttals", positions_done_at: joined }), null);
   assert.equal(wordingDeadline({ status: "awaiting_question", positions_done_at: null }), null);
+});
+
+test("the verdict is final once reviewed, or once nobody replied (both skipped or a day passed)", () => {
+  const noon = new Date("2026-11-08T13:00:00Z");
+  assert.equal(verdictFinal(decided(), [party("A"), party("B")], noon), false);
+  assert.equal(verdictFinal(decided(), [party("A"), party("B")], new Date("2026-11-09T12:00:00Z")), true);
+  assert.equal(verdictFinal(decided(), [party("A", { rebuttal_skipped: true }), party("B", { rebuttal_skipped: true })], noon), true);
+  assert.equal(verdictFinal(decided(), [party("A", { rebuttal: "x" }), party("B", { rebuttal_skipped: true })], noon), false);
+  assert.equal(verdictFinal(decided({ verdict_reviewed_at: "x" }), [party("A", { rebuttal: "x" }), party("B")], noon), true);
+});
+
+test("the stake: pending until final, then the loser owes it, or nobody without a clear winner", () => {
+  const skipped = [party("A", { rebuttal_skipped: true }), party("B", { rebuttal_skipped: true })];
+  assert.equal(stakeOutcome(decided(), skipped), null);
+  assert.deepEqual(stakeOutcome(decided({ stake: "кава" }), [party("A"), party("B")], new Date("2026-11-08T13:00:00Z")), { state: "pending" });
+  assert.deepEqual(stakeOutcome(decided({ stake: "кава" }), skipped), { state: "lost", loser: "B" });
+  assert.deepEqual(stakeOutcome(decided({ stake: "кава", verdict: verdictOf("B") }), skipped), { state: "lost", loser: "A" });
+  assert.deepEqual(stakeOutcome(decided({ stake: "кава", verdict: verdictOf("both") }), skipped), { state: "void" });
 });

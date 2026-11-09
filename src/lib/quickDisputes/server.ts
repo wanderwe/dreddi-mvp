@@ -15,6 +15,7 @@ import {
   readyForReview,
   readyForVerdict,
   rebuttalDone,
+  stakeOutcome,
   wordingOverdue,
   type DisputeRow,
   type PartyRow,
@@ -54,7 +55,7 @@ export function makeIdentity(userId: string | null, cookieToken: string | undefi
 }
 
 const DISPUTE_COLUMNS =
-  "id,created_at,lang,question,question_proposed,question_confirmed_at,status,invite_token,share_slug,positions_done_at,verdict,decided_at,first_verdict,verdict_reviewed_at";
+  "id,created_at,lang,question,question_proposed,question_confirmed_at,status,invite_token,share_slug,positions_done_at,verdict,decided_at,first_verdict,verdict_reviewed_at,stake,stake_promise_id";
 const PARTY_COLUMNS = "id,dispute_id,role,user_id,nickname,secret_hash,position,rebuttal,rebuttal_skipped";
 
 const clean = (value: unknown, max: number) => {
@@ -143,11 +144,13 @@ async function notifySides(
 
 export async function createDispute(
   identity: Identity,
-  body: { lang?: unknown; question?: unknown; position?: unknown; nickname?: unknown }
+  body: { lang?: unknown; question?: unknown; position?: unknown; nickname?: unknown; stake?: unknown }
 ) {
   const lang: QuickLang = body.lang === "en" ? "en" : "uk";
   const question = clean(body.question, LIMITS.question);
   const position = clean(body.position, LIMITS.position);
+  // The stake is optional: what the loser does for the winner.
+  const stake = typeof body.stake === "string" && body.stake.trim() ? clean(body.stake, LIMITS.stake) : null;
   const admin = getAdminClient();
   const creatorKey = sha256(identity.userId ? `user:${identity.userId}` : `anon:${identity.secretHash}`);
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -173,6 +176,7 @@ export async function createDispute(
     .insert({
       lang,
       question,
+      stake,
       invite_token: randomToken(18),
       creator_key: creatorKey,
       creator_ip_hash: identity.ipHash,
@@ -211,6 +215,7 @@ export async function previewInvite(token: string, identity: Identity) {
     positionA: sideA?.position ?? "",
     myRole: (mine?.role ?? null) as QuickRole | null,
     open: dispute.status === "awaiting_b" && !parties.some((party) => party.role === "B"),
+    stake: dispute.stake ?? null,
   };
 }
 
@@ -281,8 +286,65 @@ export async function joinDispute(
 }
 
 export async function getView(id: string, identity: Identity) {
-  const { dispute, parties, me } = await loadForSide(id, identity);
-  return buildView(dispute, parties, me.role);
+  const { admin, dispute, parties, me } = await loadForSide(id, identity);
+  const view = buildView(dispute, parties, me.role);
+  // The stake was recorded as a promise by the other side: this side gets its invite, unless already in it.
+  if (dispute.stake_promise_id) {
+    const { data: promise } = await admin
+      .from("promises")
+      .select("creator_id,counterparty_id,invite_token")
+      .eq("id", dispute.stake_promise_id)
+      .maybeSingle<{ creator_id: string; counterparty_id: string | null; invite_token: string | null }>();
+    const inIt = Boolean(identity.userId && (promise?.creator_id === identity.userId || promise?.counterparty_id === identity.userId));
+    view.stakeInviteToken = promise && !inIt && !promise.counterparty_id ? promise.invite_token : null;
+  }
+  return view;
+}
+
+// What the new-promise form needs to record the stake: the stake as the title, who keeps it, and the
+// other side when they have an account. Only for a side, signed in, once the stake is lost and unrecorded.
+export async function getStakePrefill(id: string, identity: Identity) {
+  if (!identity.userId) throw new JudgeError("sign_in", 401);
+  const { admin, dispute, parties, me } = await loadForSide(id, identity);
+  const outcome = stakeOutcome(dispute, parties);
+  if (outcome?.state !== "lost" || dispute.stake_promise_id) throw new JudgeError("stale", 409);
+  const other = parties.find((party) => party.role !== me.role);
+  let counterparty: { id: string; handle: string; display_name: string | null; avatar_url: string | null } | null = null;
+  if (other?.user_id && other.user_id !== identity.userId) {
+    const { data } = await admin.from("profiles").select("id,handle,display_name,avatar_url").eq("id", other.user_id).maybeSingle();
+    counterparty = data ?? null;
+  }
+  return {
+    disputeId: dispute.id,
+    question: dispute.question,
+    title: dispute.stake as string,
+    executor: (outcome.loser === me.role ? "me" : "other") as "me" | "other",
+    counterparty,
+  };
+}
+
+// Checks, for the promise being created, that it really is this dispute's lost stake; returns who must
+// be the other side. The link is written after the insert by linkStakePromise.
+export async function checkStakePromise(disputeId: string, userId: string, executor: "me" | "other") {
+  const { dispute, parties } = await loadDispute({ id: disputeId });
+  const me = parties.find((party) => party.user_id === userId);
+  if (!me) throw new JudgeError("not_a_side", 403);
+  const outcome = stakeOutcome(dispute, parties);
+  if (outcome?.state !== "lost" || dispute.stake_promise_id) throw new JudgeError("stale", 409);
+  if ((outcome.loser === me.role) !== (executor === "me")) throw new JudgeError("stale", 409);
+  const other = parties.find((party) => party.role !== me.role);
+  return { otherUserId: other?.user_id && other.user_id !== userId ? other.user_id : null };
+}
+
+// Links a freshly created promise to its dispute, once: false when the other side recorded it first.
+export async function linkStakePromise(disputeId: string, promiseId: string) {
+  const { data } = await getAdminClient()
+    .from("quick_disputes")
+    .update({ stake_promise_id: promiseId })
+    .eq("id", disputeId)
+    .is("stake_promise_id", null)
+    .select("id");
+  return Boolean(data?.length);
 }
 
 type Action =
@@ -580,17 +642,17 @@ export async function getPublicCard(slug: string) {
   const admin = getAdminClient();
   const { data: dispute } = await admin
     .from("quick_disputes")
-    .select("id,lang,question,verdict,decided_at")
+    .select("id,status,lang,question,verdict,decided_at,verdict_reviewed_at,stake")
     .eq("share_slug", slug)
     // While the review runs the card keeps showing the verdict it had.
     .in("status", ["decided", "deciding"])
-    .maybeSingle<Pick<DisputeRow, "id" | "lang" | "question" | "verdict" | "decided_at">>();
+    .maybeSingle<Pick<DisputeRow, "id" | "status" | "lang" | "question" | "verdict" | "decided_at" | "verdict_reviewed_at" | "stake">>();
   if (!dispute?.verdict) return null;
   const { data: parties } = await admin
     .from("quick_dispute_parties")
-    .select("id,role,nickname,user_id")
+    .select("id,role,nickname,user_id,rebuttal,rebuttal_skipped")
     .eq("dispute_id", dispute.id)
-    .returns<{ id: string; role: QuickRole; nickname: string; user_id: string | null }[]>();
+    .returns<{ id: string; role: QuickRole; nickname: string; user_id: string | null; rebuttal: string | null; rebuttal_skipped: boolean }[]>();
   // Anyone can open the card, and either side can share it: a signed-in side shows up under a random
   // nickname of their own here, never their profile name.
   const nickname = (role: QuickRole) => {
@@ -611,6 +673,8 @@ export async function getPublicCard(slug: string) {
     nicknameA: nickname("A"),
     nicknameB: nickname("B"),
     decidedAt: dispute.decided_at,
+    stake: dispute.stake ? mask(dispute.stake) : null,
+    stakeOutcome: stakeOutcome(dispute, parties ?? []),
     verdict: {
       ...verdict,
       short_answer: mask(verdict.short_answer),

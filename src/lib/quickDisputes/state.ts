@@ -26,6 +26,8 @@ export type DisputeRow = {
   decided_at: string | null;
   first_verdict: QuickVerdict | null;
   verdict_reviewed_at: string | null;
+  stake?: string | null;
+  stake_promise_id?: string | null;
 };
 
 export type PartyRow = {
@@ -44,6 +46,7 @@ export const LIMITS = {
   question: 300,
   position: 2000,
   rebuttal: 1000,
+  stake: 200,
   // B has this long to come; then the dispute expires.
   inviteDays: 7,
   // After the verdict, a side who replied waits this long for the other; then the review runs anyway.
@@ -126,6 +129,34 @@ export const readyForReview = (
   return Boolean(at) && now.getTime() >= new Date(at as string).getTime();
 };
 
+// The verdict will not change any more: reviewed, or nobody replied (both skipped, or a day passed).
+export const verdictFinal = (
+  dispute: Pick<DisputeRow, "status" | "decided_at" | "verdict" | "verdict_reviewed_at">,
+  parties: Pick<PartyRow, "rebuttal" | "rebuttal_skipped">[],
+  now: Date = new Date()
+) => {
+  if (dispute.status !== "decided" || !dispute.verdict) return false;
+  if (dispute.verdict_reviewed_at) return true;
+  if (parties.some((party) => party.rebuttal)) return false;
+  if (parties.length === 2 && parties.every(rebuttalDone)) return true;
+  const at = replyDeadline(dispute);
+  return Boolean(at) && now.getTime() >= new Date(at as string).getTime();
+};
+
+// Who owes the stake: pending until the verdict is final, then the loser, or void without one.
+export const stakeOutcome = (
+  dispute: Pick<DisputeRow, "status" | "decided_at" | "verdict" | "verdict_reviewed_at" | "stake">,
+  parties: Pick<PartyRow, "rebuttal" | "rebuttal_skipped">[],
+  now: Date = new Date()
+): { state: "pending" } | { state: "void" } | { state: "lost"; loser: QuickRole } | null => {
+  if (!dispute.stake) return null;
+  if (!verdictFinal(dispute, parties, now)) return { state: "pending" };
+  const winner = dispute.verdict?.winner;
+  if (winner === "A") return { state: "lost", loser: "B" };
+  if (winner === "B") return { state: "lost", loser: "A" };
+  return { state: "void" };
+};
+
 // After the review: did the replies change who is right?
 export const reviewOutcome = (dispute: Pick<DisputeRow, "first_verdict" | "verdict" | "verdict_reviewed_at">) =>
   !dispute.verdict_reviewed_at || !dispute.first_verdict || !dispute.verdict
@@ -151,6 +182,11 @@ export type QuickView = {
   canReviewNow: boolean;
   reviewing: boolean;
   reviewOutcome: "changed" | "unchanged" | null;
+  stake: string | null;
+  stakeOutcome: ReturnType<typeof stakeOutcome>;
+  // The promise recorded from the stake, and the invite link for a side not yet in it.
+  stakePromiseId: string | null;
+  stakeInviteToken?: string | null;
   shareSlug: string | null;
   verdict: QuickVerdict | null;
   parties: {
@@ -188,6 +224,9 @@ export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: Quic
     canReviewNow: readyForReview(dispute, parties, now),
     reviewing,
     reviewOutcome: reviewOutcome(dispute),
+    stake: dispute.stake ?? null,
+    stakeOutcome: dispute.status === "decided" || reviewing ? stakeOutcome(dispute, parties, now) : null,
+    stakePromiseId: dispute.stake_promise_id ?? null,
     shareSlug: dispute.share_slug,
     verdict: dispute.status === "decided" || reviewing ? dispute.verdict : null,
     parties: (["A", "B"] as const).flatMap((role) => {
