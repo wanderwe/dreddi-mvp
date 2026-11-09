@@ -1591,7 +1591,7 @@
       "lost": "{nickname} loses the stake: {stake}",
       "void": "The stake didn't play out",
       "pending": "The stake is settled after the replies",
-      "record": "Lock in the stake as a promise",
+      "record": "Lock in a promise",
       "recorded": "The stake is locked in as a promise",
       "add": "+ Add a stake"
     }

@@ -49,7 +49,7 @@
 | Під вердиктом, є програвший | {nickname} програє ставку: {stake} | {nickname} loses the stake: {stake} |
 | Під вердиктом, нічия | Ставка не зіграла | The stake didn't play out |
 | Поки є репліки | Ставку буде визначено після реплік | The stake is settled after the replies |
-| Кнопка | Зафіксувати ставку як обіцянку | Lock in the stake as a promise |
+| Кнопка | Зафіксувати обіцянку | Lock in a promise |
 | Після запису | Ставку зафіксовано як обіцянку | The stake is locked in as a promise |
 | Історія обіцянки | Створено зі суперечки «{question}» | Created from the dispute «{question}» |
 | Порожній список обіцянок | Посперечались? Розсудіть суперечку в Дредді | Had an argument? Let Dreddi settle it |
