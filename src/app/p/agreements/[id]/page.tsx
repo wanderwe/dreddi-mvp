@@ -69,6 +69,7 @@ type PublicAgreementRow = {
   viewer_following?: boolean | null;
   followers_count?: number | null;
   viewer_can_follow?: boolean | null;
+  viewer_is_side?: boolean | null;
   is_self_promise?: boolean | null;
   // Dreddi's ruling that took effect, with the agreed criteria; the case itself stays private.
   dreddi_ruling?: {
@@ -442,13 +443,15 @@ export default function PublicAgreementPage() {
   const executorName = agreement
     ? displayExecutorName(agreement, t("publicAgreement.participants.counterpartyFallback"))
     : "";
+  // Whom the promise was made to: the reviewer, or whoever accepted it if that is not the executor.
   const reviewerName = agreement
-    ? displayProfileName(
-        agreement.reviewer_display_name ?? null,
-        agreement.reviewer_handle ?? null,
-        t("publicAgreement.participants.counterpartyFallback")
-      )
+    ? displayProfileName(agreement.reviewer_display_name ?? null, agreement.reviewer_handle ?? null, "") ||
+      (accepterName && accepterName !== executorName ? accepterName : "") ||
+      creatorName
     : "";
+  const reviewerHref = agreement
+    ? getPublicProfileHref(agreement.reviewer_handle ?? null, agreement.reviewer_is_public_profile, locale)
+    : null;
 
   const creatorHref = agreement
     ? getPublicProfileHref(agreement.creator_handle, agreement.creator_is_public_profile, locale)
@@ -718,6 +721,14 @@ export default function PublicAgreementPage() {
                     </span>
                   </button>
                 </Tooltip>
+                {agreement.viewer_is_side && (
+                  <Link
+                    href={localizePath(`/promises/${agreement.id}`, locale)}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:-translate-y-0.5 sm:text-sm"
+                  >
+                    {t("invite.goToDeal")}
+                  </Link>
+                )}
                 {agreement.viewer_can_follow !== false ? (
                   <Tooltip
                     label={agreement.viewer_following ? t("publicAgreement.unfollowTooltip") : t("publicAgreement.followTooltip")}
@@ -764,20 +775,23 @@ export default function PublicAgreementPage() {
                 {t("publicAgreement.participants.title")}
               </p>
               <div className="mt-5 grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr] lg:grid-cols-1 xl:grid-cols-[1fr_auto_1fr]">
-                <ParticipantCard
-                  label={t("publicAgreement.participants.createdBy")}
-                  name={creatorName}
-                  href={creatorHref}
-                />
-                <div className="hidden h-px w-10 bg-gradient-to-r from-tone-white/10 via-accent-200/45 to-tone-white/10 sm:block lg:hidden xl:block" />
                 {isSelf ? (
-                  <ParticipantCard label={t("publicAgreement.participants.promisedTo")} name={t("publicAgreement.participants.self")} href={null} />
+                  <>
+                    <ParticipantCard label={t("publicAgreement.participants.createdBy")} name={creatorName} href={creatorHref} />
+                    <div className="hidden h-px w-10 bg-gradient-to-r from-tone-white/10 via-accent-200/45 to-tone-white/10 sm:block lg:hidden xl:block" />
+                    <ParticipantCard label={t("publicAgreement.participants.promisedTo")} name={t("publicAgreement.participants.self")} href={null} />
+                  </>
                 ) : (
-                  <ParticipantCard
-                    label={t("publicAgreement.participants.acceptedBy")}
-                    name={accepterName || executorName || creatorName}
-                    href={counterpartyHref}
-                  />
+                  <>
+                    {/* Who promises and to whom, as on the promise itself: the creator may be either. */}
+                    <ParticipantCard
+                      label={t("publicAgreement.participants.acceptedBy")}
+                      name={executorName || accepterName || creatorName}
+                      href={counterpartyHref}
+                    />
+                    <div className="hidden h-px w-10 bg-gradient-to-r from-tone-white/10 via-accent-200/45 to-tone-white/10 sm:block lg:hidden xl:block" />
+                    <ParticipantCard label={t("promises.detail.roles.madeTo")} name={reviewerName} href={reviewerHref} />
+                  </>
                 )}
               </div>
             </div>

@@ -350,6 +350,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       ),
       dreddi_ruling: await loadDreddiRuling(admin, promise),
       is_self_promise: isSelfPromise(promise),
+      // A side of the promise gets the way to the promise itself, where they can act on it.
+      viewer_is_side: viewerIsParticipant,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
