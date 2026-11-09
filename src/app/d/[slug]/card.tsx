@@ -6,6 +6,7 @@ import { createTranslator } from "@/lib/i18n/t";
 import { localizePath } from "@/lib/i18n/routing";
 import type { Locale } from "@/lib/i18n/locales";
 import { VerdictCard, verdictHeadline } from "@/app/decide/VerdictCard";
+import { ShareVerdict } from "./ShareVerdict";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
@@ -49,14 +50,7 @@ export async function QuickCardPage({ slug, locale }: { slug: string; locale: Lo
             </p>
           </div>
           <VerdictCard verdict={card.verdict} nicknames={{ A: card.nicknameA, B: card.nicknameB }} t={t} />
-          <div className="flex justify-end">
-            <a
-              href={localizePath("/decide/new", locale)}
-              className="h-12 w-full rounded-xl bg-emerald-400 px-6 py-3 text-center text-base font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:-translate-y-0.5 hover:shadow-accent-400/50 sm:w-auto"
-            >
-              {t("decide.homeButton")}
-            </a>
-          </div>
+          <ShareVerdict question={card.question} shareText={card.verdict.share_text} />
         </div>
       </div>
     </main>
