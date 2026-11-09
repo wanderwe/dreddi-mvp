@@ -249,11 +249,54 @@ type Action =
   | { action: "rebuttal"; text?: unknown }
   | { action: "skip_rebuttal" }
   | { action: "decide" }
-  | { action: "claim" }
+  | { action: "claim"; code?: unknown }
+  | { action: "claim_code" }
   | { action: "cancel" };
 
+const CLAIM_CODE_MINUTES = 30;
+
+// Saving after sign-in with the one-time code: the side whose code it is, still unsaved, goes to this
+// user. A wrong or expired code does nothing; the caller then needs the cookie as before.
+async function claimByCode(id: string, userId: string, code: unknown) {
+  if (typeof code !== "string" || !/^[A-Za-z0-9_-]{20,40}$/.test(code)) return;
+  await getAdminClient()
+    .from("quick_dispute_parties")
+    .update({ user_id: userId, claim_code_hash: null, claim_code_expires_at: null })
+    .eq("dispute_id", id)
+    .eq("claim_code_hash", sha256(code))
+    .gt("claim_code_expires_at", new Date().toISOString())
+    .is("user_id", null);
+}
+
+// A signed-in person in a browser that played anonymous sides: those disputes become theirs, so they
+// follow the account to other devices.
+export async function adoptBrowserDisputes(identity: Identity) {
+  if (!identity.userId || identity.newToken) return;
+  await getAdminClient()
+    .from("quick_dispute_parties")
+    .update({ user_id: identity.userId })
+    .eq("secret_hash", identity.secretHash)
+    .is("user_id", null);
+}
+
 export async function act(id: string, identity: Identity, body: Action) {
+  if (body.action === "claim" && identity.userId) await claimByCode(id, identity.userId, body.code);
   const { admin, dispute, parties, me } = await loadForSide(id, identity);
+
+  // Before going to sign in: a code that saves this side wherever the sign-in ends.
+  if (body.action === "claim_code") {
+    if (me.user_id) return { code: null };
+    const code = randomToken(18);
+    const { error } = await admin
+      .from("quick_dispute_parties")
+      .update({
+        claim_code_hash: sha256(code),
+        claim_code_expires_at: new Date(Date.now() + CLAIM_CODE_MINUTES * 60 * 1000).toISOString(),
+      })
+      .eq("id", me.id);
+    // Not stored (say, before the migration): no code, saving then relies on this browser's cookie.
+    return { code: error ? null : code };
+  }
   const now = new Date().toISOString();
 
   // Side A takes the dispute back before anyone answered: it is gone, the link stops working.
