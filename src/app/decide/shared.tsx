@@ -49,6 +49,24 @@ export function useSignedIn() {
   return signedIn;
 }
 
+// The signed-in person's own name as other sides will see it (display name, else @handle), for their
+// avatar before anything is sent; null while unknown or not signed in.
+export function useMyName(signedIn: boolean | null) {
+  const [name, setName] = useState<string | null>(null);
+  useEffect(() => {
+    if (!signedIn || !supabaseOptional) return;
+    const client = supabaseOptional;
+    void client.auth.getSession().then(async ({ data }) => {
+      const userId = data.session?.user.id;
+      if (!userId) return;
+      const { data: profile } = await client.from("profiles").select("display_name,handle").eq("id", userId).maybeSingle();
+      const row = profile as { display_name: string | null; handle: string | null } | null;
+      setName(row?.display_name?.trim() || (row?.handle ? row.handle : null));
+    });
+  }, [signedIn]);
+  return name;
+}
+
 export function useErrorText() {
   const t = useT();
   return useCallback(

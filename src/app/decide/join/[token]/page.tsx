@@ -19,6 +19,7 @@ import {
   primaryButtonClass,
   useDraft,
   useDraftNickname,
+  useMyName,
   useErrorText,
   useSignedIn,
 } from "../../shared";
@@ -43,6 +44,7 @@ export default function JoinQuickDisputePage() {
   const signedIn = useSignedIn();
   const errorText = useErrorText();
   const { nickname, reroll } = useDraftNickname();
+  const myName = useMyName(signedIn);
   const { draft, update, clear } = useDraft(`join:${token}`, { position: "", question: "", reword: "" });
   const [preview, setPreview] = useState<Preview | null>(null);
   const [askIdentity, setAskIdentity] = useState(false);
@@ -162,7 +164,7 @@ export default function JoinQuickDisputePage() {
           {closedText ? null : (
             <Bubble
               side="me"
-              name={nickname ?? "?"}
+              name={(signedIn ? myName : nickname) ?? "?"}
               label={<NicknameTag nickname={signedIn ? null : nickname} onReroll={signedIn ? undefined : reroll} />}
               wide
               delayMs={120}

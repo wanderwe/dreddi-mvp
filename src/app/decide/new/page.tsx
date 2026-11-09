@@ -17,6 +17,7 @@ import {
   primaryButtonClass,
   useDraft,
   useDraftNickname,
+  useMyName,
   useErrorText,
   useSignedIn,
 } from "../shared";
@@ -30,6 +31,7 @@ export default function NewQuickDisputePage() {
   const signedIn = useSignedIn();
   const errorText = useErrorText();
   const { nickname, reroll } = useDraftNickname();
+  const myName = useMyName(signedIn);
   const { draft, update, clear } = useDraft("new", { question: "", position: "" });
   const [askIdentity, setAskIdentity] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -101,7 +103,7 @@ export default function NewQuickDisputePage() {
         <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">
           <Bubble
             side="me"
-            name={nickname ?? "?"}
+            name={(signedIn ? myName : nickname) ?? "?"}
             label={<NicknameTag nickname={signedIn ? null : nickname} onReroll={signedIn ? undefined : reroll} />}
               wide
           >
