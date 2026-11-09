@@ -14,12 +14,11 @@ export function DecideEntry() {
   const [waiting, setWaiting] = useState(0);
 
   useEffect(() => {
-    void decideFetch("/api/decide/history")
-      .then((res) => (res.ok ? res.json() : { disputes: [] }))
-      .then((body: { disputes?: { waitingOnMe?: boolean }[] }) => {
-        const disputes = body.disputes ?? [];
-        setCount(disputes.length);
-        setWaiting(disputes.filter((item) => item.waitingOnMe).length);
+    void decideFetch("/api/decide/history?limit=0")
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((body: { total?: number; waiting?: number }) => {
+        setCount(body.total ?? 0);
+        setWaiting(body.waiting ?? 0);
       })
       .catch(() => undefined);
   }, []);

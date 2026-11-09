@@ -357,7 +357,11 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
 }
 
 // The disputes of the signed-in user, and of this browser: an anonymous side finds theirs again too.
-export async function listMine(identity: Identity) {
+// One page of this person's disputes, newest first, plus the totals the home page shows. Statuses of
+// all of them are cheap to read; questions and verdicts only for the page.
+export async function listMine(identity: Identity, page: { offset?: number; limit?: number } = {}) {
+  const offset = Math.max(0, Math.floor(page.offset ?? 0));
+  const limit = Math.min(50, Math.max(0, Math.floor(page.limit ?? 20)));
   const admin = getAdminClient();
   const filter = identity.userId
     ? `user_id.eq.${identity.userId},secret_hash.eq.${identity.secretHash}`
@@ -367,31 +371,48 @@ export async function listMine(identity: Identity) {
     .select("dispute_id,role,rebuttal,rebuttal_skipped")
     .or(filter)
     .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>();
-  const ids = (mine ?? []).map((row) => row.dispute_id);
-  if (ids.length === 0) return [];
-  const { data: disputes } = await admin
+  const empty = { disputes: [], total: 0, waiting: 0, hasMore: false };
+  const ids = [...new Set((mine ?? []).map((row) => row.dispute_id))];
+  if (ids.length === 0) return empty;
+
+  const { data: all } = await admin
     .from("quick_disputes")
-    .select("id,created_at,question,status,verdict,decided_at")
+    .select("id,created_at,status")
     .in("id", ids)
     .order("created_at", { ascending: false })
-    .limit(100)
-    .returns<Pick<DisputeRow, "id" | "created_at" | "question" | "status" | "verdict" | "decided_at">[]>();
-  return (disputes ?? []).map((row) => {
+    .returns<Pick<DisputeRow, "id" | "created_at" | "status">[]>();
+  const rows = all ?? [];
+  // The next move is this side's: approve the reworded question, or write the rebuttal.
+  const waitingOnMe = (row: Pick<DisputeRow, "id" | "status">) => {
     const side = mine?.find((m) => m.dispute_id === row.id);
-    // The next move is this side's: approve the reworded question, or write the rebuttal.
-    const waitingOnMe =
+    return (
       (row.status === "awaiting_question" && side?.role === "A") ||
-      (row.status === "rebuttals" && Boolean(side) && !rebuttalDone(side as Pick<PartyRow, "rebuttal" | "rebuttal_skipped">));
-    return {
-      id: row.id,
-      createdAt: row.created_at,
-      question: row.question,
-      status: row.status,
-      shortAnswer: row.verdict?.short_answer ?? null,
-      myRole: side?.role ?? null,
-      waitingOnMe,
-    };
-  });
+      (row.status === "rebuttals" && Boolean(side) && !rebuttalDone(side as Pick<PartyRow, "rebuttal" | "rebuttal_skipped">))
+    );
+  };
+  const pageRows = rows.slice(offset, offset + limit);
+  const totals = { total: rows.length, waiting: rows.filter(waitingOnMe).length, hasMore: offset + limit < rows.length };
+  if (pageRows.length === 0) return { ...totals, disputes: [] };
+
+  const { data: details } = await admin
+    .from("quick_disputes")
+    .select("id,question,verdict")
+    .in("id", pageRows.map((row) => row.id))
+    .returns<Pick<DisputeRow, "id" | "question" | "verdict">[]>();
+  return {
+    ...totals,
+    disputes: pageRows.map((row) => {
+      const detail = details?.find((item) => item.id === row.id);
+      return {
+        id: row.id,
+        createdAt: row.created_at,
+        question: detail?.question ?? "",
+        status: row.status,
+        shortAnswer: detail?.verdict?.short_answer ?? null,
+        waitingOnMe: waitingOnMe(row),
+      };
+    }),
+  };
 }
 
 // The public card: the question, the nicknames and the verdict, never the positions.
