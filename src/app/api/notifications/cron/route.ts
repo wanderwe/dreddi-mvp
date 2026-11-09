@@ -6,6 +6,8 @@ import { createNotification, mapPriorityForType } from "@/lib/notifications/serv
 import { getCompletionFollowupStage } from "@/lib/notifications/policy";
 import { isPromiseAccepted } from "@/lib/promiseAcceptance";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
+import { autoConfirmDate, autoConfirmDue, finalNoticeDue } from "@/lib/promises/silenceRules";
+import { confirmBySilence } from "@/lib/promises/silenceConfirm";
 
 const REQUIRED_ENV_VARS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 const HOURS_24 = 24 * 60 * 60 * 1000;
@@ -46,7 +48,10 @@ type PromiseRow = {
     overdue_notified_at?: string | null;
     completion_notified_at?: string | null;
     completion_followups_count?: number | null;
+    completion_final_notice_at?: string | null;
   }> | null;
+  completed_at?: string | null;
+  auto_confirm_at?: string | null;
 };
 
 const unauthorizedResponse = () =>
@@ -182,7 +187,7 @@ const runCron = async (req: Request) => {
     const { data: completionRows, error: completionFetchError } = await admin
       .from("promises")
       .select(
-        "id,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,status,confirmed_at,disputed_at,promise_notification_state(completion_notified_at,completion_followups_count)"
+        "id,creator_id,counterparty_id,counterparty_accepted_at,accepted_at,invite_status,promisor_id,promisee_id,status,completed_at,auto_confirm_at,confirmed_at,disputed_at,promise_notification_state(completion_notified_at,completion_followups_count,completion_final_notice_at)"
       )
       .eq("status", "completed_by_promisor");
     if (completionFetchError) {
@@ -465,6 +470,75 @@ const runCron = async (req: Request) => {
       });
     };
 
+    // The other side never answered a promise marked done: a final reminder that names the date, and
+    // on that date the promise counts as kept (src/lib/promises/silenceRules.ts).
+    const processSilenceCandidate = async (row: PromiseRow) => {
+      const reviewerId = resolveCounterpartyId(row);
+      if (!reviewerId || !isPromiseAccepted(row) || row.status !== "completed_by_promisor") return;
+      if (row.confirmed_at || row.disputed_at) return;
+      const state = getNotificationState(row.promise_notification_state);
+      const silence = {
+        completedAt: row.completed_at ?? null,
+        finalNoticeAt: state.completion_final_notice_at ?? null,
+        autoConfirmAt: row.auto_confirm_at ?? null,
+      };
+      const logBase = { ts: nowIso, promiseId: row.id, userId: reviewerId };
+
+      if (finalNoticeDue(silence, now)) {
+        response.processed += 1;
+        if (dryRun) {
+          console.info("[notifications] silence_final_notice_candidate", { ...logBase, dryRun: true });
+          return;
+        }
+        const date = autoConfirmDate(silence.completedAt as string, now).toISOString();
+        const outcome = await createNotification(admin, {
+          userId: reviewerId,
+          promiseId: row.id,
+          type: "completion_final_notice",
+          role: "counterparty",
+          dedupeKey: `completion_final_notice:${row.id}:${reviewerId}`,
+          ctaUrl: `/promises/${row.id}/confirm`,
+          priority: mapPriorityForType("completion_final_notice"),
+          date,
+        });
+        // The date is promised only once the reminder actually exists; otherwise try again tomorrow.
+        if (!outcome.created && outcome.skippedReason !== "dedupe_key_exists") {
+          response.skipped += 1;
+          console.info("[notifications] silence_final_notice_skipped", { ...logBase, reason: outcome.skippedReason });
+          return;
+        }
+        if (outcome.created) triggeredTypes.add("completion_final_notice");
+        if (outcome.emailSent) response.emailsSent += 1;
+        const [{ error: stateError }, { error: promiseError }] = await Promise.all([
+          admin.from("promise_notification_state").upsert({ promise_id: row.id, completion_final_notice_at: nowIso, updated_at: nowIso }),
+          admin.from("promises").update({ auto_confirm_at: date }).eq("id", row.id).eq("status", "completed_by_promisor"),
+        ]);
+        const error = stateError ?? promiseError;
+        if (error) {
+          response.errors.push("silence_state_upsert_failed");
+          console.error("[notifications] cron_silence_state_upsert_failed", { promiseId: row.id, error: error.message });
+        }
+        return;
+      }
+
+      if (autoConfirmDue(silence, now)) {
+        response.processed += 1;
+        if (dryRun) {
+          console.info("[notifications] silence_confirm_candidate", { ...logBase, dryRun: true });
+          return;
+        }
+        try {
+          if (await confirmBySilence(admin, row.id, now)) triggeredTypes.add("completion_auto_confirmed");
+        } catch (error) {
+          response.errors.push("silence_confirm_failed");
+          console.error("[notifications] cron_silence_confirm_failed", {
+            promiseId: row.id,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    };
+
     const processInviteIgnoredCandidate = async (row: PromiseRow) => {
       const logBase = {
         ts: nowIso,
@@ -581,6 +655,7 @@ const runCron = async (req: Request) => {
     }
     for (const row of completionCandidates) {
       await processCompletionFollowupCandidate(row);
+      await processSilenceCandidate(row);
     }
     for (const row of inviteIgnoredCandidates) {
       await processInviteIgnoredCandidate(row);

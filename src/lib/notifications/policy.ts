@@ -6,6 +6,8 @@ export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
   "marked_completed",
   "completion_waiting",
   "completion_followup",
+  "completion_final_notice",
+  "completion_auto_confirmed",
   "dispute",
   "disputed",
 ];

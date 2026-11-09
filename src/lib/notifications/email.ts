@@ -9,6 +9,8 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "disputed",
   "completion_waiting",
   "completion_followup",
+  "completion_final_notice",
+  "completion_auto_confirmed",
   "reminder_due_24h",
   "reminder_overdue",
   "reminder_deadline",
@@ -119,6 +121,26 @@ const resolveEmailCopy = (payload: EmailPayload) => {
         manageUrl,
       });
       return { subject: "Invite declined", ...content };
+    }
+    case "completion_final_notice": {
+      const content = renderTemplate({
+        heading: "Final reminder: confirm or dispute",
+        message: payload.body || "The promise will soon be counted as kept without your answer.",
+        ctaLabel: "Review outcome",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "Final reminder", ...content };
+    }
+    case "completion_auto_confirmed": {
+      const content = renderTemplate({
+        heading: "Promise counted as kept",
+        message: payload.body || "The promise was counted as kept.",
+        ctaLabel: "Open",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: "Promise counted as kept", ...content };
     }
     case "marked_completed":
     case "completion_waiting": {

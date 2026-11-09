@@ -29,6 +29,7 @@ export type NotificationRequest = {
   body?: string;
   followup?: "invite" | "completion24" | "completion72";
   delta?: number | null;
+  date?: string | null;
   requiresDeadlineReminder?: boolean;
 };
 
@@ -182,6 +183,7 @@ export async function createNotification(
     role: request.role,
     followup: request.followup,
     delta: request.delta,
+    date: request.date,
   });
 
   const title = request.title ?? copy.title ?? "";

@@ -162,6 +162,16 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The creator did not accept your obligation.",
       ctaLabel: "Open",
     },
+    completion_final_notice: {
+      title: "Final reminder",
+      body: "If you don't confirm or dispute by {date}, the promise will be counted as kept",
+      ctaLabel: "Review",
+    },
+    completion_auto_confirmed: {
+      title: "Promise counted as kept",
+      body: "The promise was counted as kept without your answer",
+      ctaLabel: "View",
+    },
     admin_new_feedback: {
       title: "New feedback submitted",
       body: "A user submitted new feedback.",
@@ -319,6 +329,16 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Автор не прийняв ваше зобов'язання.",
       ctaLabel: "Відкрити",
     },
+    completion_final_notice: {
+      title: "Останнє нагадування",
+      body: "Якщо не підтвердите або не оскаржите до {date}, обіцянку буде зараховано",
+      ctaLabel: "Перевірити",
+    },
+    completion_auto_confirmed: {
+      title: "Обіцянку зараховано",
+      body: "Обіцянку зараховано без вашої відповіді",
+      ctaLabel: "Переглянути",
+    },
     admin_new_feedback: {
       title: "Новий фідбек",
       body: "Користувач залишив новий фідбек.",
@@ -343,6 +363,13 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
         ctaLabel: "Open",
       },
     },
+    completion_auto_confirmed: {
+      executor: {
+        title: "Promise counted as kept",
+        body: "Promise counted as kept: the other side didn't answer in 14 days",
+        ctaLabel: "View",
+      },
+    },
   },
   uk: {
     invite_followup: {
@@ -357,6 +384,13 @@ const roleOverrides: Record<NotificationLocale, Partial<Record<NotificationType,
         title: "Домовленість прострочена",
         body: "Домовленість, на яку ви очікуєте, прострочена",
         ctaLabel: "Відкрити",
+      },
+    },
+    completion_auto_confirmed: {
+      executor: {
+        title: "Обіцянку зараховано",
+        body: "Обіцянку зараховано: інша сторона не відповіла за 14 днів",
+        ctaLabel: "Переглянути",
       },
     },
   },
@@ -385,6 +419,8 @@ export type NotificationCopyOptions = {
   role?: NotificationRole;
   followup?: "invite" | "completion24" | "completion72";
   delta?: number | null;
+  // Fills {date} in the text, in the reader's language (Kyiv time).
+  date?: string | null;
 };
 
 export const getNotificationCopy = ({
@@ -393,6 +429,7 @@ export const getNotificationCopy = ({
   role,
   followup,
   delta,
+  date,
 }: NotificationCopyOptions) => {
   const normalizedType = normalizeNotificationType(type);
   const baseLocale = copyByLocale[locale] ? locale : fallbackLocale;
@@ -420,6 +457,15 @@ export const getNotificationCopy = ({
     body = baseLocale === "uk"
       ? `Репутацію оновлено: ${formatted}`
       : `Reputation updated: ${formatted}`;
+  }
+
+  if (date && body.includes("{date}")) {
+    const formatted = new Intl.DateTimeFormat(baseLocale === "uk" ? "uk-UA" : "en-US", {
+      timeZone: "Europe/Kyiv",
+      day: "numeric",
+      month: "long",
+    }).format(new Date(date));
+    body = body.replace("{date}", formatted);
   }
 
   return {

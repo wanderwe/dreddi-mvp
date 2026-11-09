@@ -15,13 +15,14 @@ type EventMeta = {
   on_time?: boolean;
   late_penalty?: boolean;
   role?: string;
-  verified_by?: "dreddi";
+  verified_by?: "dreddi" | "silence";
   weight?: number;
 };
 
-// A promise with no other side, checked by Dreddi (the AI judge), counts at a reduced weight:
-// a screenshot is easier to fake than a person who confirms it.
-export type ReputationOptions = { weight?: number; verifiedBy?: "dreddi" };
+// A promise with no other side, checked by Dreddi (the AI judge), counts at a reduced weight: a
+// screenshot is easier to fake than a person who confirms it. So does one counted because the other
+// side never answered: nobody checked it.
+export type ReputationOptions = { weight?: number; verifiedBy?: "dreddi" | "silence" };
 
 type EventInput = {
   user_id: string;
