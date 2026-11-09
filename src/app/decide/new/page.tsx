@@ -34,6 +34,7 @@ export default function NewQuickDisputePage() {
   const myName = useMyName(signedIn);
   const { draft, update, stash } = useDraft("new", { question: "", position: "", stake: "" });
   const [askIdentity, setAskIdentity] = useState(false);
+  const [showStake, setShowStake] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,7 +93,7 @@ export default function NewQuickDisputePage() {
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold text-tone-200">{t("decide.questionLabel")}</span>
           <input
-            className={`${inputClass} py-3 text-base font-semibold placeholder:font-normal`}
+            className={`${inputClass} py-3 font-semibold placeholder:font-normal`}
             value={draft.question}
             maxLength={LIMITS.question}
             placeholder={t("decide.questionPlaceholder")}
@@ -100,16 +101,30 @@ export default function NewQuickDisputePage() {
           />
         </label>
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
-          <input
-            className={`${inputClass} py-3 text-base`}
-            value={draft.stake}
-            maxLength={LIMITS.stake}
-            placeholder={t("decide.stake.placeholder")}
-            onChange={(e) => update({ stake: e.target.value })}
-          />
-        </label>
+        {/* Optional, so hidden behind a link, as «+ Додати зустрічне зобов'язання» on a new promise. */}
+        {showStake || draft.stake ? (
+          <label className="block space-y-1.5">
+            <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
+            <input
+              className={`${inputClass} py-3`}
+              value={draft.stake}
+              maxLength={LIMITS.stake}
+              placeholder={t("decide.stake.placeholder")}
+              autoFocus={showStake && !draft.stake}
+              onChange={(e) => update({ stake: e.target.value })}
+            />
+          </label>
+        ) : (
+          <div className="flex -mt-2">
+            <button
+              type="button"
+              onClick={() => setShowStake(true)}
+              className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
+            >
+              {t("decide.stake.add")}
+            </button>
+          </div>
+        )}
 
         <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">
           <Bubble

@@ -14,7 +14,7 @@ import { randomNickname } from "@/lib/quickDisputes/state";
 // of how to appear, asked only when the side sends what they wrote.
 
 export const inputClass =
-  "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none focus:border-accent-300/60";
+  "w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-3 py-2 text-sm text-tone-white outline-none placeholder:text-tone-500 focus:border-accent-300/60";
 export const primaryButtonClass =
   "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/20 transition hover:-translate-y-0.5 hover:shadow-accent-400/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 export const secondaryButtonClass =
