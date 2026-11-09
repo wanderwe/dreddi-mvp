@@ -287,7 +287,7 @@ export const buildCaseFacts = (promise: JudgePromise, now: Date = new Date()) =>
     promise.openedAt ? `Recorded in Dreddi on: ${promise.openedAt}` : null,
     promise.markedDoneAt ? `The promisor marked it done in Dreddi on: ${promise.markedDoneAt}` : null,
     promise.silenceConfirmsAt
-      ? `If the other side neither confirms nor disputes, Dreddi counts the promise as kept on: ${promise.silenceConfirmsAt} (there is no other time limit)`
+      ? `Closing by silence: if the other side neither confirms nor disputes, Dreddi counts the promise as kept on ${promise.silenceConfirmsAt}. When the promisor asks about the other side's silence or about closing the case, give them this date.`
       : null,
     promise.deadline ? `Deadline: ${promise.deadline}` : "Deadline: none",
     promise.status ? `Current status in Dreddi: ${promise.status}` : null,

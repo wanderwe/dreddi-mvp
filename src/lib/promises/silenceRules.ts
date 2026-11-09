@@ -44,6 +44,12 @@ export const autoConfirmDate = (completedAt: string, noticeAt: Date) => {
 export const autoConfirmDue = (state: SilenceState, now: Date) =>
   Boolean(state.finalNoticeAt && state.autoConfirmAt) && now >= new Date(state.autoConfirmAt as string);
 
-// The date to show while waiting: the promised one once the reminder went out, the planned one before.
-export const expectedAutoConfirmAt = (state: SilenceState) =>
-  state.autoConfirmAt ?? (state.completedAt ? plus(state.completedAt, SILENCE.confirmDays).toISOString() : null);
+// The date to show while waiting: the promised one once the reminder went out; before that, the date the
+// reminder will promise when it goes out (day 10, or the next daily run for a promise already past it).
+export const expectedAutoConfirmAt = (state: SilenceState, now: Date = new Date()) => {
+  if (state.autoConfirmAt) return state.autoConfirmAt;
+  if (!state.completedAt) return null;
+  const dueNotice = plus(state.completedAt, SILENCE.finalNoticeDays);
+  const noticeAt = now > dueNotice ? now : dueNotice;
+  return autoConfirmDate(state.completedAt, noticeAt).toISOString();
+};

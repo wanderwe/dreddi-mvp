@@ -30,8 +30,14 @@ test("counted only after the reminder went out and its date came", () => {
   assert.equal(autoConfirmDue({ ...sent, finalNoticeAt: null }, at("2027-01-01T00:00:00Z")), false);
 });
 
-test("the page shows the promised date, or the planned one before the reminder", () => {
-  assert.equal(expectedAutoConfirmAt({ completedAt: done, finalNoticeAt: null, autoConfirmAt: null }), "2026-11-15T10:00:00.000Z");
+test("the page shows the promised date, or the one the reminder will promise", () => {
+  const early = at("2026-11-03T00:00:00Z");
+  assert.equal(expectedAutoConfirmAt({ completedAt: done, finalNoticeAt: null, autoConfirmAt: null }, early), "2026-11-15T10:00:00.000Z");
+  // Hanging since March, no reminder yet: a week from now, never a date in the past.
+  assert.equal(
+    expectedAutoConfirmAt({ completedAt: "2026-03-01T09:18:00Z", finalNoticeAt: null, autoConfirmAt: null }, at("2026-11-09T12:00:00Z")),
+    "2026-11-16T12:00:00.000Z"
+  );
   assert.equal(
     expectedAutoConfirmAt({ completedAt: done, finalNoticeAt: "x", autoConfirmAt: "2026-11-17T08:00:00.000Z" }),
     "2026-11-17T08:00:00.000Z"
