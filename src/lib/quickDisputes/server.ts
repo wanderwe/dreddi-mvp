@@ -12,6 +12,7 @@ import {
   randomNickname,
   readyForVerdict,
   rebuttalDone,
+  wordingOverdue,
   type DisputeRow,
   type PartyRow,
   type QuickRole,
@@ -91,6 +92,13 @@ async function loadDispute(where: { id: string } | { invite_token: string }) {
   if (isExpired(dispute)) {
     await admin.from("quick_disputes").update({ status: "expired" }).eq("id", dispute.id).eq("status", "awaiting_b");
     dispute.status = "expired";
+  }
+  // A never answered B's rewording: the original question stays and the replies begin.
+  if (wordingOverdue(dispute)) {
+    const now = new Date().toISOString();
+    const keep = { question_proposed: null, question_confirmed_at: now, positions_done_at: now, status: "rebuttals" as const };
+    await admin.from("quick_disputes").update(keep).eq("id", dispute.id).eq("status", "awaiting_question");
+    Object.assign(dispute, keep);
   }
   return { admin, dispute, parties: parties ?? [] };
 }
@@ -211,7 +219,7 @@ export async function joinDispute(
     .from("quick_disputes")
     .update(
       changed
-        ? { status: "awaiting_question", question_proposed: proposed }
+        ? { status: "awaiting_question", question_proposed: proposed, positions_done_at: now }
         : { status: "rebuttals", question_confirmed_at: now, positions_done_at: now }
     )
     .eq("id", dispute.id)

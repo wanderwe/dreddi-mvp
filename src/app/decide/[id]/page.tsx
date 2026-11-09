@@ -321,10 +321,26 @@ export default function QuickDisputePage() {
             </div>
           </div>
         ) : (
-          <p className="flex items-center gap-2 text-sm text-tone-400">
-            <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {t("decide.chat.waitingWording", { nickname: other?.nickname ?? "" })}
-          </p>
+          <div className="space-y-1">
+            <p className="flex items-center gap-2 text-sm text-tone-400">
+              <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {t("decide.chat.waitingWording", { nickname: other?.nickname ?? "" })}
+            </p>
+            {view.wordingDeadline && (
+              <p className="pl-5 text-xs text-tone-500">
+                {t("decide.chat.wordingDeadline", {
+                  nickname: other?.nickname ?? "",
+                  date: new Intl.DateTimeFormat(locale === "en" ? "en-US" : "uk-UA", {
+                    timeZone: "Europe/Kyiv",
+                    day: "numeric",
+                    month: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(view.wordingDeadline)),
+                })}
+              </p>
+            )}
+          </div>
         ))}
 
       {view.status === "rebuttals" && me && !me.rebuttalDone && !deciding && (

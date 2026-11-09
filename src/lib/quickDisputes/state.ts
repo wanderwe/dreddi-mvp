@@ -46,6 +46,8 @@ export const LIMITS = {
   inviteDays: 7,
   // After both positions, either side may ask for the verdict without waiting for a rebuttal.
   rebuttalHours: 24,
+  // A has this long to answer B's rewording; silence keeps the original question.
+  wordingHours: 24,
   // New disputes a day per person (signed in or the same browser) and per IP.
   perCreatorPerDay: 5,
   // Verdicts a day across the whole service, as a cost cap.
@@ -94,6 +96,17 @@ export const decideNowAt = (dispute: Pick<DisputeRow, "status" | "positions_done
     ? new Date(new Date(dispute.positions_done_at).getTime() + LIMITS.rebuttalHours * HOUR_MS).toISOString()
     : null;
 
+// Until when A may answer B's rewording; null when not relevant. B joined at positions_done_at.
+export const wordingDeadline = (dispute: Pick<DisputeRow, "status" | "positions_done_at">) =>
+  dispute.status === "awaiting_question" && dispute.positions_done_at
+    ? new Date(new Date(dispute.positions_done_at).getTime() + LIMITS.wordingHours * HOUR_MS).toISOString()
+    : null;
+
+export const wordingOverdue = (dispute: Pick<DisputeRow, "status" | "positions_done_at">, now: Date = new Date()) => {
+  const at = wordingDeadline(dispute);
+  return Boolean(at) && now.getTime() >= new Date(at as string).getTime();
+};
+
 export const readyForVerdict = (
   dispute: Pick<DisputeRow, "status" | "positions_done_at">,
   parties: Pick<PartyRow, "rebuttal" | "rebuttal_skipped">[],
@@ -115,6 +128,7 @@ export type QuickView = {
   saved: boolean;
   inviteToken: string | null;
   decideNowAt: string | null;
+  wordingDeadline: string | null;
   canDecideNow: boolean;
   shareSlug: string | null;
   verdict: QuickVerdict | null;
@@ -144,6 +158,7 @@ export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: Quic
     saved: Boolean(mine?.user_id),
     inviteToken: myRole === "A" && dispute.status === "awaiting_b" ? dispute.invite_token : null,
     decideNowAt: decideNowAt(dispute),
+    wordingDeadline: wordingDeadline(dispute),
     canDecideNow: readyForVerdict(dispute, parties, now),
     shareSlug: dispute.share_slug,
     verdict: dispute.status === "decided" ? dispute.verdict : null,

@@ -159,3 +159,14 @@ test("the public card hides profile names inside the verdict, inflected too", as
   assert.equal(maskNames("Ігорівна тут ні до чого? 12 дня", names).includes("12 дня"), true);
   assert.equal(maskNames("нікого", [{ real: "Ян", shown: "X" }]), "нікого");
 });
+
+test("an unanswered rewording keeps the original question after 24 hours", async () => {
+  const { wordingDeadline, wordingOverdue } = await import("../src/lib/quickDisputes/state");
+  const joined = "2026-11-09T10:00:00.000Z";
+  const dispute = { status: "awaiting_question" as const, positions_done_at: joined };
+  assert.equal(wordingDeadline(dispute), "2026-11-10T10:00:00.000Z");
+  assert.equal(wordingOverdue(dispute, new Date("2026-11-10T09:59:00.000Z")), false);
+  assert.equal(wordingOverdue(dispute, new Date("2026-11-10T10:00:00.000Z")), true);
+  assert.equal(wordingDeadline({ status: "rebuttals", positions_done_at: joined }), null);
+  assert.equal(wordingDeadline({ status: "awaiting_question", positions_done_at: null }), null);
+});

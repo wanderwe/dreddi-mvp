@@ -1509,7 +1509,8 @@
       "notDecided": "Dreddi couldn't decide in time.",
       "retry": "Try again",
       "rebuttalTitle": "Your reply",
-      "rebuttalHint": "One answer to {nickname}'s position. After the replies, Dreddi gives the verdict."
+      "rebuttalHint": "One answer to {nickname}'s position. After the replies, Dreddi gives the verdict.",
+      "wordingDeadline": "If {nickname} doesn't answer by {date}, the original question stays."
     },
     "verdict": {
       "title": "Dreddi's verdict",
