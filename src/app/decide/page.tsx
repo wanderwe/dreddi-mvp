@@ -100,8 +100,13 @@ export default function QuickDisputeHistoryPage() {
                       <StatusPill label={t(`decide.history.status.${item.status}`)} tone={pill.tone} icon={pill.icon} marker="icon" />
                       <span className="shrink-0 text-xs text-tone-400">{dateFormat.format(new Date(item.createdAt))}</span>
                     </div>
-                    <p className="line-clamp-2 text-sm font-semibold text-tone-white sm:text-base">{item.question}</p>
-                    {item.shortAnswer && <p className="truncate text-sm text-tone-400">{item.shortAnswer}</p>}
+                    <p className="truncate text-sm font-semibold text-tone-white sm:text-base" title={item.question}>
+                      {item.question}
+                    </p>
+                    {/* Always one line, empty until there is a verdict, so every card has the same height. */}
+                    <p className="h-5 truncate text-sm text-tone-400" aria-hidden={!item.shortAnswer}>
+                      {item.shortAnswer ?? ""}
+                    </p>
                   </div>
                   <ChevronRight
                     className="h-5 w-5 shrink-0 text-tone-500 transition group-hover:translate-x-0.5 group-hover:text-accent-200"
