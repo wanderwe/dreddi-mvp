@@ -10,6 +10,7 @@ import {
   PenLine,
   RefreshCw,
   Shield,
+  Hourglass,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -34,6 +35,7 @@ import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { buildAgreementFlowState } from "@/lib/agreementFlowState";
+import { expectedAutoConfirmAt } from "@/lib/promises/silenceRules";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -55,6 +57,8 @@ type PromiseRow = {
   status: PromiseStatus;
   completed_at: string | null;
   confirmed_at: string | null;
+  confirmed_by?: "counterparty" | "silence" | "dreddi" | null;
+  auto_confirm_at?: string | null;
   disputed_at: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
@@ -225,12 +229,16 @@ function buildAgreementTimeline(
   }
 
   if (promise.confirmed_at) {
+    // Counted because the other side never answered: Dreddi closed it, not the reviewer.
+    const bySilence = promise.confirmed_by === "silence";
     items.push({
       key: "confirmed",
-      label: t("publicAgreement.timeline.confirmed"),
-      actor: labels.reviewer,
+      label: t(bySilence ? "publicAgreement.timeline.confirmedBySilence" : "publicAgreement.timeline.confirmed"),
+      actor: bySilence ? "Dreddi" : labels.reviewer,
       timestamp: promise.confirmed_at,
-      description: t("publicAgreement.timeline.confirmedDescription"),
+      description: t(
+        bySilence ? "publicAgreement.timeline.confirmedBySilenceDescription" : "publicAgreement.timeline.confirmedDescription"
+      ),
       tone: "success",
     });
   }
@@ -492,7 +500,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,activated_without_counterparty,activated_without_counterparty_at"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,confirmed_by,auto_confirm_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,activated_without_counterparty,activated_without_counterparty_at"
       )
       .eq("id", id)
       .maybeSingle();
@@ -1214,6 +1222,15 @@ export default function PromisePage() {
   const reviewerId =
     p?.promisor_id && p?.promisee_id && p.promisor_id === executorId ? p.promisee_id : p?.promisor_id ?? null;
   const accepterLabel = getParticipantLabel(accepterId);
+  // The date a promise marked done counts as kept if the other side stays silent: the one the final
+  // reminder promised, else the planned day 14; nothing once it has passed without the reminder yet.
+  const silenceIso = p ? expectedAutoConfirmAt({ completedAt: p.completed_at, finalNoticeAt: null, autoConfirmAt: p.auto_confirm_at ?? null }) : null;
+  const silenceDate =
+    silenceIso && new Date(silenceIso).getTime() > Date.now()
+      ? new Intl.DateTimeFormat(locale === "en" ? "en-US" : "uk-UA", { timeZone: "Europe/Kyiv", day: "numeric", month: "long" }).format(
+          new Date(silenceIso)
+        )
+      : null;
   const reviewerLabel = getParticipantLabel(reviewerId);
   const responsibleLabel = getParticipantLabel(executorId);
   const promiseToLabel = isSelf ? t("promises.detail.roles.selfValue") : getParticipantLabel(promiseMadeToId);
@@ -1748,6 +1765,16 @@ export default function PromisePage() {
 
             {isSelf && p.status === "completed_by_promisor" && (
               <p className="mt-5 text-sm text-tone-300">{t("promises.detail.selfDoneHint")}</p>
+            )}
+
+            {/* Marked done and waiting for the other side: both see when it counts anyway. */}
+            {!isSelf && isInviteAccepted && p.status === "completed_by_promisor" && silenceDate && (isExecutor || canReview) && (
+              <p className="mt-5 flex items-start gap-2 text-sm text-tone-300">
+                <Hourglass className="mt-0.5 h-4 w-4 shrink-0 text-warn-200" aria-hidden />
+                {isExecutor
+                  ? t("promises.detail.silenceExecutor", { name: reviewerLabel, date: silenceDate })
+                  : t("promises.detail.silenceReviewer", { date: silenceDate })}
+              </p>
             )}
 
             {p.activated_without_counterparty && !p.counterparty_id && isFinal && (

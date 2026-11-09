@@ -1,3 +1,4 @@
+import { expectedAutoConfirmAt } from "@/lib/promises/silenceRules";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAdminClient } from "../common";
@@ -33,6 +34,7 @@ type PromiseRow = {
   due_at: string | null;
   created_at: string;
   completed_at: string | null;
+  auto_confirm_at?: string | null;
   creator_id: string;
   promisor_id: string | null;
   promisee_id: string | null;
@@ -106,12 +108,19 @@ const waitingSince = (rows: MessageRow[], side: Speaker) => {
   return since;
 };
 
+// For a promise marked done and waiting on the other side: the day it counts as kept if they stay silent.
+function silenceConfirmsAt(promise: PromiseRow) {
+  if (promise.status !== "completed_by_promisor" || !promise.counterparty_id) return undefined;
+  const at = expectedAutoConfirmAt({ completedAt: promise.completed_at, finalNoticeAt: null, autoConfirmAt: promise.auto_confirm_at ?? null });
+  return at ? formatKyivDate(new Date(at)) : undefined;
+}
+
 async function loadCase(promiseId: string, userId: string) {
   const admin = getAdminClient();
   const { data: promise, error } = await admin
     .from("promises")
     .select(
-      "id,title,details,condition_text,condition_proposed_by,condition_met_at,status,visibility,due_at,created_at,completed_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,counterparty_accepted_at"
+      "id,title,details,condition_text,condition_proposed_by,condition_met_at,status,visibility,due_at,created_at,completed_at,auto_confirm_at,creator_id,promisor_id,promisee_id,counterparty_id,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,counterparty_accepted_at"
     )
     .eq("id", promiseId)
     .maybeSingle<PromiseRow>();
@@ -476,6 +485,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         deadline: promise.due_at ? formatKyivDate(new Date(promise.due_at)) : undefined,
         openedAt: formatKyivDate(new Date(promise.created_at)),
         markedDoneAt: promise.completed_at ? formatKyivDate(new Date(promise.completed_at)) : undefined,
+        silenceConfirmsAt: silenceConfirmsAt(promise),
         status: describeStatus(promise),
         visibility: promise.visibility ?? undefined,
         criteria: loaded.criteriaAgreed ? loaded.agreedCriteria : loaded.criteria,

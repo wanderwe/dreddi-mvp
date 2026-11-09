@@ -43,6 +43,8 @@ export type JudgePromise = {
   openedAt?: string;
   // When the promisor pressed "done" in Dreddi, if they did.
   markedDoneAt?: string;
+  // Marked done and waiting: the day it counts as kept if the other side neither confirms nor disputes.
+  silenceConfirmsAt?: string;
   status?: string;
   visibility?: string;
   counterObligation?: string;
@@ -284,6 +286,9 @@ export const buildCaseFacts = (promise: JudgePromise, now: Date = new Date()) =>
     promise.counterObligation ? `Counter-obligation: ${promise.counterObligation}` : null,
     promise.openedAt ? `Recorded in Dreddi on: ${promise.openedAt}` : null,
     promise.markedDoneAt ? `The promisor marked it done in Dreddi on: ${promise.markedDoneAt}` : null,
+    promise.silenceConfirmsAt
+      ? `If the other side neither confirms nor disputes, Dreddi counts the promise as kept on: ${promise.silenceConfirmsAt} (there is no other time limit)`
+      : null,
     promise.deadline ? `Deadline: ${promise.deadline}` : "Deadline: none",
     promise.status ? `Current status in Dreddi: ${promise.status}` : null,
     promise.visibility ? `Visibility: ${promise.visibility}` : null,

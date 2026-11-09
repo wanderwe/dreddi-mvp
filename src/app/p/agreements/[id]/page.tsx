@@ -41,6 +41,7 @@ type PublicAgreementRow = {
   due_at: string | null;
   completed_at: string | null;
   confirmed_at: string | null;
+  confirmed_by?: "counterparty" | "silence" | "dreddi" | null;
   disputed_at: string | null;
   accepted_at: string | null;
   counterparty_accepted_at: string | null;
@@ -263,12 +264,16 @@ function buildTimeline(
   }
 
   if (agreement.confirmed_at) {
+    // Counted because the other side never answered: Dreddi closed it, not the reviewer.
+    const bySilence = agreement.confirmed_by === "silence";
     items.push({
       key: "confirmed",
-      label: t("publicAgreement.timeline.confirmed"),
-      actor: labels.reviewer,
+      label: t(bySilence ? "publicAgreement.timeline.confirmedBySilence" : "publicAgreement.timeline.confirmed"),
+      actor: bySilence ? "Dreddi" : labels.reviewer,
       timestamp: agreement.confirmed_at,
-      description: t("publicAgreement.timeline.confirmedDescription"),
+      description: t(
+        bySilence ? "publicAgreement.timeline.confirmedBySilenceDescription" : "publicAgreement.timeline.confirmedDescription"
+      ),
       tone: "success",
     });
   }

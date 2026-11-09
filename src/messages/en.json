@@ -412,7 +412,9 @@
       "activatedWithoutCounterpartyNote": "Activated without counterparty confirmation",
       "closedWithoutCounterparty": "Closed, counterparty unconfirmed",
       "conditionStatusLabel": "Status",
-      "disputeReasonLabel": "Dispute reason"
+      "disputeReasonLabel": "Dispute reason",
+      "silenceExecutor": "If {name} doesn't answer by {date}, the promise will be counted as kept",
+      "silenceReviewer": "If you don't answer by {date}, the promise will be counted as kept"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
@@ -1316,7 +1318,9 @@
       "activatedWithoutCounterparty": "Activated without other party",
       "activatedWithoutCounterpartyDescription": "The agreement was activated without the other party's confirmation. They can still join later via the invite link.",
       "update": "Update",
-      "updateAuthorFallback": "Agreement participant"
+      "updateAuthorFallback": "Agreement participant",
+      "confirmedBySilence": "Counted without an answer",
+      "confirmedBySilenceDescription": "The other side neither confirmed nor disputed in 14 days"
     },
     "errors": {
       "supabase": "Supabase is not configured in this preview",
@@ -1502,9 +1506,9 @@
       "waitingRebuttal": "Waiting for {nickname}'s reply",
       "deciding": "Dreddi is deciding",
       "you": "you",
-      "notDecided": "Dreddi couldn't decide in time.",
+      "notDecided": "Dreddi couldn't decide in time",
       "retry": "Try again",
-      "wordingDeadline": "If {nickname} doesn't answer by {date}, the original question stays."
+      "wordingDeadline": "If {nickname} doesn't answer by {date}, the original question stays"
     },
     "verdict": {
       "title": "Dreddi's verdict",
@@ -1565,7 +1569,7 @@
     "sendChallenge": "Send the challenge",
     "cancelConfirm": {
       "title": "Cancel the dispute?",
-      "body": "The dispute will be deleted and the opponent's link will stop working.",
+      "body": "The dispute will be deleted and the opponent's link will stop working",
       "back": "Back",
       "confirm": "Cancel the dispute"
     },

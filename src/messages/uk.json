@@ -420,7 +420,9 @@
       "activatedWithoutCounterpartyNote": "Активовано без підтвердження іншої сторони",
       "closedWithoutCounterparty": "Закрито без підтвердження другої сторони",
       "conditionStatusLabel": "Статус",
-      "disputeReasonLabel": "Причина оскарження"
+      "disputeReasonLabel": "Причина оскарження",
+      "silenceExecutor": "Якщо {name} не відповість до {date}, обіцянку буде зараховано",
+      "silenceReviewer": "Якщо не відповісте до {date}, обіцянку буде зараховано"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Очікує прийняття",
@@ -1346,7 +1348,9 @@
       "activatedWithoutCounterparty": "Активовано без другої сторони",
       "activatedWithoutCounterpartyDescription": "Угоду активовано без підтвердження іншої сторони. Вони можуть приєднатись пізніше за посиланням.",
       "update": "Оновлення",
-      "updateAuthorFallback": "Учасник угоди"
+      "updateAuthorFallback": "Учасник угоди",
+      "confirmedBySilence": "Зараховано без відповіді",
+      "confirmedBySilenceDescription": "Інша сторона не підтвердила й не оскаржила виконання за 14 днів"
     },
     "errors": {
       "supabase": "Supabase не налаштовано в цьому превʼю",
@@ -1532,9 +1536,9 @@
       "waitingRebuttal": "Чекаємо на репліку {nickname}",
       "deciding": "Дредді розсуджує",
       "you": "ви",
-      "notDecided": "Дредді не встиг розсудити.",
+      "notDecided": "Дредді не встиг розсудити",
       "retry": "Спробувати ще раз",
-      "wordingDeadline": "Якщо {nickname} не відповість до {date}, лишиться початкове питання."
+      "wordingDeadline": "Якщо {nickname} не відповість до {date}, лишиться початкове питання"
     },
     "verdict": {
       "title": "Вердикт Дредді",
@@ -1595,7 +1599,7 @@
     "sendChallenge": "Надіслати виклик",
     "cancelConfirm": {
       "title": "Скасувати спір?",
-      "body": "Спір буде видалено, а посилання для опонента перестане працювати.",
+      "body": "Спір буде видалено, а посилання для опонента перестане працювати",
       "back": "Назад",
       "confirm": "Скасувати спір"
     },

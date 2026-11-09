@@ -66,6 +66,7 @@ type PromisePublicAgreementRecord = {
   due_at: string | null;
   completed_at: string | null;
   confirmed_at: string | null;
+  confirmed_by?: string | null;
   disputed_at: string | null;
   accepted_at: string | null;
   counterparty_accepted_at: string | null;
@@ -196,6 +197,7 @@ function serializePublicAgreement(
     due_at: promise.due_at,
     completed_at: promise.completed_at,
     confirmed_at: promise.confirmed_at,
+    confirmed_by: promise.confirmed_by ?? null,
     disputed_at: promise.disputed_at,
     accepted_at: promise.accepted_at,
     counterparty_accepted_at: promise.counterparty_accepted_at,
@@ -243,7 +245,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     const { data: promise, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
+        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,confirmed_by,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
       )
       .eq("id", id)
       .eq("visibility", "public")
@@ -372,7 +374,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const { data: promise, error } = await admin
       .from("promises")
       .select(
-        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
+        "id,title,details,condition_text,is_important,status,invite_status,created_at,due_at,completed_at,confirmed_at,confirmed_by,disputed_at,accepted_at,counterparty_accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,counterparty_id,promisor_id,promisee_id,counterparty_contact,activated_without_counterparty,activated_without_counterparty_at,invited_at"
       )
       .eq("id", id)
       .eq("visibility", "public")
