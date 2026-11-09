@@ -1593,7 +1593,8 @@
       "pending": "The stake is settled after the replies",
       "record": "Lock in a promise",
       "recorded": "The stake is locked in as a promise",
-      "add": "+ Add a stake"
+      "add": "+ Add a stake",
+      "remove": "Remove stake"
     }
   }
 }

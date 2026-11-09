@@ -101,18 +101,30 @@ export default function NewQuickDisputePage() {
           />
         </label>
 
-        {/* Optional, so hidden behind a link, as «+ Додати зустрічне зобов'язання» on a new promise. */}
+        {/* Optional, so hidden behind a link and removable, as the counter-condition on a new promise. */}
         {showStake || draft.stake ? (
           <label className="block space-y-1.5">
             <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
             <input
-              className={`${inputClass} py-3`}
+              className={`${inputClass} py-3 font-semibold placeholder:font-normal`}
               value={draft.stake}
               maxLength={LIMITS.stake}
               placeholder={t("decide.stake.placeholder")}
               autoFocus={showStake && !draft.stake}
               onChange={(e) => update({ stake: e.target.value })}
             />
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  update({ stake: "" });
+                  setShowStake(false);
+                }}
+                className="cursor-pointer text-xs font-semibold text-tone-300 transition hover:text-accent-100"
+              >
+                {t("decide.stake.remove")}
+              </button>
+            </div>
           </label>
         ) : (
           <div className="flex -mt-2">
