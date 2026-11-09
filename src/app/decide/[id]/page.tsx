@@ -229,13 +229,16 @@ export default function QuickDisputePage() {
       {inviteUrl && (
         <section className="decide-pop space-y-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/[0.07] p-4">
           <p className="text-base font-semibold text-tone-white">{t("decide.readyTitle")}</p>
-          <ShareButton
-            url={inviteUrl}
-            text={inviteText}
-            title={view.question}
-            label={t("decide.sendChallenge")}
-            links={messengers}
-          />
+          {/* On a phone the share sheet is the natural way to send; on a computer the link field below is. */}
+          <div className="sm:hidden">
+            <ShareButton
+              url={inviteUrl}
+              text={inviteText}
+              title={view.question}
+              label={t("decide.sendChallenge")}
+              links={messengers}
+            />
+          </div>
           <CopyField text={inviteUrl} label={t("decide.copyLink")} copiedLabel={t("decide.linkCopied")} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-2 text-xs text-tone-400">
