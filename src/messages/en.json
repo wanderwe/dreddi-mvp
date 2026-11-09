@@ -1497,19 +1497,13 @@
       "agree": "I agree",
       "keepMine": "Keep mine",
       "waitingWording": "Waiting for {nickname} to approve the wording",
-      "rebuttalPlaceholder": "One reply to the other side's position",
-      "reply": "Reply",
       "noReply": "No reply",
       "rebuttalHidden": "{nickname} has replied. You'll see it after yours.",
       "waitingRebuttal": "Waiting for {nickname}'s reply",
-      "decideNow": "Decide without the reply",
-      "availableAt": "Available {date}",
       "deciding": "Dreddi is deciding",
       "you": "you",
       "notDecided": "Dreddi couldn't decide in time.",
       "retry": "Try again",
-      "rebuttalTitle": "Your reply",
-      "rebuttalHint": "One answer to {nickname}'s position. After the replies, Dreddi gives the verdict.",
       "wordingDeadline": "If {nickname} doesn't answer by {date}, the original question stays."
     },
     "verdict": {
@@ -1556,7 +1550,6 @@
     "steps": {
       "question": "Question",
       "positions": "Positions",
-      "replies": "Replies",
       "verdict": "Verdict"
     },
     "anotherNickname": "Another nickname",
@@ -1575,6 +1568,16 @@
       "body": "The dispute will be deleted and the opponent's link will stop working.",
       "back": "Back",
       "confirm": "Cancel the dispute"
+    },
+    "reply": {
+      "title": "Disagree with the verdict?",
+      "hint": "One reply each. Once both have answered, Dreddi reviews the verdict once.",
+      "placeholder": "What do you disagree with?",
+      "send": "Send reply",
+      "reviewing": "Dreddi is reviewing the verdict",
+      "waiting": "Waiting for {nickname}. If they don't answer by {date}, Dreddi reviews the verdict with your reply.",
+      "changed": "The verdict was reviewed after the replies",
+      "unchanged": "The replies didn't change the verdict"
     }
   }
 }

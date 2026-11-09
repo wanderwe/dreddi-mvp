@@ -5,7 +5,6 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Check, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
-import { formatKyivDate } from "@/lib/ai/kyivDate";
 import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
 import { VerdictCard } from "../VerdictCard";
 import {
@@ -32,12 +31,13 @@ const STEP: Record<QuickView["status"], StepIndex> = {
   awaiting_b: 1,
   awaiting_question: 1,
   rebuttals: 2,
-  deciding: 3,
-  decided: 4,
+  deciding: 2,
+  decided: 3,
   expired: 1,
 };
 
-// The shared chat of a quick dispute: both positions, one rebuttal each, then Dreddi's verdict.
+// The shared chat of a quick dispute: both positions, Dreddi's verdict right away, then one reply each
+// and a single review of the verdict.
 export default function QuickDisputePage() {
   const t = useT();
   const locale = useLocale();
@@ -53,12 +53,12 @@ export default function QuickDisputePage() {
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [failed, setFailed] = useState<"decide" | "review" | null>(null);
+  const autoRun = useRef({ decide: false, review: false });
   const [origin, setOrigin] = useState("");
   const [shared, setShared] = useState(false);
   const autoSaved = useRef(false);
-  const rebuttalRef = useRef<HTMLFormElement | null>(null);
   const rebuttalInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const scrolledToTurn = useRef(false);
 
   useEffect(() => setOrigin(window.location.origin), []);
 
@@ -141,12 +141,15 @@ export default function QuickDisputePage() {
     window.location.assign(loginUrl.toString());
   };
 
-  // Back on the page when it is this side's turn to reply: bring the reply form into view once.
+  // The first verdict as soon as both positions are in, and the review once the replies are: whichever
+  // side has the page open asks for it (the server lets only one request do the work).
   useEffect(() => {
-    if (scrolledToTurn.current || !rebuttalRef.current) return;
-    scrolledToTurn.current = true;
-    rebuttalRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+    if (!view || busy) return;
+    const step = view.canDecideNow ? "decide" : view.canReviewNow ? "review" : null;
+    if (!step || autoRun.current[step]) return;
+    autoRun.current[step] = true;
+    void act({ action: step }).then((ok) => setFailed(ok ? null : step));
+  }, [view, busy, act]);
 
   useEffect(() => {
     if (!confirmCancel) return;
@@ -184,16 +187,25 @@ export default function QuickDisputePage() {
   const partyA = view.parties.find((party) => party.role === "A");
   const partyB = view.parties.find((party) => party.role === "B");
   const nicknames = { A: partyA?.nickname ?? "", B: partyB?.nickname ?? "" };
-  const winner = view.status === "decided" && view.verdict ? view.verdict.winner : null;
+  const verdict = view.verdict;
+  const winner = verdict ? verdict.winner : null;
   const inviteUrl = view.inviteToken && origin ? `${origin}${localizePath(`/decide/join/${view.inviteToken}`, locale)}` : null;
   const shareUrl = view.shareSlug && origin ? `${origin}${localizePath(`/d/${view.shareSlug}`, locale)}` : null;
-  const bothDone = view.parties.length === 2 && view.parties.every((party) => party.rebuttalDone);
-  const stuck = view.status === "rebuttals" && bothDone && !busy;
-  // The request that completes the replies also waits for the verdict, so show Dreddi at work right away.
-  const finishing =
-    pending === "decide" ||
-    ((pending === "rebuttal" || pending === "skip_rebuttal") && Boolean(other?.rebuttalDone));
-  const deciding = view.status === "deciding" || (busy && view.status === "rebuttals" && finishing);
+  // Dreddi at work: on the first verdict, or on the review the last reply sets off.
+  const deciding =
+    (view.status === "rebuttals" && failed !== "decide") || (view.status === "deciding" && !view.reviewing) || pending === "decide";
+  const reviewing =
+    view.reviewing ||
+    pending === "review" ||
+    (busy && (pending === "rebuttal" || pending === "skip_rebuttal") && Boolean(other?.rebuttalDone));
+  const dateTime = (iso: string) =>
+    new Intl.DateTimeFormat(locale === "en" ? "en-US" : "uk-UA", {
+      timeZone: "Europe/Kyiv",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(iso));
 
   const sideOf = (role: "A" | "B") => (view.myRole === role ? "me" : "other") as "me" | "other";
   const labelOf = (party: NonNullable<typeof me>) => (
@@ -285,18 +297,6 @@ export default function QuickDisputePage() {
           )
         )}
 
-        {view.parties.map((party) =>
-          party.rebuttal ? (
-            <Bubble key={`r-${party.role}`} side={sideOf(party.role)} name={party.nickname} label={labelOf(party)}>
-              <p className="whitespace-pre-wrap">{party.rebuttal}</p>
-            </Bubble>
-          ) : !party.isMe && party.rebuttalDone && me && !me.rebuttalDone && view.status === "rebuttals" ? (
-            <Bubble key={`r-${party.role}`} side="other" name={party.nickname} label={labelOf(party)} muted>
-              {t("decide.chat.rebuttalHidden", { nickname: party.nickname })}
-            </Bubble>
-          ) : null
-        )}
-
         {deciding && (
           <div className="decide-pop flex items-center justify-center gap-2 py-2 text-sm font-medium text-accent-200">
             <Scale className="h-4 w-4" aria-hidden />
@@ -328,97 +328,102 @@ export default function QuickDisputePage() {
             </p>
             {view.wordingDeadline && (
               <p className="pl-5 text-xs text-tone-500">
-                {t("decide.chat.wordingDeadline", {
-                  nickname: other?.nickname ?? "",
-                  date: new Intl.DateTimeFormat(locale === "en" ? "en-US" : "uk-UA", {
-                    timeZone: "Europe/Kyiv",
-                    day: "numeric",
-                    month: "long",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(view.wordingDeadline)),
-                })}
+                {t("decide.chat.wordingDeadline", { nickname: other?.nickname ?? "", date: dateTime(view.wordingDeadline) })}
               </p>
             )}
           </div>
         ))}
 
-      {view.status === "rebuttals" && me && !me.rebuttalDone && !deciding && (
-        <form
-          ref={rebuttalRef}
-          className="decide-pop scroll-mt-24 space-y-3 rounded-2xl border-2 border-emerald-400/50 bg-emerald-400/[0.07] p-4 shadow-lg shadow-accent-500/10"
-          onSubmit={(e) => {
-            e.preventDefault();
-            // An empty reply sends nothing: it points to the field instead.
-            if (!rebuttal.trim()) {
-              rebuttalInputRef.current?.focus();
-              return;
-            }
-            void act({ action: "rebuttal", text: rebuttal }).then((ok) => ok && setRebuttal(""));
-          }}
-        >
-          <div className="space-y-1">
-            <p className="flex items-center gap-2 text-base font-semibold text-tone-white">
-              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" aria-hidden />
-              {t("decide.chat.rebuttalTitle")}
-            </p>
-            <p className="text-sm text-tone-300">{t("decide.chat.rebuttalHint", { nickname: other?.nickname ?? "" })}</p>
-          </div>
-          <textarea
-            ref={rebuttalInputRef}
-            className="min-h-[96px] w-full rounded-xl border border-emerald-400/30 bg-tone-950/60 px-3 py-2 text-sm text-tone-white outline-none placeholder:text-tone-500 focus:border-emerald-400/70"
-            value={rebuttal}
-            maxLength={LIMITS.rebuttal}
-            placeholder={t("decide.chat.rebuttalPlaceholder")}
-            onChange={(e) => setRebuttal(e.target.value)}
-          />
-          <div className={actionRowClass}>
-            <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
-              {t("decide.chat.noReply")}
-            </button>
-            <button type="submit" className={`${primaryButtonClass} py-3 text-base`} disabled={busy}>
-              <Send className="h-4 w-4" aria-hidden />
-              {t("decide.chat.reply")}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {view.status === "rebuttals" && me?.rebuttalDone && other && !other.rebuttalDone && !deciding && (
-        <div className="space-y-2">
-          <p className="flex items-center gap-2 text-sm text-tone-400">
-            <Hourglass className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {t("decide.chat.waitingRebuttal", { nickname: other.nickname })}
-          </p>
-          {view.canDecideNow ? (
-            <div className={actionRowClass}>
-              <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "decide" })}>
-                {t("decide.chat.decideNow")}
-              </button>
-            </div>
-          ) : view.decideNowAt ? (
-            <p className="text-xs text-tone-500">
-              {t("decide.chat.decideNow")}: {t("decide.chat.availableAt", {
-                date: formatKyivDate(new Date(view.decideNowAt), locale === "en" ? "en-US" : "uk-UA"),
-              })}
-            </p>
-          ) : null}
-        </div>
-      )}
-
-      {stuck && (
+      {failed && !busy && (
         <div className="decide-pop flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-warn-300/30 bg-warn-500/10 p-4">
           <p className="text-sm text-tone-200">{t("decide.chat.notDecided")}</p>
-          <button type="button" className={primaryButtonClass} onClick={() => void act({ action: "decide" })}>
+          <button type="button" className={primaryButtonClass} onClick={() => void act({ action: failed }).then((ok) => ok && setFailed(null))}>
             <RotateCcw className="h-4 w-4" aria-hidden />
             {t("decide.chat.retry")}
           </button>
         </div>
       )}
 
-      {view.status === "decided" && view.verdict && (
+      {verdict && (
         <div className="decide-pop space-y-4">
-          <VerdictCard verdict={view.verdict} nicknames={nicknames} t={t} />
+          {reviewing ? (
+            <p className="flex items-center gap-2 text-sm font-medium text-accent-200">
+              <Scale className="h-4 w-4" aria-hidden />
+              {t("decide.reply.reviewing")}
+              <TypingDots />
+            </p>
+          ) : view.reviewOutcome ? (
+            <p className="flex items-center gap-2 text-sm font-medium text-tone-300">
+              <RotateCcw className="h-4 w-4 text-accent-200" aria-hidden />
+              {t(view.reviewOutcome === "changed" ? "decide.reply.changed" : "decide.reply.unchanged")}
+            </p>
+          ) : null}
+          <div className={reviewing ? "opacity-60 transition-opacity" : "transition-opacity"}>
+            <VerdictCard verdict={verdict} nicknames={nicknames} t={t} />
+          </div>
+
+          {view.parties.some((party) => party.rebuttal || (!party.isMe && party.rebuttalDone && view.replyOpen)) && (
+            <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">
+              {view.parties.map((party) =>
+                party.rebuttal ? (
+                  <Bubble key={`r-${party.role}`} side={sideOf(party.role)} name={party.nickname} label={labelOf(party)}>
+                    <p className="whitespace-pre-wrap">{party.rebuttal}</p>
+                  </Bubble>
+                ) : !party.isMe && party.rebuttalDone && me && !me.rebuttalDone && view.replyOpen ? (
+                  <Bubble key={`r-${party.role}`} side="other" name={party.nickname} label={labelOf(party)} muted>
+                    {t("decide.chat.rebuttalHidden", { nickname: party.nickname })}
+                  </Bubble>
+                ) : null
+              )}
+            </div>
+          )}
+
+          {view.replyOpen && me && !me.rebuttalDone && !reviewing && (
+            <form
+              className="space-y-3 rounded-2xl border-2 border-emerald-400/50 bg-emerald-400/[0.07] p-4 shadow-lg shadow-accent-500/10"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // An empty reply sends nothing: it points to the field instead.
+                if (!rebuttal.trim()) {
+                  rebuttalInputRef.current?.focus();
+                  return;
+                }
+                void act({ action: "rebuttal", text: rebuttal }).then((ok) => ok && setRebuttal(""));
+              }}
+            >
+              <div className="space-y-1">
+                <p className="text-base font-semibold text-tone-white">{t("decide.reply.title")}</p>
+                <p className="text-sm text-tone-300">{t("decide.reply.hint")}</p>
+              </div>
+              <textarea
+                ref={rebuttalInputRef}
+                className="min-h-[96px] w-full rounded-xl border border-emerald-400/30 bg-tone-950/60 px-3 py-2 text-sm text-tone-white outline-none placeholder:text-tone-500 focus:border-emerald-400/70"
+                value={rebuttal}
+                maxLength={LIMITS.rebuttal}
+                placeholder={t("decide.reply.placeholder")}
+                onChange={(e) => setRebuttal(e.target.value)}
+              />
+              <div className={actionRowClass}>
+                <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
+                  {t("decide.chat.noReply")}
+                </button>
+                <button type="submit" className={`${primaryButtonClass} py-3 text-base`} disabled={busy}>
+                  <Send className="h-4 w-4" aria-hidden />
+                  {t("decide.reply.send")}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {view.replyOpen && me?.rebuttalDone && other && !other.rebuttalDone && !reviewing && (
+            <p className="flex items-start gap-2 text-sm text-tone-400">
+              <Hourglass className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+              {me.rebuttal && view.replyDeadline
+                ? t("decide.reply.waiting", { nickname: other.nickname, date: dateTime(view.replyDeadline) })
+                : t("decide.chat.waitingRebuttal", { nickname: other.nickname })}
+            </p>
+          )}
+
           <div className={actionRowClass}>
             {view.saved ? (
               <span className="inline-flex items-center justify-center gap-1.5 py-2 text-sm text-tone-400 sm:mr-auto">
@@ -446,7 +451,7 @@ export default function QuickDisputePage() {
             )}
           </div>
           {!view.saved && !signedIn && <p className="text-xs text-tone-400 sm:text-right">{t("decide.verdict.saveHint")}</p>}
-          {view.verdict.suggest_mediation && (
+          {verdict.suggest_mediation && (
             <div className="space-y-2 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] p-4">
               <p className="text-sm text-tone-200">{t("decide.verdict.mediation")}</p>
               <div className={actionRowClass}>

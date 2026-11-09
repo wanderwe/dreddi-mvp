@@ -175,12 +175,12 @@ export function IdentityChoice({
 
 export type StepIndex = 0 | 1 | 2 | 3 | 4;
 
-// Question · Positions · Replies · Verdict; `current` is the step in progress, 4 when all are done.
+// Question · Positions · Verdict; `current` is the step in progress, 3 when all are done.
 export function StepsBar({ current }: { current: StepIndex }) {
   const t = useT();
-  const labels = [t("decide.steps.question"), t("decide.steps.positions"), t("decide.steps.replies"), t("decide.steps.verdict")];
+  const labels = [t("decide.steps.question"), t("decide.steps.positions"), t("decide.steps.verdict")];
   return (
-    <ol className="grid grid-cols-4 gap-1.5">
+    <ol className="grid grid-cols-3 gap-1.5">
       {labels.map((label, index) => {
         const done = index < current;
         const active = index === current;
