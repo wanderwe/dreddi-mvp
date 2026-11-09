@@ -434,7 +434,7 @@ export default function QuickDisputePage() {
                 {t("decide.verdict.save")}
               </button>
             )}
-            <a href={localizePath(`/decide/new?q=${encodeURIComponent(view.question)}`, locale)} className={secondaryButtonClass}>
+            <a href={localizePath("/decide/new", locale)} className={secondaryButtonClass}>
               <Swords className="h-4 w-4" aria-hidden />
               {t("decide.verdict.rematch")}
             </a>
