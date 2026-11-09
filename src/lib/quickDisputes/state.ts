@@ -53,8 +53,10 @@ export const LIMITS = {
   replyHours: 24,
   // A has this long to answer B's rewording; silence keeps the original question.
   wordingHours: 24,
-  // New disputes a day per person (signed in or the same browser) and per IP.
-  perCreatorPerDay: 5,
+  // New disputes a day per person (signed in or the same browser), and per IP address, which a mobile
+  // network or an office shares among many people.
+  perCreatorPerDay: 10,
+  perIpPerDay: 30,
   // Verdicts a day across the whole service, as a cost cap.
   verdictsPerDay: 300,
 } as const;

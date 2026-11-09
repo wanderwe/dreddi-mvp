@@ -167,7 +167,7 @@ export async function createDispute(
         .eq("creator_ip_hash", identity.ipHash)
         .gte("created_at", since)
     : { count: 0 };
-  if ((mine ?? 0) >= LIMITS.perCreatorPerDay || (fromIp ?? 0) >= LIMITS.perCreatorPerDay) {
+  if ((mine ?? 0) >= LIMITS.perCreatorPerDay || (fromIp ?? 0) >= LIMITS.perIpPerDay) {
     throw new JudgeError("daily_limit", 429);
   }
 
