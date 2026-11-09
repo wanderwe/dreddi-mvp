@@ -8,6 +8,10 @@ export const CRITICAL_NOTIFICATION_TYPES: NotificationType[] = [
   "completion_followup",
   "completion_final_notice",
   "completion_auto_confirmed",
+  "dispute_wording",
+  "dispute_verdict",
+  "dispute_reply",
+  "dispute_reviewed",
   "dispute",
   "disputed",
 ];

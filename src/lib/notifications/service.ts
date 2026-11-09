@@ -30,6 +30,9 @@ export type NotificationRequest = {
   followup?: "invite" | "completion24" | "completion72";
   delta?: number | null;
   date?: string | null;
+  params?: Record<string, string>;
+  // A «Хто правий?» notification points at a quick dispute instead of a promise.
+  disputeId?: string | null;
   requiresDeadlineReminder?: boolean;
 };
 
@@ -184,6 +187,7 @@ export async function createNotification(
     followup: request.followup,
     delta: request.delta,
     date: request.date,
+    params: request.params,
   });
 
   const title = request.title ?? copy.title ?? "";
@@ -192,6 +196,7 @@ export async function createNotification(
   const { error } = await admin.from("notifications").insert({
     user_id: request.userId,
     promise_id: request.promiseId,
+    ...(request.disputeId ? { dispute_id: request.disputeId } : {}),
     type: normalizedType,
     title,
     body,

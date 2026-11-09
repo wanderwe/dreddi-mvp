@@ -11,6 +11,8 @@ const EMAIL_ELIGIBLE_TYPES = new Set<NotificationType>([
   "completion_followup",
   "completion_final_notice",
   "completion_auto_confirmed",
+  "dispute_verdict",
+  "dispute_reply",
   "reminder_due_24h",
   "reminder_overdue",
   "reminder_deadline",
@@ -121,6 +123,26 @@ const resolveEmailCopy = (payload: EmailPayload) => {
         manageUrl,
       });
       return { subject: "Invite declined", ...content };
+    }
+    case "dispute_verdict": {
+      const content = renderTemplate({
+        heading: payload.title || "Who's right?",
+        message: payload.body || "Dreddi gave a verdict in your dispute.",
+        ctaLabel: "Open",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: payload.title || "Who's right?", ...content };
+    }
+    case "dispute_reply": {
+      const content = renderTemplate({
+        heading: payload.title || "Who's right?",
+        message: payload.body || "The other side disagrees with the verdict and sent a reply.",
+        ctaLabel: "Open",
+        ctaUrl,
+        manageUrl,
+      });
+      return { subject: payload.title || "Who's right?", ...content };
     }
     case "completion_final_notice": {
       const content = renderTemplate({

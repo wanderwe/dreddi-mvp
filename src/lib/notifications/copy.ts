@@ -172,6 +172,26 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "The promise was counted as kept without your answer",
       ctaLabel: "View",
     },
+    dispute_wording: {
+      title: "Who's right?",
+      body: "{nickname} suggests a different wording",
+      ctaLabel: "Open",
+    },
+    dispute_verdict: {
+      title: "Who's right?",
+      body: "Dreddi gave a verdict on «{question}»",
+      ctaLabel: "Open",
+    },
+    dispute_reply: {
+      title: "Who's right?",
+      body: "{nickname} disagrees with the verdict and sent a reply",
+      ctaLabel: "Open",
+    },
+    dispute_reviewed: {
+      title: "Who's right?",
+      body: "Dreddi reviewed the verdict after the replies",
+      ctaLabel: "Open",
+    },
     admin_new_feedback: {
       title: "New feedback submitted",
       body: "A user submitted new feedback.",
@@ -339,6 +359,26 @@ const copyByLocale: Record<NotificationLocale, Record<NotificationType, Notifica
       body: "Обіцянку зараховано без вашої відповіді",
       ctaLabel: "Переглянути",
     },
+    dispute_wording: {
+      title: "Хто правий?",
+      body: "{nickname} пропонує інше формулювання питання",
+      ctaLabel: "Відкрити",
+    },
+    dispute_verdict: {
+      title: "Хто правий?",
+      body: "Дредді виніс вердикт у суперечці «{question}»",
+      ctaLabel: "Відкрити",
+    },
+    dispute_reply: {
+      title: "Хто правий?",
+      body: "{nickname} не згоден з вердиктом і надіслав репліку",
+      ctaLabel: "Відкрити",
+    },
+    dispute_reviewed: {
+      title: "Хто правий?",
+      body: "Дредді переглянув вердикт після реплік",
+      ctaLabel: "Відкрити",
+    },
     admin_new_feedback: {
       title: "Новий фідбек",
       body: "Користувач залишив новий фідбек.",
@@ -421,6 +461,8 @@ export type NotificationCopyOptions = {
   delta?: number | null;
   // Fills {date} in the text, in the reader's language (Kyiv time).
   date?: string | null;
+  // Fills other {name} placeholders as given.
+  params?: Record<string, string>;
 };
 
 export const getNotificationCopy = ({
@@ -430,6 +472,7 @@ export const getNotificationCopy = ({
   followup,
   delta,
   date,
+  params,
 }: NotificationCopyOptions) => {
   const normalizedType = normalizeNotificationType(type);
   const baseLocale = copyByLocale[locale] ? locale : fallbackLocale;
@@ -467,6 +510,8 @@ export const getNotificationCopy = ({
     }).format(new Date(date));
     body = body.replace("{date}", formatted);
   }
+
+  for (const [key, value] of Object.entries(params ?? {})) body = body.split(`{${key}}`).join(value);
 
   return {
     title: stripTrailingPeriod(pledgeWording(title)),

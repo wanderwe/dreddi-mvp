@@ -2,6 +2,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askQuickVerdict } from "@/lib/ai/askQuickVerdict";
+import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
+import type { NotificationType } from "@/lib/notifications/types";
 import type { QuickLang } from "@/lib/ai/quickVerdict";
 import {
   LIMITS,
@@ -109,6 +111,34 @@ async function loadForSide(id: string, identity: Identity) {
   const me = loaded.parties.find((party) => isMine(party, identity));
   if (!me) throw new JudgeError("not_a_side", 403);
   return { ...loaded, me };
+}
+
+// Tells the signed-in sides (an anonymous one has no address) about a step in their dispute: on the
+// site, and by email for the verdict and the other side's reply. Never breaks the step itself.
+async function notifySides(
+  dispute: Pick<DisputeRow, "id">,
+  parties: Pick<PartyRow, "role" | "user_id">[],
+  type: NotificationType,
+  params: Record<string, string> = {},
+  roles: QuickRole[] = ["A", "B"]
+) {
+  for (const party of parties) {
+    if (!party.user_id || !roles.includes(party.role)) continue;
+    try {
+      await createNotification(getAdminClient(), {
+        userId: party.user_id,
+        promiseId: null,
+        disputeId: dispute.id,
+        type,
+        dedupeKey: `${type}:${dispute.id}:${party.user_id}`,
+        ctaUrl: `/decide/${dispute.id}`,
+        priority: mapPriorityForType(type),
+        params,
+      });
+    } catch (error) {
+      console.warn("quick dispute: notification failed", { disputeId: dispute.id, type, error: String(error) });
+    }
+  }
 }
 
 export async function createDispute(
@@ -228,12 +258,13 @@ export async function joinDispute(
     .select("id");
   if (!moved?.length) throw new JudgeError("taken", 409);
 
+  const nicknameB = await nicknameFor(identity, dispute.lang, sideA?.nickname, body.nickname);
   const { error } = await admin.from("quick_dispute_parties").insert({
     dispute_id: dispute.id,
     role: "B",
     user_id: identity.userId,
     secret_hash: identity.secretHash,
-    nickname: await nicknameFor(identity, dispute.lang, sideA?.nickname, body.nickname),
+    nickname: nicknameB,
     position,
     position_at: now,
   });
@@ -244,6 +275,8 @@ export async function joinDispute(
       .eq("id", dispute.id);
     throw new JudgeError(`Could not join: ${error.message}`, 500);
   }
+  // A reworded question waits for side A, who may well have left the page.
+  if (changed && sideA) await notifySides(dispute, [sideA], "dispute_wording", { nickname: nicknameB });
   return { id: dispute.id };
 }
 
@@ -344,6 +377,11 @@ export async function act(id: string, identity: Identity, body: Action) {
           : { rebuttal_skipped: true, rebuttal_at: now }
       )
       .eq("id", me.id);
+    // A reply waits for the other side's, unless they already answered and the review runs now.
+    const other = parties.find((party) => party.role !== me.role);
+    if (body.action === "rebuttal" && other && !rebuttalDone(other)) {
+      await notifySides(dispute, [other], "dispute_reply", { nickname: me.nickname });
+    }
   } else if (body.action === "claim") {
     // Saving a dispute: the signed-in user takes over the side this browser played.
     if (!identity.userId) throw new JudgeError("sign_in", 401);
@@ -419,6 +457,7 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
         ...(parties.some(rebuttalDone) ? { verdict_reviewed_at: new Date().toISOString() } : {}),
       })
       .eq("id", dispute.id);
+    await notifySides(dispute, parties, "dispute_verdict", { question: dispute.question });
   } catch (error) {
     // Back to rebuttals, so the verdict can be asked for again.
     await admin.from("quick_disputes").update({ status: "rebuttals" }).eq("id", dispute.id).eq("status", "deciding");
@@ -459,6 +498,7 @@ async function review(dispute: DisputeRow, parties: PartyRow[]) {
         cost_usd: Number(before?.cost_usd ?? 0) + answer.usage.costUsd,
       })
       .eq("id", dispute.id);
+    await notifySides(dispute, parties, "dispute_reviewed");
   } catch (error) {
     // Back to the verdict as it was, so the review can be asked for again.
     await admin.from("quick_disputes").update({ status: "decided" }).eq("id", dispute.id).eq("status", "deciding");

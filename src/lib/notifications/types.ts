@@ -32,7 +32,11 @@ export type NotificationType =
   | "counter_condition_rejected"
   | "admin_new_feedback"
   | "completion_final_notice"
-  | "completion_auto_confirmed";
+  | "completion_auto_confirmed"
+  | "dispute_wording"
+  | "dispute_verdict"
+  | "dispute_reply"
+  | "dispute_reviewed";
 
 export const normalizeNotificationType = (type: NotificationType): NotificationType => {
   if (type === "manual_reminder") return "reminder_manual";
