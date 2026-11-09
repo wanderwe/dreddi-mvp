@@ -92,7 +92,7 @@ export default function NewQuickDisputePage() {
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold text-tone-200">{t("decide.questionLabel")}</span>
           <input
-            className={`${inputClass} py-3 text-base font-semibold`}
+            className={`${inputClass} py-3 text-base font-semibold placeholder:font-normal`}
             value={draft.question}
             maxLength={LIMITS.question}
             placeholder={t("decide.questionPlaceholder")}
@@ -103,7 +103,7 @@ export default function NewQuickDisputePage() {
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
           <input
-            className={inputClass}
+            className={`${inputClass} py-3 text-base`}
             value={draft.stake}
             maxLength={LIMITS.stake}
             placeholder={t("decide.stake.placeholder")}
