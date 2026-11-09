@@ -12,6 +12,7 @@ import {
   Bubble,
   CopyField,
   PageShell,
+  ShareButton,
   SkeletonRows,
   actionRowClass,
   StepsBar,
@@ -196,19 +197,13 @@ export default function QuickDisputePage() {
       {inviteUrl && (
         <section className="decide-pop space-y-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/[0.07] p-4">
           <p className="text-base font-semibold text-tone-white">{t("decide.readyTitle")}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {messengers.map((messenger) => (
-              <a
-                key={messenger.name}
-                href={messenger.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${secondaryButtonClass} px-2`}
-              >
-                {messenger.name}
-              </a>
-            ))}
-          </div>
+          <ShareButton
+            url={inviteUrl}
+            text={inviteText}
+            title={view.question}
+            label={t("decide.sendChallenge")}
+            links={messengers}
+          />
           <CopyField text={inviteUrl} label={t("decide.copyLink")} copiedLabel={t("decide.linkCopied")} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-2 text-xs text-tone-400">
@@ -219,7 +214,7 @@ export default function QuickDisputePage() {
               type="button"
               disabled={busy}
               onClick={() => void act({ action: "cancel" })}
-              className="cursor-pointer text-xs font-medium text-tone-400 underline-offset-2 hover:text-danger-300 hover:underline"
+              className="cursor-pointer text-xs font-medium text-danger-300 underline-offset-2 transition hover:text-danger-200 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("decide.cancel")}
             </button>

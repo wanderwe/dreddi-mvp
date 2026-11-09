@@ -1595,6 +1595,7 @@
     "shareText": "Посперечаймось у Дредді: {question}",
     "cancel": "Скасувати спір",
     "you": "Ви",
-    "youAs": "Ви · {nickname}"
+    "youAs": "Ви · {nickname}",
+    "sendChallenge": "Надіслати виклик"
   }
 }

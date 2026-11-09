@@ -1565,6 +1565,7 @@
     "shareText": "Let's settle it in Dreddi: {question}",
     "cancel": "Cancel the dispute",
     "you": "You",
-    "youAs": "You · {nickname}"
+    "youAs": "You · {nickname}",
+    "sendChallenge": "Send the challenge"
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { Check, Copy, Dices } from "lucide-react";
+import { Check, Copy, Dices, Send } from "lucide-react";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -331,6 +331,91 @@ export function SkeletonRows({ count = 3, className = "h-[52px]" }: { count?: nu
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={`${className} animate-pulse rounded-xl bg-tone-white/5`} />
       ))}
+    </div>
+  );
+}
+
+// One send button: the system share sheet where the browser has one (phones, Safari), otherwise a small
+// menu of messengers. The link field under it stays for copying by hand.
+export function ShareButton({
+  url,
+  text,
+  title,
+  label,
+  links,
+}: {
+  url: string;
+  text: string;
+  title: string;
+  label: string;
+  links: { name: string; href: string }[];
+}) {
+  const [canShare, setCanShare] = useState(false);
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function"), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: MouseEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !boxRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open]);
+
+  const onClick = async () => {
+    if (canShare) {
+      try {
+        await navigator.share({ title, text, url });
+        return;
+      } catch (error) {
+        // Closed by the person: nothing to do. Any other failure falls back to the menu.
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    setOpen((value) => !value);
+  };
+
+  return (
+    <div ref={boxRef} className="relative">
+      <button
+        type="button"
+        className={`${primaryButtonClass} w-full py-3 text-base`}
+        aria-haspopup={canShare ? undefined : "menu"}
+        aria-expanded={canShare ? undefined : open}
+        onClick={() => void onClick()}
+      >
+        <Send className="h-4 w-4" aria-hidden />
+        {label}
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="decide-pop absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-xl border border-tone-white/10 bg-tone-950 shadow-xl shadow-tone-black/20"
+        >
+          {links.map((link) => (
+            <a
+              key={link.name}
+              role="menuitem"
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-sm font-semibold text-tone-100 transition hover:bg-tone-white/5 hover:text-accent-200"
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
