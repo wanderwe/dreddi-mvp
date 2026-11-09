@@ -52,6 +52,7 @@ export default function QuickDisputePage() {
   const [rebuttal, setRebuttal] = useState("");
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [origin, setOrigin] = useState("");
   const [shared, setShared] = useState(false);
   const autoSaved = useRef(false);
@@ -146,6 +147,13 @@ export default function QuickDisputePage() {
     scrolledToTurn.current = true;
     rebuttalRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
   });
+
+  useEffect(() => {
+    if (!confirmCancel) return;
+    const close = (event: KeyboardEvent) => event.key === "Escape" && setConfirmCancel(false);
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [confirmCancel]);
 
   if (!view) {
     return (
@@ -248,7 +256,7 @@ export default function QuickDisputePage() {
             <button
               type="button"
               disabled={busy}
-              onClick={() => void act({ action: "cancel" })}
+              onClick={() => setConfirmCancel(true)}
               className="cursor-pointer text-xs font-medium text-danger-300 underline-offset-2 transition hover:text-danger-200 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("decide.cancel")}
@@ -436,6 +444,47 @@ export default function QuickDisputePage() {
       )}
 
       {error && <p className="text-sm text-danger-300">{error}</p>}
+
+      {/* Same confirmation as declining an agreement invite: the dispute and its link are gone for good. */}
+      {confirmCancel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4"
+          onMouseDown={(event) => event.target === event.currentTarget && setConfirmCancel(false)}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="cancel-dispute-title"
+            className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl"
+          >
+            <h2 id="cancel-dispute-title" className="text-xl font-semibold text-tone-white">
+              {t("decide.cancelConfirm.title")}
+            </h2>
+            <p className="mt-3 text-sm text-ntone-200">{t("decide.cancelConfirm.body")}</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setConfirmCancel(false)}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tone-white/15 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950"
+              >
+                {t("decide.cancelConfirm.back")}
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setConfirmCancel(false);
+                  void act({ action: "cancel" });
+                }}
+                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-tone-white shadow-lg shadow-danger-500/25 transition hover:bg-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ntone-950 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t("decide.cancelConfirm.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 }

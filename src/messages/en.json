@@ -1568,6 +1568,12 @@
     "cancel": "Cancel the dispute",
     "you": "You",
     "youAs": "You · {nickname}",
-    "sendChallenge": "Send the challenge"
+    "sendChallenge": "Send the challenge",
+    "cancelConfirm": {
+      "title": "Cancel the dispute?",
+      "body": "The dispute will be deleted and the opponent's link will stop working.",
+      "back": "Back",
+      "confirm": "Cancel the dispute"
+    }
   }
 }
