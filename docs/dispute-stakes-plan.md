@@ -44,7 +44,7 @@
 | Де | uk | en |
 |---|---|---|
 | Поле при створенні | Ставка (необов'язково) | Stake (optional) |
-| Підказка в полі | Наприклад: хто програє, купує каву | For example: whoever loses buys coffee |
+| Підказка в полі | Наприклад: купити каву переможцю | For example: buy the winner a coffee |
 | Опоненту за посиланням | Ставка: {stake} | Stake: {stake} |
 | Під вердиктом, є програвший | {nickname} програє ставку: {stake} | {nickname} loses the stake: {stake} |
 | Під вердиктом, нічия | Ставка не зіграла | The stake didn't play out |

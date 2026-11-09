@@ -1586,7 +1586,7 @@
     },
     "stake": {
       "label": "Stake (optional)",
-      "placeholder": "For example: whoever loses buys coffee",
+      "placeholder": "For example: buy the winner a coffee",
       "inline": "Stake: {stake}",
       "lost": "{nickname} loses the stake: {stake}",
       "void": "The stake didn't play out",
