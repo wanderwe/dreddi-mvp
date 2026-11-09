@@ -7,6 +7,7 @@ import { localizePath } from "@/lib/i18n/routing";
 import type { Locale } from "@/lib/i18n/locales";
 import { VerdictCard, verdictHeadline } from "@/app/decide/VerdictCard";
 import { ShareVerdict } from "./ShareVerdict";
+import { TrackView } from "@/lib/events/TrackView";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
@@ -40,6 +41,7 @@ export async function QuickCardPage({ slug, locale }: { slug: string; locale: Lo
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
+      <TrackView name="dispute_card_view" refId={slug} />
       <div className="relative flex min-h-screen items-start justify-center px-4 py-8 md:py-12">
         <div className="w-full max-w-2xl space-y-5 rounded-3xl border border-tone-white/10 bg-tone-black/40 p-5 shadow-2xl shadow-tone-black/40 backdrop-blur sm:p-8">
           <div className="space-y-1">
@@ -60,7 +62,7 @@ export async function QuickCardPage({ slug, locale }: { slug: string; locale: Lo
                 : t("decide.stake.void")}
             </p>
           )}
-          <ShareVerdict question={card.question} shareText={card.verdict.share_text} />
+          <ShareVerdict slug={slug} question={card.question} shareText={card.verdict.share_text} />
         </div>
       </div>
     </main>

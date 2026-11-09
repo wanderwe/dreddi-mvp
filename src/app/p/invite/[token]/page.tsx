@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Copy, ExternalLink } from "lucide-react";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
+import { track } from "@/lib/events/client";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { formatDueDate } from "@/lib/formatDueDate";
@@ -81,6 +82,10 @@ export default function InvitePage() {
   const searchParams = useSearchParams();
 
   const [info, setInfo] = useState<InviteInfo | null>(null);
+
+  useEffect(() => {
+    if (token) track("promise_invite_open", token);
+  }, [token]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean>(false);

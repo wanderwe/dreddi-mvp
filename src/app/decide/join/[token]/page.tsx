@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Handshake, Scale, Send, Swords } from "lucide-react";
+import { track } from "@/lib/events/client";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickRole, type QuickStatus } from "@/lib/quickDisputes/state";
@@ -52,6 +53,10 @@ export default function JoinQuickDisputePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reword = draft.reword === "1";
+
+  useEffect(() => {
+    if (token) track("dispute_invite_open", token);
+  }, [token]);
 
   useEffect(() => {
     if (signedIn === null) return;

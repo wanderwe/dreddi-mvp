@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Check, Gavel, Handshake, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
+import { track } from "@/lib/events/client";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
@@ -227,6 +228,7 @@ export default function QuickDisputePage() {
 
   const shareVerdict = async () => {
     if (!shareUrl || !view.verdict) return;
+    track("dispute_share", view.id);
     if (navigator.share) {
       await navigator.share({ title: view.question, text: view.verdict.share_text, url: shareUrl }).catch(() => undefined);
       return;
