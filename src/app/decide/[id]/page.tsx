@@ -361,7 +361,11 @@ export default function QuickDisputePage() {
             </p>
           ) : view.reviewOutcome ? (
             <p className="flex items-center gap-2 text-sm font-medium text-tone-300">
-              <RotateCcw className="h-4 w-4 text-accent-200" aria-hidden />
+              {view.reviewOutcome === "changed" ? (
+                <Scale className="h-4 w-4 text-accent-200" aria-hidden />
+              ) : (
+                <Check className="h-4 w-4 text-accent-200" aria-hidden />
+              )}
               {t(view.reviewOutcome === "changed" ? "decide.reply.changed" : "decide.reply.unchanged")}
             </p>
           ) : null}
