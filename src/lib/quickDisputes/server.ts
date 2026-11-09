@@ -10,6 +10,7 @@ import {
   isRandomNickname,
   maskNames,
   randomNickname,
+  readyForReview,
   readyForVerdict,
   rebuttalDone,
   wordingOverdue,
@@ -51,7 +52,7 @@ export function makeIdentity(userId: string | null, cookieToken: string | undefi
 }
 
 const DISPUTE_COLUMNS =
-  "id,created_at,lang,question,question_proposed,question_confirmed_at,status,invite_token,share_slug,positions_done_at,verdict,decided_at";
+  "id,created_at,lang,question,question_proposed,question_confirmed_at,status,invite_token,share_slug,positions_done_at,verdict,decided_at,first_verdict,verdict_reviewed_at";
 const PARTY_COLUMNS = "id,dispute_id,role,user_id,nickname,secret_hash,position,rebuttal,rebuttal_skipped";
 
 const clean = (value: unknown, max: number) => {
@@ -257,6 +258,7 @@ type Action =
   | { action: "rebuttal"; text?: unknown }
   | { action: "skip_rebuttal" }
   | { action: "decide" }
+  | { action: "review" }
   | { action: "claim"; code?: unknown }
   | { action: "claim_code" }
   | { action: "cancel" };
@@ -330,7 +332,10 @@ export async function act(id: string, identity: Identity, body: Action) {
       .eq("id", id)
       .eq("status", "awaiting_question");
   } else if (body.action === "rebuttal" || body.action === "skip_rebuttal") {
-    if (dispute.status !== "rebuttals" || me.rebuttal || me.rebuttal_skipped) throw new JudgeError("stale", 409);
+    // Replies come after the verdict, once each, until the review ran.
+    if (dispute.status !== "decided" || !dispute.verdict || dispute.verdict_reviewed_at || me.rebuttal || me.rebuttal_skipped) {
+      throw new JudgeError("stale", 409);
+    }
     await admin
       .from("quick_dispute_parties")
       .update(
@@ -345,23 +350,46 @@ export async function act(id: string, identity: Identity, body: Action) {
     if (!me.user_id) {
       await admin.from("quick_dispute_parties").update({ user_id: identity.userId }).eq("id", me.id).is("user_id", null);
     }
-  } else if (body.action !== "decide") {
+  } else if (body.action !== "decide" && body.action !== "review") {
     throw new JudgeError("unknown_action", 400);
   }
 
   const fresh = await loadForSide(id, identity);
-  if (readyForVerdict(fresh.dispute, fresh.parties)) await decide(fresh.dispute, fresh.parties);
+  if (body.action === "decide" && readyForVerdict(fresh.dispute, fresh.parties)) await decide(fresh.dispute, fresh.parties);
+  const replying = body.action === "review" || body.action === "rebuttal" || body.action === "skip_rebuttal";
+  if (replying && readyForReview(fresh.dispute, fresh.parties)) await review(fresh.dispute, fresh.parties);
   return getView(id, identity);
 }
 
-async function decide(dispute: DisputeRow, parties: PartyRow[]) {
+// The service-wide cap counts first verdicts and reviews of the last day alike.
+async function checkServiceLimit() {
   const admin = getAdminClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count } = await admin
-    .from("quick_disputes")
-    .select("id", { count: "exact", head: true })
-    .gte("decided_at", since);
-  if ((count ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
+  const [{ count: verdicts }, { count: reviews }] = await Promise.all([
+    admin.from("quick_disputes").select("id", { count: "exact", head: true }).gte("decided_at", since),
+    admin.from("quick_disputes").select("id", { count: "exact", head: true }).gte("verdict_reviewed_at", since),
+  ]);
+  if ((verdicts ?? 0) + (reviews ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
+}
+
+const verdictInput = (dispute: DisputeRow, parties: PartyRow[]) => {
+  const a = parties.find((party) => party.role === "A");
+  const b = parties.find((party) => party.role === "B");
+  return {
+    lang: dispute.lang,
+    question: dispute.question,
+    nicknameA: a?.nickname ?? "A",
+    nicknameB: b?.nickname ?? "B",
+    positionA: a?.position ?? "",
+    positionB: b?.position ?? "",
+    rebuttalA: a?.rebuttal,
+    rebuttalB: b?.rebuttal,
+  };
+};
+
+async function decide(dispute: DisputeRow, parties: PartyRow[]) {
+  const admin = getAdminClient();
+  await checkServiceLimit();
 
   // Only one request writes the verdict: the one that moves the status to deciding.
   const { data: claimed } = await admin
@@ -372,19 +400,8 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
     .select("id");
   if (!claimed?.length) return;
 
-  const a = parties.find((party) => party.role === "A");
-  const b = parties.find((party) => party.role === "B");
   try {
-    const answer = await askQuickVerdict({
-      lang: dispute.lang,
-      question: dispute.question,
-      nicknameA: a?.nickname ?? "A",
-      nicknameB: b?.nickname ?? "B",
-      positionA: a?.position ?? "",
-      positionB: b?.position ?? "",
-      rebuttalA: a?.rebuttal,
-      rebuttalB: b?.rebuttal,
-    });
+    const answer = await askQuickVerdict(verdictInput(dispute, parties));
     if (answer.verdict.injection_attempt) console.warn("quick verdict: injection attempt", { disputeId: dispute.id });
     await admin
       .from("quick_disputes")
@@ -398,11 +415,53 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
         cost_usd: answer.usage.costUsd,
         share_slug: randomToken(9),
         decided_at: new Date().toISOString(),
+        // Disputes from before replies moved after the verdict already had theirs: no second round.
+        ...(parties.some(rebuttalDone) ? { verdict_reviewed_at: new Date().toISOString() } : {}),
       })
       .eq("id", dispute.id);
   } catch (error) {
     // Back to rebuttals, so the verdict can be asked for again.
     await admin.from("quick_disputes").update({ status: "rebuttals" }).eq("id", dispute.id).eq("status", "deciding");
+    throw error;
+  }
+}
+
+// The single review after the replies: no web search, the earlier verdict and its sources in view.
+async function review(dispute: DisputeRow, parties: PartyRow[]) {
+  const admin = getAdminClient();
+  await checkServiceLimit();
+  const { data: claimed } = await admin
+    .from("quick_disputes")
+    .update({ status: "deciding" })
+    .eq("id", dispute.id)
+    .eq("status", "decided")
+    .is("verdict_reviewed_at", null)
+    .select("id");
+  if (!claimed?.length) return;
+
+  try {
+    const answer = await askQuickVerdict({ ...verdictInput(dispute, parties), previousVerdict: dispute.verdict });
+    if (answer.verdict.injection_attempt) console.warn("quick verdict review: injection attempt", { disputeId: dispute.id });
+    const { data: before } = await admin
+      .from("quick_disputes")
+      .select("input_tokens,output_tokens,cost_usd")
+      .eq("id", dispute.id)
+      .maybeSingle<{ input_tokens: number | null; output_tokens: number | null; cost_usd: number | null }>();
+    await admin
+      .from("quick_disputes")
+      .update({
+        status: "decided",
+        first_verdict: dispute.verdict,
+        verdict: answer.verdict,
+        verdict_reviewed_at: new Date().toISOString(),
+        input_tokens: (before?.input_tokens ?? 0) + answer.usage.inputTokens,
+        output_tokens: (before?.output_tokens ?? 0) + answer.usage.outputTokens,
+        cost_usd: Number(before?.cost_usd ?? 0) + answer.usage.costUsd,
+      })
+      .eq("id", dispute.id);
+  } catch (error) {
+    // Back to the verdict as it was, so the review can be asked for again.
+    await admin.from("quick_disputes").update({ status: "decided" }).eq("id", dispute.id).eq("status", "deciding");
     throw error;
   }
 }
@@ -426,20 +485,29 @@ export async function listMine(identity: Identity, page: { offset?: number; limi
   const ids = [...new Set((mine ?? []).map((row) => row.dispute_id))];
   if (ids.length === 0) return empty;
 
-  const { data: all } = await admin
-    .from("quick_disputes")
-    .select("id,created_at,status")
-    .in("id", ids)
-    .order("created_at", { ascending: false })
-    .returns<Pick<DisputeRow, "id" | "created_at" | "status">[]>();
+  const [{ data: all }, { data: everyone }] = await Promise.all([
+    admin
+      .from("quick_disputes")
+      .select("id,created_at,status,verdict_reviewed_at")
+      .in("id", ids)
+      .order("created_at", { ascending: false })
+      .returns<Pick<DisputeRow, "id" | "created_at" | "status" | "verdict_reviewed_at">[]>(),
+    admin
+      .from("quick_dispute_parties")
+      .select("dispute_id,role,rebuttal,rebuttal_skipped")
+      .in("dispute_id", ids)
+      .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>(),
+  ]);
   const rows = all ?? [];
-  // The next move is this side's: approve the reworded question, or write the rebuttal.
-  const waitingOnMe = (row: Pick<DisputeRow, "id" | "status">) => {
+  // The next move is this side's: approve the reworded question, or answer the other side's reply to
+  // the verdict before the review.
+  const waitingOnMe = (row: Pick<DisputeRow, "id" | "status" | "verdict_reviewed_at">) => {
     const side = mine?.find((m) => m.dispute_id === row.id);
-    return (
-      (row.status === "awaiting_question" && side?.role === "A") ||
-      (row.status === "rebuttals" && Boolean(side) && !rebuttalDone(side as Pick<PartyRow, "rebuttal" | "rebuttal_skipped">))
-    );
+    if (!side) return false;
+    if (row.status === "awaiting_question") return side.role === "A";
+    if (row.status !== "decided" || row.verdict_reviewed_at || rebuttalDone(side)) return false;
+    const other = everyone?.find((party) => party.dispute_id === row.id && party.role !== side.role);
+    return Boolean(other?.rebuttal);
   };
   const pageRows = rows.slice(offset, offset + limit);
   const totals = { total: rows.length, waiting: rows.filter(waitingOnMe).length, hasMore: offset + limit < rows.length };
@@ -474,7 +542,8 @@ export async function getPublicCard(slug: string) {
     .from("quick_disputes")
     .select("id,lang,question,verdict,decided_at")
     .eq("share_slug", slug)
-    .eq("status", "decided")
+    // While the review runs the card keeps showing the verdict it had.
+    .in("status", ["decided", "deciding"])
     .maybeSingle<Pick<DisputeRow, "id" | "lang" | "question" | "verdict" | "decided_at">>();
   if (!dispute?.verdict) return null;
   const { data: parties } = await admin

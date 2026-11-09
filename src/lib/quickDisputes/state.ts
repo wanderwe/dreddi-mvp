@@ -3,9 +3,9 @@ import type { QuickLang, QuickVerdict } from "@/lib/ai/quickVerdict";
 // «Дредді розсуди»: the rules of a quick dispute, with no database or network here.
 //   awaiting_b         side A wrote the question and a position; waiting for side B to join and answer
 //   awaiting_question  B proposed a new wording of the question; A accepts it or keeps the original
-//   rebuttals          both positions are in; each side may answer once or skip
-//   deciding           Dreddi is writing the verdict
-//   decided            the verdict is in
+//   rebuttals          both positions are in; the first verdict is due (the name is historical)
+//   deciding           Dreddi is writing the verdict, or reviewing it after the replies
+//   decided            the verdict is in; each side may reply once, then Dreddi reviews it once
 //   expired            B never came
 
 export type QuickRole = "A" | "B";
@@ -24,6 +24,8 @@ export type DisputeRow = {
   positions_done_at: string | null;
   verdict: QuickVerdict | null;
   decided_at: string | null;
+  first_verdict: QuickVerdict | null;
+  verdict_reviewed_at: string | null;
 };
 
 export type PartyRow = {
@@ -44,8 +46,8 @@ export const LIMITS = {
   rebuttal: 1000,
   // B has this long to come; then the dispute expires.
   inviteDays: 7,
-  // After both positions, either side may ask for the verdict without waiting for a rebuttal.
-  rebuttalHours: 24,
+  // After the verdict, a side who replied waits this long for the other; then the review runs anyway.
+  replyHours: 24,
   // A has this long to answer B's rewording; silence keeps the original question.
   wordingHours: 24,
   // New disputes a day per person (signed in or the same browser) and per IP.
@@ -90,10 +92,10 @@ export const isExpired = (dispute: Pick<DisputeRow, "status" | "created_at">, no
 export const rebuttalDone = (party: Pick<PartyRow, "rebuttal" | "rebuttal_skipped">) =>
   Boolean(party.rebuttal) || party.rebuttal_skipped;
 
-// When either side may ask for the verdict without the other's rebuttal; null when not yet relevant.
-export const decideNowAt = (dispute: Pick<DisputeRow, "status" | "positions_done_at">) =>
-  dispute.status === "rebuttals" && dispute.positions_done_at
-    ? new Date(new Date(dispute.positions_done_at).getTime() + LIMITS.rebuttalHours * HOUR_MS).toISOString()
+// Until when the other side may still reply before the review runs on the replies already in.
+export const replyDeadline = (dispute: Pick<DisputeRow, "status" | "decided_at" | "verdict_reviewed_at">) =>
+  dispute.status === "decided" && dispute.decided_at && !dispute.verdict_reviewed_at
+    ? new Date(new Date(dispute.decided_at).getTime() + LIMITS.replyHours * HOUR_MS).toISOString()
     : null;
 
 // Until when A may answer B's rewording; null when not relevant. B joined at positions_done_at.
@@ -107,16 +109,30 @@ export const wordingOverdue = (dispute: Pick<DisputeRow, "status" | "positions_d
   return Boolean(at) && now.getTime() >= new Date(at as string).getTime();
 };
 
-export const readyForVerdict = (
-  dispute: Pick<DisputeRow, "status" | "positions_done_at">,
+// The first verdict is due as soon as both positions are in.
+export const readyForVerdict = (dispute: Pick<DisputeRow, "status">, parties: unknown[]) =>
+  dispute.status === "rebuttals" && parties.length === 2;
+
+// The single review: at least one reply, and the other side has replied or skipped, or let a day pass.
+export const readyForReview = (
+  dispute: Pick<DisputeRow, "status" | "decided_at" | "verdict" | "verdict_reviewed_at">,
   parties: Pick<PartyRow, "rebuttal" | "rebuttal_skipped">[],
   now: Date = new Date()
 ) => {
-  if (dispute.status !== "rebuttals") return false;
+  if (dispute.status !== "decided" || !dispute.verdict || dispute.verdict_reviewed_at) return false;
+  if (!parties.some((party) => party.rebuttal)) return false;
   if (parties.length === 2 && parties.every(rebuttalDone)) return true;
-  const at = decideNowAt(dispute);
+  const at = replyDeadline(dispute);
   return Boolean(at) && now.getTime() >= new Date(at as string).getTime();
 };
+
+// After the review: did the replies change who is right?
+export const reviewOutcome = (dispute: Pick<DisputeRow, "first_verdict" | "verdict" | "verdict_reviewed_at">) =>
+  !dispute.verdict_reviewed_at || !dispute.first_verdict || !dispute.verdict
+    ? null
+    : dispute.first_verdict.winner === dispute.verdict.winner
+      ? ("unchanged" as const)
+      : ("changed" as const);
 
 export type QuickView = {
   id: string;
@@ -127,9 +143,14 @@ export type QuickView = {
   myRole: QuickRole;
   saved: boolean;
   inviteToken: string | null;
-  decideNowAt: string | null;
   wordingDeadline: string | null;
   canDecideNow: boolean;
+  // The reply round after the verdict: open until both acted or the review ran.
+  replyOpen: boolean;
+  replyDeadline: string | null;
+  canReviewNow: boolean;
+  reviewing: boolean;
+  reviewOutcome: "changed" | "unchanged" | null;
   shareSlug: string | null;
   verdict: QuickVerdict | null;
   parties: {
@@ -142,12 +163,15 @@ export type QuickView = {
   }[];
 };
 
-// What one side sees. The other side's rebuttal stays hidden until this side has answered or skipped,
-// so nobody writes theirs after reading the other's.
+// What one side sees. The other side's reply stays hidden until this side has replied or skipped, or the
+// review ran, so nobody writes theirs after reading the other's.
 export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: QuickRole, now: Date = new Date()): QuickView {
   const mine = parties.find((party) => party.role === myRole);
   const iAnswered = Boolean(mine && rebuttalDone(mine));
-  const revealAll = dispute.status === "deciding" || dispute.status === "decided";
+  const reviewing = dispute.status === "deciding" && Boolean(dispute.verdict);
+  const revealAll = Boolean(dispute.verdict_reviewed_at) || reviewing;
+  const roundOpen =
+    dispute.status === "decided" && !dispute.verdict_reviewed_at && !(parties.length === 2 && parties.every(rebuttalDone));
   return {
     id: dispute.id,
     status: dispute.status,
@@ -157,11 +181,15 @@ export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: Quic
     myRole,
     saved: Boolean(mine?.user_id),
     inviteToken: myRole === "A" && dispute.status === "awaiting_b" ? dispute.invite_token : null,
-    decideNowAt: decideNowAt(dispute),
     wordingDeadline: wordingDeadline(dispute),
-    canDecideNow: readyForVerdict(dispute, parties, now),
+    canDecideNow: readyForVerdict(dispute, parties),
+    replyOpen: roundOpen,
+    replyDeadline: roundOpen ? replyDeadline(dispute) : null,
+    canReviewNow: readyForReview(dispute, parties, now),
+    reviewing,
+    reviewOutcome: reviewOutcome(dispute),
     shareSlug: dispute.share_slug,
-    verdict: dispute.status === "decided" ? dispute.verdict : null,
+    verdict: dispute.status === "decided" || reviewing ? dispute.verdict : null,
     parties: (["A", "B"] as const).flatMap((role) => {
       const party = parties.find((row) => row.role === role);
       if (!party) return [];

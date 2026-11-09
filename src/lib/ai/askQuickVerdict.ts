@@ -4,6 +4,7 @@ import { JudgeError, noLongDashes, toJudgeError } from "./askJudge";
 import { JUDGE_MODEL, estimateCostUsd } from "./judge";
 import {
   QuickVerdictSchema,
+  buildQuickReviewRules,
   buildQuickVerdictSystem,
   buildQuickVerdictUser,
   cleanSources,
@@ -11,7 +12,8 @@ import {
   type QuickVerdict,
 } from "./quickVerdict";
 
-// Server only: one quick verdict, with web search for fact questions.
+// Server only: one quick verdict, with web search for fact questions; or its single review after the
+// replies, without search, on the sources already found.
 
 export const MAX_WEB_SEARCHES = 3;
 // $ per search (web search is billed apart from tokens).
@@ -32,6 +34,7 @@ export async function askQuickVerdict(input: QuickDisputeInput): Promise<QuickVe
     throw new JudgeError("Add ANTHROPIC_API_KEY to .env.local and restart", 500);
   }
   const client = new Anthropic();
+  const review = Boolean(input.previousVerdict);
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: buildQuickVerdictUser(input) }];
   let inputTokens = 0;
   let outputTokens = 0;
@@ -42,9 +45,9 @@ export async function askQuickVerdict(input: QuickDisputeInput): Promise<QuickVe
       const response = await client.messages.parse({
         model: JUDGE_MODEL,
         max_tokens: 4000,
-        system: buildQuickVerdictSystem(input.lang),
+        system: review ? `${buildQuickVerdictSystem(input.lang)}\n\n${buildQuickReviewRules()}` : buildQuickVerdictSystem(input.lang),
         messages,
-        tools: [{ type: "web_search_20250305", name: "web_search", max_uses: MAX_WEB_SEARCHES }],
+        ...(review ? {} : { tools: [{ type: "web_search_20250305" as const, name: "web_search" as const, max_uses: MAX_WEB_SEARCHES }] }),
         output_config: { effort: "medium", format: zodOutputFormat(QuickVerdictSchema) },
       });
       inputTokens += response.usage.input_tokens;
@@ -65,7 +68,8 @@ export async function askQuickVerdict(input: QuickDisputeInput): Promise<QuickVe
         explanation: tidy(parsed.explanation),
         nuance: parsed.nuance ? tidy(parsed.nuance) : null,
         share_text: tidy(parsed.share_text).slice(0, 200),
-        sources: cleanSources(parsed.sources),
+        // A review adds no sources: it keeps the ones it was given when it drops them all.
+        sources: review && parsed.sources.length === 0 ? (input.previousVerdict?.sources ?? []) : cleanSources(parsed.sources),
         // Interpersonal questions always point to a real agreement.
         suggest_mediation: parsed.suggest_mediation || parsed.question_type === "interpersonal",
       };

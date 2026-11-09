@@ -33,6 +33,8 @@ export type QuickDisputeInput = {
   positionB: string;
   rebuttalA?: string | null;
   rebuttalB?: string | null;
+  // Set for the review after the verdict: the verdict the sides replied to.
+  previousVerdict?: QuickVerdict | null;
 };
 
 const LANG_NAME: Record<QuickLang, string> = { uk: "Ukrainian", en: "English" };
@@ -58,6 +60,12 @@ How to decide:
 Voice: Dreddi is a laconic judge. Short, certain sentences, no small talk, no emojis, no exclamation marks. Firm about the facts, never harsh about the people: people will share this card, so never mock, shame or insult anyone. Name the sides by their nicknames, never as A or B.
 Write every text field in ${LANG_NAME[lang]}. Do not use long dashes (—). A single short phrase carries no closing period.`;
 
+// The review after the replies: what changes, and what does not, compared to a first verdict.
+export const buildQuickReviewRules = () => `This is a review. You already gave the verdict in <previous_verdict>. After reading it, each side could reply once, in <rebuttal>.
+- Change the winner only if a reply brings a new argument, fact or source that really changes the conclusion. A reply that only repeats a position, insists or complains changes nothing: keep the winner.
+- Either way, write the full verdict again: short_answer, explanation and nuance should account for the replies (say briefly why a reply does or does not change things).
+- Do not search the web. Keep the sources from <previous_verdict> that still apply; add none.`;
+
 export const buildQuickVerdictUser = (input: QuickDisputeInput) => {
   const side = (role: "A" | "B", nickname: string, position: string, rebuttal?: string | null) =>
     [
@@ -72,6 +80,21 @@ export const buildQuickVerdictUser = (input: QuickDisputeInput) => {
     side("A", input.nicknameA, input.positionA, input.rebuttalA),
     side("B", input.nicknameB, input.positionB, input.rebuttalB),
     "</dispute>",
+    ...(input.previousVerdict
+      ? [
+          "<previous_verdict>",
+          escapeSideText(
+            JSON.stringify({
+              winner: input.previousVerdict.winner,
+              short_answer: input.previousVerdict.short_answer,
+              explanation: input.previousVerdict.explanation,
+              nuance: input.previousVerdict.nuance,
+              sources: input.previousVerdict.sources,
+            })
+          ),
+          "</previous_verdict>",
+        ]
+      : []),
   ].join("\n");
 };
 
