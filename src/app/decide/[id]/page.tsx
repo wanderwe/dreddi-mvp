@@ -246,8 +246,8 @@ export default function QuickDisputePage() {
         </p>
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{view.question}</h1>
         {view.stake && (
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/15 px-3 py-1 text-sm font-medium text-tone-200">
-            <Handshake className="h-3.5 w-3.5 text-amber-400" aria-hidden />
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-violet-400/15 px-3 py-1 text-sm font-medium text-tone-200">
+            <Handshake className="h-3.5 w-3.5 text-violet-500" aria-hidden />
             {t("decide.stake.inline", { stake: view.stake })}
           </p>
         )}
@@ -374,9 +374,9 @@ export default function QuickDisputePage() {
           </div>
 
           {view.stakeOutcome && view.stake && (
-            <div className="space-y-3 rounded-2xl border border-amber-300/40 bg-amber-300/[0.08] p-4">
+            <div className="space-y-3 rounded-2xl border border-violet-400/40 bg-violet-400/[0.08] p-4">
               <p className="flex items-start gap-2 text-sm font-semibold text-tone-white">
-                <Handshake className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
+                <Handshake className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" aria-hidden />
                 {view.stakeOutcome.state === "lost"
                   ? t("decide.stake.lost", { nickname: nicknames[view.stakeOutcome.loser], stake: view.stake })
                   : view.stakeOutcome.state === "void"

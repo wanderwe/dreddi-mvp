@@ -51,7 +51,7 @@ export async function QuickCardPage({ slug, locale }: { slug: string; locale: Lo
           </div>
           <VerdictCard verdict={card.verdict} nicknames={{ A: card.nicknameA, B: card.nicknameB }} t={t} />
           {card.stake && card.stakeOutcome && card.stakeOutcome.state !== "pending" && (
-            <p className="rounded-2xl border border-amber-300/40 bg-amber-300/[0.08] px-4 py-3 text-sm font-semibold text-tone-white">
+            <p className="rounded-2xl border border-violet-400/40 bg-violet-400/[0.08] px-4 py-3 text-sm font-semibold text-tone-white">
               {card.stakeOutcome.state === "lost"
                 ? t("decide.stake.lost", {
                     nickname: card.stakeOutcome.loser === "A" ? card.nicknameA : card.nicknameB,

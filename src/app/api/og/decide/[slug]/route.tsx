@@ -69,7 +69,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string }>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <span style={{ fontSize: question.length > 60 ? 44 : 54, fontWeight: 600, lineHeight: 1.15 }}>{question}</span>
           <span style={{ fontSize: 32, lineHeight: 1.3, color: "#1e293b" }}>{answer}</span>
-          {stakeLine && <span style={{ fontSize: 28, fontWeight: 600, color: "#92400e" }}>{stakeLine}</span>}
+          {stakeLine && <span style={{ fontSize: 28, fontWeight: 600, color: "#6d28d9" }}>{stakeLine}</span>}
         </div>
         <div style={{ display: "flex" }}>
           <span

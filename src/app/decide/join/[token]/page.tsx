@@ -149,8 +149,8 @@ export default function JoinQuickDisputePage() {
         </p>
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{preview.question}</h1>
         {preview.stake && (
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/15 px-3 py-1 text-sm font-medium text-tone-200">
-            <Handshake className="h-3.5 w-3.5 text-amber-400" aria-hidden />
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-violet-400/15 px-3 py-1 text-sm font-medium text-tone-200">
+            <Handshake className="h-3.5 w-3.5 text-violet-500" aria-hidden />
             {t("decide.stake.inline", { stake: preview.stake })}
           </p>
         )}
