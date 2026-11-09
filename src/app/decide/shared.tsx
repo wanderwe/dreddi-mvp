@@ -97,39 +97,29 @@ export function useDraftNickname() {
   return { nickname, reroll };
 }
 
-// What a side typed survives a trip to the sign-in page and back.
+// What a side typed survives a trip to the sign-in page and back, and only that: it is stashed when
+// they go to sign in and taken back once on return, so a new dispute never opens with an old question.
 export function useDraft<T extends Record<string, string>>(key: string, initial: T) {
   const storageKey = `dreddi-decide-draft:${key}`;
   const [draft, setDraft] = useState<T>(initial);
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(storageKey);
+      sessionStorage.removeItem(storageKey);
       if (saved) setDraft((current) => ({ ...current, ...(JSON.parse(saved) as Partial<T>) }));
     } catch {
       // No storage: the draft just starts empty.
     }
   }, [storageKey]);
-  const update = useCallback(
-    (patch: Partial<T>) =>
-      setDraft((current) => {
-        const next = { ...current, ...patch };
-        try {
-          sessionStorage.setItem(storageKey, JSON.stringify(next));
-        } catch {
-          // Ignore.
-        }
-        return next;
-      }),
-    [storageKey]
-  );
-  const clear = useCallback(() => {
+  const update = useCallback((patch: Partial<T>) => setDraft((current) => ({ ...current, ...patch })), []);
+  const stash = useCallback(() => {
     try {
-      sessionStorage.removeItem(storageKey);
+      sessionStorage.setItem(storageKey, JSON.stringify(draft));
     } catch {
-      // Ignore.
+      // Ignore: the draft is just lost.
     }
-  }, [storageKey]);
-  return { draft, update, clear };
+  }, [storageKey, draft]);
+  return { draft, update, stash };
 }
 
 export function NicknameTag({ nickname, onReroll }: { nickname: string | null; onReroll?: () => void }) {
@@ -158,10 +148,12 @@ export function IdentityChoice({
   nickname,
   busy,
   onAnonymous,
+  onSignIn,
 }: {
   nickname: string;
   busy: boolean;
   onAnonymous: () => void;
+  onSignIn: () => void;
 }) {
   const t = useT();
   const loginHref = useLoginHref();
@@ -169,7 +161,7 @@ export function IdentityChoice({
     <div className="decide-pop space-y-3 rounded-2xl border border-accent-400/30 bg-accent-400/[0.06] p-4">
       <p className="text-base font-semibold text-tone-white">{t("decide.identityAsk")}</p>
       <div className={actionRowClass}>
-        <a href={loginHref} className={secondaryButtonClass}>
+        <a href={loginHref} className={secondaryButtonClass} onClick={onSignIn}>
           {t("decide.signIn")}
         </a>
         <button type="button" className={primaryButtonClass} disabled={busy} onClick={onAnonymous}>

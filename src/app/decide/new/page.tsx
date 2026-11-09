@@ -32,7 +32,7 @@ export default function NewQuickDisputePage() {
   const errorText = useErrorText();
   const { nickname, reroll } = useDraftNickname();
   const myName = useMyName(signedIn);
-  const { draft, update, clear } = useDraft("new", { question: "", position: "" });
+  const { draft, update, stash } = useDraft("new", { question: "", position: "" });
   const [askIdentity, setAskIdentity] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,6 @@ export default function NewQuickDisputePage() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(errorText(body.error));
-      clear();
       router.push(localizePath(`/decide/${body.id}`, locale));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("decide.errors.generic"));
@@ -122,7 +121,7 @@ export default function NewQuickDisputePage() {
         </div>
 
         {askIdentity && !signedIn && nickname ? (
-          <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void create(nickname)} />
+          <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void create(nickname)} onSignIn={stash} />
         ) : (
           <div className="flex justify-end">
             <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
