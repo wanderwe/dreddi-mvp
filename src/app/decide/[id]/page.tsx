@@ -109,9 +109,9 @@ export default function QuickDisputePage() {
     void load();
   }, [load, signedIn, savingOnArrival]);
 
-  // Until the verdict, the page keeps up with the other side.
+  // Until the verdict and its review, the page keeps up with the other side.
   useEffect(() => {
-    if (!view || view.status === "decided" || view.status === "expired") return;
+    if (!view || view.status === "expired" || (view.status === "decided" && !view.replyOpen)) return;
     const timer = setInterval(() => void load(), POLL_MS);
     return () => clearInterval(timer);
   }, [view, load]);
