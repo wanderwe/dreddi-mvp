@@ -728,11 +728,14 @@ export function PublicProfilePageView({ variant = "profile" }: PublicProfilePage
     // even with a promise closed. With closed promises, count at least one day.
     const profileDays =
       profileActiveDays !== null && totalDeals > 0 ? Math.max(1, profileActiveDays) : profileActiveDays;
-    const pace = hasProfilePace
-      ? Number(profileAvgDealsPerMonth.toFixed(1))
-      : profileDays && profileDays > 0
+    // The database divides by the profile's age in months as is, so a promise closed yesterday reads as
+    // 30 a month. A profile younger than a month counts as one month: its pace is simply its promises.
+    const pace =
+      profileDays && profileDays > 0
         ? getMonthlyPace(totalDeals, profileDays)
-        : promisePaceMetrics.pace;
+        : hasProfilePace
+          ? Number(profileAvgDealsPerMonth.toFixed(1))
+          : promisePaceMetrics.pace;
     const activeDays = profileDays && profileDays > 0 ? profileDays : promisePaceMetrics.activeDays;
 
     return {
