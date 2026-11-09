@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Scale, Send, Swords } from "lucide-react";
+import { Handshake, Scale, Send, Swords } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickRole, type QuickStatus } from "@/lib/quickDisputes/state";
@@ -32,6 +32,7 @@ type Preview = {
   positionA: string;
   myRole: QuickRole | null;
   open: boolean;
+  stake: string | null;
 };
 
 // The invite link: side B sees the question and A's message, confirms or rewords the question, and
@@ -147,6 +148,12 @@ export default function JoinQuickDisputePage() {
           {t("decide.join.title", { nickname: preview.nicknameA })}
         </p>
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{preview.question}</h1>
+        {preview.stake && (
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/15 px-3 py-1 text-sm font-medium text-tone-200">
+            <Handshake className="h-3.5 w-3.5 text-amber-400" aria-hidden />
+            {t("decide.stake.inline", { stake: preview.stake })}
+          </p>
+        )}
       </div>
 
       <form

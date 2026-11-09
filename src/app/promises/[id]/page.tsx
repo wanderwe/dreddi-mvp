@@ -59,6 +59,7 @@ type PromiseRow = {
   confirmed_at: string | null;
   confirmed_by?: "counterparty" | "silence" | "dreddi" | null;
   auto_confirm_at?: string | null;
+  source_dispute_id?: string | null;
   disputed_at: string | null;
   disputed_code: string | null;
   dispute_reason: string | null;
@@ -408,6 +409,23 @@ export default function PromisePage() {
   const actionParam = searchParams?.get("action");
 
   const [p, setP] = useState<PromiseRow | null>(null);
+  // A promise recorded from a «Хто правий?» stake links back to its dispute (only its sides can open it).
+  const [sourceDisputeQuestion, setSourceDisputeQuestion] = useState<string | null>(null);
+  const sourceDisputeId = p?.source_dispute_id ?? null;
+  useEffect(() => {
+    if (!sourceDisputeId) return;
+    let active = true;
+    void (async () => {
+      const { data } = await requireSupabase().auth.getSession();
+      const token = data.session?.access_token;
+      const res = await fetch(`/api/decide/${sourceDisputeId}`, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+      const body = (await res.json().catch(() => null)) as { question?: string } | null;
+      if (active && res.ok && body?.question) setSourceDisputeQuestion(body.question);
+    })().catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [sourceDisputeId]);
   const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [counterpartyDisplayName, setCounterpartyDisplayName] = useState<string | null>(null);
@@ -500,7 +518,7 @@ export default function PromisePage() {
     const { data, error } = await supabase
       .from("promises")
       .select(
-        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,confirmed_by,auto_confirm_at,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,activated_without_counterparty,activated_without_counterparty_at"
+        "id,title,is_important,details,condition_text,condition_met_at,condition_met_by,condition_proposed_by,condition_proposed_at,condition_confirmed_at,counterparty_contact,due_at,status,completed_at,confirmed_at,confirmed_by,auto_confirm_at,source_dispute_id,disputed_at,disputed_code,dispute_reason,created_at,invite_token,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,visibility,activated_without_counterparty,activated_without_counterparty_at"
       )
       .eq("id", id)
       .maybeSingle();
@@ -1603,6 +1621,15 @@ export default function PromisePage() {
             <h1 className="mt-4 text-3xl font-semibold leading-tight text-tone-white sm:text-4xl">
               {p.title}
             </h1>
+
+            {p.source_dispute_id && sourceDisputeQuestion && (
+              <Link
+                href={localizePath(`/decide/${p.source_dispute_id}`, locale)}
+                className="mt-2 inline-flex text-sm font-medium text-accent-200 hover:underline"
+              >
+                {t("promises.detail.fromDispute", { question: sourceDisputeQuestion })}
+              </Link>
+            )}
 
             {p.due_at && (
               <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">

@@ -414,7 +414,8 @@
       "conditionStatusLabel": "Status",
       "disputeReasonLabel": "Dispute reason",
       "silenceExecutor": "If {name} doesn't answer by {date}, the promise will be counted as kept",
-      "silenceReviewer": "If you don't answer by {date}, the promise will be counted as kept"
+      "silenceReviewer": "If you don't answer by {date}, the promise will be counted as kept",
+      "fromDispute": "Created from the dispute «{question}»"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
@@ -1582,6 +1583,16 @@
       "waiting": "Waiting for {nickname}. If they don't answer by {date}, Dreddi reviews the verdict with your reply.",
       "changed": "The verdict was reviewed after the replies",
       "unchanged": "The replies didn't change the verdict"
+    },
+    "stake": {
+      "label": "Stake (optional)",
+      "placeholder": "For example: whoever loses buys coffee",
+      "inline": "Stake: {stake}",
+      "lost": "{nickname} loses the stake: {stake}",
+      "void": "The stake didn't play out",
+      "pending": "The stake is settled after the replies",
+      "record": "Record the stake as a promise",
+      "recorded": "The stake is recorded as a promise"
     }
   }
 }

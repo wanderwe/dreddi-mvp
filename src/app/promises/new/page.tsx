@@ -49,6 +49,9 @@ export default function NewPromisePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromPromiseId = searchParams?.get("fromPromise");
+  // Recording the lost stake of a «Хто правий?» dispute.
+  const fromDisputeId = searchParams?.get("fromDispute");
+  const [sourceDisputeId, setSourceDisputeId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [conditionText, setConditionText] = useState("");
@@ -860,6 +863,47 @@ export default function NewPromisePage() {
     selectedParticipants,
   ]);
 
+  // The stake as the title, the loser as the one who keeps it, the winner as the other side when they
+  // have an account (otherwise the invite link, as for any promise). No deadline: the sides add one.
+  useEffect(() => {
+    if (!fromDisputeId) return;
+    let active = true;
+    void (async () => {
+      let supabase;
+      try {
+        supabase = requireSupabase();
+      } catch {
+        return;
+      }
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      const res = await fetch(`/api/decide/${encodeURIComponent(fromDisputeId)}/stake`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!active || !res.ok) return;
+      const prefill = (await res.json()) as {
+        title: string;
+        executor: "me" | "other";
+        counterparty: { id: string; handle: string; display_name: string | null; avatar_url: string | null } | null;
+      };
+      setTitle(prefill.title);
+      setExecutor(prefill.executor);
+      if (prefill.counterparty) {
+        setSelectedCounterparty({
+          id: prefill.counterparty.id,
+          handle: prefill.counterparty.handle,
+          displayName: prefill.counterparty.display_name,
+          avatarUrl: prefill.counterparty.avatar_url,
+        });
+      }
+      setSourceDisputeId(fromDisputeId);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [fromDisputeId]);
+
   useEffect(() => {
     prefillResolved.current = false;
     setPrefillRetryTick(0);
@@ -1031,6 +1075,7 @@ export default function NewPromisePage() {
           groupId: selectedGroupId || null,
           isImportant,
           ...(selfPromise ? { selfPromise: true } : {}),
+          ...(sourceDisputeId ? { sourceDisputeId } : {}),
         };
 
     let res: Response;

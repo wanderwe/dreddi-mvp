@@ -23,6 +23,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string }>
 
   const question = clip(card.question, 110);
   const answer = clip(card.verdict.short_answer, 160);
+  // What the loser owes is the most shareable line: under the answer, once the verdict is final.
+  const stakeLine =
+    card.stake && card.stakeOutcome?.state === "lost"
+      ? clip(
+          t("decide.stake.lost", { nickname: card.stakeOutcome.loser === "A" ? card.nicknameA : card.nicknameB, stake: card.stake }),
+          110
+        )
+      : null;
   const headline = verdictHeadline(card.verdict, { A: card.nicknameA, B: card.nicknameB }, t);
   const logo = await readFile(path.join(process.cwd(), "public", "dreddi-logo.svg"), "utf8");
   const logoSrc = `data:image/svg+xml;base64,${Buffer.from(logo).toString("base64")}`;
@@ -61,6 +69,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string }>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <span style={{ fontSize: question.length > 60 ? 44 : 54, fontWeight: 600, lineHeight: 1.15 }}>{question}</span>
           <span style={{ fontSize: 32, lineHeight: 1.3, color: "#1e293b" }}>{answer}</span>
+          {stakeLine && <span style={{ fontSize: 28, fontWeight: 600, color: "#92400e" }}>{stakeLine}</span>}
         </div>
         <div style={{ display: "flex" }}>
           <span

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Check, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
+import { Check, Handshake, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
@@ -244,6 +244,12 @@ export default function QuickDisputePage() {
           {t("decide.title")}
         </p>
         <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{view.question}</h1>
+        {view.stake && (
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-amber-300/15 px-3 py-1 text-sm font-medium text-tone-200">
+            <Handshake className="h-3.5 w-3.5 text-amber-400" aria-hidden />
+            {t("decide.stake.inline", { stake: view.stake })}
+          </p>
+        )}
       </div>
 
       {inviteUrl && (
@@ -361,6 +367,47 @@ export default function QuickDisputePage() {
           <div className={reviewing ? "opacity-60 transition-opacity" : "transition-opacity"}>
             <VerdictCard verdict={verdict} nicknames={nicknames} t={t} />
           </div>
+
+          {view.stakeOutcome && view.stake && (
+            <div className="space-y-3 rounded-2xl border border-amber-300/40 bg-amber-300/[0.08] p-4">
+              <p className="flex items-start gap-2 text-sm font-semibold text-tone-white">
+                <Handshake className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
+                {view.stakeOutcome.state === "lost"
+                  ? t("decide.stake.lost", { nickname: nicknames[view.stakeOutcome.loser], stake: view.stake })
+                  : view.stakeOutcome.state === "void"
+                    ? t("decide.stake.void")
+                    : t("decide.stake.pending")}
+              </p>
+              {view.stakeOutcome.state === "lost" &&
+                (view.stakePromiseId ? (
+                  <div className={actionRowClass}>
+                    <a
+                      href={localizePath(
+                        view.stakeInviteToken ? `/p/invite/${view.stakeInviteToken}` : `/promises/${view.stakePromiseId}`,
+                        locale
+                      )}
+                      className={secondaryButtonClass}
+                    >
+                      <Check className="h-4 w-4 text-accent-200" aria-hidden />
+                      {t("decide.stake.recorded")}
+                    </a>
+                  </div>
+                ) : (
+                  <div className={actionRowClass}>
+                    {signedIn ? (
+                      <a href={localizePath(`/promises/new?fromDispute=${view.id}`, locale)} className={primaryButtonClass}>
+                        {t("decide.stake.record")}
+                      </a>
+                    ) : (
+                      // A promise needs an account: sign in (which saves the dispute too), then record it.
+                      <button type="button" className={primaryButtonClass} disabled={busy} onClick={() => void goSave()}>
+                        {t("decide.stake.record")}
+                      </button>
+                    )}
+                  </div>
+                ))}
+            </div>
+          )}
 
           {view.parties.some((party) => party.rebuttal || (!party.isMe && party.rebuttalDone && view.replyOpen)) && (
             <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">

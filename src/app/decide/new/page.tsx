@@ -32,7 +32,7 @@ export default function NewQuickDisputePage() {
   const errorText = useErrorText();
   const { nickname, reroll } = useDraftNickname();
   const myName = useMyName(signedIn);
-  const { draft, update, stash } = useDraft("new", { question: "", position: "" });
+  const { draft, update, stash } = useDraft("new", { question: "", position: "", stake: "" });
   const [askIdentity, setAskIdentity] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +55,7 @@ export default function NewQuickDisputePage() {
           lang: locale === "en" ? "en" : "uk",
           question: draft.question,
           position: draft.position,
+          stake: draft.stake.trim() || null,
           nickname: asNickname,
         }),
       });
@@ -96,6 +97,17 @@ export default function NewQuickDisputePage() {
             maxLength={LIMITS.question}
             placeholder={t("decide.questionPlaceholder")}
             onChange={(e) => update({ question: e.target.value })}
+          />
+        </label>
+
+        <label className="block space-y-1.5">
+          <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
+          <input
+            className={inputClass}
+            value={draft.stake}
+            maxLength={LIMITS.stake}
+            placeholder={t("decide.stake.placeholder")}
+            onChange={(e) => update({ stake: e.target.value })}
           />
         </label>
 
