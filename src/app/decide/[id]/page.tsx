@@ -6,6 +6,7 @@ import { Check, Handshake, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Tr
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { VerdictCard } from "../VerdictCard";
 import {
   Bubble,
@@ -471,30 +472,38 @@ export default function QuickDisputePage() {
             </p>
           )}
 
-          <div className={actionRowClass}>
+          {/* Secondary actions in one row on every screen; sharing is an icon, the stake keeps the only green. */}
+          <div className="flex items-center gap-2 sm:justify-end">
             {view.saved ? (
-              <span className="inline-flex items-center justify-center gap-1.5 py-2 text-sm text-tone-400 sm:mr-auto">
+              <span className="inline-flex flex-1 items-center gap-1.5 py-2 text-sm text-tone-400 sm:mr-auto sm:flex-none">
                 <Check className="h-4 w-4 text-accent-200" aria-hidden />
                 {t("decide.verdict.saved")}
               </span>
-            ) : signedIn ? (
-              <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "claim" })}>
-                {t("decide.verdict.save")}
-              </button>
             ) : (
-              <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void goSave()}>
+              <button
+                type="button"
+                className={`${secondaryButtonClass} flex-1 whitespace-nowrap px-3 sm:flex-none sm:px-4`}
+                disabled={busy}
+                onClick={() => void (signedIn ? act({ action: "claim" }) : goSave())}
+              >
                 {t("decide.verdict.save")}
               </button>
             )}
-            <a href={localizePath("/decide/new", locale)} className={secondaryButtonClass}>
+            <a href={localizePath("/decide/new", locale)} className={`${secondaryButtonClass} flex-1 whitespace-nowrap px-3 sm:flex-none sm:px-4`}>
               <Swords className="h-4 w-4" aria-hidden />
               {t("decide.verdict.rematch")}
             </a>
             {shareUrl && (
-              <button type="button" className={primaryButtonClass} onClick={() => void shareVerdict()}>
-                <Share2 className="h-4 w-4" aria-hidden />
-                {shared ? t("decide.linkCopied") : t("decide.verdict.share")}
-              </button>
+              <Tooltip label={shared ? t("decide.linkCopied") : t("decide.verdict.share")} placement="top">
+                <button
+                  type="button"
+                  onClick={() => void shareVerdict()}
+                  aria-label={shared ? t("decide.linkCopied") : t("decide.verdict.share")}
+                  className="inline-flex h-[42px] w-[42px] shrink-0 cursor-pointer items-center justify-center rounded-xl border border-tone-white/15 text-tone-200 transition hover:border-accent-300/50 hover:text-accent-200"
+                >
+                  {shared ? <Check className="h-4 w-4 text-accent-200" aria-hidden /> : <Share2 className="h-4 w-4" aria-hidden />}
+                </button>
+              </Tooltip>
             )}
           </div>
           {!view.saved && !signedIn && <p className="text-xs text-tone-400 sm:text-right">{t("decide.verdict.saveHint")}</p>}
