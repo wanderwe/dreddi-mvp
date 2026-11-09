@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Check, Handshake, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
+import { Check, Gavel, Handshake, Hourglass, RotateCcw, Scale, Send, Share2, Swords, Trophy } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS, type QuickView } from "@/lib/quickDisputes/state";
@@ -364,7 +364,7 @@ export default function QuickDisputePage() {
               {view.reviewOutcome === "changed" ? (
                 <Scale className="h-4 w-4 text-accent-200" aria-hidden />
               ) : (
-                <Check className="h-4 w-4 text-accent-200" aria-hidden />
+                <Gavel className="h-4 w-4 text-accent-200" aria-hidden />
               )}
               {t(view.reviewOutcome === "changed" ? "decide.reply.changed" : "decide.reply.unchanged")}
             </p>
