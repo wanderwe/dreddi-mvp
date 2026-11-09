@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clipboard, Code2, Eye, Link2, MessageSquareText, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Check, Clipboard, Code2, Eye, Link2, MessageSquareText, ShieldCheck, Sparkles, SquarePen, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -722,12 +722,15 @@ export default function PublicAgreementPage() {
                   </button>
                 </Tooltip>
                 {agreement.viewer_is_side && (
-                  <Link
-                    href={localizePath(`/promises/${agreement.id}`, locale)}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-400 px-4 py-2 text-xs font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:-translate-y-0.5 sm:text-sm"
-                  >
-                    {t("invite.goToDeal")}
-                  </Link>
+                  <Tooltip label={t("invite.goToDeal")} placement="top">
+                    <Link
+                      href={localizePath(`/promises/${agreement.id}`, locale)}
+                      aria-label={t("invite.goToDeal")}
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-tone-white/10 bg-transparent text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 active:scale-[0.98]"
+                    >
+                      <SquarePen className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </Tooltip>
                 )}
                 {agreement.viewer_can_follow !== false ? (
                   <Tooltip
