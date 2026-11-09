@@ -18,7 +18,6 @@ import {
   StepsBar,
   TypingDots,
   decideFetch,
-  inputClass,
   primaryButtonClass,
   secondaryButtonClass,
   useErrorText,
@@ -47,7 +46,7 @@ export default function QuickDisputePage() {
   const searchParams = useSearchParams();
   const signedIn = useSignedIn();
   const errorText = useErrorText();
-  const loginToSave = useLoginHref("?save=1");
+  const loginHref = useLoginHref();
   const [view, setView] = useState<QuickView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rebuttal, setRebuttal] = useState("");
@@ -56,6 +55,9 @@ export default function QuickDisputePage() {
   const [origin, setOrigin] = useState("");
   const [shared, setShared] = useState(false);
   const autoSaved = useRef(false);
+  const rebuttalRef = useRef<HTMLFormElement | null>(null);
+  const rebuttalInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const scrolledToTurn = useRef(false);
 
   useEffect(() => setOrigin(window.location.origin), []);
 
@@ -96,10 +98,15 @@ export default function QuickDisputePage() {
     [id, errorText, load, t, router, locale]
   );
 
+  // Coming back from sign-in with a save code, the claim loads the page itself: this browser may not
+  // be a side yet (the sign-in link was opened elsewhere), so a plain load would be refused first.
+  const saveParam = searchParams.get("save");
+  const savingOnArrival = Boolean(signedIn && saveParam);
+
   useEffect(() => {
-    if (signedIn === null) return;
+    if (signedIn === null || savingOnArrival) return;
     void load();
-  }, [load, signedIn]);
+  }, [load, signedIn, savingOnArrival]);
 
   // Until the verdict, the page keeps up with the other side.
   useEffect(() => {
@@ -108,12 +115,37 @@ export default function QuickDisputePage() {
     return () => clearInterval(timer);
   }, [view, load]);
 
-  // Back from signing in to save the dispute: save it.
+  // Back from signing in to save the dispute: save it, by the one-time code when there is one.
   useEffect(() => {
-    if (!view || !signedIn || view.saved || autoSaved.current || searchParams.get("save") !== "1") return;
+    if (!signedIn || !saveParam || autoSaved.current) return;
     autoSaved.current = true;
-    void act({ action: "claim" });
-  }, [view, signedIn, searchParams, act]);
+    void act({ action: "claim", code: saveParam === "1" ? undefined : saveParam });
+  }, [signedIn, saveParam, act]);
+
+  // Not signed in: get a code that saves this side wherever the sign-in ends, then go to sign in.
+  const goSave = async () => {
+    setBusy(true);
+    let code = "1";
+    try {
+      const res = await decideFetch(`/api/decide/${id}`, { method: "POST", body: JSON.stringify({ action: "claim_code" }) });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && typeof body.code === "string") code = body.code;
+    } catch {
+      // Without a code, saving still works when the sign-in ends in this browser.
+    }
+    const back = new URL(window.location.href);
+    back.searchParams.set("save", code);
+    const loginUrl = new URL(loginHref, window.location.origin);
+    loginUrl.searchParams.set("next", `${back.pathname}${back.search}`);
+    window.location.assign(loginUrl.toString());
+  };
+
+  // Back on the page when it is this side's turn to reply: bring the reply form into view once.
+  useEffect(() => {
+    if (scrolledToTurn.current || !rebuttalRef.current) return;
+    scrolledToTurn.current = true;
+    rebuttalRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 
   if (!view) {
     return (
@@ -286,14 +318,28 @@ export default function QuickDisputePage() {
 
       {view.status === "rebuttals" && me && !me.rebuttalDone && !deciding && (
         <form
-          className="space-y-2"
+          ref={rebuttalRef}
+          className="decide-pop scroll-mt-24 space-y-3 rounded-2xl border-2 border-emerald-400/50 bg-emerald-400/[0.07] p-4 shadow-lg shadow-accent-500/10"
           onSubmit={(e) => {
             e.preventDefault();
+            // An empty reply sends nothing: it points to the field instead.
+            if (!rebuttal.trim()) {
+              rebuttalInputRef.current?.focus();
+              return;
+            }
             void act({ action: "rebuttal", text: rebuttal }).then((ok) => ok && setRebuttal(""));
           }}
         >
+          <div className="space-y-1">
+            <p className="flex items-center gap-2 text-base font-semibold text-tone-white">
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-emerald-400" aria-hidden />
+              {t("decide.chat.rebuttalTitle")}
+            </p>
+            <p className="text-sm text-tone-300">{t("decide.chat.rebuttalHint", { nickname: other?.nickname ?? "" })}</p>
+          </div>
           <textarea
-            className={`${inputClass} min-h-[90px]`}
+            ref={rebuttalInputRef}
+            className="min-h-[96px] w-full rounded-xl border border-emerald-400/30 bg-tone-950/60 px-3 py-2 text-sm text-tone-white outline-none placeholder:text-tone-500 focus:border-emerald-400/70"
             value={rebuttal}
             maxLength={LIMITS.rebuttal}
             placeholder={t("decide.chat.rebuttalPlaceholder")}
@@ -303,7 +349,7 @@ export default function QuickDisputePage() {
             <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
               {t("decide.chat.noReply")}
             </button>
-            <button type="submit" className={primaryButtonClass} disabled={busy || !rebuttal.trim()}>
+            <button type="submit" className={`${primaryButtonClass} py-3 text-base`} disabled={busy}>
               <Send className="h-4 w-4" aria-hidden />
               {t("decide.chat.reply")}
             </button>
@@ -357,9 +403,9 @@ export default function QuickDisputePage() {
                 {t("decide.verdict.save")}
               </button>
             ) : (
-              <a href={loginToSave} className={secondaryButtonClass}>
+              <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void goSave()}>
                 {t("decide.verdict.save")}
-              </a>
+              </button>
             )}
             <a href={localizePath(`/decide/new?q=${encodeURIComponent(view.question)}`, locale)} className={secondaryButtonClass}>
               <Swords className="h-4 w-4" aria-hidden />

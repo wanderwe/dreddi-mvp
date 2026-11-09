@@ -1507,7 +1507,9 @@
       "deciding": "Dreddi is deciding",
       "you": "you",
       "notDecided": "Dreddi couldn't decide in time.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "rebuttalTitle": "Your reply",
+      "rebuttalHint": "One answer to {nickname}'s position. After the replies, Dreddi gives the verdict."
     },
     "verdict": {
       "title": "Dreddi's verdict",
