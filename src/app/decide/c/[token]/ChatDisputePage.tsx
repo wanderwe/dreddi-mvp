@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle, ArrowRight, Check, CheckCircle2, Share2, Swords, Users } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Share2, Swords, Users } from "lucide-react";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
@@ -369,13 +369,14 @@ export default function ChatDisputePage() {
           {view.majorityRight !== null && (
             <p
               className={`decide-pop flex items-center gap-2 rounded-2xl px-4 py-3 text-base font-semibold ${
-                view.majorityRight ? "bg-emerald-400/[0.12] text-tone-white" : "bg-amber-300/25 text-tone-white"
+                // Gold belongs to the side that is right; the crowd's line stays neutral when it got it wrong.
+                view.majorityRight ? "bg-emerald-400/[0.12] text-tone-white" : "border border-tone-white/15 bg-tone-white/5 text-tone-white"
               }`}
             >
               {view.majorityRight ? (
                 <CheckCircle2 className="h-5 w-5 text-accent-200" aria-hidden />
               ) : (
-                <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden />
+                <Users className="h-5 w-5 text-tone-300" aria-hidden />
               )}
               {view.majorityRight ? t("decide.group.majorityRight") : t("decide.group.majorityWrong")}
             </p>
