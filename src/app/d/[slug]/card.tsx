@@ -11,7 +11,7 @@ import { TrackView } from "@/lib/events/TrackView";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
-// The public card of a «Дредді розсуди» verdict: the question, the nicknames and the verdict, never the positions.
+// The public card of a «Дредді розсуди» verdict: the question, the names or nicknames and the verdict, never the positions.
 
 export async function buildQuickCardMetadata(slug: string, locale: Locale): Promise<Metadata> {
   const card = await getPublicCard(slug);

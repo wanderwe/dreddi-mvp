@@ -671,17 +671,19 @@ export async function getPublicCard(slug: string) {
     .select("id,role,nickname,user_id,rebuttal,rebuttal_skipped")
     .eq("dispute_id", dispute.id)
     .returns<{ id: string; role: QuickRole; nickname: string; user_id: string | null; rebuttal: string | null; rebuttal_skipped: boolean }[]>();
-  // Anyone can open the card, and either side can share it: a signed-in side shows up under a random
-  // nickname of their own here, never their profile name.
+  // Anyone can open the card, and either side can share it. When both sides are signed in, both play
+  // under their own names and the card shows them. Otherwise a signed-in side shows up under a random
+  // nickname of their own, never their profile name next to an anonymous one.
+  const bothSignedIn = (parties ?? []).length === 2 && (parties ?? []).every((party) => party.user_id);
   const nickname = (role: QuickRole) => {
     const party = parties?.find((row) => row.role === role);
     if (!party) return role;
-    if (!party.user_id) return party.nickname;
+    if (!party.user_id || bothSignedIn) return party.nickname;
     const other = parties?.find((row) => row.role !== role)?.nickname;
     return randomNickname(dispute.lang, other, seededRandom(party.id));
   };
   const names = (parties ?? [])
-    .filter((party) => party.user_id)
+    .filter((party) => party.user_id && !bothSignedIn)
     .map((party) => ({ real: party.nickname, shown: nickname(party.role) }));
   const mask = (text: string) => maskNames(text, names);
   const verdict = dispute.verdict;
