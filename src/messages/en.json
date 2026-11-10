@@ -1636,7 +1636,6 @@
       "editArgument": "Edit",
       "created": "The dispute is ready. Send the link to the chat.",
       "invite": "Call someone else: the more people, the better",
-      "closeNeedsMore": "You can close it once at least 3 people take a side",
       "closes": "closes {time}",
       "closesManual": "the creator closes it",
       "participants": {

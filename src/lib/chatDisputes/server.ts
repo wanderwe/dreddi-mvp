@@ -186,9 +186,9 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
     const argument = typeof body.text === "string" && body.text.trim() ? clean(body.text, CHAT_LIMITS.argument) : null;
     await admin.from("quick_chat_sides").update({ argument, updated_at: now }).eq("id", mine.id);
   } else if (body.action === "close") {
-    // By hand only with enough people for a verdict: closing early must never throw the dispute away.
+    // The creator closes it whenever they like: with too few people it simply ends without a verdict.
     const creator = (identity.userId && dispute.creator_user_id === identity.userId) || dispute.creator_secret_hash === identity.secretHash;
-    if (!creator || dispute.status !== "open" || sides.length < CHAT_LIMITS.minSides) throw new JudgeError("stale", 409);
+    if (!creator || dispute.status !== "open") throw new JudgeError("stale", 409);
     await admin.from("quick_chat_disputes").update({ closes_at: now }).eq("id", dispute.id).eq("status", "open");
   } else if (body.action !== "decide") {
     throw new JudgeError("unknown_action", 400);

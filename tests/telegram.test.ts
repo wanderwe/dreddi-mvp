@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { disputeMessage, draftMessage, verdictText, type TgDispute } from "../src/lib/telegram/render";
-import { closeTime, langOf } from "../src/lib/telegram/texts";
+import { closeTime, langFor, langOf } from "../src/lib/telegram/texts";
 
 const dispute = (patch: Partial<TgDispute> = {}): TgDispute => ({
   id: "d1",
@@ -32,6 +32,10 @@ test("Ukrainian and Russian Telegram get Ukrainian, everyone else English", () =
   assert.equal(langOf("ru-RU"), "uk");
   assert.equal(langOf("en"), "en");
   assert.equal(langOf(undefined), "en");
+  // Telegram in English, the argument in Ukrainian: Ukrainian.
+  assert.equal(langFor("я кажу, що помідор це фрукт", "en"), "uk");
+  assert.equal(langFor("pineapple on pizza", "uk"), "uk");
+  assert.equal(langFor("pineapple on pizza", "en"), "en");
 });
 
 test("closing time reads in Kyiv time, with the date only on another day", () => {

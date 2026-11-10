@@ -317,14 +317,11 @@ export default function ChatDisputePage() {
               {" · "}
               {view.closesAt ? t("decide.group.closes", { time: timeFormat.format(new Date(view.closesAt)) }) : t("decide.group.closesManual")}
             </span>
-            {view.isCreator &&
-              (view.total >= CHAT_LIMITS.minSides ? (
-                <button type="button" className={`${secondaryButtonClass} ml-auto`} disabled={busy} onClick={() => void act({ action: "close" })}>
-                  {t("decide.group.closeLabel")}
-                </button>
-              ) : (
-                <span className="ml-auto text-xs text-tone-500">{t("decide.group.closeNeedsMore")}</span>
-              ))}
+            {view.isCreator && (
+              <button type="button" className={`${secondaryButtonClass} ml-auto`} disabled={busy} onClick={() => void act({ action: "close" })}>
+                {t("decide.group.closeLabel")}
+              </button>
+            )}
           </div>
 
           {(view.mine || (view.isCreator && view.total > 0)) && shareBlock(t("decide.group.invite"), false)}

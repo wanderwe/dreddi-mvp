@@ -24,7 +24,6 @@ export const TG_TEXTS = {
     picked: (position: string) => `Ви за «${position}»`,
     switched: (position: string) => `Тепер ви за «${position}»`,
     onlyCreator: (name: string) => `Закрити може лише ${name}`,
-    tooFewToClose: "Закрити можна, коли на бік стануть хоча б 3 людини",
     argumentNoSide: (name: string) => `${name}, спершу оберіть бік кнопкою`,
     thinking: "Суперечку закрито, Дредді думає",
     verdictTitle: "Вердикт Дредді",
@@ -59,7 +58,6 @@ export const TG_TEXTS = {
     picked: (position: string) => `You're for «${position}»`,
     switched: (position: string) => `Now you're for «${position}»`,
     onlyCreator: (name: string) => `Only ${name} can close it`,
-    tooFewToClose: "It can close once at least 3 people take a side",
     argumentNoSide: (name: string) => `${name}, pick a side with the buttons first`,
     thinking: "Closed, Dreddi is thinking",
     verdictTitle: "Dreddi's verdict",
@@ -79,6 +77,11 @@ export type TgTexts = (typeof TG_TEXTS)[QuickLang];
 
 // Ukrainian (and Russian, for Ukrainians on a Russian interface) get Ukrainian; everyone else English.
 export const langOf = (code: string | undefined): QuickLang => (code && /^(uk|ru)/i.test(code) ? "uk" : "en");
+
+// The language people actually write in wins over the app's: many here run Telegram in English but
+// argue in Ukrainian. Cyrillic means Ukrainian; otherwise the app's language decides.
+export const langFor = (text: string | null | undefined, code: string | undefined): QuickLang =>
+  text && /[а-яіїєґ]/i.test(text) ? "uk" : langOf(code);
 
 export const textsFor = (lang: QuickLang): TgTexts => TG_TEXTS[lang];
 

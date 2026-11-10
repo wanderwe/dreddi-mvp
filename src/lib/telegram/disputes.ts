@@ -25,7 +25,7 @@ import {
   type TgMessage,
   type TgUpdate,
 } from "./api";
-import { langOf, textsFor } from "./texts";
+import { langFor, textsFor } from "./texts";
 import { disputeMessage, draftMessage, verdictText, type TgDispute } from "./render";
 
 // Server only: «Дредді, розсуди!» in a Telegram group. The dispute is a chat dispute from the site, played
@@ -108,12 +108,13 @@ async function onMembership(update: TgChatMemberUpdated) {
   const joined = ["member", "administrator"].includes(update.new_chat_member.status);
   const wasOut = ["left", "kicked"].includes(update.old_chat_member.status);
   if (!joined || !wasOut || (update.chat.type !== "group" && update.chat.type !== "supergroup")) return;
-  await quietly(tg("sendMessage", { chat_id: update.chat.id, text: textsFor(langOf(update.from.language_code)).greeting }));
+  await quietly(tg("sendMessage", { chat_id: update.chat.id, text: textsFor(langFor(update.chat.title, update.from.language_code)).greeting }));
   await logEvent("tg_bot_added", sha256(`chat:${update.chat.id}`).slice(0, 32));
 }
 
 async function onCommand(message: TgMessage, name: string, rest: string) {
-  const lang = langOf(message.from?.language_code);
+  const context = message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null;
+  const lang = langFor(`${rest} ${context ?? ""} ${message.chat.title ?? ""}`, message.from?.language_code);
   const t = textsFor(lang);
   const reply = (text: string, extra: Record<string, unknown> = {}) =>
     quietly(tg("sendMessage", { chat_id: message.chat.id, text, reply_parameters: { message_id: message.message_id, allow_sending_without_reply: true }, ...extra }));
@@ -125,7 +126,6 @@ async function onCommand(message: TgMessage, name: string, rest: string) {
   if (name === "start" || name === "help") return reply(t.greeting);
   if (name !== "dreddi" && name !== "rozsudy") return;
 
-  const context = message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null;
   if (!rest && !context) return reply(t.empty);
 
   const from = message.from!;
@@ -247,7 +247,6 @@ async function onCallback(query: TgCallbackQuery) {
 
   if (kind === "x") {
     if (!isCreator) return answer(t.onlyCreator(dispute.tg_creator_name ?? ""));
-    if (sides.length < CHAT_LIMITS.minSides) return answer(t.tooFewToClose);
     await admin.from("quick_chat_disputes").update({ closes_at: new Date().toISOString() }).eq("id", dispute.id).eq("status", "open");
     await answer();
     return finishNow({ ...live, closes_at: new Date().toISOString() }, sides);
