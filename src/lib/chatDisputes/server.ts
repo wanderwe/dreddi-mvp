@@ -229,7 +229,12 @@ async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
 // What a shared link shows in messengers, and the page's own title: no arguments, no nicknames.
 export async function getChatCard(token: string) {
   try {
-    const { dispute, sides } = await load(token);
+    // A messenger asks right after the link is made and caches what it gets: one more try on a hiccup.
+    const { dispute, sides } = await load(token).catch(async (error) => {
+      if (error instanceof JudgeError && error.status === 404) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      return load(token);
+    });
     const view = buildChatView(dispute, sides, { userId: null, secretHash: "" });
     return {
       lang: dispute.lang,

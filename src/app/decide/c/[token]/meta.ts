@@ -4,6 +4,7 @@ import { getMessages } from "@/lib/i18n/getMessages";
 import { createTranslator } from "@/lib/i18n/t";
 import { localizePath } from "@/lib/i18n/routing";
 import type { Locale } from "@/lib/i18n/locales";
+import { disputeFallback } from "@/app/decide/join/[token]/invite";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 
@@ -11,8 +12,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
 // once decided, Dreddi's answer. Never what people wrote.
 export async function buildChatMetadata(token: string, locale: Locale): Promise<Metadata> {
   const card = await getChatCard(token);
-  if (!card) return { robots: { index: false } };
   const t = createTranslator(locale, getMessages(locale));
+  if (!card) return disputeFallback(t("decide.title"), t("decide.format.chatHint"));
   const title = card.question;
   const description = card.verdict ? card.verdict.short_answer : `${card.positions[1]} · ${card.positions[2]}. ${t("decide.format.chatHint")}`;
   const url = new URL(localizePath(`/decide/c/${token}`, locale), SITE_URL).toString();

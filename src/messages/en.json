@@ -1495,7 +1495,8 @@
       "taken": "Someone has already answered this dispute",
       "own": "This is your dispute. Send the link to the other side.",
       "expired": "The dispute is closed: the other side didn't answer within 7 days",
-      "startOwn": "Start your own dispute"
+      "startOwn": "Start your own dispute",
+      "previewFallback": "You're called to Dreddi to settle a dispute"
     },
     "chat": {
       "proposedWording": "{nickname} suggests a different wording",

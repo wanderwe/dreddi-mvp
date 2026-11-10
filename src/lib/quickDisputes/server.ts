@@ -223,8 +223,14 @@ export async function previewInvite(token: string, identity: Identity) {
 // What a shared invite link shows in messengers: the question and who is calling, never the position.
 export async function getInviteCard(token: string) {
   if (!/^[A-Za-z0-9_-]{20,32}$/.test(token)) return null;
+  // A messenger asks right after the link is made and caches what it gets: one more try on a hiccup.
+  const read = () => loadDispute({ invite_token: token });
   try {
-    const { dispute, parties } = await loadDispute({ invite_token: token });
+    const { dispute, parties } = await read().catch(async (error) => {
+      if (error instanceof JudgeError && error.status === 404) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      return read();
+    });
     return {
       question: dispute.question,
       nicknameA: parties.find((party) => party.role === "A")?.nickname ?? "",
