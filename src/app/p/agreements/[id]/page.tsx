@@ -667,6 +667,18 @@ export default function PublicAgreementPage() {
                 ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-end justify-end gap-2 sm:max-w-[22rem]">
+                {/* For the sides, opening their own promise comes first. */}
+                {agreement.viewer_is_side && (
+                  <Tooltip label={t("invite.goToDeal")} placement="top">
+                    <Link
+                      href={localizePath(`/promises/${agreement.id}`, locale)}
+                      aria-label={t("invite.goToDeal")}
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-tone-white/10 bg-transparent text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 active:scale-[0.98]"
+                    >
+                      <SquarePen className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </Tooltip>
+                )}
                 <Tooltip
                   label={
                     copyState === "copied"
@@ -721,17 +733,6 @@ export default function PublicAgreementPage() {
                     </span>
                   </button>
                 </Tooltip>
-                {agreement.viewer_is_side && (
-                  <Tooltip label={t("invite.goToDeal")} placement="top">
-                    <Link
-                      href={localizePath(`/promises/${agreement.id}`, locale)}
-                      aria-label={t("invite.goToDeal")}
-                      className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-tone-white/10 bg-transparent text-tone-white transition hover:border-accent-300/50 hover:text-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950 active:scale-[0.98]"
-                    >
-                      <SquarePen className="h-4 w-4" aria-hidden="true" />
-                    </Link>
-                  </Tooltip>
-                )}
                 {agreement.viewer_can_follow !== false ? (
                   <Tooltip
                     label={agreement.viewer_following ? t("publicAgreement.unfollowTooltip") : t("publicAgreement.followTooltip")}
