@@ -758,6 +758,8 @@
       "googleCta": "Увійти через Google",
       "googleSigningIn": "Підключення...",
       "googleError": "Не вдалося запустити вхід через Google. Спробуйте ще раз.",
+      "appleCta": "Увійти через Apple",
+      "appleError": "Не вдалося запустити вхід через Apple. Спробуйте ще раз.",
       "or": "Або",
       "sendLink": "Надіслати magic link",
       "sending": "Надсилання...",
