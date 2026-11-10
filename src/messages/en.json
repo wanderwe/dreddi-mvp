@@ -1619,7 +1619,7 @@
         "day": "In a day",
         "manual": "Manually"
       },
-      "create": "Get the link",
+      "create": "Call the chat",
       "shareText": "Who's right? {question}",
       "whyLabel": "Why? Dreddi shows everyone the strongest argument.",
       "tooFew": "Too few people for a verdict: at least 3 needed",
