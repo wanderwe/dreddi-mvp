@@ -64,33 +64,33 @@ export const LIMITS = {
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 
-// A trait you would show in an argument, and an animal: the animal carries the grammatical gender, so the
-// nickname says nothing about the person.
-const NICKNAMES: Record<QuickLang, { adjectives: string[]; animals: string[] }> = {
+// A trait you would show in an argument, and a chemical element. The element carries the grammatical gender
+// (all masculine, so the adjective keeps one form), and the nickname says nothing about the person.
+const NICKNAMES: Record<QuickLang, { adjectives: string[]; elements: string[] }> = {
   uk: {
     adjectives: ["Впертий", "Принциповий", "Скептичний", "Переконаний", "Незламний", "Логічний", "Хитрий", "Безапеляційний", "Палкий", "Холоднокровний", "Допитливий", "Чесний"],
-    animals: ["Борсук", "Їжак", "Лис", "Вовк", "Бобер", "Кіт", "Горобець", "Сокіл", "Ведмідь", "Заєць", "Лелека", "Пугач"],
+    elements: ["Марганець", "Кобальт", "Вольфрам", "Неон", "Аргон", "Гелій", "Літій", "Титан", "Хром", "Цинк", "Нікель", "Ксенон"],
   },
   en: {
     adjectives: ["Stubborn", "Principled", "Skeptical", "Convinced", "Unyielding", "Logical", "Cunning", "Adamant", "Fiery", "Cool-headed", "Curious", "Honest"],
-    animals: ["Badger", "Hedgehog", "Fox", "Wolf", "Beaver", "Cat", "Sparrow", "Falcon", "Bear", "Hare", "Stork", "Owl"],
+    elements: ["Manganese", "Cobalt", "Tungsten", "Neon", "Argon", "Helium", "Lithium", "Titanium", "Chromium", "Zinc", "Nickel", "Xenon"],
   },
 };
 
 export function randomNickname(lang: QuickLang, avoid?: string, random: () => number = Math.random): string {
-  const { adjectives, animals } = NICKNAMES[lang];
+  const { adjectives, elements } = NICKNAMES[lang];
   for (let i = 0; i < 10; i++) {
-    const name = `${adjectives[Math.floor(random() * adjectives.length)]} ${animals[Math.floor(random() * animals.length)]}`;
+    const name = `${adjectives[Math.floor(random() * adjectives.length)]} ${elements[Math.floor(random() * elements.length)]}`;
     if (name !== avoid) return name;
   }
-  return `${adjectives[0]} ${animals[0]}`;
+  return `${adjectives[0]} ${elements[0]}`;
 }
 
 // The nickname the page showed an anonymous side before they started: accepted only if it is one we make.
 export function isRandomNickname(lang: QuickLang, name: unknown): name is string {
   if (typeof name !== "string") return false;
-  const [adjective, animal, ...rest] = name.split(" ");
-  return rest.length === 0 && NICKNAMES[lang].adjectives.includes(adjective) && NICKNAMES[lang].animals.includes(animal);
+  const [adjective, element, ...rest] = name.split(" ");
+  return rest.length === 0 && NICKNAMES[lang].adjectives.includes(adjective) && NICKNAMES[lang].elements.includes(element);
 }
 
 export const isExpired = (dispute: Pick<DisputeRow, "status" | "created_at">, now: Date = new Date()) =>

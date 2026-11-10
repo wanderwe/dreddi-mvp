@@ -179,8 +179,8 @@ test("random nicknames differ from the other side's", () => {
   const values = [0, 0, 0, 0, 0.5, 0.5];
   let i = 0;
   const random = () => values[i++ % values.length];
-  assert.equal(randomNickname("uk", undefined, () => 0), "Впертий Борсук");
-  assert.notEqual(randomNickname("uk", "Впертий Борсук", random), "Впертий Борсук");
+  assert.equal(randomNickname("uk", undefined, () => 0), "Впертий Марганець");
+  assert.notEqual(randomNickname("uk", "Впертий Марганець", random), "Впертий Марганець");
   assert.match(randomNickname("en", undefined, () => 0.99), /^\S+ \S+$/);
 });
 
