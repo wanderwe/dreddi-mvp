@@ -1604,7 +1604,7 @@
       "duo": "Two of us",
       "label": "Who's arguing",
       "chat": "The whole chat",
-      "chatHint": "Drop the link in a chat, everyone takes a side, Dreddi decides"
+      "chatHint": "Drop the link in a chat, everyone picks a position, Dreddi decides"
     },
     "group": {
       "cancel": "Cancel",
