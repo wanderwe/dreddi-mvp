@@ -109,7 +109,7 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
   en: {
     seo: {
       title: "Why Dreddi Exists — Dreddi",
-      description: "Promised? Dreddi knows. Keep your word to others and to yourself. Record promises, agreements and dispute stakes, and each one you keep becomes a reputation people trust.",
+      description: "Promised? Dreddi knows. Keep your word to others and to yourself. Record your promises and dispute stakes. Every one you keep adds to a reputation people trust.",
     },
     title: "Why Dreddi exists",
     subtitle: "",
@@ -134,7 +134,7 @@ const pledgeWhyCopy: Record<Locale, WhyCopy> = {
   uk: {
     seo: {
       title: "Чому існує Dreddi — Dreddi",
-      description: "Пообіцяв? Dreddi знає. Тримай слово перед іншими й перед собою. Фіксуй обіцянки, домовленості й ставки в суперечках, а кожна виконана стане репутацією, якій довіряють.",
+      description: "Пообіцяв? Dreddi знає. Тримай слово перед іншими й перед собою. Фіксуй обіцянки і ставки в суперечках. Кожна виконана додає до репутації, якій довіряють.",
     },
     title: "Чому існує Dreddi",
     subtitle: "",
