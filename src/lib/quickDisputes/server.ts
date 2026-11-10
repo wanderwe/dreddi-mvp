@@ -582,7 +582,7 @@ async function review(dispute: DisputeRow, parties: PartyRow[]) {
 // all of them are cheap to read; questions and verdicts only for the page.
 export async function listMine(identity: Identity, page: { offset?: number; limit?: number } = {}) {
   const offset = Math.max(0, Math.floor(page.offset ?? 0));
-  const limit = Math.min(50, Math.max(0, Math.floor(page.limit ?? 20)));
+  const limit = Math.min(50, Math.max(0, Math.floor(page.limit ?? 12)));
   const admin = getAdminClient();
   const filter = identity.userId
     ? `user_id.eq.${identity.userId},secret_hash.eq.${identity.secretHash}`

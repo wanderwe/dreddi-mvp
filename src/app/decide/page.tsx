@@ -21,7 +21,7 @@ type Item = {
 };
 type Page = { disputes: Item[]; hasMore: boolean };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 12;
 
 // How a dispute's status reads in the list: decided in green, a move waiting on this person in amber.
 function pillFor(item: Item): { tone: StatusPillTone; icon: "check" | "clock" | "warning" } {
