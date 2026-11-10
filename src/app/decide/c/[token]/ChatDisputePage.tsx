@@ -124,6 +124,8 @@ export default function ChatDisputePage() {
     minute: "2-digit",
   });
   const open = view.status === "open" && !view.canDecideNow;
+  // A dispute from a Telegram group is played there: the site shows it, the sides are taken in the chat.
+  const inTelegram = view.source === "telegram";
   const positionText = (position: ChatPosition) => view.positions[position];
 
   const takeSide = async (position: ChatPosition) => {
@@ -195,7 +197,24 @@ export default function ChatDisputePage() {
 
       {open && view.isCreator && view.total === 0 && shareBlock(t("decide.group.created"), true)}
 
-      {open && (
+      {open && inTelegram && (
+        <section className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {([1, 2] as const).map((position) => (
+              <div key={position} className="rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 text-base font-semibold text-tone-white">
+                {positionText(position)}
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-tone-300">{t("decide.group.telegramOnly")}</p>
+          <p className="text-sm text-tone-400">
+            <span className="font-semibold text-tone-200">{people(view.total)}</span>
+            {view.closesAt && <> · {t("decide.group.closes", { time: timeFormat.format(new Date(view.closesAt)) })}</>}
+          </p>
+        </section>
+      )}
+
+      {open && !inTelegram && (
         <>
           {/* The rule sits right above the two sides it is about, after the creator's link block. */}
           {!view.mine && <p className="text-sm text-tone-300">{t("decide.group.rules")}</p>}

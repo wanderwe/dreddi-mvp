@@ -25,6 +25,12 @@ export type ChatDisputeRow = {
   creator_secret_hash: string | null;
   verdict: ChatVerdict | null;
   decided_at: string | null;
+  // Where it lives: on the site, or in a Telegram group (then the site only shows it).
+  source?: "web" | "telegram";
+  tg_chat_id?: number | null;
+  tg_message_id?: number | null;
+  tg_creator_name?: string | null;
+  tg_shown_count?: number | null;
 };
 
 export type ChatSideRow = {
@@ -36,6 +42,8 @@ export type ChatSideRow = {
   user_id: string | null;
   secret_hash: string;
   ip_hash?: string | null;
+  // A Telegram participant's nickname on the site, where their Telegram name never shows.
+  web_nickname?: string | null;
   created_at: string;
 };
 
@@ -63,7 +71,7 @@ export const closesAtFor = (option: CloseOption, now: Date = new Date()) =>
   option === "manual" ? null : new Date(now.getTime() + (option === "hour" ? 1 : 24) * HOUR_MS).toISOString();
 
 // Time is up (a dispute closed by hand has no time).
-export const closeDue = (dispute: Pick<ChatDisputeRow, "status" | "closes_at">, now: Date = new Date()) =>
+export const closeDue = (dispute: { status: string; closes_at: string | null }, now: Date = new Date()) =>
   dispute.status === "open" && Boolean(dispute.closes_at) && now.getTime() >= new Date(dispute.closes_at as string).getTime();
 
 export const countSides = (sides: Pick<ChatSideRow, "position">[]) => ({
@@ -94,6 +102,7 @@ const percent = (part: number, total: number) => (total ? Math.round((part / tot
 
 export type ChatView = {
   token: string;
+  source: "web" | "telegram";
   status: ChatStatus;
   lang: QuickLang;
   question: string;
@@ -131,6 +140,7 @@ export function buildChatView(
   };
   return {
     token: dispute.token,
+    source: dispute.source ?? "web",
     status: dispute.status,
     lang: dispute.lang,
     question: dispute.question,

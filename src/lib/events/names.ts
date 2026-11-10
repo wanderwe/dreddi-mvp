@@ -9,6 +9,11 @@ export const EVENT_NAMES = [
   "chat_dispute_open",
   "chat_dispute_side",
   "chat_dispute_share",
+  "tg_bot_added",
+  "tg_dispute_create",
+  "tg_dispute_side",
+  "tg_dispute_argument",
+  "tg_dispute_verdict",
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

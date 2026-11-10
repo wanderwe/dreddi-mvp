@@ -3,7 +3,7 @@ import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askChatVerdict } from "@/lib/ai/askChatVerdict";
 import type { QuickLang } from "@/lib/ai/quickVerdict";
-import { LIMITS, isRandomNickname, randomNickname } from "@/lib/quickDisputes/state";
+import { LIMITS, isRandomNickname, maskNames, randomNickname } from "@/lib/quickDisputes/state";
 import type { Identity } from "@/lib/quickDisputes/server";
 import {
   CHAT_LIMITS,
@@ -22,9 +22,9 @@ import {
 // Server only: «Хто правий?» for a chat in the database. Only the service role touches these tables.
 // Anyone with the link is a participant; everyone appears under a random nickname, never a profile name.
 
-const DISPUTE_COLUMNS =
-  "id,created_at,lang,question,position_1,position_2,status,token,closes_at,closed_at,creator_user_id,creator_secret_hash,verdict,decided_at";
-const SIDE_COLUMNS = "id,dispute_id,position,argument,nickname,user_id,secret_hash,ip_hash,created_at";
+export const DISPUTE_COLUMNS =
+  "id,created_at,lang,question,position_1,position_2,status,token,closes_at,closed_at,creator_user_id,creator_secret_hash,verdict,decided_at,source,tg_chat_id,tg_message_id,tg_creator_name,tg_shown_count";
+export const SIDE_COLUMNS = "id,dispute_id,position,argument,nickname,web_nickname,user_id,secret_hash,ip_hash,created_at";
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
 const randomToken = (bytes: number) => randomBytes(bytes).toString("base64url");
@@ -82,7 +82,7 @@ export async function createChatDispute(
   return { token: data.token };
 }
 
-async function load(token: string) {
+export async function load(token: string) {
   if (!validToken(token)) throw new JudgeError("not_found", 404);
   const admin = getAdminClient();
   const { data: dispute, error } = await admin
@@ -91,7 +91,8 @@ async function load(token: string) {
     .eq("token", token)
     .maybeSingle<ChatDisputeRow>();
   if (error) throw new JudgeError(`Lookup failed: ${error.message}`, 500);
-  if (!dispute) throw new JudgeError("not_found", 404);
+  // A Telegram draft waits for its author: nobody else sees it yet.
+  if (!dispute || (dispute.status as string) === "draft") throw new JudgeError("not_found", 404);
   const { data: sides } = await admin
     .from("quick_chat_sides")
     .select(SIDE_COLUMNS)
@@ -103,8 +104,34 @@ async function load(token: string) {
 const isMine = (side: Pick<ChatSideRow, "user_id" | "secret_hash">, identity: Identity) =>
   (identity.userId !== null && side.user_id === identity.userId) || side.secret_hash === identity.secretHash;
 
+// On the site a Telegram dispute shows nicknames, never the Telegram names, in the verdict's text too.
+function forWeb(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
+  if (dispute.source !== "telegram") return { dispute, sides };
+  const names = sides
+    .filter((side) => side.web_nickname)
+    .map((side) => ({ real: side.nickname, shown: side.web_nickname as string }));
+  if (dispute.tg_creator_name && !names.some((name) => name.real === dispute.tg_creator_name)) {
+    names.push({ real: dispute.tg_creator_name, shown: randomNickname(dispute.lang) });
+  }
+  const mask = (text: string) => maskNames(text, names);
+  const verdict = dispute.verdict
+    ? {
+        ...dispute.verdict,
+        short_answer: mask(dispute.verdict.short_answer),
+        explanation: mask(dispute.verdict.explanation),
+        nuance: dispute.verdict.nuance ? mask(dispute.verdict.nuance) : null,
+        share_text: mask(dispute.verdict.share_text),
+      }
+    : null;
+  return {
+    dispute: { ...dispute, question: mask(dispute.question), verdict, tg_creator_name: null },
+    sides: sides.map((side) => ({ ...side, nickname: side.web_nickname ?? side.nickname, argument: side.argument ? mask(side.argument) : null })),
+  };
+}
+
 export async function getChatView(token: string, identity: Identity) {
-  const { dispute, sides } = await load(token);
+  const loaded = await load(token);
+  const { dispute, sides } = forWeb(loaded.dispute, loaded.sides);
   return buildChatView(dispute, sides, identity);
 }
 
@@ -117,6 +144,8 @@ type ChatAction =
 export async function actOnChat(token: string, identity: Identity, body: ChatAction) {
   const { admin, dispute, sides } = await load(token);
   const now = new Date().toISOString();
+  // A Telegram dispute is played in the group: the site only shows it, and asks for the verdict when due.
+  if (dispute.source === "telegram" && body.action !== "decide") throw new JudgeError("stale", 409);
 
   if (body.action === "side") {
     if (dispute.status !== "open" || closeDue(dispute)) throw new JudgeError("stale", 409);
@@ -170,6 +199,39 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
   return getChatView(token, identity);
 }
 
+// The group hears how it ended. Loaded on demand: the site's code never needs the bot otherwise.
+async function announceInTelegram(disputeId: string) {
+  const { announceResult } = await import("@/lib/telegram/disputes");
+  await announceResult(disputeId).catch((error) => console.warn("telegram announce:", error instanceof Error ? error.message : error));
+}
+
+// Every chat dispute whose time is up: the 5-minute tick closes them, so a Telegram group gets its
+// verdict on time and a card on the site is ready before anyone opens it.
+export async function closeDueChats(limit = 10) {
+  const admin = getAdminClient();
+  const { data } = await admin
+    .from("quick_chat_disputes")
+    .select("token")
+    .eq("status", "open")
+    .lte("closes_at", new Date().toISOString())
+    .order("closes_at")
+    .limit(limit)
+    .returns<{ token: string }[]>();
+  let closed = 0;
+  for (const { token } of data ?? []) {
+    try {
+      const { dispute, sides } = await load(token);
+      if (closeDue(dispute)) {
+        await decideChat(dispute, sides);
+        closed++;
+      }
+    } catch (error) {
+      console.warn("chat tick:", token, error instanceof Error ? error.message : error);
+    }
+  }
+  return closed;
+}
+
 // Verdicts a day across the whole service, chats and disputes between two people together.
 async function checkServiceLimit() {
   const admin = getAdminClient();
@@ -182,12 +244,18 @@ async function checkServiceLimit() {
   if ((quick ?? 0) + (reviews ?? 0) + (chats ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
 }
 
-async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
+export async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
   const admin = getAdminClient();
   const now = new Date().toISOString();
   // Too few people: it closes without a verdict, and without spending anything.
   if (sides.length < CHAT_LIMITS.minSides) {
-    await admin.from("quick_chat_disputes").update({ status: "closed_empty", closed_at: now }).eq("id", dispute.id).eq("status", "open");
+    const { data: closed } = await admin
+      .from("quick_chat_disputes")
+      .update({ status: "closed_empty", closed_at: now })
+      .eq("id", dispute.id)
+      .eq("status", "open")
+      .select("id");
+    if (closed?.length && dispute.source === "telegram") await announceInTelegram(dispute.id);
     return;
   }
   await checkServiceLimit();
@@ -229,6 +297,7 @@ async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
         decided_at: new Date().toISOString(),
       })
       .eq("id", dispute.id);
+    if (dispute.source === "telegram") await announceInTelegram(dispute.id);
   } catch (error) {
     // Back to open with the time up, so the next visit asks again.
     await admin.from("quick_chat_disputes").update({ status: "open" }).eq("id", dispute.id).eq("status", "deciding");
@@ -245,7 +314,8 @@ export async function getChatCard(token: string) {
       await new Promise((resolve) => setTimeout(resolve, 400));
       return load(token);
     });
-    const view = buildChatView(dispute, sides, { userId: null, secretHash: "" });
+    const shown = forWeb(dispute, sides);
+    const view = buildChatView(shown.dispute, shown.sides, { userId: null, secretHash: "" });
     return {
       lang: dispute.lang,
       question: view.question,

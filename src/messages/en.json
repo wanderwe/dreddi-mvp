@@ -1605,6 +1605,7 @@
       "chatHint": "Drop the link in a chat, everyone takes a side, Dreddi decides"
     },
     "group": {
+      "telegramOnly": "Voting happens in the Telegram chat. The result shows up here once it closes.",
       "situationLabel": "What happened",
       "situationPlaceholder": "For example: a friend borrowed the car and got a speed camera fine. Who pays?",
       "position": "Position {n}",
