@@ -1617,22 +1617,31 @@
         "manual": "Manually"
       },
       "create": "Get the link",
-      "shareTitle": "Send the link to the chat",
       "shareText": "Who's right? {question}",
-      "whyLabel": "Why? (optional)",
-      "takeSide": "Take this side",
-      "yourSide": "You're with: {position}",
-      "change": "Change",
-      "count": "Taking part: {count}",
-      "beforeClose": "The split and the verdict once it closes, {time}",
-      "beforeCloseManual": "The split and the verdict once it closes",
+      "whyLabel": "Why? Dreddi shows everyone the strongest argument.",
       "tooFew": "Too few people for a verdict: at least 3 needed",
       "majorityRight": "The majority is right",
       "majorityWrong": "The majority is wrong",
       "winner": "Those for «{position}» are right",
       "best": "The strongest argument for «{position}»",
       "allArguments": "What people said",
-      "tag": "Chat"
+      "tag": "Chat",
+      "rules": "Pick a side. Dreddi says who's right once it closes.",
+      "pick": "I'm with this",
+      "or": "or",
+      "mySide": "Your side",
+      "switch": "Switch to this side",
+      "addArgument": "Add an argument",
+      "editArgument": "Edit",
+      "created": "The dispute is ready. Send the link to the chat.",
+      "invite": "Call someone else: the more people, the better",
+      "closeNeedsMore": "You can close it once at least 3 people take a side",
+      "closes": "closes {time}",
+      "closesManual": "the creator closes it",
+      "participants": {
+        "one": "person",
+        "other": "people"
+      }
     }
   }
 }

@@ -109,7 +109,8 @@ export async function getChatView(token: string, identity: Identity) {
 }
 
 type ChatAction =
-  | { action: "side"; position?: unknown; argument?: unknown; nickname?: unknown }
+  | { action: "side"; position?: unknown; nickname?: unknown }
+  | { action: "argument"; text?: unknown }
   | { action: "close" }
   | { action: "decide" };
 
@@ -119,13 +120,15 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
 
   if (body.action === "side") {
     if (dispute.status !== "open" || closeDue(dispute)) throw new JudgeError("stale", 409);
+    // One tap takes a side; the argument comes after, on its own.
     const position = body.position === 1 || body.position === 2 ? (body.position as ChatPosition) : null;
     if (!position) throw new JudgeError("empty", 400);
-    const argument =
-      typeof body.argument === "string" && body.argument.trim() ? clean(body.argument, CHAT_LIMITS.argument) : null;
     const mine = sides.find((side) => isMine(side, identity));
     if (mine) {
-      await admin.from("quick_chat_sides").update({ position, argument, updated_at: now }).eq("id", mine.id);
+      // A switch drops the argument: it argued for the other side.
+      if (mine.position !== position) {
+        await admin.from("quick_chat_sides").update({ position, argument: null, updated_at: now }).eq("id", mine.id);
+      }
     } else {
       const fromIp = identity.ipHash ? sides.filter((side) => side.ip_hash === identity.ipHash).length : 0;
       if (fromIp >= CHAT_LIMITS.sidesPerIp) throw new JudgeError("daily_limit", 429);
@@ -138,7 +141,6 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
       const { error } = await admin.from("quick_chat_sides").insert({
         dispute_id: dispute.id,
         position,
-        argument,
         nickname: nickname || randomNickname(dispute.lang),
         user_id: identity.userId,
         secret_hash: identity.secretHash,
@@ -147,9 +149,17 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
       // Two taps at once: the second finds the side the first created.
       if (error && !/duplicate|unique/i.test(error.message)) throw new JudgeError(`Could not save: ${error.message}`, 500);
     }
+  } else if (body.action === "argument") {
+    // Why this side: written, changed or removed while it is open.
+    if (dispute.status !== "open" || closeDue(dispute)) throw new JudgeError("stale", 409);
+    const mine = sides.find((side) => isMine(side, identity));
+    if (!mine) throw new JudgeError("stale", 409);
+    const argument = typeof body.text === "string" && body.text.trim() ? clean(body.text, CHAT_LIMITS.argument) : null;
+    await admin.from("quick_chat_sides").update({ argument, updated_at: now }).eq("id", mine.id);
   } else if (body.action === "close") {
+    // By hand only with enough people for a verdict: closing early must never throw the dispute away.
     const creator = (identity.userId && dispute.creator_user_id === identity.userId) || dispute.creator_secret_hash === identity.secretHash;
-    if (!creator || dispute.status !== "open") throw new JudgeError("stale", 409);
+    if (!creator || dispute.status !== "open" || sides.length < CHAT_LIMITS.minSides) throw new JudgeError("stale", 409);
     await admin.from("quick_chat_disputes").update({ closes_at: now }).eq("id", dispute.id).eq("status", "open");
   } else if (body.action !== "decide") {
     throw new JudgeError("unknown_action", 400);
