@@ -32,7 +32,6 @@ const profile = {
     description: "Hi, I'm Dreddi. Add me to a group, and when an argument starts there, type /dreddi and what it's about. Everyone takes a side, and I say who is right.",
     commands: [
       { command: "dreddi", description: "Settle an argument" },
-      { command: "rozsudy", description: "Dreddi, settle it!" },
     ],
   },
   uk: {
@@ -41,7 +40,6 @@ const profile = {
     description: "Привіт, я Дредді. Додайте мене в групу, і коли там почнеться суперечка, напишіть /dreddi і в чому вона. Всі стануть на бік, а я скажу, хто правий.",
     commands: [
       { command: "dreddi", description: "Розсудити суперечку" },
-      { command: "rozsudy", description: "Дредді, розсуди!" },
     ],
   },
 };

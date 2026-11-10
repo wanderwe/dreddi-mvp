@@ -125,7 +125,7 @@ async function onCommand(message: TgMessage, name: string, rest: string) {
     return reply(t.start, { reply_markup: { inline_keyboard: [[{ text: t.addToGroup, url: `https://t.me/${BOT_USERNAME}?startgroup=true` }]] } });
   }
   if (name === "start" || name === "help") return reply(t.greeting);
-  if (name !== "dreddi" && name !== "rozsudy") return;
+  if (name !== "dreddi") return;
 
   if (!rest && !context) return reply(t.empty);
 

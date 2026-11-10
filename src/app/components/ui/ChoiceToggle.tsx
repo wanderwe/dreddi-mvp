@@ -1,8 +1,8 @@
 "use client";
 
 // One choice out of a few, with a small caption above: «Хто кому обіцяє», «Хто сперечається»,
-// «Закрити суперечку». The same shape everywhere; the chosen one in green, or neutral where a green main
-// button below would have to compete with it (the dispute forms).
+// «Закрити суперечку». The same shape everywhere; the chosen one filled green, or, where a green main button
+// below would have to compete with it (the dispute forms), outlined.
 export function ChoiceToggle<T extends string>({
   label,
   options,
@@ -16,7 +16,7 @@ export function ChoiceToggle<T extends string>({
   value: T;
   onChange: (value: T) => void;
   className?: string;
-  tone?: "accent" | "neutral";
+  tone?: "accent" | "outline";
 }) {
   return (
     <div className={["space-y-2 text-sm text-tone-200", className].filter(Boolean).join(" ")}>
@@ -31,15 +31,15 @@ export function ChoiceToggle<T extends string>({
               role="radio"
               aria-checked={active}
               onClick={() => onChange(option.value)}
-              className={`flex-1 cursor-pointer rounded-2xl px-2 py-2 text-sm font-semibold leading-tight transition ${
-                active
-                  ? tone === "neutral"
-                    ? "bg-tone-white/10 text-tone-white shadow-sm"
-                    : "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                  : tone === "neutral"
-                    ? // Hover only darkens the text: a grey plate on hover would read as chosen.
-                      "text-tone-300 hover:text-tone-white"
-                    : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
+              className={`flex-1 cursor-pointer rounded-2xl border-2 px-2 py-1.5 text-sm font-semibold leading-tight transition ${
+                tone === "accent"
+                  ? active
+                    ? "border-transparent bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
+                    : "border-transparent text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
+                  : // The dispute forms: the chosen one stands out without the green fill of the main button.
+                    active
+                    ? "border-emerald-500/80 text-accent-200"
+                    : "border-transparent text-tone-400 hover:text-tone-white"
               }`}
             >
               {option.label}

@@ -84,7 +84,7 @@ export function ChatForm() {
         options={CLOSE_OPTIONS.map((option: CloseOption) => ({ value: option, label: t(`decide.group.close.${option}`) }))}
         value={draft.close as CloseOption}
         onChange={(close) => update({ close })}
-        tone="neutral"
+        tone="outline"
       />
 
       <div className="flex justify-end">
