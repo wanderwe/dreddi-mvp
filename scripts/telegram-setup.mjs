@@ -13,7 +13,7 @@ const env = Object.fromEntries(
 );
 const token = env.TELEGRAM_BOT_TOKEN;
 if (!token) throw new Error("TELEGRAM_BOT_TOKEN is not in .env.local");
-const site = process.env.SITE_URL ?? "https://dreddi.com";
+const site = process.env.SITE_URL ?? "https://www.dreddi.com";
 
 async function call(method, body) {
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
