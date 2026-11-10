@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askQuickVerdict } from "@/lib/ai/askQuickVerdict";
+import { listMyChats } from "@/lib/chatDisputes/server";
 import { createNotification, mapPriorityForType } from "@/lib/notifications/service";
 import type { NotificationType } from "@/lib/notifications/types";
 import type { QuickLang } from "@/lib/ai/quickVerdict";
@@ -461,15 +462,16 @@ export async function act(id: string, identity: Identity, body: Action) {
   return getView(id, identity);
 }
 
-// The service-wide cap counts first verdicts and reviews of the last day alike.
+// The service-wide cap counts first verdicts, reviews and chat verdicts of the last day alike.
 async function checkServiceLimit() {
   const admin = getAdminClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const [{ count: verdicts }, { count: reviews }] = await Promise.all([
+  const [{ count: verdicts }, { count: reviews }, { count: chats }] = await Promise.all([
     admin.from("quick_disputes").select("id", { count: "exact", head: true }).gte("decided_at", since),
     admin.from("quick_disputes").select("id", { count: "exact", head: true }).gte("verdict_reviewed_at", since),
+    admin.from("quick_chat_disputes").select("id", { count: "exact", head: true }).gte("decided_at", since),
   ]);
-  if ((verdicts ?? 0) + (reviews ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
+  if ((verdicts ?? 0) + (reviews ?? 0) + (chats ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
 }
 
 const verdictInput = (dispute: DisputeRow, parties: PartyRow[]) => {
@@ -568,7 +570,8 @@ async function review(dispute: DisputeRow, parties: PartyRow[]) {
   }
 }
 
-// The disputes of the signed-in user, and of this browser: an anonymous side finds theirs again too.
+// The disputes of the signed-in user, and of this browser: an anonymous side finds theirs again too, chat
+// disputes included.
 // One page of this person's disputes, newest first, plus the totals the home page shows. Statuses of
 // all of them are cheap to read; questions and verdicts only for the page.
 export async function listMine(identity: Identity, page: { offset?: number; limit?: number } = {}) {
@@ -583,22 +586,24 @@ export async function listMine(identity: Identity, page: { offset?: number; limi
     .select("dispute_id,role,rebuttal,rebuttal_skipped")
     .or(filter)
     .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>();
-  const empty = { disputes: [], total: 0, waiting: 0, hasMore: false };
   const ids = [...new Set((mine ?? []).map((row) => row.dispute_id))];
-  if (ids.length === 0) return empty;
-
-  const [{ data: all }, { data: everyone }] = await Promise.all([
-    admin
-      .from("quick_disputes")
-      .select("id,created_at,status,verdict_reviewed_at")
-      .in("id", ids)
-      .order("created_at", { ascending: false })
-      .returns<Pick<DisputeRow, "id" | "created_at" | "status" | "verdict_reviewed_at">[]>(),
-    admin
-      .from("quick_dispute_parties")
-      .select("dispute_id,role,rebuttal,rebuttal_skipped")
-      .in("dispute_id", ids)
-      .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>(),
+  const [{ data: all }, { data: everyone }, chats] = await Promise.all([
+    ids.length
+      ? admin
+          .from("quick_disputes")
+          .select("id,created_at,status,verdict_reviewed_at")
+          .in("id", ids)
+          .returns<Pick<DisputeRow, "id" | "created_at" | "status" | "verdict_reviewed_at">[]>()
+      : Promise.resolve({ data: [] as Pick<DisputeRow, "id" | "created_at" | "status" | "verdict_reviewed_at">[] }),
+    ids.length
+      ? admin
+          .from("quick_dispute_parties")
+          .select("dispute_id,role,rebuttal,rebuttal_skipped")
+          .in("dispute_id", ids)
+          .returns<Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[]>()
+      : Promise.resolve({ data: [] as Pick<PartyRow, "dispute_id" | "role" | "rebuttal" | "rebuttal_skipped">[] }),
+    // Chat disputes go in the same list; a missing table (before its migration) just leaves them out.
+    listMyChats(identity).catch(() => []),
   ]);
   const rows = all ?? [];
   // The next move is this side's: approve the reworded question, or answer the other side's reply to
@@ -611,26 +616,33 @@ export async function listMine(identity: Identity, page: { offset?: number; limi
     const other = everyone?.find((party) => party.dispute_id === row.id && party.role !== side.role);
     return Boolean(other?.rebuttal);
   };
-  const pageRows = rows.slice(offset, offset + limit);
-  const totals = { total: rows.length, waiting: rows.filter(waitingOnMe).length, hasMore: offset + limit < rows.length };
-  if (pageRows.length === 0) return { ...totals, disputes: [] };
-
-  const { data: details } = await admin
-    .from("quick_disputes")
-    .select("id,question,verdict")
-    .in("id", pageRows.map((row) => row.id))
-    .returns<Pick<DisputeRow, "id" | "question" | "verdict">[]>();
+  const combined = [
+    ...rows.map((row) => ({ kind: "quick" as const, createdAt: row.created_at, row })),
+    ...chats.map((chat) => ({ kind: "chat" as const, createdAt: chat.createdAt, chat })),
+  ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const pageRows = combined.slice(offset, offset + limit);
+  const totals = { total: combined.length, waiting: rows.filter(waitingOnMe).length, hasMore: offset + limit < combined.length };
+  const quickIds = pageRows.flatMap((item) => (item.kind === "quick" ? [item.row.id] : []));
+  const { data: details } = quickIds.length
+    ? await admin
+        .from("quick_disputes")
+        .select("id,question,verdict")
+        .in("id", quickIds)
+        .returns<Pick<DisputeRow, "id" | "question" | "verdict">[]>()
+    : { data: [] as Pick<DisputeRow, "id" | "question" | "verdict">[] };
   return {
     ...totals,
-    disputes: pageRows.map((row) => {
-      const detail = details?.find((item) => item.id === row.id);
+    disputes: pageRows.map((item) => {
+      if (item.kind === "chat") return item.chat;
+      const detail = details?.find((entry) => entry.id === item.row.id);
       return {
-        id: row.id,
-        createdAt: row.created_at,
+        kind: "quick" as const,
+        id: item.row.id,
+        createdAt: item.row.created_at,
         question: detail?.question ?? "",
-        status: row.status,
+        status: item.row.status,
         shortAnswer: detail?.verdict?.short_answer ?? null,
-        waitingOnMe: waitingOnMe(row),
+        waitingOnMe: waitingOnMe(item.row),
       };
     }),
   };

@@ -1,14 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Users } from "lucide-react";
 import { StatusPill, type StatusPillTone } from "@/app/components/ui/StatusPill";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import type { QuickStatus } from "@/lib/quickDisputes/state";
+import type { ChatStatus } from "@/lib/chatDisputes/state";
 import { PageShell, SkeletonRows, decideFetch, primaryButtonClass, useLoginHref, useSignedIn } from "./shared";
 
-type Item = { id: string; createdAt: string; question: string; status: QuickStatus; shortAnswer: string | null; waitingOnMe?: boolean };
+// A chat dispute has its own statuses and opens by its link token.
+type Item = {
+  kind?: "quick" | "chat";
+  id: string;
+  createdAt: string;
+  question: string;
+  status: QuickStatus | ChatStatus;
+  shortAnswer: string | null;
+  waitingOnMe?: boolean;
+};
 type Page = { disputes: Item[]; hasMore: boolean };
 
 const PAGE_SIZE = 20;
@@ -90,14 +100,22 @@ export default function QuickDisputeHistoryPage() {
             return (
               <li key={item.id}>
                 <a
-                  href={localizePath(`/decide/${item.id}`, locale)}
+                  href={localizePath(item.kind === "chat" ? `/decide/c/${item.id}` : `/decide/${item.id}`, locale)}
                   className={`group flex items-center gap-3 rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 ${
-                    item.status === "expired" ? "opacity-70" : ""
+                    item.status === "expired" || item.status === "closed_empty" ? "opacity-70" : ""
                   }`}
                 >
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <div className="flex items-center justify-between gap-3">
-                      <StatusPill label={t(`decide.history.status.${item.status}`)} tone={pill.tone} icon={pill.icon} marker="icon" />
+                      <span className="flex min-w-0 items-center gap-2">
+                        <StatusPill label={t(`decide.history.status.${item.status}`)} tone={pill.tone} icon={pill.icon} marker="icon" />
+                        {item.kind === "chat" && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-tone-400">
+                            <Users className="h-3.5 w-3.5" aria-hidden />
+                            {t("decide.group.tag")}
+                          </span>
+                        )}
+                      </span>
                       <span className="shrink-0 text-xs text-tone-400">{dateFormat.format(new Date(item.createdAt))}</span>
                     </div>
                     <p className="truncate text-sm font-semibold text-tone-white sm:text-base" title={item.question}>

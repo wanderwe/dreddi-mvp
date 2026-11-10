@@ -6,6 +6,9 @@ export const EVENT_NAMES = [
   "dispute_card_view",
   "dispute_card_share",
   "dispute_card_start_own",
+  "chat_dispute_open",
+  "chat_dispute_side",
+  "chat_dispute_share",
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

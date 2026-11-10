@@ -12,15 +12,22 @@ export function verdictHeadline(verdict: QuickVerdict, nicknames: { A: string; B
   return t(`decide.verdict.${verdict.winner}`);
 }
 
+// A chat dispute passes its own headline and whether someone won (its winner is a position, not a side).
 export function VerdictCard({
   verdict,
   nicknames,
+  headline,
+  won,
   t,
 }: {
-  verdict: QuickVerdict;
-  nicknames: { A: string; B: string };
+  verdict: Pick<QuickVerdict, "short_answer" | "explanation" | "nuance" | "sources"> & { winner: string };
+  nicknames?: { A: string; B: string };
+  headline?: string;
+  won?: boolean;
   t: TFunction;
 }) {
+  const title = headline ?? verdictHeadline(verdict as QuickVerdict, nicknames ?? { A: "A", B: "B" }, t);
+  const trophy = won ?? (verdict.winner === "A" || verdict.winner === "B");
   return (
     <section className="relative space-y-4 overflow-clip rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-300/[0.10] via-accent-400/[0.05] to-transparent p-5 shadow-xl shadow-amber-500/10">
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-300/20 blur-3xl" aria-hidden />
@@ -30,8 +37,8 @@ export function VerdictCard({
           {t("decide.verdict.title")}
         </p>
         <p className="inline-flex items-center gap-2 rounded-full bg-amber-300/20 px-3 py-1 text-sm font-bold text-tone-white">
-          {(verdict.winner === "A" || verdict.winner === "B") && <Trophy className="h-4 w-4 text-amber-400" aria-hidden />}
-          {verdictHeadline(verdict, nicknames, t)}
+          {trophy && <Trophy className="h-4 w-4 text-amber-400" aria-hidden />}
+          {title}
         </p>
       </div>
       <p className="relative text-2xl font-semibold leading-snug text-tone-white sm:text-3xl">{verdict.short_answer}</p>

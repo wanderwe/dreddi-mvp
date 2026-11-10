@@ -1538,7 +1538,9 @@
         "rebuttals": "In progress",
         "deciding": "In progress",
         "decided": "Decided",
-        "expired": "Closed"
+        "expired": "Closed",
+        "open": "Ongoing",
+        "closed_empty": "No verdict"
       },
       "newButton": "New dispute"
     },
@@ -1595,6 +1597,41 @@
       "recorded": "The stake is locked in as a promise",
       "add": "+ Add a stake",
       "remove": "Remove stake"
+    },
+    "format": {
+      "duo": "One on one",
+      "chat": "For a chat",
+      "chatHint": "Drop the link in a chat, everyone takes a side, Dreddi decides"
+    },
+    "group": {
+      "situationLabel": "What happened",
+      "situationPlaceholder": "For example: a friend borrowed the car and got a speed camera fine. Who pays?",
+      "position": "Position {n}",
+      "position1Placeholder": "For example: the friend pays",
+      "position2Placeholder": "For example: the owner pays",
+      "closeLabel": "Close the dispute",
+      "close": {
+        "hour": "In an hour",
+        "day": "In a day",
+        "manual": "Manually"
+      },
+      "create": "Get the link",
+      "shareTitle": "Send the link to the chat",
+      "shareText": "Who's right? {question}",
+      "whyLabel": "Why? (optional)",
+      "takeSide": "Take this side",
+      "yourSide": "You're with: {position}",
+      "change": "Change",
+      "count": "Taking part: {count}",
+      "beforeClose": "The split and the verdict once it closes, {time}",
+      "beforeCloseManual": "The split and the verdict once it closes",
+      "tooFew": "Too few people for a verdict: at least 3 needed",
+      "majorityRight": "The majority is right",
+      "majorityWrong": "The majority is wrong",
+      "winner": "Those for «{position}» are right",
+      "best": "The strongest argument for «{position}»",
+      "allArguments": "What people said",
+      "tag": "Chat"
     }
   }
 }

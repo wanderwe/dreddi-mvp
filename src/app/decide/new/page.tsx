@@ -6,6 +6,7 @@ import { Swords } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS } from "@/lib/quickDisputes/state";
+import { ChatForm } from "./ChatForm";
 import {
   Bubble,
   IdentityChoice,
@@ -35,6 +36,11 @@ export default function NewQuickDisputePage() {
   const { draft, update, stash } = useDraft("new", { question: "", position: "", stake: "" });
   const [askIdentity, setAskIdentity] = useState(false);
   const [showStake, setShowStake] = useState(false);
+  // Two people, or a whole chat; ?format=chat opens the second.
+  const [format, setFormat] = useState<"duo" | "chat">("duo");
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("format") === "chat") setFormat("chat");
+  }, []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,12 +83,32 @@ export default function NewQuickDisputePage() {
 
   return (
     <PageShell>
-      <StepsBar current={draft.question.trim() ? 1 : 0} />
+      {format === "duo" && <StepsBar current={draft.question.trim() ? 1 : 0} />}
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.title")}</h1>
-        <p className="text-sm text-tone-300">{t("decide.homeHint")}</p>
+        <p className="text-sm text-tone-300">{format === "chat" ? t("decide.format.chatHint") : t("decide.homeHint")}</p>
       </div>
 
+      <div className="grid grid-cols-2 gap-1 rounded-xl border border-tone-white/10 bg-tone-white/5 p-1" role="tablist">
+        {(["duo", "chat"] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            role="tab"
+            aria-selected={format === option}
+            onClick={() => setFormat(option)}
+            className={`cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              format === option ? "bg-tone-white/10 text-tone-white shadow-sm" : "text-tone-400 hover:text-accent-100"
+            }`}
+          >
+            {t(`decide.format.${option}`)}
+          </button>
+        ))}
+      </div>
+
+      {format === "chat" ? (
+        <ChatForm />
+      ) : (
       <form
         className="space-y-5"
         onSubmit={(e) => {
@@ -171,6 +197,7 @@ export default function NewQuickDisputePage() {
         )}
         {error && <p className="text-sm text-danger-300">{error}</p>}
       </form>
+      )}
     </PageShell>
   );
 }
