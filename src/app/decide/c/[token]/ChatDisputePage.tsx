@@ -109,7 +109,13 @@ export default function ChatDisputePage() {
   useEffect(() => {
     if (!view || (view.status !== "open" && view.status !== "deciding")) return;
     const id = setInterval(() => void load(), view.status === "deciding" ? 3000 : 15000);
-    return () => clearInterval(id);
+    // A tab in the background gets its timers slowed: coming back, it asks at once.
+    const onVisible = () => document.visibilityState === "visible" && void load();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [view, load]);
 
   const pluralRules = useMemo(() => new Intl.PluralRules(locale === "en" ? "en" : "uk"), [locale]);

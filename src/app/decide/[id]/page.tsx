@@ -115,7 +115,13 @@ export default function QuickDisputePage() {
   useEffect(() => {
     if (!view || view.status === "expired" || (view.status === "decided" && !view.replyOpen)) return;
     const timer = setInterval(() => void load(), POLL_MS);
-    return () => clearInterval(timer);
+    // A tab in the background gets its timers slowed to a minute or more: coming back, it asks at once.
+    const onVisible = () => document.visibilityState === "visible" && void load();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [view, load]);
 
   // Back from signing in to save the dispute: save it, by the one-time code when there is one.
