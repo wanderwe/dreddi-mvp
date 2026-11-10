@@ -95,6 +95,7 @@ export default function NewQuickDisputePage() {
         options={(["duo", "chat"] as const).map((option) => ({ value: option, label: t(`decide.format.${option}`) }))}
         value={format}
         onChange={setFormat}
+        tone="neutral"
       />
 
       {format === "chat" ? (
