@@ -1,5 +1,5 @@
 import type { QuickLang } from "../ai/quickVerdict";
-import { CLOSE_OPTIONS, countSides, majorityRight, type ChatDisputeRow, type ChatPosition, type ChatSideRow, type CloseOption } from "../chatDisputes/state";
+import { CHAT_LIMITS, CLOSE_OPTIONS, countSides, majorityRight, type ChatDisputeRow, type ChatPosition, type ChatSideRow, type CloseOption } from "../chatDisputes/state";
 import { localizePath } from "../i18n/routing";
 import { escapeHtml, type InlineButton } from "./api";
 import { closeTime, textsFor } from "./texts";
@@ -50,7 +50,8 @@ export function disputeMessage(dispute: TgDispute, count: number, stage: "open" 
       ? [
           [{ text: t.sideButton(dispute.position_1), callback_data: `s:${dispute.token}:1` }],
           [{ text: t.sideButton(dispute.position_2), callback_data: `s:${dispute.token}:2` }],
-          [{ text: t.closeButton, callback_data: `x:${dispute.token}` }],
+          // Cancel until there are enough people for a verdict, then close.
+          [{ text: count < CHAT_LIMITS.minSides ? t.cancel : t.closeButton, callback_data: `x:${dispute.token}` }],
         ]
       : [];
   return { text: lines.join("\n"), reply_markup: { inline_keyboard: keyboard } };

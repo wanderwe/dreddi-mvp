@@ -246,6 +246,13 @@ async function onCallback(query: TgCallbackQuery) {
   }
 
   if (kind === "x") {
+    // Too few people for a verdict: the button cancels; from three on it closes.
+    if (sides.length < CHAT_LIMITS.minSides) {
+      if (!isCreator) return answer(t.onlyCreatorCancel(dispute.tg_creator_name ?? ""));
+      await admin.from("quick_chat_disputes").delete().eq("id", dispute.id).eq("status", "open");
+      await quietly(tg("editMessageText", { chat_id: dispute.tg_chat_id, message_id: query.message.message_id, text: t.cancelled }));
+      return answer();
+    }
     if (!isCreator) return answer(t.onlyCreator(dispute.tg_creator_name ?? ""));
     await admin.from("quick_chat_disputes").update({ closes_at: new Date().toISOString() }).eq("id", dispute.id).eq("status", "open");
     await answer();

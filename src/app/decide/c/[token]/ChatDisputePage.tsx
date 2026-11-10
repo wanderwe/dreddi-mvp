@@ -76,6 +76,22 @@ export default function ChatDisputePage() {
     [token, errorText, t]
   );
 
+  const cancel = async () => {
+    setBusy(true);
+    setError(null);
+    const res = await decideFetch(`/api/decide/chat/${encodeURIComponent(token)}`, {
+      method: "POST",
+      body: JSON.stringify({ action: "cancel" }),
+    }).catch(() => null);
+    if (res?.ok) {
+      window.location.assign(localizePath("/decide", locale));
+      return;
+    }
+    const body = await res?.json().catch(() => ({}));
+    setError(errorText(body?.error));
+    setBusy(false);
+  };
+
   useEffect(() => {
     if (!token) return;
     track("chat_dispute_open", token);
@@ -317,11 +333,17 @@ export default function ChatDisputePage() {
               {" · "}
               {view.closesAt ? t("decide.group.closes", { time: timeFormat.format(new Date(view.closesAt)) }) : t("decide.group.closesManual")}
             </span>
-            {view.isCreator && (
-              <button type="button" className={`${secondaryButtonClass} ml-auto`} disabled={busy} onClick={() => void act({ action: "close" })}>
-                {t("decide.group.closeLabel")}
-              </button>
-            )}
+            {view.isCreator &&
+              (view.total < CHAT_LIMITS.minSides ? (
+                // Cancel until there are enough people for a verdict, then close.
+                <button type="button" className={`${secondaryButtonClass} ml-auto`} disabled={busy} onClick={() => void cancel()}>
+                  {t("decide.group.cancel")}
+                </button>
+              ) : (
+                <button type="button" className={`${secondaryButtonClass} ml-auto`} disabled={busy} onClick={() => void act({ action: "close" })}>
+                  {t("decide.group.closeLabel")}
+                </button>
+              ))}
           </div>
 
           {(view.mine || (view.isCreator && view.total > 0)) && shareBlock(t("decide.group.invite"), false)}

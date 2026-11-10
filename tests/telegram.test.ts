@@ -57,6 +57,9 @@ test("the draft asks the author when to close; the dispute escapes what people w
   const open = disputeMessage(dispute(), 2, "open");
   assert.match(open.text, /Стали на бік: 2 · закриття/);
   assert.equal(open.reply_markup.inline_keyboard.length, 3);
+  // Cancel until three people are in, then close.
+  assert.equal(open.reply_markup.inline_keyboard[2][0].text, "Скасувати");
+  assert.equal(disputeMessage(dispute(), 3, "open").reply_markup.inline_keyboard[2][0].text, "Закрити");
   assert.match(disputeMessage(dispute({ closes_at: null }), 0, "open").text, /закриє Ігор/);
   assert.equal(disputeMessage(dispute(), 4, "closed").reply_markup.inline_keyboard.length, 0);
 });

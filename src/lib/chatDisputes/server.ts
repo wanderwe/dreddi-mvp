@@ -139,6 +139,7 @@ type ChatAction =
   | { action: "side"; position?: unknown; nickname?: unknown }
   | { action: "argument"; text?: unknown }
   | { action: "close" }
+  | { action: "cancel" }
   | { action: "decide" };
 
 export async function actOnChat(token: string, identity: Identity, body: ChatAction) {
@@ -190,6 +191,12 @@ export async function actOnChat(token: string, identity: Identity, body: ChatAct
     const creator = (identity.userId && dispute.creator_user_id === identity.userId) || dispute.creator_secret_hash === identity.secretHash;
     if (!creator || dispute.status !== "open") throw new JudgeError("stale", 409);
     await admin.from("quick_chat_disputes").update({ closes_at: now }).eq("id", dispute.id).eq("status", "open");
+  } else if (body.action === "cancel") {
+    // Before there are enough people for a verdict, the creator takes it back; nothing is left of it.
+    const creator = (identity.userId && dispute.creator_user_id === identity.userId) || dispute.creator_secret_hash === identity.secretHash;
+    if (!creator || dispute.status !== "open" || sides.length >= CHAT_LIMITS.minSides) throw new JudgeError("stale", 409);
+    await admin.from("quick_chat_disputes").delete().eq("id", dispute.id).eq("status", "open");
+    return { cancelled: true as const };
   } else if (body.action !== "decide") {
     throw new JudgeError("unknown_action", 400);
   }
