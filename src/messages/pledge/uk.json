@@ -3,10 +3,7 @@
     "myPromises": "Обіцянки",
     "newPromise": "Нова обіцянка",
     "createMenu": {
-      "promise": {
-        "title": "Нова обіцянка",
-        "description": "Обіцянка, що впливає на репутацію"
-      }
+      "promise": "Нова обіцянка"
     }
   },
   "landing": {

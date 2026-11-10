@@ -87,8 +87,18 @@ export function MobileMenu({
                   </SheetClose>
                 )}
                 <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/decide">
+                    {t("nav.disputes")}
+                  </LocalizedLink>
+                </SheetClose>
+                <SheetClose asChild>
                   <LocalizedLink className={primaryLinkClasses} href="/promises/new">
                     {t("nav.newPromise")}
+                  </LocalizedLink>
+                </SheetClose>
+                <SheetClose asChild>
+                  <LocalizedLink className={baseLinkClasses} href="/decide/new">
+                    {t("nav.createMenu.dispute")}
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>

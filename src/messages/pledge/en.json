@@ -3,10 +3,7 @@
     "myPromises": "Promises",
     "newPromise": "New promise",
     "createMenu": {
-      "promise": {
-        "title": "New promise",
-        "description": "A promise that affects your reputation"
-      }
+      "promise": "New promise"
     }
   },
   "landing": {

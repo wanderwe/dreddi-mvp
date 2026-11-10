@@ -212,6 +212,9 @@ export function AppHeader() {
                       <span className="rounded-full bg-amber-200 px-1.5 py-0.5 text-[11px] text-tone-900">{actionQueueCount}</span>
                     </LocalizedLink>
                   )}
+                  <LocalizedLink className={linkBaseClasses} href="/decide">
+                    {t("nav.disputes")}
+                  </LocalizedLink>
                 </div>
                 <div className="ml-1 flex items-center gap-3">
                   <NewItemMenu />

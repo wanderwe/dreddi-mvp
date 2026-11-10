@@ -18,13 +18,12 @@
     "groups": "Groups",
     "allGroups": "All groups",
     "watching": "Watchlist",
+    "disputes": "Disputes",
     "create": "Create",
     "createMenu": {
       "label": "Create",
-      "promise": {
-        "title": "New deal",
-        "description": "A two-party agreement that affects your reputation"
-      }
+      "promise": "New deal",
+      "dispute": "New dispute"
     },
     "theme": {
       "current": "Theme: {theme}. Click to change.",
