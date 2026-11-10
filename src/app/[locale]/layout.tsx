@@ -6,7 +6,6 @@ import { DocumentLanguageSync } from "@/app/components/DocumentLanguageSync";
 import { POSITIONING } from "@/lib/features";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getMessages } from "@/lib/i18n/getMessages";
-import { localizePath } from "@/lib/i18n/routing";
 import { resolveRouteLocale } from "@/lib/i18n/resolveRouteLocale";
 
 const CLASSIC_OG_COPY = {
@@ -48,13 +47,8 @@ export async function generateMetadata({
   return {
     title: copy.title,
     description: copy.description,
-    alternates: {
-      canonical: localizePath("/", locale),
-      languages: {
-        en: localizePath("/", "en"),
-        uk: localizePath("/", "uk"),
-      },
-    },
+    // No canonical here: every page would inherit the homepage as its canonical, and Telegram then shows
+    // the homepage's preview for any link (a dispute, an invite). The homepage sets its own.
     openGraph: {
       title: copy.title,
       description: copy.description,
