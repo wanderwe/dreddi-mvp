@@ -77,7 +77,11 @@ export default function QuickDisputeHistoryPage() {
           <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.history.title")}</h1>
           <p className="text-sm text-tone-300">{t("decide.history.subtitle")}</p>
         </div>
-        <NewDealButton href="/decide/new" label={t("decide.history.newButton")} className="min-h-12 sm:min-h-0" />
+        {/* On a phone a signed-in person has «Нова суперечка» in the menu, as with promises; without an
+            account the menu has no such item, so the button stays. */}
+        <div className={`shrink-0 ${signedIn ? "hidden sm:block" : ""}`}>
+          <NewDealButton href="/decide/new" label={t("decide.history.newButton")} className="min-h-12 w-full sm:min-h-0 sm:w-auto" />
+        </div>
       </div>
       {signedIn === false && (
         <p className="text-sm text-tone-400">
