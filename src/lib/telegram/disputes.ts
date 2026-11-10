@@ -359,7 +359,7 @@ export async function announceResult(disputeId: string) {
   // The card picture with the caption; if Telegram cannot fetch the picture, the same words alone.
   await tg("sendPhoto", { ...base, photo: message.photo, caption: message.caption }).catch((error) => {
     console.warn("telegram verdict photo:", error instanceof Error ? error.message : error);
-    return quietly(tg("sendMessage", { ...base, text: message.caption, link_preview_options: { is_disabled: true } }));
+    return quietly(tg("sendMessage", { ...base, text: message.text, link_preview_options: { is_disabled: true } }));
   });
   await logEvent("tg_dispute_verdict", dispute.token);
 }

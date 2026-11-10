@@ -73,7 +73,7 @@ test("the verdict says whether the majority was right and quotes the winner's st
     { id: "b", position: 1 as const, argument: null, nickname: "Оля" },
     { id: "c", position: 2 as const, argument: "Власник отримує лист", nickname: "Вася" },
   ];
-  const { caption: text, photo, reply_markup } = verdictMessage(
+  const { caption, text, photo, reply_markup } = verdictMessage(
     dispute({
       status: "decided",
       verdict: {
@@ -92,10 +92,14 @@ test("the verdict says whether the majority was right and quotes the winner's st
     sides,
     "https://dreddi.com"
   );
-  assert.match(text, /^<b>⚖️ Праві ті, хто за «Власник»<\/b>/);
+  // The card shows the split and the majority: the caption keeps the headline, the argument and the why.
+  assert.match(caption, /^<b>⚖️ Праві ті, хто за «Власник»<\/b>/);
+  assert.doesNotMatch(caption, /Більшість/);
+  assert.match(caption, /Найсильніший аргумент: «Власник отримує лист», Вася/);
+  assert.match(caption, /<blockquote expandable>Штраф з камери надходить власнику\.<\/blockquote>$/);
+  // Without the picture, the words carry everything.
   assert.match(text, /Більшість помиляється: 67% були за «Водій»/);
   assert.match(text, /Найсильніший аргумент: «Власник отримує лист», Вася/);
-  assert.match(text, /<blockquote expandable>Штраф з камери надходить власнику\.<\/blockquote>$/);
   assert.equal(photo, "https://dreddi.com/api/og/decide/c/tok_tok_tok_tok_tok1?locale=uk");
   assert.deepEqual(reply_markup.inline_keyboard[0].map((button) => button.text), ["Детальніше", "Поділитися"]);
 });

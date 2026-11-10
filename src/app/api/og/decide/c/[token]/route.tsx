@@ -51,7 +51,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ token: string }
           border: right ? "2px solid #f2cf63" : "2px solid #e2e8f0",
         }}
       >
-        <span style={{ display: "flex" }}>{clip(card.positions[position], 60)}</span>
+        <span style={{ display: "flex" }}>{`${right ? "✓  " : ""}${clip(card.positions[position], 60)}`}</span>
         {decided && <span style={{ display: "flex", fontWeight: 600 }}>{percent}%</span>}
       </div>
     );
@@ -91,15 +91,23 @@ export async function GET(req: Request, ctx: { params: Promise<{ token: string }
               gap: 6,
               padding: "16px 22px",
               borderRadius: 14,
-              background: "#e7f8ef",
-              border: "2px solid #9fdcbf",
+              // Gold and green belong to the right side; a majority that got it wrong stays neutral, as on the page.
+              background: card.majorityRight === false ? "#ffffffaa" : "#e7f8ef",
+              border: card.majorityRight === false ? "2px solid #e2e8f0" : "2px solid #9fdcbf",
             }}
           >
-            <span style={{ display: "flex", fontSize: 28, fontWeight: 600, color: "#0f7a4a" }}>
-              {winner ? clip(t("decide.group.winner", { position: card.positions[winner] }), 70) : t(`decide.verdict.${card.verdict.winner}`)}
-              {card.majorityRight !== null ? ` · ${card.majorityRight ? t("decide.group.majorityRight") : t("decide.group.majorityWrong")}` : ""}
+            {/* The right side is already marked in its row: the box says whether the majority got it, or,
+                with no single right side, what Dreddi found. Nothing is cut in the middle. */}
+            <span style={{ display: "flex", fontSize: 28, fontWeight: 600, color: card.majorityRight === false ? "#0b1220" : "#0f7a4a" }}>
+              {winner
+                ? card.majorityRight !== null
+                  ? card.majorityRight
+                    ? t("decide.group.majorityRight")
+                    : t("decide.group.majorityWrong")
+                  : clip(t("decide.group.winner", { position: card.positions[winner] }), 90)
+                : t(`decide.verdict.${card.verdict.winner}`)}
             </span>
-            <span style={{ display: "flex", fontSize: 24, color: "#1d3b2f", lineHeight: 1.3 }}>{clip(card.verdict.short_answer, 150)}</span>
+            <span style={{ display: "flex", fontSize: 24, color: card.majorityRight === false ? "#334155" : "#1d3b2f", lineHeight: 1.3 }}>{clip(card.verdict.short_answer, 150)}</span>
           </div>
         ) : (
           <div style={{ display: "flex" }}>

@@ -87,22 +87,25 @@ export function verdictMessage(
   const best = bestId ? sides.find((side) => side.id === bestId && side.argument) : null;
   if (best) facts.push(escapeHtml(t.bestArgument(best.argument as string, best.nickname)));
 
-  const parts = [`<b>${escapeHtml(t.verdictMark)} ${escapeHtml(headline)}</b>`, escapeHtml(verdict.short_answer)];
-  if (facts.length) parts.push(`<blockquote>${facts.join("\n")}</blockquote>`);
-  const before = parts.join("\n\n");
-  // The why goes in last, folded, cut to what the caption still has room for.
-  let caption = before;
-  if (verdict.explanation) {
+  // The card already shows the split, who is right, the majority and Dreddi's answer: the caption adds
+  // only the headline (it is what the chat list shows), the strongest argument and the why, folded.
+  const title = `<b>${escapeHtml(t.verdictMark)} ${escapeHtml(headline)}</b>`;
+  const quote = best ? `<blockquote>${escapeHtml(t.bestArgument(best.argument as string, best.nickname))}</blockquote>` : null;
+  const fold = (before: string) => {
+    if (!verdict.explanation) return before;
     const room = CAPTION_MAX - visible(before) - 4;
-    if (room > 80) {
-      const text = verdict.explanation.length > room ? `${verdict.explanation.slice(0, room - 1).trimEnd()}…` : verdict.explanation;
-      caption = `${before}\n\n<blockquote expandable>${escapeHtml(text)}</blockquote>`;
-    }
-  }
+    if (room <= 80) return before;
+    const text = verdict.explanation.length > room ? `${verdict.explanation.slice(0, room - 1).trimEnd()}…` : verdict.explanation;
+    return `${before}\n\n<blockquote expandable>${escapeHtml(text)}</blockquote>`;
+  };
+  const caption = fold([title, quote].filter(Boolean).join("\n\n"));
+  // Without the picture (Telegram could not fetch it), the words carry everything.
+  const text = fold([title, escapeHtml(verdict.short_answer), facts.length ? `<blockquote>${facts.join("\n")}</blockquote>` : null].filter(Boolean).join("\n\n"));
 
   const url = new URL(localizePath(`/decide/c/${dispute.token}`, lang), siteUrl).toString();
   const share = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(verdict.share_text || dispute.question)}`;
   return {
+    text,
     photo: new URL(`/api/og/decide/c/${encodeURIComponent(dispute.token)}?locale=${lang}`, siteUrl).toString(),
     caption,
     reply_markup: { inline_keyboard: [[{ text: t.more, url }, { text: t.share, url: share }]] },
