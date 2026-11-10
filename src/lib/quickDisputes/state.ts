@@ -199,6 +199,8 @@ export type QuickView = {
     position: string | null;
     rebuttal: string | null;
     rebuttalDone: boolean;
+    // Wrote a reply (not skipped): shown before its text is, so a skip never reads as a reply.
+    replied: boolean;
     isMe: boolean;
   }[];
 };
@@ -245,6 +247,7 @@ export function buildView(dispute: DisputeRow, parties: PartyRow[], myRole: Quic
           position: party.position,
           rebuttal: showRebuttal ? party.rebuttal : null,
           rebuttalDone: rebuttalDone(party),
+          replied: Boolean(party.rebuttal),
           isMe,
         },
       ];

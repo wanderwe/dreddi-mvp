@@ -278,7 +278,7 @@ export default function QuickDisputePage() {
               type="button"
               disabled={busy}
               onClick={() => setConfirmCancel(true)}
-              className="cursor-pointer text-xs font-medium text-danger-300 underline-offset-2 transition hover:text-danger-200 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+              className="ml-auto cursor-pointer text-xs font-medium text-danger-300 underline-offset-2 transition hover:text-danger-200 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("decide.cancel")}
             </button>
@@ -416,14 +416,14 @@ export default function QuickDisputePage() {
             </div>
           )}
 
-          {view.parties.some((party) => party.rebuttal || (!party.isMe && party.rebuttalDone && view.replyOpen)) && (
+          {view.parties.some((party) => party.rebuttal || (!party.isMe && party.replied && view.replyOpen)) && (
             <div className="space-y-4 rounded-2xl border border-tone-white/10 bg-tone-black/20 p-3 sm:p-4">
               {view.parties.map((party) =>
                 party.rebuttal ? (
                   <Bubble key={`r-${party.role}`} side={sideOf(party.role)} name={party.nickname} label={labelOf(party)}>
                     <p className="whitespace-pre-wrap">{party.rebuttal}</p>
                   </Bubble>
-                ) : !party.isMe && party.rebuttalDone && me && !me.rebuttalDone && view.replyOpen ? (
+                ) : !party.isMe && party.replied && me && !me.rebuttalDone && view.replyOpen ? (
                   <Bubble key={`r-${party.role}`} side="other" name={party.nickname} label={labelOf(party)} muted>
                     {t("decide.chat.rebuttalHidden", { nickname: party.nickname })}
                   </Bubble>
