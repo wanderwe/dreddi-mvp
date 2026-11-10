@@ -364,18 +364,18 @@ export default function NotificationsClient() {
                   }`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex items-start gap-3">
+                    <div className="flex min-w-0 flex-1 items-start gap-3">
                       <span
-                        className={`mt-1 h-2 w-2 rounded-full ${
+                        className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
                           unread ? "bg-emerald-300" : "bg-transparent"
                         }`}
                         aria-hidden
                       />
-                      <div className="space-y-1">
-                        <div className="text-sm font-semibold text-tone-white">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="truncate text-sm font-semibold text-tone-white" title={stripTrailingPeriod(title)}>
                           {stripTrailingPeriod(title)}
                         </div>
-                        <p className="text-sm text-tone-200">
+                        <p className="truncate text-sm text-tone-200" title={stripTrailingPeriod(description)}>
                           {stripTrailingPeriod(description)}
                         </p>
                         <div className="text-xs text-tone-400">
@@ -383,7 +383,7 @@ export default function NotificationsClient() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-3 sm:items-end">
+                    <div className="flex shrink-0 flex-col gap-3 sm:items-end">
                       {ctaLabel && (
                         <LocalizedLink
                           href={ctaUrl}
