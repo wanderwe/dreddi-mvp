@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { checkAiBudget, recordAiUsage } from "@/lib/ai/budget";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askQuickVerdict } from "@/lib/ai/askQuickVerdict";
@@ -478,6 +479,7 @@ async function checkServiceLimit() {
     admin.from("quick_chat_disputes").select("id", { count: "exact", head: true }).gte("decided_at", since),
   ]);
   if ((verdicts ?? 0) + (reviews ?? 0) + (chats ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
+  await checkAiBudget();
 }
 
 const verdictInput = (dispute: DisputeRow, parties: PartyRow[]) => {
@@ -510,6 +512,7 @@ async function decide(dispute: DisputeRow, parties: PartyRow[]) {
 
   try {
     const answer = await askQuickVerdict(verdictInput(dispute, parties));
+    await recordAiUsage("quick_verdict", answer.usage.costUsd);
     if (answer.verdict.injection_attempt) console.warn("quick verdict: injection attempt", { disputeId: dispute.id });
     await admin
       .from("quick_disputes")
@@ -550,6 +553,7 @@ async function review(dispute: DisputeRow, parties: PartyRow[]) {
 
   try {
     const answer = await askQuickVerdict({ ...verdictInput(dispute, parties), previousVerdict: dispute.verdict });
+    await recordAiUsage("quick_review", answer.usage.costUsd);
     if (answer.verdict.injection_attempt) console.warn("quick verdict review: injection attempt", { disputeId: dispute.id });
     const { data: before } = await admin
       .from("quick_disputes")

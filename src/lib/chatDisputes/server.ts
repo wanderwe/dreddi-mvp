@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askChatVerdict } from "@/lib/ai/askChatVerdict";
+import { checkAiBudget, recordAiUsage } from "@/lib/ai/budget";
 import type { QuickLang } from "@/lib/ai/quickVerdict";
 import { LIMITS, isRandomNickname, maskNames, randomNickname } from "@/lib/quickDisputes/state";
 import type { Identity } from "@/lib/quickDisputes/server";
@@ -249,6 +250,7 @@ async function checkServiceLimit() {
     admin.from("quick_chat_disputes").select("id", { count: "exact", head: true }).gte("decided_at", since),
   ]);
   if ((quick ?? 0) + (reviews ?? 0) + (chats ?? 0) >= LIMITS.verdictsPerDay) throw new JudgeError("service_limit", 429);
+  await checkAiBudget();
 }
 
 export async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) {
@@ -290,6 +292,7 @@ export async function decideChat(dispute: ChatDisputeRow, sides: ChatSideRow[]) 
         text: side.argument as string,
       })),
     });
+    await recordAiUsage("chat_verdict", answer.usage.costUsd);
     if (answer.verdict.injection_attempt) console.warn("chat verdict: injection attempt", { disputeId: dispute.id });
     await admin
       .from("quick_chat_disputes")

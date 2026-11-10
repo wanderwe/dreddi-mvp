@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { JudgeError, noLongDashes, toJudgeError } from "./askJudge";
-import { JUDGE_MODEL, escapeSideText } from "./judge";
+import { JUDGE_MODEL, escapeSideText, estimateCostUsd } from "./judge";
 import type { QuickLang } from "./quickVerdict";
 
 // Server only: «/dreddi Вася каже, що..., а Петя, що...» in a Telegram group becomes a question and two
@@ -30,7 +30,11 @@ Find the disagreement: the question people disagree about and the two opposing p
 - If there are no two opposing positions (a plain question, a greeting, nonsense), set found to false and leave the other fields empty.
 Write in ${LANG_NAME[lang]}, unless the message is clearly in another language: then use that language. Do not use long dashes (—). No closing period in the positions.`;
 
-export async function parseChatDispute(input: { lang: QuickLang; text: string; context?: string | null }): Promise<ParsedDispute | null> {
+export async function parseChatDispute(input: {
+  lang: QuickLang;
+  text: string;
+  context?: string | null;
+}): Promise<{ parsed: ParsedDispute | null; costUsd: number }> {
   if (!process.env.ANTHROPIC_API_KEY) throw new JudgeError("Add ANTHROPIC_API_KEY to .env.local and restart", 500);
   const user = [
     input.context ? `<context>\n${escapeSideText(input.context.slice(0, 1500))}\n</context>` : null,
@@ -46,14 +50,15 @@ export async function parseChatDispute(input: { lang: QuickLang; text: string; c
       messages: [{ role: "user", content: user }],
       output_config: { effort: "low", format: zodOutputFormat(ParsedDisputeSchema) },
     });
+    const costUsd = estimateCostUsd(response.usage.input_tokens, response.usage.output_tokens);
     const parsed = response.parsed_output;
-    if (!parsed?.found) return null;
+    if (!parsed?.found) return { parsed: null, costUsd };
     const tidy = (text: string, max: number) => noLongDashes(text).trim().replace(/\.$/, "").slice(0, max);
     const result = { question: tidy(parsed.question, 300), position1: tidy(parsed.position_1, 80), position2: tidy(parsed.position_2, 80) };
-    if (!result.question || !result.position1 || !result.position2 || result.position1 === result.position2) return null;
+    if (!result.question || !result.position1 || !result.position2 || result.position1 === result.position2) return { parsed: null, costUsd };
     // The question keeps its question mark.
     if (!/[?!.]$/.test(result.question)) result.question = `${result.question}?`;
-    return result;
+    return { parsed: result, costUsd };
   } catch (error) {
     throw toJudgeError(error);
   }
