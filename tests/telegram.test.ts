@@ -89,6 +89,7 @@ test("the verdict says whether the majority was right and quotes the winner's st
     sides,
     "https://dreddi.com"
   );
+  assert.match(text, /<b>Праві ті, хто за «Власник»<\/b>/);
   assert.match(text, /Більшість помиляється: 67% були за «Водій»/);
   assert.match(text, /Найсильніший аргумент: «Власник отримує лист», Вася/);
   assert.match(text, /href="https:\/\/dreddi\.com\/(ua\/)?decide\/c\/tok_tok_tok_tok_tok1"/);

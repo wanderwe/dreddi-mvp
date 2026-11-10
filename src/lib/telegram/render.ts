@@ -67,7 +67,12 @@ export function verdictText(
   const verdict = dispute.verdict!;
   const counts = countSides(sides);
   const total = counts[1] + counts[2];
-  const lines = [`<b>${escapeHtml(t.verdictTitle)}</b>`, "", `<b>${escapeHtml(verdict.short_answer)}</b>`];
+  // Who is right comes first, as on the site; then Dreddi's one-line answer and the why.
+  const headline =
+    verdict.winner === "1" || verdict.winner === "2"
+      ? t.winner(verdict.winner === "1" ? dispute.position_1 : dispute.position_2)
+      : t[verdict.winner];
+  const lines = [`<b>${escapeHtml(t.verdictTitle)}</b>`, "", `<b>${escapeHtml(headline)}</b>`, "", escapeHtml(verdict.short_answer)];
   if (verdict.explanation) lines.push("", escapeHtml(verdict.explanation));
 
   const facts: string[] = [];
