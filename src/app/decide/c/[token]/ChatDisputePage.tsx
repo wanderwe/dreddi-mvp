@@ -15,6 +15,7 @@ import {
   PageShell,
   ShareButton,
   SkeletonRows,
+  StepsBar,
   TypingDots,
   decideFetch,
   inputClass,
@@ -155,6 +156,8 @@ export default function ChatDisputePage() {
 
   return (
     <PageShell>
+      {/* The same three steps as between two people: the question, everyone's sides, the verdict. */}
+      <StepsBar current={view.status === "open" && !view.canDecideNow ? 1 : view.status === "decided" || view.status === "closed_empty" ? 3 : 2} />
       <div className="space-y-1">
         <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-200">
           <Users className="h-3.5 w-3.5" aria-hidden />

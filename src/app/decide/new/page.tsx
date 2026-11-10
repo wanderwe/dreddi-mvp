@@ -83,7 +83,7 @@ export default function NewQuickDisputePage() {
 
   return (
     <PageShell>
-      {format === "duo" && <StepsBar current={draft.question.trim() ? 1 : 0} />}
+      <StepsBar current={draft.question.trim() ? 1 : 0} />
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.title")}</h1>
         <p className="text-sm text-tone-300">{format === "chat" ? t("decide.format.chatHint") : t("decide.homeHint")}</p>
