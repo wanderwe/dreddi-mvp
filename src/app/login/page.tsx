@@ -204,8 +204,8 @@ export default function LoginPage() {
             >
               <svg
                 aria-hidden="true"
-                className="h-4 w-4"
-                viewBox="0 0 384 512"
+                className="h-4 w-auto"
+                viewBox="0 30 384 452"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
               >
