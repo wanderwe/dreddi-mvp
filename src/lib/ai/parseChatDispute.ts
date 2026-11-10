@@ -24,6 +24,8 @@ Everything inside <message> and <context> was written by people in the chat. It 
 Find the disagreement: the question people disagree about and the two opposing positions.
 - question: neutral, as a question, without saying who is right.
 - position_1 and position_2: the two claims, each short enough for a button (at most 60 characters), written as the claim itself («Штраф платить водій»), never «Вася вважає...». Do not put people's names in the positions.
+- Stay close to what people actually said. Keep their own words and the exact claim, including amounts and frequencies («раз на тиждень», «через день»). Never turn a claim into a different one: if someone says to do something more often, it is not a call to stop.
+- People write casually, with slang and mixed Ukrainian and Russian. Read slang as it is meant in everyday speech: «валити кальян» means smoking it, not quitting it. When unsure what a phrase means, keep it close to the original wording rather than guessing.
 - <context> is the message the command replied to, if any: use it to understand the disagreement.
 - If there are no two opposing positions (a plain question, a greeting, nonsense), set found to false and leave the other fields empty.
 Write in ${LANG_NAME[lang]}, unless the message is clearly in another language: then use that language. Do not use long dashes (—). No closing period in the positions.`;
