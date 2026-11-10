@@ -1599,6 +1599,7 @@
       "remove": "Remove stake"
     },
     "format": {
+      "duoHint": "Send the link to your opponent, each of you writes your side, Dreddi decides",
       "duo": "Two of us",
       "label": "Who's arguing",
       "chat": "The whole chat",
