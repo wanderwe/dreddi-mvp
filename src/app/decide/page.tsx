@@ -71,8 +71,12 @@ export default function QuickDisputeHistoryPage() {
 
   return (
     <PageShell>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.history.title")}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        {/* The title with one line about the page under it, as on the promises page. */}
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.history.title")}</h1>
+          <p className="text-sm text-tone-300">{t("decide.history.subtitle")}</p>
+        </div>
         <NewDealButton href="/decide/new" label={t("decide.history.newButton")} className="min-h-12 sm:min-h-0" />
       </div>
       {signedIn === false && (

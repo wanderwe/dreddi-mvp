@@ -1530,6 +1530,7 @@
     },
     "history": {
       "title": "My disputes",
+      "subtitle": "All your disputes and Dreddi's verdicts",
       "empty": "No disputes yet",
       "browserOnly": "Without signing in, only disputes from this browser show here.",
       "status": {
