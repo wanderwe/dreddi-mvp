@@ -1,5 +1,6 @@
 "use client";
 
+import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Swords } from "lucide-react";
@@ -89,22 +90,12 @@ export default function NewQuickDisputePage() {
         <p className="text-sm text-tone-300">{format === "chat" ? t("decide.format.chatHint") : t("decide.homeHint")}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-1 rounded-xl border border-tone-white/10 bg-tone-white/5 p-1" role="tablist">
-        {(["duo", "chat"] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            role="tab"
-            aria-selected={format === option}
-            onClick={() => setFormat(option)}
-            className={`cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold transition ${
-              format === option ? "bg-tone-white/10 text-tone-white shadow-sm" : "text-tone-400 hover:text-accent-100"
-            }`}
-          >
-            {t(`decide.format.${option}`)}
-          </button>
-        ))}
-      </div>
+      <ChoiceToggle
+        label={t("decide.format.label")}
+        options={(["duo", "chat"] as const).map((option) => ({ value: option, label: t(`decide.format.${option}`) }))}
+        value={format}
+        onChange={setFormat}
+      />
 
       {format === "chat" ? (
         <ChatForm />

@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ChevronRight, Users } from "lucide-react";
+import { NewDealButton } from "@/app/components/NewDealButton";
 import { StatusPill, type StatusPillTone } from "@/app/components/ui/StatusPill";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import type { QuickStatus } from "@/lib/quickDisputes/state";
 import type { ChatStatus } from "@/lib/chatDisputes/state";
-import { PageShell, SkeletonRows, decideFetch, primaryButtonClass, useLoginHref, useSignedIn } from "./shared";
+import { PageShell, SkeletonRows, decideFetch, useLoginHref, useSignedIn } from "./shared";
 
 // A chat dispute has its own statuses and opens by its link token.
 type Item = {
@@ -71,10 +72,8 @@ export default function QuickDisputeHistoryPage() {
   return (
     <PageShell>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-tone-white sm:text-3xl">{t("decide.history.title")}</h1>
-        <a href={localizePath("/decide/new", locale)} className={`${primaryButtonClass} py-3 sm:py-2.5`}>
-          {t("decide.history.newButton")}
-        </a>
+        <h1 className="text-3xl font-semibold text-tone-white sm:text-4xl">{t("decide.history.title")}</h1>
+        <NewDealButton href="/decide/new" label={t("decide.history.newButton")} className="min-h-12 sm:min-h-0" />
       </div>
       {signedIn === false && (
         <p className="text-sm text-tone-400">

@@ -8,12 +8,14 @@ import { localizePath } from "@/lib/i18n/routing";
 
 type NewDealButtonProps = {
   label: string;
+  href?: string;
   className?: string;
   variant?: "text" | "icon";
 };
 
 export function NewDealButton({
   label,
+  href = "/promises/new",
   className,
   variant = "text",
 }: NewDealButtonProps) {
@@ -24,7 +26,7 @@ export function NewDealButton({
   if (variant === "icon") {
     return (
       <IconButton
-        href={localizePath("/promises/new", locale)}
+        href={localizePath(href, locale)}
         ariaLabel={label}
         className={[
           "bg-emerald-400 text-tone-50 shadow-lg shadow-accent-500/30 hover:bg-emerald-300 hover:text-tone-50 focus-visible:text-tone-50 active:text-tone-50 border-accent-300/60",
@@ -40,7 +42,7 @@ export function NewDealButton({
   }
 
   return (
-    <LocalizedLink href="/promises/new" className={[baseClasses, className].filter(Boolean).join(" ")}>
+    <LocalizedLink href={href} className={[baseClasses, className].filter(Boolean).join(" ")}>
       {label}
     </LocalizedLink>
   );

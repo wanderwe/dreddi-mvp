@@ -1,5 +1,6 @@
 "use client";
 
+import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Link2 } from "lucide-react";
@@ -78,28 +79,12 @@ export function ChatForm() {
         ))}
       </div>
 
-      <div className="space-y-1.5">
-        <p className="text-sm font-semibold text-tone-200">{t("decide.group.closeLabel")}</p>
-        <div className="grid grid-cols-3 gap-1 rounded-xl border border-tone-white/10 bg-tone-white/5 p-1" role="radiogroup">
-          {CLOSE_OPTIONS.map((option: CloseOption) => {
-            const active = draft.close === option;
-            return (
-              <button
-                key={option}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => update({ close: option })}
-                className={`cursor-pointer rounded-lg px-2 py-2 text-sm font-semibold transition ${
-                  active ? "bg-emerald-400 text-slate-950" : "text-tone-300 hover:text-accent-100"
-                }`}
-              >
-                {t(`decide.group.close.${option}`)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <ChoiceToggle
+        label={t("decide.group.closeLabel")}
+        options={CLOSE_OPTIONS.map((option: CloseOption) => ({ value: option, label: t(`decide.group.close.${option}`) }))}
+        value={draft.close as CloseOption}
+        onChange={(close) => update({ close })}
+      />
 
       <div className="flex justify-end">
         <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>

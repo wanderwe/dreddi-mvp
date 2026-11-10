@@ -1,5 +1,6 @@
 "use client";
 
+import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -1158,28 +1159,13 @@ export default function NewPromisePage() {
 
           <div className="grid items-start gap-5 sm:grid-cols-2">
             {POSITIONING === "pledge" ? (
-              <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
-                  {t("promises.new.fields.promiseKind")}
-                </span>
-                <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
-                  {(["me", "other", "self"] as const).map((kind) => (
-                    <button
-                      key={kind}
-                      type="button"
-                      aria-pressed={promiseKind === kind}
-                      onClick={() => choosePromiseKind(kind)}
-                      className={`flex-1 cursor-pointer rounded-2xl px-2 py-2 text-sm font-semibold leading-tight transition ${
-                        promiseKind === kind
-                          ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                          : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
-                      }`}
-                    >
-                      {t(`promises.new.promiseKind.${kind}`)}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ChoiceToggle
+                className="sm:col-span-2"
+                label={t("promises.new.fields.promiseKind")}
+                options={(["me", "other", "self"] as const).map((kind) => ({ value: kind, label: t(`promises.new.promiseKind.${kind}`) }))}
+                value={promiseKind}
+                onChange={choosePromiseKind}
+              />
             ) : (
             <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
               <div className="flex items-center gap-2">

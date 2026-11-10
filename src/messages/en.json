@@ -1599,8 +1599,9 @@
       "remove": "Remove stake"
     },
     "format": {
-      "duo": "One on one",
-      "chat": "For a chat",
+      "duo": "Two of us",
+      "label": "Who's arguing",
+      "chat": "The whole chat",
       "chatHint": "Drop the link in a chat, everyone takes a side, Dreddi decides"
     },
     "group": {
