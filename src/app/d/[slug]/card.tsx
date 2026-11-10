@@ -9,7 +9,7 @@ import { VerdictCard, verdictHeadline } from "@/app/decide/VerdictCard";
 import { ShareVerdict } from "./ShareVerdict";
 import { TrackView } from "@/lib/events/TrackView";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 
 // The public card of a «Дредді розсуди» verdict: the question, the names or nicknames and the verdict, never the positions.
 

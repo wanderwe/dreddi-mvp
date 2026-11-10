@@ -5,7 +5,7 @@ import { createTranslator } from "@/lib/i18n/t";
 import { localizePath } from "@/lib/i18n/routing";
 import type { Locale } from "@/lib/i18n/locales";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 
 // The preview of an invite link in messengers: the question and who is calling, so the opponent knows
 // what the link is before opening it. The position stays inside.

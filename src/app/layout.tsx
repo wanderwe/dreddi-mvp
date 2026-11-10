@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://dreddi.com"),
+  metadataBase: new URL("https://www.dreddi.com"),
 };
 
 export default async function RootLayout({

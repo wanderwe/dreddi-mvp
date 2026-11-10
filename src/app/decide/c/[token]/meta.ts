@@ -6,7 +6,7 @@ import { localizePath } from "@/lib/i18n/routing";
 import type { Locale } from "@/lib/i18n/locales";
 import { disputeFallback } from "@/app/decide/join/[token]/invite";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 
 // The preview of a chat dispute link in messengers: while open, the situation and the two positions;
 // once decided, Dreddi's answer. Never what people wrote.

@@ -5,7 +5,7 @@ import { lookupInvitePreview } from "@/lib/invitePreview";
 import { localizePath } from "@/lib/i18n/routing";
 import { pledgeWording } from "@/lib/pledgeWording";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 
 const INVITE_METADATA_COPY = {
   en: {

@@ -8,7 +8,7 @@ import { createTranslator } from "@/lib/i18n/t";
 import { lookupAgreementPreview } from "@/lib/agreementPreview";
 import { formatKyivDate } from "@/lib/ai/kyivDate";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 
 // A shared link to a public promise shows what was promised, its status and the deadline, with a picture.
 export async function buildAgreementMetadata(id: string, locale: Locale): Promise<Metadata> {
