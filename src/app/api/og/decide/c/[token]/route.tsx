@@ -82,28 +82,43 @@ export async function GET(req: Request, ctx: { params: Promise<{ token: string }
           {row(1)}
           {row(2)}
         </div>
-        <div style={{ display: "flex" }}>
-          <span
+        {decided && card.verdict ? (
+          // Who is right first, as in the chat; Dreddi's answer under it, whole when it fits.
+          <div
             style={{
               display: "flex",
-              padding: "10px 22px",
+              flexDirection: "column",
+              gap: 6,
+              padding: "16px 22px",
               borderRadius: 14,
-              fontSize: 26,
-              fontWeight: 600,
               background: "#e7f8ef",
-              color: "#0f7a4a",
               border: "2px solid #9fdcbf",
             }}
           >
-            {decided && card.majorityRight !== null
-              ? card.majorityRight
-                ? t("decide.group.majorityRight")
-                : t("decide.group.majorityWrong")
-              : decided
-                ? clip(card.verdict?.short_answer ?? "", 80)
-                : t("decide.format.chatHint")}
-          </span>
-        </div>
+            <span style={{ display: "flex", fontSize: 28, fontWeight: 600, color: "#0f7a4a" }}>
+              {winner ? clip(t("decide.group.winner", { position: card.positions[winner] }), 70) : t(`decide.verdict.${card.verdict.winner}`)}
+              {card.majorityRight !== null ? ` · ${card.majorityRight ? t("decide.group.majorityRight") : t("decide.group.majorityWrong")}` : ""}
+            </span>
+            <span style={{ display: "flex", fontSize: 24, color: "#1d3b2f", lineHeight: 1.3 }}>{clip(card.verdict.short_answer, 150)}</span>
+          </div>
+        ) : (
+          <div style={{ display: "flex" }}>
+            <span
+              style={{
+                display: "flex",
+                padding: "10px 22px",
+                borderRadius: 14,
+                fontSize: 26,
+                fontWeight: 600,
+                background: "#e7f8ef",
+                color: "#0f7a4a",
+                border: "2px solid #9fdcbf",
+              }}
+            >
+              {t("decide.format.chatHint")}
+            </span>
+          </div>
+        )}
       </div>
     ),
     {

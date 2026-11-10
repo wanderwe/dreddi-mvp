@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { disputeMessage, draftMessage, verdictText, type TgDispute } from "../src/lib/telegram/render";
+import { disputeMessage, draftMessage, verdictMessage, type TgDispute } from "../src/lib/telegram/render";
 import { closeTime, langFor, langOf } from "../src/lib/telegram/texts";
 
 const dispute = (patch: Partial<TgDispute> = {}): TgDispute => ({
@@ -55,12 +55,15 @@ test("the draft asks the author when to close; the dispute escapes what people w
   );
 
   const open = disputeMessage(dispute(), 2, "open");
-  assert.match(open.text, /Стали на бік: 2 · закриття/);
+  assert.match(open.text, /👥 2 · ⏱ закриття/);
+  // The side buttons carry the positions; the list shows only where there are no buttons.
+  assert.doesNotMatch(open.text, /1\. Водій/);
+  assert.match(disputeMessage(dispute(), 4, "closed").text, /1\. Водій/);
   assert.equal(open.reply_markup.inline_keyboard.length, 3);
   // Cancel until three people are in, then close.
   assert.equal(open.reply_markup.inline_keyboard[2][0].text, "Скасувати");
   assert.equal(disputeMessage(dispute(), 3, "open").reply_markup.inline_keyboard[2][0].text, "Закрити");
-  assert.match(disputeMessage(dispute({ closes_at: null }), 0, "open").text, /закриє Ігор/);
+  assert.match(disputeMessage(dispute({ closes_at: null }), 0, "open").text, /⏱ закриє Ігор/);
   assert.equal(disputeMessage(dispute(), 4, "closed").reply_markup.inline_keyboard.length, 0);
 });
 
@@ -70,7 +73,7 @@ test("the verdict says whether the majority was right and quotes the winner's st
     { id: "b", position: 1 as const, argument: null, nickname: "Оля" },
     { id: "c", position: 2 as const, argument: "Власник отримує лист", nickname: "Вася" },
   ];
-  const text = verdictText(
+  const { caption: text, photo, reply_markup } = verdictMessage(
     dispute({
       status: "decided",
       verdict: {
@@ -89,8 +92,10 @@ test("the verdict says whether the majority was right and quotes the winner's st
     sides,
     "https://dreddi.com"
   );
-  assert.match(text, /<b>Праві ті, хто за «Власник»<\/b>/);
+  assert.match(text, /^<b>⚖️ Праві ті, хто за «Власник»<\/b>/);
   assert.match(text, /Більшість помиляється: 67% були за «Водій»/);
   assert.match(text, /Найсильніший аргумент: «Власник отримує лист», Вася/);
-  assert.match(text, /href="https:\/\/dreddi\.com\/(ua\/)?decide\/c\/tok_tok_tok_tok_tok1"/);
+  assert.match(text, /<blockquote expandable>Штраф з камери надходить власнику\.<\/blockquote>$/);
+  assert.equal(photo, "https://dreddi.com/api/og/decide/c/tok_tok_tok_tok_tok1?locale=uk");
+  assert.deepEqual(reply_markup.inline_keyboard[0].map((button) => button.text), ["Детальніше", "Поділитися"]);
 });

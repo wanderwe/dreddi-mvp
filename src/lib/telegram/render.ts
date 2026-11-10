@@ -8,16 +8,12 @@ import { closeTime, textsFor } from "./texts";
 
 export type TgDispute = Omit<ChatDisputeRow, "status"> & { status: ChatDisputeRow["status"] | "draft" };
 
-const head = (dispute: Pick<ChatDisputeRow, "lang" | "question" | "position_1" | "position_2">) => {
+// The positions are spelled out where there are no side buttons to show them: the draft, and once closed.
+const head = (dispute: Pick<ChatDisputeRow, "lang" | "question" | "position_1" | "position_2">, withPositions: boolean) => {
   const t = textsFor(dispute.lang);
-  return [
-    `<b>${escapeHtml(t.title)}</b>`,
-    "",
-    `<b>${escapeHtml(dispute.question)}</b>`,
-    "",
-    `1. ${escapeHtml(dispute.position_1)}`,
-    `2. ${escapeHtml(dispute.position_2)}`,
-  ].join("\n");
+  const lines = [`<b>${escapeHtml(t.title)}</b>`, "", `<b>${escapeHtml(dispute.question)}</b>`];
+  if (withPositions) lines.push("", `1. ${escapeHtml(dispute.position_1)}`, `2. ${escapeHtml(dispute.position_2)}`);
+  return lines.join("\n");
 };
 
 export function draftMessage(dispute: TgDispute) {
@@ -27,7 +23,7 @@ export function draftMessage(dispute: TgDispute) {
     callback_data: `d:${dispute.token}:${option}`,
   });
   return {
-    text: [head(dispute), "", escapeHtml(t.whenClose), `<i>${escapeHtml(t.decides(dispute.tg_creator_name ?? ""))}</i>`].join("\n"),
+    text: [head(dispute, true), "", escapeHtml(t.whenClose), `<i>${escapeHtml(t.decides(dispute.tg_creator_name ?? ""))}</i>`].join("\n"),
     reply_markup: { inline_keyboard: [CLOSE_OPTIONS.map(button), [button("cancel")]] },
   };
 }
@@ -42,9 +38,9 @@ export function disputeMessage(dispute: TgDispute, count: number, stage: "open" 
         : dispute.closes_at
           ? t.counter(count, closeTime(dispute.closes_at, dispute.lang))
           : t.counterManual(count, dispute.tg_creator_name ?? "");
-  const lines = [head(dispute), ""];
+  const lines = [head(dispute, stage !== "open"), ""];
   if (stage === "open") lines.push(escapeHtml(t.pickSide), "");
-  lines.push(`<i>${escapeHtml(footer)}</i>`);
+  lines.push(escapeHtml(footer));
   const keyboard =
     stage === "open"
       ? [
@@ -57,8 +53,14 @@ export function disputeMessage(dispute: TgDispute, count: number, stage: "open" 
   return { text: lines.join("\n"), reply_markup: { inline_keyboard: keyboard } };
 }
 
-export function verdictText(
-  dispute: Pick<ChatDisputeRow, "lang" | "verdict" | "position_1" | "position_2" | "token">,
+// Telegram counts a caption's visible characters, without the tags.
+const CAPTION_MAX = 1024;
+const visible = (html: string) => html.replace(/<[^>]+>/g, "").replace(/&(amp|lt|gt|quot);/g, "_").length;
+
+// The verdict: the card picture with the split, and under it who is right, Dreddi's answer, the majority
+// and the strongest argument; the why folded away, opened with a tap. Buttons to the page and to share.
+export function verdictMessage(
+  dispute: Pick<ChatDisputeRow, "lang" | "verdict" | "position_1" | "position_2" | "token" | "question">,
   sides: Pick<ChatSideRow, "id" | "position" | "argument" | "nickname">[],
   siteUrl: string
 ) {
@@ -67,13 +69,10 @@ export function verdictText(
   const verdict = dispute.verdict!;
   const counts = countSides(sides);
   const total = counts[1] + counts[2];
-  // Who is right comes first, as on the site; then Dreddi's one-line answer and the why.
   const headline =
     verdict.winner === "1" || verdict.winner === "2"
       ? t.winner(verdict.winner === "1" ? dispute.position_1 : dispute.position_2)
       : t[verdict.winner];
-  const lines = [`<b>${escapeHtml(t.verdictTitle)}</b>`, "", `<b>${escapeHtml(headline)}</b>`, "", escapeHtml(verdict.short_answer)];
-  if (verdict.explanation) lines.push("", escapeHtml(verdict.explanation));
 
   const facts: string[] = [];
   const right = majorityRight(verdict.winner, counts);
@@ -87,9 +86,25 @@ export function verdictText(
     verdict.winner === "1" ? verdict.best_argument_1 : verdict.winner === "2" ? verdict.best_argument_2 : (verdict.best_argument_1 ?? verdict.best_argument_2);
   const best = bestId ? sides.find((side) => side.id === bestId && side.argument) : null;
   if (best) facts.push(escapeHtml(t.bestArgument(best.argument as string, best.nickname)));
-  if (facts.length) lines.push("", ...facts);
+
+  const parts = [`<b>${escapeHtml(t.verdictMark)} ${escapeHtml(headline)}</b>`, escapeHtml(verdict.short_answer)];
+  if (facts.length) parts.push(`<blockquote>${facts.join("\n")}</blockquote>`);
+  const before = parts.join("\n\n");
+  // The why goes in last, folded, cut to what the caption still has room for.
+  let caption = before;
+  if (verdict.explanation) {
+    const room = CAPTION_MAX - visible(before) - 4;
+    if (room > 80) {
+      const text = verdict.explanation.length > room ? `${verdict.explanation.slice(0, room - 1).trimEnd()}…` : verdict.explanation;
+      caption = `${before}\n\n<blockquote expandable>${escapeHtml(text)}</blockquote>`;
+    }
+  }
 
   const url = new URL(localizePath(`/decide/c/${dispute.token}`, lang), siteUrl).toString();
-  lines.push("", `<a href="${escapeHtml(url)}">${escapeHtml(t.more)}</a>`);
-  return lines.join("\n");
+  const share = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(verdict.share_text || dispute.question)}`;
+  return {
+    photo: new URL(`/api/og/decide/c/${encodeURIComponent(dispute.token)}?locale=${lang}`, siteUrl).toString(),
+    caption,
+    reply_markup: { inline_keyboard: [[{ text: t.more, url }, { text: t.share, url: share }]] },
+  };
 }

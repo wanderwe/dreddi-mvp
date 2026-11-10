@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
+import { checkAiBudget, recordAiUsage, tgParseAttempts } from "@/lib/ai/budget";
 import { parseChatDispute } from "@/lib/ai/parseChatDispute";
 import { DISPUTE_COLUMNS, SIDE_COLUMNS, decideChat } from "@/lib/chatDisputes/server";
 import {
@@ -26,14 +27,14 @@ import {
   type TgUpdate,
 } from "./api";
 import { langFor, textsFor } from "./texts";
-import { disputeMessage, draftMessage, verdictText, type TgDispute } from "./render";
+import { disputeMessage, draftMessage, verdictMessage, type TgDispute } from "./render";
 
 // Server only: «Дредді, розсуди!» in a Telegram group. The dispute is a chat dispute from the site, played
 // in the group: the bot's message carries the buttons, replies to it are the arguments, and the verdict
 // comes back as a reply to it.
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dreddi.com";
-const DAY_MS = 24 * 60 * 60 * 1000;
+// www: the bare domain redirects, and Telegram fetches the card picture from here.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.dreddi.com";
 // New disputes a day: per group, and per person across groups.
 export const TG_LIMITS = { perChatPerDay: 5, perUserPerDay: 3 } as const;
 
@@ -131,18 +132,23 @@ async function onCommand(message: TgMessage, name: string, rest: string) {
   const from = message.from!;
   const creatorHash = tgUserHash(from.id);
   const admin = getAdminClient();
-  const since = new Date(Date.now() - DAY_MS).toISOString();
-  const [{ count: inChat }, { count: byUser }] = await Promise.all([
-    admin.from("quick_chat_disputes").select("id", { count: "exact", head: true }).eq("tg_chat_id", message.chat.id).gte("created_at", since),
-    admin.from("quick_chat_disputes").select("id", { count: "exact", head: true }).eq("creator_key", sha256(`tg:${creatorHash}`)).gte("created_at", since),
-  ]);
-  if ((inChat ?? 0) >= TG_LIMITS.perChatPerDay || (byUser ?? 0) >= TG_LIMITS.perUserPerDay) return reply(t.limit);
+  // Every call to the model counts, the ones that found no dispute too: a flood of /dreddi stops here.
+  const keys = { chatKey: sha256(`chat:${message.chat.id}`).slice(0, 32), userKey: creatorHash };
+  const attempts = await tgParseAttempts(keys.chatKey, keys.userKey);
+  if (attempts.inChat >= TG_LIMITS.perChatPerDay || attempts.byUser >= TG_LIMITS.perUserPerDay) return reply(t.limit);
+  try {
+    await checkAiBudget();
+  } catch {
+    return reply(t.limit);
+  }
 
   await quietly(tg("sendChatAction", { chat_id: message.chat.id, action: "typing" }));
-  const parsed = await parseChatDispute({ lang, text: rest || context || "", context: rest ? context : null }).catch((error) => {
+  const result = await parseChatDispute({ lang, text: rest || context || "", context: rest ? context : null }).catch((error) => {
     console.warn("telegram parse:", error instanceof Error ? error.message : error);
-    return null;
+    return { parsed: null, costUsd: 0 };
   });
+  await recordAiUsage("tg_parse", result.costUsd, keys);
+  const parsed = result.parsed;
   if (!parsed) return reply(t.notFound);
 
   const { data: dispute, error } = await admin
@@ -348,14 +354,12 @@ export async function announceResult(disputeId: string) {
     await quietly(tg("sendMessage", { chat_id: dispute.tg_chat_id, text: t.tooFew, reply_parameters: replyTo }));
     return;
   }
-  await quietly(
-    tg("sendMessage", {
-      chat_id: dispute.tg_chat_id,
-      parse_mode: "HTML",
-      link_preview_options: { is_disabled: true },
-      reply_parameters: replyTo,
-      text: verdictText(dispute, sides, SITE_URL),
-    })
-  );
+  const message = verdictMessage(dispute, sides, SITE_URL);
+  const base = { chat_id: dispute.tg_chat_id, parse_mode: "HTML", reply_parameters: replyTo, reply_markup: message.reply_markup };
+  // The card picture with the caption; if Telegram cannot fetch the picture, the same words alone.
+  await tg("sendPhoto", { ...base, photo: message.photo, caption: message.caption }).catch((error) => {
+    console.warn("telegram verdict photo:", error instanceof Error ? error.message : error);
+    return quietly(tg("sendMessage", { ...base, text: message.caption, link_preview_options: { is_disabled: true } }));
+  });
   await logEvent("tg_dispute_verdict", dispute.token);
 }
