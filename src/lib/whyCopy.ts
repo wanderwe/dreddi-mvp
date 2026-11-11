@@ -75,7 +75,7 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       {
         kind: "body",
         paragraphs: [
-          "Суддя Дредді розсудить"
+          "Дредді розсудить"
         ]
       },
       {
@@ -179,7 +179,7 @@ export const whyCopy: Record<Locale, WhyCopy> = {
       {
         kind: "body",
         paragraphs: [
-          "Judge Dreddi settles it"
+          "Dreddi settles it"
         ]
       },
       {
