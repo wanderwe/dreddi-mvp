@@ -779,6 +779,15 @@
       "sentBody": "Check your email (and spam)",
       "back": "Back to landing",
       "secure": "Secure, zero-password access"
+    },
+    "callback": {
+      "signingIn": "Signing you in…",
+      "securing": "Securing your session…",
+      "unavailable": "Sign-in is unavailable in this preview",
+      "linkExpired": "The sign-in link has expired. Sign in again.",
+      "noSession": "Couldn't sign you in. Try again.",
+      "error": "Sign-in error: {detail}",
+      "unexpected": "Something went wrong: {detail}"
     }
   },
   "publicProfile": {

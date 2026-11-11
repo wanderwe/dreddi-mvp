@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
+import { useT } from "@/lib/i18n/I18nProvider";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
 type SignedInUser = {
@@ -16,14 +17,17 @@ function signedInWithApple(user: SignedInUser) {
   return latest?.provider === "apple";
 }
 
+type CallbackMessage = { key: "signingIn" | "unavailable" | "linkExpired" | "noSession" | "error" | "unexpected"; detail?: string };
+
 export default function AuthCallbackPage() {
-  const [msg, setMsg] = useState("Signing you in...");
+  const t = useT();
+  const [msg, setMsg] = useState<CallbackMessage>({ key: "signingIn" });
 
   useEffect(() => {
     (async () => {
       try {
         if (!supabase) {
-          setMsg("Authentication is unavailable in this preview.");
+          setMsg({ key: "unavailable" });
           return;
         }
 
@@ -42,8 +46,8 @@ export default function AuthCallbackPage() {
         if (error_code) {
           setMsg(
             error_code === "otp_expired"
-              ? "Лінк протермінований. Зроби логін ще раз."
-              : error_description ?? error_code
+              ? { key: "linkExpired" }
+              : { key: "error", detail: error_description ?? error_code }
           );
           return;
         }
@@ -67,7 +71,7 @@ export default function AuthCallbackPage() {
               error.message?.toLowerCase().includes("already linked") ||
               error.code === "identity_already_exists";
             if (!isAlreadyLinked) {
-              setMsg("Auth error: " + error.message);
+              setMsg({ key: "error", detail: error.message });
               return;
             }
           }
@@ -80,7 +84,7 @@ export default function AuthCallbackPage() {
             refresh_token,
           });
           if (error) {
-            setMsg("Auth error: " + error.message);
+            setMsg({ key: "error", detail: error.message });
             return;
           }
         }
@@ -88,7 +92,7 @@ export default function AuthCallbackPage() {
         // Перевірка сесії
         const { data, error } = await supabase.auth.getSession();
         if (error || !data.session?.user) {
-          setMsg("No session found. Try logging in again.");
+          setMsg({ key: "noSession" });
           return;
         }
 
@@ -116,22 +120,24 @@ export default function AuthCallbackPage() {
         window.location.replace(nextPath);
       } catch (e: unknown) {
         const message = e instanceof Error ? e.message : String(e);
-        setMsg("Unexpected error: " + message);
+        setMsg({ key: "unexpected", detail: message });
       }
     })();
   }, []);
 
+  // The page sits under the 77px header, so it takes the rest of the screen and the card lands in the
+  // middle of what is visible, not half a header lower.
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
+    <main className="relative min-h-[calc(100dvh-77px)] overflow-hidden bg-gradient-to-b from-tone-950 via-[var(--page-wash-via)] to-[var(--page-wash-to)] text-tone-100">
       <div className="absolute inset-0 hero-grid" aria-hidden />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--auth-wash-1),transparent_30%),radial-gradient(circle_at_70%_10%,var(--auth-wash-2),transparent_28%),radial-gradient(circle_at_55%_65%,var(--auth-wash-3),transparent_40%)]" />
 
-      <div className="relative flex min-h-screen items-center justify-center px-6">
+      <div className="relative flex min-h-[calc(100dvh-77px)] items-center justify-center px-6">
         <div className="glass-panel w-full max-w-xl rounded-3xl border-tone-white/10 p-8 text-center">
           <DreddiLogoMark className="mx-auto mb-4 h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           <h1 className="text-3xl font-semibold text-tone-white">Dreddi knows</h1>
-          <p className="mt-2 text-tone-300">{msg}</p>
-          <div className="mt-4 text-sm text-accent-200">Securing your session…</div>
+          <p className="mt-2 text-tone-300">{t(`auth.callback.${msg.key}`, { detail: msg.detail ?? "" })}</p>
+          <div className="mt-4 text-sm text-accent-200">{t("auth.callback.securing")}</div>
         </div>
       </div>
     </main>
