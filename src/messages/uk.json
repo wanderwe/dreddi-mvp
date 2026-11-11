@@ -158,14 +158,6 @@
         "awaitingOthers": "Очікує інших"
       }
     },
-    "profile": {
-      "eyebrow": "ПРОФІЛЬ",
-      "publicTitle": "Публічний профіль",
-      "publicHelper": "Якщо вимкнено, профіль недоступний публічно",
-      "publicOn": "Публічний",
-      "publicOff": "Приватний",
-      "loading": "Завантаження…"
-    },
     "empty": {
       "title": "Поки що порожньо",
       "globalDescription": "У вас ще немає обіцянок",

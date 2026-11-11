@@ -905,8 +905,6 @@
       "awaitingAcceptance": "Awaiting acceptance"
     },
     "meta": {
-      "created": "Created {date}",
-      "closed": "Closed {date}",
       "due": "Due {date}",
       "overdue": "Overdue since {date}",
       "noDue": "No due date"

@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, UserRound, X, ExternalLink, Copy, Check } from "lucide-react";
 import { getAuthState, type AuthState } from "@/lib/auth/getAuthState";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useT } from "@/lib/i18n/I18nProvider";
+import { localizePath } from "@/lib/i18n/routing";
 import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
@@ -54,6 +56,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTagsInput, setProfileTagsInput] = useState("");
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
+  const [deleted, setDeleted] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
   const [tagsError, setTagsError] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState<"identity" | "domains" | "notifications" | "social">(
     "identity"
@@ -120,7 +126,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         .from("profiles")
         // Quiet hours columns remain in DB for backwards compatibility (deprecated in MVP).
         .select(
-          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,deleted_at"
         )
         .eq("id", session.user.id)
         .single();
@@ -141,7 +147,15 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         push_notifications_enabled?: boolean | null;
         email_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
+        deleted_at?: string | null;
       } | null;
+      // An account waiting for deletion is only restored or left: no settings until then, or turning the
+      // profile public here would put a deleted account back on public pages.
+      if (profileRow?.deleted_at) {
+        setDeleted(true);
+        setLoading(false);
+        return;
+      }
       const handle = profileRow?.handle ?? null;
       const displayName = profileRow?.display_name ?? null;
       const profileTagsRow = profileRow?.profile_tags ?? [];
@@ -172,6 +186,10 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   }, [t]);
 
   useEffect(() => {
+    if (deleted && !pathname?.endsWith("/account/restore")) router.replace(localizePath("/account/restore", locale));
+  }, [deleted, pathname, router, locale]);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       setOrigin(window.location.origin);
     }
@@ -200,8 +218,6 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
   const isPublic = Boolean(profile?.isPublic);
   const publicProfileEnabled = publicProfileInput ?? isPublic;
-  const publicProfileDirty =
-    publicProfileInput !== null && Boolean(profile) && publicProfileInput !== profile?.isPublic;
   const publicProfilePath = useMemo(() => {
     if (!profile?.handle) return "";
     return `/u/${encodeURIComponent(profile.handle)}`;
@@ -249,27 +265,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     return true;
   };
 
-  const handlePublicProfileToggle = () => {
+  // Saved at once, like the notification switches next to it.
+  const handlePublicProfileToggle = async () => {
     if (!profile || saving) return;
-    setPublicProfileInput((prev) => !(prev ?? isPublic));
-  };
-
-  const savePublicProfile = async () => {
-    if (!profile || publicProfileInput === null || saving) return;
-    if (publicProfileInput === profile.isPublic) return;
-
-    const nextHandle = publicProfileInput
-      ? lastHandleRef.current ?? profile.handle ?? defaultHandle
-      : profile.handle;
-
-    if (profile.handle) {
-      lastHandleRef.current = profile.handle;
-    }
-
-    await updateProfileRow(
-      { is_public_profile: publicProfileInput, handle: nextHandle },
-      { handle: nextHandle, isPublic: publicProfileInput }
+    const next = !profile.isPublic;
+    const nextHandle = next ? lastHandleRef.current ?? profile.handle ?? defaultHandle : profile.handle;
+    if (profile.handle) lastHandleRef.current = profile.handle;
+    setPublicProfileInput(next);
+    const saved = await updateProfileRow(
+      { is_public_profile: next, handle: nextHandle },
+      { handle: nextHandle, isPublic: next }
     );
+    if (!saved) setPublicProfileInput(profile.isPublic);
   };
 
   const handleCopyLink = async () => {
@@ -399,6 +406,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
       { displayName: nextDisplayName, handle: nextHandle }
     );
   };
+
+  if (deleted) return null;
 
   return (
     <div className={`flex min-h-0 flex-col ${className}`}>
