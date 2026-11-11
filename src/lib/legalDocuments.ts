@@ -13,21 +13,21 @@ const LEGAL_DOCUMENTS: Record<LegalDocumentType, Record<string, { title: string;
   privacy: {
     en: {
       title: "Privacy Policy",
-      updatedAt: "2025-01-15",
+      updatedAt: "2026-11-11",
     },
     uk: {
       title: "Політика конфіденційності",
-      updatedAt: "2025-01-15",
+      updatedAt: "2026-11-11",
     },
   },
   terms: {
     en: {
       title: "Terms of Service",
-      updatedAt: "2025-01-15",
+      updatedAt: "2026-11-11",
     },
     uk: {
       title: "Умови користування",
-      updatedAt: "2025-01-15",
+      updatedAt: "2026-11-11",
     },
   },
 };

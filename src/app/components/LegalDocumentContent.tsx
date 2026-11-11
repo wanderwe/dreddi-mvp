@@ -9,9 +9,12 @@ type MarkdownBlock =
   | { type: "list"; items: string[] }
   | { type: "paragraph"; lines: string[] };
 
+// A heading line ends its block even with no blank line after it, so «## Title» followed by a list reads
+// as a heading and a list, not as one paragraph of raw text.
 const splitBlocks = (content: string) =>
   content
     .split(/\n{2,}/)
+    .flatMap((block) => block.split(/\n(?=#)|(?<=^#[^\n]*)\n/m))
     .map((block) => block.trim())
     .filter(Boolean);
 
@@ -36,6 +39,18 @@ const parseMarkdown = (content: string): MarkdownBlock[] =>
     return { type: "paragraph", lines };
   });
 
+// **bold** inside a line; nothing else of Markdown is needed in these documents.
+const inline = (text: string) =>
+  text.split(/(\*\*[^*]+\*\*)/).map((part, index) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={index} className="font-semibold text-tone-white">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      part
+    )
+  );
+
 export function LegalDocumentContent({ content }: LegalDocumentContentProps) {
   const blocks = parseMarkdown(content);
 
@@ -58,7 +73,7 @@ export function LegalDocumentContent({ content }: LegalDocumentContentProps) {
           return (
             <ul key={`list-${index}`} className="list-disc space-y-2 pl-5 text-tone-200">
               {block.items.map((item, itemIndex) => (
-                <li key={`${item}-${itemIndex}`}>{item}</li>
+                <li key={`${item}-${itemIndex}`}>{inline(item)}</li>
               ))}
             </ul>
           );
@@ -68,7 +83,7 @@ export function LegalDocumentContent({ content }: LegalDocumentContentProps) {
           <p key={`paragraph-${index}`}>
             {block.lines.map((line, lineIndex, lines) => (
               <React.Fragment key={`${line}-${lineIndex}`}>
-                {line}
+                {inline(line)}
                 {lineIndex < lines.length - 1 ? <br /> : null}
               </React.Fragment>
             ))}
