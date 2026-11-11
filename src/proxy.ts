@@ -53,5 +53,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  // Static files are skipped by their extension, not by any dot: a profile handle like
+  // «spaceout.whitecity» is a page and needs its locale.
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|xml|json|js|css|map|woff|woff2|ttf|webmanifest)$).*)",
+  ],
 };
