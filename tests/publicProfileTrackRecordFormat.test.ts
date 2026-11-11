@@ -30,7 +30,7 @@ test("public profile track record card renders pace value with secondary per-mon
   const enMessages = JSON.parse(readFileSync("src/messages/en.json", "utf8"));
 
   assert.equal(ukMessages.publicProfile.reputationDetails.trackRecord.perMonthUnit, "/ місяць");
-  assert.equal(ukMessages.publicProfile.reputationDetails.trackRecord.activeDays, "активність {count} днів");
+  assert.equal(ukMessages.publicProfile.reputationDetails.trackRecord.activeDays, "активність {count} {label}");
   assert.equal(enMessages.publicProfile.reputationDetails.trackRecord.perMonthUnit, "/ month");
-  assert.equal(enMessages.publicProfile.reputationDetails.trackRecord.activeDays, "active {count} days");
+  assert.equal(enMessages.publicProfile.reputationDetails.trackRecord.activeDays, "active {count} {label}");
 });

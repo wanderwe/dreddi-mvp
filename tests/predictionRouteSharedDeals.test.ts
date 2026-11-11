@@ -6,7 +6,8 @@ import { buildSharedDealsOrFilter } from '@/app/api/promises/prediction/route';
 test('shared-deals filter covers all role combinations', () => {
   const filter = buildSharedDealsOrFilter('user-1', 'user-2');
 
-  const clauses = filter.split(',');
+  // Split between the and(…) groups, not on the comma inside each one.
+  const clauses = filter.split(/,(?=and\()/);
   assert.equal(clauses.length, 16);
   assert.ok(clauses.includes('and(creator_id.eq.user-1,creator_id.eq.user-2)'));
   assert.ok(clauses.includes('and(promisor_id.eq.user-1,promisee_id.eq.user-2)'));

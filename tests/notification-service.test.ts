@@ -179,22 +179,27 @@ describe("notification service caps", () => {
     assert.equal(outcome.created, true);
   });
 
+  // Deadline and reminder types skip this cap on purpose (policy.ts), so it is checked on an invite.
   it("blocks repeated same-type notifications within 24 hours", async () => {
     const admin = new FakeSupabaseClient({
       notifications: [
         {
           user_id: "user-1",
           promise_id: "promise-1",
-          type: "due_soon",
+          type: "invite",
           created_at: "2024-02-01T06:00:00Z",
-          dedupe_key: "due_soon:promise-1:0",
+          dedupe_key: "invite:promise-1:0",
         },
       ],
     });
 
-    const outcome = await createNotification(admin as never, buildRequest(), new Date("2024-02-01T12:00:00Z"));
+    const outcome = await createNotification(
+      admin as never,
+      buildRequest({ type: "invite", dedupeKey: "invite:promise-1:1" }),
+      new Date("2024-02-01T12:00:00Z")
+    );
 
     assert.equal(outcome.created, false);
-    assert.equal(outcome.skippedReason, "per_deal_cap");
+    assert.equal(outcome.skippedReason, "rate_limited_24h");
   });
 });

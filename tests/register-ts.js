@@ -28,3 +28,14 @@ Module._extensions[".js"] = function (module, filename) {
 
   return originalJsLoader(module, filename);
 };
+
+// The app imports through the «@/» alias from tsconfig (src/…); without this every test that reaches
+// such an import failed before running a single check.
+const srcRoot = path.join(process.cwd(), "src");
+const originalResolve = Module._resolveFilename;
+Module._resolveFilename = function (request, ...rest) {
+  if (request.startsWith("@/")) {
+    request = path.join(srcRoot, request.slice(2));
+  }
+  return originalResolve.call(this, request, ...rest);
+};

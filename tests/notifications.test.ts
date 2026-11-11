@@ -69,8 +69,8 @@ describe("invite response notifications", () => {
     });
 
     assert.equal(copy.title, "Invite declined");
-    assert.equal(copy.body, "@alex declined the invite to the deal: Design sprint");
-    assert.equal(copy.ctaLabel, "Open deal");
+    assert.equal(copy.body, "@alex declined the invite to the promise: Design sprint. No action needed.");
+    assert.equal(copy.ctaLabel, "");
   });
 
   it("builds ignore copy in Ukrainian", () => {
@@ -82,8 +82,8 @@ describe("invite response notifications", () => {
     });
 
     assert.equal(copy.title, "Запрошення без відповіді");
-    assert.equal(copy.body, "@olena поки що не відповів(ла) на запрошення до угоди: UX аудит");
-    assert.equal(copy.ctaLabel, "Відкрити угоду");
+    assert.equal(copy.body, "@olena поки що не відповів(ла) на запрошення до обіцянки: UX аудит. Дій не потрібно.");
+    assert.equal(copy.ctaLabel, "");
   });
 });
 

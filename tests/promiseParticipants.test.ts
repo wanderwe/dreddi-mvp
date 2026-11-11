@@ -62,7 +62,8 @@ test("resolveCounterpartyId prefers promisee when present", () => {
   assert.equal(resolveCounterpartyId(record), "creator");
 });
 
-test("resolveCounterpartyId falls back to counterparty_id", () => {
+// The executor is neither the creator nor the counterparty here, so the other side is the creator.
+test("resolveCounterpartyId returns the creator for an executor who is not the creator", () => {
   const record: PromiseParticipants = {
     creator_id: "creator",
     promisor_id: "executor",
@@ -70,7 +71,7 @@ test("resolveCounterpartyId falls back to counterparty_id", () => {
     counterparty_id: "counterparty",
   };
 
-  assert.equal(resolveCounterpartyId(record), "counterparty");
+  assert.equal(resolveCounterpartyId(record), "creator");
 });
 
 test("resolveCounterpartyId mirrors creator when promisor is counterparty", () => {

@@ -141,6 +141,9 @@ class FakeQuery {
   }
 }
 
+// A deadline taken as «now» lands a millisecond before completed_at and makes the promise late at random.
+const DUE_TOMORROW = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
 class FakeAdmin {
   events: ReputationEvent[] = [];
   reputation = new Map<string, ReputationRow>();
@@ -157,7 +160,7 @@ test("reputation applies to executor and is idempotent", async () => {
     title: "Ship feature",
     is_important: false,
     status: "confirmed" as PromiseStatus,
-    due_at: new Date().toISOString(),
+    due_at: DUE_TOMORROW,
     completed_at: new Date().toISOString(),
     creator_id: "creator",
     counterparty_id: "executor",
@@ -203,7 +206,7 @@ test("reputation applies to creator on self deals", async () => {
     title: "Solo work",
     is_important: false,
     status: "confirmed" as PromiseStatus,
-    due_at: new Date().toISOString(),
+    due_at: DUE_TOMORROW,
     completed_at: new Date().toISOString(),
     creator_id: "creator",
     counterparty_id: null,
@@ -244,7 +247,7 @@ test("reputation does not apply when executor is missing", async () => {
     title: "Pending invite",
     is_important: false,
     status: "confirmed" as PromiseStatus,
-    due_at: new Date().toISOString(),
+    due_at: DUE_TOMORROW,
     completed_at: new Date().toISOString(),
     creator_id: "creator",
     counterparty_id: null,
@@ -348,7 +351,7 @@ test("important deals apply stronger reputation impact", async () => {
     title: "Critical launch",
     is_important: true,
     status: "confirmed" as PromiseStatus,
-    due_at: new Date().toISOString(),
+    due_at: DUE_TOMORROW,
     completed_at: new Date().toISOString(),
     creator_id: "creator",
     counterparty_id: "executor",

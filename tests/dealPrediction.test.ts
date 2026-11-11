@@ -55,7 +55,7 @@ test("new user gets moderate score with limited history reason", () => {
   });
 
   assert.equal(result.band, "moderate");
-  assert.ok(result.reasons.some((reason) => reason.includes("limited history")));
+  assert.ok(result.reasonKeys.some((key) => key.includes("limited_history")));
 });
 
 test("shared fulfilled history with same counterparty increases score", () => {
