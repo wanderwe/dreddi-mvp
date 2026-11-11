@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { AppFooter } from "@/app/components/AppFooter";
 import { AppHeader } from "@/app/components/AppHeader";
+import { DeletedAccountGuard } from "@/app/components/DeletedAccountGuard";
 import { DocumentLanguageSync } from "@/app/components/DocumentLanguageSync";
 import { POSITIONING } from "@/lib/features";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
@@ -77,6 +78,7 @@ export default async function LocalizedLayout({
     <I18nProvider locale={locale} messages={messages}>
       <div className="flex min-h-screen flex-col">
         <DocumentLanguageSync locale={locale} />
+        <DeletedAccountGuard />
         <AppHeader />
         <div className="flex-1">{children}</div>
         <AppFooter />

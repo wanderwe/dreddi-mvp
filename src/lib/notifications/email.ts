@@ -312,11 +312,12 @@ export const maybeSendNotificationEmail = async (admin: SupabaseClient, payload:
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("email_notifications_enabled")
+    .select("email_notifications_enabled,deleted_at")
     .eq("id", payload.userId)
-    .maybeSingle();
+    .maybeSingle<{ email_notifications_enabled: boolean | null; deleted_at: string | null }>();
 
-  if (profile?.email_notifications_enabled === false) {
+  // An account waiting for deletion gets no letters, as if notifications were off.
+  if (profile?.email_notifications_enabled === false || profile?.deleted_at) {
     console.info("[notifications] email_skipped", {
       type: payload.type,
       userId: payload.userId,

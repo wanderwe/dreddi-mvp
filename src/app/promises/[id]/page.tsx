@@ -39,6 +39,7 @@ import { expectedAutoConfirmAt } from "@/lib/promises/silenceRules";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
+import { isDeletedAccountId } from "@/lib/account/constants";
 import { toPublicDisplayName } from "@/lib/publicProfileIdentity";
 
 type PromiseRow = {
@@ -565,6 +566,11 @@ export default function PromisePage() {
       try {
         supabase = requireSupabase();
       } catch {
+        return;
+      }
+
+      if (isDeletedAccountId(p.counterparty_id)) {
+        setCounterpartyDisplayName(t("account.deletedAccount"));
         return;
       }
 
@@ -1346,6 +1352,12 @@ export default function PromisePage() {
             handle: profile.handle?.trim() || null,
             isPublicProfile: Boolean(profile.is_public_profile),
           };
+        }
+      }
+      // The side of a deleted account: its profile is private, so name it here.
+      for (const id of participantIds) {
+        if (isDeletedAccountId(id)) {
+          profiles[id] = { label: t("account.deletedAccount"), handle: null, isPublicProfile: false };
         }
       }
       setParticipantProfiles(profiles);

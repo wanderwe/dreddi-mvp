@@ -4,6 +4,18 @@ import { useEffect, useState } from "react";
 import { DreddiLogoMark } from "@/app/components/DreddiLogo";
 import { supabaseOptional as supabase } from "@/lib/supabaseClient";
 
+type SignedInUser = {
+  identities?: Array<{ provider: string; last_sign_in_at?: string | null }> | null;
+};
+
+// The provider of this sign-in is the identity used most recently.
+function signedInWithApple(user: SignedInUser) {
+  const latest = [...(user.identities ?? [])].sort((a, b) =>
+    (b.last_sign_in_at ?? "").localeCompare(a.last_sign_in_at ?? "")
+  )[0];
+  return latest?.provider === "apple";
+}
+
 export default function AuthCallbackPage() {
   const [msg, setMsg] = useState("Signing you in...");
 
@@ -36,9 +48,18 @@ export default function AuthCallbackPage() {
           return;
         }
 
+        // Apple's tokens come only with the code exchange; deleting the account revokes them later.
+        let providerTokens: { refreshToken: string | null; accessToken: string | null } | null = null;
+
         // PKCE flow
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { data: exchanged, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchanged?.session?.provider_refresh_token || exchanged?.session?.provider_token) {
+            providerTokens = {
+              refreshToken: exchanged.session.provider_refresh_token ?? null,
+              accessToken: exchanged.session.provider_token ?? null,
+            };
+          }
           if (error) {
             // "Identity is already linked" means the OAuth succeeded on a previous
             // attempt — treat as success and continue to sync + redirect.
@@ -74,6 +95,17 @@ export default function AuthCallbackPage() {
         // Upsert профілю
         const { upsertProfile } = await import("@/lib/ensureProfile");
         await upsertProfile(data.session.user);
+
+        if (providerTokens && signedInWithApple(data.session.user)) {
+          await fetch("/api/account/apple-token", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${data.session.access_token}`,
+            },
+            body: JSON.stringify(providerTokens),
+          }).catch(() => null);
+        }
 
         // Sync any OAuth social identities (Twitter, LinkedIn) to social_links table
         const { syncSocialLinks } = await import("@/lib/syncSocialLinks");

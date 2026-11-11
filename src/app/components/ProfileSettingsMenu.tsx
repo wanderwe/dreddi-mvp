@@ -9,6 +9,7 @@ import { HelperText } from "@/app/components/ui/HelperText";
 import { IconButton } from "@/app/components/ui/IconButton";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { FeedbackModalTrigger } from "@/app/components/FeedbackModal";
+import { DeleteAccountButton } from "@/app/components/DeleteAccountButton";
 import { SocialLinksSection } from "@/app/components/SocialLinksSection";
 import { ThemeSegment } from "@/app/components/ThemeSwitcher";
 import {
@@ -931,6 +932,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               {logoutError}
             </div>
           )}
+          <DeleteAccountButton disabled={Boolean(authState?.isMock)} />
         </div>
       </div>
 

@@ -1095,6 +1095,27 @@
       }
     }
   },
+  "account": {
+    "deletedAccount": "Deleted account",
+    "delete": {
+      "button": "Delete account",
+      "title": "Delete account?",
+      "body": "Your account will be deleted in 30 days. Until then you can restore it by signing in. After deletion, deals with no other party are removed, and deals with other people show \"Deleted account\" instead of you.",
+      "activeDeals": "Active deals with other people: {count}. They will stay unfinished.",
+      "confirmLabel": "Type DELETE to confirm",
+      "confirmWord": "DELETE",
+      "submit": "Delete account",
+      "cancel": "Cancel",
+      "error": "Couldn't delete the account. Please try again."
+    },
+    "restore": {
+      "title": "Account scheduled for deletion",
+      "body": "Your account will be deleted on {date}. Restore it to keep using Dreddi.",
+      "button": "Restore account",
+      "restored": "Account restored",
+      "error": "Couldn't restore the account. Please try again."
+    }
+  },
   "feedback": {
     "title": "Send feedback",
     "close": "Close feedback form",
