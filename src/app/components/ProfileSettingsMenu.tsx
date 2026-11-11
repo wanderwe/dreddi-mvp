@@ -126,7 +126,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         .from("profiles")
         // Quiet hours columns remain in DB for backwards compatibility (deprecated in MVP).
         .select(
-          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled,deleted_at"
+          "handle,display_name,profile_tags,is_public_profile,push_notifications_enabled,email_notifications_enabled,deadline_reminders_enabled"
         )
         .eq("id", session.user.id)
         .single();
@@ -147,11 +147,17 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
         push_notifications_enabled?: boolean | null;
         email_notifications_enabled?: boolean | null;
         deadline_reminders_enabled?: boolean | null;
-        deleted_at?: string | null;
       } | null;
       // An account waiting for deletion is only restored or left: no settings until then, or turning the
-      // profile public here would put a deleted account back on public pages.
-      if (profileRow?.deleted_at) {
+      // profile public here would put a deleted account back on public pages. Asked apart, so a missing
+      // column grant can't break the settings themselves.
+      const { data: deletion } = await supabase
+        .from("profiles")
+        .select("deleted_at")
+        .eq("id", session.user.id)
+        .maybeSingle<{ deleted_at: string | null }>();
+      if (!active) return;
+      if (deletion?.deleted_at) {
         setDeleted(true);
         setLoading(false);
         return;
