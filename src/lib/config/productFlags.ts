@@ -10,5 +10,4 @@ const parseBooleanFlag = (value: string | undefined, defaultValue: boolean): boo
 
 export const productFlags = {
   showBetaUi: parseBooleanFlag(envFlag, false),
-  collectiveAgreements: parseBooleanFlag(process.env.NEXT_PUBLIC_COLLECTIVE_AGREEMENTS, false),
 } as const;

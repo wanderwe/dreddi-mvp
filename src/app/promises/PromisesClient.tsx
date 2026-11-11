@@ -10,7 +10,6 @@ import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
-import { productFlags } from "@/lib/config/productFlags";
 import { isSelfPromise } from "@/lib/selfPromise";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -52,7 +51,6 @@ type PromiseRow = {
   promisor_id: string | null;
   promisee_id: string | null;
   visibility: "public" | "private" | null;
-  collective_agreement_id: string | null;
   activated_without_counterparty: boolean | null;
   activated_without_counterparty_at: string | null;
 };
@@ -93,7 +91,6 @@ type PromiseRoleBase = Pick<
   | "promisee_id"
   | "counterparty_id"
   | "visibility"
-  | "collective_agreement_id"
   | "activated_without_counterparty"
   | "activated_without_counterparty_at"
 >;
@@ -398,7 +395,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id,counterparty_id"
-        + ",visibility,collective_agreement_id,activated_without_counterparty,activated_without_counterparty_at"
+        + ",visibility,activated_without_counterparty,activated_without_counterparty_at"
       )
       .or(buildBaseFilter(user.id))
       .order("created_at", { ascending: false })
@@ -465,7 +462,7 @@ export default function PromisesClient() {
       .from("promises")
       .select(
         "id,title,is_important,status,due_at,created_at,completed_at,confirmed_at,disputed_at,condition_text,condition_met_at,counterparty_id,counterparty_accepted_at,invite_status,invited_at,accepted_at,declined_at,ignored_at,expires_at,cancelled_at,creator_id,promisor_id,promisee_id"
-        + ",visibility,collective_agreement_id,activated_without_counterparty,activated_without_counterparty_at"
+        + ",visibility,activated_without_counterparty,activated_without_counterparty_at"
       )
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
@@ -731,28 +728,9 @@ export default function PromisesClient() {
     [summaryRows, activeMetricFilter, activeDealTypeFilter, searchQuery]
   );
 
-  // For the creator of a collective agreement, every invited participant gets their
-  // own promise row (all with the same collective_agreement_id, role "counterparty").
-  // Count those as a single entry so totals/tabs reflect "1 agreement", not N invites.
-  const dedupeCollectiveForCount = <
-    T extends { collective_agreement_id: string | null; creator_id: string; role: PromiseRole }
-  >(
-    rowsIn: T[]
-  ): T[] => {
-    if (!userId || !productFlags.collectiveAgreements) return rowsIn;
-    const seen = new Set<string>();
-    return rowsIn.filter((row) => {
-      if (row.collective_agreement_id && row.creator_id === userId && row.role === "counterparty") {
-        if (seen.has(row.collective_agreement_id)) return false;
-        seen.add(row.collective_agreement_id);
-      }
-      return true;
-    });
-  };
-
   const roleCounts = useMemo(
     () =>
-      dedupeCollectiveForCount(filteredSummaryRows).reduce(
+      filteredSummaryRows.reduce(
         (acc, row) => {
           if (row.role === "promisor") acc.promisor += 1;
           else if (row.role === "counterparty") acc.counterparty += 1;
@@ -764,19 +742,6 @@ export default function PromisesClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [filteredSummaryRows, userId]
   );
-
-  const collectiveStatsByAgreementId = useMemo(() => {
-    const map = new Map<string, { total: number; accepted: number }>();
-    if (!userId || !productFlags.collectiveAgreements) return map;
-    for (const row of summaryRows) {
-      if (!row.collective_agreement_id || row.creator_id !== userId || row.role !== "counterparty") continue;
-      const stats = map.get(row.collective_agreement_id) ?? { total: 0, accepted: 0 };
-      stats.total += 1;
-      if (isPromiseAccepted(row)) stats.accepted += 1;
-      map.set(row.collective_agreement_id, stats);
-    }
-    return map;
-  }, [summaryRows, userId]);
 
   const metricFilteredListRowsByTab = useMemo(
     () => ({
@@ -822,7 +787,7 @@ export default function PromisesClient() {
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
     : filteredListRowsByTab[tab];
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const displayRows = useMemo(() => dedupeCollectiveForCount(rows), [rows, userId]);
+  const displayRows = useMemo(() => rows, [rows]);
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
@@ -865,7 +830,7 @@ export default function PromisesClient() {
       : t("promises.empty.filteredDescription");
 
   const overview = useMemo(() => {
-    const total = dedupeCollectiveForCount(summaryRows).length;
+    const total = summaryRows.length;
     const awaitingYou = summaryRows.filter((row) => isAwaitingYourAction(row)).length;
     const awaitingOthers = summaryRows.filter((row) => isAwaitingOthers(row) && !isSelfPromise(row)).length;
 
@@ -1314,56 +1279,6 @@ export default function PromisesClient() {
 
             {!effectiveListLoading &&
               displayRows.map((p) => {
-                const isCollectiveCreatorEntry =
-                  productFlags.collectiveAgreements &&
-                  !!p.collective_agreement_id &&
-                  p.creator_id === userId &&
-                  p.role === "counterparty";
-
-                if (isCollectiveCreatorEntry) {
-                  const stats = collectiveStatsByAgreementId.get(p.collective_agreement_id!) ?? {
-                    total: 1,
-                    accepted: 0,
-                  };
-                  const dealMeta = formatDealMeta(p, locale, dealMetaLabels);
-                  const allAccepted = stats.accepted === stats.total;
-
-                  return (
-                    <div
-                      key={p.collective_agreement_id}
-                      className="group overflow-hidden rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4"
-                    >
-                      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
-                        <div className="min-w-0 flex-1 space-y-1">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <div className="min-w-0 flex-1">
-                              <DealTitleLink
-                                id={p.id}
-                                title={p.title}
-                                href={`/promises/collective/${p.collective_agreement_id}`}
-                              />
-                            </div>
-                          </div>
-                          <div className="text-xs text-tone-400">{dealMeta}</div>
-                        </div>
-
-                        <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
-                          <StatusPill
-                            label={t("collectiveAgreements.summary.progress", {
-                              total: stats.total,
-                              accepted: stats.accepted,
-                            })}
-                            tone={allAccepted ? "success" : "neutral"}
-                            icon={allAccepted ? "check" : "clock"}
-                            marker="icon"
-                            className="shrink-0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
                 const isPromisor = p.role === "promisor";
                 const canReview = p.isReviewer;
                 const acceptedBySecondSide = isPromiseAccepted(p);
@@ -1413,14 +1328,6 @@ export default function PromisesClient() {
                           </div>
                         </div>
                         <div className="text-xs text-tone-400">{dealMeta}</div>
-                        {productFlags.collectiveAgreements && p.collective_agreement_id && (
-                          <LocalizedLink
-                            href={`/promises/collective/${p.collective_agreement_id}`}
-                            className="inline-flex w-fit items-center gap-1 rounded-full border border-accent-300/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs text-accent-200 hover:text-accent-100"
-                          >
-                            {t("collectiveAgreements.badge")}
-                          </LocalizedLink>
-                        )}
                       </div>
 
                       <div className="flex shrink-0 flex-wrap items-center gap-2 text-left text-sm text-tone-200 sm:justify-end lg:self-start">
