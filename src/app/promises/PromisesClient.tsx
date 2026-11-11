@@ -739,8 +739,7 @@ export default function PromisesClient() {
         },
         { promisor: 0, counterparty: 0, uncategorized: [] as string[] }
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filteredSummaryRows, userId]
+    [filteredSummaryRows]
   );
 
   const metricFilteredListRowsByTab = useMemo(
@@ -786,8 +785,7 @@ export default function PromisesClient() {
   const rows = hasAnyFilter
     ? (summaryRowsForCurrentTab as PromiseWithRole[])
     : filteredListRowsByTab[tab];
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const displayRows = useMemo(() => rows, [rows]);
+  const displayRows = rows;
   const availableStatusOptions = useMemo(() => {
     const optionsMap = new Map<StatusFilter, string>();
 
