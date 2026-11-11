@@ -25,7 +25,6 @@ import { requireSupabase } from "@/lib/supabaseClient";
 import { productFlags } from "@/lib/config/productFlags";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { getPromiseLabels } from "@/lib/promiseLabels";
-import { POSITIONING } from "@/lib/features";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { getPromiseInviteStatus } from "@/lib/promiseAcceptance";
 import {
@@ -97,13 +96,13 @@ export default function NewPromisePage() {
   // "pledge" positioning: a promise to yourself has no other side; the creator closes it and it
   // does not count towards reputation, which the form says plainly.
   const [noCounterparty, setNoCounterparty] = useState(false);
-  const selfPromise = POSITIONING === "pledge" && noCounterparty && executor === "me";
+  const selfPromise = noCounterparty && executor === "me";
   // Pledge asks one question, who promises whom, instead of an executor switch plus a self switch:
   // three choices cover every valid pair, and the rest of the form follows from it.
   const promiseKind: "self" | "me" | "other" = selfPromise ? "self" : executor;
   const counterpartyHelper = selfPromise
     ? t("promises.new.fields.counterpartyHelperSelf")
-    : POSITIONING === "pledge" && promiseKind === "me"
+    : promiseKind === "me"
       ? t("promises.new.fields.counterpartyHelperMe")
       : t("promises.new.fields.counterpartyHelper");
   const choosePromiseKind = (kind: "self" | "me" | "other") => {
@@ -1158,58 +1157,13 @@ export default function NewPromisePage() {
           </div>
 
           <div className="grid items-start gap-5 sm:grid-cols-2">
-            {POSITIONING === "pledge" ? (
-              <ChoiceToggle
-                className="sm:col-span-2"
-                label={t("promises.new.fields.promiseKind")}
-                options={(["me", "other", "self"] as const).map((kind) => ({ value: kind, label: t(`promises.new.promiseKind.${kind}`) }))}
-                value={promiseKind}
-                onChange={choosePromiseKind}
-              />
-            ) : (
-            <div className="space-y-2 text-sm text-tone-200 sm:col-span-2">
-              <div className="flex items-center gap-2">
-                <span className="block text-xs uppercase tracking-[0.2em] text-accent-200">
-                  {t("promises.new.fields.executor", { executorRole: promiseLabels.executorRole })}
-                </span>
-                <Tooltip label={t("promises.new.fields.executorHelper")} placement="top">
-                  <span
-                    aria-label={t("promises.new.fields.executorHelper")}
-                    className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100"
-                  >
-                    <Info className="h-3.5 w-3.5" aria-hidden />
-                  </span>
-                </Tooltip>
-              </div>
-              <div className="flex w-full rounded-2xl border border-tone-white/10 bg-tone-white/5 p-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setExecutor("me");
-                    setMultipleParticipants(false);
-                  }}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    executor === "me"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                      : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
-                  }`}
-                >
-                  {t("promises.new.executor.me")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setExecutor("other")}
-                  className={`flex-1 cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                    executor === "other"
-                      ? "bg-emerald-400/90 text-slate-950 shadow shadow-accent-500/20"
-                      : "text-tone-200 hover:bg-tone-white/10 hover:text-accent-100"
-                  }`}
-                >
-                  {t("promises.new.executor.other")}
-                </button>
-              </div>
-            </div>
-            )}
+            <ChoiceToggle
+              className="sm:col-span-2"
+              label={t("promises.new.fields.promiseKind")}
+              options={(["me", "other", "self"] as const).map((kind) => ({ value: kind, label: t(`promises.new.promiseKind.${kind}`) }))}
+              value={promiseKind}
+              onChange={choosePromiseKind}
+            />
 
             {productFlags.collectiveAgreements && executor === "other" && (
               <div className="sm:col-span-2">
@@ -1250,11 +1204,7 @@ export default function NewPromisePage() {
               </span>
               <input
                 className="w-full rounded-xl border border-tone-white/10 bg-tone-white/5 px-4 py-3 text-tone-white outline-none transition focus:border-accent-300/60 focus:ring-2 focus:ring-accent-400/40"
-                placeholder={
-                  POSITIONING === "pledge"
-                    ? t(`promises.new.placeholders.title_${promiseKind}`)
-                    : t("promises.new.placeholders.title", { entityLower: promiseLabels.entityLower })
-                }
+                placeholder={t(`promises.new.placeholders.title_${promiseKind}`)}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -1401,7 +1351,7 @@ export default function NewPromisePage() {
                           htmlFor="counterparty"
                           className="block text-xs uppercase tracking-[0.2em] text-accent-200"
                         >
-                          {POSITIONING === "pledge" && promiseKind !== "self"
+                          {promiseKind !== "self"
                             ? t(`promises.new.fields.counterparty_${promiseKind}`)
                             : t("promises.new.fields.counterparty")}
                         </label>

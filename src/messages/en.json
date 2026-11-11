@@ -3,9 +3,9 @@
     "fulfilled": "Fulfilled"
   },
   "nav": {
-    "myPromises": "Deals",
+    "myPromises": "Promises",
     "publicProfiles": "Public profiles",
-    "newPromise": "New deal",
+    "newPromise": "New promise",
     "login": "Sign in",
     "getStarted": "Get started",
     "logout": "Log out",
@@ -22,7 +22,7 @@
     "create": "Create",
     "createMenu": {
       "label": "Create",
-      "promise": "New deal",
+      "promise": "New promise",
       "dispute": "New dispute"
     },
     "theme": {
@@ -47,18 +47,18 @@
       "brandSuffix": "knows"
     },
     "betaBanner": {
-      "body": "Deals and data created during beta testing will likely not be carried over to the final version",
+      "body": "Promises and data created during beta testing will likely not be carried over to the final version",
       "dismiss": "Dismiss banner"
     },
     "demoDeals": {
       "deal1": {
-        "title": "Help with moving on Saturday"
+        "title": "Nova Energy: 500 charging stations by December"
       },
       "deal2": {
-        "title": "Prepare an investor pitch"
+        "title": "Run a half marathon by April 1"
       },
       "deal3": {
-        "title": "Return $200 by March 1"
+        "title": "Open a tech hub in Vinnytsia by September"
       }
     }
   },
@@ -80,11 +80,11 @@
     "domainsLabel": "Fields of activity",
     "displayNameLabel": "Display name",
     "displayNamePlaceholder": "Enter a name or brand",
-    "displayNameHelper": "This name is shown in public profiles and deals.\nIf left blank, @handle will be shown.",
+    "displayNameHelper": "This name is shown in public profiles and promises.\nIf left blank, @handle will be shown.",
     "handleLabel": "Public handle (profile link)",
     "handlePlaceholder": "your-handle",
     "handleHelper": "Unique identifier used in links and search",
-    "tagsLabel": "Add up to 7 tags that describe the types of deals you make",
+    "tagsLabel": "Add up to 7 tags that describe the types of promises you make",
     "tagsPlaceholder": "e.g. auto-repair, startups, design",
     "tagsHelper": "{count}/{max} tags. Press Enter or comma to add.",
     "tagsAdd": "Add",
@@ -118,28 +118,28 @@
       "hint": "Connecting a social account proves you control it. A verified badge will appear on your public profile."
     },
     "pushLabel": "In-app notifications",
-    "pushDescription": "Notifications about important deal events shown inside the app",
+    "pushDescription": "Notifications about important promise events shown inside the app",
     "emailLabel": "Email notifications",
     "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
-    "deadlineDescription": "When enabled, you receive reminders before a deal with a deadline ends",
+    "deadlineDescription": "When enabled, you receive reminders before a promise with a deadline ends",
     "save": "Save"
   },
   "promises": {
     "entity": {
-      "deal": "Deal"
+      "deal": "Promise"
     },
     "entityLower": {
-      "deal": "deal"
+      "deal": "promise"
     },
     "entityPublic": {
-      "deal": "Public Agreement"
+      "deal": "Public Promise"
     },
     "entityNew": {
-      "deal": "New deal"
+      "deal": "New promise"
     },
     "entityPlural": {
-      "deal": "deals"
+      "deal": "promises"
     },
     "roles": {
       "deal": {
@@ -149,9 +149,9 @@
       }
     },
     "overview": {
-      "title": "Your deals overview",
-      "subtitle": "Deals you’re accountable for and deals others owe you",
-      "cta": "New deal",
+      "title": "Your promises overview",
+      "subtitle": "What you promised yourself, others, and what others promised you",
+      "cta": "New promise",
       "metrics": {
         "total": "Total",
         "awaitingYou": "Awaiting your action",
@@ -160,18 +160,18 @@
     },
     "empty": {
       "title": "Nothing here yet",
-      "globalDescription": "You don’t have any deals yet",
-      "watchingTitle": "You are not following any public agreements yet",
-      "watchingDescription": "Public agreements you follow will appear here",
-      "filteredTitle": "No deals match this filter",
-      "publicFilteredTitle": "No public deals in this filter",
-      "privateFilteredTitle": "No private deals in this filter",
-      "filteredDescription": "Try a different filter to see your deals",
+      "globalDescription": "You don’t have any promises yet",
+      "watchingTitle": "You are not following any public promises yet",
+      "watchingDescription": "Public promises you follow will appear here",
+      "filteredTitle": "No promises match this filter",
+      "publicFilteredTitle": "No public promises in this filter",
+      "privateFilteredTitle": "No private promises in this filter",
+      "filteredDescription": "Try a different filter to see your promises",
       "awaitingYourActionTitle": "You’re all caught up",
-      "awaitingYourActionDescription": "There are no deals waiting for your action right now",
-      "cta": "Create deal",
-      "showAll": "Show all deals",
-      "reputationStakeFilteredTitle": "No reputation stake deals in this filter"
+      "awaitingYourActionDescription": "There are no promises waiting for your action right now",
+      "cta": "Create promise",
+      "showAll": "Show all promises",
+      "reputationStakeFilteredTitle": "No reputation stake promises in this filter"
     },
     "status": {
       "active": "Active",
@@ -217,7 +217,7 @@
           "closed": "Closed invites"
         }
       },
-      "cardLabel": "Deal",
+      "cardLabel": "Promise",
       "dueLabel": "Due",
       "noDeadline": "No deadline",
       "waitingNotePromisor": "You marked this complete. Waiting for the other side.",
@@ -241,11 +241,11 @@
         "forbidden": "Only the side waiting for action can send a reminder",
         "unavailable": "Reminder feature is temporarily unavailable. Please try again later.",
         "invalidState": "Reminders are available only while someone is waiting for action",
-        "acceptedOnly": "Reminders are available only after a deal is accepted",
+        "acceptedOnly": "Reminders are available only after a promise is accepted",
         "last": "Last reminder: {date}",
         "tooltip": "Send a reminder to the other side",
         "tooltipWithLast": "Send a reminder to the other side\nLast reminder: {date}",
-        "participantsInvalid": "Deal participants are invalid",
+        "participantsInvalid": "Promise participants are invalid",
         "createFailed": "Could not create reminder ({detail})",
         "notificationFailed": "Could not dispatch reminder notification ({detail})",
         "unexpected": "Unexpected reminder error ({detail})"
@@ -255,12 +255,13 @@
         "updateFailed": "Failed to update"
       },
       "dealTypeFilter": {
-        "label": "Deal type",
+        "label": "Promise type",
         "options": {
-          "all": "All deals",
+          "all": "All promises",
           "public": "Public",
           "private": "Private",
-          "reputationStake": "Reputation stake"
+          "reputationStake": "Reputation stake",
+          "self": "Promises to yourself"
         }
       }
     },
@@ -294,18 +295,18 @@
       "conditionRejected": "Counter-obligation was rejected",
       "conditionProposedBanner": {
         "title": "Invitee proposed a counter-obligation",
-        "body": "Review the proposed counter-obligation and confirm to activate the deal, or cancel",
+        "body": "Review the proposed counter-obligation and confirm to activate the promise, or cancel",
         "confirm": "Confirm & activate",
-        "cancel": "Cancel deal",
+        "cancel": "Cancel promise",
         "confirming": "Confirming...",
         "cancelling": "Cancelling..."
       },
       "statusActions": "Status actions",
       "primaryActionTitle": "Primary action",
       "toolsTitle": "Links",
-      "historyTitle": "Agreement history",
+      "historyTitle": "Promise history",
       "updates": {
-        "title": "Agreement updates",
+        "title": "Promise updates",
         "add": "Add update",
         "labelPrivate": "Progress update (visible only to participants)",
         "placeholder": "Share a short update on progress, blockers, or next steps"
@@ -356,7 +357,7 @@
       "errors": {
         "unsupportedStatus": "{entity} has an unsupported status value",
         "updateStatus": "Could not update status",
-        "noAccess": "You don’t have access to this agreement or it does not exist",
+        "noAccess": "You don’t have access to this promise or it does not exist",
         "copyClipboard": "Could not copy to clipboard"
       },
       "acceptAction": "Accept",
@@ -368,36 +369,38 @@
       "disputeExplanationLabel": "Dispute explanation",
       "reminderCopy": {
         "label": "Copy reminder text",
-        "tooltip": "Copy messenger reminder text (includes deal link)",
+        "tooltip": "Copy messenger reminder text (includes promise link)",
         "copied": "Reminder copied",
         "copyFailed": "Failed to copy"
       },
       "linkCopy": {
         "label": "Copy direct link",
-        "tooltip": "Copy deal link",
-        "copied": "Deal link copied",
+        "tooltip": "Copy promise link",
+        "copied": "Promise link copied",
         "copyFailed": "Failed to copy link"
       },
       "recreate": {
-        "label": "Recreate deal",
-        "tooltip": "Recreate deal"
+        "label": "Recreate promise",
+        "tooltip": "Recreate promise"
       },
       "roles": {
-        "title": "Agreement roles",
+        "title": "Promise roles",
         "createdBy": "Created by",
         "responsible": "Responsible side",
         "madeTo": "Promise made to",
         "summary": {
-          "invitedSideExecutes": "{responsible} is expected to complete this deal for {recipient}",
-          "invitedSideReceives": "This deal is a promise made by {responsible} to {recipient}"
-        }
+          "invitedSideExecutes": "{responsible} is expected to complete this promise for {recipient}",
+          "invitedSideReceives": "{responsible} makes this promise to {recipient}"
+        },
+        "selfValue": "Yourself",
+        "noOtherSide": "No other side"
       },
       "publicAgreementLink": {
         "title": "Public page",
-        "helper": "A page for monitoring this agreement",
+        "helper": "A page for monitoring this promise",
         "copy": "Copy public link",
         "open": "Open public page",
-        "copied": "Public agreement link copied",
+        "copied": "Public promise link copied",
         "copyFailed": "Failed to copy public link"
       },
       "copyInviteLink": "Copy invite link",
@@ -406,15 +409,16 @@
       "withdrawInviteShort": "Withdraw",
       "activateWithoutCounterparty": "Activate without confirmation",
       "activateWithoutCounterpartyConfirmTitle": "Activate without confirmation?",
-      "activateWithoutCounterpartyConfirmBody": "The agreement will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
-      "activateWithoutCounterpartyHint": "For a public agreement with a group of people, where no one accepts the invite individually",
+      "activateWithoutCounterpartyConfirmBody": "The promise will become active without the other party's confirmation. They can still join later via the invite link. Continue?",
+      "activateWithoutCounterpartyHint": "For a public promise to a group of people, where no one accepts the invite individually",
       "activatedWithoutCounterpartyNote": "Activated without counterparty confirmation",
       "closedWithoutCounterparty": "Closed, counterparty unconfirmed",
       "conditionStatusLabel": "Status",
       "disputeReasonLabel": "Dispute reason",
       "silenceExecutor": "If {name} doesn't answer by {date}, the promise will be counted as kept",
       "silenceReviewer": "If you don't answer by {date}, the promise will be counted as kept",
-      "fromDispute": "Created from the dispute «{question}»"
+      "fromDispute": "Created from the dispute «{question}»",
+      "selfDoneHint": "To count it toward your reputation, show the evidence to Dreddi in Arbitration below"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
@@ -425,7 +429,7 @@
       "cancelled_by_creator": "Withdrawn"
     },
     "confirm": {
-      "back": "Back to deals",
+      "back": "Back to promises",
       "badge": "Review",
       "promiseLabel": "{entity}",
       "dueLabel": "Due",
@@ -481,16 +485,16 @@
     },
     "notDeliveredModal": {
       "title": "Mark as not delivered?",
-      "body": "The executor has not marked the deal as completed after the deadline. Are you sure it was not fulfilled?",
+      "body": "The executor has not marked the promise as completed after the deadline. Are you sure it was not fulfilled?",
       "confirm": "Yes, not delivered",
       "cancel": "Cancel"
     },
     "new": {
-      "title": "Document the {entityLower}",
+      "title": "Record the {entityLower}",
       "subtitle": "Name the {entityLower}, add context, and an optional deadline",
       "prefill": {
-        "loading": "Prefilled from expired deal",
-        "fromExpiredDeal": "Prefilled from expired deal"
+        "loading": "Prefilled from expired promise",
+        "fromExpiredDeal": "Prefilled from expired promise"
       },
       "back": "Back",
       "fields": {
@@ -500,8 +504,8 @@
         "conditionHint": "What is required in return",
         "executor": "{executorRole}",
         "executorHelper": "Choose who is responsible for execution",
-        "counterparty": "Counterparty",
-        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them with a link: you will see it right after creating the deal.",
+        "counterparty": "Other side",
+        "counterpartyHelper": "Start typing @handle or name. If the person is not on Dreddi, invite them with a link: you will see it right after creating the promise.",
         "dueDate": "Due date",
         "dueTime": "Due time",
         "reward": "Reward (optional)",
@@ -509,22 +513,30 @@
         "rewardText": "Reward details (optional)",
         "paymentTerms": "Payment terms (optional)",
         "group": "Group",
-        "settings": "Settings"
+        "settings": "Settings",
+        "promiseKind": "Who promises whom",
+        "counterparty_me": "To whom",
+        "counterparty_other": "Who promises",
+        "counterpartyHelperSelf": "A promise to yourself has no other side: you make it and you keep it",
+        "counterpartyHelperMe": "Start typing @handle or name. If the person is not on Dreddi, invite them with a link: you will see it right after creating the promise. A public promise to a group of people can be activated without the other side accepting it."
       },
       "executor": {
         "me": "Me",
-        "other": "Other person"
+        "other": "Other side"
       },
       "placeholders": {
         "title": "Short {entityLower} description, for example: “Shoot a video by Friday”",
-        "details": "Clarify what is included in this deal (optional)",
+        "details": "Clarify what is included in this promise (optional)",
         "condition": "What is required in return (optional)",
         "counterpartyMe": "@username or name",
         "counterpartyOther": "@username or name",
         "dueDate": "Select date (optional)",
         "rewardAmount": "Reward amount",
         "rewardText": "Describe the reward, deliverable, or scope",
-        "paymentTerms": "Payment terms or milestones"
+        "paymentTerms": "Payment terms or milestones",
+        "title_self": "For example: “Run my first marathon”",
+        "title_me": "For example: “Deliver the project to the client by Friday”",
+        "title_other": "For example: “Pay back the loan by the end of the month”"
       },
       "actions": {
         "addCondition": "+ Add counter-obligation",
@@ -541,15 +553,15 @@
         "label": "Visibility",
         "private": {
           "label": "Private",
-          "helper": "Only participants can see this deal"
+          "helper": "Only participants can see this promise"
         },
         "public": {
-          "label": "Public deal",
+          "label": "Public promise",
           "helper": "Visible on your public profile, demonstrating transparency and reliability."
         }
       },
       "settings": {
-        "title": "Agreement settings",
+        "title": "Promise settings",
         "importance": {
           "title": "Reputation stake",
           "toggle": "Reputation stake",
@@ -564,7 +576,7 @@
         "searching": "Searching users…",
         "noResults": "User not found",
         "inviteByLink": "Invite by link",
-        "inviteByLinkSelected": "This deal will be created with an invite link.",
+        "inviteByLinkSelected": "This promise will be created with an invite link.",
         "inDreddi": "On Dreddi"
       },
       "errors": {
@@ -594,29 +606,37 @@
         "reasons": {
           "strongFulfillmentHistory": "you have a strong fulfillment history",
           "lowFulfillmentHistory": "your low fulfillment history increases risk",
-          "strongCompletionHistory": "you complete deals often, which lowers risk",
-          "lowCompletionHistory": "you rarely complete deals, which increases risk",
+          "strongCompletionHistory": "you complete promises often, which lowers risk",
+          "lowCompletionHistory": "you rarely complete promises, which increases risk",
           "highDisputeRate": "your high dispute rate increases risk",
           "lowDisputeRate": "clean record: no disputes so far",
           "limitedHistory": "your history is limited, so the prediction is less certain",
           "positiveButLimitedHistory": "you have positive history, but there is still limited data",
           "deepSharedHistory": "you have a successful shared history with this person",
-          "someSharedHistory": "you have fulfilled deals together",
-          "newCounterparty": "first deal with this person: no shared history yet",
+          "someSharedHistory": "you have fulfilled promises together",
+          "newCounterparty": "first promise with this person: no shared history yet",
           "counterpartyHighFulfillment": "the other party has a good fulfillment rate",
           "counterpartyLowFulfillment": "the other party has a low fulfillment rate, which increases risk",
           "hasDeadline": "a clear deadline improves clarity",
           "noDeadline": "no deadline makes outcome less clear",
           "shortDeadlineRisk": "short deadline increases risk",
-          "clearDetails": "clear deal details improve clarity",
-          "unclearDetails": "unclear deal details increase ambiguity",
+          "clearDetails": "clear promise details improve clarity",
+          "unclearDetails": "unclear promise details increase ambiguity",
           "publicCommitment": "public commitment adds accountability"
         }
       },
       "group": {
         "none": "No group",
-        "helper": "Optional: attach this deal to a group to view related context together",
+        "helper": "Optional: attach this promise to a group to view related context together",
         "manage": "Manage groups"
+      },
+      "selfPromise": {
+        "inputDisabled": "No other side"
+      },
+      "promiseKind": {
+        "self": "To myself",
+        "me": "I promise someone",
+        "other": "Someone promises me"
       }
     },
     "actionQueue": {
@@ -639,17 +659,17 @@
     "signedIn": "Signed in",
     "guestMode": "Guest mode",
     "heading": {
-      "pending": "Deal invitation",
+      "pending": "Promise invitation",
       "accepted": "This invite has been accepted",
       "acceptedByYou": "Invitation status"
     },
-    "invitedStateTitle": "You’re invited to a deal",
-    "acceptedStateTitle": "You joined this deal",
+    "invitedStateTitle": "You’re invited to a promise",
+    "acceptedStateTitle": "You joined this promise",
     "title": "Join this {entity} on Dreddi",
     "subtitle": "Review the {entityLower} details and your role. If it looks right, accept to continue.",
     "accepted": "This invite was already accepted",
-    "acceptedStateMessage": "This deal has already been accepted",
-    "acceptedStateMessageYou": "You accepted this deal",
+    "acceptedStateMessage": "This promise has already been accepted",
+    "acceptedStateMessageYou": "You accepted this promise",
     "acceptedBy": "Invitation accepted by: {name}",
     "acceptedByLabel": "Accepted by",
     "badge": "{entity} invite",
@@ -657,7 +677,7 @@
     "createdByLabel": "Created by",
     "invitedSideLabel": "Invited side",
     "invitedSidePending": "Not assigned yet",
-    "dealDetailsLabel": "Deal details",
+    "dealDetailsLabel": "Promise details",
     "deadline": "Deadline",
     "publicTag": "Public",
     "publicTooltip": "Shown on public profile",
@@ -697,7 +717,7 @@
     "decline": "Decline",
     "declinedMessage": "You declined this invite",
     "ignoredMessage": "This invite expired without a response",
-    "withdrawnMessage": "This agreement was withdrawn by the creator",
+    "withdrawnMessage": "This promise was withdrawn by the creator",
     "awaitingCounterparty": "Waiting for the other side to respond",
     "publicProposal": {
       "title": "This {entityLower} is PUBLIC",
@@ -724,14 +744,14 @@
     },
     "roleLine": {
       "label": "Your role",
-      "executor": "You are expected to complete this deal",
-      "receiver": "This deal is a promise made to you"
+      "executor": "You are expected to complete this promise",
+      "receiver": "This promise is made to you"
     },
     "acceptCta": "Accept and take responsibility",
-    "acceptDeal": "Accept deal",
+    "acceptDeal": "Accept promise",
     "proposeCondition": "Send proposal",
-    "goToDeal": "Open deal",
-    "viewDeal": "View deal",
+    "goToDeal": "Open promise",
+    "viewDeal": "View promise",
     "creatorShare": {
       "copyInviteLink": "Copy invite link",
       "copySuccess": "Invite link copied",
@@ -743,7 +763,7 @@
   "auth": {
     "login": {
       "eyebrow": "Welcome back",
-      "subtitle": "Sign in to create deals and track reputation",
+      "subtitle": "Sign in to create promises and track reputation",
       "signInCta": "Sign in",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
@@ -763,8 +783,8 @@
   },
   "publicProfile": {
     "backToDirectory": "← Back to public profiles",
-    "confirmed": "Fulfilled deals",
-    "disputed": "Disputed deals",
+    "confirmed": "Fulfilled promises",
+    "disputed": "Disputed promises",
     "loading": "Loading profile…",
     "copyLink": "Copy link",
     "reputationScore": "Reputation score",
@@ -779,29 +799,29 @@
       "lastActivityEmpty": "No activity yet"
     },
     "privacyNote": {
-      "metrics": "Metrics include all finalized agreements. Private agreement details are not shown."
+      "metrics": "Metrics include all finalized promises. Private promise details are not shown."
     },
     "reputationDetails": {
       "title": "Reputation details",
       "expandLabel": "Expand reputation details",
       "collapseLabel": "Collapse reputation details",
-      "empty": "No completed deals yet",
+      "empty": "No completed promises yet",
       "sections": {
         "workedWith": "Worked with",
         "commitments": "Commitments",
         "disputes": "Disputes",
-        "trackRecord": "Deal pace",
+        "trackRecord": "Promise pace",
         "completionRate": "Completion rate",
         "completionReview": "Response"
       },
       "workedWith": {
-        "secondary": "out of {count} closed deals"
+        "secondary": "out of {count} closed promises"
       },
       "commitments": {
         "onTime": "{count} on time"
       },
       "disputes": {
-        "rate": "{rate}% of deals",
+        "rate": "{rate}% of promises",
         "rateLabel": "%"
       },
       "trackRecord": {
@@ -813,7 +833,7 @@
         "breakdown": "{completed} of {total} {label} marked completed"
       },
       "completionReview": {
-        "breakdown": "{responded} of {total} deals confirmed or disputed"
+        "breakdown": "{responded} of {total} promises confirmed or disputed"
       },
       "labels": {
         "people": {
@@ -825,20 +845,20 @@
           "other": "people"
         },
         "deals": {
-          "one": "deal",
-          "other": "deals"
+          "one": "promise",
+          "other": "promises"
         },
         "acceptedDeals": {
-          "one": "accepted deal",
-          "other": "accepted deals"
+          "one": "accepted promise",
+          "other": "accepted promises"
         },
         "fulfilledDeals": {
-          "one": "confirmed deal",
-          "other": "confirmed deals"
+          "one": "confirmed promise",
+          "other": "confirmed promises"
         },
         "dealsPace": {
-          "one": "deal",
-          "other": "deals"
+          "one": "promise",
+          "other": "promises"
         },
         "deadlines": {
           "one": "deadline",
@@ -857,17 +877,17 @@
     "sections": {
       "responsibilityStatus": "Responsibility status",
       "trackRecord": "Track record",
-      "publicDeals": "Public deals",
-      "network": "Public agreement network"
+      "publicDeals": "Public promises",
+      "network": "Public promise network"
     },
     "graph": {
       "legend": {
-        "fulfilled": "Fulfilled deals",
+        "fulfilled": "Fulfilled promises",
         "disputed": "Disputed",
-        "nodeSize": "Node size = deal count"
+        "nodeSize": "Node size = promise count"
       },
       "tooltip": {
-        "dealsTotal": "deals total",
+        "dealsTotal": "promises total",
         "active": "active",
         "fulfilled": "fulfilled",
         "disputed": "disputed",
@@ -896,8 +916,8 @@
     "emptyAwaitingAcceptance": "Nothing is awaiting acceptance",
     "emptyOverdue": "No overdue responsibilities",
     "emptyHistory": "No history yet",
-    "emptyPublicDeals": "No public deals yet",
-    "emptyPublicDealsByRole": "No public agreements in this role",
+    "emptyPublicDeals": "No public promises yet",
+    "emptyPublicDealsByRole": "No public promises in this role",
     "publicDealsTabs": {
       "execution": "I deliver ({count})",
       "reaction": "For me ({count})"
@@ -911,8 +931,8 @@
     },
     "streak": {
       "title": "Streak: {count}",
-      "zero": "Start fulfilling agreements in a row as responsible side to launch your streak",
-      "nonZero": "{count} agreements fulfilled in a row as responsible side"
+      "zero": "Start fulfilling promises in a row as responsible side to launch your streak",
+      "nonZero": "{count} promises fulfilled in a row as responsible side"
     },
     "copyEmbedCode": "Copy embed code",
     "embed": {
@@ -947,7 +967,7 @@
   "notifications": {
     "header": {
       "title": "Your notifications",
-      "subtitle": "Everything happening with your agreements"
+      "subtitle": "Everything happening with your promises"
     },
     "loading": "Loading notifications…",
     "empty": "No notifications yet",
@@ -959,137 +979,137 @@
     },
     "types": {
       "accepted": {
-        "title": "Deal accepted",
-        "description": "The other party accepted the deal.",
+        "title": "Promise accepted",
+        "description": "The other party accepted the promise.",
         "cta": "Open"
       },
       "invite": {
-        "title": "New deal invitation",
+        "title": "New promise invitation",
         "description": "Confirm only if you’re ready to take responsibility",
         "cta": "Review"
       },
       "invite_followup": {
-        "title": "Deal confirmed",
+        "title": "Promise confirmed",
         "description": "Responsibility is now active",
         "cta": "Open"
       },
       "invite_withdrawn": {
-        "title": "Agreement withdrawn",
-        "description": "The agreement was withdrawn by the creator before acceptance",
+        "title": "Promise withdrawn",
+        "description": "The promise was withdrawn by the creator before acceptance",
         "cta": "View"
       },
       "marked_completed": {
         "title": "Action needed",
-        "description": "Deal marked completed, confirm or dispute",
+        "description": "Promise marked completed, confirm or dispute",
         "cta": "Review"
       },
       "confirmed": {
         "title": "Outcome fulfilled",
-        "description": "The other party marked the deal as fulfilled. Review the outcome details.",
+        "description": "The other party marked the promise as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "disputed": {
         "title": "Outcome disputed",
-        "description": "The deal was disputed, check details",
+        "description": "The promise was disputed, check details",
         "cta": "View"
       },
       "reminder_due_24h": {
         "title": "Deadline approaching",
-        "description": "The due date is within 24 hours. Check the deal details and plan completion.",
+        "description": "The due date is within 24 hours. Check the promise details and plan completion.",
         "cta": "View"
       },
       "reminder_deadline": {
         "title": "Deadline passed",
-        "description": "The deadline has passed. Review the agreement and complete the needed actions.",
+        "description": "The deadline has passed. Review the promise and complete the needed actions.",
         "cta": "Open"
       },
       "reminder_manual": {
         "title": "Reminder",
-        "description": "Review the agreement and complete the needed actions, if relevant",
+        "description": "Review the promise and complete the needed actions, if relevant",
         "cta": "Open"
       },
       "reminder_overdue": {
-        "title": "Deal is overdue",
-        "description": "The due date has passed. Review the deal and mark it completed if it’s done.",
+        "title": "Promise is overdue",
+        "description": "The due date has passed. Review the promise and mark it completed if it’s done.",
         "cta": "Open"
       },
       "due_soon": {
         "title": "Deadline approaching",
-        "description": "The due date is within 24 hours. Check the deal details and plan completion.",
+        "description": "The due date is within 24 hours. Check the promise details and plan completion.",
         "cta": "View"
       },
       "overdue": {
-        "title": "Deal is overdue",
-        "description": "The due date has passed. Review the deal and mark it completed if it’s done.",
+        "title": "Promise is overdue",
+        "description": "The due date has passed. Review the promise and mark it completed if it’s done.",
         "cta": "Open"
       },
       "completion_waiting": {
         "title": "Action needed",
-        "description": "Deal marked completed, confirm or dispute",
+        "description": "Promise marked completed, confirm or dispute",
         "cta": "Review"
       },
       "completion_followup": {
         "title": "Outcome fulfilled",
-        "description": "The other party marked the deal as fulfilled. Review the outcome details.",
+        "description": "The other party marked the promise as fulfilled. Review the outcome details.",
         "cta": "View"
       },
       "dispute": {
         "title": "Outcome disputed",
-        "description": "The deal was disputed, check details",
+        "description": "The promise was disputed, check details",
         "cta": "View"
       },
       "public_agreement_accepted": {
-        "title": "Public agreement accepted",
-        "description": "The public agreement was accepted by the responsible side",
+        "title": "Public promise accepted",
+        "description": "The public promise was accepted by the responsible side",
         "cta": "Open"
       },
       "public_agreement_completed": {
         "title": "Completion reported",
-        "description": "The responsible side marked the agreement as completed",
+        "description": "The responsible side marked the promise as completed",
         "cta": "Review"
       },
       "public_agreement_fulfilled": {
-        "title": "Agreement fulfilled",
-        "description": "The agreement was fulfilled",
+        "title": "Promise fulfilled",
+        "description": "The promise was fulfilled",
         "cta": "Open"
       },
       "public_agreement_disputed": {
-        "title": "Agreement disputed",
-        "description": "The agreement was disputed",
+        "title": "Promise disputed",
+        "description": "The promise was disputed",
         "cta": "Review"
       },
       "public_agreement_updated": {
         "title": "New public update added",
-        "description": "Check the latest public update in this agreement",
+        "description": "Check the latest public update in this promise",
         "cta": "Open"
       },
       "public_agreement_deadline": {
-        "title": "Public agreement deadline reached",
-        "description": "The agreement deadline has been reached",
+        "title": "Public promise deadline reached",
+        "description": "The promise deadline has been reached",
         "cta": "Open"
       },
       "agreement_updated": {
-        "title": "New agreement update",
-        "description": "The other side added an update to this agreement",
+        "title": "New promise update",
+        "description": "The other side added an update to this promise",
         "cta": "Open"
       },
       "deadline_passed": {
         "title": "Deadline passed",
-        "description": "The deadline has passed. Review the agreement and complete the needed actions.",
+        "description": "The deadline has passed. Review the promise and complete the needed actions.",
         "cta": "Open"
       },
       "counter_condition_proposed": {
         "title": "Counter-obligation proposed",
-        "description": "Review and confirm or cancel the agreement.",
+        "description": "Review and confirm or cancel the promise.",
         "cta": "Review"
       },
       "counter_condition_confirmed": {
         "title": "Counter-obligation confirmed",
-        "description": "The agreement is now active.",
+        "description": "The promise is now active.",
         "cta": "Open"
       },
       "counter_condition_rejected": {
-        "title": "Agreement cancelled",
+        "title": "Promise cancelled",
         "description": "The creator did not accept your obligation.",
         "cta": "Open"
       }
@@ -1100,8 +1120,8 @@
     "delete": {
       "button": "Delete account",
       "title": "Delete account?",
-      "body": "Your account will be deleted in 30 days. Until then you can restore it by signing in. After deletion, deals with no other party are removed, and deals with other people show \"Deleted account\" instead of you.",
-      "activeDeals": "Active deals with other people: {count}. They will stay unfinished.",
+      "body": "Your account will be deleted in 30 days. Until then you can restore it by signing in. After deletion, promises with no other party are removed, and promises with other people show \"Deleted account\" instead of you.",
+      "activeDeals": "Active promises with other people: {count}. They will stay unfinished.",
       "confirmLabel": "Type DELETE to confirm",
       "confirmWord": "DELETE",
       "submit": "Delete account",
@@ -1144,15 +1164,15 @@
   },
   "groups": {
     "detailEyebrow": "Group",
-    "title": "Deal groups",
-    "subtitle": "Keep related deals together: by project, client or team",
-    "backToDeal": "Back to deal draft",
+    "title": "Promise groups",
+    "subtitle": "Keep related promises together: by project, person or goal",
+    "backToDeal": "Back to promise draft",
     "back": "Back to groups",
     "loading": "Loading groups…",
-    "dealsTitle": "Deals in this group",
-    "dealsEmpty": "No deals in this group yet",
+    "dealsTitle": "Promises in this group",
+    "dealsEmpty": "No promises in this group yet",
     "deals": {
-      "menu": "Deal actions",
+      "menu": "Promise actions",
       "unlink": "Unlink",
       "unlinking": "Unlinking…"
     },
@@ -1160,19 +1180,19 @@
       "menu": "Group actions"
     },
     "attachExisting": {
-      "title": "Add an existing deal",
-      "hint": "Choose one of your previously created deals and attach it to this group",
-      "empty": "No available deals to add",
-      "selectPlaceholder": "Select deal",
-      "searchPlaceholder": "Search by deal title",
-      "noMatches": "No deals found",
+      "title": "Add an existing promise",
+      "hint": "Choose one of your previously created promises and attach it to this group",
+      "empty": "No available promises to add",
+      "selectPlaceholder": "Select promise",
+      "searchPlaceholder": "Search by promise title",
+      "noMatches": "No promises found",
       "submit": "Add to group",
       "attaching": "Adding…"
     },
     "delete": {
       "action": "Delete group",
       "deleting": "Deleting…",
-      "confirm": "Delete group \"{title}\"? All deals will be unlinked from this group.",
+      "confirm": "Delete group \"{title}\"? All promises will be unlinked from this group.",
       "cancel": "Cancel",
       "confirmAction": "Delete"
     },
@@ -1188,10 +1208,10 @@
     },
     "list": {
       "title": "Your groups ({count})",
-      "dealCount": "{count} deals"
+      "dealCount": "{count} promises"
     },
     "summary": {
-      "total": "Total deals: {count}",
+      "total": "Total promises: {count}",
       "awaitingAcceptance": "Awaiting acceptance: {count}",
       "active": "Active: {count}",
       "awaitingReview": "Awaiting review: {count}",
@@ -1207,15 +1227,15 @@
       "notFound": "Group not found or unavailable"
     },
     "emptyTitle": "No groups yet",
-    "emptyDescription": "Create your first group above to keep related agreements in one list"
+    "emptyDescription": "Create your first group above to keep related promises in one list"
   },
   "collectiveAgreements": {
     "new": {
-      "title": "New collective agreement",
-      "subtitle": "Describe the commitment and pick participants: each one gets their own copy of the agreement",
+      "title": "New collective promise",
+      "subtitle": "Describe the commitment and pick participants: each one gets their own copy of the promise",
       "toggle": {
         "label": "Invite multiple participants",
-        "helper": "Each participant will get their own copy of the agreement to accept"
+        "helper": "Each participant will get their own copy of the promise to accept"
       },
       "fields": {
         "title": "Title",
@@ -1247,37 +1267,37 @@
           "helper": "Has a bigger impact on reputation after confirmation or a dispute"
         },
         "visibility": {
-          "label": "Public agreement",
+          "label": "Public promise",
           "helper": "When enabled, each participant's copy will appear on their public profile"
         }
       },
-      "submit": "Create collective agreement",
+      "submit": "Create collective promise",
       "creating": "Creating…",
       "errors": {
         "titleRequired": "Title is required",
         "participantsRequired": "Add at least one participant",
-        "createFailed": "Could not create the collective agreement",
+        "createFailed": "Could not create the collective promise",
         "network": "Network issue. Please try again."
       }
     },
     "detail": {
-      "back": "Back to deals",
+      "back": "Back to promises",
       "loading": "Loading…",
-      "notFound": "Collective agreement not found or unavailable",
+      "notFound": "Collective promise not found or unavailable",
       "roster": "Participants ({count})",
-      "yourCopy": "Your copy of the agreement",
-      "viewDeal": "View deal →",
+      "yourCopy": "Your copy of the promise",
+      "viewDeal": "View promise →",
       "createdAt": "Created {date}"
     },
-    "badge": "Part of a collective agreement",
+    "badge": "Part of a collective promise",
     "summary": {
-      "title": "Agreement · {title}",
+      "title": "Promise · {title}",
       "progress": "Participants: {total} · accepted: {accepted}"
     }
   },
   "publicAgreement": {
-    "loading": "Loading public agreement…",
-    "notPublicTitle": "Agreement is not public",
+    "loading": "Loading public promise…",
+    "notPublicTitle": "Promise is not public",
     "reputationStake": "Reputation stake",
     "deadline": "Deadline: {date}",
     "copyLink": "Copy link",
@@ -1285,8 +1305,8 @@
     "copied": "Link copied",
     "embedCodeCopied": "Embed code copied",
     "copyFailed": "Copy failed",
-    "whatAgreed": "What was agreed",
-    "noDetails": "The agreement text is captured in the title",
+    "whatAgreed": "What was promised",
+    "noDetails": "The promise text is captured in the title",
     "flowTitle": "Status flow",
     "status": {
       "active": "Active",
@@ -1303,8 +1323,10 @@
       "title": "Participants",
       "createdBy": "Created by",
       "acceptedBy": "Responsible side",
-      "creatorFallback": "Agreement creator",
-      "counterpartyFallback": "Responsible side"
+      "creatorFallback": "Promise creator",
+      "counterpartyFallback": "Responsible side",
+      "promisedTo": "Promised to",
+      "self": "Themselves"
     },
     "flow": {
       "created": "Created",
@@ -1317,38 +1339,38 @@
     "timeline": {
       "title": "Public timeline",
       "system": "Dreddi",
-      "created": "Agreement created",
-      "createdDescription": "The commitment was recorded as a public agreement",
+      "created": "Promise created",
+      "createdDescription": "The commitment was recorded as a public promise",
       "createdDescriptionPrivate": "The commitment was recorded",
-      "accepted": "Agreement accepted",
-      "acceptedDescription": "Invite accepted, the agreement is in progress",
+      "accepted": "Promise accepted",
+      "acceptedDescription": "Invite accepted, the promise is in progress",
       "completed": "Marked as completed",
       "completedDescription": "The responsible side reported that the commitment was fulfilled",
-      "confirmed": "Agreement fulfilled",
-      "confirmedDescription": "The outcome was recorded as a fulfilled agreement",
-      "disputed": "Agreement disputed",
+      "confirmed": "Promise fulfilled",
+      "confirmedDescription": "The outcome was recorded as a fulfilled promise",
+      "disputed": "Promise disputed",
       "disputedDescription": "The outcome was marked as disputed",
-      "declined": "Agreement declined",
-      "cancelled": "Agreement cancelled",
+      "declined": "Promise declined",
+      "cancelled": "Promise cancelled",
       "counterConditionProposed": "Counter-obligation proposed",
       "counterConditionConfirmed": "Counter-obligation confirmed",
-      "counterConditionConfirmedDescription": "The agreement creator confirmed the counter-obligation",
+      "counterConditionConfirmedDescription": "The promise creator confirmed the counter-obligation",
       "counterConditionRejected": "Counter-obligation declined",
-      "counterConditionRejectedDescription": "The agreement creator declined the proposed counter-obligation",
+      "counterConditionRejectedDescription": "The promise creator declined the proposed counter-obligation",
       "counterConditionMet": "Counter-obligation fulfilled",
       "counterConditionMetDescription": "The counter-obligation was marked as fulfilled",
       "expired": "Invitation expired",
       "activatedWithoutCounterparty": "Activated without other party",
-      "activatedWithoutCounterpartyDescription": "The agreement was activated without the other party's confirmation. They can still join later via the invite link.",
+      "activatedWithoutCounterpartyDescription": "The promise was activated without the other party's confirmation. They can still join later via the invite link.",
       "update": "Update",
-      "updateAuthorFallback": "Agreement participant",
+      "updateAuthorFallback": "Promise participant",
       "confirmedBySilence": "Counted without an answer",
       "confirmedBySilenceDescription": "The other side neither confirmed nor disputed in 14 days"
     },
     "errors": {
       "supabase": "Supabase is not configured in this preview",
-      "load": "Could not load this public agreement",
-      "notPublic": "This agreement is not public or does not exist"
+      "load": "Could not load this public promise",
+      "notPublic": "This promise is not public or does not exist"
     },
     "awaitingAcceptanceNote": "The invite has not been accepted yet",
     "updates": {
@@ -1359,15 +1381,15 @@
       "cancel": "Cancel",
       "publish": "Publish update",
       "saving": "Publishing…",
-      "error": "Could not publish this update. Only agreement participants can add official updates.",
+      "error": "Could not publish this update. Only promise participants can add official updates.",
       "unavailable": "Updates are currently unavailable"
     },
     "follow": "Watch",
     "following": "Watching",
     "unfollowHint": "Unfollow",
-    "unfollowTooltip": "Stop watching this public agreement",
+    "unfollowTooltip": "Stop watching this public promise",
     "followersCount": "{count} following",
-    "followTooltip": "Watch this public agreement to monitor status changes and the final outcome",
+    "followTooltip": "Watch this public promise to monitor status changes and the final outcome",
     "dreddi": {
       "title": "Dreddi's ruling",
       "verdict": {
@@ -1384,17 +1406,17 @@
     }
   },
   "watching": {
-    "title": "Agreements you follow",
-    "subtitle": "Other people’s public agreements: status and outcome in one place",
+    "title": "Promises you follow",
+    "subtitle": "Other people’s public promises: status and outcome in one place",
     "status": "Status",
     "deadline": "Deadline",
     "loadMore": "Load more",
     "loadingMore": "Loading…"
   },
   "agreementEmbed": {
-    "badge": "Public agreement",
-    "cta": "View agreement",
-    "unavailable": "This public agreement is unavailable",
+    "badge": "Public promise",
+    "cta": "View promise",
+    "unavailable": "This public promise is unavailable",
     "watching": "watching",
     "deadline": "Deadline",
     "noDeadline": "No deadline",
@@ -1405,8 +1427,8 @@
     "liveNote": "Public status updates in Dreddi"
   },
   "dealsTabs": {
-    "label": "Deal sections",
-    "mine": "My deals"
+    "label": "Promise sections",
+    "mine": "My promises"
   },
   "arbitration": {
     "title": "Arbitration",
@@ -1454,17 +1476,17 @@
       "changedAfterApproval": "The criteria changed after you approved them: approve the new version or write what is wrong"
     },
     "ruling": {
-      "pending": "The ruling «{verdict}» takes effect when both sides accept it. Then the agreement status changes.",
+      "pending": "The ruling «{verdict}» takes effect when both sides accept it. Then the promise status changes.",
       "hint": "Disagree? Write to Dreddi below why, with evidence. A new message is an appeal, and Dreddi will review the case.",
       "accepted": "accepted ✓",
       "accept": "I accept the ruling",
-      "binding": "The ruling has taken effect.{how} Agreement status: «{status}».",
+      "binding": "The ruling has taken effect.{how} Promise status: «{status}».",
       "bindingAccepted": " Both sides accepted it.",
       "bindingSilence": " Nobody appealed."
     },
     "approvedCriteria": "I approve the criteria",
     "acceptedRuling": "I accept the ruling",
-    "closed": "The case is closed: the agreement status is final",
+    "closed": "The case is closed: the promise status is final",
     "placeholder": {
       "ruling": "Disagree with the ruling? Write why and add evidence",
       "criteria": "Disagree with the criteria? Write what to change",

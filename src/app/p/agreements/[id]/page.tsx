@@ -17,7 +17,6 @@ import type { PromiseStatus } from "@/lib/promiseStatus";
 import { getPromiseUiStatus } from "@/lib/promiseUiStatus";
 import { isAgreementLiveStatus } from "@/lib/agreementLiveState";
 import { caseNumber } from "@/lib/ai/caseNumber";
-import { POSITIONING } from "@/lib/features";
 import { supabaseOptional } from "@/lib/supabaseClient";
 import type { PromiseUiStatus } from "@/lib/promiseUiStatus";
 
@@ -476,7 +475,7 @@ export default function PublicAgreementPage() {
     : [];
 
   // A promise to yourself has nobody to accept it.
-  const isSelf = Boolean(POSITIONING === "pledge" && agreement?.is_self_promise);
+  const isSelf = Boolean(agreement?.is_self_promise);
   const flowStates = (agreement ? getFlowStates(agreement, t) : []).filter(
     (state) => !(isSelf && state.key === "accepted")
   );

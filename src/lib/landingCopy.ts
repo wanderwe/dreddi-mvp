@@ -1,4 +1,3 @@
-import { POSITIONING } from "@/lib/features";
 import { Locale, defaultLocale } from "@/lib/i18n/locales";
 export type LandingCopy = {
   hero: {
@@ -79,14 +78,14 @@ export type LandingCopy = {
   };
 };
 
+// The homepage, told around promises. The earlier «Угоди» version's texts are in docs/obsolete-copy.md.
 export const landingCopy: Record<Locale, LandingCopy> = {
   uk: {
     hero: {
       eyebrow: "Легкий трекер домовленостей",
-      headline: "Домовленість починається з підтвердження",
-      description:
-        "Фіксуйте угоди з друзями, партнерами чи клієнтами.\n\nПросто: публічно або приватно. Без контрактів і без тиску.\n\nЛише з видимими наслідками для репутації.",
-      whyLink: "Чому існує Dreddi →",
+      headline: "Пообіцяв? Dreddi знає",
+      description: "Тримай слово перед іншими й перед собою.\nФіксуй обіцянки і ставки в суперечках. Кожна виконана додає до репутації, якій довіряють.",
+      whyLink: "Чому Dreddi →"
     },
     useDreddi: {
       label: "Сценарії використання",
@@ -95,7 +94,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Ви погодили дедлайни, але нічого не підписано",
         "На кону гроші, час або репутація",
         "Ви чуєте «давайте поки просто домовимось»",
-        "Ви ще не хочете юристів — але й хаосу теж",
+        "Ви ще не хочете юристів — але й хаосу теж"
       ],
       scenariosTitle: "Типові сценарії",
       scenarios: [
@@ -103,11 +102,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Партнерства на ранніх етапах",
         "Переговори з нерухомості",
         "Підрядники та довгі проєкти",
-        "Пілотні проєкти / тестова співпраця",
+        "Пілотні проєкти / тестова співпраця"
       ],
       noteTitle: "Не для всього",
-      framing:
-        "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова",
+      framing: "Для домовленостей, де ще рано для контрактів, але вже ризиковано покладатися лише на слова"
     },
     reputation: {
       label: "Результат",
@@ -115,73 +113,72 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       steps: [
         "Домовленість фіксується в Dreddi",
         "Виконання підтверджують обидві сторони",
-        "Підтвердження формують репутаційний бал",
+        "Підтвердження формують репутаційний бал"
       ],
       outcomeTitle: "Публічний профіль",
       outcomeDescription: "Відображає дотримані та оскаржені угоди",
-      cta: "Переглянути приклад профілю",
+      cta: "Переглянути приклад профілю"
     },
     cta: {
-      getStarted: "Створити угоду",
+      getStarted: "Зафіксувати обіцянку",
       publicProfiles: "Переглянути профілі",
-      createPromise: "Створити угоду",
-      reviewDeals: "Переглянути угоди",
+      createPromise: "Зафіксувати обіцянку",
+      reviewDeals: "Мої обіцянки"
     },
     loading: {
       session: "Завантажуємо вашу сесію…",
       short: "Завантаження…",
-      placeholder: "…",
+      placeholder: "…"
     },
     errors: {
       userSession: "Не вдалося завантажити сесію користувача",
       notAuthenticated: "Не автентифіковано",
-      reputation: "Не вдалося завантажити репутацію",
+      reputation: "Не вдалося завантажити репутацію"
     },
     score: {
       label: "Репутаційний бал",
       shortLabel: "Репутація",
-      overviewLabel: "Огляд домовленостей",
+      overviewLabel: "Огляд обіцянок",
       live: "Наживо",
       signIn: "Увійдіть, щоб бачити оновлення",
       demoBadge: "Приклад профілю",
       cards: {
         confirmed: "Дотримано",
-        disputed: "Оскаржено",
+        disputed: "Оскаржено"
       },
       onTime: {
         label: "Вчасні виконання",
         helper: "Тут враховуються лише дотримані угоди зі строком",
-        empty: "Ще немає даних",
-      },
+        empty: "Ще немає даних"
+      }
     },
     recentDeals: {
-      title: "Останні угоди",
-      demoTitle: "Останні угоди",
+      title: "Останні обіцянки",
+      demoTitle: "Останні обіцянки",
       seeAll: "Переглянути всі",
-      empty: "У вас поки що немає жодної угоди",
+      empty: "У вас поки що немає жодної обіцянки",
       sentiment: {
         positive: "Позитивно",
-        negative: "Негативно",
+        negative: "Негативно"
       },
-      eventFallbackTitle: "Угода",
-      placeholderMetaDue: (date) => `Строк ${date}`,
-      placeholderMetaCreated: (date) => `Створено ${date}`,
+      eventFallbackTitle: "Обіцянка",
+      placeholderMetaDue: (date: string) => `Строк ${date}`,
+      placeholderMetaCreated: (date: string) => `Створено ${date}`,
       status: {
         active: "Активна",
         completedByPromisor: "Очікує перегляду",
         confirmed: "Дотримано",
         disputed: "Оскаржено",
-        declined: "Відхилено",
-      },
-    },
+        declined: "Відхилено"
+      }
+    }
   },
   en: {
     hero: {
       eyebrow: "A lightweight deal tracker",
-      headline: "An agreement starts with confirmation",
-      description:
-        "Record deals with friends, partners and clients.\n\nSimple, public or private. No contracts, no pressure.\n\nJust visible consequences for reputation.",
-      whyLink: "Why Dreddi exists →",
+      headline: "Promised? Dreddi knows",
+      description: "Keep your word to others and to yourself.\nRecord your promises and dispute stakes. Every one you keep adds to a reputation people trust.",
+      whyLink: "Why Dreddi →"
     },
     useDreddi: {
       label: "Use cases",
@@ -190,7 +187,7 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "You agree on deadlines, but nothing is signed yet",
         "Money, time, or reputation is at stake",
         "You hear “let’s just agree for now”",
-        "You don’t want lawyers yet — but don’t want chaos either",
+        "You don’t want lawyers yet — but don’t want chaos either"
       ],
       scenariosTitle: "Typical scenarios",
       scenarios: [
@@ -198,11 +195,10 @@ export const landingCopy: Record<Locale, LandingCopy> = {
         "Early-stage partnerships",
         "Real estate negotiations",
         "Contractors & long-term jobs",
-        "Pilot projects / test collaborations",
+        "Pilot projects / test collaborations"
       ],
       noteTitle: "Not for everything",
-      framing:
-        "For agreements where it’s too early for contracts but already risky to rely on words",
+      framing: "For agreements where it’s too early for contracts but already risky to rely on words"
     },
     reputation: {
       label: "Outcome",
@@ -210,126 +206,66 @@ export const landingCopy: Record<Locale, LandingCopy> = {
       steps: [
         "The agreement is recorded in Dreddi",
         "Both sides confirm the outcome",
-        "Confirmations build the reputation score",
+        "Confirmations build the reputation score"
       ],
       outcomeTitle: "Public profile",
       outcomeDescription: "Shows fulfilled and disputed deals",
-      cta: "View example profile",
+      cta: "View example profile"
     },
     cta: {
-      getStarted: "Create a deal",
+      getStarted: "Record a promise",
       publicProfiles: "Browse profiles",
-      createPromise: "Create a deal",
-      reviewDeals: "View deals",
+      createPromise: "Record a promise",
+      reviewDeals: "My promises"
     },
     loading: {
       session: "Loading your session…",
       short: "Loading…",
-      placeholder: "…",
+      placeholder: "…"
     },
     errors: {
       userSession: "We couldn’t load your user session",
       notAuthenticated: "Not authenticated",
-      reputation: "We couldn’t load reputation",
+      reputation: "We couldn’t load reputation"
     },
     score: {
       label: "Reputation score",
       shortLabel: "Reputation",
-      overviewLabel: "Agreement Snapshot",
+      overviewLabel: "Promises overview",
       live: "Live",
       signIn: "Sign in to see updates",
       demoBadge: "Demo profile",
       cards: {
         confirmed: "Fulfilled",
-        disputed: "Disputed",
+        disputed: "Disputed"
       },
       onTime: {
         label: "On-time outcomes",
         helper: "Only fulfilled deals with a due date count here",
-        empty: "No data yet",
-      },
+        empty: "No data yet"
+      }
     },
     recentDeals: {
-      title: "Recent deals",
-      demoTitle: "Recent deals",
+      title: "Recent promises",
+      demoTitle: "Recent promises",
       seeAll: "View all",
-      empty: "You don't have any deals yet",
+      empty: "You don't have any promises yet",
       sentiment: {
         positive: "Positive",
-        negative: "Negative",
+        negative: "Negative"
       },
-      eventFallbackTitle: "Deal",
-      placeholderMetaDue: (date) => `Due ${date}`,
-      placeholderMetaCreated: (date) => `Created ${date}`,
+      eventFallbackTitle: "Promise",
+      placeholderMetaDue: (date: string) => `Due ${date}`,
+      placeholderMetaCreated: (date: string) => `Created ${date}`,
       status: {
         active: "Active",
         completedByPromisor: "Awaiting review",
         confirmed: "Fulfilled",
         disputed: "Disputed",
-        declined: "Declined",
-      },
-    },
-  },
+        declined: "Declined"
+      }
+    }
+  }
 };
 
-// "pledge" positioning (the default): the same page told around promises.
-const withPledge = (base: LandingCopy, pledge: {
-  hero: Pick<LandingCopy["hero"], "headline" | "description" | "whyLink">;
-  cta: Pick<LandingCopy["cta"], "getStarted" | "createPromise" | "reviewDeals">;
-  overviewLabel: string;
-  recentDeals: Pick<LandingCopy["recentDeals"], "title" | "demoTitle" | "empty" | "eventFallbackTitle">;
-}): LandingCopy => ({
-  ...base,
-  hero: { ...base.hero, ...pledge.hero },
-  cta: { ...base.cta, ...pledge.cta },
-  score: { ...base.score, overviewLabel: pledge.overviewLabel },
-  recentDeals: { ...base.recentDeals, ...pledge.recentDeals },
-});
-
-const pledgeCopy: Record<Locale, LandingCopy> = {
-  uk: withPledge(landingCopy.uk, {
-    hero: {
-      headline: "Пообіцяв? Dreddi знає",
-      description:
-        "Тримай слово перед іншими й перед собою.\nФіксуй обіцянки і ставки в суперечках. Кожна виконана додає до репутації, якій довіряють.",
-      whyLink: "Чому Dreddi →",
-    },
-    cta: {
-      getStarted: "Зафіксувати обіцянку",
-      createPromise: "Зафіксувати обіцянку",
-      reviewDeals: "Мої обіцянки",
-    },
-    overviewLabel: "Огляд обіцянок",
-    recentDeals: {
-      title: "Останні обіцянки",
-      demoTitle: "Останні обіцянки",
-      empty: "У вас поки що немає жодної обіцянки",
-      eventFallbackTitle: "Обіцянка",
-    },
-  }),
-  en: withPledge(landingCopy.en, {
-    hero: {
-      headline: "Promised? Dreddi knows",
-      description:
-        "Keep your word to others and to yourself.\nRecord your promises and dispute stakes. Every one you keep adds to a reputation people trust.",
-      whyLink: "Why Dreddi →",
-    },
-    cta: {
-      getStarted: "Record a promise",
-      createPromise: "Record a promise",
-      reviewDeals: "My promises",
-    },
-    overviewLabel: "Promises overview",
-    recentDeals: {
-      title: "Recent promises",
-      demoTitle: "Recent promises",
-      empty: "You don't have any promises yet",
-      eventFallbackTitle: "Promise",
-    },
-  }),
-};
-
-export const getLandingCopy = (locale: Locale): LandingCopy => {
-  const copy = POSITIONING === "pledge" ? pledgeCopy : landingCopy;
-  return copy[locale] ?? copy[defaultLocale];
-};
+export const getLandingCopy = (locale: Locale): LandingCopy => landingCopy[locale] ?? landingCopy[defaultLocale];

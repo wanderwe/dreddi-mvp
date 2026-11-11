@@ -1,6 +1,4 @@
-import { POSITIONING } from "./features";
-
-// "pledge" positioning: the same "agreement" → "promise" swap as src/messages/pledge, for copy kept in code.
+// The "agreement" → "promise" swap for copy kept in code (the messages already say promise).
 // Both Ukrainian words are feminine, so only the noun itself changes. Apply it to templates only,
 // never to text users typed (deal titles).
 
@@ -47,4 +45,4 @@ export const toPledgeWording = (text: string) =>
     .replace(/\b(an|An) (agreement)\b/g, (_, article: string, word: string) => `${article === "An" ? "A" : "a"} ${word}`)
     .replace(/\b(agreements?|deals?)\b/gi, (word) => matchCase(EN_FORMS[word.toLowerCase()] ?? word, word));
 
-export const pledgeWording = (text: string) => (POSITIONING === "pledge" ? toPledgeWording(text) : text);
+export const pledgeWording = toPledgeWording;

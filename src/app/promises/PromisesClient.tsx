@@ -11,7 +11,6 @@ import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
 import { productFlags } from "@/lib/config/productFlags";
-import { POSITIONING } from "@/lib/features";
 import { isSelfPromise } from "@/lib/selfPromise";
 import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promiseActions";
@@ -125,7 +124,7 @@ const DEAL_TYPE_FILTER_ALL: DealTypeFilter = "all";
 
 const normalizeDealTypeParam = (typeValue: string | null, visibilityValue: string | null): DealTypeFilter => {
   if (typeValue === "public" || typeValue === "private" || typeValue === "reputation_stake") return typeValue;
-  if (typeValue === "self" && POSITIONING === "pledge") return typeValue;
+  if (typeValue === "self") return typeValue;
   if (visibilityValue === "public" || visibilityValue === "private") return visibilityValue;
   return DEAL_TYPE_FILTER_ALL;
 };
@@ -1039,9 +1038,7 @@ export default function PromisesClient() {
     { value: "public", label: t("promises.list.dealTypeFilter.options.public") },
     { value: "private", label: t("promises.list.dealTypeFilter.options.private") },
     { value: "reputation_stake", label: t("promises.list.dealTypeFilter.options.reputationStake") },
-    ...(POSITIONING === "pledge"
-      ? [{ value: "self" as const, label: t("promises.list.dealTypeFilter.options.self") }]
-      : []),
+    { value: "self", label: t("promises.list.dealTypeFilter.options.self") },
   ];
   const activeStatusLabel =
     statusOptions.find((option) => option.value === activeStatusFilter)?.label ??

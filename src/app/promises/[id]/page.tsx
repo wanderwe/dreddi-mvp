@@ -21,7 +21,6 @@ import { PromiseStatus, isPromiseStatus } from "@/lib/promiseStatus";
 import { resolveCounterpartyId, resolveExecutorId } from "@/lib/promiseParticipants";
 import { formatDueDate } from "@/lib/formatDueDate";
 import { isSelfPromise } from "@/lib/selfPromise";
-import { POSITIONING } from "@/lib/features";
 import { JudgePanel } from "./JudgePanel";
 import { pledgeWording } from "@/lib/pledgeWording";
 import { stripTrailingPeriod } from "@/lib/text";
@@ -1174,7 +1173,7 @@ export default function PromisePage() {
   const shouldShowInviteBlock = !isFinal && canManageInvite && !isInviteAccepted;
   const canCopyPromiseLink = Boolean(p && inviteStatus === "accepted" && promiseLink);
   // A promise to yourself has nobody to remind and nobody it was made to.
-  const isSelf = Boolean(p && POSITIONING === "pledge" && isSelfPromise(p));
+  const isSelf = Boolean(p && isSelfPromise(p));
   const canShareReminder = Boolean(
     p &&
       !isSelf &&
