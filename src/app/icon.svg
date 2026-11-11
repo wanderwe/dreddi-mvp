@@ -1,20 +1,20 @@
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dreddi knows logo">
   <defs>
-    <linearGradient id="dreddi-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5DF0B5" />
-      <stop offset="0.55" stop-color="#4B93FF" />
-      <stop offset="1" stop-color="#0B1526" />
+    <linearGradient id="dreddi-glow" x1="8" y1="6" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5DF0B5" stop-opacity="0.9" />
+      <stop offset="0.55" stop-color="#4B93FF" stop-opacity="0.8" />
+      <stop offset="1" stop-color="#0B1526" stop-opacity="0.95" />
     </linearGradient>
     <linearGradient id="dreddi-core" x1="20" y1="18" x2="46" y2="46" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF" />
-      <stop offset="1" stop-color="#CFF5E6" />
+      <stop stop-color="#E7FFF4" />
+      <stop offset="1" stop-color="#B6EAD8" />
     </linearGradient>
   </defs>
 
-  <rect width="64" height="64" rx="14" fill="#0B1220" />
-  <rect width="64" height="64" rx="14" fill="url(#dreddi-bg)" opacity="0.9" />
-  <g transform="translate(32 32) scale(0.8) translate(-35 -32)">
-    <path d="M20 18H33.5C43 18 50 25 50 32C50 39 43 46 33.5 46H20" fill="none" stroke="url(#dreddi-core)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M20 24 28 32 20 40" fill="none" stroke="#36D399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-  </g>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="16" fill="#0B1220" />
+  <rect x="2.5" y="2.5" width="59" height="59" rx="16" fill="url(#dreddi-glow)" opacity="0.9" />
+  <rect x="6.5" y="6.5" width="51" height="51" rx="13" stroke="#9DE8C9" stroke-opacity="0.15" />
+
+  <path d="M20 18H33.5C43 18 50 25 50 32C50 39 43 46 33.5 46H20" fill="none" stroke="url(#dreddi-core)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M20 24 28 32 20 40" fill="none" stroke="#36D399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
 </svg>
