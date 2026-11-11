@@ -473,5 +473,11 @@
       "binding": "The ruling has taken effect.{how} Promise status: «{status}»."
     },
     "closed": "The case is closed: the promise status is final"
+  },
+  "account": {
+    "delete": {
+      "body": "Your account will be deleted in 30 days. Until then you can restore it by signing in. After deletion, promises with no other party are removed, and promises with other people show \"Deleted account\" instead of you.",
+      "activeDeals": "Active promises with other people: {count}. They will stay unfinished."
+    }
   }
 }
