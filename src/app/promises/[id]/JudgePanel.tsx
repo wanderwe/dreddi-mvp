@@ -383,7 +383,6 @@ export function JudgePanel({ promiseId, promiseStatus }: { promiseId: string; pr
             )}
             {message.model && (
               <p className="mt-2 text-[11px] text-tone-500">
-                {message.model} ·{" "}
                 {t("arbitration.tokens", { input: message.input_tokens ?? 0, output: message.output_tokens ?? 0 })}
               </p>
             )}

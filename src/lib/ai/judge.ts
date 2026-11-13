@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { formatKyivDate } from "./kyivDate";
 
-// Dreddi, the AI judge (the lab page with LAB_ENABLED only): an AI judge that checks whether a promise was kept,
+// Dreddi, the AI judge: checks whether a promise was kept,
 // on its own when there is no other side, or hearing both sides of an agreement. No database access.
 
 export const JUDGE_MODEL = "claude-haiku-5-5";
@@ -33,13 +33,12 @@ export type JudgePromise = {
   details?: string;
   deadline?: string;
   criteria?: string[];
-  // False while the criteria are only the judge's proposal; the lab treats its criteria as agreed.
+  // False while the criteria are only the judge's proposal.
   criteriaAgreed?: boolean;
   // A change to agreed criteria that not every side has approved yet; the agreed ones stay in force.
   proposedCriteria?: string[];
   // Whether the other side has answered, and their response window (two-sided cases only).
   otherSide?: string;
-  // Known for a real promise, not in the lab.
   openedAt?: string;
   // When the promisor pressed "done" in Dreddi, if they did.
   markedDoneAt?: string;
