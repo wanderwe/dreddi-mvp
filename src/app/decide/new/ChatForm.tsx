@@ -16,7 +16,7 @@ export function ChatForm() {
   const locale = useLocale();
   const router = useRouter();
   const errorText = useErrorText();
-  const { draft, update } = useDraft("chat", { question: "", position1: "", position2: "", close: "day" });
+  const { draft, update } = useDraft("chat", { question: "", position1: "", position2: "", close: "hour" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const ready = Boolean(draft.question.trim() && draft.position1.trim() && draft.position2.trim());
@@ -57,6 +57,7 @@ export function ChatForm() {
         <span className="text-sm font-semibold text-tone-200">{t("decide.group.situationLabel")}</span>
         <textarea
           className={`${inputClass} min-h-[84px] resize-y py-3`}
+          autoComplete="off"
           value={draft.question}
           maxLength={CHAT_LIMITS.question}
           placeholder={t("decide.group.situationPlaceholder")}
@@ -70,6 +71,7 @@ export function ChatForm() {
             <span className="text-sm font-semibold text-tone-200">{t("decide.group.position", { n })}</span>
             <input
               className={`${inputClass} py-3`}
+              autoComplete="off"
               value={n === 1 ? draft.position1 : draft.position2}
               maxLength={CHAT_LIMITS.position}
               placeholder={t(`decide.group.position${n}Placeholder`)}
@@ -81,6 +83,7 @@ export function ChatForm() {
 
       <ChoiceToggle
         label={t("decide.group.closeLabel")}
+        hint={t("decide.group.closeHint")}
         options={CLOSE_OPTIONS.map((option: CloseOption) => ({ value: option, label: t(`decide.group.close.${option}`) }))}
         value={draft.close as CloseOption}
         onChange={(close) => update({ close })}

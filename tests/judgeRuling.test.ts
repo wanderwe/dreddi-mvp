@@ -27,25 +27,19 @@ test("binds at once for a promise with no other side", () => {
   assert.equal(getRulingState(ruled, ["promisor"], new Date("2026-10-20T11:00:00Z"))?.binding, "self");
 });
 
-test("pending until both sides accept or the response window passes", () => {
-  const early = new Date("2026-10-21T10:00:00Z");
-  assert.equal(getRulingState(ruled, [...both], early)?.binding, null);
-
-  const oneAccepted = [...ruled, row("a1", "promisor", "2026-10-20T12:00:00Z", { approves_message_id: "j1" })];
-  const state = getRulingState(oneAccepted, [...both], early);
-  assert.deepEqual(state?.acceptedBy, ["promisor"]);
-  assert.equal(state?.binding, null);
-
-  const bothAccepted = [...oneAccepted, row("a2", "counterparty", "2026-10-20T13:00:00Z", { approves_message_id: "j1" })];
-  assert.equal(getRulingState(bothAccepted, [...both], early)?.binding, "accepted");
-
-  // Silence does not bind while the other side gets no notice of the case.
-  assert.equal(getRulingState(oneAccepted, [...both], new Date("2026-10-23T10:00:06Z"))?.binding, null);
+test("with two sides a ruling is only an opinion: nothing to accept, nothing binds", () => {
+  const bothAccepted = [
+    ...ruled,
+    row("a1", "promisor", "2026-10-20T12:00:00Z", { approves_message_id: "j1" }),
+    row("a2", "counterparty", "2026-10-20T13:00:00Z", { approves_message_id: "j1" }),
+  ];
+  assert.equal(getRulingState(ruled, [...both], new Date("2026-10-30T00:00:00Z")), null);
+  assert.equal(getRulingState(bothAccepted, [...both], new Date("2026-10-30T00:00:00Z")), null);
 });
 
 test("a message after the ruling is an appeal and keeps the case open", () => {
-  const appealed = [...ruled, row("m2", "counterparty", "2026-10-21T09:00:00Z")];
-  const state = getRulingState(appealed, [...both], new Date("2026-10-30T00:00:00Z"));
+  const appealed = [...ruled, row("m2", "promisor", "2026-10-21T09:00:00Z")];
+  const state = getRulingState(appealed, ["promisor"], new Date("2026-10-30T00:00:00Z"));
   assert.equal(state?.appealed, true);
   assert.equal(state?.binding, null);
 });
@@ -53,10 +47,10 @@ test("a message after the ruling is an appeal and keeps the case open", () => {
 test("a newer ruling replaces the old one", () => {
   const rows = [
     ...ruled,
-    row("m2", "counterparty", "2026-10-21T09:00:00Z"),
+    row("m2", "promisor", "2026-10-21T09:00:00Z"),
     row("j2", "judge", "2026-10-21T09:00:05Z", { verdict: "not_kept" }),
   ];
-  const state = getRulingState(rows, [...both], new Date("2026-10-21T10:00:00Z"));
+  const state = getRulingState(rows, ["promisor"], new Date("2026-10-21T10:00:00Z"));
   assert.equal(state?.rulingId, "j2");
   assert.equal(state?.verdict, "not_kept");
   assert.equal(state?.appealed, false);

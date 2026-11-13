@@ -34,8 +34,13 @@ test("Ukrainian and Russian Telegram get Ukrainian, everyone else English", () =
   assert.equal(langOf(undefined), "en");
   // Telegram in English, the argument in Ukrainian: Ukrainian.
   assert.equal(langFor("я кажу, що помідор це фрукт", "en"), "uk");
-  assert.equal(langFor("pineapple on pizza", "uk"), "uk");
-  assert.equal(langFor("pineapple on pizza", "en"), "en");
+  // Russian text gets Ukrainian; any other written language English, whatever the Telegram language.
+  assert.equal(langFor("кто лучше водит", "en"), "uk");
+  assert.equal(langFor("pineapple on pizza", "uk"), "en");
+  assert.equal(langFor("piña en la pizza", "uk"), "en");
+  // No letters to go by: the Telegram language decides.
+  assert.equal(langFor("👍", "uk"), "uk");
+  assert.equal(langFor(null, "en"), "en");
 });
 
 test("closing time reads in Kyiv time, with the date only on another day", () => {

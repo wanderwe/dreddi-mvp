@@ -11,10 +11,14 @@ type TooltipProps = {
   disabled?: boolean;
   placement?: "bottom" | "bottom-right" | "top" | "top-right";
   shouldOpen?: () => boolean;
+  // For an info icon, which does nothing else when pressed: a tap or click opens and closes the text.
+  // Without it a press closes the tooltip (it belongs to a button whose press does the action), so on a
+  // phone, where a tap is all there is, an info icon showed nothing.
+  tapToOpen?: boolean;
 };
 
 const baseTooltipClasses =
-  "pointer-events-none fixed z-[100] max-w-[280px] whitespace-pre-line break-words rounded-md border border-tone-white/10 bg-tone-950/95 px-2.5 py-1.5 text-[11px] font-medium leading-[1.35] text-tone-100 shadow-lg transition-opacity duration-150";
+  "pointer-events-none fixed z-[100] max-w-[280px] whitespace-pre-line break-words text-balance rounded-md border border-tone-white/10 bg-tone-950/95 px-2.5 py-1.5 text-[11px] font-medium leading-[1.35] text-tone-100 shadow-lg transition-opacity duration-150";
 
 const VIEWPORT_PADDING = 8;
 const TOOLTIP_OFFSET = 8;
@@ -33,10 +37,13 @@ export function Tooltip({
   disabled = false,
   placement = "bottom",
   shouldOpen,
+  tapToOpen = false,
 }: TooltipProps) {
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const tooltipRef = useRef<HTMLSpanElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  // A tap on a phone first fakes a hover, which opens the tooltip, then a click: that click must not shut it.
+  const openedAtRef = useRef(0);
   const [isPositioned, setIsPositioned] = useState(false);
   const [position, setPosition] = useState<TooltipPosition>({
     top: 0,
@@ -69,6 +76,22 @@ export function Tooltip({
       const trigger = triggerRef.current;
       const tooltip = tooltipRef.current;
       if (!trigger || !tooltip) return;
+
+      // Wrapped text leaves the box at its full max width however short the lines are: shrink it to
+      // the longest line (balanced lines, so it ends up compact rather than one long and one short).
+      tooltip.style.width = "";
+      const range = document.createRange();
+      range.selectNodeContents(tooltip);
+      const lines = [...range.getClientRects()];
+      if (lines.length > 1) {
+        const style = window.getComputedStyle(tooltip);
+        const frame = ["paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce(
+          (sum, key) => sum + parseFloat(style[key as keyof CSSStyleDeclaration] as string),
+          0
+        );
+        const longest = Math.max(...lines.map((line) => line.width));
+        tooltip.style.width = `${Math.ceil(longest + frame + 1)}px`;
+      }
 
       const triggerRect = trigger.getBoundingClientRect();
       const tooltipRect = tooltip.getBoundingClientRect();
@@ -135,6 +158,7 @@ export function Tooltip({
   const openTooltip = () => {
     if (disabled) return;
     if (shouldOpen && !shouldOpen()) return;
+    openedAtRef.current = Date.now();
     setIsOpen(true);
   };
 
@@ -160,7 +184,15 @@ export function Tooltip({
       onBlur={() => setIsOpen(false)}
       onClick={(event) => {
         event.stopPropagation();
-        setIsOpen(false);
+        if (!tapToOpen) {
+          setIsOpen(false);
+          return;
+        }
+        // Inside a field's label a tap would also focus the field and pop up the keyboard.
+        event.preventDefault();
+        if (disabled) return;
+        if (Date.now() - openedAtRef.current < 500) return;
+        setIsOpen((open) => !open);
       }}
     >
       {children}

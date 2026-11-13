@@ -1,10 +1,10 @@
 // When a ruling by Dreddi, the AI judge, becomes binding and changes the promise status.
-// A ruling is the latest judge message with a kept / not_kept verdict. It binds:
-// - at once for a promise with no other side (Dreddi is the only one who checks it);
-// - when every side accepted it;
-// - or, once SILENCE_BINDS is on, when nobody appealed within RULING_RESPONSE_DAYS.
-// Silence stays off until the other side gets notified of the case: they cannot lose a case they never heard of.
-// Any message from a side after the ruling, other than accepting it, is an appeal: the case goes on.
+// A ruling is the latest judge message with a kept / not_kept verdict. Only a promise with no other side
+// has one: there Dreddi is the only one who checks, and the ruling binds at once.
+// With two sides a verdict is Dreddi's opinion and nothing more: the status changes only by the sides' own
+// «Підтвердити виконання» and «Оскаржити», since a person who saw the result is harder to fool than a model
+// shown a photo. (Until 2026-11-13 both sides could make it binding with «Приймаю рішення».)
+// Any message from a side after the ruling is an appeal: the case goes on.
 
 export const RULING_RESPONSE_DAYS = 3;
 export const SILENCE_BINDS = false;
@@ -39,6 +39,7 @@ export function getRulingState(
     .reverse()
     .find((row) => row.author_role === "judge" && (row.verdict === "kept" || row.verdict === "not_kept"));
   if (!ruling || (ruling.verdict !== "kept" && ruling.verdict !== "not_kept")) return null;
+  if (requiredSides.includes("counterparty")) return null;
 
   const after = rows.slice(rows.indexOf(ruling) + 1).filter((row) => row.author_role !== "judge");
   const acceptedBy = requiredSides.filter((side) =>

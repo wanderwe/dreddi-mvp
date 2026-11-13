@@ -4,10 +4,7 @@ import {
   AutoSchema,
   CriteriaSchema,
   JUDGE_MODEL,
-  TONE_RULES,
-  ToneSchema,
   VerdictSchema,
-  buildToneMessages,
   buildJudgeMessages,
   buildSystemPrompt,
   estimateCostUsd,
@@ -16,7 +13,6 @@ import {
   type JudgeMode,
   type JudgePromise,
   type JudgeTurn,
-  type ToneResult,
   type VerdictResult,
 } from "./judge";
 
@@ -125,26 +121,3 @@ export const toJudgeError = (error: unknown) => {
   return error;
 };
 
-// A calmer version of a message a side is about to send. Only a suggestion: the side picks what goes out.
-export async function askTone(draft: string): Promise<ToneResult & { costUsd: number }> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new JudgeError("Add ANTHROPIC_API_KEY to .env.local and restart", 500);
-  }
-  try {
-    const response = await new Anthropic().messages.parse({
-      model: JUDGE_MODEL,
-      max_tokens: 2000,
-      system: TONE_RULES,
-      messages: buildToneMessages(draft) as Anthropic.MessageParam[],
-      output_config: { effort: "medium" as const, format: zodOutputFormat(ToneSchema) },
-    });
-    const parsed = response.parsed_output;
-    const { input_tokens: inputTokens, output_tokens: outputTokens } = response.usage;
-    const costUsd = estimateCostUsd(inputTokens, outputTokens);
-    if (!parsed) return { text: draft, changed: false, costUsd };
-    const text = noLongDashes(parsed.text).trim();
-    return { text, changed: parsed.changed && text.length > 0 && text !== draft.trim(), costUsd };
-  } catch (error) {
-    throw toJudgeError(error);
-  }
-}

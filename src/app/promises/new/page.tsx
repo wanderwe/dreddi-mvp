@@ -1223,7 +1223,7 @@ export default function NewPromisePage() {
                             ? t(`promises.new.fields.counterparty_${promiseKind}`)
                             : t("promises.new.fields.counterparty")}
                         </label>
-                        <Tooltip label={counterpartyHelper} placement="top">
+                        <Tooltip label={counterpartyHelper} placement="top" tapToOpen>
                           <span
                             aria-label={counterpartyHelper}
                             className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100"

@@ -136,7 +136,7 @@ export default function AuthCallbackPage() {
         <div className="glass-panel w-full max-w-xl rounded-3xl border-tone-white/10 p-8 text-center">
           <DreddiLogoMark className="mx-auto mb-4 h-12 w-12 drop-shadow-[0_0_18px_rgba(52,211,153,0.25)]" />
           <h1 className="text-3xl font-semibold text-tone-white">Dreddi knows</h1>
-          <p className="mt-2 text-tone-300">{t(`auth.callback.${msg.key}`, { detail: msg.detail ?? "" })}</p>
+          <p className="mt-2 text-balance text-tone-300">{t(`auth.callback.${msg.key}`, { detail: msg.detail ?? "" })}</p>
           <div className="mt-4 text-sm text-accent-200">{t("auth.callback.securing")}</div>
         </div>
       </div>

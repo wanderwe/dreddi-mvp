@@ -1,9 +1,10 @@
 "use client";
 
 import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
+import { Tooltip } from "@/app/components/ui/Tooltip";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Swords } from "lucide-react";
+import { Info, Swords } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { LIMITS } from "@/lib/quickDisputes/state";
@@ -111,6 +112,7 @@ export default function NewQuickDisputePage() {
           <span className="text-sm font-semibold text-tone-200">{t("decide.questionLabel")}</span>
           <input
             className={`${inputClass} py-3`}
+            autoComplete="off"
             value={draft.question}
             maxLength={LIMITS.question}
             placeholder={t("decide.questionPlaceholder")}
@@ -121,9 +123,17 @@ export default function NewQuickDisputePage() {
         {/* Optional, so hidden behind a link and removable, as the counter-condition on a new promise. */}
         {showStake || draft.stake ? (
           <label className="block space-y-1.5">
-            <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-tone-200">{t("decide.stake.label")}</span>
+              <Tooltip label={t("decide.stake.hint")} placement="top" tapToOpen tooltipClassName="!max-w-[min(360px,calc(100vw-32px))]">
+                <span aria-label={t("decide.stake.hint")} className="inline-flex items-center justify-center text-tone-500 transition hover:text-accent-100">
+                  <Info className="h-3.5 w-3.5" aria-hidden />
+                </span>
+              </Tooltip>
+            </span>
             <input
               className={`${inputClass} py-3`}
+              autoComplete="off"
               value={draft.stake}
               maxLength={LIMITS.stake}
               placeholder={t("decide.stake.placeholder")}
@@ -164,6 +174,7 @@ export default function NewQuickDisputePage() {
           >
             <textarea
               className="min-h-[96px] w-full resize-y bg-transparent text-sm text-tone-100 outline-none placeholder:text-tone-500"
+              autoComplete="off"
               value={draft.position}
               maxLength={LIMITS.position}
               placeholder={t("decide.positionPlaceholder")}

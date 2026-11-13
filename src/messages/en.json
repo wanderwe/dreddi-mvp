@@ -1373,6 +1373,7 @@
   },
   "arbitration": {
     "title": "Arbitration",
+    "titleSelf": "Dreddi check",
     "beta": "beta",
     "roles": {
       "promisor": "Promisor",
@@ -1387,7 +1388,7 @@
     "summon": "Case No. {number}. Dreddi is deciding whether «{title}» was kept. Without your answer the ruling won’t take effect: {link}",
     "summonCriteria": "Case No. {number}. Dreddi has proposed criteria for «{title}». Take a look and approve them or write what to change: {link}",
     "summonCase": "Case No. {number} «{title}» in Dreddi arbitration: {link}",
-    "empty": "The case is empty. Start with how you will prove it was done, and Dreddi will agree the criteria.",
+    "empty": "The other side closes the promise with «Confirm completion». Dreddi helps if you can't agree, or settles what counts as done.",
     "showEarlier": "Show earlier messages ({count})",
     "hideEarlier": "Hide earlier messages",
     "evidence": "Evidence: {note}",
@@ -1431,18 +1432,13 @@
     "placeholder": {
       "ruling": "Disagree with the ruling? Write why and add evidence",
       "criteria": "Disagree with the criteria? Write what to change",
-      "start": "For example: how will I prove it was done?",
+      "start": "For example: what counts as done?",
       "check": "Tell what was done or what went wrong, and add evidence"
     },
     "attachPhoto": "+ Photo or screenshot",
     "attached": "Attached: {count} (remove)",
     "sendFirst": "Ask Dreddi",
     "sendReply": "Reply",
-    "tone": {
-      "hint": "You could say it more calmly",
-      "sendSoftened": "Send this",
-      "keepMine": "Keep as is"
-    },
     "errors": {
       "signIn": "Sign in again",
       "stale": "The case has changed. Refresh the page.",
@@ -1452,7 +1448,8 @@
     "messagesLeft": "Messages left: {count}",
     "limitReached": "In the beta a case holds a limited number of messages, and they are used up. The «I approve the criteria» and «I accept the ruling» buttons still work.",
     "betaLimit": "Beta: up to {limit} messages per case, {count} left",
-    "caseNumber": "Case No. {number}"
+    "caseNumber": "Case No. {number}",
+    "emptySelf": "Dreddi will check that it's done. You can start with what counts as done."
   },
   "decide": {
     "homeButton": "Settle a dispute",
@@ -1575,6 +1572,7 @@
     },
     "stake": {
       "label": "Stake",
+      "hint": "What the loser of the dispute will do. After the verdict, the stake can be recorded as a promise.",
       "placeholder": "For example: buy the winner a coffee",
       "inline": "Stake: {stake}",
       "lost": "{nickname} loses the stake: {stake}",
@@ -1601,6 +1599,7 @@
       "position1Placeholder": "For example: the friend pays",
       "position2Placeholder": "For example: the owner pays",
       "closeLabel": "Close the dispute",
+      "closeHint": "In an hour or a day it closes by itself. Manually, you close it whenever you like. Dreddi gives a verdict if at least three people picked a position.",
       "close": {
         "hour": "In an hour",
         "day": "In a day",

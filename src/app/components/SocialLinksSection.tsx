@@ -330,7 +330,7 @@ export function SocialLinksSection({ onUpdate }: Props) {
                     placeholder="linkedin.com/in/your-username"
                     className="min-w-0 flex-1 bg-transparent text-xs text-tone-white/80 placeholder:text-tone-white/25 focus:outline-none"
                   />
-                  <Tooltip label={t("profileSettings.social.linkedinUrlLabel")} placement="top" tooltipClassName="!z-[99999]">
+                  <Tooltip label={t("profileSettings.social.linkedinUrlLabel")} placement="top" tooltipClassName="!z-[99999]" tapToOpen>
                     <span className="cursor-default text-tone-white/30 hover:text-tone-white/60 transition">
                       <Info className="h-3.5 w-3.5" />
                     </span>

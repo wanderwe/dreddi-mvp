@@ -92,8 +92,10 @@ export const langOf = (code: string | undefined): QuickLang => (code && /^(uk|ru
 
 // The language people actually write in wins over the app's: many here run Telegram in English but
 // argue in Ukrainian. Cyrillic means Ukrainian; otherwise the app's language decides.
+// Cyrillic (Ukrainian or Russian) gets Ukrainian, any other written language English; with no letters to
+// go by, the person's Telegram language decides.
 export const langFor = (text: string | null | undefined, code: string | undefined): QuickLang =>
-  text && /[а-яіїєґ]/i.test(text) ? "uk" : langOf(code);
+  text && /[а-яіїєґ]/i.test(text) ? "uk" : text && /\p{L}/u.test(text) ? "en" : langOf(code);
 
 export const textsFor = (lang: QuickLang): TgTexts => TG_TEXTS[lang];
 
