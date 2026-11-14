@@ -198,7 +198,7 @@ export function SheetContent({ className = "", ...props }: SheetContentProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className={`fixed right-0 top-0 z-[9999] h-[100dvh] w-[280px] overflow-y-auto border-l border-tone-white/10 bg-tone-950/95 p-6 text-tone-100 shadow-2xl shadow-tone-black/50 backdrop-blur [-webkit-overflow-scrolling:touch] ${className}`}
+      className={`fixed right-0 top-[env(safe-area-inset-top)] z-[9999] h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-[280px] overflow-y-auto border-l border-tone-white/10 bg-tone-950/95 p-6 text-tone-100 shadow-2xl shadow-tone-black/50 backdrop-blur [-webkit-overflow-scrolling:touch] ${className}`}
       {...props}
     />
   );

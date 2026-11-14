@@ -28,7 +28,7 @@ export function WhyProgress({ title }: { title: string }) {
 
   return (
     <div
-      className={`fixed inset-x-0 top-0 z-30 transition-opacity duration-200 ${
+      className={`fixed inset-x-0 top-[env(safe-area-inset-top)] z-30 transition-opacity duration-200 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
       aria-hidden={!visible}

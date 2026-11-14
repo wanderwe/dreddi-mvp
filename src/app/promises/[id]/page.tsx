@@ -1539,7 +1539,7 @@ export default function PromisePage() {
       )}
 
       {toast && (
-        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
+        <div className="pointer-events-none fixed inset-x-4 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center sm:bottom-8">
           <div
             role={toastTone === "success" ? "status" : "alert"}
             aria-live={toastTone === "success" ? "polite" : "assertive"}

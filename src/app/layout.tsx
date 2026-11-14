@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { getLocale } from "@/lib/i18n/getLocale";
@@ -20,6 +20,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// "cover" makes the phone report its safe-area insets (env(safe-area-inset-*)), which the page then
+// keeps clear: an app installed from Samsung Internet draws under the status and navigation bars.
+// Everywhere else the insets are 0 and nothing moves.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.dreddi.com"),

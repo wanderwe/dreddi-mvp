@@ -32,33 +32,46 @@ const authHeaders = async (): Promise<Record<string, string>> => {
   return token ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` } : { "Content-Type": "application/json" };
 };
 
+// Some browsers (seen on Android) never answer getRegistration/getSubscription: give up after a while
+// instead of leaving the switch waiting forever.
+const within = <T,>(promise: Promise<T>, ms = 3000) =>
+  Promise.race([promise, new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), ms))]);
+
 const registration = async () => {
   const existing = await navigator.serviceWorker.getRegistration("/");
   return existing ?? navigator.serviceWorker.register("/sw.js", { scope: "/" });
 };
 
-export async function getPushState(): Promise<PushState> {
+// What can be told without waiting on the browser; null: it can work, ask the service worker.
+const quickState = (): PushState | null => {
   if (typeof window === "undefined") return "unsupported";
   if (isIos() && !isInstalled()) return "needs-install";
   if (!supported() || !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) return "unsupported";
   if (Notification.permission === "denied") return "denied";
-  const reg = await navigator.serviceWorker.getRegistration("/");
-  const subscription = await reg?.pushManager.getSubscription();
+  return null;
+};
+
+export async function getPushState(): Promise<PushState> {
+  const quick = quickState();
+  if (quick) return quick;
+  const reg = await within(navigator.serviceWorker.getRegistration("/"));
+  const subscription = reg ? await within(reg.pushManager.getSubscription()) : undefined;
   return subscription && Notification.permission === "granted" ? "on" : "off";
 }
 
 // Must run from a tap or click: browsers only show the permission prompt in answer to one.
 export async function enablePush(): Promise<PushState> {
-  const state = await getPushState();
-  if (state === "unsupported" || state === "needs-install" || state === "denied") return state;
+  // The permission prompt comes first: browsers show it only right after the tap, not after a wait.
+  const quick = quickState();
+  if (quick) return quick;
 
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return permission === "denied" ? "denied" : "off";
 
   const reg = await registration();
-  await navigator.serviceWorker.ready;
+  await within(navigator.serviceWorker.ready, 8000);
   const subscription =
-    (await reg.pushManager.getSubscription()) ??
+    (await within(reg.pushManager.getSubscription())) ??
     (await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: keyBytes(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string),

@@ -1013,7 +1013,7 @@ export default function PromisesClient() {
   return (
     <main className="relative py-8 sm:py-10">
       {toast && (
-        <div className="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex justify-center sm:bottom-8">
+        <div className="pointer-events-none fixed inset-x-4 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center sm:bottom-8">
           <div
             role="status"
             aria-live="polite"

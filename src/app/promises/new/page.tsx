@@ -1575,7 +1575,7 @@ export default function NewPromisePage() {
             )}
           </div>
 
-          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-tone-white/10 bg-tone-950/80 px-4 py-3 backdrop-blur sm:hidden">
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-tone-white/10 bg-tone-950/80 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
             <button
               onClick={createPromise}
               disabled={isSubmitDisabled}
