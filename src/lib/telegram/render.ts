@@ -28,7 +28,14 @@ export function draftMessage(dispute: TgDispute) {
   };
 }
 
-export function disputeMessage(dispute: TgDispute, count: number, stage: "open" | "thinking" | "closed") {
+// split: how many picked each position, shown on the buttons while it is open (asked for by players:
+// a live score is half the fun in a group chat; Dreddi's verdict reads arguments, not votes).
+export function disputeMessage(
+  dispute: TgDispute,
+  count: number,
+  stage: "open" | "thinking" | "closed",
+  split: { 1: number; 2: number } = { 1: 0, 2: 0 }
+) {
   const t = textsFor(dispute.lang);
   const footer =
     stage === "thinking"
@@ -44,8 +51,9 @@ export function disputeMessage(dispute: TgDispute, count: number, stage: "open" 
   const keyboard =
     stage === "open"
       ? [
-          [{ text: t.sideButton(dispute.position_1), callback_data: `s:${dispute.token}:1` }],
-          [{ text: t.sideButton(dispute.position_2), callback_data: `s:${dispute.token}:2` }],
+          // Buttons can't be coloured, so a coloured mark tells the two positions apart at a glance.
+          [{ text: `🔵 ${dispute.position_1} · ${split[1]}`, callback_data: `s:${dispute.token}:1` }],
+          [{ text: `🟠 ${dispute.position_2} · ${split[2]}`, callback_data: `s:${dispute.token}:2` }],
           // Cancel until there are enough people for a verdict, then close.
           [{ text: count < CHAT_LIMITS.minSides ? t.cancel : t.closeButton, callback_data: `x:${dispute.token}` }],
         ]

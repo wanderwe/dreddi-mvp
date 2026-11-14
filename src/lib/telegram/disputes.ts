@@ -11,6 +11,7 @@ import {
   closesAtFor,
   type ChatDisputeRow,
   type ChatPosition,
+  countSides,
   type ChatSideRow,
 } from "@/lib/chatDisputes/state";
 import type { EventName } from "@/lib/events/names";
@@ -327,12 +328,14 @@ async function onReply(message: TgMessage) {
 // --- Counter and result ----------------------------------------------------------------------------
 
 async function refreshCounter(dispute: TgDispute) {
-  const { count } = await getAdminClient()
+  const { data } = await getAdminClient()
     .from("quick_chat_sides")
-    .select("id", { count: "exact", head: true })
-    .eq("dispute_id", dispute.id);
-  const total = count ?? 0;
-  await editDispute(dispute, disputeMessage(dispute, total, "open"));
+    .select("position")
+    .eq("dispute_id", dispute.id)
+    .returns<{ position: ChatPosition }[]>();
+  const split = countSides(data ?? []);
+  const total = split[1] + split[2];
+  await editDispute(dispute, disputeMessage(dispute, total, "open", split));
   await getAdminClient().from("quick_chat_disputes").update({ tg_shown_count: total }).eq("id", dispute.id);
 }
 
