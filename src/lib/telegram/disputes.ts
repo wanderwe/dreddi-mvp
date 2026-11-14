@@ -26,7 +26,7 @@ import {
   type TgMessage,
   type TgUpdate,
 } from "./api";
-import { langFor, textsFor } from "./texts";
+import { TG_TEXTS, langFor, textsFor } from "./texts";
 import { disputeMessage, draftMessage, verdictMessage, type TgDispute } from "./render";
 
 // Server only: «Дредді, розсуди!» in a Telegram group. The dispute is a chat dispute from the site, played
@@ -92,8 +92,16 @@ export async function handleUpdate(update: TgUpdate) {
   if (!message?.from || message.from.is_bot) return;
   const command = commandOf(message);
   if (command) return onCommand(message, command.name, command.rest);
-  if (isGroup(message) && message.reply_to_message?.from?.username === BOT_USERNAME) return onReply(message);
+  if (isGroup(message) && message.reply_to_message?.from?.username === BOT_USERNAME) {
+    // An answer to «what is the argument?» (sent for a bare /dreddi) is the /dreddi text itself.
+    if (isPrompt(message.reply_to_message)) return onCommand(message, "dreddi", (message.text ?? message.caption ?? "").trim(), { fromPrompt: true });
+    return onReply(message);
+  }
 }
+
+// The bot's own «what is the argument?» message, in either language.
+const PROMPTS = new Set<string>(Object.values(TG_TEXTS).map((t) => t.empty));
+const isPrompt = (message: TgMessage) => Boolean(message.text && PROMPTS.has(message.text));
 
 // «/dreddi текст» or «/dreddi@dreddi_bot текст»; a command for another bot is not ours.
 function commandOf(message: TgMessage) {
@@ -113,8 +121,9 @@ async function onMembership(update: TgChatMemberUpdated) {
   await logEvent("tg_bot_added", sha256(`chat:${update.chat.id}`).slice(0, 32));
 }
 
-async function onCommand(message: TgMessage, name: string, rest: string) {
-  const context = message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null;
+async function onCommand(message: TgMessage, name: string, rest: string, options: { fromPrompt?: boolean } = {}) {
+  // An answer to the prompt replies to the bot's question, which is not the argument's context.
+  const context = options.fromPrompt ? null : (message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null);
   const lang = langFor(`${rest} ${context ?? ""} ${message.chat.title ?? ""}`, message.from?.language_code);
   const t = textsFor(lang);
   const reply = (text: string, extra: Record<string, unknown> = {}) =>
@@ -127,7 +136,11 @@ async function onCommand(message: TgMessage, name: string, rest: string) {
   if (name === "start" || name === "help") return reply(t.greeting);
   if (name !== "dreddi") return;
 
-  if (!rest && !context) return reply(t.empty);
+  // A bare /dreddi (picking it from Telegram's command list sends it at once): ask, and open a reply to
+  // the question for this person, so they write the argument instead of typing the command again.
+  if (!rest && !context) {
+    return reply(t.empty, { reply_markup: { force_reply: true, selective: true, input_field_placeholder: t.emptyPlaceholder } });
+  }
 
   const from = message.from!;
   const creatorHash = tgUserHash(from.id);
