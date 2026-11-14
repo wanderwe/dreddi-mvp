@@ -21,6 +21,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// iPhone launch screens, one per screen size (made by scripts/app-icons.mjs; keep the two lists equal):
+// [width, height, pixel ratio] in CSS points, portrait.
+const SPLASH_SCREENS: [number, number, number][] = [
+  [440, 956, 3],
+  [402, 874, 3],
+  [430, 932, 3],
+  [393, 852, 3],
+  [428, 926, 3],
+  [390, 844, 3],
+  [375, 812, 3],
+  [414, 896, 3],
+  [414, 896, 2],
+  [375, 667, 2],
+];
+
 // "cover" makes the phone report its safe-area insets (env(safe-area-inset-*)), which the page then
 // keeps clear: an app installed from Samsung Internet draws under the status and navigation bars.
 // Everywhere else the insets are 0 and nothing moves.
@@ -34,7 +49,15 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.dreddi.com"),
   applicationName: "Dreddi",
   // Added to the iPhone home screen, it opens as an app, under this name.
-  appleWebApp: { capable: true, title: "Dreddi", statusBarStyle: "default" },
+  appleWebApp: {
+    capable: true,
+    title: "Dreddi",
+    statusBarStyle: "default",
+    startupImage: SPLASH_SCREENS.map(([width, height, ratio]) => ({
+      url: `/splash/apple-splash-${width * ratio}x${height * ratio}.png`,
+      media: `(device-width: ${width}px) and (device-height: ${height}px) and (-webkit-device-pixel-ratio: ${ratio}) and (orientation: portrait)`,
+    })),
+  },
 };
 
 export default async function RootLayout({
