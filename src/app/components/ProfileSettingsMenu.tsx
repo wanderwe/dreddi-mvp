@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { isEmailLike } from "@/lib/publicProfileIdentity";
-import { disablePush, enablePush, getPushState, type PushState } from "@/lib/push/client";
+import { disablePush, enablePush, getPushState, pushDebug, type PushState } from "@/lib/push/client";
 
 type ProfileSettingsPanelProps = {
   showTitle?: boolean;
@@ -302,6 +302,14 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
 
   useEffect(() => {
     void getPushState().then(setPushState).catch(() => setPushState("off"));
+  }, []);
+
+  // Temporary: with ?pushdebug=1 the diagnostics line refreshes every second, even if a step hangs.
+  const [, setDebugTick] = useState(0);
+  useEffect(() => {
+    if (!window.location.search.includes("pushdebug")) return;
+    const timer = window.setInterval(() => setDebugTick((tick) => tick + 1), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const togglePushNotifications = async () => {
@@ -835,6 +843,18 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                         {t("profileSettings.pushLabel")}
                       </div>
                       <HelperText>{pushHint}</HelperText>
+                      {/* Temporary: ?pushdebug=1 shows why push does not turn on in a given browser. */}
+                      {typeof window !== "undefined" && window.location.search.includes("pushdebug") && (
+                        <pre className="whitespace-pre-wrap break-all text-[10px] leading-snug text-tone-400">
+                          {[
+                            `state=${pushState} busy=${pushBusy} loading=${loading} saving=${saving} profile=${Boolean(profile)}`,
+                            `sw=${"serviceWorker" in navigator} pm=${"PushManager" in window} notif=${"Notification" in window} perm=${"Notification" in window ? Notification.permission : "-"}`,
+                            `standalone=${window.matchMedia("(display-mode: standalone)").matches} key=${Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)}`,
+                            `step=${pushDebug.step} error=${pushDebug.error ?? "-"}`,
+                            navigator.userAgent,
+                          ].join("\n")}
+                        </pre>
+                      )}
                     </div>
                     <div className="flex justify-end self-center">
                       <button
