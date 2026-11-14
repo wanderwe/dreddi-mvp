@@ -100,8 +100,13 @@ export async function handleUpdate(update: TgUpdate) {
   }
 }
 
-// The bot's own «what is the argument?» message, in either language.
-const PROMPTS = new Set<string>(Object.values(TG_TEXTS).map((t) => t.empty));
+// The bot's own «what is the argument?» message, in either language. The earlier wording stays here
+// so replies to questions asked before it changed still count.
+const PROMPTS = new Set<string>([
+  ...Object.values(TG_TEXTS).map((t) => t.empty),
+  "В чому суперечка? Відповідайте на це повідомлення. Наприклад: Вася каже, що штраф платить водій, а Петя, що власник.",
+  "What's the argument? Reply to this message. For example: Sam says the driver pays the fine, Alex says the owner does.",
+]);
 const isPrompt = (message: TgMessage) => Boolean(message.text && PROMPTS.has(message.text));
 
 // «/dreddi текст» or «/dreddi@dreddi_bot текст»; a command for another bot is not ours.

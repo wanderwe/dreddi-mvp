@@ -1456,7 +1456,7 @@
   },
   "decide": {
     "homeButton": "Settle a dispute",
-    "homeHint": "Disputes without agreements or sign-ups. Dreddi hears both sides and decides.",
+    "homeHint": "Disputes without agreements or sign-ups. Dreddi listens and decides.",
     "title": "Who's right?",
     "signIn": "Sign in",
     "continueAnon": "Continue anonymously",
