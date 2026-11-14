@@ -2,6 +2,8 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeLocale } from "@/lib/i18n/locales";
 import { getNotificationCopy } from "@/lib/notifications/copy";
 import { maybeSendNotificationEmail } from "@/lib/notifications/email";
+import { sendPushToUser } from "@/lib/push/send";
+import { after } from "next/server";
 import {
   CAP_BYPASS_NOTIFICATION_TYPES,
   DAILY_NOTIFICATION_CAP,
@@ -218,12 +220,20 @@ export async function createNotification(
     .eq("dedupe_key", request.dedupeKey)
     .maybeSingle();
 
-  if (shouldSendPush) {
-    await sendPush({
-      userId: request.userId,
-      type: normalizedType,
-      ctaUrl: request.ctaUrl,
-    });
+  if (shouldSendPush && insertedNotification?.id) {
+    // The same title and text as in the bell; a tap opens the page it is about.
+    const message = { title: title || "Dreddi", body, url: request.ctaUrl, tag: request.dedupeKey };
+    const push = () =>
+      sendPushToUser(admin, request.userId, message).catch((error) =>
+        console.error("[push] failed", { userId: request.userId, error: error instanceof Error ? error.message : String(error) })
+      );
+    // After the response when there is one, so the action does not wait for the phone; tests and
+    // scripts run outside a request, and there it is simply awaited.
+    try {
+      after(push);
+    } catch {
+      await push();
+    }
   }
 
   let emailSent = false;
@@ -251,16 +261,6 @@ export async function createNotification(
     emailSent,
     emailSkippedReason,
   };
-}
-
-export async function sendPush(payload: {
-  userId: string;
-  type: NotificationType;
-  ctaUrl: string;
-}) {
-  if (process.env.NODE_ENV !== "production") {
-    console.info("[notifications] push stub", payload);
-  }
 }
 
 export const buildDedupeKey = (parts: Array<string | number>) => parts.join(":");

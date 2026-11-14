@@ -23,6 +23,7 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { isEmailLike } from "@/lib/publicProfileIdentity";
+import { disablePush, enablePush, getPushState, type PushState } from "@/lib/push/client";
 
 type ProfileSettingsPanelProps = {
   showTitle?: boolean;
@@ -57,6 +58,9 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
   const [profileTags, setProfileTags] = useState<string[]>([]);
   const [publicProfileInput, setPublicProfileInput] = useState<boolean | null>(null);
   const [deleted, setDeleted] = useState(false);
+  // Push is per device: this switch shows and changes this browser only, not the account's other devices.
+  const [pushState, setPushState] = useState<PushState | null>(null);
+  const [pushBusy, setPushBusy] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
@@ -296,13 +300,42 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
     }
   };
 
+  useEffect(() => {
+    void getPushState().then(setPushState).catch(() => setPushState("unsupported"));
+  }, []);
+
   const togglePushNotifications = async () => {
-    if (!profile) return;
-    await updateProfileRow(
-      { push_notifications_enabled: !profile.pushEnabled },
-      { pushEnabled: !profile.pushEnabled }
-    );
+    if (!profile || pushBusy || !pushState) return;
+    setPushBusy(true);
+    try {
+      if (pushState === "on") {
+        await disablePush();
+        setPushState("off");
+      } else {
+        const next = await enablePush();
+        setPushState(next);
+        // The account-wide switch (push_notifications_enabled) must be on for any device to get pushes.
+        if (next === "on" && !profile.pushEnabled) {
+          await updateProfileRow({ push_notifications_enabled: true }, { pushEnabled: true });
+        }
+      }
+    } catch {
+      setPushState(await getPushState().catch(() => "unsupported" as const));
+    } finally {
+      setPushBusy(false);
+    }
   };
+  const pushOn = pushState === "on" && Boolean(profile?.pushEnabled);
+  const pushBlocked = pushState === "unsupported" || pushState === "needs-install" || pushState === "denied";
+  const pushDisabled = loading || saving || pushBusy || !profile || !pushState || pushBlocked;
+  const pushHint =
+    pushState === "needs-install"
+      ? t("profileSettings.pushNeedsInstall")
+      : pushState === "denied"
+        ? t("profileSettings.pushDenied")
+        : pushState === "unsupported"
+          ? t("profileSettings.pushUnsupported")
+          : t("profileSettings.pushDescription");
 
   const toggleEmailNotifications = async () => {
     if (!profile) return;
@@ -799,28 +832,28 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                       <div className="text-sm font-medium text-tone-white">
                         {t("profileSettings.pushLabel")}
                       </div>
-                      <HelperText>{t("profileSettings.pushDescription")}</HelperText>
+                      <HelperText>{pushHint}</HelperText>
                     </div>
                     <div className="flex justify-end self-center">
                       <button
                         type="button"
                         role="switch"
-                        aria-checked={profile?.pushEnabled ?? false}
+                        aria-checked={pushOn}
                         onClick={togglePushNotifications}
-                        disabled={loading || saving || !profile}
+                        disabled={pushDisabled}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${
-                          profile?.pushEnabled
+                          pushOn
                             ? "border-accent-300/50 bg-emerald-400/70"
                             : "border-tone-white/20 bg-tone-white/10"
                         } ${
-                          loading || saving || !profile
+                          pushDisabled
                             ? "cursor-not-allowed opacity-60"
                             : "cursor-pointer hover:border-accent-300/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-popover)] active:scale-[0.98]"
                           }`}
                       >
                         <span
                           className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow transition ${
-                            profile?.pushEnabled ? "translate-x-5" : "translate-x-1"
+                            pushOn ? "translate-x-5" : "translate-x-1"
                           }`}
                         />
                       </button>
@@ -923,6 +956,8 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
               }
               try {
                 const supabase = requireSupabase();
+                // While still signed in: this phone stops getting this account's pushes.
+                await disablePush().catch(() => null);
                 const { error: signOutError } = await supabase.auth.signOut();
                 if (
                   signOutError &&

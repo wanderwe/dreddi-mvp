@@ -1,0 +1,87 @@
+"use client";
+
+import { supabaseOptional } from "@/lib/supabaseClient";
+
+// Push notifications on this device, from the browser side: public/sw.js shows them,
+// /api/push/subscribe tells the server where to send them.
+
+export type PushState =
+  | "unsupported" // this browser cannot do web push at all
+  | "needs-install" // an iPhone: push only works once the site is added to the home screen
+  | "denied" // the person blocked notifications for dreddi.com in the browser
+  | "on" // this device gets pushes
+  | "off"; // it could, but is not subscribed
+
+const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent);
+const isInstalled = () =>
+  window.matchMedia("(display-mode: standalone)").matches ||
+  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+const supported = () =>
+  typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+
+// The public key arrives base64url-encoded; the browser wants the raw bytes.
+const keyBytes = (base64url: string) => {
+  const base64 = (base64url + "=".repeat((4 - (base64url.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
+  return Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+};
+
+const authHeaders = async (): Promise<Record<string, string>> => {
+  const { data } = (await supabaseOptional?.auth.getSession()) ?? { data: { session: null } };
+  const token = data.session?.access_token;
+  return token ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` } : { "Content-Type": "application/json" };
+};
+
+const registration = async () => {
+  const existing = await navigator.serviceWorker.getRegistration("/");
+  return existing ?? navigator.serviceWorker.register("/sw.js", { scope: "/" });
+};
+
+export async function getPushState(): Promise<PushState> {
+  if (typeof window === "undefined") return "unsupported";
+  if (isIos() && !isInstalled()) return "needs-install";
+  if (!supported() || !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) return "unsupported";
+  if (Notification.permission === "denied") return "denied";
+  const reg = await navigator.serviceWorker.getRegistration("/");
+  const subscription = await reg?.pushManager.getSubscription();
+  return subscription && Notification.permission === "granted" ? "on" : "off";
+}
+
+// Must run from a tap or click: browsers only show the permission prompt in answer to one.
+export async function enablePush(): Promise<PushState> {
+  const state = await getPushState();
+  if (state === "unsupported" || state === "needs-install" || state === "denied") return state;
+
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return permission === "denied" ? "denied" : "off";
+
+  const reg = await registration();
+  await navigator.serviceWorker.ready;
+  const subscription =
+    (await reg.pushManager.getSubscription()) ??
+    (await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: keyBytes(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string),
+    }));
+
+  const res = await fetch("/api/push/subscribe", {
+    method: "POST",
+    headers: await authHeaders(),
+    body: JSON.stringify(subscription.toJSON()),
+  });
+  return res.ok ? "on" : "off";
+}
+
+// Forget this device: on the server first (while still signed in), then in the browser.
+export async function disablePush(): Promise<void> {
+  if (!supported()) return;
+  const reg = await navigator.serviceWorker.getRegistration("/");
+  const subscription = await reg?.pushManager.getSubscription();
+  if (!subscription) return;
+  await fetch("/api/push/subscribe", {
+    method: "DELETE",
+    headers: await authHeaders(),
+    body: JSON.stringify({ endpoint: subscription.endpoint }),
+  }).catch(() => null);
+  await subscription.unsubscribe().catch(() => false);
+}

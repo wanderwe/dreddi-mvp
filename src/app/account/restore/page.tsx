@@ -6,6 +6,7 @@ import { accountDeletesAt } from "@/lib/account/constants";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { supabaseOptional } from "@/lib/supabaseClient";
+import { disablePush } from "@/lib/push/client";
 
 export default function AccountRestorePage() {
   const t = useT();
@@ -69,6 +70,7 @@ export default function AccountRestorePage() {
 
   const logout = async () => {
     setBusy("logout");
+    await disablePush().catch(() => null);
     await supabaseOptional?.auth.signOut().catch(() => null);
     window.location.replace(localizePath("/", locale));
   };

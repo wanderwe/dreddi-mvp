@@ -56,6 +56,9 @@ export async function requestAccountDeletion(admin: SupabaseClient, userId: stri
     .eq("id", userId);
   if (updateError) throw updateError;
 
+  // No more pushes to phones of an account that is going away.
+  await admin.from("push_subscriptions").delete().eq("user_id", userId);
+
   const { error: sessionsError } = await admin.rpc("revoke_user_sessions", { p_user: userId });
   if (sessionsError) console.error("[account] revoke_sessions_failed", { userId, error: sessionsError.message });
 

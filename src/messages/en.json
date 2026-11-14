@@ -117,8 +117,11 @@
       "linkedinUrlLabel": "LinkedIn profile URL (optional, makes the badge clickable)",
       "hint": "Connecting a social account proves you control it. A verified badge will appear on your public profile."
     },
-    "pushLabel": "In-app notifications",
-    "pushDescription": "Notifications about important promise events shown inside the app",
+    "pushLabel": "Notifications on this device",
+    "pushDescription": "Reminders and updates on your promises, even when Dreddi is closed",
+    "pushNeedsInstall": "On iPhone, notifications work once Dreddi is on the home screen: Share → Add to Home Screen.",
+    "pushDenied": "Notifications are blocked in this browser. Allow them in the site settings for dreddi.com.",
+    "pushUnsupported": "This browser doesn't support notifications",
     "emailLabel": "Email notifications",
     "emailDescription": "Transactional emails for invites and deadline reminders",
     "deadlineLabel": "Deadline reminders",
