@@ -340,7 +340,7 @@ async function refreshCounter(dispute: TgDispute) {
     .returns<{ position: ChatPosition }[]>();
   const split = countSides(data ?? []);
   const total = split[1] + split[2];
-  await editDispute(dispute, disputeMessage(dispute, total, "open", split));
+  await editDispute(dispute, disputeMessage(dispute, total, "open"));
   await getAdminClient().from("quick_chat_disputes").update({ tg_shown_count: total }).eq("id", dispute.id);
 }
 
