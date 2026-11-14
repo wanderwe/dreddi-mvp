@@ -23,6 +23,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.dreddi.com"),
+  applicationName: "Dreddi",
+  // Added to the iPhone home screen, it opens as an app, under this name.
+  appleWebApp: { capable: true, title: "Dreddi", statusBarStyle: "default" },
 };
 
 export default async function RootLayout({

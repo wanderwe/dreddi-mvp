@@ -4,6 +4,7 @@ import { AppFooter } from "@/app/components/AppFooter";
 import { AppHeader } from "@/app/components/AppHeader";
 import { DeletedAccountGuard } from "@/app/components/DeletedAccountGuard";
 import { DocumentLanguageSync } from "@/app/components/DocumentLanguageSync";
+import { ServiceWorkerRegistration } from "@/app/components/ServiceWorkerRegistration";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
 import { getMessages } from "@/lib/i18n/getMessages";
 import { resolveRouteLocale } from "@/lib/i18n/resolveRouteLocale";
@@ -63,6 +64,7 @@ export default async function LocalizedLayout({
       <div className="flex min-h-screen flex-col">
         <DocumentLanguageSync locale={locale} />
         <DeletedAccountGuard />
+        <ServiceWorkerRegistration />
         <AppHeader />
         <div className="flex-1">{children}</div>
         <AppFooter />
