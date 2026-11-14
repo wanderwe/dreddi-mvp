@@ -37,9 +37,6 @@ const authHeaders = async (): Promise<Record<string, string>> => {
 const within = <T,>(promise: Promise<T>, ms = 3000) =>
   Promise.race([promise, new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), ms))]);
 
-// Temporary diagnostics (?pushdebug=1 in settings): the last step reached and the error, if any.
-export const pushDebug: { step: string; error: string | null } = { step: "idle", error: null };
-
 // Older browsers (some Samsung Internet versions) answer through a callback instead of a promise.
 const askPermission = () =>
   new Promise<NotificationPermission>((resolve) => {
@@ -73,49 +70,38 @@ export async function getPushState(): Promise<PushState> {
 export async function enablePush(): Promise<PushState> {
   // The permission prompt comes first: browsers show it only right after the tap, not after a wait.
   const quick = quickState();
-  pushDebug.error = null;
-  if (quick) {
-    pushDebug.step = `quick:${quick}`;
-    return quick;
-  }
+  if (quick) return quick;
 
-  try {
-    pushDebug.step = "permission";
-    const permission = await askPermission();
-    pushDebug.step = `permission:${permission}`;
-    if (permission !== "granted") return permission === "denied" ? "denied" : "off";
-
-    pushDebug.step = "register";
-    const reg = await registration();
-    pushDebug.step = "ready";
-    await within(navigator.serviceWorker.ready, 8000);
-    pushDebug.step = "subscribe";
-    const subscription =
-      (await within(reg.pushManager.getSubscription())) ??
-      (await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: keyBytes(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string),
-      }));
-
-    pushDebug.step = "save";
-    const res = await fetch("/api/push/subscribe", {
-      method: "POST",
-      headers: await authHeaders(),
-      body: JSON.stringify(subscription.toJSON()),
-    });
-    pushDebug.step = `save:${res.status}`;
-    return res.ok ? "on" : "off";
-  } catch (error) {
-    pushDebug.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-    throw error;
-  }
+  const permission = await askPermission();
+  if (permission !== "granted") return permission === "denied" ? "denied" : "off";
+  const reg = await registration();
+  await within(navigator.serviceWorker.ready, 8000);
+  const subscription = await subscribeDevice(reg);
+  const res = await fetch("/api/push/subscribe", {
+    method: "POST",
+    headers: await authHeaders(),
+    body: JSON.stringify(subscription.toJSON()),
+  });
+  return res.ok ? "on" : "off";
 }
+
+// subscribe() hands back the existing subscription when there is one, so there is no separate
+// getSubscription() first: Samsung Internet leaves that one unanswered, which cost 3 seconds.
+const subscribeDevice = (reg: ServiceWorkerRegistration) =>
+  reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: keyBytes(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string),
+  });
 
 // Forget this device: on the server first (while still signed in), then in the browser.
 export async function disablePush(): Promise<void> {
   if (!supported()) return;
-  const reg = await navigator.serviceWorker.getRegistration("/");
-  const subscription = await reg?.pushManager.getSubscription();
+  const reg = await within(navigator.serviceWorker.getRegistration("/"));
+  if (!reg) return;
+  // Where getSubscription() goes unanswered, subscribe() still returns the one there is.
+  const subscription =
+    (await within(reg.pushManager.getSubscription(), 1500)) ??
+    (Notification.permission === "granted" ? await within(subscribeDevice(reg)) : undefined);
   if (!subscription) return;
   await fetch("/api/push/subscribe", {
     method: "DELETE",
