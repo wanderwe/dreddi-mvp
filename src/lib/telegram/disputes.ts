@@ -203,7 +203,9 @@ async function onCommand(message: TgMessage, name: string, rest: string, options
 }
 
 async function onCallback(query: TgCallbackQuery) {
-  const answer = (text?: string) => quietly(tg("answerCallbackQuery", { callback_query_id: query.id, ...(text ? { text } : {}) }));
+  // alert: a window with OK instead of the short toast at the top, which is easy to miss on phones.
+  const answer = (text?: string, alert = false) =>
+    quietly(tg("answerCallbackQuery", { callback_query_id: query.id, ...(text ? { text } : {}), ...(alert ? { show_alert: true } : {}) }));
   const [kind, token, arg] = (query.data ?? "").split(":");
   const loaded = token ? await loadBy("token", token) : null;
   if (!loaded || !query.message || query.message.chat.id !== loaded.dispute.tg_chat_id) return answer();
@@ -266,7 +268,8 @@ async function onCallback(query: TgCallbackQuery) {
         secret_hash: me,
       });
       if (error && !/duplicate|unique/i.test(error.message)) throw new Error(`telegram side: ${error.message}`);
-      await answer(t.picked(label));
+      // The first pick shows a window, so each person reads once that the argument goes as a reply.
+      await answer(t.picked(label), true);
     }
     await logEvent("tg_dispute_side", dispute.token);
     return refreshCounter(live);
