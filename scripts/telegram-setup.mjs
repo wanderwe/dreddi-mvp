@@ -28,16 +28,16 @@ async function call(method, body) {
 const profile = {
   "": {
     name: "Dreddi",
-    short: "I settle arguments in group chats. Add me to a group and type /dreddi with what it's about.",
-    description: "Hi, I'm Dreddi. Add me to a group, and when an argument starts there, type /dreddi and what it's about. Everyone takes a side, and I say who is right.",
+    short: "I settle arguments in group chats. Type /dreddi and what it's about, 3+ people needed. dreddi.com",
+    description: "Hi, I'm Dreddi. Add me to a group, and when an argument starts there, type /dreddi and what it's about. Everyone takes a side, and I say who is right. A verdict needs at least 3 people.\n\nMore at dreddi.com",
     commands: [
       { command: "dreddi", description: "Settle an argument" },
     ],
   },
   uk: {
     name: "Dreddi",
-    short: "Розсуджу суперечку в чаті. Додайте мене в групу й напишіть /dreddi і в чому суперечка.",
-    description: "Привіт, я Дредді. Додайте мене в групу, і коли там почнеться суперечка, напишіть /dreddi і в чому вона. Всі стануть на бік, а я скажу, хто правий.",
+    short: "Розсуджу суперечку в групі. Напишіть /dreddi і в чому вона, треба від 3 учасників. dreddi.com",
+    description: "Привіт, я Дредді. Додайте мене в групу, і коли там почнеться суперечка, напишіть /dreddi і в чому вона. Учасники оберуть позицію, а я скажу, хто правий. Для вердикту потрібно щонайменше 3 учасники.\n\nБільше на сайті: dreddi.com",
     commands: [
       { command: "dreddi", description: "Розсудити суперечку" },
     ],

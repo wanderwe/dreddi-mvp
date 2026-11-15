@@ -4,9 +4,9 @@ import type { QuickLang } from "../ai/quickVerdict";
 
 export const TG_TEXTS = {
   uk: {
-    start: "Привіт, я Дредді. Додайте мене в групу, і коли там почнеться суперечка, напишіть /dreddi і в чому вона. Всі стануть на бік, а я скажу, хто правий.",
+    start: "Привіт, я Дредді. Додайте мене в групу, і коли там почнеться суперечка, напишіть /dreddi і в чому вона. Учасники оберуть позицію, а я скажу, хто правий. Для вердикту потрібно щонайменше 3 учасники.\n\nБільше на сайті: dreddi.com",
     addToGroup: "Додати в групу",
-    greeting: "Дредді в чаті. Коли почнеться суперечка, напишіть /dreddi і в чому вона. Я бачу лише команди й відповіді на мої повідомлення.",
+    greeting: "Дредді в чаті. Коли почнеться суперечка, напишіть /dreddi і в чому вона. Для вердикту потрібно щонайменше 3 учасники. Я бачу лише команди й відповіді на мої повідомлення.",
     empty: "Опишіть суперечку, наприклад: «Що більше, Австралія чи Антарктида? Одні кажуть, що Австралія, інші, що Антарктида. Розсуди нас!»",
     emptyPlaceholder: "Тема і дві позиції",
     notFound: "Не бачу двох позицій. Напишіть, хто що каже, і я розберу",
@@ -44,9 +44,9 @@ export const TG_TEXTS = {
     at: (time: string) => `о ${time}`,
   },
   en: {
-    start: "Hi, I'm Dreddi. Add me to a group, and when an argument starts there, type /dreddi and what it's about. Everyone takes a side, and I say who is right.",
+    start: "Hi, I'm Dreddi. Add me to a group, and when an argument starts there, type /dreddi and what it's about. Everyone takes a side, and I say who is right. A verdict needs at least 3 people.\n\nMore at dreddi.com",
     addToGroup: "Add to a group",
-    greeting: "Dreddi is here. When an argument starts, type /dreddi and what it's about. I only see commands and replies to my messages.",
+    greeting: "Dreddi is here. When an argument starts, type /dreddi and what it's about. A verdict needs at least 3 people. I only see commands and replies to my messages.",
     empty: 'Describe the argument, for example: "Which is bigger, Australia or Antarctica? Some say Australia, others say Antarctica. Settle it for us!"',
     emptyPlaceholder: "Topic and both sides",
     notFound: "I can't see two positions. Say who claims what, and I'll sort it out",
