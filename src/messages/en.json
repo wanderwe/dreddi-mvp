@@ -421,7 +421,7 @@
       "silenceExecutor": "If {name} doesn't answer by {date}, the promise will be counted as kept",
       "silenceReviewer": "If you don't answer by {date}, the promise will be counted as kept",
       "fromDispute": "Created from the dispute «{question}»",
-      "selfDoneHint": "To count it toward your reputation, show the evidence to Dreddi in Arbitration below"
+      "selfDoneHint": "Tell Dreddi below how you did it, and Dreddi will close the promise"
     },
     "inviteStatus": {
       "awaiting_acceptance": "Awaiting acceptance",
@@ -1340,7 +1340,7 @@
         "not_kept": "Not kept"
       },
       "how": {
-        "self": "Dreddi checked the evidence · {date}",
+        "self": "Checked by Dreddi · {date}",
         "accepted": "Both sides accepted the ruling · {date}",
         "silence": "Nobody appealed the ruling · {date}"
       },
