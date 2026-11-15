@@ -258,11 +258,15 @@ export function AppHeader() {
               <div className="flex items-center gap-2 md:hidden">
                 <ThemeSwitcher />
                 <LocaleSwitcher />
-                <MobileMenu
-                  isAuthenticated={isAuthenticated}
-                  actionQueueCount={actionQueueCount}
-                  actionQueueHref={actionQueueHref}
-                />
+                {/* Signed out, a menu would hold only this one button: show it right here. */}
+                {showSignIn && (
+                  <Link
+                    href={signInHref}
+                    className="inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300/70"
+                  >
+                    {t("auth.login.signInCta")}
+                  </Link>
+                )}
               </div>
             </>
           )}

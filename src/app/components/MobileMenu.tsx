@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { X } from "lucide-react";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useState, useEffect } from "react";
 import { ProfileSettingsPanel } from "@/app/components/ProfileSettingsMenu";
@@ -15,7 +15,6 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { useT } from "@/lib/i18n/I18nProvider";
-import { useSignInHref } from "@/lib/i18n/useSignInHref";
 
 type MobileMenuProps = {
   isAuthenticated?: boolean;
@@ -30,7 +29,6 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
-  const signInHref = useSignInHref();
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
@@ -42,8 +40,12 @@ export function MobileMenu({
   }, []);
   const baseLinkClasses =
     "rounded-xl border border-tone-white/10 px-3 py-2 text-left text-tone-white transition hover:border-accent-300/50 hover:text-accent-100";
-  const primaryLinkClasses =
-    "rounded-xl bg-emerald-400 px-3 py-2 text-left font-semibold text-slate-950 shadow-lg shadow-accent-500/25 transition hover:translate-y-[-1px] hover:shadow-accent-400/45";
+  // «Нова обіцянка» and «Нова суперечка» stand out the same, gently: neither is the one main action.
+  const createLinkClasses =
+    "rounded-xl border border-accent-300/40 px-3 py-2 text-left text-accent-200 transition hover:border-accent-300/70 hover:bg-accent-400/10";
+
+  // Signed out there is nothing to list but «Увійти»: the header shows that button instead.
+  if (!isAuthenticated) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -64,10 +66,20 @@ export function MobileMenu({
       </SheetTrigger>
       <SheetPortal>
         <SheetOverlay />
-        <SheetContent id="mobile-menu" className="w-[calc(100vw-1rem)] max-w-sm p-4 md:hidden">
+        {/* Narrower than the screen, so the dimmed page on the left is wide enough to tap and close. */}
+        <SheetContent id="mobile-menu" className="w-[85vw] max-w-sm p-4 md:hidden">
+          <div className="mb-3 flex justify-end">
+            <SheetClose asChild>
+              <button
+                type="button"
+                aria-label={t("nav.closeMenu")}
+                className="flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/10 p-2 text-tone-200 transition hover:bg-tone-white/10"
+              >
+                <X className="h-5 w-5" aria-hidden />
+              </button>
+            </SheetClose>
+          </div>
           <nav className="flex flex-col gap-4 text-sm font-medium text-tone-200">
-            {isAuthenticated ? (
-              <>
                 <SheetClose asChild>
                   <LocalizedLink className={baseLinkClasses} href="/promises">
                     {t("nav.myPromises")}
@@ -92,12 +104,12 @@ export function MobileMenu({
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
-                  <LocalizedLink className={primaryLinkClasses} href="/promises/new">
+                  <LocalizedLink className={createLinkClasses} href="/promises/new">
                     {t("nav.newPromise")}
                   </LocalizedLink>
                 </SheetClose>
                 <SheetClose asChild>
-                  <LocalizedLink className={baseLinkClasses} href="/decide/new">
+                  <LocalizedLink className={createLinkClasses} href="/decide/new">
                     {t("nav.createMenu.dispute")}
                   </LocalizedLink>
                 </SheetClose>
@@ -125,14 +137,6 @@ export function MobileMenu({
                   </div>
                   <ProfileSettingsPanel showTitle={false} className="mt-3" />
                 </div>
-              </>
-            ) : (
-              <SheetClose asChild>
-                <Link className={primaryLinkClasses} href={signInHref}>
-                  {t("auth.login.signInCta")}
-                </Link>
-              </SheetClose>
-            )}
           </nav>
         </SheetContent>
       </SheetPortal>

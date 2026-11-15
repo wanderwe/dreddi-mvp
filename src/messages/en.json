@@ -5,6 +5,7 @@
   "nav": {
     "myPromises": "Promises",
     "publicProfiles": "Public profiles",
+    "closeMenu": "Close menu",
     "newPromise": "New promise",
     "login": "Sign in",
     "getStarted": "Get started",
