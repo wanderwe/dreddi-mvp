@@ -1815,7 +1815,8 @@ export default function PromisePage() {
               </p>
             )}
 
-            {p.activated_without_counterparty && !p.counterparty_id && isFinal && (
+            {/* A promise to oneself never had another side: saying so would only confuse. */}
+            {!isSelf && p.activated_without_counterparty && !p.counterparty_id && isFinal && (
               <div className="mt-5 rounded-2xl border border-tone-white/10 bg-tone-white/[0.03] p-4 text-tone-400">
                 <p className="text-sm">{t("promises.detail.closedWithoutCounterparty")}</p>
               </div>

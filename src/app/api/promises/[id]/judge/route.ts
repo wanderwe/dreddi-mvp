@@ -290,8 +290,9 @@ async function applyBindingRuling(loaded: LoadedCase) {
   // Someone changed the status in the meantime; their decision stands.
   if (!updated) return false;
 
-  const selfPromise = !loaded.requiredRoles.includes("counterparty");
-  await applyReputationForPromiseFinalization(admin, updated, selfPromise ? { weight: 0.5, verifiedBy: "dreddi" } : {});
+  // A promise to oneself changes only its own status: nobody else checked it, so it earns no
+  // reputation (decided 2026-11-15). Reputation is what others can trust.
+  if (loaded.requiredRoles.includes("counterparty")) await applyReputationForPromiseFinalization(admin, updated);
 
   // A marker, not a sentence: each side reads it in their own language (see JudgePanel).
   await admin.from("judge_messages").insert({

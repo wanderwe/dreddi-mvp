@@ -1,6 +1,7 @@
 import { resolveExecutorId } from "@/lib/promiseParticipants";
 import type { PromiseStatus } from "@/lib/promiseStatus";
 import { isCompletedOnTime } from "@/lib/reputation/onTime";
+import { isSelfPromise, type SelfPromiseFields } from "@/lib/selfPromise";
 
 type OnTimePromiseRow = {
   status: PromiseStatus;
@@ -12,7 +13,7 @@ type OnTimePromiseRow = {
   counterparty_id: string | null;
   promisor_id: string | null;
   promisee_id: string | null;
-};
+} & SelfPromiseFields;
 
 type OnTimeMetrics = {
   confirmed: number;
@@ -34,6 +35,8 @@ export const buildOnTimeMetrics = (rows: OnTimePromiseRow[], userId: string): On
   for (const row of rows) {
     const executorId = resolveExecutorId(row);
     if (!executorId || executorId !== userId) continue;
+    // A promise to oneself is not counted: nobody else checked it (decided 2026-11-15).
+    if (isSelfPromise(row)) continue;
 
     if (row.status === "confirmed") {
       metrics.confirmed += 1;

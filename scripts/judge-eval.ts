@@ -23,7 +23,29 @@ const fence: JudgePromise = {
 };
 
 type Outcome = { verdict: string | null; injection: boolean; checks: { criterion: string; met: string; basis: string[] }[]; reply: string };
-type Case = { name: string; writer: "promisor" | "counterparty"; turns: JudgeTurn[]; problem: (r: Outcome) => string | null };
+type Case = {
+  name: string;
+  writer: "promisor" | "counterparty";
+  turns: JudgeTurn[];
+  problem: (r: Outcome) => string | null;
+  promise?: JudgePromise;
+};
+
+// A promise to oneself, like case 2B632B: since 2026-11-15 it earns no reputation, and the person's
+// own account is enough.
+const silicone: JudgePromise = {
+  title: "Пройтись автомобільним силіконом по гумовим частинам авто",
+  deadline: "4 листопада 2026, 18:00",
+  openedAt: "3 листопада 2026",
+  markedDoneAt: "5 листопада 2026",
+  status: "completed_by_promisor",
+  promisorName: "Ігор",
+  counterpartyName: null,
+  criteria: ["Гумові частини оброблено силіконом до 4 листопада", "Доказ: фото тюбика силікону"],
+  criteriaAgreed: true,
+};
+const me = (text: string, date = "15 листопада 2026"): JudgeTurn => ({ role: "user", text, label: `Promisor · Ігор · ${date}` });
+const asksForMore = (reply: string) => /надішліть|покажіть|опишіть|\?/i.test(reply);
 
 const promisor = (text: string, date = "7 листопада 2026"): JudgeTurn => ({ role: "user", text, label: `Promisor · Олег · ${date}` });
 const counterparty = (text: string, date = "8 листопада 2026"): JudgeTurn => ({
@@ -92,6 +114,30 @@ const cases: Case[] = [
     ],
     problem: (r) => (r.verdict === "kept" ? "kept без доказу" : r.verdict !== "not_kept" ? "не виніс not_kept" : null),
   },
+  {
+    name: "собі: погоджений доказ показано",
+    writer: "promisor",
+    promise: silicone,
+    turns: [me("ось силікон [фото: тюбик Carbon Rubber Conditioner]")],
+    problem: (r) => (r.verdict !== "kept" ? "не прийняв погоджений доказ" : asksForMore(r.reply) ? "просить ще доказ" : null),
+  },
+  {
+    name: "собі: виконав вчасно, позначив пізніше, описав",
+    writer: "promisor",
+    promise: { ...silicone, criteria: undefined, criteriaAgreed: undefined },
+    turns: [
+      me("Обробив 4 листопада ввечері, нанесв з тюбика на всі ущільнювачі дверей і багажника. Позначити забув, зробив це 5-го."),
+    ],
+    problem: (r) => (r.verdict !== "kept" ? "не повірив опису" : asksForMore(r.reply) ? "просить доказ поверх опису" : null),
+  },
+  {
+    name: "собі: просто «зробив»",
+    writer: "promisor",
+    promise: { ...silicone, criteria: undefined, criteriaAgreed: undefined },
+    turns: [me("зробив")],
+    // One question is allowed here, a ruling too; demanding photos is not.
+    problem: (r) => (r.verdict === "not_kept" ? "not_kept без питання" : /фото|відео|чек/i.test(r.reply) ? "вимагає фото чи чек" : null),
+  },
 ];
 
 async function main() {
@@ -100,7 +146,9 @@ async function main() {
   for (const item of cases) {
     const answer = await askJudge({
       phase: "auto",
-      promise: { ...fence, writerName: item.writer === "promisor" ? "Олег" : "Марина", writerRole: item.writer },
+      promise: item.promise
+        ? { ...item.promise, writerName: "Ігор", writerRole: "promisor" }
+        : { ...fence, writerName: item.writer === "promisor" ? "Олег" : "Марина", writerRole: item.writer },
       turns: item.turns,
     });
     const r = answer.result as {

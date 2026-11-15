@@ -344,6 +344,27 @@ test("on-time metrics align with executor and completed timestamps", () => {
   assert.equal(metrics.totalCompleted, 4);
 });
 
+test("a promise to oneself is left out of the on-time metrics", () => {
+  const at = "2026-11-03T17:46:53.938Z";
+  const self = {
+    status: "confirmed" as PromiseStatus,
+    due_at: "2026-11-04T16:00:00Z",
+    completed_at: "2026-11-04T15:00:00Z",
+    confirmed_at: "2026-11-15T18:45:00Z",
+    creator_id: "me",
+    counterparty_id: null,
+    promisor_id: "me",
+    promisee_id: null,
+    activated_without_counterparty: true,
+    activated_without_counterparty_at: at,
+    invited_at: at,
+  };
+  // The same deal activated later while waiting for someone to join still counts.
+  const waiting = { ...self, invited_at: "2026-11-03T10:00:00Z" };
+  assert.equal(buildOnTimeMetrics([self], "me").totalCompleted, 0);
+  assert.equal(buildOnTimeMetrics([waiting], "me").totalCompleted, 1);
+});
+
 test("important deals apply stronger reputation impact", async () => {
   const admin = new FakeAdmin();
   const promise = {
