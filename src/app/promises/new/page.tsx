@@ -94,9 +94,7 @@ export default function NewPromisePage() {
   const promiseKind: "self" | "me" | "other" = selfPromise ? "self" : executor;
   const counterpartyHelper = selfPromise
     ? t("promises.new.fields.counterpartyHelperSelf")
-    : promiseKind === "me"
-      ? t("promises.new.fields.counterpartyHelperMe")
-      : t("promises.new.fields.counterpartyHelper");
+    : t("promises.new.fields.counterpartyHelper");
   const choosePromiseKind = (kind: "self" | "me" | "other") => {
     setExecutor(kind === "other" ? "other" : "me");
     setNoCounterparty(kind === "self");
