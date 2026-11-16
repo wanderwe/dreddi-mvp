@@ -1,7 +1,7 @@
 import type { QuickLang } from "../ai/quickVerdict";
 import { CHAT_LIMITS, CLOSE_OPTIONS, countSides, majorityRight, type ChatDisputeRow, type ChatPosition, type ChatSideRow, type CloseOption } from "../chatDisputes/state";
 import { localizePath } from "../i18n/routing";
-import { escapeHtml, type InlineButton } from "./api";
+import { BOT_USERNAME, escapeHtml, type InlineButton } from "./api";
 import { closeTime, textsFor } from "./texts";
 
 // What the bot's messages look like: no network or database here.
@@ -111,6 +111,12 @@ export function verdictMessage(
     text,
     photo: new URL(`/api/og/decide/c/${encodeURIComponent(dispute.token)}?locale=${lang}`, siteUrl).toString(),
     caption,
-    reply_markup: { inline_keyboard: [[{ text: t.more, url }, { text: t.share, url: share }]] },
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: t.more, url }, { text: t.share, url: share }],
+        // Someone who liked it takes Dreddi to their other chats: the way groups bring groups.
+        [{ text: t.addToOtherGroup, url: `https://t.me/${BOT_USERNAME}?startgroup=true` }],
+      ],
+    },
   };
 }
