@@ -1,6 +1,7 @@
 import { Scale, Trophy } from "lucide-react";
 import type { QuickVerdict } from "@/lib/ai/quickVerdict";
 import type { TFunction } from "@/lib/i18n/t";
+import { MarkUseful } from "@/app/components/InstallBanner";
 
 // The verdict of «Дредді розсуди», the same in the shared chat and on the public card. No hooks, so a
 // server page can render it too.
@@ -30,6 +31,7 @@ export function VerdictCard({
   const trophy = won ?? (verdict.winner === "A" || verdict.winner === "B");
   return (
     <section className="relative space-y-4 overflow-clip rounded-2xl border border-amber-300/40 bg-gradient-to-br from-amber-300/[0.10] via-accent-400/[0.05] to-transparent p-5 shadow-xl shadow-amber-500/10">
+      <MarkUseful />
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-300/20 blur-3xl" aria-hidden />
       <div className="relative space-y-2">
         <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-200">

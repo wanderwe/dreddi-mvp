@@ -1,6 +1,7 @@
 "use client";
 
 import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
+import { markUseful } from "@/lib/install";
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -1024,6 +1025,7 @@ export default function NewPromisePage() {
 
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(DEAL_DRAFT_STORAGE_KEY);
+      markUseful();
     }
 
     router.push(localizePath(`/promises/${body.id}`, locale));

@@ -10,6 +10,7 @@ import {
   themeInitScript,
 } from "@/lib/theme";
 import "./globals.css";
+import { installPromptScript } from "@/lib/install";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -87,6 +88,7 @@ export default async function RootLayout({
       <head>
         <meta name="theme-color" content={THEME_COLORS[serverTheme]} />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: installPromptScript }} />
       </head>
       {body}
     </html>

@@ -1634,5 +1634,11 @@
         "other": "people"
       }
     }
+  },
+  "install": {
+    "text": "Install Dreddi on your phone to get promise and verdict alerts right away",
+    "button": "Install",
+    "iosHint": "Tap Share, then Add to Home Screen",
+    "close": "Close"
   }
 }
