@@ -2,11 +2,10 @@
 
 import { LocalizedLink } from "@/app/components/LocalizedLink";
 import { DealsTabs } from "@/app/components/DealsTabs";
-import { CheckCircle2, BadgeCheck, BellRing, ChevronDown, Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { NewDealButton } from "@/app/components/NewDealButton";
-import { IconButton } from "@/app/components/ui/IconButton";
 import { StatusPill, StatusPillTone } from "@/app/components/ui/StatusPill";
 import { Tooltip } from "@/app/components/ui/Tooltip";
 import { requireSupabase } from "@/lib/supabaseClient";
@@ -16,12 +15,9 @@ import { PromiseRole, isAwaitingOthers, isAwaitingYourAction } from "@/lib/promi
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizeLoginPath, localizePath } from "@/lib/i18n/routing";
 import { resolveExecutorId } from "@/lib/promiseParticipants";
-import { getNextActionOwner } from "@/lib/promiseNextAction";
 import { formatDealMeta } from "@/lib/formatDealMeta";
-import { getPromiseLabels } from "@/lib/promiseLabels";
 import {
   getPromiseInviteStatus,
-  isPromiseAccepted,
   InviteStatus,
 } from "@/lib/promiseAcceptance";
 import { getPromiseUiStatus, PromiseUiStatus } from "@/lib/promiseUiStatus";
@@ -106,11 +102,6 @@ type PromiseSummary = PromiseRoleBase & {
   inviteStatus: InviteStatus;
   uiStatus: PromiseUiStatus;
   isReviewer: boolean;
-};
-
-type ReminderInfo = {
-  count: number;
-  lastSentAt: string | null;
 };
 
 const PAGE_SIZE = 12;
@@ -259,8 +250,6 @@ export default function PromisesClient() {
     [t]
   );
 
-  const promiseLabels = useMemo(() => getPromiseLabels(t), [t]);
-
   useEffect(() => {
     if (tabParam !== "watching") return;
     router.replace(localizePath("/watching", locale));
@@ -322,11 +311,6 @@ export default function PromisesClient() {
   const [listLoading, setListLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [busyMap, setBusyMap] = useState<Record<string, boolean>>({});
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
-  const [reminderInfoByDeal, setReminderInfoByDeal] = useState<Record<string, ReminderInfo>>({});
-  const [toast, setToast] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [activeMetricFilter, setActiveMetricFilter] = useState<MetricFilter>(metricFromSearch);
   const [activeStatusFilter, setActiveStatusFilter] = useState<StatusFilter>(statusFromSearch);
@@ -345,25 +329,6 @@ export default function PromisesClient() {
 
   const supabaseErrorMessage = (error: unknown) =>
     error instanceof Error ? error.message : "Authentication is unavailable in this preview.";
-
-  const reminderErrorMessage = (errorCode?: string, detail?: string) => {
-    if (errorCode === "reminder_rate_limit") return t("promises.list.reminder.rateLimited");
-    if (errorCode === "reminder_forbidden") return t("promises.list.reminder.forbidden");
-    if (errorCode === "reminder_feature_unavailable") return t("promises.list.reminder.unavailable");
-    if (errorCode === "reminder_acceptance_required") return t("promises.list.reminder.acceptedOnly");
-    if (errorCode === "reminder_invalid_state") return t("promises.list.reminder.invalidState");
-    if (errorCode === "reminder_participants_invalid") return t("promises.list.reminder.participantsInvalid");
-    if (errorCode === "reminder_create_failed") {
-      return t("promises.list.reminder.createFailed", { detail: detail ?? "unknown" });
-    }
-    if (errorCode === "reminder_notification_failed") {
-      return t("promises.list.reminder.notificationFailed", { detail: detail ?? "unknown" });
-    }
-    if (errorCode === "reminder_unexpected") {
-      return t("promises.list.reminder.unexpected", { detail: detail ?? "unknown" });
-    }
-    return t("promises.list.reminder.sendFailed");
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -494,35 +459,6 @@ export default function PromisesClient() {
     setPageByTab((prev) => ({ ...prev, [tabKey]: page }));
   };
 
-  const loadReminderInfo = async (ids: string[]) => {
-    if (!ids.length) return;
-
-    let supabase;
-    try {
-      supabase = requireSupabase();
-    } catch {
-      return;
-    }
-
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) return;
-
-    const res = await fetch(`/api/promises/reminders/summary?ids=${encodeURIComponent(ids.join(","))}`, {
-      headers: {
-        Authorization: `Bearer ${data.session.access_token}`,
-      },
-    });
-
-    if (!res.ok) return;
-
-    const body = await res.json().catch(() => null) as
-      | { reminders?: Record<string, ReminderInfo> }
-      | null;
-    if (!body?.reminders) return;
-
-    setReminderInfoByDeal((prev) => ({ ...prev, ...body.reminders }));
-  };
-
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
@@ -543,12 +479,6 @@ export default function PromisesClient() {
       cancelled = true;
     };
   }, [tab, userId]);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 1800);
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   useEffect(() => {
     if (!isStatusMenuOpen && !isDealTypeMenuOpen) return;
@@ -590,72 +520,6 @@ export default function PromisesClient() {
   useEffect(() => {
     setActiveDealTypeFilter(dealTypeFromSearch);
   }, [dealTypeFromSearch]);
-
-  useEffect(() => {
-    if (listLoading) return;
-    const summaryForTab = applyMetricFilter(summaryRows).filter((row) =>
-      tab === "all" ? true : tab === "i-promised" ? row.role === "promisor" : row.role === "counterparty"
-    );
-    const hasAnyActiveFilter =
-      activeMetricFilter !== "total" ||
-      activeStatusFilter !== STATUS_FILTER_ALL ||
-      activeDealTypeFilter !== DEAL_TYPE_FILTER_ALL;
-    const filteredRows = hasAnyActiveFilter
-      ? applyStatusFilter(summaryForTab)
-      : applyListFilters(listRowsByTab[tab] ?? []);
-    void loadReminderInfo(filteredRows.map((row) => row.id));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMetricFilter, activeStatusFilter, activeDealTypeFilter, searchQuery, listLoading, listRowsByTab, summaryRows, tab]);
-
-  const handleSendReminder = async (promiseId: string) => {
-    setError(null);
-    setSendingReminderId(promiseId);
-    try {
-      const supabase = requireSupabase();
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        router.push(localizeLoginPath(localizePath("/promises", locale), locale));
-        return;
-      }
-
-      const res = await fetch(`/api/promises/${promiseId}/reminder`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${data.session.access_token}`,
-        },
-      });
-
-      const body = await res.json().catch(() => ({})) as {
-        error?: string;
-        error_code?: string;
-        detail?: string | null;
-        count?: number;
-        created_at?: string;
-      };
-      if (!res.ok) {
-        throw new Error(reminderErrorMessage(body.error_code, body.detail ?? undefined));
-      }
-
-      setReminderInfoByDeal((prev) => ({
-        ...prev,
-        [promiseId]: {
-          count: body.count ?? (prev[promiseId]?.count ?? 0) + 1,
-          lastSentAt: body.created_at ?? new Date().toISOString(),
-        },
-      }));
-      setToast(t("promises.list.reminder.sent"));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t("promises.list.reminder.sendFailed"));
-    } finally {
-      setSendingReminderId(null);
-    }
-  };
-
-  const isReminderCoolingDown = (lastSentAt: string | null) => {
-    if (!lastSentAt) return false;
-    const diff = Date.now() - new Date(lastSentAt).getTime();
-    return diff < 24 * 60 * 60 * 1000;
-  };
 
   const applyMetricFilter = <T extends PromiseSummary | PromiseWithRole>(
     rows: T[]
@@ -717,10 +581,6 @@ export default function PromisesClient() {
     if (!q) return rows;
     return rows.filter((row) => row.title.toLowerCase().includes(q));
   };
-
-  const applyListFilters = <T extends PromiseSummary | PromiseWithRole>(
-    rows: T[]
-  ): T[] => applySearchFilter(applyDealTypeFilter(applyStatusFilter(applyMetricFilter(rows))));
 
   const filteredSummaryRows = useMemo(
     () => applySearchFilter(applyDealTypeFilter(applyMetricFilter(summaryRows))),
@@ -892,54 +752,6 @@ export default function PromisesClient() {
     }
   }, [activeMetricFilter, countMeExecutor, countOtherExecutor, summaryLoaded, tab]);
 
-  const handleMarkCompleted = async (promiseId: string) => {
-    setBusyMap((m) => ({ ...m, [promiseId]: true }));
-    setError(null);
-    try {
-      const supabase = requireSupabase();
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        router.push(localizeLoginPath(localizePath("/promises", locale), locale));
-        return;
-      }
-
-      const res = await fetch(`/api/promises/${promiseId}/complete`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${data.session.access_token}`,
-        },
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? t("promises.list.errors.markComplete"));
-      }
-
-      setSummaryRows((prev) =>
-        prev.map((row) =>
-          row.id === promiseId ? { ...row, status: "completed_by_promisor" } : row
-        )
-      );
-      setListRowsByTab((prev) => {
-        const updater = (rows: PromiseWithRole[]) =>
-          rows.map((row) =>
-            row.id === promiseId ? { ...row, status: "completed_by_promisor" as const } : row
-          );
-        return {
-          "i-promised": updater(prev["i-promised"]),
-          "promised-to-me": updater(prev["promised-to-me"]),
-          "all": updater(prev["all"]),
-        };
-      });
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : t("promises.list.errors.updateFailed")
-      );
-    } finally {
-      setBusyMap((m) => ({ ...m, [promiseId]: false }));
-    }
-  };
-
   const handleLoadMore = async () => {
     if (loadingMore || effectiveListLoading || !canLoadMore) return;
     const nextPage = pageByTab[tab] + 1;
@@ -1012,18 +824,6 @@ export default function PromisesClient() {
 
   return (
     <main className="relative py-8 sm:py-10">
-      {toast && (
-        <div className="pointer-events-none fixed inset-x-4 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 flex justify-center sm:bottom-8">
-          <div
-            role="status"
-            aria-live="polite"
-            className="max-w-sm rounded-2xl border border-accent-300/35 bg-emerald-500/20 px-4 py-3 text-sm font-semibold text-accent-50 shadow-2xl shadow-tone-black/35 backdrop-blur-md sm:max-w-md"
-          >
-            {toast}
-          </div>
-        </div>
-      )}
-
       <div
         className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(74,222,128,0.08),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(74,144,226,0.08),transparent_28%)]"
         aria-hidden
@@ -1277,28 +1077,16 @@ export default function PromisesClient() {
 
             {!effectiveListLoading &&
               displayRows.map((p) => {
-                const isPromisor = p.role === "promisor";
-                const canReview = p.isReviewer;
-                const acceptedBySecondSide = isPromiseAccepted(p);
-                const canSendReminder = getNextActionOwner(p, userId) === "other";
                 const isDeclined = p.uiStatus === "declined" || p.status === "declined";
                 const isArchivedInviteStatus =
                   p.status === "declined" ||
                   p.uiStatus === "declined" ||
                   p.uiStatus === "expired" ||
                   p.uiStatus === "cancelled_by_creator";
-                const reminderInfo = reminderInfoByDeal[p.id] ?? { count: 0, lastSentAt: null };
-                const reminderCooldown = isReminderCoolingDown(reminderInfo.lastSentAt);
-                const reminderTooltip = reminderInfo.lastSentAt
-                  ? t("promises.list.reminder.tooltipWithLast", {
-                      date: new Date(reminderInfo.lastSentAt).toLocaleString(locale),
-                    })
-                  : t("promises.list.reminder.tooltip");
 
                 const statusLabel = statusLabelForRole(p.status, p.role, p.uiStatus);
                 const statusPill = statusPillFor(p.status, p.uiStatus);
 
-                const busy = busyMap[p.id];
                 const dealMeta = isDeclined
                   ? formatDealMeta(
                       {
@@ -1314,14 +1102,21 @@ export default function PromisesClient() {
                   <div
                     key={p.id}
                     className={[
-                      "group overflow-hidden rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4",
+                      "group relative overflow-hidden rounded-2xl border border-tone-white/10 bg-tone-white/5 p-4 transition hover:border-accent-300/40 hover:bg-emerald-500/5 sm:p-5 lg:p-4",
                       isArchivedInviteStatus ? "opacity-70" : "",
                     ].join(" ")}
                   >
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+                    {/* The whole card opens the promise; the title stays the link for keyboards and screen readers. */}
+                    <LocalizedLink
+                      href={`/promises/${p.id}?from=deals`}
+                      aria-hidden
+                      tabIndex={-1}
+                      className="absolute inset-0 rounded-2xl"
+                    />
+                    <div className="pointer-events-none relative flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex min-w-0 items-center gap-2">
-                          <div className="min-w-0 flex-1">
+                          <div className="pointer-events-auto min-w-0 flex-1">
                             <DealTitleLink id={p.id} title={p.title} />
                           </div>
                         </div>
@@ -1335,41 +1130,6 @@ export default function PromisesClient() {
                           icon={statusPill.icon}
                           className="shrink-0"
                         />
-
-                        {canSendReminder && (
-                          <Tooltip label={reminderTooltip} placement="top">
-                            <IconButton
-                              icon={<BellRing className="h-[18px] w-[18px]" />}
-                              ariaLabel={t("promises.list.reminder.aria")}
-                              onClick={() => handleSendReminder(p.id)}
-                              disabled={sendingReminderId === p.id || reminderCooldown}
-                              className="h-12 w-12"
-                            />
-                          </Tooltip>
-                        )}
-
-                        {isPromisor && p.status === "active" && acceptedBySecondSide && (
-                          <Tooltip label={t("promises.list.markCompleted")} placement="top">
-                            <IconButton
-                              icon={<CheckCircle2 className="h-[18px] w-[18px]" />}
-                              ariaLabel={t("promises.list.markCompleted")}
-                              onClick={() => setConfirmingId(p.id)}
-                              disabled={busy}
-                              className="h-12 w-12"
-                            />
-                          </Tooltip>
-                        )}
-
-                        {canReview && p.status === "completed_by_promisor" && (
-                          <Tooltip label={t("promises.list.reviewConfirm")} placement="top">
-                            <IconButton
-                              href={`/promises/${p.id}/confirm`}
-                              icon={<BadgeCheck className="h-[18px] w-[18px]" />}
-                              ariaLabel={t("promises.list.reviewConfirm")}
-                              className="h-12 w-12"
-                            />
-                          </Tooltip>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -1438,39 +1198,6 @@ export default function PromisesClient() {
         </div>
       </div>
 
-      {confirmingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-tone-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-tone-white/10 bg-ntone-900 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-tone-white">
-              {t("promises.confirmModal.title")}
-            </h2>
-            <p className="mt-3 text-sm text-ntone-200">
-              {t("promises.confirmModal.body", { entityLower: promiseLabels.entityLower })}
-            </p>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setConfirmingId(null)}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-tone-white/20 bg-tone-white/5 px-4 py-2 text-sm font-semibold text-tone-white transition hover:bg-tone-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
-              >
-                {t("promises.confirmModal.cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  const id = confirmingId;
-                  setConfirmingId(null);
-                  if (id) await handleMarkCompleted(id);
-                }}
-                className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-accent-500/30 transition hover:translate-y-[-1px] hover:shadow-accent-400/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-tone-950"
-              >
-                {t("promises.confirmModal.confirm")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
