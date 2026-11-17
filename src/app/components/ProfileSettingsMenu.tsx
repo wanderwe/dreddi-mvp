@@ -512,7 +512,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
                           placeholder={t("profileSettings.displayNamePlaceholder")}
                           maxLength={40}
-                          className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
+                          className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-sm placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                         />
                         {displayNameInput.length > 0 && (
                           <button
@@ -544,7 +544,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                           onBlur={() => { if (identityChanged && !displayNameTooShort && !displayNameTooLong && !handleMissing) void saveIdentity(); }}
                           onKeyDown={(e) => { if (e.key === "Enter") { e.currentTarget.blur(); } }}
                           placeholder={t("profileSettings.handlePlaceholder")}
-                          className="w-full bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
+                          className="w-full bg-transparent text-base text-tone-white placeholder:text-sm placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                         />
                       </div>
                       <HelperText>{t("profileSettings.handleHelper")}</HelperText>
@@ -730,7 +730,7 @@ export function ProfileSettingsPanel({ showTitle = true, className = "" }: Profi
                                 }}
                                 onBlur={() => addTagsFromInput(profileTagsInput)}
                                 placeholder={t("profileSettings.tagsPlaceholder")}
-                                className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
+                                className="w-full min-w-0 bg-transparent text-base text-tone-white placeholder:text-sm placeholder:text-tone-500 focus-visible:outline-none md:text-sm"
                               />
                               {profileTagsInput.trim().length > 0 && (
                                 <button
