@@ -67,8 +67,14 @@ export type CloseOption = (typeof CLOSE_OPTIONS)[number];
 
 const HOUR_MS = 60 * 60 * 1000;
 
-export const closesAtFor = (option: CloseOption, now: Date = new Date()) =>
-  option === "manual" ? null : new Date(now.getTime() + (option === "hour" ? 1 : 24) * HOUR_MS).toISOString();
+// On the minute: the bot shows «о 22:47» and the tick runs every minute at :00, so it closes on the minute
+// it promised, not one later.
+export const closesAtFor = (option: CloseOption, now: Date = new Date()) => {
+  if (option === "manual") return null;
+  const at = new Date(now.getTime() + (option === "hour" ? 1 : 24) * HOUR_MS);
+  at.setUTCSeconds(0, 0);
+  return at.toISOString();
+};
 
 // Time is up (a dispute closed by hand has no time).
 export const closeDue = (dispute: { status: string; closes_at: string | null }, now: Date = new Date()) =>

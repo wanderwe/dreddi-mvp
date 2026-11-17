@@ -39,6 +39,8 @@ test("closing: an hour or a day ahead, or by hand; due only while open and past 
   assert.equal(closesAtFor("hour", now), "2026-11-10T11:00:00.000Z");
   assert.equal(closesAtFor("day", now), "2026-11-11T10:00:00.000Z");
   assert.equal(closesAtFor("manual", now), null);
+  // Seconds are dropped, so it closes on the minute the bot shows.
+  assert.equal(closesAtFor("hour", new Date("2026-11-10T10:00:47.512Z")), "2026-11-10T11:00:00.000Z");
   assert.equal(closeDue(dispute(), new Date("2026-11-10T10:59:00.000Z")), false);
   assert.equal(closeDue(dispute(), new Date("2026-11-10T11:00:00.000Z")), true);
   assert.equal(closeDue(dispute({ closes_at: null })), false);
