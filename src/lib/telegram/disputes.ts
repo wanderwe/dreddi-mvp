@@ -95,7 +95,10 @@ export async function handleUpdate(update: TgUpdate) {
   if (command) return onCommand(message, command.name, command.rest);
   if (isGroup(message) && message.reply_to_message?.from?.username === BOT_USERNAME) {
     // An answer to «what is the argument?» (sent for a bare /dreddi) is the /dreddi text itself.
-    if (isPrompt(message.reply_to_message)) return onCommand(message, "dreddi", (message.text ?? message.caption ?? "").trim(), { fromPrompt: true });
+    if (isPrompt(message.reply_to_message)) {
+      await onCommand(message, "dreddi", (message.text ?? message.caption ?? "").trim(), { fromPrompt: true });
+      return deletePrompt(message.chat.id, message.reply_to_message.message_id);
+    }
     return onReply(message);
   }
 }
@@ -110,6 +113,30 @@ const PROMPTS = new Set<string>([
   'Describe the argument, for example: "Which is bigger, Australia or Antarctica? Some say Australia, others say Antarctica."',
 ]);
 const isPrompt = (message: TgMessage) => Boolean(message.text && PROMPTS.has(message.text));
+
+// The question holds a reply open for the person (force_reply) until they answer it, even days later and
+// after they started a dispute another way: Telegram keeps it as the chat's draft. Only deleting the
+// question closes it, so it goes once answered, or after a while unanswered (the tick).
+const PROMPT_TTL_MS = 15 * 60 * 1000;
+
+async function deletePrompt(chatId: number, messageId: number) {
+  await quietly(tg("deleteMessage", { chat_id: chatId, message_id: messageId }));
+  await getAdminClient().from("telegram_prompts").delete().eq("chat_id", chatId).eq("message_id", messageId).then(
+    () => undefined,
+    () => undefined
+  );
+}
+
+export async function clearStalePrompts(limit = 50) {
+  const { data } = await getAdminClient()
+    .from("telegram_prompts")
+    .select("chat_id,message_id")
+    .lt("created_at", new Date(Date.now() - PROMPT_TTL_MS).toISOString())
+    .order("created_at")
+    .limit(limit)
+    .returns<{ chat_id: number; message_id: number }[]>();
+  for (const prompt of data ?? []) await deletePrompt(prompt.chat_id, prompt.message_id);
+}
 
 // «/dreddi текст» or «/dreddi@dreddi_bot текст»; a command for another bot is not ours.
 function commandOf(message: TgMessage) {
@@ -147,7 +174,16 @@ async function onCommand(message: TgMessage, name: string, rest: string, options
   // A bare /dreddi (picking it from Telegram's command list sends it at once): ask, and open a reply to
   // the question for this person, so they write the argument instead of typing the command again.
   if (!rest && !context) {
-    return reply(t.empty, { reply_markup: { force_reply: true, selective: true, input_field_placeholder: t.emptyPlaceholder } });
+    const prompt = (await reply(t.empty, {
+      reply_markup: { force_reply: true, selective: true, input_field_placeholder: t.emptyPlaceholder },
+    })) as TgMessage | undefined;
+    if (prompt?.message_id) {
+      await getAdminClient().from("telegram_prompts").insert({ chat_id: message.chat.id, message_id: prompt.message_id }).then(
+        () => undefined,
+        () => undefined
+      );
+    }
+    return;
   }
 
   const from = message.from!;
