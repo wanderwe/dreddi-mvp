@@ -30,7 +30,8 @@ Find the disagreement: the question people disagree about and the two opposing p
 - Stay close to what people actually said. Keep their own words and the exact claim, including amounts and frequencies («раз на тиждень», «через день»). Never turn a claim into a different one: if someone says to do something more often, it is not a call to stop.
 - People write casually, with slang and mixed Ukrainian and Russian. Read slang as it is meant in everyday speech: «валити кальян» means smoking it, not quitting it. When unsure what a phrase means, keep it close to the original wording rather than guessing.
 - <context> is the message the command replied to, if any: use it to understand the disagreement.
-- If there are no two opposing positions (a plain question, a greeting, nonsense), set found to false and leave the other fields empty.
+- A question that names two alternatives is a dispute even when nobody says who holds which: the alternatives are the positions. «Що швидше до Львова, поїзд чи автобус?» gives «Поїзд» and «Автобус». Keep every detail of the question that matters for the answer (how many people, when, where from).
+- If there are no two opposing positions (a plain question with no alternatives named, a greeting, nonsense), set found to false and leave the other fields empty.
 Write in ${LANG_NAME[lang]}, whatever language the chat uses. Do not use long dashes (—). No closing period in the positions.`;
 
 export async function parseChatDispute(input: {

@@ -94,9 +94,11 @@ export async function handleUpdate(update: TgUpdate) {
   const command = commandOf(message);
   if (command) return onCommand(message, command.name, command.rest);
   if (isGroup(message) && message.reply_to_message?.from?.username === BOT_USERNAME) {
-    // An answer to «what is the argument?» (sent for a bare /dreddi) is the /dreddi text itself.
-    if (isPrompt(message.reply_to_message)) {
-      await onCommand(message, "dreddi", (message.text ?? message.caption ?? "").trim(), { fromPrompt: true });
+    // An answer to «what is the argument?» (sent for a bare /dreddi) is the /dreddi text itself; one to
+    // «I can't see two positions» is read together with what was first written.
+    const asked = await promptFor(message.chat.id, message.reply_to_message.message_id);
+    if (asked || isPrompt(message.reply_to_message)) {
+      await onCommand(message, "dreddi", (message.text ?? message.caption ?? "").trim(), { fromPrompt: true, promptContext: asked?.context ?? null });
       return deletePrompt(message.chat.id, message.reply_to_message.message_id);
     }
     return onReply(message);
@@ -122,6 +124,24 @@ const PROMPT_TTL_MS = 15 * 60 * 1000;
 async function deletePrompt(chatId: number, messageId: number) {
   await quietly(tg("deleteMessage", { chat_id: chatId, message_id: messageId }));
   await getAdminClient().from("telegram_prompts").delete().eq("chat_id", chatId).eq("message_id", messageId).then(
+    () => undefined,
+    () => undefined
+  );
+}
+
+async function promptFor(chatId: number, messageId: number) {
+  const { data } = await getAdminClient()
+    .from("telegram_prompts")
+    .select("context")
+    .eq("chat_id", chatId)
+    .eq("message_id", messageId)
+    .maybeSingle<{ context: string | null }>();
+  return data;
+}
+
+async function rememberPrompt(chatId: number, prompt: TgMessage | undefined, context: string | null = null) {
+  if (!prompt?.message_id) return;
+  await getAdminClient().from("telegram_prompts").insert({ chat_id: chatId, message_id: prompt.message_id, ...(context ? { context } : {}) }).then(
     () => undefined,
     () => undefined
   );
@@ -156,9 +176,15 @@ async function onMembership(update: TgChatMemberUpdated) {
   await logEvent("tg_bot_added", sha256(`chat:${update.chat.id}`).slice(0, 32));
 }
 
-async function onCommand(message: TgMessage, name: string, rest: string, options: { fromPrompt?: boolean } = {}) {
-  // An answer to the prompt replies to the bot's question, which is not the argument's context.
-  const context = options.fromPrompt ? null : (message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null);
+async function onCommand(
+  message: TgMessage,
+  name: string,
+  rest: string,
+  options: { fromPrompt?: boolean; promptContext?: string | null } = {}
+) {
+  // An answer to the bot's question replies to the question, which is not the argument's context; what
+  // the person first wrote is, when the question was «I can't see two positions».
+  const context = options.fromPrompt ? (options.promptContext ?? null) : (message.reply_to_message?.text ?? message.reply_to_message?.caption ?? null);
   const lang = langFor(`${rest} ${context ?? ""} ${message.chat.title ?? ""}`, message.from?.language_code);
   const t = textsFor(lang);
   const reply = (text: string, extra: Record<string, unknown> = {}) =>
@@ -177,13 +203,7 @@ async function onCommand(message: TgMessage, name: string, rest: string, options
     const prompt = (await reply(t.empty, {
       reply_markup: { force_reply: true, selective: true, input_field_placeholder: t.emptyPlaceholder },
     })) as TgMessage | undefined;
-    if (prompt?.message_id) {
-      await getAdminClient().from("telegram_prompts").insert({ chat_id: message.chat.id, message_id: prompt.message_id }).then(
-        () => undefined,
-        () => undefined
-      );
-    }
-    return;
+    return rememberPrompt(message.chat.id, prompt);
   }
 
   const from = message.from!;
@@ -206,7 +226,14 @@ async function onCommand(message: TgMessage, name: string, rest: string, options
   });
   await recordAiUsage("tg_parse", result.costUsd, keys);
   const parsed = result.parsed;
-  if (!parsed) return reply(t.notFound);
+  if (!parsed) {
+    // Open a reply for the person: who claims what, read together with what they wrote.
+    const asked = (await reply(t.notFound, {
+      reply_markup: { force_reply: true, selective: true, input_field_placeholder: t.emptyPlaceholder },
+    })) as TgMessage | undefined;
+    const written = [context, rest].filter(Boolean).join("\n").slice(0, 1500);
+    return rememberPrompt(message.chat.id, asked, written || null);
+  }
 
   const { data: dispute, error } = await admin
     .from("quick_chat_disputes")
