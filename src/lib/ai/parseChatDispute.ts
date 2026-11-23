@@ -10,7 +10,7 @@ import type { QuickLang } from "./quickVerdict";
 
 export const ParsedDisputeSchema = z.object({
   found: z.boolean().describe("True only if the text contains a disagreement with two opposing positions"),
-  question: z.string().describe("The disputed question, one short sentence, at most 200 characters"),
+  question: z.string().describe("The disputed question with the circumstances that matter for the answer, at most 250 characters"),
   position_1: z.string().describe("The first position as a short claim, at most 35 characters, no names"),
   position_2: z.string().describe("The opposing position as a short claim, at most 35 characters, differing from the first in its first words, no names"),
 });
@@ -31,10 +31,12 @@ Find the disagreement: the question people disagree about and the two opposing p
 - People write casually, with slang and mixed Ukrainian and Russian. Read slang as it is meant in everyday speech: «валити кальян» means smoking it, not quitting it. When unsure what a phrase means, keep it close to the original wording rather than guessing.
 - <context> is the message the command replied to, if any: use it to understand the disagreement.
 - A question that names two alternatives is a dispute even when nobody says who holds which: the alternatives are the positions. «Що швидше до Львова, поїзд чи автобус?» gives «Поїзд» and «Автобус». Keep every detail of the question that matters for the answer (how many people, when, where from).
+- The question must carry the circumstances that change the answer: who asks and in what situation (by car or on foot, with children, which country), and «now» or «during the war» when the message says so. Leave out jokes and greetings. «Слухай, розсуди: я їду на авто в Європу, зараз війна, швидше через вантажний гейт чи легковий?» gives «Їду легковим авто з України в ЄС під час війни: через який пункт пропуску швидше, вантажний чи легковий?». These circumstances only sharpen the question: they never make a dispute out of nothing or stop one from being a dispute.
+- Two answers named in a yes-or-no question are alternatives too: «Заряджати до 100% норм чи вбиває батарею?» gives «Це норма» and «Вбиває батарею».
 - If there are no two opposing positions (a plain question with no alternatives named, a greeting, nonsense), set found to false and leave the other fields empty.
 Write in ${LANG_NAME[lang]}, whatever language the chat uses. Do not use long dashes (—). No closing period in the positions.`;
 
-export async function parseChatDispute(input: {
+async function parseOnce(input: {
   lang: QuickLang;
   text: string;
   context?: string | null;
@@ -72,4 +74,18 @@ export async function parseChatDispute(input: {
   } catch (error) {
     throw toJudgeError(error);
   }
+}
+
+type ParseInput = Parameters<typeof parseOnce>[0];
+
+// Now and then the model slips an English word into a Ukrainian one («кошеняaccording»): such a
+// question would reach the whole chat, so it gets one more try.
+const garbled = (parsed: ParsedDispute | null) =>
+  !!parsed && /[а-яґєії][a-z]|[a-z][а-яґєії]/i.test(`${parsed.question} ${parsed.position1} ${parsed.position2}`);
+
+export async function parseChatDispute(input: ParseInput): Promise<{ parsed: ParsedDispute | null; costUsd: number }> {
+  const first = await parseOnce(input);
+  if (!garbled(first.parsed)) return first;
+  const second = await parseOnce(input);
+  return { parsed: garbled(second.parsed) ? null : second.parsed, costUsd: first.costUsd + second.costUsd };
 }
