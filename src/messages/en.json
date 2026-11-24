@@ -27,9 +27,10 @@
       "dispute": "New dispute"
     },
     "theme": {
-      "current": "Theme: {theme}. Click to change.",
-      "light": "light",
-      "dark": "dark",
+      "switchTo": {
+        "light": "Switch to light theme",
+        "dark": "Switch to dark theme"
+      },
       "options": {
         "label": "Theme",
         "light": "Light",

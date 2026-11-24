@@ -39,11 +39,13 @@ export function ThemeSwitcher() {
   const t = useT();
   const { theme, toggle } = useThemeToggle();
 
-  const label = t("nav.theme.current", { theme: t(`nav.theme.${theme}`) });
+  // Like the language button (EN on the Ukrainian site), the button shows where a click takes you.
+  const next: Theme = theme === "dark" ? "light" : "dark";
+  const label = t(`nav.theme.switchTo.${next}`);
 
   return (
     <Tooltip label={label} placement="top-right">
-      <IconButton onClick={toggle} ariaLabel={label} icon={ICONS[theme]} />
+      <IconButton onClick={toggle} ariaLabel={label} icon={ICONS[next]} />
     </Tooltip>
   );
 }
