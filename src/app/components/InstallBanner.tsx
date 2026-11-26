@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { getAuthState } from "@/lib/auth/getAuthState";
+import { primaryButtonClass } from "@/app/decide/shared";
 import {
   dismissInstall,
   markUseful,
@@ -79,7 +80,7 @@ export function InstallBanner() {
         <button
           type="button"
           onClick={() => void install()}
-          className="mt-3 w-full cursor-pointer rounded-xl border border-accent-300/40 px-3 py-2 font-medium text-accent-200 transition hover:border-accent-300/70 hover:bg-accent-400/10"
+          className={`${primaryButtonClass} mt-3 w-full`}
         >
           {t("install.button")}
         </button>
