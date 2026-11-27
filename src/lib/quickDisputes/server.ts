@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { checkDisputeAllowance } from "@/lib/billing/server";
 import { checkAiBudget, recordAiUsage } from "@/lib/ai/budget";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
@@ -172,6 +173,7 @@ export async function createDispute(
   if ((mine ?? 0) >= LIMITS.perCreatorPerDay || (fromIp ?? 0) >= LIMITS.perIpPerDay) {
     throw new JudgeError("daily_limit", 429);
   }
+  await checkDisputeAllowance(identity.userId, creatorKey);
 
   const { data: dispute, error } = await admin
     .from("quick_disputes")

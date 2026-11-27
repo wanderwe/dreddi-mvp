@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { getAdminClient } from "@/app/api/promises/[id]/common";
 import { JudgeError } from "@/lib/ai/askJudge";
 import { askChatVerdict } from "@/lib/ai/askChatVerdict";
+import { checkDisputeAllowance } from "@/lib/billing/server";
 import { checkAiBudget, recordAiUsage } from "@/lib/ai/budget";
 import type { QuickLang } from "@/lib/ai/quickVerdict";
 import { LIMITS, isRandomNickname, maskNames, randomNickname } from "@/lib/quickDisputes/state";
@@ -62,6 +63,7 @@ export async function createChatDispute(
   if ((mine ?? 0) >= CHAT_LIMITS.perCreatorPerDay || (fromIp ?? 0) >= CHAT_LIMITS.perIpPerDay) {
     throw new JudgeError("daily_limit", 429);
   }
+  await checkDisputeAllowance(identity.userId, creatorKey);
 
   const { data, error } = await admin
     .from("quick_chat_disputes")
