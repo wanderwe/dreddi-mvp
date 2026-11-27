@@ -25,6 +25,8 @@ import {
   useLoginHref,
   useSignedIn,
   type StepIndex,
+  CharCount,
+  tooLong,
 } from "../shared";
 
 const POLL_MS = 5000;
@@ -444,7 +446,7 @@ export default function QuickDisputePage() {
               onSubmit={(e) => {
                 e.preventDefault();
                 // An empty reply sends nothing: it points to the field instead.
-                if (!rebuttal.trim()) {
+                if (!rebuttal.trim() || tooLong(rebuttal, LIMITS.rebuttal)) {
                   rebuttalInputRef.current?.focus();
                   return;
                 }
@@ -459,15 +461,19 @@ export default function QuickDisputePage() {
                 ref={rebuttalInputRef}
                 className="min-h-[96px] w-full rounded-xl border border-emerald-400/30 bg-tone-950/60 px-3 py-2 text-sm text-tone-white outline-none placeholder:text-tone-500 focus:border-emerald-400/70"
                 value={rebuttal}
-                maxLength={LIMITS.rebuttal}
                 placeholder={t("decide.reply.placeholder")}
                 onChange={(e) => setRebuttal(e.target.value)}
               />
+              <CharCount value={rebuttal} max={LIMITS.rebuttal} className="-mt-2" />
               <div className={actionRowClass}>
                 <button type="button" className={secondaryButtonClass} disabled={busy} onClick={() => void act({ action: "skip_rebuttal" })}>
                   {t("decide.chat.noReply")}
                 </button>
-                <button type="submit" className={`${primaryButtonClass} py-3 text-base`} disabled={busy}>
+                <button
+                  type="submit"
+                  className={`${primaryButtonClass} py-3 text-base`}
+                  disabled={busy || tooLong(rebuttal, LIMITS.rebuttal)}
+                >
                   <Send className="h-4 w-4" aria-hidden />
                   {t("decide.reply.send")}
                 </button>

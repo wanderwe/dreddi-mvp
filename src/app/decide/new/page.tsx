@@ -23,6 +23,8 @@ import {
   useMyName,
   useErrorText,
   useSignedIn,
+  CharCount,
+  tooLong,
 } from "../shared";
 
 // «Хто правий?»: side A writes the question and their position as the first message of a chat, then
@@ -52,7 +54,11 @@ export default function NewQuickDisputePage() {
     if (q) update({ question: q.slice(0, LIMITS.question) });
   }, [update]);
 
-  const ready = Boolean(draft.question.trim() && draft.position.trim());
+  const ready =
+    Boolean(draft.question.trim() && draft.position.trim()) &&
+    !tooLong(draft.question, LIMITS.question) &&
+    !tooLong(draft.stake, LIMITS.stake) &&
+    !tooLong(draft.position, LIMITS.position);
 
   const create = async (asNickname: string | null) => {
     setBusy(true);
@@ -114,10 +120,10 @@ export default function NewQuickDisputePage() {
             className={`${inputClass} py-3`}
             autoComplete="off"
             value={draft.question}
-            maxLength={LIMITS.question}
             placeholder={t("decide.questionPlaceholder")}
             onChange={(e) => update({ question: e.target.value })}
           />
+          <CharCount value={draft.question} max={LIMITS.question} />
         </label>
 
         {/* Optional, so hidden behind a link and removable, as the counter-condition on a new promise. */}
@@ -135,11 +141,11 @@ export default function NewQuickDisputePage() {
               className={`${inputClass} py-3`}
               autoComplete="off"
               value={draft.stake}
-              maxLength={LIMITS.stake}
               placeholder={t("decide.stake.placeholder")}
               autoFocus={showStake && !draft.stake}
               onChange={(e) => update({ stake: e.target.value })}
             />
+            <CharCount value={draft.stake} max={LIMITS.stake} />
             <div className="flex justify-end">
               <button
                 type="button"
@@ -176,11 +182,11 @@ export default function NewQuickDisputePage() {
               className="min-h-[96px] w-full resize-y bg-transparent text-sm text-tone-100 outline-none placeholder:text-tone-500"
               autoComplete="off"
               value={draft.position}
-              maxLength={LIMITS.position}
               placeholder={t("decide.positionPlaceholder")}
               aria-label={t("decide.positionLabel")}
               onChange={(e) => update({ position: e.target.value })}
             />
+            <CharCount value={draft.position} max={LIMITS.position} />
           </Bubble>
           <Bubble side="other" name="?" label={t("decide.opponent")} ghost delayMs={120}>
             {t("decide.opponentEmpty")}

@@ -23,6 +23,18 @@ export const secondaryButtonClass =
 // A row of actions: the main one on the right on desktop, on top on a phone (the DOM lists it last).
 export const actionRowClass = "flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end";
 
+// Fields keep the whole text, even pasted past the limit: the counter turns red and sending waits until it fits.
+export const tooLong = (value: string, max: number) => value.length > max;
+
+export function CharCount({ value, max, className = "" }: { value: string; max: number; className?: string }) {
+  if (value.length < max * 0.8) return null;
+  return (
+    <p className={`text-right text-xs tabular-nums ${tooLong(value, max) ? "font-semibold text-danger-300" : "text-tone-500"} ${className}`}>
+      {value.length} / {max}
+    </p>
+  );
+}
+
 export async function decideFetch(path: string, init?: RequestInit) {
   const { data } = (await supabaseOptional?.auth.getSession()) ?? { data: { session: null } };
   const token = data.session?.access_token;

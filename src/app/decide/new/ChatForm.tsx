@@ -7,7 +7,7 @@ import { Link2 } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
 import { localizePath } from "@/lib/i18n/routing";
 import { CHAT_LIMITS, CLOSE_OPTIONS, type CloseOption } from "@/lib/chatDisputes/state";
-import { decideFetch, inputClass, primaryButtonClass, useDraft, useErrorText } from "../shared";
+import { CharCount, decideFetch, inputClass, primaryButtonClass, tooLong, useDraft, useErrorText } from "../shared";
 
 // «Хто правий?» for a chat: the creator states the situation and the two positions, picks when it closes,
 // and gets the link for the chat. Everyone, the creator too, then takes a side on that page.
@@ -19,7 +19,11 @@ export function ChatForm() {
   const { draft, update } = useDraft("chat", { question: "", position1: "", position2: "", close: "hour" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ready = Boolean(draft.question.trim() && draft.position1.trim() && draft.position2.trim());
+  const ready =
+    Boolean(draft.question.trim() && draft.position1.trim() && draft.position2.trim()) &&
+    !tooLong(draft.question, CHAT_LIMITS.question) &&
+    !tooLong(draft.position1, CHAT_LIMITS.position) &&
+    !tooLong(draft.position2, CHAT_LIMITS.position);
 
   const create = async () => {
     if (!ready) return;
@@ -59,10 +63,10 @@ export function ChatForm() {
           className={`${inputClass} min-h-[84px] resize-y py-3`}
           autoComplete="off"
           value={draft.question}
-          maxLength={CHAT_LIMITS.question}
           placeholder={t("decide.group.situationPlaceholder")}
           onChange={(e) => update({ question: e.target.value })}
         />
+        <CharCount value={draft.question} max={CHAT_LIMITS.question} />
       </label>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -73,10 +77,10 @@ export function ChatForm() {
               className={`${inputClass} py-3`}
               autoComplete="off"
               value={n === 1 ? draft.position1 : draft.position2}
-              maxLength={CHAT_LIMITS.position}
               placeholder={t(`decide.group.position${n}Placeholder`)}
               onChange={(e) => update(n === 1 ? { position1: e.target.value } : { position2: e.target.value })}
             />
+            <CharCount value={n === 1 ? draft.position1 : draft.position2} max={CHAT_LIMITS.position} />
           </label>
         ))}
       </div>

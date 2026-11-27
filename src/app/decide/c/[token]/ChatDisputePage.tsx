@@ -23,6 +23,8 @@ import {
   secondaryButtonClass,
   useDraftNickname,
   useErrorText,
+  CharCount,
+  tooLong,
 } from "../../shared";
 
 // «Хто правий?» for a chat: one page for everyone with the link. A tap on a position takes that side; the
@@ -315,16 +317,16 @@ export default function ChatDisputePage() {
                   <textarea
                     className={`${inputClass} min-h-[72px] resize-y py-3`}
                     value={argument}
-                    maxLength={CHAT_LIMITS.argument}
                     onChange={(e) => setArgument(e.target.value)}
                   />
+                  <CharCount value={argument} max={CHAT_LIMITS.argument} />
                 </label>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-semibold text-tone-400">{t("decide.youAs", { nickname: view.mine.nickname })}</span>
                   <button
                     type="button"
                     className={`${secondaryButtonClass} w-full sm:w-auto`}
-                    disabled={busy || (!argument.trim() && !view.mine.argument)}
+                    disabled={busy || (!argument.trim() && !view.mine.argument) || tooLong(argument, CHAT_LIMITS.argument)}
                     onClick={() => void saveArgument()}
                   >
                     {t("decide.group.addArgument")}

@@ -23,6 +23,8 @@ import {
   useMyName,
   useErrorText,
   useSignedIn,
+  CharCount,
+  tooLong,
 } from "../../shared";
 
 type Preview = {
@@ -77,7 +79,10 @@ export default function JoinQuickDisputePage() {
   }, [token, signedIn, errorText, router, locale]);
 
   const question = draft.question || preview?.question || "";
-  const ready = Boolean(draft.position.trim() && (!reword || question.trim()));
+  const ready =
+    Boolean(draft.position.trim() && (!reword || question.trim())) &&
+    !tooLong(draft.position, LIMITS.position) &&
+    !(reword && tooLong(question, LIMITS.question));
 
   const join = async (asNickname: string | null) => {
     setBusy(true);
@@ -183,12 +188,12 @@ export default function JoinQuickDisputePage() {
               <textarea
                 className="min-h-[96px] w-full resize-y bg-transparent text-sm text-tone-100 outline-none placeholder:text-tone-500"
                 value={draft.position}
-                maxLength={LIMITS.position}
                 placeholder={t("decide.positionPlaceholder")}
                 aria-label={t("decide.positionLabel")}
                 autoFocus
                 onChange={(e) => update({ position: e.target.value })}
               />
+              <CharCount value={draft.position} max={LIMITS.position} />
             </Bubble>
           )}
         </div>
@@ -220,13 +225,15 @@ export default function JoinQuickDisputePage() {
                 ))}
               </div>
               {reword && (
-                <input
-                  className={inputClass}
-                  value={question}
-                  maxLength={LIMITS.question}
-                  autoFocus
-                  onChange={(e) => update({ question: e.target.value })}
-                />
+                <>
+                  <input
+                    className={inputClass}
+                    value={question}
+                    autoFocus
+                    onChange={(e) => update({ question: e.target.value })}
+                  />
+                  <CharCount value={question} max={LIMITS.question} />
+                </>
               )}
             </div>
 
