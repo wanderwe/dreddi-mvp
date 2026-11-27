@@ -1,7 +1,7 @@
 "use client";
 
 import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Link2 } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -19,13 +19,19 @@ export function ChatForm() {
   const { draft, update } = useDraft("chat", { question: "", position1: "", position2: "", close: "hour" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ready =
-    Boolean(draft.question.trim() && draft.position1.trim() && draft.position2.trim()) &&
-    !tooLong(draft.question, CHAT_LIMITS.question) &&
-    !tooLong(draft.position1, CHAT_LIMITS.position) &&
-    !tooLong(draft.position2, CHAT_LIMITS.position);
+  const questionRef = useRef<HTMLTextAreaElement>(null);
+  const positionRefs = { 1: useRef<HTMLInputElement>(null), 2: useRef<HTMLInputElement>(null) };
+  const overLimit =
+    tooLong(draft.question, CHAT_LIMITS.question) ||
+    tooLong(draft.position1, CHAT_LIMITS.position) ||
+    tooLong(draft.position2, CHAT_LIMITS.position);
+  const ready = Boolean(draft.question.trim() && draft.position1.trim() && draft.position2.trim()) && !overLimit;
 
   const create = async () => {
+    // An empty field sends nothing: the cursor goes to the first one left to fill.
+    if (!draft.question.trim()) return questionRef.current?.focus();
+    if (!draft.position1.trim()) return positionRefs[1].current?.focus();
+    if (!draft.position2.trim()) return positionRefs[2].current?.focus();
     if (!ready) return;
     setBusy(true);
     setError(null);
@@ -60,6 +66,7 @@ export function ChatForm() {
       <label className="block space-y-1.5">
         <span className="text-sm font-semibold text-tone-200">{t("decide.group.situationLabel")}</span>
         <textarea
+          ref={questionRef}
           className={`${inputClass} min-h-[84px] resize-y py-3`}
           autoComplete="off"
           value={draft.question}
@@ -74,6 +81,7 @@ export function ChatForm() {
           <label key={n} className="block space-y-1.5">
             <span className="text-sm font-semibold text-tone-200">{t("decide.group.position", { n })}</span>
             <input
+              ref={positionRefs[n]}
               className={`${inputClass} py-3`}
               autoComplete="off"
               value={n === 1 ? draft.position1 : draft.position2}
@@ -94,7 +102,7 @@ export function ChatForm() {
       />
 
       <div className="flex justify-end">
-        <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
+        <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || overLimit}>
           <Link2 className="h-4 w-4" aria-hidden />
           {t("decide.group.create")}
         </button>

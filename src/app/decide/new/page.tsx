@@ -2,7 +2,7 @@
 
 import { ChoiceToggle } from "@/app/components/ui/ChoiceToggle";
 import { Tooltip } from "@/app/components/ui/Tooltip";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Info, Swords } from "lucide-react";
 import { useLocale, useT } from "@/lib/i18n/I18nProvider";
@@ -54,11 +54,11 @@ export default function NewQuickDisputePage() {
     if (q) update({ question: q.slice(0, LIMITS.question) });
   }, [update]);
 
-  const ready =
-    Boolean(draft.question.trim() && draft.position.trim()) &&
-    !tooLong(draft.question, LIMITS.question) &&
-    !tooLong(draft.stake, LIMITS.stake) &&
-    !tooLong(draft.position, LIMITS.position);
+  const questionRef = useRef<HTMLInputElement>(null);
+  const positionRef = useRef<HTMLTextAreaElement>(null);
+  const overLimit =
+    tooLong(draft.question, LIMITS.question) || tooLong(draft.stake, LIMITS.stake) || tooLong(draft.position, LIMITS.position);
+  const ready = Boolean(draft.question.trim() && draft.position.trim()) && !overLimit;
 
   const create = async (asNickname: string | null) => {
     setBusy(true);
@@ -84,6 +84,9 @@ export default function NewQuickDisputePage() {
   };
 
   const submit = () => {
+    // Like the reply under a verdict: an empty field sends nothing, the cursor goes to it instead.
+    if (!draft.question.trim()) return questionRef.current?.focus();
+    if (!draft.position.trim()) return positionRef.current?.focus();
     if (!ready || signedIn === null) return;
     if (signedIn) void create(null);
     else setAskIdentity(true);
@@ -117,6 +120,7 @@ export default function NewQuickDisputePage() {
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold text-tone-200">{t("decide.questionLabel")}</span>
           <input
+            ref={questionRef}
             className={`${inputClass} py-3`}
             autoComplete="off"
             value={draft.question}
@@ -179,6 +183,7 @@ export default function NewQuickDisputePage() {
               wide
           >
             <textarea
+              ref={positionRef}
               className="min-h-[96px] w-full resize-y bg-transparent text-sm text-tone-100 outline-none placeholder:text-tone-500"
               autoComplete="off"
               value={draft.position}
@@ -197,7 +202,7 @@ export default function NewQuickDisputePage() {
           <IdentityChoice nickname={nickname} busy={busy} onAnonymous={() => void create(nickname)} onSignIn={stash} />
         ) : (
           <div className="flex justify-end">
-            <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || !ready}>
+            <button type="submit" className={`${primaryButtonClass} w-full py-3 text-base sm:w-auto`} disabled={busy || overLimit}>
               <Swords className="h-4 w-4" aria-hidden />
               {t("decide.create")}
             </button>
