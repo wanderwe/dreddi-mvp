@@ -12,10 +12,11 @@ import {
   type QuickVerdict,
 } from "./quickVerdict";
 
-// Server only: one quick verdict, with web search for fact questions; or its single review after the
-// replies, without search, on the sources already found.
+// Server only: one quick verdict, with web search for what can be checked; or its single review after the
+// replies, with one search at most, only to check a new factual claim.
 
 export const MAX_WEB_SEARCHES = 3;
+const MAX_REVIEW_WEB_SEARCHES = 1;
 // $ per search (web search is billed apart from tokens).
 const SEARCH_PRICE = 0.01;
 // A search-heavy answer may pause; it is resumed a couple of times at most.
@@ -47,7 +48,13 @@ export async function askQuickVerdict(input: QuickDisputeInput): Promise<QuickVe
         max_tokens: 4000,
         system: review ? `${buildQuickVerdictSystem(input.lang)}\n\n${buildQuickReviewRules()}` : buildQuickVerdictSystem(input.lang),
         messages,
-        ...(review ? {} : { tools: [{ type: "web_search_20250305" as const, name: "web_search" as const, max_uses: MAX_WEB_SEARCHES }] }),
+        tools: [
+          {
+            type: "web_search_20250305" as const,
+            name: "web_search" as const,
+            max_uses: review ? MAX_REVIEW_WEB_SEARCHES : MAX_WEB_SEARCHES,
+          },
+        ],
         output_config: { effort: "medium", format: zodOutputFormat(QuickVerdictSchema) },
       });
       inputTokens += response.usage.input_tokens;
@@ -68,7 +75,7 @@ export async function askQuickVerdict(input: QuickDisputeInput): Promise<QuickVe
         explanation: tidy(parsed.explanation),
         nuance: parsed.nuance ? tidy(parsed.nuance) : null,
         share_text: tidy(parsed.share_text).slice(0, 200),
-        // A review adds no sources: it keeps the ones it was given when it drops them all.
+        // A review that drops every source keeps the ones it was given.
         sources: review && parsed.sources.length === 0 ? (input.previousVerdict?.sources ?? []) : cleanSources(parsed.sources),
         // Interpersonal questions always point to a real agreement.
         suggest_mediation: parsed.suggest_mediation || parsed.question_type === "interpersonal",
